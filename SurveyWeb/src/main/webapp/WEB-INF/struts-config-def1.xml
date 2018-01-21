@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC 
+"-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" 
+"http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+
+	<form-beans>
+		<form-bean name="dynaTestSomethingForm"
+			type="org.apache.struts.action.DynaActionForm">
+			<form-property name="method" type="java.lang.String" />
+		</form-bean>
+	</form-beans>
+
+	<action-mappings>
+		<action path="/SqlQuery"
+			type="org.springframework.web.struts.DelegatingActionProxy"
+			parameter="method" name="dynaCustomerListForm">
+			<forward name="success" path="/pages/utility/sql_query_list.tiles" />
+		</action>
+
+		<action path="/TestSomething"
+			type="org.springframework.web.struts.DelegatingActionProxy"
+			parameter="method" name="dynaTestSomethingForm">
+			<forward name="test_index" path="/pages/test/test_index.tiles" />
+		</action>
+		
+		<action path="/TestSomething2"
+			type="org.springframework.web.struts.DelegatingActionProxy"
+			parameter="method" name="dynaTestSomethingForm">
+			<forward name="test_index2" path="/pages/test/test_index2.tiles" />
+		</action>
+	</action-mappings>
+
+</struts-config>

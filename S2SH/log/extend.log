@@ -1,0 +1,2064 @@
+2017-07-04 09:31:56,003 DEBUG - 
+2017-07-04 09:33:26,088 DEBUG - 
+2017-07-04 09:33:57,178 DEBUG - 
+2017-07-04 09:37:32,930 DEBUG - 
+2017-07-04 09:46:45,998 DEBUG - 
+2017-07-04 09:49:28,068 DEBUG - 
+2017-07-04 09:50:29,117 DEBUG - 
+2017-07-04 09:51:13,328 DEBUG - 
+2017-07-04 09:52:51,258 DEBUG - 
+2017-07-04 09:56:05,794 DEBUG - 
+2017-07-04 09:57:30,398 DEBUG - 
+2017-07-04 09:58:26,577 DEBUG - 
+2017-07-04 10:19:53,143 DEBUG - 
+2017-07-04 10:26:34,449 DEBUG - 
+2017-07-04 10:42:07,631 DEBUG - 
+2017-07-04 10:42:56,668 DEBUG - 
+2017-07-04 11:11:35,505 DEBUG - 
+2017-07-04 11:12:17,656 DEBUG - #. LoginAction .s
+2017-07-04 11:12:17,661 DEBUG - #. input .s
+2017-07-04 11:12:17,670 DEBUG - ---<null>
+2017-07-04 11:12:17,671 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 11:12:17,671 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 11:12:17,671 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 11:12:17,672 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 11:12:17,673 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 11:12:17,673 DEBUG - bean - loginAction
+2017-07-04 11:12:17,674 DEBUG - bean - indexAction
+2017-07-04 11:12:17,675 DEBUG - bean - userDao
+2017-07-04 11:12:17,675 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 11:12:17,676 DEBUG - bean - entityManagerFactory
+2017-07-04 11:12:17,677 DEBUG - bean - dataSource
+2017-07-04 11:12:17,678 DEBUG - bean - transactionManager
+2017-07-04 11:12:17,678 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 11:12:17,678 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 11:12:17,678 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 11:12:17,679 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 11:12:17,679 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 11:12:17,679 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 11:12:17,710 DEBUG - dao = gtu.model.dao.UserDaoImpl@408f6cac
+2017-07-04 11:12:18,147 DEBUG - #. LoginAction .e
+2017-07-04 11:12:18,197 DEBUG - #. ActionSupport .s
+2017-07-04 11:12:19,142 DEBUG - #. ActionSupport .e
+2017-07-04 11:16:59,418 DEBUG - 
+2017-07-04 11:17:17,867 DEBUG - 
+2017-07-04 11:17:28,661 DEBUG - #. /.index.execute .s
+2017-07-04 11:17:29,307 DEBUG - #. /.index.execute .e
+2017-07-04 11:17:57,180 DEBUG - #. /.Login_input.input .s
+2017-07-04 11:17:57,191 DEBUG - ---<null>
+2017-07-04 11:17:57,192 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 11:17:57,192 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 11:17:57,192 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 11:17:57,192 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 11:17:57,192 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 11:17:57,193 DEBUG - bean - loginAction
+2017-07-04 11:17:57,193 DEBUG - bean - indexAction
+2017-07-04 11:17:57,193 DEBUG - bean - userDao
+2017-07-04 11:17:57,193 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 11:17:57,193 DEBUG - bean - entityManagerFactory
+2017-07-04 11:17:57,193 DEBUG - bean - dataSource
+2017-07-04 11:17:57,193 DEBUG - bean - transactionManager
+2017-07-04 11:17:57,194 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 11:17:57,194 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 11:17:57,194 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 11:17:57,194 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 11:17:57,195 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 11:17:57,195 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 11:17:57,214 DEBUG - dao = gtu.model.dao.UserDaoImpl@2153e5f5
+2017-07-04 11:17:57,470 DEBUG - #. /.Login_input.input .e
+2017-07-04 11:17:57,483 DEBUG - #. /.index.execute .s
+2017-07-04 11:17:57,581 DEBUG - #. /.index.execute .e
+2017-07-04 11:20:11,083 DEBUG - 
+2017-07-04 11:20:28,697 DEBUG - 
+2017-07-04 11:21:25,272 DEBUG - 
+2017-07-04 11:23:08,075 DEBUG - 
+2017-07-04 11:32:18,299 DEBUG - 
+2017-07-04 14:04:58,508 DEBUG - 
+2017-07-04 14:05:35,685 DEBUG - 
+2017-07-04 14:05:59,391 DEBUG - #. act[StrutsActionProxy]ns[/]an[Login_input]mth[input] .s
+2017-07-04 14:05:59,409 DEBUG - ---<null>
+2017-07-04 14:05:59,411 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:05:59,411 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:05:59,411 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:05:59,411 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:05:59,412 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:05:59,412 DEBUG - bean - loginAction
+2017-07-04 14:05:59,412 DEBUG - bean - indexAction
+2017-07-04 14:05:59,413 DEBUG - bean - userDao
+2017-07-04 14:05:59,413 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:05:59,413 DEBUG - bean - entityManagerFactory
+2017-07-04 14:05:59,414 DEBUG - bean - dataSource
+2017-07-04 14:05:59,414 DEBUG - bean - transactionManager
+2017-07-04 14:05:59,414 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:05:59,415 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:05:59,415 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:05:59,415 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:05:59,415 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:05:59,416 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:05:59,444 DEBUG - dao = gtu.model.dao.UserDaoImpl@3b9befb4
+2017-07-04 14:05:59,782 DEBUG - #. act[StrutsActionProxy]ns[/]an[Login_input]mth[input] rtn[index] .e
+2017-07-04 14:05:59,836 DEBUG - #. act[StrutsActionProxy]ns[/]an[index]mth[execute] .s
+2017-07-04 14:06:00,514 DEBUG - #. act[StrutsActionProxy]ns[/]an[index]mth[execute] rtn[success] .e
+2017-07-04 14:07:30,223 DEBUG - 
+2017-07-04 14:07:35,945 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:07:36,551 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] rtn[success] .e
+2017-07-04 14:09:01,308 DEBUG - 
+2017-07-04 14:09:07,432 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:09:07,999 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:09:42,179 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_input],method[input] .s
+2017-07-04 14:09:42,191 DEBUG - ---<null>
+2017-07-04 14:09:42,191 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:09:42,191 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:09:42,192 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:09:42,192 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:09:42,192 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:09:42,192 DEBUG - bean - loginAction
+2017-07-04 14:09:42,192 DEBUG - bean - indexAction
+2017-07-04 14:09:42,193 DEBUG - bean - userDao
+2017-07-04 14:09:42,193 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:09:42,193 DEBUG - bean - entityManagerFactory
+2017-07-04 14:09:42,193 DEBUG - bean - dataSource
+2017-07-04 14:09:42,193 DEBUG - bean - transactionManager
+2017-07-04 14:09:42,193 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:09:42,194 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:09:42,194 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:09:42,194 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:09:42,194 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:09:42,194 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:09:42,212 DEBUG - dao = gtu.model.dao.UserDaoImpl@6cc51187
+2017-07-04 14:09:42,417 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_input],method[input] -> result[index] .e
+2017-07-04 14:09:42,424 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:09:42,524 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:10:07,964 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_input],method[input] .s
+2017-07-04 14:10:07,965 DEBUG - ---<null>
+2017-07-04 14:10:07,965 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:10:07,965 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:10:07,966 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:10:07,966 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:10:07,966 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:10:07,966 DEBUG - bean - loginAction
+2017-07-04 14:10:07,967 DEBUG - bean - indexAction
+2017-07-04 14:10:07,967 DEBUG - bean - userDao
+2017-07-04 14:10:07,967 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:10:07,967 DEBUG - bean - entityManagerFactory
+2017-07-04 14:10:07,967 DEBUG - bean - dataSource
+2017-07-04 14:10:07,967 DEBUG - bean - transactionManager
+2017-07-04 14:10:07,967 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:10:07,969 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:10:07,971 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:10:07,971 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:10:07,972 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:10:07,972 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:10:07,972 DEBUG - dao = gtu.model.dao.UserDaoImpl@6cc51187
+2017-07-04 14:10:07,976 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_input],method[input] -> result[index] .e
+2017-07-04 14:10:07,989 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:10:08,077 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:10:22,227 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_goCreate],method[goCreate] .s
+2017-07-04 14:10:23,736 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_goCreate],method[goCreate] -> result[goCreate] .e
+2017-07-04 14:10:36,440 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_doCreate],method[doCreate] .s
+2017-07-04 14:10:36,444 DEBUG - ---<null>
+2017-07-04 14:12:33,271 DEBUG - 
+2017-07-04 14:12:42,531 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_doCreate],method[doCreate] .s
+2017-07-04 14:12:42,542 DEBUG - ---<null>
+2017-07-04 14:14:47,728 DEBUG - 
+2017-07-04 14:14:55,702 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_doCreate],method[doCreate] .s
+2017-07-04 14:14:55,718 DEBUG - ---<null>
+2017-07-04 14:16:35,697 DEBUG - 
+2017-07-04 14:16:52,634 DEBUG - 
+2017-07-04 14:17:02,822 DEBUG - #. action[LoginAction],namespace[/],act_name[Login_doCreate],method[doCreate] .s
+2017-07-04 14:17:02,834 DEBUG - ---<null>
+2017-07-04 14:24:29,025 DEBUG - 
+2017-07-04 14:24:49,745 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:24:49,746 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:24:49,768 DEBUG - ---<null>
+2017-07-04 14:26:20,818 DEBUG - 
+2017-07-04 14:26:29,355 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:29,356 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:29,370 DEBUG - ---<null>
+2017-07-04 14:26:29,371 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:26:29,372 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:26:29,372 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:26:29,372 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:26:29,372 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:26:29,372 DEBUG - bean - loginAction
+2017-07-04 14:26:29,373 DEBUG - bean - indexAction
+2017-07-04 14:26:29,373 DEBUG - bean - userDao
+2017-07-04 14:26:29,373 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:26:29,373 DEBUG - bean - entityManagerFactory
+2017-07-04 14:26:29,373 DEBUG - bean - dataSource
+2017-07-04 14:26:29,374 DEBUG - bean - transactionManager
+2017-07-04 14:26:29,374 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:26:29,374 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:26:29,374 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:26:29,374 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:26:29,375 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:26:29,375 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:26:29,393 DEBUG - dao = gtu.model.dao.UserDaoImpl@542ef738
+2017-07-04 14:26:29,641 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:29,641 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:29,684 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:26:30,696 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:26:33,507 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:33,507 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:33,507 DEBUG - ---<null>
+2017-07-04 14:26:33,508 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:26:33,508 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:26:33,508 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:26:33,509 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:26:33,509 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:26:33,509 DEBUG - bean - loginAction
+2017-07-04 14:26:33,510 DEBUG - bean - indexAction
+2017-07-04 14:26:33,511 DEBUG - bean - userDao
+2017-07-04 14:26:33,511 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:26:33,511 DEBUG - bean - entityManagerFactory
+2017-07-04 14:26:33,511 DEBUG - bean - dataSource
+2017-07-04 14:26:33,512 DEBUG - bean - transactionManager
+2017-07-04 14:26:33,512 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:26:33,512 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:26:33,512 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:26:33,513 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:26:33,513 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:26:33,513 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:26:33,513 DEBUG - dao = gtu.model.dao.UserDaoImpl@542ef738
+2017-07-04 14:26:33,517 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:33,517 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:33,579 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:26:33,792 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:26:42,271 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:42,271 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:26:42,272 DEBUG - ---<null>
+2017-07-04 14:26:42,272 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:26:42,272 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:26:42,272 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:26:42,272 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:26:42,272 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:26:42,272 DEBUG - bean - loginAction
+2017-07-04 14:26:42,273 DEBUG - bean - indexAction
+2017-07-04 14:26:42,273 DEBUG - bean - userDao
+2017-07-04 14:26:42,273 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:26:42,273 DEBUG - bean - entityManagerFactory
+2017-07-04 14:26:42,273 DEBUG - bean - dataSource
+2017-07-04 14:26:42,273 DEBUG - bean - transactionManager
+2017-07-04 14:26:42,274 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:26:42,274 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:26:42,274 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:26:42,274 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:26:42,274 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:26:42,275 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:26:42,275 DEBUG - dao = gtu.model.dao.UserDaoImpl@542ef738
+2017-07-04 14:26:42,278 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:42,278 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:26:42,295 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:26:42,385 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:27:28,717 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:27:28,718 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:28:21,889 DEBUG - 
+2017-07-04 14:28:30,132 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:28:30,133 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:28:36,420 DEBUG - ---<null>
+2017-07-04 14:28:40,465 DEBUG - bean - org.springframework.context.annotation.internalConfigurationAnnotationProcessor
+2017-07-04 14:28:40,467 DEBUG - bean - org.springframework.context.annotation.internalAutowiredAnnotationProcessor
+2017-07-04 14:28:40,469 DEBUG - bean - org.springframework.context.annotation.internalRequiredAnnotationProcessor
+2017-07-04 14:28:40,471 DEBUG - bean - org.springframework.context.annotation.internalCommonAnnotationProcessor
+2017-07-04 14:28:40,475 DEBUG - bean - org.springframework.context.annotation.internalPersistenceAnnotationProcessor
+2017-07-04 14:28:40,476 DEBUG - bean - loginAction
+2017-07-04 14:28:40,478 DEBUG - bean - indexAction
+2017-07-04 14:28:40,480 DEBUG - bean - userDao
+2017-07-04 14:28:40,482 DEBUG - bean - org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor#0
+2017-07-04 14:28:40,484 DEBUG - bean - entityManagerFactory
+2017-07-04 14:28:40,486 DEBUG - bean - dataSource
+2017-07-04 14:28:40,487 DEBUG - bean - transactionManager
+2017-07-04 14:28:40,489 DEBUG - bean - org.springframework.aop.config.internalAutoProxyCreator
+2017-07-04 14:28:40,490 DEBUG - bean - org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0
+2017-07-04 14:28:40,491 DEBUG - bean - org.springframework.transaction.interceptor.TransactionInterceptor#0
+2017-07-04 14:28:40,492 DEBUG - bean - org.springframework.transaction.config.internalTransactionAdvisor
+2017-07-04 14:28:40,493 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor
+2017-07-04 14:28:40,494 DEBUG - bean - org.springframework.context.annotation.ConfigurationClassPostProcessor.enhancedConfigurationProcessor
+2017-07-04 14:28:42,998 DEBUG - dao = gtu.model.dao.UserDaoImpl@1a075ea5
+2017-07-04 14:28:52,699 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:28:52,699 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:28:52,720 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:28:53,222 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:29:43,450 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:29:43,556 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:33:03,649 DEBUG - 
+2017-07-04 14:33:12,564 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:33:12,565 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:33:18,424 DEBUG - ---<null>
+2017-07-04 14:33:18,861 DEBUG - dao = gtu.model.dao.UserDaoImpl@101c0
+2017-07-04 14:33:31,128 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:33:31,128 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:33:31,148 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:33:31,646 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:41:56,011 DEBUG - 
+2017-07-04 14:42:11,610 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:42:11,611 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:42:15,397 DEBUG - ---<null>
+2017-07-04 14:42:15,874 DEBUG - dao = gtu.model.dao.UserDaoImpl@33f8bb4e
+2017-07-04 14:43:10,348 DEBUG - 
+2017-07-04 14:43:16,505 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:43:16,507 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:43:16,520 DEBUG - ---<null>
+2017-07-04 14:43:16,543 DEBUG - dao = gtu.model.dao.UserDaoImpl@337d6aee
+2017-07-04 14:44:21,273 DEBUG - 
+2017-07-04 14:44:27,724 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:44:27,725 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:44:27,737 DEBUG - ---<null>
+2017-07-04 14:44:27,755 DEBUG - dao = gtu.model.dao.UserDaoImpl@5b698b07
+2017-07-04 14:44:27,828 DEBUG - total size = 0
+2017-07-04 14:44:28,066 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:44:28,066 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:44:28,099 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:44:28,611 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:45:30,389 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 14:45:30,389 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 14:45:31,568 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] -> result[goCreate] .e
+2017-07-04 14:45:31,568 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] -> result[goCreate] .e
+2017-07-04 14:45:41,874 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:45:41,875 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:45:41,876 DEBUG - ---<null>
+2017-07-04 14:48:35,541 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:48:35,542 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:48:35,543 DEBUG - ---<null>
+2017-07-04 14:48:41,144 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:48:41,145 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:48:41,146 DEBUG - ---<null>
+2017-07-04 14:50:52,095 DEBUG - 
+2017-07-04 14:50:57,350 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:50:57,351 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 14:50:57,362 DEBUG - ---<null>
+2017-07-04 14:50:57,395 ERROR - attempt to create create event with null entity
+java.lang.IllegalArgumentException: attempt to create create event with null entity
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:44)
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:37)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:784)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:789)
+	at org.hibernate.jpa.spi.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:1181)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:344)
+	at com.sun.proxy.$Proxy40.persist(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:291)
+	at com.sun.proxy.$Proxy35.persist(Unknown Source)
+	at gtu.model.dao.UserDaoImpl.insert(UserDaoImpl.java:46)
+	at gtu.model.dao.UserDaoImpl$$FastClassBySpringCGLIB$$d7b8ed00.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:717)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:281)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:653)
+	at gtu.model.dao.UserDaoImpl$$EnhancerBySpringCGLIB$$44ba2e4c.insert(<generated>)
+	at gtu.action.LoginAction.doCreate(LoginAction.java:43)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at ognl.OgnlRuntime.invokeMethod(OgnlRuntime.java:870)
+	at ognl.OgnlRuntime.callAppropriateMethod(OgnlRuntime.java:1293)
+	at ognl.ObjectMethodAccessor.callMethod(ObjectMethodAccessor.java:68)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethodWithDebugInfo(XWorkMethodAccessor.java:117)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethod(XWorkMethodAccessor.java:108)
+	at ognl.OgnlRuntime.callMethod(OgnlRuntime.java:1369)
+	at ognl.ASTMethod.getValueBody(ASTMethod.java:90)
+	at ognl.SimpleNode.evaluateGetValueBody(SimpleNode.java:212)
+	at ognl.SimpleNode.getValue(SimpleNode.java:258)
+	at ognl.Ognl.getValue(Ognl.java:494)
+	at ognl.Ognl.getValue(Ognl.java:458)
+	at com.opensymphony.xwork2.ognl.OgnlUtil$2.execute(OgnlUtil.java:309)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.compileAndExecute(OgnlUtil.java:340)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.getValue(OgnlUtil.java:307)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeAction(DefaultActionInvocation.java:423)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeActionOnly(DefaultActionInvocation.java:287)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:250)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 14:50:57,398 ERROR - attempt to create create event with null entity
+java.lang.IllegalArgumentException: attempt to create create event with null entity
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:44)
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:37)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:784)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:789)
+	at org.hibernate.jpa.spi.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:1181)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:344)
+	at com.sun.proxy.$Proxy40.persist(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:291)
+	at com.sun.proxy.$Proxy35.persist(Unknown Source)
+	at gtu.model.dao.UserDaoImpl.insert(UserDaoImpl.java:46)
+	at gtu.model.dao.UserDaoImpl$$FastClassBySpringCGLIB$$d7b8ed00.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:717)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:281)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:653)
+	at gtu.model.dao.UserDaoImpl$$EnhancerBySpringCGLIB$$44ba2e4c.insert(<generated>)
+	at gtu.action.LoginAction.doCreate(LoginAction.java:43)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at ognl.OgnlRuntime.invokeMethod(OgnlRuntime.java:870)
+	at ognl.OgnlRuntime.callAppropriateMethod(OgnlRuntime.java:1293)
+	at ognl.ObjectMethodAccessor.callMethod(ObjectMethodAccessor.java:68)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethodWithDebugInfo(XWorkMethodAccessor.java:117)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethod(XWorkMethodAccessor.java:108)
+	at ognl.OgnlRuntime.callMethod(OgnlRuntime.java:1369)
+	at ognl.ASTMethod.getValueBody(ASTMethod.java:90)
+	at ognl.SimpleNode.evaluateGetValueBody(SimpleNode.java:212)
+	at ognl.SimpleNode.getValue(SimpleNode.java:258)
+	at ognl.Ognl.getValue(Ognl.java:494)
+	at ognl.Ognl.getValue(Ognl.java:458)
+	at com.opensymphony.xwork2.ognl.OgnlUtil$2.execute(OgnlUtil.java:309)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.compileAndExecute(OgnlUtil.java:340)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.getValue(OgnlUtil.java:307)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeAction(DefaultActionInvocation.java:423)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeActionOnly(DefaultActionInvocation.java:287)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:250)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 14:51:00,532 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:51:00,532 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:51:00,533 DEBUG - ---<null>
+2017-07-04 14:51:00,536 DEBUG - dao = gtu.model.dao.UserDaoImpl@771e4773
+2017-07-04 14:51:00,622 DEBUG - total size = 0
+2017-07-04 14:51:00,811 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:51:00,812 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:51:00,841 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:51:01,248 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:51:04,353 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:51:04,354 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:51:04,354 DEBUG - ---<null>
+2017-07-04 14:51:04,355 DEBUG - dao = gtu.model.dao.UserDaoImpl@771e4773
+2017-07-04 14:51:04,356 DEBUG - total size = 0
+2017-07-04 14:51:04,358 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:51:04,359 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:51:04,375 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:51:04,468 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 14:55:09,702 DEBUG - 
+2017-07-04 14:55:16,517 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:55:16,518 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 14:55:16,529 DEBUG - ---<null>
+2017-07-04 14:55:16,548 DEBUG - dao = gtu.model.dao.UserDaoImpl@43be018f
+2017-07-04 14:55:16,622 DEBUG - total size = 0
+2017-07-04 14:55:16,826 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:55:16,826 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 14:55:16,856 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 14:55:17,417 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:01:03,219 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:01:03,220 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:01:12,056 DEBUG - ---<null>
+2017-07-04 15:01:14,131 DEBUG - dao = gtu.model.dao.UserDaoImpl@43be018f
+2017-07-04 15:01:15,046 DEBUG - total size = 0
+2017-07-04 15:01:21,525 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:01:21,544 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:01:21,563 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:01:21,668 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:03:23,457 DEBUG - 
+2017-07-04 15:04:05,786 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:04:05,787 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:04:09,998 DEBUG - ---<null>
+2017-07-04 15:04:10,956 DEBUG - dao = gtu.model.dao.UserDaoImpl@710f66be
+2017-07-04 15:04:12,177 DEBUG - total size = 0
+2017-07-04 15:04:15,580 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:04:15,580 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:04:15,613 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:04:16,119 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:04:58,745 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:04:58,746 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:05:02,179 DEBUG - ---<null>
+2017-07-04 15:05:05,885 DEBUG - dao = gtu.model.dao.UserDaoImpl@710f66be
+2017-07-04 15:05:07,439 DEBUG - total size = 0
+2017-07-04 15:05:10,113 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:05:10,114 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:05:10,147 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:05:10,292 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:06:07,250 DEBUG - 
+2017-07-04 15:06:16,898 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:06:16,899 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:06:20,487 DEBUG - ---<null>
+2017-07-04 15:06:20,536 DEBUG - dao = gtu.model.dao.UserDaoImpl@1fc190a6
+2017-07-04 15:06:20,604 DEBUG - total size = 0
+2017-07-04 15:06:20,797 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:06:20,797 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:06:20,818 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:06:21,315 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:09:51,793 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:09:51,794 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:09:54,373 DEBUG - ---<null>
+2017-07-04 15:09:55,172 DEBUG - dao = gtu.model.dao.UserDaoImpl@1fc190a6
+2017-07-04 15:09:56,214 DEBUG - total size = 0
+2017-07-04 15:09:59,054 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:09:59,055 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:09:59,107 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:10:00,252 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:10:19,858 DEBUG - 
+2017-07-04 15:11:01,235 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:11:01,236 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:11:04,487 DEBUG - ---<null>
+2017-07-04 15:11:04,521 DEBUG - dao = gtu.model.dao.UserDaoImpl@23afcd8
+2017-07-04 15:11:04,595 DEBUG - total size = 0
+2017-07-04 15:11:04,797 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:11:04,797 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:11:04,832 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:11:05,342 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:11:17,708 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:11:17,708 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:11:20,466 DEBUG - ---<null>
+2017-07-04 15:11:56,778 DEBUG - dao = gtu.model.dao.UserDaoImpl@23afcd8
+2017-07-04 15:11:57,708 DEBUG - total size = 0
+2017-07-04 15:12:00,917 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:12:00,918 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:12:00,936 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:12:01,042 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:12:40,456 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:12:40,755 ERROR - /pages/login/login.jsp(24,4) According to TLD or attribute directive in tag file, attribute name does not accept any expressions
+org.apache.jasper.JasperException: /pages/login/login.jsp(24,4) According to TLD or attribute directive in tag file, attribute name does not accept any expressions
+	at org.apache.jasper.compiler.DefaultErrorHandler.jspError(DefaultErrorHandler.java:40)
+	at org.apache.jasper.compiler.ErrorDispatcher.dispatch(ErrorDispatcher.java:407)
+	at org.apache.jasper.compiler.ErrorDispatcher.jspError(ErrorDispatcher.java:148)
+	at org.apache.jasper.compiler.Validator$ValidateVisitor.checkXmlAttributes(Validator.java:1209)
+	at org.apache.jasper.compiler.Validator$ValidateVisitor.visit(Validator.java:846)
+	at org.apache.jasper.compiler.Node$CustomTag.accept(Node.java:1530)
+	at org.apache.jasper.compiler.Node$Nodes.visit(Node.java:2361)
+	at org.apache.jasper.compiler.Node$Visitor.visitBody(Node.java:2411)
+	at org.apache.jasper.compiler.Validator$ValidateVisitor.visit(Validator.java:865)
+	at org.apache.jasper.compiler.Node$CustomTag.accept(Node.java:1530)
+	at org.apache.jasper.compiler.Node$Nodes.visit(Node.java:2361)
+	at org.apache.jasper.compiler.Node$Visitor.visitBody(Node.java:2411)
+	at org.apache.jasper.compiler.Node$Visitor.visit(Node.java:2417)
+	at org.apache.jasper.compiler.Node$Root.accept(Node.java:495)
+	at org.apache.jasper.compiler.Node$Nodes.visit(Node.java:2361)
+	at org.apache.jasper.compiler.Validator.validateExDirectives(Validator.java:1763)
+	at org.apache.jasper.compiler.Compiler.generateJava(Compiler.java:198)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:347)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:327)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:314)
+	at org.apache.jasper.JspCompilationContext.compile(JspCompilationContext.java:592)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:317)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 15:13:09,693 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:13:10,676 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:13:13,720 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:13:13,720 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:13:16,437 DEBUG - ---<null>
+2017-07-04 15:13:17,248 DEBUG - dao = gtu.model.dao.UserDaoImpl@23afcd8
+2017-07-04 15:13:17,720 DEBUG - total size = 0
+2017-07-04 15:13:22,095 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:13:22,101 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:13:22,129 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:13:22,252 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:18:09,541 DEBUG - 
+2017-07-04 15:19:53,683 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:19:53,685 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:19:56,695 DEBUG - ---<null>
+2017-07-04 15:19:57,600 DEBUG - dao = gtu.model.dao.UserDaoImpl@3653c9fd
+2017-07-04 15:19:58,283 DEBUG - total size = 0
+2017-07-04 15:20:02,040 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:20:02,041 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:20:02,064 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:20:02,654 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:21:48,789 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:21:50,596 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:21:53,757 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:21:53,757 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:21:56,190 DEBUG - ---<null>
+2017-07-04 15:21:56,536 DEBUG - dao = gtu.model.dao.UserDaoImpl@3653c9fd
+2017-07-04 15:21:58,850 DEBUG - total size = 0
+2017-07-04 15:22:03,416 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:22:03,417 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:22:03,468 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:22:03,578 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:24:53,556 DEBUG - 
+2017-07-04 15:25:25,888 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:25:27,203 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:25:31,473 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:25:31,474 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:25:31,475 DEBUG - test ---- null
+2017-07-04 15:25:34,266 DEBUG - ---<null>
+2017-07-04 15:25:37,678 DEBUG - dao = gtu.model.dao.UserDaoImpl@1751d392
+2017-07-04 15:25:39,354 DEBUG - total size = 0
+2017-07-04 15:25:41,459 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:25:41,460 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:25:41,480 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:25:41,598 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:25:45,135 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:25:45,236 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:25:49,522 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:25:49,522 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:25:49,522 DEBUG - test ---- null
+2017-07-04 15:25:52,151 DEBUG - ---<null>
+2017-07-04 15:25:53,492 DEBUG - dao = gtu.model.dao.UserDaoImpl@1751d392
+2017-07-04 15:25:56,243 DEBUG - total size = 0
+2017-07-04 15:26:07,005 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:26:07,007 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:26:07,056 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:26:07,188 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:26:34,114 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:26:34,115 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:26:34,115 DEBUG - test ---- null
+2017-07-04 15:26:40,893 DEBUG - ---<null>
+2017-07-04 15:27:14,977 DEBUG - dao = gtu.model.dao.UserDaoImpl@1751d392
+2017-07-04 15:27:19,878 DEBUG - total size = 0
+2017-07-04 15:27:33,780 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:27:33,781 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:27:33,810 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:27:33,909 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:30:03,418 DEBUG - 
+2017-07-04 15:30:28,035 DEBUG - 
+2017-07-04 15:30:39,873 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:30:39,874 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:30:39,878 DEBUG - test ---- null
+2017-07-04 15:30:51,193 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:30:51,766 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:31:21,460 DEBUG - ---<null>
+2017-07-04 15:31:24,088 DEBUG - dao = gtu.model.dao.UserDaoImpl@4670231d
+2017-07-04 15:31:25,026 DEBUG - total size = 0
+2017-07-04 15:31:27,415 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:31:27,415 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:31:31,807 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 15:31:31,808 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 15:31:32,048 ERROR - /pages/login/accountCreate.jsp(21,53) Unterminated &lt;s:textfield tag
+org.apache.jasper.JasperException: /pages/login/accountCreate.jsp(21,53) Unterminated &lt;s:textfield tag
+	at org.apache.jasper.compiler.DefaultErrorHandler.jspError(DefaultErrorHandler.java:40)
+	at org.apache.jasper.compiler.ErrorDispatcher.dispatch(ErrorDispatcher.java:407)
+	at org.apache.jasper.compiler.ErrorDispatcher.jspError(ErrorDispatcher.java:132)
+	at org.apache.jasper.compiler.Parser.parseOptionalBody(Parser.java:967)
+	at org.apache.jasper.compiler.Parser.parseCustomTag(Parser.java:1245)
+	at org.apache.jasper.compiler.Parser.parseElements(Parser.java:1421)
+	at org.apache.jasper.compiler.Parser.parseBody(Parser.java:1633)
+	at org.apache.jasper.compiler.Parser.parseOptionalBody(Parser.java:977)
+	at org.apache.jasper.compiler.Parser.parseCustomTag(Parser.java:1245)
+	at org.apache.jasper.compiler.Parser.parseElements(Parser.java:1421)
+	at org.apache.jasper.compiler.Parser.parse(Parser.java:130)
+	at org.apache.jasper.compiler.ParserController.doParse(ParserController.java:255)
+	at org.apache.jasper.compiler.ParserController.parse(ParserController.java:103)
+	at org.apache.jasper.compiler.Compiler.generateJava(Compiler.java:185)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:347)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:327)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:314)
+	at org.apache.jasper.JspCompilationContext.compile(JspCompilationContext.java:592)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:317)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 15:31:32,054 ERROR - /pages/login/accountCreate.jsp(21,53) Unterminated &lt;s:textfield tag
+org.apache.jasper.JasperException: /pages/login/accountCreate.jsp(21,53) Unterminated &lt;s:textfield tag
+	at org.apache.jasper.compiler.DefaultErrorHandler.jspError(DefaultErrorHandler.java:40)
+	at org.apache.jasper.compiler.ErrorDispatcher.dispatch(ErrorDispatcher.java:407)
+	at org.apache.jasper.compiler.ErrorDispatcher.jspError(ErrorDispatcher.java:132)
+	at org.apache.jasper.compiler.Parser.parseOptionalBody(Parser.java:967)
+	at org.apache.jasper.compiler.Parser.parseCustomTag(Parser.java:1245)
+	at org.apache.jasper.compiler.Parser.parseElements(Parser.java:1421)
+	at org.apache.jasper.compiler.Parser.parseBody(Parser.java:1633)
+	at org.apache.jasper.compiler.Parser.parseOptionalBody(Parser.java:977)
+	at org.apache.jasper.compiler.Parser.parseCustomTag(Parser.java:1245)
+	at org.apache.jasper.compiler.Parser.parseElements(Parser.java:1421)
+	at org.apache.jasper.compiler.Parser.parse(Parser.java:130)
+	at org.apache.jasper.compiler.ParserController.doParse(ParserController.java:255)
+	at org.apache.jasper.compiler.ParserController.parse(ParserController.java:103)
+	at org.apache.jasper.compiler.Compiler.generateJava(Compiler.java:185)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:347)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:327)
+	at org.apache.jasper.compiler.Compiler.compile(Compiler.java:314)
+	at org.apache.jasper.JspCompilationContext.compile(JspCompilationContext.java:592)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:317)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 15:31:54,086 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 15:31:54,087 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] .s
+2017-07-04 15:31:54,966 DEBUG - ####### ----- getUser
+2017-07-04 15:31:54,994 DEBUG - ####### ----- getUser
+2017-07-04 15:31:54,999 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,071 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,088 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,090 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,097 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,099 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,100 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,107 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,109 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,110 DEBUG - ####### ----- getUser
+2017-07-04 15:31:55,117 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] -> result[goCreate] .e
+2017-07-04 15:31:55,118 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!goCreate],method[goCreate] -> result[goCreate] .e
+2017-07-04 15:31:59,085 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 15:31:59,086 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!doCreate],method[doCreate] .s
+2017-07-04 15:31:59,092 DEBUG - ---<null>
+2017-07-04 15:31:59,096 ERROR - attempt to create create event with null entity
+java.lang.IllegalArgumentException: attempt to create create event with null entity
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:44)
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:37)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:784)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:789)
+	at org.hibernate.jpa.spi.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:1181)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:344)
+	at com.sun.proxy.$Proxy40.persist(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:291)
+	at com.sun.proxy.$Proxy36.persist(Unknown Source)
+	at gtu.model.dao.UserDaoImpl.insert(UserDaoImpl.java:46)
+	at gtu.model.dao.UserDaoImpl$$FastClassBySpringCGLIB$$d7b8ed00.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:717)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:281)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:653)
+	at gtu.model.dao.UserDaoImpl$$EnhancerBySpringCGLIB$$49caa378.insert(<generated>)
+	at gtu.action.LoginAction.doCreate(LoginAction.java:42)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at ognl.OgnlRuntime.invokeMethod(OgnlRuntime.java:870)
+	at ognl.OgnlRuntime.callAppropriateMethod(OgnlRuntime.java:1293)
+	at ognl.ObjectMethodAccessor.callMethod(ObjectMethodAccessor.java:68)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethodWithDebugInfo(XWorkMethodAccessor.java:117)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethod(XWorkMethodAccessor.java:108)
+	at ognl.OgnlRuntime.callMethod(OgnlRuntime.java:1369)
+	at ognl.ASTMethod.getValueBody(ASTMethod.java:90)
+	at ognl.SimpleNode.evaluateGetValueBody(SimpleNode.java:212)
+	at ognl.SimpleNode.getValue(SimpleNode.java:258)
+	at ognl.Ognl.getValue(Ognl.java:494)
+	at ognl.Ognl.getValue(Ognl.java:458)
+	at com.opensymphony.xwork2.ognl.OgnlUtil$2.execute(OgnlUtil.java:309)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.compileAndExecute(OgnlUtil.java:340)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.getValue(OgnlUtil.java:307)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeAction(DefaultActionInvocation.java:423)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeActionOnly(DefaultActionInvocation.java:287)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:250)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 15:31:59,099 ERROR - attempt to create create event with null entity
+java.lang.IllegalArgumentException: attempt to create create event with null entity
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:44)
+	at org.hibernate.event.spi.PersistEvent.<init>(PersistEvent.java:37)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:784)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:789)
+	at org.hibernate.jpa.spi.AbstractEntityManagerImpl.persist(AbstractEntityManagerImpl.java:1181)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.ExtendedEntityManagerCreator$ExtendedEntityManagerInvocationHandler.invoke(ExtendedEntityManagerCreator.java:344)
+	at com.sun.proxy.$Proxy40.persist(Unknown Source)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:291)
+	at com.sun.proxy.$Proxy36.persist(Unknown Source)
+	at gtu.model.dao.UserDaoImpl.insert(UserDaoImpl.java:46)
+	at gtu.model.dao.UserDaoImpl$$FastClassBySpringCGLIB$$d7b8ed00.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:717)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:157)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:99)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:281)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:653)
+	at gtu.model.dao.UserDaoImpl$$EnhancerBySpringCGLIB$$49caa378.insert(<generated>)
+	at gtu.action.LoginAction.doCreate(LoginAction.java:42)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at ognl.OgnlRuntime.invokeMethod(OgnlRuntime.java:870)
+	at ognl.OgnlRuntime.callAppropriateMethod(OgnlRuntime.java:1293)
+	at ognl.ObjectMethodAccessor.callMethod(ObjectMethodAccessor.java:68)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethodWithDebugInfo(XWorkMethodAccessor.java:117)
+	at com.opensymphony.xwork2.ognl.accessor.XWorkMethodAccessor.callMethod(XWorkMethodAccessor.java:108)
+	at ognl.OgnlRuntime.callMethod(OgnlRuntime.java:1369)
+	at ognl.ASTMethod.getValueBody(ASTMethod.java:90)
+	at ognl.SimpleNode.evaluateGetValueBody(SimpleNode.java:212)
+	at ognl.SimpleNode.getValue(SimpleNode.java:258)
+	at ognl.Ognl.getValue(Ognl.java:494)
+	at ognl.Ognl.getValue(Ognl.java:458)
+	at com.opensymphony.xwork2.ognl.OgnlUtil$2.execute(OgnlUtil.java:309)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.compileAndExecute(OgnlUtil.java:340)
+	at com.opensymphony.xwork2.ognl.OgnlUtil.getValue(OgnlUtil.java:307)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeAction(DefaultActionInvocation.java:423)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invokeActionOnly(DefaultActionInvocation.java:287)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:250)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+2017-07-04 15:34:51,533 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:34:51,533 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:34:51,533 DEBUG - test ---- null
+2017-07-04 15:34:57,175 DEBUG - ---<null>
+2017-07-04 15:34:57,176 DEBUG - dao = gtu.model.dao.UserDaoImpl@4670231d
+2017-07-04 15:34:57,185 DEBUG - total size = 0
+2017-07-04 15:34:57,198 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:34:57,198 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:34:57,217 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:34:57,369 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:35:04,912 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:35:04,912 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:35:04,912 DEBUG - test ---- null
+2017-07-04 15:35:04,913 DEBUG - ---<null>
+2017-07-04 15:35:04,913 DEBUG - dao = gtu.model.dao.UserDaoImpl@4670231d
+2017-07-04 15:35:04,915 DEBUG - total size = 0
+2017-07-04 15:35:04,924 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:35:04,924 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:35:04,931 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:35:05,027 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:35:41,985 DEBUG - 
+2017-07-04 15:35:51,564 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:35:51,565 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:35:51,568 DEBUG - test ---- fffff
+2017-07-04 15:35:51,575 DEBUG - ---<null>
+2017-07-04 15:35:51,595 DEBUG - dao = gtu.model.dao.UserDaoImpl@4c1686d6
+2017-07-04 15:35:51,660 DEBUG - total size = 0
+2017-07-04 15:35:51,838 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:35:51,838 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:35:51,852 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:35:52,434 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:36:46,778 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:36:47,997 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:36:59,423 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:36:59,763 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:37:01,163 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:37:01,272 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:37:01,865 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:37:01,960 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:37:02,408 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:37:02,503 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:37:08,612 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:37:08,613 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:37:08,613 DEBUG - test ---- fffff
+2017-07-04 15:37:08,614 DEBUG - ---<null>
+2017-07-04 15:37:08,615 DEBUG - dao = gtu.model.dao.UserDaoImpl@4c1686d6
+2017-07-04 15:37:08,623 DEBUG - total size = 0
+2017-07-04 15:37:08,627 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:37:08,627 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:37:08,633 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:37:08,720 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:38:43,460 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:38:43,826 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="myBean">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="myBeanProperty" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="myBean">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="myBeanProperty" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:16,951 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:17,150 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:18,035 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:18,140 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:18,805 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:18,903 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:19,582 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:19,681 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:20,808 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:20,904 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="Login">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:28,216 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:28,468 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:29,336 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:29,442 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:30,292 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:30,389 ERROR - An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+org.apache.jasper.JasperException: An exception occurred processing JSP page /pages/login/login.jsp at line 30
+
+27: 		<s:password key="user.password" name="user.password"
+28: 			value="%{user.password}" />
+29: 
+30: 		<s:push value="user">
+31: 			<!-- Example 1: -->
+32: 			<s:property value="test" />
+33: 
+
+
+Stacktrace:
+	at org.apache.jasper.servlet.JspServletWrapper.handleJspException(JspServletWrapper.java:510)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:419)
+	at org.apache.jasper.servlet.JspServlet.serviceJspFile(JspServlet.java:313)
+	at org.apache.jasper.servlet.JspServlet.service(JspServlet.java:260)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:290)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.ApplicationDispatcher.invoke(ApplicationDispatcher.java:646)
+	at org.apache.catalina.core.ApplicationDispatcher.processRequest(ApplicationDispatcher.java:436)
+	at org.apache.catalina.core.ApplicationDispatcher.doForward(ApplicationDispatcher.java:374)
+	at org.apache.catalina.core.ApplicationDispatcher.forward(ApplicationDispatcher.java:302)
+	at org.apache.struts2.dispatcher.ServletDispatcherResult.doExecute(ServletDispatcherResult.java:164)
+	at org.apache.struts2.dispatcher.StrutsResultSupport.execute(StrutsResultSupport.java:191)
+	at com.opensymphony.xwork2.DefaultActionInvocation.executeResult(DefaultActionInvocation.java:369)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:273)
+	at gtu.interceptor.ExceptionInterceptor.intercept(ExceptionInterceptor.java:36)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at gtu.interceptor.LogInterceptor.intercept(LogInterceptor.java:32)
+	at com.opensymphony.xwork2.DefaultActionInvocation.invoke(DefaultActionInvocation.java:244)
+	at org.apache.struts2.impl.StrutsActionProxy.execute(StrutsActionProxy.java:54)
+	at org.apache.struts2.dispatcher.Dispatcher.serviceAction(Dispatcher.java:564)
+	at org.apache.struts2.dispatcher.ng.ExecuteOperations.executeAction(ExecuteOperations.java:81)
+	at org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter.doFilter(StrutsPrepareAndExecuteFilter.java:99)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter.doFilterInternal(OpenEntityManagerInViewFilter.java:178)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:235)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:206)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:233)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:191)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:127)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:102)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:109)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:298)
+	at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:857)
+	at org.apache.coyote.http11.Http11Protocol$Http11ConnectionHandler.process(Http11Protocol.java:588)
+	at org.apache.tomcat.util.net.JIoEndpoint$Worker.run(JIoEndpoint.java:489)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: tag 'push', field 'value': You must specify a value to push on the stack. Example: person - [unknown location]
+	at org.apache.struts2.components.Component.fieldError(Component.java:263)
+	at org.apache.struts2.components.Component.findValue(Component.java:356)
+	at org.apache.struts2.components.Push.start(Push.java:128)
+	at org.apache.struts2.views.jsp.ComponentTagSupport.doStartTag(ComponentTagSupport.java:54)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fpush_005f0(login_jsp.java:249)
+	at org.apache.jsp.pages.login.login_jsp._jspx_meth_s_005fform_005f0(login_jsp.java:147)
+	at org.apache.jsp.pages.login.login_jsp._jspService(login_jsp.java:95)
+	at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:70)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:717)
+	at org.apache.jasper.servlet.JspServletWrapper.service(JspServletWrapper.java:377)
+	... 37 more
+2017-07-04 15:39:50,358 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:50,566 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:39:55,875 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:55,876 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:55,876 DEBUG - test ---- fffff
+2017-07-04 15:39:55,877 DEBUG - ---<null>
+2017-07-04 15:39:55,877 DEBUG - dao = gtu.model.dao.UserDaoImpl@4c1686d6
+2017-07-04 15:39:55,879 DEBUG - total size = 0
+2017-07-04 15:39:55,882 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:55,883 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:55,903 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:56,004 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:39:57,136 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:57,136 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:57,136 DEBUG - test ---- fffff
+2017-07-04 15:39:57,136 DEBUG - ---<null>
+2017-07-04 15:39:57,136 DEBUG - dao = gtu.model.dao.UserDaoImpl@4c1686d6
+2017-07-04 15:39:57,138 DEBUG - total size = 0
+2017-07-04 15:39:57,140 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:57,140 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:57,160 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:57,246 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:39:59,541 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:59,541 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:39:59,541 DEBUG - test ---- fffff
+2017-07-04 15:39:59,541 DEBUG - ---<null>
+2017-07-04 15:39:59,542 DEBUG - dao = gtu.model.dao.UserDaoImpl@4c1686d6
+2017-07-04 15:39:59,543 DEBUG - total size = 0
+2017-07-04 15:39:59,546 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:59,547 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:39:59,568 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:39:59,653 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:40:20,955 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:40:21,190 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:40:45,907 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:40:46,251 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:40:47,385 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:40:47,468 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:25,553 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:25,843 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:37,443 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:37,697 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:40,018 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:40,107 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:49,568 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:49,780 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:56,574 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:56,769 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:57,548 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:57,639 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:57,744 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:57,852 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:58,365 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:58,457 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:41:58,803 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:41:58,888 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:05,802 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:05,941 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:06,580 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:06,678 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:07,018 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:07,106 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:07,376 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:07,469 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:07,769 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:07,868 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:32,396 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:32,562 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:33,307 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:33,392 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:33,486 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:33,582 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:33,681 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:33,773 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:33,811 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:33,911 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:38,628 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:38,794 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:42:51,496 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:42:51,699 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:43:49,210 DEBUG - 
+2017-07-04 15:43:56,756 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:43:56,758 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:43:56,761 DEBUG - test ---- fffff
+2017-07-04 15:43:56,811 DEBUG - ---gtu.model.entity.User@97f20a6[id=0,userId=<null>,userName=<null>,password=<null>,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 15:43:56,831 DEBUG - dao = gtu.model.dao.UserDaoImpl@2af73631
+2017-07-04 15:43:56,904 DEBUG - total size = 0
+2017-07-04 15:43:57,096 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:43:57,096 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:43:57,109 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:43:58,684 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:44:10,111 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:44:10,111 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:44:10,111 DEBUG - test ---- fffff
+2017-07-04 15:44:10,112 DEBUG - ---gtu.model.entity.User@97f20a6[id=0,userId=<null>,userName=<null>,password=<null>,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 15:44:10,112 DEBUG - dao = gtu.model.dao.UserDaoImpl@2af73631
+2017-07-04 15:44:10,114 DEBUG - total size = 0
+2017-07-04 15:44:10,116 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:44:10,116 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:44:10,135 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:44:10,231 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:46:45,849 DEBUG - 
+2017-07-04 15:46:53,432 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:46:53,433 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:46:53,443 DEBUG - ---gtu.action.LoginAction$UserVO@288594e8[userId=A,password=B]
+2017-07-04 15:46:53,466 DEBUG - dao = gtu.model.dao.UserDaoImpl@3a726e7
+2017-07-04 15:46:53,530 DEBUG - total size = 0
+2017-07-04 15:46:53,734 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:46:53,734 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:46:53,745 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:46:54,234 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:47:28,596 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:47:29,765 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:47:36,249 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:36,249 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:36,249 DEBUG - ---gtu.action.LoginAction$UserVO@288594e8[userId=A,password=B]
+2017-07-04 15:47:36,250 DEBUG - dao = gtu.model.dao.UserDaoImpl@3a726e7
+2017-07-04 15:47:36,254 DEBUG - total size = 0
+2017-07-04 15:47:36,257 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:36,258 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:36,269 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:47:36,362 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:47:46,714 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:47:46,820 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:47:52,786 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:52,786 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:52,786 DEBUG - ---gtu.action.LoginAction$UserVO@288594e8[userId=A,password=B]
+2017-07-04 15:47:52,787 DEBUG - dao = gtu.model.dao.UserDaoImpl@3a726e7
+2017-07-04 15:47:52,788 DEBUG - total size = 0
+2017-07-04 15:47:52,791 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:52,792 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:52,798 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:47:52,887 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:47:56,725 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:56,726 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:47:56,726 DEBUG - ---gtu.action.LoginAction$UserVO@288594e8[userId=A,password=B]
+2017-07-04 15:47:56,726 DEBUG - dao = gtu.model.dao.UserDaoImpl@3a726e7
+2017-07-04 15:47:56,727 DEBUG - total size = 0
+2017-07-04 15:47:56,730 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:56,731 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:47:56,745 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:47:56,832 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:49:55,393 DEBUG - 
+2017-07-04 15:50:01,477 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:50:01,490 DEBUG - ---gtu.action.LoginAction$UserVO@66b209b4[userId=A,password=B]
+2017-07-04 15:50:01,508 DEBUG - dao = gtu.model.dao.UserDaoImpl@493dcf34
+2017-07-04 15:50:01,576 DEBUG - total size = 0
+2017-07-04 15:50:01,808 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:50:01,825 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:50:02,345 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:50:04,573 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:50:04,574 DEBUG - ---gtu.action.LoginAction$UserVO@66b209b4[userId=A,password=B]
+2017-07-04 15:50:04,575 DEBUG - dao = gtu.model.dao.UserDaoImpl@493dcf34
+2017-07-04 15:50:04,577 DEBUG - total size = 0
+2017-07-04 15:50:04,580 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:50:04,587 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:50:04,681 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:51:17,818 DEBUG - 
+2017-07-04 15:52:03,429 DEBUG - 
+2017-07-04 15:52:10,165 DEBUG - ---gtu.action.LoginAction$UserVO@62455404[userId=A,password=B]
+2017-07-04 15:52:10,183 DEBUG - dao = gtu.model.dao.UserDaoImpl@23e865cf
+2017-07-04 15:52:10,249 DEBUG - total size = 0
+2017-07-04 15:52:10,464 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:52:10,993 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:52:14,006 DEBUG - ####### ----- getUser
+2017-07-04 15:52:14,012 DEBUG - ####### ----- getUser
+2017-07-04 15:52:14,014 DEBUG - ---gtu.action.LoginAction$UserVO@62455404[userId=333,password=2222]
+2017-07-04 15:52:14,014 DEBUG - dao = gtu.model.dao.UserDaoImpl@23e865cf
+2017-07-04 15:52:14,016 DEBUG - total size = 0
+2017-07-04 15:52:14,024 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:52:14,112 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:52:43,284 DEBUG - ####### ----- getUser
+2017-07-04 15:52:43,285 DEBUG - ####### ----- getUser
+2017-07-04 15:52:43,288 DEBUG - ---gtu.action.LoginAction$UserVO@62455404[userId=1212121,password=121212122]
+2017-07-04 15:52:43,288 DEBUG - dao = gtu.model.dao.UserDaoImpl@23e865cf
+2017-07-04 15:52:43,290 DEBUG - total size = 0
+2017-07-04 15:52:43,306 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:52:43,401 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:54:22,076 DEBUG - 
+2017-07-04 15:54:28,484 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:54:29,059 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:56:07,285 DEBUG - 
+2017-07-04 15:56:12,937 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:56:12,950 DEBUG - ---gtu.action.LoginAction$UserVO@6c13a3da[userId=A,password=B]
+2017-07-04 15:56:12,978 DEBUG - dao = gtu.model.dao.UserDaoImpl@2990a62a
+2017-07-04 15:56:13,053 DEBUG - total size = 0
+2017-07-04 15:56:13,247 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:56:13,275 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:56:13,806 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:56:16,674 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:56:16,674 DEBUG - ---gtu.action.LoginAction$UserVO@6c13a3da[userId=A,password=B]
+2017-07-04 15:56:16,674 DEBUG - dao = gtu.model.dao.UserDaoImpl@2990a62a
+2017-07-04 15:56:16,678 DEBUG - total size = 0
+2017-07-04 15:56:16,680 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:56:16,693 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:56:16,792 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:56:24,790 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:56:24,790 DEBUG - ---gtu.action.LoginAction$UserVO@6c13a3da[userId=A,password=B]
+2017-07-04 15:56:24,790 DEBUG - dao = gtu.model.dao.UserDaoImpl@2990a62a
+2017-07-04 15:56:24,792 DEBUG - total size = 0
+2017-07-04 15:56:24,796 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:56:24,809 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:56:24,901 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:57:19,693 DEBUG - 
+2017-07-04 15:57:26,248 DEBUG - ---gtu.action.LoginAction$UserVO@340861ea[userId=A,password=B]
+2017-07-04 15:57:26,272 DEBUG - dao = gtu.model.dao.UserDaoImpl@3926c64c
+2017-07-04 15:57:26,345 DEBUG - total size = 0
+2017-07-04 15:59:06,377 DEBUG - 
+2017-07-04 15:59:12,153 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:59:12,162 DEBUG - ####### ----- getUser
+2017-07-04 15:59:12,168 DEBUG - ####### ----- getUser
+2017-07-04 15:59:12,182 DEBUG - ---gtu.action.LoginAction$UserVO@679c36a9[userId=232332,password=32323233]
+2017-07-04 15:59:12,200 DEBUG - dao = gtu.model.dao.UserDaoImpl@11d8d151
+2017-07-04 15:59:12,265 DEBUG - total size = 0
+2017-07-04 15:59:12,492 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:59:12,512 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:59:13,061 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 15:59:24,310 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 15:59:24,311 DEBUG - ####### ----- getUser
+2017-07-04 15:59:24,311 DEBUG - ####### ----- getUser
+2017-07-04 15:59:24,312 DEBUG - ---gtu.action.LoginAction$UserVO@679c36a9[userId=11111,password=22222]
+2017-07-04 15:59:24,312 DEBUG - dao = gtu.model.dao.UserDaoImpl@11d8d151
+2017-07-04 15:59:24,320 DEBUG - total size = 0
+2017-07-04 15:59:24,323 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 15:59:24,333 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 15:59:24,436 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:00:16,790 DEBUG - 
+2017-07-04 16:00:22,800 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:00:22,845 DEBUG - ---gtu.model.entity.User@6aad7ce5[id=0,userId=2323,userName=<null>,password=23233,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:00:22,865 DEBUG - dao = gtu.model.dao.UserDaoImpl@3f334bcc
+2017-07-04 16:00:22,936 DEBUG - total size = 0
+2017-07-04 16:00:23,115 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:00:23,130 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:00:23,785 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:11:17,075 DEBUG - 
+2017-07-04 16:11:25,399 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:11:26,777 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:12:20,213 DEBUG - 
+2017-07-04 16:20:53,225 DEBUG - 
+2017-07-04 16:23:17,364 DEBUG - 
+2017-07-04 16:23:24,998 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:23:27,457 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=22222,userName=<null>,password=33333,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:23:31,222 DEBUG - login fail!
+2017-07-04 16:23:32,963 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:23:32,993 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:23:33,557 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:24:36,389 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:24:38,561 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:24:42,638 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:24:46,563 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=dfdasdf,userName=<null>,password=fasdfasdf,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:24:46,579 DEBUG - login fail!
+2017-07-04 16:24:46,584 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:24:46,668 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:24:46,775 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:25:35,566 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:25:35,991 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:25:39,339 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:25:39,456 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:25:42,314 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:25:46,514 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=werqre,userName=<null>,password=rqwerqwerqwer,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:25:46,524 DEBUG - login fail!
+2017-07-04 16:25:46,537 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:25:46,598 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:25:46,701 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:26:05,471 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:26:05,472 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=2323,userName=<null>,password=44344,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:26:05,475 DEBUG - login fail!
+2017-07-04 16:26:05,477 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:26:05,524 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:26:05,833 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:26:11,396 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:26:11,397 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=656566,userName=<null>,password=5656566,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:26:11,399 DEBUG - login fail!
+2017-07-04 16:26:11,401 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:26:11,447 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:26:11,538 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:26:43,316 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:26:43,455 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:26:45,917 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:26:45,919 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=2323,userName=<null>,password=34234234,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:26:45,921 DEBUG - login fail!
+2017-07-04 16:26:45,924 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:26:45,968 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:26:46,077 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 16:27:13,018 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 16:27:13,019 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=33,userName=<null>,password=44,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 16:27:13,022 DEBUG - login fail!
+2017-07-04 16:27:13,025 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 16:27:13,061 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 16:27:13,178 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 17:30:09,447 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 17:30:09,448 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=dfasdf,userName=<null>,password=weweewr,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 17:30:09,455 DEBUG - login fail!
+2017-07-04 17:30:09,457 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e
+2017-07-04 17:30:09,464 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] .s
+2017-07-04 17:30:09,568 DEBUG - #. action[ActionSupport],namespace[/],act_name[index],method[execute] -> result[success] .e
+2017-07-04 23:32:23,874 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] .s
+2017-07-04 23:32:23,895 DEBUG - ---gtu.model.entity.User@1508c947[id=0,userId=dfasdf,userName=<null>,password=weweewr,email=<null>,lastLoginDate=<null>,loginTimeCount=0,createDate=<null>,createUser=<null>]
+2017-07-04 23:32:23,904 DEBUG - login fail!
+2017-07-04 23:32:23,906 DEBUG - #. action[LoginAction],namespace[/],act_name[Login!input],method[input] -> result[index] .e

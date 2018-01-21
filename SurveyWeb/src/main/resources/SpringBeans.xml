@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- Database Configuration -->
+	<import resource="config/database/spring/DataSource.xml" />
+	<import resource="config/database/spring/HibernateSessionFactory.xml" />
+
+	<!-- config -->
+	<import resource="com/gtu/spring/CommonConfig.xml" />
+	
+	<!-- Beans Declaration -->
+	<import resource="com/gtu/config/spring/CustomerBean.xml" />
+
+	<!-- Action -->
+	<import resource="com/gtu/config/action/ActionBean.xml" />
+
+</beans>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+<struts>
+
+	<package name="login" extends="gtu-default"><!-- gtu-default -->
+
+		<action name="Login!*" method="{1}" class="loginAction">
+			<interceptor-ref name="guest" /> 
+			<result>/pages/login/login.jsp</result>
+			<result name="input" type="dispatcher">/pages/login/login.jsp</result>
+			<result name="goCreate" type="dispatcher">/pages/login/accountCreate.jsp
+			</result>
+			<result name="cancel" type="redirectAction">Welcome</result>
+			<result name="index" type="redirectAction">index</result>
+			<result type="redirectAction">MainMenu</result>
+			<result name="expired" type="chain">ChangePassword</result>
+			<exception-mapping
+				exception="org.apache.struts.apps.mailreader.dao.ExpiredPasswordException"
+				result="expired" />
+		</action>
+
+	</package>
+</struts>

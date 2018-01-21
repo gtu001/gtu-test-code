@@ -1,0 +1,12 @@
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 1.3//EN"
+"http://struts.apache.org/dtds/tiles-config_1_3.dtd">
+<tiles-definitions>
+
+	<definition name="/pages/utility/sql_query_list.tiles"
+		extends="baseLayout">
+		<put name="title" value="Sql Query" />
+		<put name="body" value="/pages/utility/sql_query_list.jsp" />
+	</definition>
+
+</tiles-definitions>

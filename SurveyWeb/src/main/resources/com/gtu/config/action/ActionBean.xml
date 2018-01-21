@@ -1,0 +1,11 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean name="/SqlQuery" class="com.gtu.utility.action.SqlQueryAction" />
+	<bean name="/TestQuery" class="com.gtu.example.action.TestQueryAction" />
+	<bean name="/TestSomething" class="com.gtu.example.action.TestSomethingAction" />
+	<bean name="/TestSomething2" class="com.gtu.example.action.TestSomething2Action" />
+
+</beans>

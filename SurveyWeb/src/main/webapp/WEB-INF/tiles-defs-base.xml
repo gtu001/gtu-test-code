@@ -1,0 +1,30 @@
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 1.3//EN"
+"http://struts.apache.org/dtds/tiles-config_1_3.dtd">
+<tiles-definitions>
+
+	<!-- 基本設定 -->
+	<definition name="baseLayout" path="/pages/tiles/common-layout.jsp">
+		<put name="title" value="Tiles Example" />
+		<put name="header" value="/pages/tiles/header.jsp" />
+		<put name="body" value="/pages/tiles/body.jsp" />
+		<put name="menu" value="/pages/tiles/menu.jsp" />
+		<put name="footer" value="/pages/tiles/footer.jsp" />
+	</definition>
+	
+	<definition name="/pages/customer/test_query_list.tiles" extends="baseLayout">
+		<put name="title" value="test title" />
+		<put name="body" value="/pages/customer/test_query_list.jsp" />
+	</definition>
+	
+	<definition name="/pages/test/test_index.tiles" extends="baseLayout">
+		<put name="title" value="test index" />
+		<put name="body" value="/pages/test/test_index.jsp" />
+	</definition>
+	
+	<definition name="/pages/test/test_index2.tiles" extends="baseLayout">
+		<put name="title" value="test index" />
+		<put name="body" value="/pages/test/test_index2.jsp" />
+	</definition>
+	
+</tiles-definitions>
