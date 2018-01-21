@@ -319,8 +319,10 @@ public class Log {
                 try {
                     if (message == null) {
                         writer.println("null");
+                        writer.flush();
                     } else {
                         writer.println(message.toString());
+                        writer.flush();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

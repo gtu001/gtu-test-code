@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton.ToggleButtonModel;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang.StringUtils;
@@ -292,8 +291,10 @@ public class ScreenshotUI extends JFrame {
             if (hotKeyText.isFocusOwner() || modifierText.isFocusOwner()) {
                 hotKeyText.setText(String.valueOf(e.getKeyCode()));
                 modifierText.setText(String.valueOf(e.getModifiers()));
-            } else if (e.getKeyCode() == testConfig.listenKeyCode && e.getModifiers() == testConfig.listenModifier && //
-                    (testConfig.listenModifier != 0 && e.getModifiers() == testConfig.listenModifier)) {//
+            } else if (e.getKeyCode() == testConfig.listenKeyCode && //
+                    ((testConfig.listenModifier == 0) || //
+                            (testConfig.listenModifier != 0 && e.getModifiers() == testConfig.listenModifier))//
+            ) {//
                 if (isOn) {
                     screenshot.prtsc();
                 }
