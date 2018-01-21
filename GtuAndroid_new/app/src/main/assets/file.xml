@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<records>
+	<employee>
+		<id>1</id>
+		<name>Harry</name>
+		<age>21</age>
+		<salary>$3000</salary>
+	</employee>
+	<employee>
+		<id>2</id>
+		<name>Chris</name>
+		<age>25</age>
+		<salary>$5000</salary>
+	</employee>
+	<employee>
+		<id>3</id>
+		<name>Micheal</name>
+		<age>19</age>
+		<salary>$9500</salary>
+	</employee>
+	<employee>
+		<id>4</id>
+		<name>Stacy</name>
+		<age>20</age>
+		<salary>$7500</salary>
+	</employee>
+</records>

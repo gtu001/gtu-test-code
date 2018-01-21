@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top" >
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:ems="10"
+        android:text="">
+
+        <requestFocus />
+    </AutoCompleteTextView>
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/autoCompleteTextView1"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="63dp"
+        android:text="回前頁" />
+
+    <MultiAutoCompleteTextView
+        android:id="@+id/multiAutoCompleteTextView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/autoCompleteTextView1"
+        android:layout_marginTop="26dp"
+        android:ems="10"
+        android:text="" />
+
+</RelativeLayout>

@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="vertical">
+
+    <fragment
+        android:id="@+id/fragment1"
+        android:name="com.example.gtuandroid.sub.Fragment1"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" />
+
+    <fragment
+        android:id="@+id/fragment2"
+        android:name="com.example.gtuandroid.sub.Fragment2"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" />
+
+</LinearLayout>

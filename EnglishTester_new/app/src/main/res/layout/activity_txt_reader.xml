@@ -1,0 +1,114 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbarStyle="insideOverlay"
+    android:scrollbars="vertical">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/viewGroup"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+
+            android:focusableInTouchMode="true"
+            android:orientation="vertical"><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/editText1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="輸入英文句子" />
+
+                <android.support.percent.PercentRelativeLayout
+                    android:id="@+id/englishIdLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip">
+
+                    <Button
+                        android:id="@+id/clearBtn"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/answer_button_yellow"
+                        android:padding="5dp"
+                        android:text="清除"
+                        app:layout_widthPercent="50%" />
+
+                    <Button
+                        android:id="@+id/confirmBtn"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/answer_button_yellow"
+                        android:padding="5dp"
+                        android:text="確認"
+                        app:layout_widthPercent="50%" />
+                </android.support.percent.PercentRelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtReaderView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <Button
+                    android:id="@+id/translateBtn"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="翻譯全文" />
+
+                <TextView
+                    android:id="@+id/translateView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/adView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                ads:adSize="320x300"
+                ads:adUnitId="@string/ad_unit_id_TxtReader"></com.google.android.gms.ads.NativeExpressAdView>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

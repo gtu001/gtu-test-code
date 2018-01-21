@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">懸浮字典</string>
+    <string name="menu_settings">功能</string>
+    <string name="title_activity_main">懸浮字典</string>
+
+    <string name="ad_app_id">ca-app-pub-8320935601444620~2116015398</string>
+    <string name="ad_unit_id_Main">ca-app-pub-8320935601444620/3592748592</string><!--正式-->
+    <string name="ad_unit_id_ForTEST">ca-app-pub-3940256099942544/2177258514</string><!--test-->
+    <string name="ad_unit_id_TxtReader">ca-app-pub-8320935601444620/7324186997</string><!--正式-->
+    <string name="ad_unit_id_FloatService">ca-app-pub-8320935601444620/2480028197</string><!--正式-->
+</resources>

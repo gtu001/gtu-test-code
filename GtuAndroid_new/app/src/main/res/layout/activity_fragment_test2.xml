@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/myfragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp" />
+
+    <Button
+        android:id="@+id/btn_add_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="btn_add_code" />
+
+    <Button
+        android:id="@+id/btn_add_xml"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="btn_add_xml" />
+
+    <Button
+        android:id="@+id/btn_remove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="btn_remove" />
+
+</LinearLayout>

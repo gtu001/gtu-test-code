@@ -1,0 +1,215 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_english_info_ui"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="0dip"
+
+            android:focusable="true"
+            android:focusableInTouchMode="true"><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
+
+            <android.support.percent.PercentRelativeLayout
+                android:id="@+id/englishIdLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dip">
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextView1"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="輸入單字"
+                    android:selectAllOnFocus="true"
+                    android:singleLine="true"
+                    app:layout_widthPercent="80%"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true">
+
+                    <!-- <requestFocus /> -->
+                </AutoCompleteTextView>
+
+                <Button
+                    android:id="@+id/searchBtn"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/new_search_icon2"
+                    android:text=""
+                    app:layout_widthPercent="10%"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/autoCompleteTextView1"
+                    android:layout_toEndOf="@+id/autoCompleteTextView1" />
+
+                <Button
+                    android:id="@+id/resetBtn"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/icon_eraser"
+                    android:text=""
+                    app:layout_widthPercent="10%"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+            </android.support.percent.PercentRelativeLayout>
+
+            <TextView
+                android:id="@+id/noUseText1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/englishDescText"
+                android:text="             "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/viewInfoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/noUseText1"
+                android:text="             "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.ant.liao.GifView
+                android:id="@+id/imageView_gif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/hasPicLabel"
+                android:src="@drawable/ic_action_search" />
+
+            <Button
+                android:id="@+id/previousPicBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView_gif"
+                android:layout_toLeftOf="@+id/showQuestionBtn"
+                android:background="@drawable/blue_button"
+                android:text="上一張" />
+
+            <Button
+                android:id="@+id/nextPicBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/blue_button"
+                android:text="下一張"
+                android:layout_below="@+id/imageView_gif"
+                android:layout_toRightOf="@+id/previousPicBtn"
+                android:layout_toEndOf="@+id/previousPicBtn" />
+
+            <TextView
+                android:id="@+id/picFileLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/previousPicBtn"
+                android:text="       " />
+
+            <ImageButton
+                android:id="@+id/deletePicBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/picFileLabel"
+                android:background="@drawable/blue_button"
+                android:src="@android:drawable/ic_delete" />
+
+            <TextView
+                android:id="@+id/hasPicLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/viewInfoText"
+                android:text="         " />
+
+            <Button
+                android:id="@+id/back"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/deletePicBtn"
+                android:layout_toLeftOf="@+id/nextPicBtn"
+                android:background="@drawable/blue_button"
+                android:text="回前頁" />
+
+            <EditText
+                android:id="@+id/englishDescText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/englishPronounceLabel"
+                android:ems="10"
+                android:hint="輸入解釋" /><!-- android:focusable="false" -->
+
+            <Button
+                android:id="@+id/modifyBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/back"
+                android:layout_alignBottom="@+id/back"
+                android:layout_toRightOf="@+id/back"
+                android:background="@drawable/blue_button"
+                android:text="修改" />
+
+            <TextView
+                android:id="@+id/englishPronounceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/englishIdLayout"
+                android:text="        "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/deleteBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/modifyBtn"
+                android:layout_alignBottom="@+id/modifyBtn"
+                android:layout_toRightOf="@+id/modifyBtn"
+                android:background="@drawable/blue_button"
+                android:text="刪除" />
+
+            <Button
+                android:id="@+id/englishDetailBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/deleteBtn"
+                android:layout_alignBottom="@+id/deleteBtn"
+                android:layout_toRightOf="@+id/deleteBtn"
+                android:background="@drawable/blue_button"
+                android:text="線上" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

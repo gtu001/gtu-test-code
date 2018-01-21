@@ -1,0 +1,93 @@
+<resources>
+
+    <string name="app_name">GtuAndroid</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">測試開發用</string>
+    <string name="input_text">輸入文字</string>
+    <string name="button_text">按鈕文字</string>
+    <string name="action_settings">action_settings</string>
+    <string name="test_button">change color</string>
+    <string name="activity_main_2_text">activity_main_2_text</string>
+
+    <array name="items_irdc_dialog">
+        <item>萌點女僕餐廳</item>
+        <item>一鍋日式小火鍋</item>
+        <item>好吃國巴西窯烤</item>
+    </array>
+
+    <string-array name="languages">
+        <item>Austria</item>
+        <item>Brazil</item>
+        <item>China</item>
+        <item>Colombia</item>
+        <item>Cuba</item>
+        <item>Denmark</item>
+        <item>Egypt</item>
+        <item>Estonia</item>
+        <item>Finland</item>
+        <item>France</item>
+        <item>Germany</item>
+        <item>Greece</item>
+        <item>Hong Kong</item>
+        <item>Ireland</item>
+        <item>Italy</item>
+        <item>Japan</item>
+        <item>Malaysiz</item>
+        <item>Poland</item>
+        <item>Romania</item>
+        <item>Russia</item>
+        <item>Spain</item>
+        <item>Switzerland</item>
+        <item>Taiwan</item>
+    </string-array>
+
+    <string name="downloaded">&#160;%s %%</string>
+
+    <string-array name="fragment_names">
+        <item>AdMob - Ad Listener</item>
+        <item>AdMob - Ad Targeting</item>
+        <item>AdMob - Banner Sizes</item>
+        <item>DFP - Fluid Size</item>
+        <item>DFP - PPID</item>
+        <item>DFP - Custom Targeting</item>
+        <item>DFP - Category Exclusions</item>
+        <item>DFP - Ad Sizes</item>
+        <item>DFP - App Events</item>
+    </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- This is an ad unit ID for a test ad. Replace with your own banner ad unit id. -->
+    <string name="banner_ad_unit_id">ca-app-pub-5992975414137720/7993135099</string>
+    <!-- ca-app-pub-3940256099942544/6300978111 -->
+
+    <string name="login_welcome_back">%s 歡迎回來</string>
+
+    <plurals name="minutes">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+
+    <string name="html_text" formatted="false">
+		<![CDATA[        
+		<font color=\'#28b5f5\'>Discover</font> and <font color=\'#28b5f5\'> play </font> games.    
+		]]>
+    </string>
+
+    <string-array name="program_languages">
+        <item>c语言</item>
+        <item>java </item>
+        <item>php</item>
+        <item>xml</item>
+        <item>html</item>
+    </string-array>
+
+    <integer-array name="reminder_methods_values" translatable="false">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </integer-array>
+
+</resources>

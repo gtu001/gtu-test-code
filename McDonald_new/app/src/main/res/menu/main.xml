@@ -1,0 +1,171 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.mcdonald.MainActivity">
+
+    <item
+        android:id="@+id/item_burger"
+        android:orderInCategory="100"
+        android:title="10元滿福堡"
+        android:visible="false" />
+
+    <!-- android:title="@string/action_settings" -->
+    <!-- app:showAsAction="never" -->
+
+    <item
+        android:id="@+id/item_burgers10Pork"
+        android:orderInCategory="100"
+        android:title="10元豬肉滿福堡" />
+    <item
+        android:id="@+id/item_burgers10Egg"
+        android:orderInCategory="100"
+        android:title="10元蛋堡" />
+    <item
+        android:id="@+id/item_burgerFish"
+        android:orderInCategory="100"
+        android:title="10元麥香魚" />
+    <item
+        android:id="@+id/item_burger10Chicken"
+        android:orderInCategory="100"
+        android:title="10元麥香雞" />
+    <item
+        android:id="@+id/item_burgersPorkTwo"
+        android:orderInCategory="100"
+        android:title="豬肉滿福堡買一送一" />
+    <item
+        android:id="@+id/item_burgers33"
+        android:orderInCategory="100"
+        android:title="33元飲料滿福堡" />
+    <item
+        android:id="@+id/item_burgerPorkEgg"
+        android:orderInCategory="100"
+        android:title="33元飲料豬肉蛋堡" />
+    <item
+        android:id="@+id/item_burgerChicken33"
+        android:orderInCategory="100"
+        android:title="33元香雞蛋堡" />
+    <item
+        android:id="@+id/item_burgersEgg"
+        android:orderInCategory="100"
+        android:title="火腿蛋堡" />
+    <item
+        android:id="@+id/item_burgers40"
+        android:orderInCategory="100"
+        android:title="40元大麥克" />
+    <item
+        android:id="@+id/item_bigmac_oneone"
+        android:orderInCategory="100"
+        android:title="大麥克買一送一" />
+    <item
+        android:id="@+id/item_burgersTwo"
+        android:orderInCategory="100"
+        android:title="勁辣雞腿堡買一送一" />
+    <item
+        android:id="@+id/item_burgersChickenTwo"
+        android:orderInCategory="100"
+        android:title="板烤雞腿堡買一送一" />
+    <item
+        android:id="@+id/item_chicken"
+        android:orderInCategory="100"
+        android:title="勁辣雞翅" />
+    <item
+        android:id="@+id/item_bbq"
+        android:orderInCategory="100"
+        android:title="BBQ嫩雞翅" />
+    <item
+        android:id="@+id/item_nugget"
+        android:orderInCategory="100"
+        android:title="四塊麥克雞塊" />
+    <item
+        android:id="@+id/item_nugget2"
+        android:orderInCategory="100"
+        android:title="四塊麥克雞塊(買一送一)" />
+
+    <item
+        android:id="@+id/item_gpei"
+        android:orderInCategory="100"
+        android:title="雞排(買一送一)" />
+
+    <item
+        android:id="@+id/item_frenchfries"
+        android:orderInCategory="100"
+        android:title="一元小薯" />
+    <item
+        android:id="@+id/item_frenchfryBig"
+        android:orderInCategory="100"
+        android:title="大薯買一送一" />
+    <item
+        android:id="@+id/item_icecream"
+        android:orderInCategory="100"
+        android:title="冰炫風買一送一" />
+    <item
+        android:id="@+id/item_icecream2"
+        android:orderInCategory="100"
+        android:title="黑芝麻聖代" />
+    <item
+        android:id="@+id/item_icecreamTea"
+        android:orderInCategory="100"
+        android:title="雙茶花聖代" />
+    <item
+        android:id="@+id/item_coffee"
+        android:orderInCategory="100"
+        android:title="咖啡買一送一"
+        android:visible="false" />
+    <item
+        android:id="@+id/item_potato"
+        android:orderInCategory="100"
+        android:title="薯餅買一送一" />
+    <item
+        android:id="@+id/item_potatoOne"
+        android:orderInCategory="100"
+        android:title="一元薯餅" />
+    <item
+        android:id="@+id/item_bigDrink"
+        android:orderInCategory="100"
+        android:title="大杯可樂買一送一" />
+    <item
+        android:id="@+id/item_f_potatoOne"
+        android:orderInCategory="100"
+        android:title="一元薯餅(new)" />
+    <item
+        android:id="@+id/item_f_icecream"
+        android:orderInCategory="100"
+        android:title="冰炫風買一送一(new)" />
+    <item
+        android:id="@+id/item_f_burgersChickenTwo"
+        android:orderInCategory="100"
+        android:title="板烤雞腿堡買一送一(new)" />
+    <item
+        android:id="@+id/item_f_bigBreakfast"
+        android:orderInCategory="100"
+        android:title="好享受大早餐(new)" />
+    <item
+        android:id="@+id/item_f_frenchfryBig"
+        android:orderInCategory="100"
+        android:title="大薯買一送一(new)" />
+    <item
+        android:id="@+id/item_f_nugget2"
+        android:orderInCategory="100"
+        android:title="四塊麥克雞塊(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_applePie"
+        android:orderInCategory="100"
+        android:title="蘋果派(買一送一)(new)" />
+
+    <item
+        android:id="@+id/item_f_frenchfries"
+        android:orderInCategory="100"
+        android:title="一元小薯(new)" />
+    <item
+        android:id="@+id/item_f_chicken"
+        android:orderInCategory="100"
+        android:title="勁辣雞翅(new)" />
+    <item
+        android:id="@+id/item_f_bigmacOneone"
+        android:orderInCategory="100"
+        android:title="大麥克買一送一(new)" />
+    <item
+        android:id="@+id/item_f_burgerFish40"
+        android:orderInCategory="100"
+        android:title="40元麥香魚(new)" />
+</menu>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#669977"
+    android:layout_width="match_parent"  
+    android:layout_height="match_parent">  
+    
+    <HorizontalScrollView
+        android:id="@+id/HorizontalScrollViewTree" 
+        android:layout_toLeftOf="@+id/textView22"
+        android:layout_height="match_parent" 
+        android:layout_width="match_parent">  
+        
+		<LinearLayout 
+            android:id="@+id/linearLayout022" 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" 
+            android:orientation="vertical">
+		    
+		    <!-- 这里要写自定义组件的全路径。如果出现类解析错误请查看是否是这里路径问题  
+        		android:scrollbars="horizontal|vertical" 
+		        
+				android:footerDividersEnabled="false"
+				android:headerDividersEnabled="false"
+				android:scrollingCache="false"  -->
+		    <com.example.gtuandroid.sub.TreeView
+		        android:id="@+id/tree_view"
+		        android:layout_width="500dp"
+		        android:layout_height="match_parent"
+		        android:cacheColorHint="#669977"
+		        android:divider="#006600"
+		        android:dividerHeight="1dip"
+		        android:padding="10dip">
+		    </com.example.gtuandroid.sub.TreeView>
+		
+		</LinearLayout>
+
+    </HorizontalScrollView>  
+    
+    
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="中心基准限定点" />
+    
+</RelativeLayout>  

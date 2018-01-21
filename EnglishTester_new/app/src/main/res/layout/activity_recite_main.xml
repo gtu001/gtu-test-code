@@ -1,0 +1,254 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbarStyle="insideOverlay"
+    android:scrollbars="vertical"
+    android:id="@+id/mainLayout">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true" >
+
+        <RelativeLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="0dip" >
+
+            <TextView
+                android:id="@+id/englishLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="       "
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <!-- android:shadowColor="#A8A8A8"
+		        android:shadowDx="0"
+		        android:shadowDy="0"
+		        android:shadowRadius="10" -->
+            
+            <TextView
+                android:id="@+id/englishPronounceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/englishLabel"
+                android:text="       "
+               	android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/showAnswerBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/englishPronounceLabel"
+                android:background="@drawable/answer_button_default"
+                android:text="線上" />
+
+            <Button
+                android:id="@+id/showQuestionBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/showAnswerBtn"
+                android:layout_alignBottom="@+id/showAnswerBtn"
+                android:layout_toRightOf="@+id/showAnswerBtn"
+                android:background="@drawable/answer_button_default"
+                android:text="作答" />
+
+            <TextView
+                android:id="@+id/answerLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/showAnswerBtn"
+                android:text="       "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+            <com.ant.liao.GifView
+                android:id="@+id/imageView_gif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/answerBtn4"
+                android:src="@drawable/ic_action_search" />
+
+            <Button
+                android:id="@+id/answerBtn1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/answerLabel"
+                android:shadowColor="#A8A8A8"
+		        android:shadowDx="0"
+		        android:shadowDy="0"
+		        android:shadowRadius="10"
+                android:text="A1" /><!-- style="?android:attr/buttonStyleSmall" -->
+
+            <Button
+                android:id="@+id/answerBtn2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/answerBtn1"
+                android:shadowColor="#A8A8A8"
+		        android:shadowDx="0"
+		        android:shadowDy="0"
+		        android:shadowRadius="10"
+                android:text="A2" /><!-- style="?android:attr/buttonStyleSmall" -->
+
+            <Button
+                android:id="@+id/answerBtn3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/answerBtn2"
+                android:shadowColor="#A8A8A8"
+		        android:shadowDx="0"
+		        android:shadowDy="0"
+		        android:shadowRadius="10"
+                android:text="A3" /><!-- style="?android:attr/buttonStyleSmall" -->
+
+            <Button
+                android:id="@+id/answerBtn4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/answerBtn3"
+                android:shadowColor="#A8A8A8"
+		        android:shadowDx="0"
+		        android:shadowDy="0"
+		        android:shadowRadius="10"
+                android:text="A4" /><!-- style="?android:attr/buttonStyleSmall" -->
+
+            <Button
+                android:id="@+id/previousPicBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView_gif"
+                android:layout_toLeftOf="@+id/showQuestionBtn"
+                android:background="@drawable/answer_button_default"
+                android:text="上一張" />
+
+            <Button
+                android:id="@+id/nextPicBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/picFileLabel"
+                android:layout_toRightOf="@+id/previousPicBtn"
+                android:background="@drawable/answer_button_default"
+                android:text="下一張" />
+            <TextView
+                android:id="@+id/questionNumLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/showQuestionBtn"
+                android:layout_alignBottom="@+id/showQuestionBtn"
+                android:layout_toRightOf="@+id/showQuestionBtn"
+                android:text="       "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/hasPicLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/questionNumLabel"
+                android:layout_alignBottom="@+id/questionNumLabel"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/questionNumLabel"
+                android:text="       "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/picFileLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/previousPicBtn"
+                android:text="       " />
+            
+            <Button
+                android:id="@+id/savePickPropBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/answer_button_default"
+                android:text="成績" />
+            
+            <Button
+                android:id="@+id/recentQuestionBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/savePickPropBtn"
+                android:background="@drawable/answer_button_default"
+                android:text="最近" />
+
+            <CheckBox
+                android:id="@+id/showPicCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView_gif"
+                android:layout_toRightOf="@+id/nextEnglishBtn" />
+
+            <ImageButton
+                android:id="@+id/deletePicBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/picFileLabel"
+                android:src="@android:drawable/ic_delete"
+                android:background="@drawable/answer_button_default"
+                 />
+
+            <Button
+                android:id="@+id/nextEnglishBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/nextPicBtn"
+                android:layout_below="@+id/imageView_gif"
+                android:layout_toRightOf="@+id/nextPicBtn"
+                android:background="@drawable/answer_button_default"
+                android:text="下個單字" />
+
+            <TextView
+                android:id="@+id/errorResultLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/deletePicBtn"
+                android:text=" " />
+
+            <CheckBox
+                android:id="@+id/doRecordSuccessFailBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/hasPicLabel"
+                android:layout_alignBottom="@+id/hasPicLabel"
+                android:layout_toRightOf="@+id/hasPicLabel" />
+            
+		</RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

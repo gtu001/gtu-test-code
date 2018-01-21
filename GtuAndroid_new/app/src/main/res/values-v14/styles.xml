@@ -1,0 +1,25 @@
+<resources>
+
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar" />
+
+    <style name="ch0215_dialogTheme" parent="@android:style/Theme.Dialog">
+        <!-- <item name="android:textColor">@color/FlatLightBlue</item>
+         <item name="android:windowBackground">@drawable/ch0215_dialog_bg</item>-->
+        <item name="android:alertDialogStyle">@style/ch0215_alertDialogStyle</item>
+    </style>
+
+    <style name="ch0215_alertDialogStyle">
+        <!--<item name="android:textColor">@color/FlatLightBlue</item>-->
+        <item name="android:fullBright">@android:color/transparent</item>
+        <item name="android:fullDark">@android:color/transparent</item>
+        <item name="android:topBright">@android:color/transparent</item>
+        <item name="android:topDark">@android:color/transparent</item>
+        <item name="android:centerBright">@android:color/transparent</item>
+        <item name="android:centerDark">@android:color/transparent</item>
+        <item name="android:centerMedium">@android:color/transparent</item>
+        <item name="android:bottomBright">@android:color/transparent</item>
+        <item name="android:bottomDark">@android:color/transparent</item>
+        <item name="android:bottomMedium">@android:color/transparent</item>
+    </style>
+
+</resources>

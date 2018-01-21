@@ -1,0 +1,290 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.gtuandroid"
+    android:versionCode="1"
+    android:versionName="1.0"
+    android:installLocation="preferExternal">
+    <!-- android:installLocation="preferExternal" 可將檔案安裝置SD -->
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="23" />
+
+    <!-- 歷史紀錄權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
+    <uses-permission android:name="com.android.browser.permission.WRITE_HISTORY_BOOKMARKS" />
+    <!-- 歷史紀錄權限 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 加上檔案存取權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+	<!-- 加上檔案存取權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 螢幕旋轉權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+	<!-- <uses-permission android:name="android.permission.SET_ORIENTATION" /> -->
+	<!-- 螢幕旋轉權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- wifi權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+	<!-- wifi權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 網路權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- 網路權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 打電話權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.CALL_PHONE" />
+	<!-- 打電話權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 讀取電話簿權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+	<!-- 讀取電話簿權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 讀取簡訊權限 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.READ_SMS" />
+	<!-- 讀取簡訊權限 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 相機 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.RECORD_VIDEO" />
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+	<!-- 相機 ↑↑↑↑↑↑↑↑↑↑ -->
+	<!-- 浮動窗要加 ↓↓↓↓↓↓↓↓↓↓ -->
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	<!-- 浮動窗要加 ↑↑↑↑↑↑↑↑↑↑ -->
+	
+
+	<!-- 設定 MyApp為所有activity共用的application物件 -->
+    <application
+        android:icon="@drawable/my_icon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" 
+        android:name="android.support.multidex.MultiDexApplication"
+        android:allowBackup="true"
+        ><!--android:name="android.support.multidex.MultiDexApplication" 可避免method數限制-->
+        
+        <meta-data android:name="com.google.android.gms.version"
+        	android:value="@integer/google_play_services_version" />
+        
+        <!--### Provider ###-->
+        <!-- 設定自訂Provider ↓↓↓↓↓↓↓ -->
+        <provider android:name=".component.MyProvider" android:authorities="com.gjun.provider.myprovider" />
+        <!-- 設定自訂Provider ↑↑↑↑↑↑↑ -->
+        
+        <!--### Service ###-->
+        <!-- 執行的服務需定義 ↓↓↓↓↓↓↓ -->
+        <service android:name="com.example.gtuandroid.ServiceTestActivity$MyService" />
+        <service android:name="com.example.gtuandroid.ServiceTest2Activity$MyService" />
+        <service android:name="com.example.gtuandroid.component.FloatViewService" />
+        <service android:name="com.example.gtuandroid.ServiceTest_IntentService_Activity$TestIntentService" />
+        <!-- 執行的服務需定義 ↑↑↑↑↑↑↑ -->
+        
+        <!--### Receiver ###-->
+        <!-- 設定開機自動執行 ↓↓↓↓↓↓↓ -->
+        <receiver android:name="com.example.gtuandroid.component.BootBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+        <!-- 設定開機自動執行 ↑↑↑↑↑↑↑ -->
+        
+        <!-- Alert提醒 ↓↓↓↓↓↓↓ -->
+        <receiver android:name="com.example.gtuandroid.ServiceTest2Activity$AlarmReceiver" />
+        <!-- Alert提醒 ↑↑↑↑↑↑↑ -->
+          
+        <!-- widget ↓↓↓↓↓↓↓ -->
+        <receiver
+            android:name=".component.MyAppWidgetProvider"
+            android:icon="@drawable/car2">
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_provider_info">
+            </meta-data>
+            <intent-filter>
+                <action android:name="com.example.action.CLICK" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </receiver>
+        <!-- widget ↑↑↑↑↑↑↑ --> 
+        
+        <!-- camera監聽 ↓↓↓↓↓↓↓ -->
+        <receiver
+            android:name="com.example.gtuandroid.CameraReceiverActivity$TakeNewPictureReceiver"
+            android:enabled="true" >
+            <intent-filter android:priority="10000" >
+                <action android:name="android.intent.action.CAMERA_BUTTON" />
+                <action android:name="com.android.camera.NEW_PICTURE" />
+                <action android:name="android.hardware.action.NEW_PICTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </receiver>
+        <!-- camera監聽 ↑↑↑↑↑↑↑ --> 
+        
+        <!-- android:debuggable="true" -->
+        <!--  android:screenOrientation="portrait" android:configChanges="keyboard|keyboardHidden|orientation" 控制螢幕翻轉-->
+        <activity
+            android:name="._MainActivity"
+            android:label="@string/title_activity_main"
+            android:configChanges="keyboard|keyboardHidden|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- 若加上後面這個屬性,開啟時將會以dialog的方式開啟   android:theme="@android:style/Theme.Holo.Dialog" -->
+        <activity android:name="DialogActivity" android:label="dialog" />
+        <activity android:name="PasswordActivity" android:label="密碼顯示與隱藏" />
+        <activity android:name="MoveToSDActivity" android:label="存到記憶卡" />
+        <activity android:name="ToastActivity" android:label="Toast" />
+        <activity android:name="RadioActivity" android:label="radio group" />
+        <activity android:name="ImageViewActivity" android:label="圖片顯示" />
+        <activity android:name="SpinnerActivity" android:label="下拉選單" />
+        <activity android:name="AutoCompleteActivity" android:label="autoComplete" />
+        <activity android:name="AnalogClockActivity" android:label="時鐘" />
+        <activity android:name="DateTimePickerActivity" android:label="日期時間picker" />
+        <activity android:name="DateTimeDialogActivity" android:label="日期時間dialog" />
+        <activity android:name="ProgressBarActivity" android:label="處理中控制項" />
+        <activity android:name="GridViewActivity" android:label="Grid表格" />
+        <activity android:name="ListViewActivity" android:label="清單物件" />
+        <activity android:name="ListActivityActivity" android:label="清單功能表" />
+        <activity android:name="FileDirectoryActivity" android:label="檔案瀏覽" />
+        <activity android:name="BitmapActivity" android:label="儲存空間圖片瀏覽" />
+        <activity android:name="OptionsMenuActivity" android:label="功能表" />
+        <activity android:name="OptionsMenu2Activity" android:label="功能表V2" />
+        <activity android:name="EditActivity" android:label="傳統文字編輯" />
+        <activity android:name="ChronometerActivity" android:label="計時器" />
+        <activity android:name="VideoActivity" android:label="影片" />
+        <activity android:name="GalleryActivity" android:label="畫廊" />
+        <activity android:name="RatingSeekBarActivity" android:label="RatingBar 與 SeekBar" />
+        <activity android:name="SharedPreferencesActivity" android:label="資料存取" />
+        <activity android:name="SQLiteTestActivity" android:label="SQLite" />
+        <activity android:name="ActionBarActivity" android:label="左上角按鈕">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.gtuandroid._MainActivity"/>
+        </activity>
+        <activity android:name="ListViewActivity2" android:label="自訂細節的ListView"/>
+        <activity android:name="GridViewActivity2" android:label="自訂GridView"/>
+        <activity android:name="WifiTestActivity" android:label="測試wifi用"/>
+        <activity android:name="FragmentDynamicActivity" android:label="碎片動態"/>
+        <activity android:name="FragmentTest0Activity" android:label="碎片固定"/>
+        <activity android:name="FragmentTestActivity" android:label="碎片測試"/>
+        <activity android:name="FragmentPagerV4TestActivity" android:label="碎片PagerV4" />
+        <activity android:name="EventBusActivity" android:label="事件bus"/>
+        <activity android:name="SystemPicPathActivity" android:label="抓取系統照片"/>
+        <activity android:name="HyperLinkTextActivity" android:label="設定超連結"/>
+        <activity android:name="LinkifyActivity" android:label="設定超連結2"/>
+        <activity android:name="ClipboardActivity" android:label="剪貼簿"/>
+        <activity android:name="RememberPosListViewActivity" android:label="記住點選位置"/>
+        <activity android:name="SplashScreenActivity" android:label="載入logo">
+            <!-- <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> -->
+        </activity>
+        <activity android:name="MyAppTest1Activity" android:label="共用application"/>
+        <activity android:name="MyAppTest2NextActivity" android:label="共用application"/>
+        <activity android:name="ListViewSQLiteActivity" android:label="ListView與SQLite"/>
+        <activity android:name="ListViewLoopActivity" android:label="Loop ListView"/>
+        <activity android:name="ListViewBmpActivity" android:label="List載入Bmp"/>
+        <activity android:name="HandlerTestActivity" android:label="更新UI"/>
+        <activity android:name="SMSBroadcastReceiverActivity" android:label="收到簡訊立即擷取內容"/>
+        <activity android:name="BroadcastReceiverActivity" android:label="廣播測試"/>
+        <activity android:name="GetBatteryInfoActivity" android:label="電池狀態(廣播)"/>
+        <activity android:name="CountdownTimerActivity" android:label="倒數計時器"/>
+        <activity android:name="SMSSenderActivity" android:label="發送簡訊"/>
+        <activity android:name="NotificationTestActivity" android:label="發送通知"/>
+        <activity android:name="FragmentTabsActivity" android:label="Tab分頁"/>
+        <activity android:name="ServiceTestActivity" android:label="服務"/>
+        <activity android:name="ServiceTest2Activity" android:label="服務2"/>
+        <activity android:name="ServiceTest_IntentService_Activity" android:label="服務IntentService" />
+        <activity android:name="ListViewBmpV2Activity" android:label="List載入Bmp V2"/>
+        <activity android:name="ExpandableListViewActivity" android:label="可延展ExpandableListView"/>
+        <activity android:name="AsyncTaskTestActivity" android:label="AsyncTask測試"/>
+        <activity android:name="AsyncTaskTest2Activity" android:label="AsyncTask測試2"/>
+        <activity android:name="GetServerMessageActivity" android:label="取得Server資訊"/>
+        <activity android:name="PhoneBookActivity" android:label="電話簿"/>
+        <activity android:name="SMSReaderActivity" android:label="讀取簡訊內容"/>
+        <activity android:name="PhoneBookV2Activity" android:label="電話簿(聯絡人照片)"/>
+        <activity android:name="MyProviderTestActivity" android:label="自訂Provider"/>
+        <activity android:name="ImageMyDrawViewActivity" android:label="自行繪製元件"/>
+        <activity android:name="ImageMoveV1Activity" android:label="自行繪製元件移動V1"/>
+        <activity android:name="ImageMoveV2Activity" android:label="自行繪製元件移動V2"/>
+        <activity android:name="ImageMoveV3Activity" android:label="自行繪製元件移動V3"/>
+        <!-- 媒體撥放器↓↓↓↓↓↓ -->
+        <activity android:name=".mediaplayer.MainTabMenu" android:label="影片撥放器"/>
+        <activity android:name=".mediaplayer.ResMediaPlayer"/>
+        <activity android:name=".mediaplayer.LocalMediaPlayer"/>
+        <activity android:name=".mediaplayer.StreamMediaPlayer"/>
+        <activity android:name=".mediaplayer.ExpandImage"/>
+        <!-- 媒體撥放器↑↑↑↑↑↑ -->
+        <activity android:name="FilePathActivity" android:label="檔案路徑"/>
+        <!-- 相機↓↓↓↓↓↓ -->
+        <activity android:name=".video.VideoComponent" android:label="相機" />
+        <activity android:name=".video.VideoPlayer" />
+        <activity android:name=".video.VideoRecorder" />
+        <!-- 相機↑↑↑↑↑↑ -->
+        <!-- 影音↓↓↓↓↓↓ -->
+        <activity android:name=".makemedia.MakeMedias" android:label="影音" />
+        <!-- 影音↑↑↑↑↑↑ -->
+        <activity android:name="WebviewActivity" android:label="內嵌網頁" />
+        <activity android:name="SendEmailIntentActivity" android:label="寄郵件Intent" />
+        <activity android:name="MediaTestActivity" android:label="簡易媒體撥放" />
+        <activity android:name="CameraTestActivity" android:label="簡易相機測試" />
+        <activity android:name="CameraTest2Activity" android:label="簡易相機測試(內嵌)" />
+        <activity android:name="FloatViewActivity" android:label="懸浮視窗(Compat)" />
+        <activity android:name="FloatView2Activity" android:label="懸浮視窗(Local)" />
+        <activity android:name="FloatView3Activity" android:label="懸浮視窗(Image)" />
+        <activity android:name="SensorTestActivity" android:label="感測器(加速器)" />
+        <activity android:name="SensorTest2Activity" android:label="感測器(方向)" />
+        <activity android:name="SensorTest3Activity" android:label="感測器(指南針)" />
+        <activity android:name="ViewGroupTestActivity" android:label="ViewGroup測試" />
+        <activity android:name="SensorBudaowActivity" android:label="感測器(不倒翁)" />
+        <activity android:name="TreeViewActivity" android:label="TreeView(自訂)" />
+        <activity android:name="AnimDownloadProgressButtonActivity" android:label="進度按鈕" />
+        <activity android:name="FileDataStoreActivity" android:label="檔案存取" />
+        <activity android:name="XmlParserActivity" android:label="Xml讀取" />
+        <activity android:name="JsonParserActivity" android:label="Json讀取" />
+        <activity android:name="BookReaderActivity" android:label="閱讀器" />
+        <!-- fragment list ↓↓↓↓↓↓ -->
+        <activity android:name=".listfragmgnet.ItemListActivity" android:label="ListFragment" />
+        <activity android:name=".listfragmgnet.ItemDetailActivity" />
+        <!-- fragment list ↑↑↑↑↑↑ -->
+        <activity android:name="OverridePendingTransitionActivity" android:label="切換動畫" />
+        <activity android:name="CameraPhotoActivity" android:label="相簿" />
+        <activity android:name="CameraReceiverActivity" android:label="監控相機" />
+        <activity android:name="GoogleApiTestActivity" android:label="GoogleClient測試" />
+        <activity android:name="GoogleAdMobTestActivity" android:label="Google AdMob Banner" />
+        <!-- for AdMob ↓↓↓↓↓↓ -->
+        <activity android:name="com.google.android.gms.ads.AdActivity" 
+                  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+                  android:theme="@android:style/Theme.Translucent" />
+        <!-- for AdMob ↑↑↑↑↑↑ -->
+        <!-- Drawer fragment ↓↓↓↓↓↓ -->
+        <activity android:name=".drawerfragment.DrawerMainActivity" android:label="Drawer Fragment" 
+            android:theme="@style/QueryTheme"/><!-- @style/Theme.AppCompat -->
+        <!-- Drawer fragment ↑↑↑↑↑↑ -->
+        <activity android:name="ZoomControlActivity" android:label="放大縮小" />
+        <activity android:name="TabFragmentActivity" android:label="Tab用ActionBar" />
+        <activity android:name="PrefereceCategoryTestActivity" android:label="建立設定畫面" />
+        <activity android:name="DrawerV4TestActivity" android:label="導覽選單" />
+        <activity android:name="FragmentDialogActivity" android:label="DialogFragment" />
+        <activity android:name="FragmentTest2Activity" android:label="Fragment" />
+        <activity android:name="LoaderTestActivity" android:label="瀏覽器歷史紀錄" />
+        <activity android:name="TestActivity" android:label="測試用..." />
+        <activity android:name="TapGestureDetectActivity" android:label="監聽點擊/雙點擊,捲動,長點擊" />
+        <activity android:name="ImageDetectTapActivity" android:label="圖片任意範圍的點擊" />
+        <activity android:name=".CommonKeyListenerActivity" android:label="監聽按鍵" />
+        <activity android:name=".TweenAnimationTestActivity" android:label="使用Tween動畫" />
+        <activity android:name=".BottomNavigationActivity" android:label="底部導覽按鈕" android:theme="@style/Theme.AppCompat.Light" />
+        <activity android:name=".SearchViewActivity" android:label="搜尋bar清單">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        <activity android:name=".SearchViewActivity2" android:label="搜尋bar清單[Menu]"/>
+
+
+    </application>
+
+</manifest>

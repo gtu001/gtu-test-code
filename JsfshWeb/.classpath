@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**/*.java" including="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="var" path="M2_REPO/javax/el/el-api/2.2/el-api-2.2.jar" sourcepath="M2_REPO/javax/el/el-api/2.2/el-api-2.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1.jar" sourcepath="M2_REPO/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/jstl/1.2/jstl-1.2.jar" sourcepath="M2_REPO/javax/servlet/jstl/1.2/jstl-1.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
+	<classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" sourcepath="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/asm/asm-attrs/1.5.3/asm-attrs-1.5.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/cglib/cglib/2.2/cglib-2.2.jar" sourcepath="M2_REPO/cglib/cglib/2.2/cglib-2.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/D:/maven/repo/cglib/cglib/2.2/cglib-2.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar" sourcepath="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/D:/maven/repo/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/D:/maven/repo/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar" sourcepath="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/1.2.3/ehcache-1.2.3.jar" sourcepath="M2_REPO/net/sf/ehcache/ehcache/1.2.3/ehcache-1.2.3-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/D:/maven/repo/net/sf/ehcache/ehcache/1.2.3/ehcache-1.2.3-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/web/el-impl/2.2/el-impl-2.2.jar" sourcepath="M2_REPO/org/glassfish/web/el-impl/2.2/el-impl-2.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate/3.2.7.ga/hibernate-3.2.7.ga.jar" sourcepath="M2_REPO/org/hibernate/hibernate/3.2.7.ga/hibernate-3.2.7.ga-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/D:/maven/repo/org/hibernate/hibernate/3.2.7.ga/hibernate-3.2.7.ga-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/com/sun/faces/jsf-api/2.1.0-b03/jsf-api-2.1.0-b03.jar" sourcepath="M2_REPO/com/sun/faces/jsf-api/2.1.0-b03/jsf-api-2.1.0-b03-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/sun/faces/jsf-impl/2.1.0-b03/jsf-impl-2.1.0-b03.jar" sourcepath="M2_REPO/com/sun/faces/jsf-impl/2.1.0-b03/jsf-impl-2.1.0-b03-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/mysql/mysql-connector-java/5.1.9/mysql-connector-java-5.1.9.jar"/>
+	<classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" sourcepath="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSF2.0 Implementation">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+			<attribute name="owner.project.facets" value="jst.jsf"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

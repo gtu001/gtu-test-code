@@ -1,0 +1,141 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_english_info_ui"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="top" >
+
+    <!-- windowSoftInputMode=stateUnspecified|adjustResize -->
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/new_search_icon" />
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fillViewport="true" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="0dip"
+            android:background="@drawable/layout_background"
+            android:orientation="vertical"
+            android:padding="3dp" >
+
+            <LinearLayout
+                android:id="@+id/linearLayout_inner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dip"
+                android:orientation="horizontal" >
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:ems="10"
+                    android:selectAllOnFocus="true"
+                    android:singleLine="true"
+                    android:dropDownHeight="180dp"
+                    android:completionThreshold="1"
+                    android:popupBackground="@drawable/float_autocomplete"
+                    android:hint="輸入單字"
+                    >
+                    <requestFocus />
+                </AutoCompleteTextView>
+
+                <ImageView
+                    android:id="@+id/imageViewConfig"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/icon_config" />
+
+                <ImageView
+                    android:id="@+id/imageViewSearch"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/new_search_icon2" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dip"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <ImageView
+                    android:id="@+id/imageViewDictionary"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/icon_dictionary" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/editText1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="輸入解釋">
+            </EditText>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dip"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/icon_save"
+                    android:text="加入新字" />
+
+                <Button
+                    android:id="@+id/button3"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/icon_modify"
+                    android:text="修改" />
+
+                <ImageView
+                    android:id="@+id/imageViewEraser"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/icon_eraser" />
+
+                <TextView
+                    android:id="@+id/refTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:paddingLeft="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

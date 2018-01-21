@@ -1,0 +1,8 @@
+<resources>
+
+
+    <style name="AppTheme" parent="android:Theme.Light.NoTitleBar" />
+    <style name="AppTheme2" parent="Theme.AppCompat.Light"></style>
+    <style name="AppTheme3" parent="Theme.AppCompat" />
+
+</resources>

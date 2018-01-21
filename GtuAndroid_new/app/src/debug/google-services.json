@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "505634973306",
+    "project_id": "firebase-gtuandroid"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505634973306:android:e5428900c4969f76",
+        "android_client_info": {
+          "package_name": "com.example.gtu001.gtuandroid_new"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "505634973306-immtrav5n33n5v4u4gqnto0qsocmvev8.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "505634973306-9s7q553f7rqbavrri0u5imeo8rqod04j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gtu001.gtuandroid_new",
+            "certificate_hash": "b233c1d1a92d48db066771297c41a9a7e2f6e247"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxiKe9FIRcVX_dWfdxJTfcc4_XyuZJOq8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

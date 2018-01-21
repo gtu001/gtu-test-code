@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--
+Button 類別的 android:background 屬性可用來設定按鈕的顏色，而且設定的方式有很多種，最簡單的就是直接指定按鈕顏色，例如：
+
+android:background="#0000FF" 就是指定按鈕為藍色
+
+也可以指定一個圖檔(Android 主推 PNG 格式)，例如：
+
+android:background="@drawable/圖檔名"
+
+還可以更進階地指定一外部 resource 檔，做一些細項的微調，這會用到 Shape Drawable，其屬性如下：
+
+shape，其值有 rectangle(四邊形)，oval(橢圓形)，line(直線)，ring(環形)；
+當 shape="ring" 時，又有 useLevel、innerRadius、innerRadiusRatio、thickness、thicknessRatio 5 個屬性，通常 useLevel 設為 false，若設為 true，則需要 LevelListDrawable 這個 resource 檔配合。
+innerRadius 和 innerRadiusRatio 擇一使用，innerRadius 是直接指定內圓的半徑，所以需附上單位，如 50dp；而 innerRadiusRatio 則為比例，比方說 innerRadiusRatio=2 時，則內圓的半徑就是寬度除以 2，預設值為 9。
+thickness 和 thicknessRatio 擇一使用，thickness 是直接指定外環的厚度，所以需附單位，如 5dp；而 thicknessRatio 則為比例，比方說 thicknessRatio=2 時，則環的厚度寬度除以 2，預設值為 3。
+
+corners - 指四個角，有 radius、topLeftRadius、topRightRadius、bottomLeftRadius、bottomRightRadius 子屬性。
+radius 是當 shape=rectangle 時，設定四個角為圓角的度數，如：2dp，數字愈大，角度愈圓；您也可以透過 topLeftRadius(左上)、topRightRadius(右上)、bottomLeftRadius(左下)、bottomRightRadius(右下) 指定四個角各自的角度。
+
+gradient 為漸層色，有三種 type：linear、radial(放射狀)、sweep，可惜老灰鴨英文不夠好，搞不懂也踹不出 sweep 會有什麼外觀效果。
+startColor 為起始顏色，endColor 為終止顏色，angle 為角度，當 angle=0 時，表起始顏色在左，終止顏色在右，當 angle=90，起始顏色在下，終止顏色在上，當 angle=180，起始顏色在右，終止顏色在左，當 angle=270，起始顏色在上，終止顏色在下，而 angle 必須為 45 的倍數。
+當 gradient:type="radial" 時，一定還要指定 gradientRadius 的值，如：200，不然程式會出錯。
+當 gradient:type="line" 時，還可加上 centerColor 屬性，可使漸層表現更豐富，例如：
+android:startColor="#449def"
+android:centerColor="#2f6699"
+android:endColor="#449def"
+android:angle="270"
+則會表現出 由上至中顏色漸深，再由中至下顏色漸淺
+
+stroke 為框線厚度，如：1dp。
+
+padding 為內部文字距上、下、左、右的空白。
+
+接下來思考您的 app 中用到的 Button 有哪幾種狀態：state_pressed、state_focused、state_hovered、state_selected、state_enabled、state_activated、state_window_focused、state_checkable、state_checked；通常按鈕若不 disable，則就有 一般 及 按下 二種狀態。
+
+再來就是建立一個 resource 檔，resource 檔要放在 /res/drawable 資料夾內
+-->
+
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#449def"
+                android:centerColor="#2f6699"
+                android:endColor="#449def"
+                android:angle="270" />
+  			<stroke
+                android:width="1dp"
+                android:color="#2f6699" />
+            <corners
+                android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
+ 	<item android:state_pressed="true">
+        <shape>
+            <solid
+    			android:color="#449def" />
+            <stroke
+                android:width="1dp"
+                android:color="#2f6699" />
+            <corners
+    			android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
+</selector>

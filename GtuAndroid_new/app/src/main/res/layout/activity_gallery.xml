@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    
+    <ImageSwitcher
+        android:id="@+id/image_switcher"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="100" />
+
+    <Gallery
+        android:id="@+id/gallery"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_weight="0"
+        android:background="#55000000"
+        android:gravity="center_vertical"
+        android:spacing="1dp" />
+    
+    <Button
+        android:id="@+id/back"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="back" />
+
+</LinearLayout>

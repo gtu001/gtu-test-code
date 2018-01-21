@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <item
+        android:id="@+id/file"
+        android:icon="@drawable/audio0"
+        android:title="檔案">
+        <menu>
+            <item
+                android:id="@+id/create"
+                android:icon="@drawable/audio0"
+                android:title="新"/>
+            <item
+                android:id="@+id/open"
+                android:icon="@drawable/audio0"
+                android:title="開啟"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/quit"
+        android:icon="@drawable/audio1"
+        android:title="離開"/>
+
+</menu>

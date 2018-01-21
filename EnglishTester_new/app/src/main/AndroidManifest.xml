@@ -1,0 +1,147 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.englishtester"
+    android:versionCode="20"
+    android:versionName="1.0.6.10">
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="16" />
+
+    <!-- adMob需要 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- adMob需要 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 加上檔案存取權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"></uses-permission>
+    <!-- 加上檔案存取權限 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 螢幕旋轉權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+    <!-- <uses-permission android:name="android.permission.SET_ORIENTATION" /> -->
+    <!-- 螢幕旋轉權限 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 網路權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 網路權限 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 懸浮視窗 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- 懸浮視窗 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 寫log ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <!-- 寫log ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 震動權限 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 震動權限 ↑↑↑↑↑↑↑↑↑↑ -->
+
+    <application
+        android:name="com.example.englishtester.common.MyApplication"
+        android:icon="@drawable/janna_icon1"
+        android:label="@string/app_name"
+        android:logo="@drawable/janna"
+        android:theme="@style/AppTheme"><!--AppTheme-->
+        <!-- android:name="android.support.multidex.MultiDexApplication"-->
+        <!--  android:screenOrientation="portrait" android:configChanges="keyboard|keyboardHidden|orientation" -->
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service
+            android:name="com.example.englishtester.FloatViewService"
+            android:process=":floatViewService"
+            android:exported="false"
+            android:stopWithTask="false">
+            <intent-filter android:priority="1000">
+                <action android:name="FloatViewService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.example.englishtester.FloatViewAssistService"
+            android:process=":floatViewAssistService"
+            android:exported="false"
+            android:stopWithTask="false" />
+
+        <!--<receiver android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.PACKAGE_RESTARTED" />
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.intent.action.BATTERY_CHANGED" />
+                <action android:name="android.intent.action.CONFIGURATION_CHANGED" />
+                <action android:name="android.intent.action.TIME_TICK" />
+                <action android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver" />
+            </intent-filter>
+        </receiver>會有關不掉的問題-->
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/title_activity_main">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ReciteMainActivity"
+            android:label="背單字" />
+        <activity
+            android:name=".PropertiesFindActivity"
+            android:label="題庫資訊" />
+        <activity
+            android:name=".PicFindActivity"
+            android:label="圖片資訊" />
+        <activity
+            android:name=".EnglishwordInfoActivity"
+            android:label="單字資訊" />
+        <activity
+            android:name="StatusInfoActivity"
+            android:label="系統狀態" />
+        <activity
+            android:name="ShowWordListActivity"
+            android:label="單字清單" /><!--android:exported="true"-->
+        <activity
+            android:name="SearchDictionaryActivity"
+            android:label="線上字典" />
+        <activity
+            android:name="FloatViewActivity"
+            android:label="即時字典" />
+        <activity
+            android:name="DumpLogActivity"
+            android:label="系統LOG" />
+        <activity
+            android:name="TxtReaderActivity"
+            android:label="文字閱讀器" />
+        <activity
+            android:name="DropboxApplicationActivity"
+            android:label="Dropbox App申請" />
+        <activity
+            android:name=".SlidePageInstructionActivity"
+            android:label="Dropbox App申請教學" />
+        <activity
+            android:name=".BaiduApplicationActivity"
+            android:label="百度Api申請教學" />
+        <activity
+            android:name=".InterstitialAdActivity"
+            android:label="全版廣告"
+            android:theme="@style/Transparent2" />
+
+        <!-- for AdMob ↓↓↓↓↓↓ -->
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+        <!-- for AdMob ↑↑↑↑↑↑ -->
+    </application>
+</manifest>

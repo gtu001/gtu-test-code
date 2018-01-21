@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <drawable name="white">#FFFFFF</drawable>
+    <drawable name="black">#000000</drawable>
+    <drawable name="red">#F60000</drawable>
+
+</resources>

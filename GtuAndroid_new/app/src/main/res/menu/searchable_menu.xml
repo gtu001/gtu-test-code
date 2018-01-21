@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:id="@+id/search"
+    android:actionViewClass="android.widget.SearchView"
+    android:icon="@drawable/ic_launcher"
+    android:showAsAction="collapseActionView|ifRoom"
+    android:title="搜尋" />
+</menu>

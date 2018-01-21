@@ -1,0 +1,60 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+    <PreferenceCategory
+        android:key="test1"
+        android:title="設定畫面">
+
+        <EditTextPreference
+            android:dialogTitle="編輯對話框標題"
+            android:key="edittext_key"
+            android:summary="編輯摘要"
+            android:title="標題:編輯" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="test2"
+        android:title="設定畫面2">
+
+        <ListPreference
+            android:dialogTitle="清單對話框標題"
+            android:entries="@array/setting_skintheme"
+            android:entryValues="@array/setting_skintheme_value"
+            android:key="list_key"
+            android:summary="清單摘要"
+            android:title="標題:清單" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="test3"
+        android:title="設定畫面3">
+
+        <CheckBoxPreference
+            android:key="checkbox_key"
+            android:summary="核取方塊摘要"
+            android:title="標題:核取方塊" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="test3"
+        android:title="設定畫面3">
+
+        <com.example.gtuandroid.sub.ConfigDialogPreference
+            android:defaultValue="20170707T153500"
+            android:key="customizedialog_key"
+            android:summary="自訂對話框說明"
+            android:title="自訂對話框標題"
+            android:dialogTitle="自訂對話框名稱"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="test4"
+        android:title="設定畫面4">
+
+        <com.example.gtuandroid.sub.ConfigRatingBarPreference
+            android:defaultValue="50"
+            android:key="calligraphy_diameter"
+            android:summary="編輯摘要"
+            android:title="編輯標題"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
