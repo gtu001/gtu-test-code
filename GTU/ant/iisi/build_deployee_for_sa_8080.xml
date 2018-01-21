@@ -1,0 +1,21 @@
+<project name="iisi_deployee_full" default="main">
+
+	<property name="tomcat_home" location="C:\apps\@server\apache-tomcat-7.0.26_self" />
+	<property name="test_tomcat_home" location="C:\apps\@server\apache-tomcat-7.0.26" />
+
+	<property name="target_webapp" location="${tomcat_home}\webapps\ris_web" />
+	<property name="sync_target_webapp" location="${test_tomcat_home}\webapps\ris_web" />
+
+	<target name="main">
+		<sync todir="${sync_target_webapp}" verbose="true" includeemptydirs="true">
+			<fileset dir="${target_webapp}">
+				<include name="**/**.*" />
+			</fileset>
+		</sync>
+
+		<exec dir="${test_tomcat_home}/bin" executable="cmd">
+			<arg value="/c" />
+			<arg value="startup.bat" />
+		</exec>
+	</target>
+</project>

@@ -1,0 +1,28 @@
+Dynamic Web Project 加入jar檔且不用硬塞WEB-LIB\lib的方法
+
+1.點Project右鍵開啟Properties -> 左邊選 Deployment Assembly
+
+2.右邊選Add -> 選Java Build Path Entries
+
+3.起server後開啟以下目錄檢查是否有加入jar檔
+
+.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps
+
+
+
+
+以下是舊版本eclipse作法
+
+The solution is quite straightforward:
+
+ 1. Right click on the your web project and choose PROPERTIES
+
+ 2. Choose the J2EE Module Dependencies
+
+ 3. Click on the Add External JARs… and then point on your library file (ZIP or JAR)
+
+ 4. Click on Apply then OK.
+
+ 5. Restart your Apache Tomcat
+
+The added library should be seen under: ProjectName > Java Resources: src > Libraries > WebApp Libraries.

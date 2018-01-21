@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Jun 26, 2012 10:37:08 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="gtu.db.hibernate.User" table="USER" schema="PUBLIC" catalog="PUBLIC">
+        <composite-id name="id" class="gtu.db.hibernate.UserId">
+            <key-property name="userId" type="string">
+                <column name="USER_ID" length="20" />
+            </key-property>
+            <key-property name="userName" type="string">
+                <column name="USER_NAME" length="20" />
+            </key-property>
+            <key-property name="userPassword" type="string">
+                <column name="USER_PASSWORD" length="20" />
+            </key-property>
+        </composite-id>
+    </class>
+</hibernate-mapping>

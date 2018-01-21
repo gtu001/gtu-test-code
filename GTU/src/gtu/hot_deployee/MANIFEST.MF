@@ -1,0 +1,2 @@
+Can-Redefine-Classes: true
+Premain-Class: gtu.hot_deployee.HotAgent

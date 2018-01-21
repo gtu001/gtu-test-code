@@ -1,0 +1,26 @@
+<!-- Data Access Objects -->
+<bean id="${dbName}Dao" class="com.gemtek.ehs.model.dao.${po}DaoImpl"
+	parent="baseDao">
+</bean>
+
+<bean id="${dbName}DaoProxy" parent="baseTransactionProxy">
+	<property name="target">
+		<ref local="${dbName}Dao" />
+	</property>
+</bean>
+
+<!-- Service Objects -->
+<bean id="${dbName}Service"
+	class="com.gemtek.ehs.model.service.${po}ServiceImpl">
+	<property name="${dbName}Dao">
+		<ref local="${dbName}DaoProxy" />
+	</property>
+</bean>
+
+<bean id="${dbName}ServiceProxy" parent="baseTransactionProxy">
+	<property name="target">
+		<ref local="${dbName}Service" />
+	</property>
+</bean>
+
+<sqlMap resource="com/gemtek/ehs/model/${po}.xml" />

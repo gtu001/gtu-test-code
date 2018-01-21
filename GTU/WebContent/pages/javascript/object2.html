@@ -1,0 +1,274 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function inherit(){
+		var book1 = { 
+		    name : "Javascript", 
+		    writeLine : function() { 
+		        console.log(this.name); 
+		    } 
+		}; 
+		var book2 = Object.create(book1, { 
+		    name : { 
+		        configurable : true, 
+		        enumerable : true, 
+		        value : "CSS", 
+		        writable : true 
+		    } 
+		}); 
+		book1.writeLine();          // outputs "Javascript" 
+		book2.writeLine();          // outputs "CSS" 
+		console.log(book1.hasOwnProperty("writeLine"));     // true 
+		console.log(book1.isPrototypeOf(book2));        // true 
+		console.log(book2.hasOwnProperty("writeLine"));     // false 
+	}
+	
+	function inherit2(){
+		function Rectangle(length, width) { 
+		    this.length = length;
+		    this.width = width; 
+		} 
+
+		Rectangle.prototype.getArea = function() { 
+		    return this.length * this.width; 
+		}; 
+
+		Rectangle.prototype.toString = function() { 
+		    return "[Rectangle " + this.length + "x" + this.height + "]"; 
+		}; 
+
+		// inherits from Rectangle 
+		function Square(size) { 
+		    Rectangle.call(this, size, size); 
+		} 
+
+		Square.prototype = Object.create(Rectangle.prototype, { 
+		                        constructor : { 
+		                            configurable : true, 
+		                            enumerable : true, 
+		                            value : Square, 
+		                            writable : true 
+		                        } 
+		                    }); 
+
+		// call the supertype method 
+		Square.prototype.toString = function() {  
+		    var text = Rectangle.prototype.toString.call(this); 
+		    return text.replace("Rectangle", "Square"); 
+		}; 
+	}
+	
+	//
+	{
+		function Rectangle(length, width) {  
+		    this.length = length; //from  ww w  .  ja v a  2s  . c  o m
+		    this.width = width; 
+		} 
+
+		Rectangle.prototype.getArea = function() { 
+		    return this.length * this.width; 
+		}; 
+
+		Rectangle.prototype.toString = function() { 
+		    return "[Rectangle " + this.length + "x" + this.width + "]"; 
+		}; 
+
+		// Square inherits from Rectangle 
+		function Square(size) {  
+		    this.length = size; 
+		    this.width = size; 
+		} 
+
+		Square.prototype = new Rectangle(); 
+		Square.prototype.constructor = Square; 
+
+		Square.prototype.toString = function() { 
+		    return "[Square " + this.length + "x" + this.width + "]"; 
+		}; 
+
+		var rect = new Rectangle(5, 10); 
+		var square = new Square(6); 
+
+		console.log(rect.getArea());        // 50 
+		console.log(square.getArea());      // 36 
+
+		console.log(rect.toString());       // "[Rectangle 5x10]" 
+		console.log(square.toString());     // "[Square 6x6]" 
+
+		console.log(rect instanceof Rectangle);     // true 
+		console.log(rect instanceof Object);        // true 
+
+		console.log(square instanceof Square);      // true 
+		console.log(square instanceof Rectangle);   // true 
+		console.log(square instanceof Object);      // true 
+	}
+	
+	//Constructor stealing
+	{
+		function Rectangle(length, width) { 
+		    this.length = length; /*from  w  w w .jav a 2s.  c o  m*/
+		    this.width = width; 
+		} 
+		Rectangle.prototype.getArea = function() { 
+		    return this.length * this.width; 
+		}; 
+
+		Rectangle.prototype.toString = function() { 
+		    return "[Rectangle " + this.length + "x" + this.width + "]"; 
+		}; 
+
+		// inherits from Rectangle 
+		function Square(size) {  
+		    Rectangle.call(this, size, size); 
+		    // optional: add new properties or override existing ones here 
+		} 
+
+		Square.prototype = Object.create(Rectangle.prototype, { 
+		                        constructor : { 
+		                            configurable : true, 
+		                            enumerable : true, 
+		                            value : Square, 
+		                            writable : true 
+		                        } 
+		                    }); 
+
+		Square.prototype.toString = function() { 
+		    return "[Square " + this.length + "x" + this.width + "]"; 
+		}; 
+
+		var square = new Square(6); 
+
+		console.log(square.length);         // 6 
+		console.log(square.width);          // 6 
+		console.log(square.getArea());      // 36 
+	}
+	
+	//The module pattern is an object-creation pattern designed to create singleton objects with private data.
+	{
+		var yourObject = (function() { 
+		    // private data variables 
+		    return { // w  ww.j av a2s.  com
+		        // public methods and properties 
+		    }; 
+		}()); 
+
+		<p>For example: </p>
+
+		var book = (function() { 
+		    var version= 1; 
+		    return { 
+		        name : "Javascript", 
+		        getVersion: function() { 
+		            return version; 
+		        }, 
+		        publishNewVersion : function() { 
+		            version++; 
+		        } 
+		    }; 
+		}()); 
+
+		console.log(book.name);      
+		console.log(book.getVersion());  //Javascript
+
+		book.version = 2; 
+		console.log(book.getVersion());  //1
+
+		book.publishNewVersion(); 
+		console.log(book.getVersion());  //2
+	}
+	
+	//The revealing module pattern arranges all variables and methods at the top and assigns them to the returned object. 
+	{
+		var book = (function() { 
+		    var version = 1; 
+		    function getVersion() { //from  w  w  w. j  a  v a 2  s .c  o m
+		        return version; 
+		    } 
+		    function publishNewVersion() { 
+		        version++; 
+		    } 
+		    return { 
+		        name : "Javascript", 
+		        getVersion: getVersion, 
+		        publishNewVersion : publishNewVersion 
+		    }; 
+		}()); 
+
+		console.log(book.name);      
+		console.log(book.getVersion());  //Javascript
+
+		book.version = 2; 
+		console.log(book.getVersion());  //1
+
+		book.publishNewVersion(); 
+		console.log(book.getVersion());  //2
+	}
+	
+	//The following code shows how to create custom types that require their own private properties.
+	{
+		function Book(name) { /*  w w  w . j a  v  a  2  s. c  o  m*/
+		    // define a variable only accessible inside of the Book constructor 
+		    var version = 1; 
+		    this.name = name; 
+		    this.getVersion = function() { 
+		        return versioin; 
+		    }; 
+		    this.publishNewNewsion = function() { 
+		       version++; 
+		    }; 
+		} 
+
+		var book = new Book("Javascript"); 
+
+		console.log(book.name);       // "Javascript" 
+		console.log(book.getVersion());   // 1
+
+		book.version = 2; 
+		console.log(book.getVersion());   // 1 
+
+		book.publishNewNewsion(); 
+		console.log(book.getVersion());   // 2
+	}
+	
+	//To share private data across all instances: 
+	{
+		var Book = (function() { 
+		    // everyone shares the same version
+		    var version = 1; 
+		/* w  w  w  . j a v a2s  .c o  m*/
+		    function InnerBook(name) { 
+		        this.name = name; 
+		    } 
+		    InnerBook.prototype.getVersion = function() { 
+		        return version; 
+		    }; 
+		    InnerBook.prototype.publishNewVersion = function() { 
+		        version++; 
+		    }; 
+		    return InnerBook; 
+		}()); 
+
+		var book1 = new Book("Javascript"); 
+		var book2 = new Book("CSS"); 
+
+		console.log(book1.name);      // "Javascript" 
+		console.log(book1.getVersion());  // 1 
+
+		console.log(book2.name);      // "CSS" 
+		console.log(book2.getVersion());  // 1 
+
+		book1.publishNewVersion(); 
+		console.log(book1.getVersion());   // 2 
+		console.log(book2.getVersion());   // 2 
+	}
+		
+	
+</script>
+</head>
+<body onload="functionCall()">
+</body>
+</html>

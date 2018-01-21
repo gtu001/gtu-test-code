@@ -1,0 +1,71 @@
+
+<head>
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<style type="text/css">
+	abbr.termified{
+		text-decoration: underline;
+		color: aqua;
+		cursor: pointer;
+	}
+	div.termifier {
+		background-color: cornsilk;
+		width: 256px;
+		color: brown;
+		padding: 8px;
+		font-size: 0.8em;
+	}
+	div.termifier.fancy{
+		background: url("images/termifier.bubble.png") no-repeat transparent;
+		width: 256px;
+		height: 104px;
+	}
+	div.termifier.fancy div{
+		height: 86px;
+		width: 208px;
+		overflow: auto;
+		color: black;
+		margin-left: 24px;
+	}
+</style>
+
+<script type="text/javascript">
+	(function($){
+		$.fn.termifier = function(actionURL, options){
+			var settings = $.extend({
+				origin : {top:0,left:0},
+				paramName : "term",
+				addClass : null,
+				actionURL : actionURL
+			}, options||{});
+			this.click(function(event){
+				$("div.termifier").remove();
+				$("<div>").addClass("termifier").css({
+					position : "absolute",
+					top : event.pageY - settings.origin.top,
+					left : event.pageX - settings.origin.left,
+					display : "none",
+				}).click(function(event) {
+					$(this).fadeOut("fast");
+				}).appendTo("body").append(
+					$("<div>").load(settings.actionURL,
+					encodeURIComponent($(event.target).text()), function() {
+					$(this).closest(".termifier").fadeIn("fast");
+				}));
+			});
+			this.addClass("termified");
+			return this;
+		}
+	})(jQuery);
+
+	$(document).ready(function() {
+		$("abbr").termifier(
+			"", 
+			{addClass:'fancy', origin: {top:0, left: 0}}
+		);
+	});
+</script>
+</head>
+
+<body>
+	<abbr>Goodyear welt</abbr>
+</body>

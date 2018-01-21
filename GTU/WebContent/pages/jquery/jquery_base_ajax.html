@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:p="http://primefaces.org/ui">
+	<head>
+		<link type="text/css" rel="stylesheet" href="/demo1011/faces/javax.faces.resource/theme.css?ln=primefaces-ris3cupertino" />
+		<link rel="stylesheet" media="screen" type="text/css" href="/demo1011/faces/javax.faces.resource/jqzoom.css?ln=css" />
+		<script type="text/javascript" src="jquery-1.7.1.js">
+			<!--
+			protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+			    System.out.println("#. doGet .s");
+			    response.setContentType("text/xml");//"text/xml" or "application/xml" 
+			    response.setCharacterEncoding("utf8");
+			    PrintWriter writer = response.getWriter();
+			    writer.println("<?xml version='1.0' encoding='utf8'?>");
+			    writer.println("<data>");
+			    writer.println("<row>");
+			    writer.println("<personId>");
+			    writer.println("A123456789-1");
+			    writer.println("</personId>");
+			    writer.println("<siteId>");
+			    writer.println("65000120");
+			    writer.println("</siteId>");
+			    writer.println("<birthDate>");
+			    writer.println("0720318");
+			    writer.println("</birthDate>");
+			    writer.println("</row>");
+			    
+			       writer.println("<row>");
+			        writer.println("<personId>");
+			        writer.println("A123456789-2");
+			        writer.println("</personId>");
+			        writer.println("<siteId>");
+			        writer.println("65000120");
+			        writer.println("</siteId>");
+			        writer.println("<birthDate>");
+			        writer.println("0720318");
+			        writer.println("</birthDate>");
+			        writer.println("</row>");
+			        
+			        writer.println("<row>");
+			        writer.println("<personId>");
+			        writer.println("A123456789-3");
+			        writer.println("</personId>");
+			        writer.println("<siteId>");
+			        writer.println("65000120");
+			        writer.println("</siteId>");
+			        writer.println("<birthDate>");
+			        writer.println("0720318");
+			        writer.println("</birthDate>");
+			        writer.println("</row>");
+			        
+			    writer.println("</data>");
+			    writer.flush();
+			    writer.close();
+			    System.out.println("#. doGet .e");
+			}
+			//-->
+		</script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.ajax({
+					url:"http://localhost:8081/zWebTest/TestServlet",
+					dataType : "xml",
+					success : function(data){
+						var msg = '';
+						$("data > row", data).each(function(index, va){
+							msg += 
+							$("personId", va).text() + " - " + 
+							$("siteId", va).text() + " - " +
+							$("birthDate", va).text()  + " \n ";
+						});
+						alert(msg);
+					}
+				});
+			});
+		</script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title></title>
+	</head>
+	<body bgcolor="#FFFFFF">
+	</body>
+</html>

@@ -1,0 +1,7 @@
+<project name="imported_project" default="main" basedir=".">
+	
+	<target name="init" unless="file.exists">
+		<echo># imported_project.init</echo>
+    </target>
+    
+</project>

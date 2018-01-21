@@ -1,0 +1,78 @@
+WITH usedtl AS
+/*單位己使用*/
+(SELECT COUNT(*) AS usedtlcount
+    FROM t_form_cert_dtl t
+   WHERE 1 = 1
+     and channel_type = (SELECT channel_type
+                           from t_channel_org
+                          WHERE channel_id = t.channel_id)
+     and cert_status_id = 56
+     and channel_id = 1162644
+     and form_id = 101),
+dtl AS
+/*單位待核發*/
+(SELECT COUNT(*) AS dtlcount
+    FROM t_form_cert_dtl dtl
+   WHERE 1 = 1
+     and channel_type = (SELECT channel_type
+                           from t_channel_org
+                          WHERE channel_id = dtl.channel_id)
+     and cert_status_id = 54
+     and channel_id = 1162644
+     and form_id = 101),
+org AS
+/*算單位人數*/
+(SELECT COUNT(*) AS p
+    FROM t_agent tagent
+   where 1 = 1
+     and agent_status = 0
+     and agent_cate =
+         (SELECT channel_type
+            from t_channel_org
+           WHERE channel_id = tagent.channel_org_id)
+     and channel_org_id = 1162644),
+unit AS
+/*單位人數*限額*/
+(SELECT (SELECT p FROM org) * limt.sales_limit AS unitlimit
+    FROM t_form_limit limt
+   where 1 = 1
+     and channel_type = (SELECT channel_type
+                           from t_channel_org
+                          WHERE channel_id = limt.channel_id)
+     and channel_id = 1162644
+     and form_id = 101),
+channelType AS
+(SELECT channel_type
+    FROM t_channel_org
+   WHERE 1 = 1
+     and channel_id = 1162644),
+stock_amount AS
+(SELECT
+  /*單位待核發*/
+   (SELECT dtlcount FROM dtl) AS dtl_count,
+   /*已領用數量*/
+   (SELECT usedtlcount FROM usedtl) AS usedtl_count,
+   /*單位限額*/
+   (SELECT unitlimit FROM unit) AS unit_limit,
+   /*通路別*/
+   (SELECT channel_type FROM channelType) AS channel_type,
+   /*總公司庫存*/
+   (stock.instock_amount) AS instock_amount
+    FROM t_form_stock stock
+   WHERE 1=1
+     /* (formId=101) */
+     and stock.use_deadline IS NOT NULL
+     /* (formId=103) */
+     --and stock.use_deadline IS  NULL 
+     AND stock.dept_id IS NULL
+     AND stock.channel_id IS NULL
+     AND stock.channel_type IS NULL
+     and form_id = 101)
+ 
+SELECT dtl_count,
+       usedtl_count,
+       unit_limit,
+       channel_type,
+       sum(instock_amount) AS instock_amount
+  FROM stock_amount
+GROUP BY dtl_count, usedtl_count, unit_limit, channel_type

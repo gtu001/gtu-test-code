@@ -1,0 +1,61 @@
+
+
+Java - OutOfMemoryError - GC overhead limit exceeded And Java heap space
+
+因為寫了常駐程式，爬圖檔，每天約20萬到50萬筆的圖檔資料。
+
+總共約有400萬筆的資料，雖然不多，
+
+但已經讓我程式中途發生錯誤。
+
+先求有再求好，爬圖沒事，但程式繼續加的情況下，多加了MySQL insert之後。
+
+好多狀況就陸續出現，
+
+中途當掉失敗的狀況有
+
+OutOfMemoryError  GC overhead limit exceeded 及 OutOfMemoryError Java heap space
+
+分別用不同方法解決
+
+OutOfMemoryError  GC overhead limit exceeded 使用參數
+
+java -jar -XX:-UseGCOverheadLimit javaJar.jar處理。
+
+這個原因在於GC 花太多時間在做 garbage collect (預設是 98%), 而太少時間在做你程式原本要做的事 :
+
+因為我使用多執行緒，而是一個任務結束後，立即塞新的任務處理，結果，每個任務後我都使用System.gc()
+
+反而就造成了這個問題，
+
+可見gc應該不是放在子執行緒裡。
+
+應該由主執行緒控管，且主執行緒要gc的時間點，應該要有一定的時間間隔。
+
+ 
+
+再來是
+
+Java heap space
+
+這我猜想應該是使用太多的ArrayList及HashMap，因為連到http的部分，每一筆資料我都要做回傳記錄，並且裡面我使用了ArrayList來做參數自動生成，
+
+再來是MySQL我也用ArrayList做參數生成sql與指令，
+
+在一天有80萬筆資料量，就等於有double或三倍以上的ArrayList，反而產生了許多heap，
+
+決定把這兩個都寫死成一個String參數，並且sql也使用static，
+
+雖然寫程式上是難維護一點點，但已經run很久了，應該是無所謂了，
+
+但許多地方不再生成記憶體，或許會加快速度，的確也從原本的4倍速，加快到8倍至12倍，再來就是24倍。
+
+的確有差，但時間久了，由於記憶體未釋放，導致又降低倍數。
+
+這還要再研究，哪裡的記憶體未釋放，或用太多。
+
+Java heap space 要使用
+
+-Xms1024m -Xmx1024m 去處理， 但不見得有用。
+
+所以還是要調整程式碼，看哪些使用ArrayList、Map的地方，需要改進。

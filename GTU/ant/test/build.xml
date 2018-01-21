@@ -1,0 +1,45 @@
+<project name="project_name" default="main" basedir=".">
+
+	<dirname property="imported_basedir" file="${basedir}" />
+
+	<import file="imported.xml" />
+	<import file="asdfasdfswelr.xml" optional="true" />
+	<!-- option設true沒有可以build(預設false) -->
+	<property file="build.properties" />
+
+	<!--
+	<loadproperties>
+		<url baseUrl="http://127.0.0.1" relativePath="imported.properties"/>
+	</loadproperties>
+	-->
+
+	<target name="main" depends="">
+		<echo># main</echo>
+	</target>
+
+	<extension-point name="extension_test" />
+
+	<target name="extensionOf" extensionOf="extension_test">
+		<!-- extensionOf表示將自己附加到ext_test底下, 所以會在 test1 之前被執行 -->
+		<echo># extensionOf</echo>
+	</target>
+
+	<target name="available" unless="${asdfasdfafsawer}">
+		<!-- unless=false 好像也可以執行??? -->
+		<available property="file_check2" file="ccclog.txt" />
+		<echo># available</echo>
+		<echo>file_check2 = ${file_check2}</echo>
+	</target>
+
+	<target name="extensionOf_test" depends="extension_test">
+		<echo># extensionOf_test</echo>
+		<condition property="file_check">
+			<and>
+				<available file="log.txt" />
+				<available file="velocity.log" />
+			</and>
+		</condition>
+		<echo># file_check = ${file_check}</echo>
+	</target>
+
+</project>

@@ -1,0 +1,160 @@
+<project name="example" default="main">
+
+	<property name="src_dir" location="../../src" />
+	<property name="bin_dir" location="../../bin" />
+	<property name="build_dir" location="build" />
+	<property name="jars_dir" location="jars" />
+	<property name="main_class" value="DimensionUI" />
+	<property name="main_class_full" value="gtu.zcognos.DimensionUI" />
+	<property name="desktop" value="C:\Users\Troy\Desktop\" />
+
+	<path id="my_test_classpath">
+		<pathelement path="${bin_dir}" />
+		<fileset dir="c:\jar">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
+	<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />
+	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+
+	<!-- 參考的jar -->
+	<path id="class_path">
+		<pathelement location="c:\jar" />
+	</path>
+
+	<!--
+	<target name="buildTest">
+		<echo># buildTest ..</echo>
+		<classLoader clz="${main_class_full}" />
+		<echo># buildTest ..</echo>
+	</target>
+	-->
+
+	<target name="buildClassSet" if="${enable}">
+		<echo># buildClassSet = ${enable}</echo>
+		<mkdir dir="${jars_dir}" />
+		<jarfinder copyTo="${jars_dir}">
+			<searchdir>c:\jar</searchdir>
+			<!--
+			<packagename mode="small">org.apache.commons.lang3.StringUtils</packagename>
+			-->
+			<packagename mode="small">org.apache.commons.lang.StringUtils</packagename>
+			<packagename mode="small">org.apache.commons.lang3.time.DateFormatUtils</packagename>
+			<packagename mode="small">org.apache.log4j</packagename>
+			<packagename mode="small">org.apache.velocity.VelocityContext</packagename>
+			<packagename mode="small">org.apache.commons.collections.ExtendedProperties</packagename>
+			<packagename mode="small">com.informix.jdbcx.IfxConnectionPoolDataSource</packagename>
+		</jarfinder>
+
+		<antcall target="copyReference">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<!-- 參考的設定檔 -->
+	<path id="config">
+		<fileset dir="${src_dir}">
+			<exclude name="**/*.java" />
+		</fileset>
+	</path>
+
+	<target name="main">
+		<antcall target="clean">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="buildClassSet">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="compiler" />
+
+		<antcall target="runClass">
+			<param name="enable" value="false" />
+		</antcall>
+		
+		<!-- xxxxxxxxxxxxxxxxxxxxxxxx -->
+		<copy file="C:\workspace\GTU\src\org\apache\velocity\runtime\defaults\velocity.properties" tofile="${build_dir}\org\apache\velocity\runtime\defaults\velocity.properties" />
+		<!-- xxxxxxxxxxxxxxxxxxxxxxxx -->
+
+		<antcall target="createJar">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="clean">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="moveJarToDesktop">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="clean">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="compiler">
+		<echo># compiler ...</echo>
+		<javac compiler="javac1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+			<include name="**/${main_class}.java" />
+			<classpath path="${build_dir}" />
+		</javac>
+	</target>
+
+	<target name="runClass" if="${enable}">
+		<echo># run ${main_class}.class</echo>
+		<java classname="${main_class_full}" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="createJar" if="${enable}">
+		<echo># create ${main_class}.jar</echo>
+		<jar destfile="${main_class}.jar" basedir="${build_dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main_class_full}" />
+			</manifest>
+		</jar>
+		<echo># run ${main_class}.jar</echo>
+		<java jar="${main_class}.jar" fork="true" />
+	</target>
+
+	<target name="moveJarToDesktop" if="${enable}">
+		<echo># move Jar : ${main_class}.jar</echo>
+		<move file="${main_class}.jar" todir="${desktop}" />
+		<exec executable="cmd">
+			<arg value="/c start echo ${main_class}.jar complete!!" />
+		</exec>
+	</target>
+
+	<target name="clean" if="${enable}">
+		<echo># clean = ${enable}</echo>
+		<delete dir="${build_dir}" />
+		<delete dir="${jars_dir}" />
+	</target>
+
+	<target name="copyReference" if="${enable}">
+		<echo># copyReference = ${enable}</echo>
+		<mkdir dir="${build_dir}" />
+		<mkdir dir="${jars_dir}" />
+
+		<copy todir="${jars_dir}">
+			<path refid="class_path" />
+		</copy>
+
+		<copy todir="${build_dir}">
+			<path refid="config" />
+		</copy>
+
+		<unjar dest="${build_dir}">
+			<fileset dir="${jars_dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</unjar>
+	</target>
+
+</project>

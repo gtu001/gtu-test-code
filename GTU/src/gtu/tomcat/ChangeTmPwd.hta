@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Tomcat Manager User Information Revision</title>
+<hta:application>
+<script language="vbscript">
+    window.resizeTo 400,320
+    Sub SaveBatch()
+        if (document.Forms(0).elements("OLD_PWD").value="") then
+        		Window.alert("使用者代碼不可空白！")
+            exit sub
+        end if
+        
+        if (document.Forms(0).elements("OLD_PWD").value="" or _
+            document.Forms(0).elements("NEW_PWD").value="" or _
+            document.Forms(0).elements("NEW_PWD_CONFIRM").value="") then
+            Window.alert("密碼不可空白！")
+            exit sub
+        end if
+        
+        if (document.Forms(0).elements("NEW_PWD").value <> document.Forms(0).elements("NEW_PWD_CONFIRM").value) then
+        		Window.alert("請確認新密碼與新密碼確認需一致！")
+        		exit sub
+        end if
+        
+        Set fs = CreateObject("Scripting.FileSystemObject")
+        strFile = fs.GetAbsolutePathName(fs.BuildPath(fs.GetSpecialFolder(2), "Key.bat"))
+        
+        Set ts = fs.OpenTextFile(strFile, 2, True)
+        ts.WriteLine "SET OLD_PWD=" & document.Forms(0).elements("OLD_PWD").value
+        ts.WriteLine "SET NEW_PWD=" & document.Forms(0).elements("NEW_PWD").value
+        ts.WriteLine "SET NEW_PWD_CONFIRM=" & document.Forms(0).elements("NEW_PWD_CONFIRM").value
+        ts.WriteLine "SET USER_ID=" & document.Forms(0).elements("USER_ID").value
+        
+        ts.Close
+        set fs = nothing
+        
+        Window.Close
+    End Sub
+</script>
+</head>
+<body>
+<form>
+    <p align=center>Tomcat Manager User Information Revision</p>
+    輸入使用者代碼：
+    <input type=text name=USER_ID size = 16>
+    <br>輸入原密碼　　：
+    <input type=password name=OLD_PWD size = 16>
+    <br>輸入新密碼　　：
+    <input type=password name=NEW_PWD size = 16>
+    <br>新密碼確認　　：
+    <input type=password name=NEW_PWD_CONFIRM size = 16>
+
+    <p align=center><input type=button language="vbscript" value="  確定  "
+    onclick="SaveBatch"></p>
+</form>
+<script language=vbscript>
+    document.Forms(0).elements("USER_ID").focus
+</script>
+</body>
+</html>

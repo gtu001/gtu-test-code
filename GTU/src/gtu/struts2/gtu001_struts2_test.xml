@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+ <!--報單查詢-->
+    <package name="gtu001_struts2_test" namespace="/" extends="ap-default">
+        <result-types>
+            <result-type name="default-layout" class="com.tradevan.framework.view.TilesLayoutResult" default="true">
+                <param name="layout">main-layout</param>
+                <param name="bodyName">body</param>
+            </result-type>
+             <result-type name="no-menu-layout" class="com.tradevan.framework.view.TilesLayoutResult">
+            	<param name="layout">no-menu-layout</param>
+            </result-type>
+        </result-types>
+	
+		<action name="gtu001_struts2_test"  class="com.tradevan.pbkis.action.Gtu001Struts2Action">
+    		<result name="success" >/pages/gtu001_struts2_test/gtu001Query.jsp</result>
+    		
+			<result name="nx5203Pdf" type="stream">
+				<!-- <param name="contentType">application/vnd.ms-excel; charset=UTF-8</param> -->
+				<param name="contentType">application/pdf</param>
+				<param name="inputName">pdfInputStream</param>
+				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="bufferSize">2048</param>
+			</result>
+			
+			<result name="querySingle" type="json"> 
+				<param name="root">single</param>
+			</result>
+			<result name="ajaxSave" type="json"> 
+				<param name="root">updateMessage</param>
+			</result>
+    	</action>
+    	   
+		<action name="queryJSON_*" method="{1}" class="com.tradevan.pbkis.action.Gtu001Struts2Action">    	
+    		<result type="json">
+    			<param name="includeProperties">
+    				.*Lists\[\d+\]\.\w+,
+    				totalCount,
+    			</param>
+    			<param name="contentType">text/html</param>
+				<param name="noCache">true</param>
+				<param name="ignoreHierarchy">false</param>
+    		</result>
+    	</action>    	   
+    </package>
+</struts>

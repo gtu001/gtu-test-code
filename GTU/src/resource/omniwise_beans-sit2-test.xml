@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    <!-- Quatz datasource -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="url" value="jdbc:oracle:thin:@192.168.156.140:1521:CSIMS"/>
+		<!--
+        <property name="url" value="jdbc:oracle:thin:@10.64.16.127:1530:CSIMS02T"/>
+			-->
+        <property name="username" value="OWLET25"/>
+        <property name="password" value="OWLET25"/>
+		
+		<!-- 初始化連接 -->
+        <property name="initialSize" value="10"/>
+		<!-- 最大空閒連接 -->
+        <property name="maxIdle" value="20"/>
+		<!-- 最小空閒連接 -->
+        <property name="minIdle" value="5"/>
+		 <!-- 最大連接數量 -->
+        <property name="maxActive" value="50"/>
+		<!-- 是否在自動回收超時連接的時候顯示連接的超時錯誤 -->
+        <property name="logAbandoned" value="true"/>
+		<!-- 是否自動回收超時連接 -->
+        <property name="removeAbandoned" value="true"/>
+		<!-- 超時時間(以秒數為單位) -->
+        <property name="removeAbandonedTimeout" value="180"/>
+        <!-- 超時等待時間已毫秒為單位 6000毫秒/1000等於60秒 -->
+        <property name="maxWait" value="1000"/>
+    </bean>
+
+    <!--
+    <bean id="cedsDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName">
+            <value>test_ceds</value>
+        </property>
+        <property name="jndiEnvironment">
+            <props>
+                <prop key="java.naming.factory.initial">weblogic.jndi.WLInitialContextFactory</prop>
+                <prop key="java.naming.provider.url">t3://10.64.16.128:7001</prop>
+                <prop key="java.naming.security.principal">weblogic</prop>
+                <prop key="java.naming.security.credentials">weblogic</prop>
+            </props>
+        </property>
+    </bean>-->
+
+    <bean id="cedsDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"/>
+        <property name="url" value="jdbc:jtds:sqlserver://pc-dbwf03;databasename=CEDS;user=CSIM2CEDS;password=CSIM2CEDS"/>
+        <property name="username" value="CSIM2CEDS"/>
+        <property name="password" value="CSIM2CEDS"/>
+        <property name="initialSize" value="2"/>
+        <property name="maxActive" value="5"/>
+    </bean>
+    <bean id="workFlowManager" class="com.omniwise.owlet2.scheduling.job.WorkFlowManager">
+        <property name="serverIP">
+            <value>10.64.16.128</value>
+        </property>
+        <property name="serverPort">
+            <value>1999</value>
+        </property>
+    </bean>
+
+
+    <!-- spring jdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+    <bean id="cedsJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+            <ref bean="cedsDataSource"/>
+        </property>
+    </bean>
+    <!-- mail sender -->
+    <!--<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"/> -->
+    <!-- <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="mail.omniwise.com.tw"/>
+        <property name="username" value="bengo"/>
+        <property name="password" value="eee"/>
+    </bean>
+
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" lazy-init="false">
+        <property name="autoStartup">
+            <value>false</value>
+        </property>
+
+        <property name="waitForJobsToCompleteOnShutdown">
+            <value>true</value>
+        </property>
+
+
+        <property name="quartzProperties">
+            <props>
+                <!-- ThreadPool -->
+                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+                <prop key="org.quartz.threadPool.threadCount">5</prop>
+                <prop key="org.quartz.threadPool.threadPriority">5</prop>
+                <prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+
+                <prop key="org.quartz.plugin.shutdownhook.class">org.quartz.plugins.management.ShutdownHookPlugin</prop>
+                <prop key="org.quartz.plugin.shutdownhook.cleanShutdown">true</prop>
+                <prop key="org.quartz.plugin.triggHistory.class">
+                    org.quartz.plugins.history.LoggingTriggerHistoryPlugin
+                </prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerFiredMessage">Trigger {1}.{0} fired job {6}.{5} at: {4,
+                    date, HH:mm:ss MM/dd/yyyy}
+                </prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerCompleteMessage">Trigger {1}.{0} completed firing job
+                    {6}.{5} at {4, date, HH:mm:ss MM/dd/yyyy} with resulting trigger instruction code: {9}
+                </prop>
+            </props>
+        </property>
+
+    </bean>
+
+    <bean id="sigValidationInputBuilder" class="com.fet.csims.common.service.sig.SigValidationInput" factory-method="builder" scope="prototype">
+        <property name="sigUrl" value="http://10.64.209.60:58105/sigws_sit01/dispatcher?"/>
+        <property name="sigAction" value="SGW_A011"/>
+        <property name="sigType" value="99"/>
+        <property name="sigUserNameForF" value="SIT01_01"/>
+        <property name="sigPasswordForF" value="SIT01_01"/>
+        <property name="sigUserIdForF" value="SIG"/>
+        <property name="sigChannelIdForF" value="SIG"/>
+        <property name="sigUserNameForK" value="SSI_SERVCHG"/>
+        <property name="sigPasswordForK" value="SSI_SERVCHG"/>
+        <property name="sigMsisdn" value="0999999999"/>
+        <property name="sigGetHistory" value="FALSE"/>
+    </bean>
+
+    <bean id="sigValidationInput" class="com.fet.csims.common.service.sig.SigValidationInput" factory-bean="sigValidationInputBuilder" factory-method="build" scope="prototype">
+    </bean>
+
+</beans>

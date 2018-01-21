@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+	});
+
+	function startRead() {
+		// obtain input element through DOM
+		var file = document.getElementById('file').files[0];
+		if (file) {
+			getAsText(file);
+		}
+	}
+
+	function getAsText(readFile) {
+		var reader = new FileReader();
+
+		// Read file into memory as UTF-16
+		reader.readAsText(readFile, "UTF-16");
+
+		// Handle progress, success, and errors
+		reader.onprogress = updateProgress;
+		reader.onload = loaded;
+		reader.onerror = errorHandler;
+	}
+
+	function updateProgress(evt) {
+		if (evt.lengthComputable) {
+			// evt.loaded and evt.total are ProgressEvent properties
+			var loaded = (evt.loaded / evt.total);
+			if (loaded < 1) {
+				// Increase the prog bar length
+				// style.width = (loaded * 200) + "px";
+			}
+		}
+	}
+
+	function loaded(evt) {
+		// Obtain the read file data
+		var fileString = evt.target.result;
+		// Handle UTF-16 file dump
+		// xhr.send(fileString)
+		alert(fileString);
+	}
+
+	function errorHandler(evt) {
+		if (evt.target.error.name == "NotReadableError") {
+			alert("The file could not be read");
+		}
+	}
+</script>
+</head>
+<body>
+	<input type="file" id="file" />
+	<input type="button" value="read file" onclick="javascript:startRead();" />
+</body>
+</html>

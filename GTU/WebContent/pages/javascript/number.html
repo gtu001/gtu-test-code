@@ -1,0 +1,11 @@
+<script type="text/javascript">
+	//轉為數值 (Ex : 13,243,424.00 --> 13243424)
+	function numberTrim(number) {
+		var nnn = number.replace(new RegExp("\\,", "gmi"), "");
+		nnn = parseInt(nnn, 10);
+		if (isNaN(nnn)) {
+			nnn = 0;
+		}
+		return nnn;
+	}
+</script>

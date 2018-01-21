@@ -1,0 +1,32 @@
+<project name="iisi_deployee_pages_only" default="main">
+	
+	<import file="build_deployee_full.xml" as="nested" />
+
+	<target name="main">
+		<antcall target="syncPages">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="replaceMyWebContentPages">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="syncPages" if="${enable}">
+		<echo message="所有網頁檔" />
+		<sync todir="${target_webapp}/pages" verbose="true" includeemptydirs="true" overwrite="false">
+			<fileset dir="${mavenWebContent}/pages">
+				<include name="**/*" />
+			</fileset>
+		</sync>
+	</target>
+
+	<target name="replaceMyWebContentPages" if="${enable}">
+		<echo message="覆蓋自訂網頁" />
+		<copy todir="${target_webapp}\pages" overwrite="true">
+			<fileset dir="${myWebProject}\WebContent\pages">
+				<include name="**/**.*" />
+			</fileset>
+		</copy>
+	</target>
+</project>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bmtcustomdata><namespace name="visuals"><object name="[]"><property name="BMTFW_Layout_Version">long:13</property><property name="BMTFW_Layout"><![CDATA[string:[DatasoureView].[rldf039c]
+	dx=117,64
+	parent=DatasoureView
+	x=288,654
+[DatasoureView].[rscdpg0901]
+	dx=143,82
+	parent=DatasoureView
+	x=477,541
+[BusinessView].[rscdzzzz]
+	dx=192,208
+	parent=BusinessView
+	x=372,254
+[DatasoureView].[rscdzzzz]
+	dx=122,208
+	parent=DatasoureView
+	x=492,691
+[DatasoureView]
+	c=9bdfc4
+	dx=706,909
+	expanded=t
+	parent=Informix_RIS_12
+	view=0,316
+	x=278,85
+	zoom=1.000000
+[BusinessView]
+	c=d8a77d
+	dx=583,474
+	expanded=t
+	parent=Informix_RIS_12
+	view=0,63
+	x=124,70
+	zoom=1.000000
+[DimensionView]
+	c=89c6fd
+	dx=303,314
+	expanded=f
+	parent=Informix_RIS_12
+	x=10,186
+[Informix_RIS_12]
+	view=0,32
+	zoom=1.000000
+[]
+	Notation=4
+	ShowGrid=1
+	Snap=1
+	font=Arial
+	lod=33
+	tc=0
+	viewStyle=2
+[BusinessView].[rldf039c]
+	dx=184,64
+	parent=BusinessView
+	x=64,400
+[DimensionView].[測量]
+	dx=93,82
+	parent=DimensionView
+	x=200,222
+[DatasoureView].[rscdz012]
+	dx=130,136
+	parent=DatasoureView
+	x=566,409
+[BusinessView].[rscdz012]
+	dx=197,136
+	parent=BusinessView
+	x=63,252
+[DimensionView].[區域別]
+	dx=118,83
+	parent=DimensionView
+	x=20,42
+[DimensionView].[年齡]
+	dx=93,83
+	parent=DimensionView
+	x=50,72
+[BusinessView].[rscdpg0901a]
+	dx=236,82
+	parent=BusinessView
+	x=68,63
+[BusinessView].[rscdpg0901b]
+	dx=244,82
+	parent=BusinessView
+	x=329,63
+[BusinessView].[rscdpg0901c]
+	dx=244,82
+	parent=BusinessView
+	x=64,157
+[BusinessView].[rscdpg0901d]
+	dx=244,82
+	parent=BusinessView
+	x=324,157
+]]></property></object></namespace></bmtcustomdata>

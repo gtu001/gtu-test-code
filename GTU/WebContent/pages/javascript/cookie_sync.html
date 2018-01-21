@@ -1,0 +1,57 @@
+<h1>Sender</h1>
+
+<p>Type into the text box below and watch the text 
+   appear automatically in the receiver.</p>
+
+<form name="sender">
+<input type="text" name="message" size="30" value="">
+<input type="reset" value="Clean">
+</form>
+
+<script type="text/javascript">
+function setCookie(value) {
+    document.cookie = "cookie-msg-test=" + value + "; path=/";
+    return true;
+}
+function updateMessage1() {
+    var t = document.forms['sender'].elements['message'];
+    setCookie(t.value);
+    setTimeout(updateMessage1, 100);
+}
+updateMessage1();
+</script>
+
+
+
+
+
+
+
+<h1>Receiver</h1>
+
+<p>Watch the text appear in the text box below as you type it in the sender.</p>
+
+<form name="receiver">
+<input type="text" name="message" size="30" value="" readonly disabled>
+</form>
+
+<script type="text/javascript">
+function getCookie() {
+    var cname = "cookie-msg-test=";
+    var ca = document.cookie.split(';');
+    for (var i=0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(cname) == 0) {
+            return c.substring(cname.length, c.length);
+        }
+    }
+    return null;
+}
+function updateMessage2() {
+    var text = getCookie();
+    document.forms['receiver'].elements['message'].value = text;
+    setTimeout(updateMessage2, 100);
+}
+updateMessage2();
+</script>

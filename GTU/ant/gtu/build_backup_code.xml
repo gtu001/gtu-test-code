@@ -1,0 +1,57 @@
+<project name="gtu" default="main">
+
+	<property name="backup" location="backup" />
+
+	<target name="main">
+		<antcall target="main_process">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="main_process" if="${enable}">
+		<echo># main_process = ${enable}</echo>
+
+		<delete dir="${backup}" />
+		<mkdir dir="${backup}" />
+
+		<antcall target="mkBackUpZip">
+			<param name="enable" value="true" />
+			<param name="fileName" value="gtu" />
+			<param name="sourceDir" value="C:\workspace\GTU" />
+		</antcall>
+
+		<tstamp />
+		<mail user="gtu001" password="luv90cxc048c" ssl="true" subject="gtu's code buckup at ${DSTAMP}_${TSTAMP}" mailhost="smtp.gmail.com" mailport="465" encoding="mime">
+			<from address="gtu001@gmail.com" />
+			<to address="gtu001@gmail.com" />
+			<to address="luding001@gmail.com" />
+			<message charset="UTF8" mimetype="text/html">
+				&lt;/br&gt;
+				日期：${DSTAMP} ${TSTAMP}&lt;/br&gt;
+				檔案：gtu.zip&lt;/br&gt;
+			</message>
+			<attachments>
+				<fileset dir="${backup}" />
+			</attachments>
+		</mail>
+
+		<delete dir="${backup}" />
+		
+		<exec executable="cmd">
+			<arg value="/c start echo send completetd!!" />
+		</exec>
+	</target>
+
+	<target name="mkBackUpZip" if="${enable}">
+		<echo message="mkzip = ${enable}" />
+		<echo message="fileName = ${fileName}" />
+		<echo message="sourceDir = ${sourceDir}" />
+		<zip destfile="${backup}/${fileName}.zip_" basedir="${sourceDir}" encoding="UTF8">
+			<include name="**/*.*" />
+			<include name="**/*" />
+			<exclude name="**/*.jar" />
+			<exclude name="**/*.class" />
+			<exclude name="**/*.svn-base" />
+		</zip>
+	</target>
+</project>

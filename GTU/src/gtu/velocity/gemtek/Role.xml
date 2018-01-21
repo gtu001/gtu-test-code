@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="${po}">
+���
+  <!-- Use type aliases to avoid typing the full classname every time. -->
+  <typeAlias alias="${poName}" type="com.gemtek.ehs.model.po.${poNameBig}"/>
+
+  <!-- Result maps describe the mapping between the columns returned
+       from a query, and the class properties.  A result map isn't
+       necessary if the columns (or aliases) match to the properties 
+       exactly. -->
+  <resultMap id="${dbName}Result" class="com.gemtek.ehs.model.po.${poNameBig}">
+  	#foreach( $key in $db.keySet() )
+   		<result property="$db.get($key)" column="$key"/>
+	#end
+  </resultMap>
+  
+  <parameterMap id="${dbName}Parameter" class="com.gemtek.ehs.model.po.${poNameBig}">
+	#foreach( $key in $db.keySet() )
+		<parameter property="$db.get($key)" />
+	#end
+  </parameterMap>
+  
+  <!-- Select with no parameters using the result map for Role class. -->
+  <select id="findAll" resultMap="${dbName}Result">
+    <![CDATA[
+		select 
+		  #foreach( $list in $dbList )
+			$list ,
+		  #end
+		from ${dbNameBig}
+    ]]>
+  </select>
+
+  <!-- Select by pk using the result map for Role class.  -->
+  <select id="findByPk" parameterClass="string" resultMap="${dbName}Result">
+	<![CDATA[
+		select 
+		  #foreach( $list in $dbList )
+			$list ,
+		  #end
+		from ${dbNameBig} 
+		where ${pkCon}
+    ]]>
+  </select>
+   
+  <!-- Insert example, using the Role parameter class -->
+  <insert id="insert" parameterClass="${poName}">
+  	<![CDATA[
+		insert into ${dbNameBig} (
+		  #foreach( $list in $dbList )
+			$list ,
+		  #end
+		) values (
+		  #foreach( $list in $paramList )
+			#$list# ,
+		  #end
+		  
+		 	SEQUENCE.nextval ,
+		)
+    ]]>
+  </insert>
+   
+  <!-- Update example, using the Role parameter class -->
+  <update id="update" parameterClass="${poName}">
+  	<![CDATA[
+		update ${dbNameBig} set
+		#foreach( $key in $db.keySet() )
+	   		$key = #$db.get($key)# , 
+		#end
+		where
+		  ${pkCon}
+	]]>
+  </update>
+   
+  <!-- Delete example, using a String as the parameter class -->
+  <delete id="deleteByPk" parameterClass="string">
+  	<![CDATA[
+		delete from ${dbNameBig} where ${pkCon}
+    ]]>
+  </delete>
+</sqlMap>

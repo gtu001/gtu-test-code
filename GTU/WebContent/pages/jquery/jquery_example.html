@@ -1,0 +1,446 @@
+
+$("#selected-plays > li").addClass("horizontal");
+$("#selected-plays li:not(.horizontal)").addClass("sub-level");
+$("a[href^=http][href*=henry]").addClass("henrylink");
+$("div.horizontal:eq(1)")
+$("div:nth-child(1)")
+$("tr:odd")//:even ==> $("tr").filter(":odd")
+$("td:contains(Henry)") ==>大小寫有差
+$("a").filter(function(){return this.hostname == "xxx";});
+next() nextAll() prev() prevAll() siblings() andSelf() parent() children()
+find("td:eq(1))")
+get(n)取得dom
+jQuery.noConflict -> $ -> jQuery(document).ready(function($){...
+$(...).toggle(fun1, fun2) <- hover
+$(...).click(function(event){
+        if(event.target == this){
+                $().toggleClass("hidden");
+        }
+        event.stopPropagation();
+});
+$(event.target).is("button")
+$().bind("click.collapse", function(){})
+$().one("click", function(){})
+$().keyup(function(event){
+        switch(String.fromCharCode(event.keyCode)){
+                case 'A':...
+$("#switcher button")click(function(){
+        var num = parseFloat($("div.speech").css("fontsize"), 10);
+        switch(this.id){
+                case "switch-large":
+                        num *= 1.4;
+        }
+        $("div.speech").css("fontsize", num + " px");
+})
+<a href="" class="more">
+$("a.more").click(function(){
+        var $firstPara = $("p:eq(1)");
+        if($firstPara.is("hidden")){
+                $firstPara.fadeIn("slow");
+        }else{
+                $firstPara.fadeOut("slow");
+        }
+})
+//fadeTo(..)
+
+<div class="speech"><p>...</p></div>
+$("div.sppch p").outerwidth();
+
+$().slideUp("slow")
+$("div.chapter a").attr({"rel":"external"}};
+
+$("div.chapter a[@href*=wikipedia]").each(function(index){
+        var $thisLink = $(this);
+        $thisLink.attr({
+                "rel":"external",
+                "id":"wikilink-" + index,
+                "title":"learn more about" + $thisLink.text() + " at wilipedia";
+        });
+});
+
+map ={}
+array = []
+
+$.getJson("b.json", function(data){
+        $("#dictionary").empty();
+        $.each(data, function(entryIndex, entry){
+                var html = "<div class='entry'>";
+                        += "<div class='term'>" + entry['term'] + ...
+                $("#dictionary").append(html);
+        }
+});
+
+$.each(array, function(index, element){})
+$.getScript("c.js");
+
+$.get("d.xml",function(data){
+        $(data).find("entry").each(function(){
+                var $entry = $(this);
+                var html = "<h3>" + $entry.attr("term") 
+                                  + $entry.attr("part")
+                                  + $entry.find("definition").text() + "</h3>";
+                var $quote = $entry.find("quote");
+                if($quote.length){
+                        html += $(this).text();
+                }
+        }
+});
+
+$(data).find("entry:has[quote[@author]]") -> xml含有quote的tag且有author屬性
+
+<div id="letter-e">
+        <ul><li><h href="e.php?term=Eavesdrop">Eavesdrop...
+        <ul><li><h href="e.php?term=Edible">Edible...
+        <ul><li><h href="e.php?term=Eloquence">Eloquence...
+$("#letter-e a").click(function(){
+        $.get("e.php", {"term":$(this).text()}, function(data){
+                $("#dictionary").html(data);
+        });
+        //也可用$.post("e.php", {"term":$(this).text()}, function(data){...
+}):
+
+$("#letter-f form").submit(function(){
+        $("#dictionary").load("f.php", {"term":$("input[@name='term']").val()});
+});
+
+$("#letter-f form").submit(function(){
+        $.get("f.php",$(this).serialize(), function(data){
+                $("#dictionary").html(data);
+        });
+});
+
+$(document).ready(function(){
+        $("div id='loading'>loading...</div>")
+        .insertBefore("#dictionary")
+        .ajaxStart(function(){
+                $(this).show();
+        }).ajaxStop(function(){
+                $(this).hide();
+        });
+});
+
+$(".term").live("click", function(){
+        $(this).siblings(".definition").slideToggle();
+});
+
+$(document.createElement("script")).attr("src", "xxx.js").appendTo("head");
+
+$.ajax({
+        url:"a.html",
+        type:"get",
+        dataType:"html",
+        success:function(data){
+                $("#dictionary").html(data);
+        }
+});
+等於
+$.ajaxSetup({
+        url:"a.html",
+        type:"post",
+        dataType:"html"
+});
+$.ajax({
+        type:"get",
+        success:function(data){
+                $("#dictionary").html(data);
+        }
+});
+
+$("#letter-h a").click(function(){
+        $("#dictionary").load("aaa.html .entry");// 只載入頁面的某些內容
+});
+
+<table id="my-data">
+	<thead>
+		<tr>
+			<th><a href="index.php?sort=name">name</a></th>
+			<th><a href="index.php?sort=data">data</a></th>
+		</tr>
+	</thead>
+	<tbody>
+		...
+	</tbody>
+</table>
+以下是改良
+$(document).ready(function(){
+	$("#my-data th a").click(function(){
+		$("#my-data tbody").load($(this).attr("href"));
+	});
+	
+});
+
+高級的table排序
+var alternateRowColors = function($table){
+	$("tbody tr:odd", $table).removeClass("even").addClass("odd");
+	$("tbody tr:even", $table).removeClass("odd").addClass("even");
+}
+$("table.sortable").each(function(){
+	var $table = $(this);
+	alternateRowColors($table);
+	$("th", $table).each(function(column){
+		if($(this).is(".sort-alpha")){
+			$(this).click(function(){
+				var rows = $table.find("tbody > tr").get();
+				rows.sort(function(a,b){
+					var keyA = $(a).children("td").eq(column).text().toUpperCase();
+					var keyB = $(b).children("td").eq(column).text().toUpperCase();
+					if(keyA < keyB) return -1;
+					if(keyA < keyB) return 1;
+					return 0;
+				});
+				$.each(rows, function(inedex, row){
+					$table.children("tbody").append(row);
+				});
+				alternateRowColors($table);
+			});
+		}
+	});
+});
+
+建立外掛
+jQuery.fn.alternateRowColors = function(){
+	$("tbody tr:odd", this).removeClass("even").addClass("odd");
+	$("tbody tr:even", this).removeClass("odd").addClass("even");
+	return this;
+}
+註:this在此指的是呼叫此方法的jQuery物件..所以前頁的寫法可改寫 $table.alternateRowColors();
+
+改善前例的排序
+$each(rows, function(index, row){
+	A:row.sortkey = $(row).children("td").eq(column).text().toUpperCase();
+	B:$(row).data("sortkey", $(row).children("td").eq(column).text().toUpperCase());
+});
+rows.sort(function(a,b){
+	A:if(a.sortkey < b.sortkey) return -1;
+	B:if($(a).data("sortkey") < $(b).data("sortkey")) return -1;
+});
+$.each(rows, function(index, row){
+	$table.children("tbody").append(row);
+	A:row.sortkey = null;
+	B:$(row).removeData("sortkey");
+});
+$.each(rows, function(index, row){
+	var $cell = $(row).children("td").eq(column);
+	row.sortkey = $cell.find(".sort-key").text().toUpperCase() + " " + $cell.text().toUpperCase();
+	var key = parseFloat($cell.text().replace(/^[^\d.]*/, ''));
+	row.sortkey = isNaN(key) ? 0 : key;
+	row.sortkey = Date.parse("1" + $cell.text());
+});
+
+$().filter(":nth-child("+(column+1)+")") //index並非從0開始
+
+$().bind("click", {"newPage":page}, function(event){
+	var a = event.data["newPage"];
+});
+
+似乎是排序table的加強版
+var rows = $table.find("tbody > tr").get();
+$.each(rows, function(index, row){
+	row.sortkey = findSortkey($cell);
+});
+row.sort(function(a,b){
+	if(a.sortkey < b.sortkey) return -sortDection;
+	if(a.sortkey > b.sortkey) return +sortDection;
+	return 0;
+});
+$.each(rows, function(index, row){
+	$table.children("tbody").append(row);
+	row.sortkey = null
+});
+$(document).ready(function(){
+	$("table.striped tr:not([th]):odd").addClass("odd");
+	$("table.striped tr:not([th]):even").addClass("even");
+});
+$("table.striped tbody").each(function(){
+	$(this).find("tr:not(:has(th))").filter(function(index){
+		return (index % b) < 3;
+	}).addClass("odd");
+});
+
+$().toggleClass("xxx");
+
+ToolTip範例
+var $authorCells = $("table.striped td:nth-child(3)");
+var $tooptip = $("<div id='tooltip'></div>").appendTo("body");
+var positionTooltip = function(event){
+	var tposX = event.pageX;
+	var tposY = event.pageY + 20;
+	$tooltip.css({top:tposY,left:tposX});
+};
+var showTooltip = function(event){
+	var authorName = $(this).text();
+	$tooltip.text("Highlight all articles by " + authorName).show();
+}
+var hideTooltip = function(){
+	$tooltip.hide();
+}
+$authorCells.addClass("clickable").hover(showTooltip, hideTooltip)
+	.mousemove(positionTooltip).click(function(event){
+		var authorName = $(this).text();
+		$authorCells.each(function(index){
+			if(authorName == $(this).text()){
+				$(this).parent().toggleClass("highlight");
+			}else{
+				$(this).parent().removeClass("highlight");
+			}
+			showTooltip.call(this,event);
+		});
+	});
+
+var collapseIcon = "../images/bullet_toggle_minus.png";
+var collapseText = "Collapse this section";
+var expandIcon = "../images/bullet_toggle_plus.png";
+var expandText = "Expand this section";
+$("table.collapse tbody").each(function(){
+	var $section = $(this);
+	$("<img/>").attr("src", collapseIcon).attr("alt", collapseText).prependTo($section.find("th"))
+		.addClass("clickable").click(function(){
+			if($section.is(".collapsed")){
+				$section.removeClass("collapsed").find("tr:not(:has(th))").fadeIn("slow");
+				$(this).attr("src", collapseIcon).attr("alt", collapseText);
+			}else{
+				$section.removeClass("collapsed").find("tr:not(:has(th))").fadeOut("fast");
+				$(this).attr("src", expandIcon).attr("alt", expandText);
+			}
+		});
+});
+
+$("table.striped").bind("stripe", function(){
+	$("tbody", this).each(function(){
+		$(this).find("tr:visible:not(:has(th))").removeClass("odd").addClass("even")
+		.filter(function(index){
+			return (index%b) < 3;
+		}).removeClass("even").addClass("odd");
+	}).trigger("stripe");
+});
+
+$("form :input").filter(".required").next("span").text(requiredFlag).end().end()
+	.filter(".conditional").next("span").text(conditionalFlat);
+end用來延伸方法的串接..如此便能繼續對相同的元素集合進行運算..讓DOM的走訪次數減到最少
+第一次end回復到.filter(".required")
+第二次end回復到$("form :input")
+
+驗證
+if($(this).is("#email")){
+	var $listItem = $(this).parents("li:first");
+	if($(this).is(":hidden")){
+		this.value = '';
+	}
+	if(this.value != '' && !/.+@.+\.[a-zA-Z]{2,4}$/.test(this.value)){
+		var errorMessage = "Please use proper e-mail format";
+		$("<span></span>").addClass("error-message").text(errorMessage).appendTo($listItem);
+		$listItem.addClass("warning");
+	}
+}
+
+送出
+$("form").submit(function(){
+	$("#submit.message").remove();
+	$(":input.required").trigger("blur");
+	var numWarnings = $(".warning", this).length;
+	if(numWarnings){
+		var list=[];
+		$(".warning label").each(function(){
+			fieldList.push($(this).text());
+		});
+		$("<div></div>").attr({"id":"submit-message", "class":"warning"})
+			.append("Please correct errors with " +numWarnings + " fields")
+			.append("&bull;" + fieldList.join("<br/>&bull;"))
+			.insertBefore("#send");
+		return false;
+	}
+});
+
+全選
+$("<li></li>").html("<label><input type='checkbox' id='discover_all'/><em>chk all</em></label>")
+	.prependTo("li.discover > ul");
+	$("#discover-all").click(function(){
+		var $chkboxs = $(this).parents("ul:first").find(":checkbox");
+		if(this.checked){
+			$chkboxs.attr("checked", "ture");
+		}else{
+			$chkboxs.attr("checked", "");
+		}
+	});
+
+AJAX
+var $autoComplete = $("<ul class='autoComplete'></ul>").hide().insertAfter("#search-text");
+$("#search-text").keyup(function(){
+	$.ajax({url:"../search/autoComplete.php", 
+			data:{"search-text":$("#search-text").val()},
+			dataType:"json",
+			type:"GET",
+			success:function(data){
+				if(data.length){
+					$autoComplete.empty();
+					$.each(data, function(index, term){
+						$("<li></li>").text(term).appendTo($autoComplete);
+					});
+					$autoComplete.show();
+				}
+			}
+		})
+});
+
+拒絕非數字輸入
+$(".quantity input").keypress(function(event){
+	if(event.charCode && (event.charCode < 48 || event.charCode > 58)){
+		event.preventDefault();
+	}
+});
+
+jQuery.globalFunction = function(){}
+或者
+jQuery.extend({
+	globalFunction:function(){}
+});
+
+jQuery.myPlugin = {
+	funcOne:function(){},
+	funcTwo:function(){}
+}
+$.myPlugin.funcOne();
+$.myPlugin.funcTwo();
+
+jQuery.fn.myMethod = function(){}
+使用為$("div").myMethod();
+
+去除重複
+$.unique(array); 
+
+jQuery.fn.shadow = function(){
+	return this.each(function(){
+		var $elemt = jQuery(this);
+		for(var ii = 0 ; ii < 5 ; ii ++){
+			$elemt.clone().css({
+				position:"absolute",
+				left:$elemt.offset().left + ii, 
+				top:$elemt.offset().top + ii,
+				margin:0,
+				zIndex:-1,
+				opacity:0.1
+			}).append("body");
+		}
+	});
+}
+
+jQuery.fn.show = function(option){
+	var default = {slices:5}, opacity=0.1, zIndex:-1};
+	var opts = jQuery.extend(default, option);//後面複寫前面
+	
+(function($){
+	//Plugin code
+})(jQuery);
+
+jQuery.extend(jQuery.expr[':'],{
+	'css':function(element, index, matchs, set){
+		var parts = /([\w-]+)\s*([<>=]+)\s*(\d+)/.exec(matches);
+		var value = parseFloat(jQuery(element).css(part[1]));
+		switch(parts[2]){
+			case '<':
+				return value < parseInt(parts[3]);
+			case '<=':
+				return value <= parseInt(parts[3]);
+			...
+	}
+});

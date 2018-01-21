@@ -1,0 +1,93 @@
+//struts2 透過 ajax 檢查發票是否重複 ,若重複則不submit
+		
+		var text = $.ajax({
+			url:'/APSPIS/invoice!checkInvoiceExist' ,
+			data:'invNo=' + $("#invNo").val(),
+			type:'POST',
+			dataType:'json',
+			async: false,
+			success: function(objResult){
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(xhr.status);
+                alert(thrownError);
+            }
+		}).responseText;
+		var objResult = $.parseJSON(text);
+		if(objResult.value == "true"){
+			alert("發票號碼重複!!");
+			return false;
+		}
+		
+		
+		
+	private List<Property> listShippingTerm = new ArrayList<Property>();
+  	private List<Property> listAddress = new ArrayList<Property>();
+  	private Property checkInvoice;
+  	
+  	public String checkInvoiceExist() throws Exception {
+        logger.debug("#. checkInvoiceExist .s");
+        listAddress.clear();
+        try {
+            String invNo = ServletActionContext.getRequest().getParameter("invNo");
+            logger.debug("invNo = " + invNo);
+            InvHdrDo invHdr = invoiceService.queryInvByInvNo(invNo);
+            if(invHdr != null){
+                checkInvoice = new Property("true", "true");
+            }else{
+                checkInvoice = new Property("false", "false");
+            }
+        } catch (Exception e) {
+            addActionError(getText("BKIS_WM413", "查詢異常, 請洽系統人員"));
+            logger.error(e.getMessage(), e);
+        }
+          logger.debug("#. checkInvoiceExist .e");
+        return "checkInvoice";
+    }
+    
+    public class Property {
+		private String key;
+		private String value;
+		public Property(String key, String value) {
+			super();
+			this.key = key;
+			this.value = value;
+		}
+		public String getKey() {
+			return key;
+		}
+		public void setKey(String key) {
+			this.key = key;
+		}
+		public String getValue() {
+			return value;
+		}
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
+
+
+		<action name="invoice"  class="com.tradevan.spis.action.InvoiceAction">
+    		<result name="pageQuery" >/pages/invoice/invoice.jsp</result>
+    		<result name="pageCreate" >/pages/invoice/createInv.jsp</result>
+    		<result name="pageEditCccCode" type="no-menu-layout">/pages/invoice/invoiceEditCccCode.jsp</result>
+    		<result name="view" type="stream">
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment;filename="${fileName}"</param>
+				<param name="bufferSize">1024</param>
+			</result>
+			<result name="resultList" type="json"> 
+				<param name="root">listResult</param>
+			</result>
+			<result name="stResultList" type="json"> 
+				<param name="root">listShippingTerm</param>
+			</result>
+			<result name="addrResultList" type="json"><!-- addrResultList對應action的回傳字串 -->
+				<param name="root">listAddress</param><!-- listAddress 對應action裡的物件 -->
+			</result>
+			<result name="checkInvoice" type="json"> 
+				<param name="root">checkInvoice</param>
+			</result>
+    	</action>

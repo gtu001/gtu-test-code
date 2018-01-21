@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*******************************************************************
+Source Id :                   $Id: applicationConfig-eai-jta.xml,v 1.1, 2013-01-28 10:05:57Z, Evan Tung$                                                           
+Source Version :          $Revision: 2$
+Last Modify Member : $Author: Evan Tung$    
+*******************************************************************/
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+				http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+				http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+				
+		<!-- 另一個  xxxxxxxxxxxxxxxxxx -->
+<!--
+	<bean id="jotm"
+		class="org.springframework.transaction.jta.JotmFactoryBean" />
+	<bean id="jtaTransactionManager"
+		class="org.springframework.transaction.jta.JtaTransactionManager">
+		<property name="userTransaction">
+			<ref local="jotm" />
+		</property>
+	</bean>
+
+	<bean id="xaEstoreDataSource"
+		class="org.enhydra.jdbc.standard.StandardXADataSource"
+		destroy-method="shutdown">
+		<property name="transactionManager">
+			<ref local="jotm" />
+		</property>
+		<property name="driverName">
+			<value>${jdbc.driverClass}</value>
+		</property>
+		<property name="url">
+			<value>${jdbc.jdbcUrl}</value>
+		</property>
+	</bean>
+	<bean id="xaEstoreDataSourcePool"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource">
+			<ref local="xaEstoreDataSource" />
+		</property>
+		<property name="transactionManager">
+			<ref local="jotm" />
+		</property>
+		<property name="maxSize">
+			<value>50</value>
+		</property>
+		<property name="user">
+			<value>${jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.password}</value>
+		</property>
+	</bean>
+
+
+	<bean id="xaFulfillmentDataSource"
+		class="org.enhydra.jdbc.standard.StandardXADataSource"
+		destroy-method="shutdown">
+		<property name="transactionManager">
+			<ref local="jotm" />
+		</property>
+		<property name="driverName">
+			<value>${fulfillment.jdbc.driverClass}</value>
+		</property>
+		<property name="url">
+			<value>${fulfillment.jdbc.jdbcUrl}</value>
+		</property>
+	</bean>
+	<bean id="xaFulfillmentDataSourcePool"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource">
+			<ref local="xaFulfillmentDataSource" />
+		</property>
+		<property name="transactionManager">
+			<ref local="jotm" />
+		</property>
+		<property name="maxSize">
+			<value>50</value>
+		</property>
+		<property name="user">
+			<value>${fulfillment.jdbc.username}</value>
+		</property>
+		<property name="password">
+			<value>${fulfillment.jdbc.password}</value>
+		</property>
+	</bean>
+
+	<bean id="xaEstoreSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="mappingLocations">
+				<value>classpath*:/com/sti/estore/model/**/*.hbm.xml</value>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="show_sql">true</prop>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+			</props>
+		</property>
+		<property name="dataSource">
+			<ref local="xaEstoreDataSourcePool" />
+		</property>
+	</bean>
+	<bean id="xaFulfillmentSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="mappingResources">
+			<list>
+				<value>
+					com/sti/estore/eai/model/PosMmPluExg.hbm.xml
+				</value>
+				<value>
+					com/sti/estore/eai/model/PriceExg.hbm.xml
+				</value>
+				<value>
+					com/sti/estore/eai/model/ProdinvTemp.hbm.xml
+				</value>
+				<value>
+					com/sti/estore/eai/model/ProductExg.hbm.xml
+				</value>
+				<value>
+					com/sti/estore/eai/model/SoUpdate.hbm.xml
+				</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="show_sql">true</prop>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+			</props>
+		</property>
+		<property name="dataSource">
+			<ref local="xaFulfillmentDataSourcePool" />
+		</property>
+	</bean>
+-->
+ <bean id="estoreXADataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>estoreXADS</value>
+		</property>
+	</bean>
+	<bean id="fulfillmentXADataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>fulfillmentXADS</value>
+		</property>
+	</bean>
+	<bean id="jtaTransactionManager"
+		class="org.springframework.transaction.jta.WebLogicJtaTransactionManager" />
+		
+	<bean id="xaEstoreSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="mappingLocations">
+			<value>classpath*:/com/sti/estore/model/**/*.hbm.xml</value>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="show_sql">true</prop>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.connection.release_mode">
+					auto
+				</prop>
+			</props>
+		</property>
+		<property name="dataSource">
+			<ref local="estoreXADataSource" />
+		</property>
+	</bean>
+	<bean id="xaFulfillmentSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="mappingResources">
+			<list>
+				<value>
+					com/sti/estore/eai/model/PosMmPluExg.hbm.xml
+				</value>
+				<value>com/sti/estore/eai/model/PriceExg.hbm.xml</value>
+				<value>
+					com/sti/estore/eai/model/ProdinvTemp.hbm.xml
+				</value>
+				<value>
+					com/sti/estore/eai/model/ProductExg.hbm.xml
+				</value>
+				<value>com/sti/estore/eai/model/SoUpdate.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="show_sql">true</prop>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.connection.release_mode">
+					auto
+				</prop>
+			</props>
+		</property>
+		<property name="dataSource">
+			<ref local="fulfillmentXADataSource" />
+		</property>
+	</bean>
+
+	<bean id="xaProductDAO"
+		class="com.sti.estore.dao.impl.ProductDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaPosDAO"
+		class="com.sti.estore.dao.impl.PosDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory" />
+		<property name="storeNo">
+			<value>R${estore.store_no}</value>
+		</property>
+	</bean>
+	<bean id="xaCoMasterDAO"
+		class="com.sti.estore.dao.impl.CoMasterDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaCoHistoryDAO"
+		class="com.sti.estore.dao.impl.CoHistoryDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory" />
+	</bean>
+
+	<bean id="xaProductExgDAO"
+		class="com.sti.estore.eai.dao.impl.ProductExgDAOImpl">
+		<property name="sessionFactory"
+			ref="xaFulfillmentSessionFactory" />
+	</bean>
+	<bean id="xaPriceExgDAO"
+		class="com.sti.estore.eai.dao.impl.PriceExgDAOImpl">
+		<property name="sessionFactory"
+			ref="xaFulfillmentSessionFactory" />
+	</bean>
+	<bean id="xaMmTempDAO"
+		class="com.sti.estore.eai.dao.impl.MmTempDAOImpl">
+		<property name="sessionFactory"
+			ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaPosMmPluExgDAO"
+		class="com.sti.estore.eai.dao.impl.PosMmPluExgDAOImpl">
+		<property name="sessionFactory"
+			ref="xaFulfillmentSessionFactory" />
+	</bean>
+	<bean id="xaProdinvTempDAO"
+		class="com.sti.estore.eai.dao.impl.ProdinvTempDAOImpl">
+		<property name="sessionFactory"
+			ref="xaFulfillmentSessionFactory" />
+	</bean>
+	<bean id="xaSoTempDAO"
+		class="com.sti.estore.eai.dao.impl.SoTempDAOImpl">
+		<property name="sessionFactory"
+			ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaSoUpdateDAO"
+		class="com.sti.estore.eai.dao.impl.SoUpdateDAOImpl">
+		<property name="sessionFactory"
+			ref="xaFulfillmentSessionFactory" />
+	</bean>
+	<bean id="xaGiftGroupDAO"
+		class="com.sti.estore.dao.impl.GiftGroupDAOImpl">
+		<property name="sessionFactory"
+			ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaStoreDAO"
+		class="com.sti.estore.dao.impl.StoreDAOImpl">
+		<property name="sessionFactory"
+			ref="xaEstoreSessionFactory" />
+	</bean>
+	<bean id="xaInventoryLogDAO" class="com.sti.estore.dao.impl.InventoryLogDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"></property>
+	</bean>
+	<bean id="xaOnsalePromoListDAO"
+		class="com.sti.estore.dao.impl.OnsalePromoListDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="xaBogHistoryDAO" class="com.sti.estore.dao.impl.BogHistoryDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"/>
+	</bean>
+	<bean id="xaAlarmMailDAO" class="com.sti.estore.dao.impl.AlarmMailDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"/>
+	</bean>
+	<bean id="xaMailMessageDAO" class="com.sti.estore.dao.impl.MailMessageDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"/>
+	</bean>
+	<bean id="xaSmsMessageDAO" class="com.sti.estore.dao.impl.SmsMessageDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"/>
+	</bean>
+	<bean id="xaCoKpiExtensionDAO" class="com.sti.estore.dao.impl.CoKpiExtensionDAOImpl">
+		<property name="sessionFactory" ref="xaEstoreSessionFactory"/>
+	</bean>
+	<bean id="xaJdbcDAO" class="com.sti.estore.dao.impl.JdbcDAOImpl">
+		<property name="dataSource" ref="fulfillmentXADataSource"/>
+	</bean>
+
+	<aop:config proxy-target-class="true">
+		<aop:advisor pointcut="execution(* com.sti.estore.eai.fulfillment.impl..*(..))"	advice-ref="jtaTxAdvice" />
+		<aop:advisor pointcut="execution(* com.sti.estore.eai.pos.impl..*(..))"	advice-ref="jtaTxAdvice" />
+		<aop:advisor pointcut="execution(* com.sti.estore.eai.logistic.impl..*(..))"	advice-ref="jtaTxAdvice" />
+	</aop:config>
+	<tx:advice id="jtaTxAdvice" transaction-manager="jtaTransactionManager">
+		<tx:attributes>
+			<tx:method name="commit*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception" />
+		</tx:attributes>
+	</tx:advice>
+
+
+<!-- 另一個  xxxxxxxxxxxxxxxxxx -->
+
+	<bean id="iaTxManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="iaSessionFactory" />
+	</bean>
+	
+	<tx:advice id="iaTxAdvice" transaction-manager="iaTxManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="page*" read-only="true" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+        <aop:advisor advice-ref="iaTxAdvice" pointcut="execution(* com.sti.estore.dao.impl.SpJdbcDAOImpl.updateIAEstoreOrderContent(..))"/>
+	</aop:config>
+
+</beans>

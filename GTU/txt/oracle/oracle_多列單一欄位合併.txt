@@ -1,0 +1,41 @@
+wmsys.wm_concat 資料庫內建函式：把多行轉換成一合併列
+
+例如：
+
+Select  a.id  from  table a
+
+結果：
+
+1　　　A123456789
+2　　　A987654321
+
+把多行轉換成一合併列
+
+select  wmsys.wm_concat(a.id)  from table a
+
+結果：A123456789,A987654321
+
+
+
+
+
+
+
+
+
+
+同事介紹的一個Oracle的好用查詢：LISTAGG
+
+SELECT A.GROUP_ID, A.KEY, LISTAGG(A.VALUE, '; ') WITHIN GROUP (ORDER BY A.VALUE) as GG  from SYS_PROPERTIES a GROUP by A.GROUP_ID, A.KEY
+
+LISTAGG可以將group後的結果會總顯示於一個欄位
+上述SQL原本A.VALUE會是一個row一個row的排列
+使用LISTAGG之後，可以將A.VALUE顯示在同一個row中
+並且可以指定間隔符號(在此設定為';')
+針對某一些報表查詢非常有用唷 :D
+
+單一欄位用法
+SELECT
+    LISTAGG(A.MODE_ID, ',') WITHIN GROUP (ORDER BY A.MODE_ID) AS GG
+FROM
+    T_PAY_MODE a

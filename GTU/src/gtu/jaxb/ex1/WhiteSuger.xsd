@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- xmlns:xsd="http://www.w3.org/2001/XMLSchema" ::
+   http://www.w3.org/2001/XMLSchema 
+     可以想成使用到的其它份文件的 namespace
+     xsd 則是要關聯到該文件中的 type 時用作前綴的短名稱
+ 
+  targetNamespace="http://www.WhiteSugerCompany.com/ws" ::
+    表示這一份文件的 namespace 為 http://www.WhiteSugerCompany.com/ws
+    想像有多家製糖公司各自都有一個 suger 的 type,
+    namespace 可以用來區分它們
+   -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ws="http://www.WhiteSugerCompany.com/ws"
+  targetNamespace="http://www.WhiteSugerCompany.com/ws">
+ 
+  <!-- 一個 suger 的 type, 包含了 顏色, 甜度 -->
+  <xsd:complexType name="suger">
+    <xsd:sequence>
+      <xsd:element name="color" type="xsd:string"/>
+      <xsd:element name="sweetness" type="xsd:byte"/>
+    </xsd:sequence>
+  </xsd:complexType>
+ 
+  <!-- 一個 type 為 suger 的 element -->
+  <xsd:element name="Sugers" type="ws:suger"/>
+</xsd:schema>
+
+<!-- 
+	在此目錄底下執行 xjc -p #packagePath# WhiteSuger.xsd 
+	會產生java檔
+-->

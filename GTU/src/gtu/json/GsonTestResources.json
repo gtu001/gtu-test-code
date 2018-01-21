@@ -1,0 +1,4 @@
+{ "CashRechargeMethodInfo": "{\"amount\":106,\"currency\":  \"NTD\"}",
+ "RPL9AethosChannelInfo":"{\"referenceId\":  \"11111\",  \"requestDateTime\":  \"Dec 3, 2014 4:44:55 PM\",  \"bulkTransaction\":64,  \"l3ValRcgAmtInd\":78}",
+ "PcnInfo": "{\"pcn\":245,  \"pcnPaymentCategory\":  \"PRE\"}",
+ "SubscriberPrimaryResourceInfo": "{\"primaryResourceType\":  \"C\",  \"primaryResourceValue\":  \"0976059109\"}"}

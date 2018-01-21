@@ -1,0 +1,93 @@
+<script type="text/javascript">
+	/*
+	g global
+	i case-insensitive
+	m mulit-line
+	y "sticky" search that matches starting at the current position in target string
+	*/
+	{
+		var reg = new RegExp("(\\w{0,2})(\\w{0,2})(\\w{0,2})(\\w{0,2})(\\w{0,2})", "gmi");
+		var array = reg.exec("abcdefghijklmnopqrstuvwxyz");
+		console.log(getObjInfo(array));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		var reg = /(\w+)\s(\w+)/;
+		var str = "John Smith";
+		var newStr = str.replace(reg, "$2, $1");
+		console.log("newStr = " + newStr);
+	}
+	
+	console.log("\n\n");
+	
+	{
+		var str = "please yes make my day!";
+		var newStr = str.match(/\w+/);//沒有g
+		console.log(getObjInfo(newStr));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		var str = "please yes make my day!";
+		var newStr = str.match(/\w+/g);//有g
+		console.log(getObjInfo(newStr));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		//(?:xx)不捕獲
+		var reg = /(?:foo){1,2}\w+[a-f]/;
+		var array = reg.exec("foabcfoofooaabbbcccdddeefoo foofoo");
+		console.log(getObjInfo(array));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		//x(?=y) 符合x假如x跟隨y  稱為lookahead
+		var array = /Jack(?=Sprat)/.exec("JackFrost JackKing JackSprat JackMicle");
+		console.log(getObjInfo(array));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		//x(?!y) 符合x假如x不跟隨y  稱為negated lookahead
+		var array = /\d+(?!\.)/.exec("3.141592637");
+		console.log(getObjInfo(array));
+	}
+	
+	console.log("\n\n");
+	
+	{
+		var str = "aa\tbb,cc;dd\nee\bff\tgg\0hh";
+		var reg = /[\t,;\n\b\0]/;
+		console.log(getObjInfo(str.split(reg)));
+	}
+	
+	{
+		var str = "33333.333";
+    	var patt = new RegExp("^[\\d\.]*$");
+    	var res = /^[\d\.]*$/.test(str);
+    	console.log("reg = " + res);
+	}
+	
+	function getObjInfo(array){
+		var msg = "";
+		for(var ii in array){
+			msg += ii + "..." + array[ii] + "\n";
+		}
+		return msg;
+	}
+	
+	function escape(){
+		RegExp.escape = function(text) {
+			return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+		};
+		alert(RegExp.escape('*'));
+	}
+</script>

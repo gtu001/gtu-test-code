@@ -1,0 +1,2 @@
+sqlplus / as sysdba 
+grant  DEBUG CONNECT SESSION to scott;

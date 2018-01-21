@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+</head>
+<body>
+
+<p>test string</p>
+<input type="button" id="aaaa" value="aaaa" />
+<script type="text/javascript">
+	$(document).ready(function() {
+	});
+	
+	//取得系統日為基準計算的工作天
+	function getNextWorkingDate(days){
+	     var date = new Date();
+	     var dateStr = date.format("yyyy-MM-dd");
+	     var content = {"type":"nextWorkday", "format":"yyyy-MM-dd", "startDate":dateStr, "spaceDays":"" + days};
+	     var beanName = "workingDateAjaxService";
+	     var data = $.ajax({
+	          url : "/ls/ajaxEntry.do",
+	          async : false,
+	          type : "GET",
+	          dataType : "json",
+	          data : {"content" : JSON.stringify(content), "beanName" : beanName}
+	     }).responseJSON;
+	     if(!data.hasOwnProperty("error")){
+	          var nextDateStr = data.nextDate;
+	          var nextDateSplit = nextDateStr.split("-");
+	          var rtnDate = new Date(nextDateSplit[0], parseInt(nextDateSplit[1], 10) - 1, nextDateSplit[2]);
+	          return rtnDate;
+	     }else{
+	          alert(data.error);
+	          return null;
+	     }
+	}
+</script>
+</body>
+</html>

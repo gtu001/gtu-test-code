@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_1_0.xsd"
+                version="1.0">
+ -->
+<!-- 
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+ -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_1_0.xsd"
+                version="1.0">
+
+	<persistence-unit name="test" transaction-type="RESOURCE_LOCAL"><!-- JTA or RESOURCE_LOCAL -->
+		<!-- Provider ↓↓↓↓↓ -->
+		<!-- EclipseLink -->
+		<!--provider>org.eclipse.persistence.jpa.PersistenceProvider</provider -->
+		<!-- Hibernate -->
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<!-- TopLink Essentials -->
+		<!--provider>oracle.toplink.essentials.PersistenceProvider</provider -->
+		<!-- Apache OpenJPA -->
+		<!--provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider -->
+		<!-- DataNucleus -->
+		<!--provider>org.datanucleus.jpa.PersistenceProviderImpl</provider -->
+		<!-- Provider ↑↑↑↑↑ -->
+		
+		<!-- Entity ↓↓↓↓↓ -->
+		<!-- <class>com.test.jpa.Student</class> -->
+		<class>gtu.jpa.hibernate.PersonForNative</class>
+		<class>gtu.jpa.hibernate.PersonForRealData</class>
+		<!-- <jta-data-source></jta-data-source> -->
+      	<!-- <mapping-file>META-INF/mappingFile.xml</mapping-file> -->
+     	<!-- <jar-file>packedEntity.jar</jar-file> -->
+		<!-- Entity ↑↑↑↑↑ -->
+		
+		<!-- <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode> -->
+		<!-- 
+		    ALL: force caching for all entities
+		    NONE: disable caching for all entities (useful to take second-level cache out of the equation)
+		    ENABLE_SELECTIVE (default): enable caching when explicitly marked
+		    DISABLE_SELECTIVE: enable caching unless explicitly marked as @Cacheable(false) (not recommended)
+		 -->
+      	<!-- <validation-mode>CALLBACK</validation-mode> -->
+      	<!-- 
+      	    AUTO: if Bean Validation is present in the classpath, CALLBACK and DDL are activated.
+		    CALLBACK: entities are validated on creation, update and deletion. If no Bean Validation provider is present, an exception is raised at initialization time.
+		    DDL: (not standard, see below) database schemas are entities are validated on creation, update and deletion. If no Bean Validation provider is present, an exception is raised at initialization time.
+		    NONE: Bean Validation is not used at all
+      	 -->
+      	 
+      	<exclude-unlisted-classes>true</exclude-unlisted-classes><!-- 設true不會自動掃mappingClass -->
+      	
+		<properties>
+<!-- 			<property name="javax.persistence.jdbc.driver" value="com.informix.jdbc.IfxDriver" />
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:informix-sqli://192.168.10.18:4526/chun0000:informixserver=aix2;DB_LOCALE=zh_tw.utf8;CLIENT_LOCALE=zh_tw.utf8;GL_USEGLU=1" />
+			<property name="javax.persistence.jdbc.user" value="srismapp" />
+			<property name="javax.persistence.jdbc.password" value="ris31123" /> -->
+			
+			<!-- 沒有用hibernate開頭設定參數,根本無法建立連線 -->
+			<property name="hibernate.connection.url"
+				value="jdbc:informix-sqli://192.168.10.18:4526/chun0000" />
+			<property name="hibernate.connection.driver_class" value="com.informix.jdbc.IfxDriver" />
+	        <property name="hibernate.connection.url" value="jdbc:informix-sqli://192.168.10.18:4526/chun0000:informixserver=aix2;DB_LOCALE=zh_tw.utf8;CLIENT_LOCALE=zh_tw.utf8;GL_USEGLU=1" />
+	        <property name="hibernate.connection.username" value="srismapp" />
+	        <property name="hibernate.connection.password" value="ris31123" />
+        
+			<property name="hibernate.dialect" value="org.hibernate.dialect.InformixDialect" />
+			<property name="show_sql" value="true" />
+			<property name="hibernate.temp.use_jdbc_metadata_defaults" value="false" />
+		</properties>
+	</persistence-unit>
+</persistence>

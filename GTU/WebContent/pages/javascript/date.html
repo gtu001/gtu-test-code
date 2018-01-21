@@ -1,0 +1,33 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+
+	function getToday() {
+		var date = new Date();
+		var dateStr = date.format("yyyy-MM-dd");
+		alert(dateStr);
+	}
+
+	function indicateDate1() {
+		var date1 = new Date(2016, 0, 29);//2016/1/29
+		var date2 = new Date(2016, 0, 29, 16, 55, 00, 0);//2016/1/29 16:55:00.000
+	}
+
+	function getTWNdate() {
+		var d = new Date();
+		var yyy = ("0" + String(d.getFullYear() - 1911)).slice(-3);
+		var MM = ("0" + String(d.getMonth() + 1)).slice(-2);
+		var dd = ("0" + d.getDate()).slice(-2);
+		var HH = ("0" + d.getHours()).slice(-2);
+		var mm = ("0" + d.getMinutes()).slice(-2);
+		var ss = ("0" + d.getSeconds()).slice(-2);
+		alert(yyy + "/" + MM + "/" + dd + " " + HH + ":" + mm + ":" + ss);
+	}
+</script>
+</head>
+<body onload="">
+</body>
+</html>

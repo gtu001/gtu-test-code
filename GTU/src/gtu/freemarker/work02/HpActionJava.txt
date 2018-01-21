@@ -1,0 +1,108 @@
+package com.ibt.dcs.controller.${taskGroup};
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.ibt.dcs.controller.BaseController;
+import com.ibt.dcs.mybatis.mapper.${mapperName};
+import com.ibt.dcs.mybatis.vo.${voName};
+import com.ibt.dcs.utils.CommTools;
+import com.ibt.dcs.utils.User;
+
+@Controller
+@RequestMapping("${taskId}")
+public class ${actionName} extends BaseController {
+
+	private static Logger logger = Logger.getLogger(${actionName}.class);
+	private CommTools<${voName}> commTools = new CommTools<${voName}>();
+
+	@Autowired
+	${mapperName} ${mapperNameLower};
+
+	@RequestMapping("view")
+	public String view() {
+		logger.info("view...");
+		return "${taskGroup}/${actionName}";
+	}
+	
+	@RequestMapping(value = "json/insert", produces = "application/json")
+	public @ResponseBody Map<String, Object> insert(${voName} ${voNameLower}, HttpServletRequest req) {
+		logger.info("insert...");
+		System.out.println(${voNameLower}.toString());
+		Map<String, Object> msgMap = new HashMap<String, Object>();
+		try {
+		    commTools.setUserAndTimeAndPgm(${voNameLower}, req, getClass());
+			commTools.emptyString(${voNameLower});
+			int resultCount = ${mapperNameLower}.insert(${voNameLower});
+			setResultMsgMap(resultCount, msgMap);
+		} catch (Exception e) {
+			logger.error("ERROR : " + e.getMessage(), e);
+			msgMap.put("code", FAIL);
+		}
+		return msgMap;
+	}
+
+	@RequestMapping(value = "json/update", produces = "application/json")
+	public @ResponseBody Map<String, Object> update(${voName} ${voNameLower}, HttpServletRequest req) {
+		logger.info("update...");
+		Map<String, Object> msgMap = new HashMap<String, Object>();
+		try {
+			long seq = ${voNameLower}.getMod_seqno() + 1;
+			${voNameLower}.setMod_seqno(seq);
+			commTools.setUserAndTimeAndPgm(${voNameLower}, req, getClass());
+			commTools.emptyString(${voNameLower});
+			int resultCount = ${mapperNameLower}.update(${voNameLower});
+			setResultMsgMap(resultCount, msgMap);
+		} catch (Exception e) {
+		    logger.error("ERROR : " + e.getMessage(), e);
+			msgMap.put("code", FAIL);
+		}
+		return msgMap;
+	}
+
+	@RequestMapping(value = "json/delete", produces = "application/json")
+	public @ResponseBody Map<String, Object> delete(${voName} ${voNameLower}) {
+		logger.info("delete...");
+		Map<String, Object> msgMap = new HashMap<String, Object>();
+		try {
+		    commTools.emptyString(${voNameLower});
+		    int resultCount = ${mapperNameLower}.delete(${voNameLower});
+		    setResultMsgMap(resultCount, msgMap);
+		} catch (Exception e) {
+		    logger.error("ERROR : " + e.getMessage(), e);
+			msgMap.put("code", FAIL);
+		}
+		return msgMap;
+	}
+
+	@RequestMapping(value = "json/query", produces = "application/json")
+	public @ResponseBody Object query(${voName} ${voNameLower}) {
+		logger.info("query...");
+		try {
+			List<${voName}> list = ${mapperNameLower}.query(${voNameLower});
+			return list;
+		} catch (Exception e) {
+			Map<String, Object> msgMap = new HashMap<String, Object>();
+			msgMap.put("code", FAIL);
+			return msgMap;
+		}
+	}
+	
+	private void setResultMsgMap(int resultCount, Map<String, Object> msgMap){
+        if(resultCount != 0){
+            msgMap.put("code", SUCCESS);
+        }else{
+            msgMap.put("code", FAIL);
+        }
+    }
+}

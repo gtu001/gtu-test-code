@@ -1,0 +1,7 @@
+SYS 是所有內部資料表、結構、預儲程序的擁有者，此外還擁有 V$ 和 數據字典視圖，並創建所有封裝的資料庫角色(DBA、CONNECT、RESOURCE)。而 SYS 是唯一能訪問特定內部數據字典的帳號。SYSTEM 也是安裝 Oracle 所建立的帳號，用於 DBA 任務的管理。
+
+SYS 安裝後的預設密碼為 change_on_install
+
+SYSTEM 的預設密碼則是 manager
+
+基於安全需要，可以在安裝完成後用 alter user SYS indentified by password; 命令來修改帳號的密碼。

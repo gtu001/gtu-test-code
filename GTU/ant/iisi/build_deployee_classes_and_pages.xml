@@ -1,0 +1,28 @@
+<project name="iisi_deployee_classes_and_pages" default="main">
+
+	<target name="main">
+		<ant target="shotdownTomcat" antfile="build_deployee_full.xml">
+			<property name="enable" value="true" />
+		</ant>
+
+		<ant target="deleteTomcatLog" antfile="build_deployee_full.xml">
+			<property name="enable" value="true" />
+		</ant>
+
+		<ant antfile="build_deployee_pages_only.xml" target="main" />
+
+		<ant target="syncWebappClasses" antfile="build_deployee_full.xml">
+			<property name="enable" value="true" />
+		</ant>
+		
+		<ant target="replaceMyClass" antfile="build_deployee_full.xml">
+			<property name="enable" value="true" />
+		</ant>
+		
+		<copy file="C:\Documents and Settings\Administrator\桌面\workspace\GTU\src\com\iisigroup\ris\logback.xml" tofile="${target_webapp}/WEB-INF/classes/logback.xml" />
+
+		<ant target="runTomcat" antfile="build_deployee_full.xml">
+			<property name="enable" value="true" />
+		</ant>
+	</target>
+</project>

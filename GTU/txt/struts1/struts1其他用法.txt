@@ -1,0 +1,91 @@
+
+struct-config : struts-config-crt.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by luna (luna) -->
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+<struts-config>
+ 
+                <form-beans>
+                    ...                       
+                    <form-bean name="cancelCollectionForm"                    type="com.ebao.ls.crt.ctrl.form.CancelCollectionForm" />                                               
+                    ...
+                </form-beans>
+               
+    <global-forwards>
+                                ...
+                                <forward contextRelative="true" name="selectCollectionPolicyHolder" path="/ls/crt/CancelCollectionSearch.jsp"/>
+                                ...
+                </global-forwards>
+                <action-mappings>
+                                ...
+                                <action path="/toCancleColSelAction"                  name="cancelCollectionForm" scope="request" type="org.springframework.web.struts.DelegatingActionProxy"                             validate="false"/>                          
+                                ...
+                </action-mappings>
+ 
+</struts-config>
+ 
+ 
+ 
+spring
+ 
+  <bean class="com.ebao.pub.framework.internal.spring.StrutsConfigExport">
+    <property name="moduleName" value="/crt"/>
+    <property name="configFile">
+      <list>
+        <value>/WEB-INF/struts_config/struts-config-crt.xml</value>
+      </list>
+    </property>
+  </bean>
+ 
+<bean name="/crt/toCancleColSelAction" class="com.ebao.ls.crt.ctrl.action.SelectCanColAction" parent="crt.correctionAction">
+  </bean>
+ 
+  <bean name="crt.correctionAction" class="com.ebao.ls.crt.ctrl.pub.CorrectionAction" abstract="true">
+  </bean>
+ 
+  
+  
+  
+  
+Java
+Form
+ 
+public class CancelCollectionForm extends CorrectionForm {
+...
+}
+ 
+ 
+Action Parent
+public abstract class CorrectionAction extends GenericAction {
+ 
+  @Override
+  public ActionForward process(ActionMapping map, ActionForm form,
+      HttpServletRequest request, HttpServletResponse response)
+      throws Exception {
+    CorrectionForm correctionForm = (CorrectionForm) form;
+    ...validate
+    return undoProcess(map, form, request, response);
+  }
+ 
+  public abstract ActionForward undoProcess(ActionMapping map, ActionForm form,
+      HttpServletRequest request, HttpServletResponse response)
+      throws Exception;
+ 
+  @Resource(name = PolicyService.BEAN_DEFAULT)
+  private PolicyService policyService;
+}
+ 
+ 
+ 
+Real Action
+public class SelectCanColAction extends CorrectionAction {
+ 
+  public ActionForward undoProcess(ActionMapping actionMapping,
+      ActionForm actionForm, HttpServletRequest httpServletRequest,
+      HttpServletResponse httpServletResponse) throws Exception {
+ 
+    CancelCollectionForm form = (CancelCollectionForm) actionForm;
+    ...
+    return actionMapping.findForward("selectCollectionPolicyHolder");
+  }
+}

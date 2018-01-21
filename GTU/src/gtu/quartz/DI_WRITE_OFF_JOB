@@ -1,0 +1,49 @@
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html;charset=big5">
+<html>
+  <head>
+    
+  </head>
+  <body bgcolor="#ffffff" text="#000000">  
+     {CONTENT}<BR><BR>
+
+    <table cellpadding="2" border="0" width="100%">
+      <tr>
+        <th align="right" bgcolor="#ccddec" width="20%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">主旨：<br></font>
+
+        </th>
+        <td align="left" width="80%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">
+          {SUBJECT}<br></font>
+        </td>
+      </tr>     
+      <tr>
+        <th align="right" bgcolor="#ccddec" width="20%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">Site ID&#65306;<br></font>
+        </th>
+        <td align="left" width="80%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">{SITE_ID}<br></font>
+        </td>
+      </tr>      
+      <tr>
+        <th align="right" bgcolor="#ccddec" width="20%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">工單完工日：<br></font>
+
+        </th>
+        <td align="left" width="80%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">{WO_COMPLETE_DT}</font>
+        </td>
+      </tr>
+      <tr>
+        <th align="right" bgcolor="#ccddec" width="20%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">等待天數：<br></font>
+
+        </th>
+        <td align="left" width="80%" valign="middle">
+          <font face="Helvetica, Arial, sans-serif">{WAIT_DAYS}<br></font>
+
+        </td>
+      </tr>     
+    </table>
+  </body>
+</html>

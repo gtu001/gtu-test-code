@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="waiterTarget" class="gtu.spring.aop.StaticMethodMatcherPointcutAdvisorTest$Waiter" />
+	<bean id="sellerTarget" class="gtu.spring.aop.StaticMethodMatcherPointcutAdvisorTest$Seller" />
+
+	<bean id="greetingAdvice" class="gtu.spring.aop._TestBeforeAdvice$GreetingBeforeAdvice" />
+
+	<bean id="regexpAdvisor"
+		class="org.springframework.aop.support.RegexpMethodPointcutAdvisor"
+		p:advice-ref="greetingAdvice">
+		<property name="patterns">
+			<list>
+				<value>
+					.*greet.*
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="parent" abstract="true"
+		class="org.springframework.aop.framework.ProxyFactoryBean"
+		p:interceptorNames="regexpAdvisor" p:proxyTargetClass="true" />
+
+	<bean id="waiter" parent="parent" p:target-ref="waiterTarget" />
+	<bean id="seller" parent="parent" p:target-ref="sellerTarget" />
+</beans>

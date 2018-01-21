@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:annotation-config />
+	<!-- <context:component-scan base-package="com.iisigroup.ris" /> -->
+
+	<context:property-placeholder
+		properties-ref="aeBean" />
+
+
+	<!-- <bean id="AutoNoteTemplateFactory" class="com.iisigroup.ris.rl.component.AutoNoteTemplateFactoryImpl" 
+		/> <bean id="SystemConfig" class="com.iisigroup.ris.common.SystemConfig" 
+		/> -->
+	<!-- <bean id="risCodeConvertMethod" class="gtu.freemarker.IisiFreeMarkerTest$RisCodeConvertMethod" 
+		/> <bean id="iisiFreeMarkerTest" class="gtu.freemarker.IisiFreeMarkerTest" 
+		/> -->
+
+	<bean id="RisCodeComponent" class="gtu.mock.MockitoUtil" factory-method="createMockitoObject">
+		<constructor-arg>
+			<value>
+				tw.gov.moi.ae.codetable.RisCodeComponent
+			</value>
+		</constructor-arg>
+	</bean>
+
+	
+
+	<context:component-scan base-package="gtu.freemarker" />
+
+	<bean id="aeBean"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="ris3rl_prefix">C:\workspace\backup\config</prop>
+				<prop key="globle.config.path">${ris3rl_prefix}/config</prop>
+				<prop key="globle.share.path">${ris3rl_prefix}/share</prop>
+				<prop key="config.path">${ris3rl_prefix}/RIS/config</prop>
+				<prop key="share.path">${ris3rl_prefix}/RIS/share</prop>
+				<prop key="data.path">${ris3rl_prefix}/RIS/data</prop>
+				<prop key="temp.path">${ris3rl_prefix}/RIS/tmp</prop>
+				<prop key="system.id">FAKE_VALUE</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- <import resource="classpath:/com/iisigroup/ris/ae/ae-filesystem.xml" 
+		/> -->
+</beans>
+

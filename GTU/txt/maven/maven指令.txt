@@ -1,0 +1,5 @@
+mvn clean install -DskipTests
+
+mvn <goals> -rf :party-reference
+
+-Dmaven.test.skip=true

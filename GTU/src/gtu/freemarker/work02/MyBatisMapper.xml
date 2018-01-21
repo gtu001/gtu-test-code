@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ibt.dcs.mybatis.mapper.${mapperName}">
+
+	<resultMap id="resultMap" type="com.ibt.dcs.mybatis.vo.${voName}">
+	</resultMap>
+
+	<resultMap id="dddwResultMap" type="map">
+		<id property="db_code" column="db_code" />
+		<result property="db_text" column="db_text" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ibt.dcs.mybatis.vo.${voName}">
+		INSERT INTO ${tableName} (
+			<#list list as x>
+				${x["COLUMN_NAME"]}<#if x?is_last == false>,</#if>
+			</#list>
+		)
+		VALUES (
+			<#list list as x>
+				${r"#{"}${x["COLUMN_NAME"]?lower_case}${r"}"}<#if x?is_last == false>,</#if>
+			</#list>
+		)
+	</insert>
+
+	<update id="update" parameterType="com.ibt.dcs.mybatis.vo.${voName}">
+		UPDATE ${tableName} SET
+			<#list list as x>
+				${x["COLUMN_NAME"]} = ${r"#{"}${x["COLUMN_NAME"]?lower_case}${r"}"}<#if x?is_last == false>,</#if>
+			</#list>
+		WHERE 1=1
+			<#list list as x>
+				and ${x["COLUMN_NAME"]} = ${r"#{"}${x["COLUMN_NAME"]?lower_case}${r"}"}
+			</#list>
+	</update>
+
+	<delete id="delete" parameterType="com.ibt.dcs.mybatis.vo.${voName}">
+		DELETE FROM ${tableName}
+		WHERE 1=1
+			<#list list as x>
+				and ${x["COLUMN_NAME"]} = ${r"#{"}${x["COLUMN_NAME"]?lower_case}${r"}"}
+			</#list>
+	</delete>
+	
+	<select id="getDddw" parameterType="String" resultMap="dddwResultMap">
+		SELECT
+		WF_WINID AS db_code,
+		WF_WINID || '_' || WF_NAME AS db_text
+		FROM
+		SEC_WINDOW
+		WHERE 
+		WF_TYPE = ${r"${"}value${r"}"}
+		ORDER BY db_text
+	</select>
+
+	<select id="query" parameterType="com.ibt.dcs.mybatis.vo.${voName}" resultMap="resultMap">
+		SELECT
+			<#list list as x>
+				${x["COLUMN_NAME"]}<#if x?is_last == false>,</#if>
+			</#list>
+		FROM ${tableName}
+		<where>
+			<#list list as x>
+				<if test="${x["COLUMN_NAME"]?lower_case} != null">
+					and ${x["COLUMN_NAME"]} = ${r"#{"}${x["COLUMN_NAME"]?lower_case}${r"}"}
+				</if>
+			</#list>
+		</where>
+	</select>
+
+</mapper>

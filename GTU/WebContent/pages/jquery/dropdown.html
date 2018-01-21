@@ -1,0 +1,31 @@
+//下拉選單
+
+        $.ajax({
+			url:'/APSPIS/invoice!getShippingTermList',
+			data:'',
+			type:'POST',
+			dataType:'json',
+			async: false,
+			success: function(objResult){
+				//alert(JSON.stringify(objResult));
+                $('#term > option').each(function(){
+                	$(this).remove();
+                });
+                $(objResult).each(function(){
+                	//alert(this.key);
+                	$('#term').append("<option value="+this.key+">"+this.value+"</option>");	
+                });
+                if($('#term_').val() != ''){
+    				$('#term').val($('#term_').val());
+    			}
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                alert(xhr.status);
+                alert(thrownError);
+            }
+		});
+		
+		
+		
+		
+		

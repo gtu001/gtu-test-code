@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ris="http://java.sun.com/jsf/composite/ris"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/pages/common/default.xhtml">
+
+	<ui:param name="show" value="true" />
+
+	<ui:define name="right">
+
+		<p:breadCrumb>
+			<p:menuitem value="Home" url="#" />
+			<p:menuitem value="戶籍查詢/登記/文件核發" url="#" />
+		</p:breadCrumb>
+			
+			<p:growl showDetail="true" sticky="true" />
+			<p:messages showDetail="true" autoUpdate="true" />
+			
+			<h:commandButton value="showInfo" action="#{${LOWER_ID}Controller.showInfo}" />
+		
+		<p:panel header="${chineseName}">
+			<p:fieldset legend="查詢條件">
+				<table border="0" width="900">
+    #foreach( $var in $COLUMNLIST )
+$var
+    #end
+				</table>
+			</p:fieldset>
+			<p>
+				<p:remoteCommand 
+					process="@none" 
+					name="doPrint"
+					update="hiddenId"
+					action="#{${LOWER_ID}Controller.doPrint}" />
+				<p:panel style="border:0">
+					<ris:pdfViewerAndPrinter 
+						value="送出"
+						pdfUrl="#{rr038c0Controller.dto.reportUrl}"
+						titleName="預覽戶籍登記申請書" remoteActionName="doPrint()"/>
+					<p:commandButton value="另存電子檔" action="#{rr038c0Controller.saveAs}" ajax="false" />
+				</p:panel>
+				<h:inputHidden id="hiddenId" value="#{rr038c0Controller.dto.reportUrl}" />
+			</p>
+		</p:panel>
+
+	</ui:define>
+</ui:composition>

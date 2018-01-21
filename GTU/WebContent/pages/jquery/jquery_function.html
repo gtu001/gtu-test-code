@@ -1,0 +1,84 @@
+$.fx.off //請用或停用特效
+$.support //支援的特性細節
+$.browser //探知瀏覽器細節(depreciate)
+
+jQuery.noConflict();
+或是以下面取代
+(function($){/* 這邊是函式本體 */})(jQuery);
+
+$.trim(value) //剪裁字串
+
+$.grep(array, callback, invert) 
+//過濾陣列
+//將array捕獲符合條件的結果(若符合則callback須回傳true), invert是否結果順序顛倒
+
+$.map(array, callback)
+//轉換陣列
+ex : var onBased = $.map([0,1,2,3,4], function(val){return val + 1;});
+ex : 
+var characters = $.map(['this', 'that', 'other thing'], function(val){
+	return val.split('');
+});
+--> ['t','h','i','s','t','h','a','t','o','t','h','e','r','t','h','i','n','g']
+
+$.inArray(val, array) //是否存在於陣列 
+
+$.makeArray(object) //(物件)要被轉換的類似陣列物件(像是NodeList)
+
+$.unique(array) //disinct陣列
+
+$.merge(array1, array2) //將array2加入至array1,並回傳array1
+
+$.extend(deep, target, src1, src2, ...srcN)
+//1.deep 深層複製或淺層, 2.target 要extend的來源(這個直會被改變), src1..N 越後面優先權越高,會蓋掉target值
+
+$.param(params, traditional)
+//params 傳入jquery物件,會將name=value組成字串
+//traditional 是否巢狀展開內容
+ex : 
+$.param({'a thing':'it&s=value', 
+	'another thing':'another value',
+	'weird characters':'!@#$%'
+)
+--> a+thing=it&26s%dDvalue&another+thing=another+value&weird+charagers=!%40...etc
+
+## 檢查用函式 ##
+$.isArray(o)
+$.isEmptyObject(o) //若o不具特性(包括從prototype繼承來的特性)則傳回true
+$.isFunction(o)
+$.isPlainObject(o) //o透過{}或是new Object()則回傳true
+$.isXMLDoc(node) //若node是XML文件或是XML文件中的節點則回傳true
+
+$.noop() //無動作 , 用來當作參數值用ex: callback
+
+$.contains(container, containee) //container是否含有containee
+
+
+$().data(name,value)
+$().removeData(name)
+$().hasData(name)
+
+
+$.proxy(function, property) 
+//預先於某個函示上榜定物件
+ex: 
+$('#testButton').click(function(){alert(this.id);});
+--> 顯示testButton
+$('#testButton').click($.proxy(
+	function(){alert(this.id);},
+	$('#controlPanel')
+));
+--> 顯示controlPanel
+
+
+$.parseJSON(json)
+
+$.globalEval(code)
+
+$.getScript(url, callback)//類似<script/>只是動態仔入
+
+$().serialize()
+$().serializeArray()
+
+
+

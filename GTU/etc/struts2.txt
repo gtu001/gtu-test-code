@@ -1,0 +1,134 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<%@ taglib prefix="sj" uri="/struts-jquery-tags" %>
+
+<s:submit type="button" action="CustProf!chkChgPwd" key="button.modify"/>
+
+<a href="CustProfUnLogin!insertEntry?belongTo=UPS">我同意以上條文 I accept the terms of the license agreement</a>
+          <p>     <a href='<s:property value="%{new com.tradevan.isso.ext.service.CodeDataService().getCodeDataByKey('L01','UPS03','','','','','')[0].codeData01}"/>' onClick="execute();">不同意 I do not accept the terms of the license agreement</a></td>
+          
+          
+          
+          <s:property value="%{systemCodeDO.data05}"/>
+          
+          
+          
+          
+          <s:if test='status == "A"'>
+					<div>啟用(A)</div>
+				</s:if>
+				<s:elseif test='status == "D"'>
+					<div>停用(D)</div>
+				</s:elseif>
+				<s:elseif test='status == "P"'>
+					<div>待審核(P)</div>
+				</s:elseif>
+				<s:elseif test='status == "R"'>
+					<div>申請駁回(R)</div>
+				</s:elseif>
+				<s:elseif test='status == "S"'>
+					<div>暫時失效(S)</div>
+				</s:elseif>
+				
+				
+				
+				
+				
+				var dialogConfig = {
+				resizable: true,
+				height:400,
+				width:500,
+				modal: true,
+				title: "權限",
+				buttons: {
+					"關閉": function() {
+						$( this ).dialog( "close" );
+					},
+				},
+				beforeClose: function( event, ui ) {
+				}
+		    }
+		    
+		    $("#sabQuery_Dialog").dialog(dialogConfig);
+		    
+		    
+				
+				
+				<s:select list="#{'RI_Shipper':'貨主',
+										'RI_Broker':'報關行',
+										'RI_EC_Broker':'EC-SBIP-Admin',
+										'RI_EC_Shipper':'EC-SBIP-User' }" 
+										id="roleId"  name="roleId"/>
+										
+										
+										
+										
+										<s:set var="tmp1">業務專員</s:set>
+										
+										
+										
+										
+										
+										<s:form name="CustProfForm" id="CustProfForm" action="CustProfUnLogin!insert">
+										
+										<s:hidden name="command" value=""/>
+										
+										
+										
+									
+									
+									
+									
+									
+									
+									<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="/struts-tags" prefix="s"%>
+
+
+<div class="ErrorMsg">
+<s:if test="hasActionErrors()">
+    <s:iterator value="actionErrors">                   
+          <s:property escape="false"/>        
+    </s:iterator>
+</s:if>
+<s:if test="hasActionMessages()">
+    <s:iterator value="actionMessages">
+        <script type="text/javascript">      
+          alert('<s:property escape="false"/>');
+        </script>
+    </s:iterator>
+</s:if>
+<s:if test="hasFieldErrors()">
+    <s:iterator value="fieldErrors">
+    	<s:property value="value"/>        
+    </s:iterator>
+</s:if>
+</div>
+
+
+
+
+
+
+<font color="red">
+	<s:include value="/pages/msg.jsp"></s:include>
+</font>
+
+
+
+
+
+
+ServletActionContext.getRequest()
+
+
+
+
+ActionContext.getContext().getSession()
+
+
+
+
+
+

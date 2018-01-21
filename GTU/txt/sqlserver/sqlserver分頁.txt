@@ -1,0 +1,13 @@
+SQL Server 分頁
+
+好久沒做分頁的功能，
+
+這次要用SQL SERVER做分頁，
+
+找了網路資源，以下這篇文章說的最清楚，直接就當是最適合或最佳解來用吧
+
+https://dotblogs.com.tw/jimmyyu/archive/2009/11/09/11499.aspx
+
+語法直接抄
+
+select *  FROM (SELECT  ROW_NUMBER() OVER (ORDER BY Id) AS RowNum, * FROM TableName) AS NewTable WHERE RowNum >= 1 AND RowNum <= 20

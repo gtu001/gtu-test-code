@@ -1,0 +1,176 @@
+<project name="iisi_deployee_full" default="main">
+
+	<property name="tomcat_home" location="C:\apps\@server\apache-tomcat-7.0.26_self" />
+	
+	<property name="target_webapp" location="${tomcat_home}\webapps\ris_web" />
+	<property name="sync_test_target_webapp" location="C:\apps\@server\apache-tomcat-7.0.26_self\webapps\ris_web" />
+	
+	<property name="target_webapp_classes_dir" location="${target_webapp}\WEB-INF\classes" />
+
+	<property name="mavenWebContent" location="C:\workspace\ris3rl2\ris3rl2-web\src\main\webapp" />
+
+	<property name="myWebProject" location="C:\workspace\ris_web" />
+	<property name="myWebClassesDir" location="${myWebProject}\build\classes" />
+
+	<property name="specialCompilerSrcDir" location="${myWebProject}\src" />
+	<property name="specialCompilerBuildDir" location="${basedir}\build" />
+
+	<property name="browserUrl" value="http://localhost:8081/ris_web" />
+
+	<property name="powerCmd" value="C:\apps\PowerCmd" />
+
+	<path id="classPath">
+		<pathelement path="${myWebClassesDir}" />
+		<fileset dir="${myWebProject}\WebContent\WEB-INF\lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${tomcat_home}\lib" />
+	</path>
+
+	<target name="main">
+		<antcall target="main_deployee" />
+	</target>
+
+	<target name="main_deployee">
+		<antcall target="shotdownTomcat">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<delete file="C:\Users\Troy\Desktop\ws-rolling.log" />
+
+		<antcall target="deleteTargetWebapp">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="deleteTomcatLog">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="mkWebRoot">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="copyMavenWebContent">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="copyMyWebContent">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="syncWebappClasses">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="replaceMyClass">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<copy file="C:\workspace\GTU\src\com\iisigroup\ris\logback.xml" tofile="${target_webapp}/WEB-INF/classes/logback.xml" />
+
+		<antcall target="runTomcat">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="mkWebRoot" if="${enable}">
+		<mkdir dir="${target_webapp}" />
+	</target>
+
+	<target name="shotdownTomcat" if="${enable}">
+		<echo message="# shotdown tomcat = ${tomcat_home} ..." />
+		<exec dir="${tomcat_home}/bin" executable="cmd">
+			<arg value="/c" />
+			<arg value="shutdown.bat" />
+		</exec>
+	</target>
+
+	<target name="runTomcat" if="${enable}">
+		<echo message="# run tomcat = ${tomcat_home} ..." />
+		<exec dir="${powerCmd}" executable="cmd">
+			<arg value="/c" />
+			<arg value="PowerCmd.exe /C=&quot;${tomcat_home}\bin\startup.bat&quot;" />
+		</exec>
+		<!--
+		<exec dir="${tomcat_home}/bin" executable="cmd">
+			<arg value="/c" />
+			<arg value="startup.bat" />
+		</exec>
+		-->
+		<!--
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="start" />
+			<arg value="${tomcat_home}/logs" />
+		</exec>
+		-->
+		<!--
+		<exec executable="C:\Program Files (x86)\Mozilla Firefox\firefox.exe">
+			<arg value="${browserUrl}" />
+		</exec>
+		-->
+	</target>
+
+	<target name="deleteTomcatLog" if="${enable}">
+		<echo message="# delete tomcat log = ${enable} ..." />
+		<delete>
+			<fileset dir="${tomcat_home}/logs">
+				<include name="**/*.log" />
+				<include name="**/*.txt" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="deleteTargetWebapp" if="${enable}">
+		<echo message="# delete = ${target_webapp} ..." />
+		<delete>
+			<fileset dir="${target_webapp}">
+				<include name="**/*.*" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="copyMavenWebContent" if="${enable}">
+		<echo message="# sync page image .ect ..." />
+		<copy todir="${target_webapp}" verbose="true" includeemptydirs="true">
+			<fileset dir="${mavenWebContent}" />
+		</copy>
+	</target>
+
+	<target name="copyMyWebContent" if="${enable}">
+		<echo message="# 覆蓋 ris_web/webcontent 底下所有自訂檔案 ..." />
+		<copy todir="${target_webapp}" overwrite="true" verbose="true">
+			<fileset dir="${myWebProject}/WebContent">
+				<exclude name="**/*.jar" />
+			</fileset>
+		</copy>
+		<sync todir="${target_webapp}/WEB-INF/lib" verbose="true" includeemptydirs="true">
+			<fileset dir="${myWebProject}/WebContent/WEB-INF/lib">
+				<include name="**/*" />
+			</fileset>
+		</sync>
+	</target>
+
+	<target name="syncWebappClasses" if="${enable}">
+		<echo message="# sync classes ..." />
+		<mkdir dir="${target_webapp_classes_dir}" />
+		<sync todir="${target_webapp_classes_dir}" verbose="true" includeemptydirs="true">
+			<fileset dir="${myWebClassesDir}">
+				<include name="**/*" />
+			</fileset>
+		</sync>
+	</target>
+
+	<target name="replaceMyClass" if="${enable}">
+		<echo message="# replace my classes ..." />
+		<mkdir dir="${specialCompilerBuildDir}" />
+		<javac compiler="javac1.6" source="1.6" includeantruntime="true" srcdir="${specialCompilerSrcDir}" destdir="${specialCompilerBuildDir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+			<include name="**/*.*" />
+			<classpath refid="classPath" />
+		</javac>
+		<copy todir="${target_webapp_classes_dir}" overwrite="true">
+			<fileset dir="${specialCompilerBuildDir}" />
+		</copy>
+		<delete dir="${specialCompilerBuildDir}" />
+	</target>
+</project>

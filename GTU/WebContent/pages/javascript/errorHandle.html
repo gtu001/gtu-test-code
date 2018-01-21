@@ -1,0 +1,25 @@
+<script type="text/javascript">
+onerror = function(msg, url, line){
+	alert("原因:" + msg + "\n網址:" + url + "\n行數:" + line);
+}
+
+//線上紀錄追蹤使用者畫面顯示的錯誤
+$(window).error(function(msg, url, line){
+	jQuery.post("/js_error_log.ashx", {msg:msg, url:url, line:line});
+});
+
+debugger; //主動進入中斷點
+
+try{
+	throw("Divide by zero error.");
+}catch(e){
+	var errMsg = "";
+	for(var prop in e){
+		errMsg += "[" + prop + "] : " + e[prop] + "\n";
+	}
+	alert(errMsg);
+}finally{
+	//TODO
+}
+
+</script>

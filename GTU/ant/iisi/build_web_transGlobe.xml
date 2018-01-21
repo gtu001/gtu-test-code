@@ -1,0 +1,59 @@
+<project name="iisi_deployee_full" default="main">
+
+	<property name="tomcat_home" location="D:\_桌面\apps\@server\apache-tomcat-7.0.26" />
+
+	<property name="target_webapp" location="${tomcat_home}\webapps\ATN_LDV_0_6" />
+	
+	<!--<property name="build_dir" location="${target_webapp}\WEB-INF\classes" />-->
+	<property name="build_dir" location="C:\Users\gtu001\Desktop\test" />
+	<property name="src_dir" location="\\10.67.20.72\atn\Workspace\ATN_LDV_0_6\src" />
+
+	<property name="jar_dir" location="\\10.67.20.72\atn\Workspace\ATN_LDV_0_6\WebContent\WEB-INF\lib" />
+
+	<property name="sync_from_webapp" location="\\10.67.20.72\atn\Workspace\ATN_LDV_0_6\WebContent" />
+
+
+	<target name="main">
+
+		<antcall target="sync_target_webapp">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="compiler">
+			<param name="enable" value="true" />
+		</antcall>
+		
+		<exec dir="${tomcat_home}/bin" executable="cmd">
+			<arg value="/c" />
+			<arg value="startup.bat" />
+		</exec>
+
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="http://localhost:8080/ATN_LDV_0_6" />
+		</exec>
+	</target>
+
+	<path id="include_jar_path">
+		<pathelement path="../../bin" />
+		<fileset dir="${jar_dir}">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="compiler" if="${enable}">
+		<echo># compiler = ${enable}</echo>
+		<mkdir dir="${build_dir}" />
+		<javac includeantruntime="true" fork="true" srcdir="${src_dir}" destdir="${build_dir}" nowarn="true" encoding="UTF8" debug="off" failonerror="false">
+			<classpath refid="include_jar_path" />
+		</javac>
+	</target>
+
+	<target name="sync_target_webapp" if="${enable}">
+		<sync todir="${target_webapp}" verbose="true" includeemptydirs="true">
+			<fileset dir="${sync_from_webapp}">
+				<include name="**/**.*" />
+			</fileset>
+		</sync>
+	</target>
+</project>

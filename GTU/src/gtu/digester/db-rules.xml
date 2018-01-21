@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<digester-rules>
+	<pattern value="db-config">
+		<object-create-rule classname="gtu.digester.DBConfig" />
+		<set-properties-rule />
+		<pattern value="db-provider">
+			<object-create-rule classname="gtu.digester.DBProvider" />
+			<set-properties-rule />
+			<bean-property-setter-rule pattern="url" />
+			<bean-property-setter-rule pattern="db" />
+			<bean-property-setter-rule pattern="ip" />
+			<bean-property-setter-rule pattern="port" />
+			<bean-property-setter-rule pattern="usr" />
+			<bean-property-setter-rule pattern="pwd" />
+			<bean-property-setter-rule pattern="driver" />
+			<set-next-rule methodname="addDBProvider" />
+		</pattern>
+	</pattern>
+</digester-rules>
+

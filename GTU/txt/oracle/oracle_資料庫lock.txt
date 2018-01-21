@@ -1,0 +1,81 @@
+先查出lock的sid
+select b.OSUSER,
+       a.CTIME,
+       a.sid,
+       a.type,
+       a.id1,
+       c.object_name,
+       b.username,
+       a.lmode,
+       B.MACHINE,
+       b.PROGRAM,
+       b.module,
+       b.action,
+       D.SPID,
+       'alter system kill session ' || '''' || TO_CHAR(b.sid) || ',' ||
+       TO_CHAR(b.serial#) || '''' || ';'
+  from v$lock a, v$session b, all_objects c, V$PROCESS D
+where a.sid = b.sid
+   and a.type in ('TM', 'TX')
+   and c.object_id = a.id1
+   AND B.PADDR = D.ADDR
+   and b.username like 'TGL_MAIN_DEV%'
+order by b.username, ctime desc;
+ 
+砍掉lock By sid
+ call P_KILL_USER_SESSION(1835);
+ 
+ 
+############### 
+CREATE OR REPLACE PROCEDURE P_KILL_USER_SESSION(P_SID IN NUMBER) AUTHID CURRENT_USER AS
+  V_CURRENT_USERNAME VARCHAR2(30);
+  V_CURRENT_SID      NUMBER;
+  V_USERNAME         VARCHAR2(30);
+BEGIN
+  SELECT SYS_CONTEXT('USERENV', 'SESSION_USER'),
+         SYS_CONTEXT('USERENV', 'SID')
+    INTO V_CURRENT_USERNAME, V_CURRENT_SID
+    FROM DUAL;
+ 
+  IF P_SID != V_CURRENT_SID
+  THEN
+    SELECT USERNAME INTO V_USERNAME FROM V$SESSION WHERE SID = P_SID;
+ 
+    IF V_CURRENT_USERNAME in (V_USERNAME,V_USERNAME||'_APP',V_USERNAME||'_READ_ONLY')
+    THEN
+      P_KILL_SESSION(V_USERNAME, P_SID);
+    ELSE
+      RAISE_APPLICATION_ERROR(-20000, 'CAN NOT KILL OTHERE SCHEMA USER');
+    END IF;
+  ELSE
+    RAISE_APPLICATION_ERROR(-20000, 'CAN NOT KILL CURRENT SESSION!');
+  END IF;
+END;
+
+###############
+
+CREATE OR REPLACE PROCEDURE DBADMIN.P_KILL_SESSION(P_USER IN VARCHAR2,
+                                           P_SID  IN VARCHAR2) AS
+  V_SQL VARCHAR2(32767);
+BEGIN
+  IF P_USER = 'SYS'
+  THEN
+    RAISE_APPLICATION_ERROR(-20001, 'CAN''T KILL SYS SESSION');
+  END IF;
+ 
+  SELECT 'ALTER SYSTEM KILL SESSION ''' || SID || ',' || SERIAL# || ''''
+    INTO V_SQL
+    FROM V$SESSION
+   WHERE USERNAME = P_USER
+     AND SID = P_SID;
+  EXECUTE IMMEDIATE V_SQL;
+ 
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RAISE_APPLICATION_ERROR(-20001,
+                            'SID: ' || P_SID ||
+                            ' DOES NOT EXISTS, OR THE SESSION USER IS NOT ' ||
+                            P_USER);
+END;
+
+ 

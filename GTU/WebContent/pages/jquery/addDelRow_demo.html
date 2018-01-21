@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	
+	<title>AddDelRow DEMO</title>
+    
+	<style type="text/css">
+		.detailListTable {
+			font-family: Arial, �ө���, Helvetica, sans-serif;
+			width: 90%;
+			position: relative;
+			left: 50px;
+			border-collapse: collapse;
+			border: 1pt outset;
+			border-color: #eeeeee;
+			font-size: 10pt;
+		}
+		
+		.detailListTable tr.header {
+			background-color: #eeeeee;
+		}
+		
+		.detailListTable tr.evengrid {
+			
+		}
+		
+		.detailListTable tr.oddgrid {
+			background-color: #eeeeee;
+		}
+	</style>
+	<script type="text/javascript" src="jquery-1.7.1.js"></script>
+	<script type="text/javascript">
+		
+		$(document).ready( function() {
+
+			$("#dTable tbody tr:odd").addClass("oddgrid");
+
+			//新增 Row
+			$("#add_button").click(function() {
+				var index = $("#dTable tbody tr").length;
+
+				$("#gCount").val(index);
+				var q = $("#gCount").val();
+
+				var rValue_1 = $("#dTable tbody tr:last").find("#amtDtl").val();
+				var rValue_2 = $("#dTable tbody tr:last").find("#amtDtlDscr").val();
+								
+				if ((rValue_1 == "") || (rValue_2 == "")) {
+					alert("欄位必需輸入值!!");
+					return false;
+				} else {
+					q++;
+					$("#dTable tbody tr:first").clone(true).appendTo("#dTable tbody");
+					$("gCount").val(q);
+					$("#dTable tbody tr:last").contents().find("input[type='text']").each(function() {
+						$(this).val("");
+					});
+					rowColor();
+				}
+			});
+
+			//刪除 Row
+			$("img[@id='delRow']").click( function() {
+				var rowLength = $("#dTable tbody tr").length;
+
+				if (rowLength == 1) {
+					alert("無法刪除這一列!");
+					return false;
+				} else {
+					$(this).parents("tr").remove();
+					rowColor();
+					return false;
+				}
+			});
+
+			//表單間格顏色
+			function rowColor() {
+				$("#dTable tbody tr").each( function() {
+					$(this).removeClass();
+					$("#dTable tbody tr:odd").addClass("oddgrid");
+				});
+			}
+
+			//LOV 頁面
+			$("img[@id='amtLov']").click(function() {
+				var returnValue = window.showModalDialog("payAmtPro.do?action=amtDtlLov",
+								window, 'center: Yes; dialogWidth: 800px; dialogHeight: 600px; resizable: Yes;');
+				if (returnValue != null) {
+					var returnValues = returnValue.split(",");
+					var thisTr = $(this).parents("tr").contents();
+					$(thisTr).find("input[@name='amtDtl']").val(returnValues[0]);
+					$(thisTr).find("input[@name='amtDtlDscr']").val(returnValues[1]);
+				}
+			});
+
+		});
+		
+		//確認儲存
+		function checkForm(form) {
+			var rValue_1 = $("#dTable tbody tr:last").find("#amtDtl").val();
+			var rValue_2 = $("#dTable tbody tr:last").find("#amtDtlDscr").val();
+	
+			if ($("#amtType").val() == "") {
+				alert("欠費金額種類為必填欄位, 不可為空.");
+				$("#amtType").focus();
+				return false;
+			}
+	
+			if ($("#dscr").val() == "") {
+				alert("說明為必填欄位, 不可為空.");
+				$("#dscr").focus();
+				return false;
+			}
+	
+			if (rValue_1 == "" || rValue_2 == "") {
+				alert("參數設定欄位不可有空值！");
+				return false;
+			}
+	
+			$("#saveData").val("Y");
+			$("#action").val("verifyFormula");
+			form.submit();
+		}
+	
+		$( function() {
+			if ($("#excepErr").val() == "Y") {
+				$("#saveData").val("N");
+				alert($("#alertMsg").val());
+				return false;
+			}
+			
+			if ($("#saveData").val() == "Y" && confirm($("#formula").val() + ",是否確認存檔?")) {
+				$("#action").val("save");
+				$("#saveData").val("N");
+				$("#modifyForm").submit();
+				return false;
+			}
+		});
+	
+		//關閉視窗
+		function checkClose() {
+			if (confirm('確定關閉視窗?')) {
+				window.close();
+			}
+		}
+		
+	</script>
+</head>
+
+<body>
+	<form method="post" name="modifyForm" action="">
+	  
+			<table id="dTable" class="detailListTable">
+				<input type="hidden" value="0" id="gCount" name="globalCount" />
+				<thead>
+					<tr class="header">
+						<td colspan=6 align="left">Modify_Detail</td>
+					</tr>
+					<tr>
+						<td colspan=6>
+							<input type="button" name="add_btn" id="add_button" value="新增一列" />
+							<span class="warnInfo">Note.一列輸入完後,在新增新的輸入列</span>
+						</td>
+					</tr>
+					<tr class="header">
+						<td width="15%"></td>
+						<td width="23%">細項1</td>
+						<td width="35%">細項2</td>
+						<td>註記</td>
+					</tr>
+				</thead>
+				<tbody>
+						<tr>
+							<td><img src="delete.gif" id="delRow" alt="刪除" width="16" height="16" border="0"></td>
+							<td><input type="text" name="amtDtl" id="amtDtl"size="10" maxlength="5" /></td>
+							<td><input type="text" name="amtDtlDscr" id="amtDtlDscr" maxlength="30" /></td>
+							<td>
+								<select>
+									<option value="Y">總金額包括此細項</option>
+									<option value="N">此細項金額為參考欄位</option>
+								</select>
+							</td>
+						</tr>
+				</tbody>
+				<tfoot>
+					
+					<tr>
+						<td colspan=6 align="center">
+                        	<input type="button" name="btn" value="儲存" onclick="" />
+							<input type="button" name="btn" value="關閉" onclick="" />
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+	
+	</form>
+	
+	
+</body>
+</html>

@@ -1,0 +1,63 @@
+<project name="deployee_gtu_web" default="main">
+
+	<property name="tomcat7" location="C:\apps\@server\apache-tomcat-7.0.26_self" />
+	<property name="target_webapp" location="${tomcat7}\webapps\gtu" />
+	<property name="project_webapp" location="C:\workspace\GTU\WebContent" />
+	<property name="classes" location="C:\workspace\GTU\build\classes" />
+	<property name="libs" location="C:\workspace\GTU\WebContent\WEB-INF\lib" />
+	<property name="powerCmd" location="C:\apps\PowerCmd" />
+
+	<target name="main">
+		<echo message="# main ..." />
+
+		<exec dir="${tomcat7}/bin" executable="cmd">
+			<arg value="/c" />
+			<arg value="shutdown.bat" />
+		</exec>
+
+		<mkdir dir="${target_webapp}" />
+
+		<copy todir="${target_webapp}">
+			<fileset dir="${project_webapp}" />
+		</copy>
+
+		<sync todir="${target_webapp}\WEB-INF\classes">
+			<fileset dir="${classes}" />
+		</sync>
+
+		<sync todir="${target_webapp}\WEB-INF\lib">
+			<fileset dir="${libs}" />
+		</sync>
+
+		<echo message="special lib copy" />
+		<copy todir="${target_webapp}\WEB-INF\lib">
+			<fileset dir="c:\jar">
+				<include name="**/jstl-1.2.jar" />
+				<include name="**/slf4j-api-1.6.1.jar" />
+				<include name="**/logback-access-0.9.28.jar" />
+				<include name="**/logback-classic-0.9.28.jar" />
+				<include name="**/logback-core-0.9.28.jar" />
+			</fileset>
+		</copy>
+
+		<echo message="special config copy" />
+		<copy tofile="${target_webapp}\WEB-INF\classes\logback.xml">
+			<fileset dir="${classes}">
+				<include name="**/gtu/log/logback.xml" />
+			</fileset>
+		</copy>
+
+		<!--
+		<exec command="cmd">
+			<arg line="/c start echo deployee completed!!" />
+		</exec>
+		-->
+
+		<delete dir="${tomcat7}/logs" includes="**/*.*" />
+
+		<exec dir="${powerCmd}" executable="cmd">
+			<arg value="/c" />
+			<arg value="PowerCmd.exe /C=&quot;${tomcat7}\bin\startup.bat&quot;" />
+		</exec>
+	</target>
+</project>

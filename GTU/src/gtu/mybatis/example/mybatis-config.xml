@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC
+"-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<settings>
+        <!-- changes from the defaults -->
+       <setting name="lazyLoadingEnabled" value="false" />
+    </settings>
+	<typeAliases>
+		<typeAlias alias="SecWindowVo" type="com.ibt.dcs.mybatis.vo.SecWindowVo" />
+		<typeAlias alias="PtrSrcCodeVo" type="com.ibt.dcs.mybatis.vo.PtrSrcCodeVo" />
+		<typeAlias alias="PtrGroupCodeVo" type="com.ibt.dcs.mybatis.vo.PtrGroupCodeVo" />
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/ibt/dcs/mybatis/mapper/SecWindowMapper.xml" />
+		<mapper resource="com/ibt/dcs/mybatis/mapper/PtrSrcCodeMapper.xml" />
+		<mapper resource="com/ibt/dcs/mybatis/mapper/PtrGroupCodeMapper.xml" />
+	</mappers>
+</configuration>

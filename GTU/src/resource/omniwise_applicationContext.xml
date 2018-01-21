@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="dateBean" class="java.util.Date" />
+
+	<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/Cooperation" />
+		<property name="username" value="root" />
+		<property name="password" value="" />
+		<property name="maxActive" value="100" />
+		<property name="minIdle" value="30" />
+	</bean>
+	
+	<bean id="dataSource2" class="org.springframework.jdbc.datasource.DriverManagerDataSource" destroy-method="close" >
+		<property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver" />
+		<property name="url" value="jdbc:jtds:sqlserver://192.168.60.128:1433;DatabaseName=EVL" />
+		<property name="username" value="sa" />
+		<property name="password" value="doc1" />
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+            <ref bean="dataSource2"/>
+        </property>
+    </bean>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="mail.omniwise.com.tw"/>
+        <property name="username" value="bengo"/>
+        <property name="password" value="eee"/>
+    </bean>
+
+<!--org.springframework.jdbc.datasource.DriverManagerDataSource-->
+</beans>

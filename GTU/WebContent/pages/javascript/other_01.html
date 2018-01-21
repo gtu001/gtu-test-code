@@ -1,0 +1,28 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function onload(){
+		try{
+			window.location.assign("http://www.w3schools.com");
+			
+			history.forward();
+			history.back();
+			
+			alert(document.URL);
+			
+			window.event.srcElement;//取得來源元件
+			
+			window.print();
+		}catch(e){
+			alert(e);
+		}
+	}
+</script>
+</head>
+<body onload="onload()">
+</body>
+</html>

@@ -1,0 +1,9 @@
+package com.ibt.dcs.mybatis.vo;
+
+import java.util.Date;
+
+public class ${voName?string} {
+	<#list list as x>
+		private ${x["JAVA_TYPE"]} ${x["COLUMN_NAME"]?lower_case}; //${x["columnChs"]!}
+	</#list>
+}

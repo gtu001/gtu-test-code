@@ -1,0 +1,115 @@
+			<!-- ############## 常改Swing ############## -->
+			<!--gtu.log.finder.DebugMointerUI
+			<packagename mode="small">javassist.Modifier</packagename>
+			<packagename mode="small">com.google.common.base.Optional</packagename>
+			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
+			-->
+			<!--gtu.jpa.hibernate.Rcdf002eDBUI
+			<packagename mode="small">com.informix.jdbcx.IfxConnectionPoolDataSource</packagename>
+			<packagename mode="small">com/informix/jdbc/IfxSqliConnect</packagename>
+			<packagename mode="small">com.google.common.base.Joiner</packagename>
+			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
+			<packagename mode="new">org.dom4j.DocumentException</packagename>
+			<packagename mode="new">org.jaxen.JaxenException</packagename>
+			<packagename mode="new">org/saxpath/SAXPathException</packagename>
+			-->
+			<!--gtu._work.ui.AndyXmlUI
+			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
+			<packagename mode="small">com.google.common.collect.HashMultimap</packagename>
+			<packagename mode="new">org.dom4j.DocumentException</packagename>
+			<packagename mode="new">org.jaxen.JaxenException</packagename>
+			<packagename mode="new">org/saxpath/SAXPathException</packagename>
+			<packagename mode="small">org/apache/tools/zip/ZipFile</packagename>
+			<packagename mode="small">org.apache.commons.io</packagename>
+			-->
+			<!--gtu.xml.xstream.iisi.MQDecodeUI
+			<packagename mode="small">com.thoughtworks.xstream.XStream</packagename>
+			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
+			<packagename mode="small">org.slf4j.LoggerFactory</packagename>
+			-->
+			<!--gtu._work.ui.ObnfExceptionLogDownloadUI  ObnfRepairDBUI
+			<packagename mode="small">com.thoughtworks.xstream.XStream</packagename>
+			<packagename mode="small">org.slf4j.LoggerFactory</packagename>
+			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
+			<packagename mode="new">org.dom4j.DocumentException</packagename>
+			<packagename mode="new">org.jaxen.JaxenException</packagename>
+			<packagename mode="new">org/saxpath/SAXPathException</packagename>
+			<packagename mode="small">org/apache/tools/zip/ZipFile</packagename>
+			<packagename mode="small">org.apache.commons.net.ftp</packagename>
+			<packagename mode="small">org.slf4j.impl.StaticLoggerBinder</packagename>
+			-->
+			<!--gtu._work.ui.ObnfInsertCreaterUI
+			<packagename mode="new">org.dom4j.DocumentException</packagename>
+			<packagename mode="new">org.jaxen.JaxenException</packagename>
+			<packagename mode="new">org/saxpath/SAXPathException</packagename>
+			<packagename mode="small">org/apache/tools/zip/ZipFile</packagename>
+			-->
+			<!-- ############## 共用功能 ############## -->
+			<!-- ftp
+			<packagename mode="small">org.apache.commons.net.ftp</packagename>
+			-->
+			<!-- freemarker
+			<packagename mode="small">freemarker.template</packagename>
+			-->
+			<!-- excel xlsx
+			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
+			<packagename mode="small">org.apache.poi.ss.usermodel.Cell</packagename>
+			<packagename mode="small">org/apache/xmlbeans/XmlObject</packagename>
+			<packagename mode="small">org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet</packagename>
+			<packagename mode="small">org.dom4j.DocumentException</packagename>
+			-->
+			<!-- excel xls
+			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
+			-->
+			<!-- zip
+			<packagename mode="small">org/apache/tools/zip/ZipFile</packagename>
+			-->
+			<!-- word docx
+			<packagename mode="exact" name="poi-scratchpad-3.15.jar">org.apache.poi.hwpf.usermodel</packagename>
+			<packagename mode="exact" name="poi-3.15.jar">org.apache.poi.poifs.filesystem</packagename>
+			<packagename mode="exact" name="poi-ooxml-3.15.jar">org.apache.poi.xwpf.usermodel</packagename>
+			<packagename mode="exact" name="poi-ooxml-3.15.jar">org.apache.poi.xwpf.usermodel.XWPFDocument</packagename>
+			<packagename mode="exact" name="poi-ooxml-schemas-3.15.jar">org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow</packagename>
+			<packagename mode="exact" name="xmlbeans-2.3.0.jar">org/apache/xmlbeans/XmlException</packagename>
+			<packagename mode="exact" name="dom4j-1.6.1.jar">org/dom4j/DocumentException</packagename>
+			-->
+			<!-- xml
+			<packagename mode="new">org.dom4j.DocumentException</packagename>
+			<packagename mode="new">org.jaxen.JaxenException</packagename>
+			<packagename mode="new">org/saxpath/SAXPathException</packagename>
+			-->
+			<!-- informix jdbc driver
+			<packagename mode="small">com.informix.jdbcx.IfxConnectionPoolDataSource</packagename>
+			<packagename mode="small">com/informix/jdbc/IfxSqliConnect</packagename>
+			-->
+			<!--Oracle
+			<packagename mode="small">oracle.jdbc.driver.OracleDriver</packagename>
+			-->
+			<!--MySql
+			<packagename mode="small">com.mysql.jdbc.Driver</packagename>
+			-->
+			<!--Jdbc
+			<packagename mode="small">org.apache.commons.dbcp.BasicDataSource</packagename>
+			<packagename mode="small">org.apache.commons.pool.KeyedObjectPoolFactory</packagename>
+			-->
+			<!--oracle
+			<packagename mode="small">oracle.jdbc.driver.OracleDriver</packagename>
+			-->
+			<!-- DB conn
+			<packagename mode="small">org.apache.commons.dbcp.BasicDataSource</packagename>
+			<packagename mode="small">org/apache/commons/pool/KeyedObjectPoolFactory</packagename>
+			 -->
+			<!-- spring jdbc  
+			<packagename mode="small">org.springframework.jdbc.support.JdbcUtils</packagename> 
+			<packagename mode="small">org.springframework.dao.DataAccessResourceFailureException</packagename> 
+			<packagename mode="exact" name="spring-core-3.2.6.RELEASE.jar">org.springframework.core.NestedRuntimeException</packagename> 
+			<packagename mode="small">org.apache.commons.logging.LogFactory</packagename> 
+			<packagename mode="small">org.slf4j.LoggerFactory</packagename> 
+			 -->
+			<!-- swing form layout
+			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			 -->
+			<!-- Dropbox
+			<packagename mode="small">com.dropbox.core.DbxClient</packagename>
+			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
+			  -->

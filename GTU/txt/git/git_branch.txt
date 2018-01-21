@@ -1,0 +1,15 @@
+Pull master
+
+Create branch
+
+Switch/checkout 到新的分支
+
+在branch_master改扣
+
+改完...
+
+Switch切回master,右鍵按merge
+
+把branch的內容merge回來
+
+Push

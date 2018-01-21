@@ -1,0 +1,169 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>jQuery UI Accordion - Default functionality</title>
+<link rel="stylesheet"
+	href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="/resources/demos/style.css" />
+<style>
+<!-- 點開後的顏色 -->
+<!--
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-state-active.ui-button:hover{
+	border: 1px solid #003eff;
+	background: #ffffff;
+	color: #000000;
+}
+-->
+</style>
+<script>
+	$(function() {
+		$("#accordion").accordion({
+			collapsible : true,
+			active : false,
+			heightStyle : "content"
+		});
+	});
+</script>
+</head>
+<body>
+	<div id="accordion">
+		<h1>一、如何申請加入會員?</h1>
+		<div>
+			<p>
+				<span class="INSURElist">(一)<span class="SWORD03">網路</span>註冊會員：
+				</span>
+			</p>
+			<p>
+				1.為本公司<span class="SWORD03">有效契約保戶</span>，可於線上進行註冊資料的確認及填寫，取得並輸入本公司提供之一次性密碼(以下簡稱OTP)
+				身分驗證後，即可完成註冊。
+			</p>
+			<p>
+				2.非本公司有效契約保戶，需於線上勾選確認<span class="SWORD03">要保人本人持有之中國信託商業銀行信用卡或本人開戶之活期性帳戶
+				</span>始能註冊，如確認持有，並輸入可接受之行動電話或E-mail進行一次性密碼(以下簡稱OTP)身分驗證後，即可完成註冊。
+			</p>
+			<p>
+				<span class="INSURElist">(二)<span class="SWORD03">臨櫃</span>註冊會員：
+				</span><span class="SWORD03">攜帶雙證件</span>(身分證及附有照片第二身分證明文件)，親臨本公司各地分公司，並填寫申請書辦理即可。
+			</p>
+		</div>
+
+		<h1>二、何謂有效契約保戶?</h1>
+		<div>
+			<p>
+				有效契約保戶係指客戶於註冊網路會員時，為本公司有效保單保戶(不含團體保險或旅行平安保險)，<span class="SWORD03">且已留有行動電話或E-mail資料紀錄者</span>。
+			</p>
+		</div>
+
+		<h1>三、目前有效保單沒有留存行動電話及E-mail，或是當時所留的資料有誤，該怎麼辦?</h1>
+		<div>
+			<p>(一)如果在本公司資料庫中沒有留存行動電話及E-mail時，將無法採網路方式辦理會員註冊，請親臨本公司各櫃檯辦理。</p>
+			<p>(二)如資料有誤或需要更新，請先臨櫃辦理保單資料變更完成後，同時立即辦理會員註冊即可，或利用網路完成會員註冊亦可。</p>
+		</div>
+
+		<h1>四、一次性密碼(OTP)是做什麼用途?</h1>
+		<div>
+			<p>
+				一次性密碼(OTP)全名為 one time password，又稱動態密碼，指<span class="SWORD03">只能使用一次</span>的密碼。
+				當客戶在網路上申請會員註冊時，須經由驗證通過，即本公司依據保戶原留存於本公司保單資料之行動電話或E-mail，通知一次性密碼(OTP)，客戶接收通知並輸入密碼後，以確認申請人確為保戶本人。
+			</p>
+		</div>
+
+		<h1>五、投保時一定要填寫會員本人之行動電話及E-mail嗎?</h1>
+		<div>
+			<p>在網路投保過程，包含身分驗證、投保確認、繳費成功及相關服務訊息，皆以簡訊或E-mail方式通知。為確保您投保權益，務必填寫會員本人之行動電話及E-mail。</p>
+		</div>
+
+		<h1>六、受益人是否可指定?</h1>
+		<div>
+			<p>
+				(一)身故保險金受益人，依法令監理要求，限指定為<span class="SWORD03">直系血親､配偶及法定繼承人。</span>
+			</p>
+			<p>(二)殘廢或醫療保險金受益人，依條款約定，為被保險人本人，本公司不受理指定。</p>
+		</div>
+
+		<h1>七、忘記密碼該如何處理?</h1>
+		<div>
+			<p>
+				於登入畫面點選<span class="SWORD03">忘記密碼</span>，並輸入身分證字號、生日及驗證碼，即會發送亂數密碼至您的行動電話或E-mail，請於5日內輸入亂數密碼，於成功登入後，再更新密碼。
+				<br> 提醒：亂數密碼有效期限僅為5日，如超過5日未登入，請重新點選<span class="SWORD03">忘記密碼</span>辦理。
+			</p>
+		</div>
+
+		<h1>八、繳費方式：</h1>
+		<div>
+			<p>
+				限要保人<span class="SWORD03">本人持有中國信託商業銀行信用卡或本人開戶之活期性帳戶</span>進行線上扣款或轉帳。
+			</p>
+		</div>
+
+		<h1>九、 電子保單什麼時候寄發/收到保單?</h1>
+		<div>
+			<p>
+				1)承保後1~2日(工作日)我們會依您投保時所留存的e-mail寄送電子保單通知。<br /> 2)若抽中<span
+					class="SWORD03">電訪保單者</span>，將待電訪作業完成後寄出單。<br /> 3)當您收到通知後即可登入台灣人壽<a
+					href="https://www.taiwanlife.com/Content/22186" target="_BLANK">保戶天地</a>進行電子保單下載。<br />
+			</p>
+		</div>
+
+		<h1>十、 紙本保單什麼時候寄發/收到保單?</h1>
+		<div>
+			<p>
+				1)承保後3~5日(工作日)我們會依您投保時所留存的e-mail寄送電子保單通知。<br /> 2)若抽中<span
+					class="SWORD03">電訪保單者</span>，將待電訪作業完成後寄出單。<br />
+			</p>
+		</div>
+
+		<h1>十一、變更保單選擇:在投保時選擇電子保單，可再補發紙本保單嗎?</h1>
+		<div>
+			<p>
+				可以。<br /> 1)請電洽本公司客戶服務專線：0800-099850 或 (02)8170-5156，我們將竭誠為您服務。<br />
+				2)提醒紙本補發申請，需酌收補發100元。<br />
+			</p>
+		</div>
+
+		<h1>十二、電子保單使用:打不開怎麼辦？</h1>
+		<div>
+			<p>
+				1) 電子保單檔案需使用TWCA臺灣網路認證股份有限公司所提供之電子保單瀏覽程式方可開啟，請確認您使用的載具已經<a
+					href="https://www.taiwanlife.com/Content/22186" target="_BLANK">下載</a><br />
+				&nbsp;&nbsp;&nbsp;&nbsp;並安裝電子保單瀏覽程式。<br /> 2) <a
+					href="https://www.taiwanlife.com/Content/22186" target="_BLANK">電子保單操作流程說明</a><br />
+				如在操作時遇到任何問題，歡迎您致電客服中心0800-099-850，我們將竭誠為您服務。<br />
+			</p>
+		</div>
+
+		<h1>十三、契約內容變更:我收到保單後才發現「資料內容錯誤」時應如何辦理?</h1>
+		<div>
+			<p>
+				1)保戶可攜帶雙證件親至本公司各地分公司之服務櫃檯或可透過 <a
+					href="https://www.taiwanlife.com/Content/11105" target="_BLANK">保單變更/下載</a>
+				表單填寫，並將填寫表單及需檢附文件郵寄回<br /> &nbsp;&nbsp;&nbsp;&nbsp;台灣人壽辦理。<br /> 2)<a
+					href="https://www.taiwanlife.com/SiteMap/38" target="_BLANK">契變項目/方式</a>
+				參考。<br /> 如欲查詢保單狀況之相關訊息可透過本公司網站或客服專線 0800-099-850 或(02)8170-5156 查詢。<br />
+			</p>
+		</div>
+
+		<h1>十四、契約撤銷:保戶放棄投保及撤銷作業流程?</h1>
+		<div>
+			<p>
+				1)保戶可攜帶雙證件親至本公司各地分公司之服務櫃檯。<br /> 2)可電洽本公司客戶服務專線0800-099-850 或
+				(02)8170-5156，我們將竭誠為您服務。<br />
+			</p>
+		</div>
+
+		<h1>十五、年金申領變更:年金領取方式或開始領取日?</h1>
+		<div>
+			<p>
+				1) 保戶可於年金給付開始日前透過書面提出年金給付開始日或年金給付方式變更，其書面資料最遲請於給付日開始日前<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;三十日送達本公司。<br /> 2)契約變更書取得可透過本公司官網(<a
+					href="https://www.taiwanlife.com/u/other/1a2fd4f1-91ec-455c-ac4c-b43724644d76.pdf"
+					target="_BLANK">表單下載</a>)或電洽本公司客戶服務專線0800-099-850郵寄契約變更書。<br />
+			</p>
+		</div>
+	</div>
+</body>
+</html>

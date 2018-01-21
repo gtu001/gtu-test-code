@@ -1,0 +1,12 @@
+TGL_DDM_DB/TGL_DDM_DBpwd@c189u1
+
+
+c189u1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 172.16.7.189)(PORT = 1524))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = c189u1)
+    )
+  )

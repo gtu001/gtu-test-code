@@ -1,0 +1,69 @@
+SQL> 
+SQL> PAUSE
+
+SQL> 
+SQL> REM
+SQL> REM Display execution statistics
+SQL> REM
+SQL> 
+SQL> --execute dbms_stats.gather_table_stats(ownname=>'&schema_name', tabname=>'t_contract_product');
+SQL> 
+SQL> SELECT /*+ gather_plan_statistics */ *
+  2  FROM (
+  3  	     SELECT
+  4  	     T.*
+  5  	     FROM
+  6  	     T_PREM_ARAP T, T_NOCLAIM_DISCNT_PREM D
+  7  	     WHERE
+  8  		     T.OFFSET_STATUS = 1
+  9  		     AND D.FEE_STATUS = 0
+ 10  		     AND T.POLICY_ID = D.POLICY_ID
+ 11  		     AND T.LIST_ID = D.ARAP_ID
+ 12  		     AND T.POLICY_ID = 20714899
+ 13  		     AND T.CHANGE_ID = 133498729
+ 14  );
+SQL> 
+SQL> UNDEFINE sql_id
+SQL> UNDEFINE child_number
+SQL> 
+SQL> SELECT * FROM table(dbms_xplan.display_cursor(null, null,'iostats last'));
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                               
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  0jxxwfz5ruhbq, child number 0                                                                                                                                                                                                                           
+-------------------------------------                                                                                                                                                                                                                           
+SELECT /*+ gather_plan_statistics */ * FROM (  SELECT  T.*  FROM                                                                                                                                                                                                
+T_PREM_ARAP T, T_NOCLAIM_DISCNT_PREM D  WHERE   T.OFFSET_STATUS = 1                                                                                                                                                                                             
+AND D.FEE_STATUS = 0   AND T.POLICY_ID = D.POLICY_ID   AND T.LIST_ID =                                                                                                                                                                                          
+D.ARAP_ID   AND T.POLICY_ID = 20714899   AND T.CHANGE_ID = 133498729 )                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                
+Plan hash value: 2065549483                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                
+---------------------------------------------------------------------------------------------------------------------------------------                                                                                                                         
+| Id  | Operation                             | Name                       | Starts | E-Rows | A-Rows |   A-Time   | Buffers | Reads  |                                                                                                                         
+---------------------------------------------------------------------------------------------------------------------------------------                                                                                                                         
+|   0 | SELECT STATEMENT                      |                            |      1 |        |      0 |00:00:00.16 |      72 |      7 |                                                                                                                         
+|   1 |  NESTED LOOPS                         |                            |      1 |      1 |      0 |00:00:00.16 |      72 |      7 |                                                                                                                         
+|   2 |   NESTED LOOPS                        |                            |      1 |      1 |     68 |00:00:00.16 |      21 |      7 |                                                                                                                         
+|*  3 |    TABLE ACCESS BY INDEX ROWID BATCHED| T_PREM_ARAP                |      1 |      1 |     17 |00:00:00.14 |       8 |      7 |                                                                                                                         
+|*  4 |     INDEX RANGE SCAN                  | IDX_PREM_ARAP__CHANGE_ID   |      1 |      4 |     17 |00:00:00.14 |       3 |      3 |                                                                                                                         
+|*  5 |    INDEX RANGE SCAN                   | IDX_NOCLAIM_FEE_STATUS_IBM |     17 |      1 |     68 |00:00:00.01 |      13 |      0 |                                                                                                                         
+|*  6 |   TABLE ACCESS BY INDEX ROWID         | T_NOCLAIM_DISCNT_PREM      |     68 |      1 |      0 |00:00:00.01 |      51 |      0 |                                                                                                                         
+---------------------------------------------------------------------------------------------------------------------------------------                                                                                                                         
+                                                                                                                                                                                                                                                                
+Predicate Information (identified by operation id):                                                                                                                                                                                                             
+---------------------------------------------------                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                
+   3 - filter(("T"."POLICY_ID"=20714899 AND TO_NUMBER("T"."OFFSET_STATUS")=1))                                                                                                                                                                                  
+   4 - access("T"."CHANGE_ID"=133498729)                                                                                                                                                                                                                        
+   5 - access("D"."FEE_STATUS"=0 AND "D"."POLICY_ID"=20714899)                                                                                                                                                                                                  
+   6 - filter("T"."LIST_ID"="D"."ARAP_ID")                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                
+Note                                                                                                                                                                                                                                                            
+-----                                                                                                                                                                                                                                                           
+   - dynamic statistics used: dynamic sampling (level=2)                                                                                                                                                                                                        
+   - this is an adaptive plan                                                                                                                                                                                                                                   
+   - 1 Sql Plan Directive used for this statement                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                
+SQL> 
+SQL> spool off;

@@ -1,0 +1,13 @@
+
+select cnt, translate(cnt, '零一二三四五六七八九', '0123456789') as for_order from (
+  select '一' as cnt from dual union
+  select '二' from dual union
+  select '三' from dual union
+  select '四' from dual union
+  select '五' from dual union
+  select '六' from dual union
+  select '七' from dual union
+  select '八' from dual union
+  select '九' from dual union
+  select '零' from dual
+) order by 2

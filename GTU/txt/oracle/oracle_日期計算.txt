@@ -1,0 +1,22 @@
+
+select trunc(to_date('20160522', 'yyyymmdd'), 'dd') from dual --yyyy 只保留年, mm 保留到月, dd 保留到日
+ 
+select last_day(to_date('20160522', 'yyyymmdd')) from dual --取得該月分最後一天
+ 
+select add_months(to_date('20160522', 'yyyymmdd'), -12) from dual --加月份
+
+
+NEXT_DAY(d,number) 
+ -- 時間點d開始，下一個星期幾的日期 
+   -- 星期日 = 1  星期一 = 2  星期二 = 3 
+   -- 星期三 = 4  星期四 = 5  星期五 = 6  星期六 = 7 
+   
+   
+
+MONTHS_BETWEEN(d1,d2) 
+ --計算d1與d2相隔的月數 
+    select trunc(MONTHS_BETWEEN(
+                  to_date('20071101','yyyymmdd'), 
+                  to_date('20070820','yyyymmdd')
+                 )) aa  
+      from dual;  --結果為2

@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ris="http://java.sun.com/jsf/composite/ris"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/pages/common/default.xhtml">
+
+	<ui:param name="show" value="true" />
+
+	<ui:define name="right">
+
+		<p:breadCrumb>
+			<p:menuitem value="Home" url="#" />
+			<p:menuitem value="戶籍查詢/登記/文件核發" url="#" />
+		</p:breadCrumb>
+			
+			<p:growl showDetail="true" sticky="true" />
+			<p:messages showDetail="true" autoUpdate="true" />
+			
+			<h:commandButton value="showInfo" action="#{${LOWER_ID}Controller.showInfo}" />
+		
+		<p:panel header="${chineseName}">
+			<p:fieldset legend="查詢條件">
+				<table border="0" width="900">
+    #foreach( $var in $COLUMNLIST )
+$var
+    #end
+				</table>
+			</p:fieldset>
+			<p>
+				<p:commandButton value="執行送出" action="#{${LOWER_ID}Controller.xxxxx}" ajax="false" />
+			</p>
+		</p:panel>
+		
+		<h:panelGroup id="confirmMsg">
+			<p:dialog header="確認需求" widgetVar="confirmMsg" modal="true"
+				height="200">
+				<table>
+					<tr>
+						<th><h:outputText value="是否確定通報?" /></th>
+						<td></td>
+					</tr>
+				</table>
+				<p:commandButton value="確定" update="@form" action="#{${LOWER_ID}Controller.xxxxx}" onclick="confirmMsg.hide();" />
+				<p:commandButton value="取消" type="reset" onclick="confirmMsg.hide();" />
+			</p:dialog>
+		</h:panelGroup>
+		
+
+		
+			<p:fieldset legend="" rendered="true">
+				<p:dataTable var="row" rowIndexVar="index"
+					value="#{${LOWER_ID}Controller.dto.xxxxx}" paginator="true"
+					rows="5"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+					<p:column>
+						<f:facet name="header">
+							序號
+						</f:facet>
+						<h:outputText value="#{index + 1}" />
+					</p:column>
+					    #foreach( $var in $DATATABLE )
+					<p:column>
+						<f:facet name="header">
+							$var.get(0)
+						</f:facet>
+						<h:outputText value="#{row.$var.get(1)}" />
+					</p:column>
+    					#end
+				</p:dataTable>
+			</p:fieldset>
+			<p>
+				<p:commandButton value="儲存" action="#{${LOWER_ID}Controller.xxxxx}" ajax="false" />
+			</p>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,106 @@
+SQL> 
+SQL> PAUSE
+
+SQL> 
+SQL> REM
+SQL> REM Display execution statistics
+SQL> REM
+SQL> 
+SQL> --execute dbms_stats.gather_table_stats(ownname=>'&schema_name', tabname=>'t_contract_product');
+SQL> 
+SQL> SELECT /*+ gather_plan_statistics */ *
+  2  FROM (
+  3  SELECT /*+ index(tce PK_T_CONTRACT_EXTEND) */ MIN (tce.due_date), MIN (tcp.item_id), MIN (tce.policy_period)
+  4    FROM t_contract_product tcp, t_contract_extend tce, t_contract_master tcm
+  5   WHERE tcp.policy_id = tcm.policy_id
+  6  	AND tcp.liability_state = 1
+  7  	AND tcp.item_id = tce.item_id
+  8  	AND tce.due_date <= TO_DATE('2016/09/01','YYYY/MM/DD') + 30
+  9  	AND tce.prem_status IN (1, 7)
+ 10  	AND tcp.renewal_type IN (5, 1, 2, 3, 4)
+ 11  	AND tcp.pay_next NOT IN (8, 9)
+ 12  	AND (tcp.decision_id IS NULL OR tcp.decision_id NOT IN (3, 4))
+ 13  	--AND tcm.policy_id = 23300472
+ 14  	AND tcm.policy_id = 1877179
+ 15  	AND EXISTS (
+ 16  	       SELECT 1
+ 17  		 FROM t_prem_arap tpa
+ 18  		WHERE tpa.policy_id = tcm.policy_id
+ 19  		  AND tpa.due_time = tce.due_date
+ 20  		  AND tpa.fee_status NOT IN (1, 2)
+ 21  		  AND tpa.pay_mode NOT IN (37, 48, 49, 50, 51, 52, 53, 54)
+ 22  		  AND tpa.service_id = 3)
+ 23  );
+
+MIN(TCE.DUE_DA MIN(TCP.ITEM_ID) MIN(TCE.POLICY_PERIOD)                                                                                                                                                                                                          
+-------------- ---------------- ----------------------                                                                                                                                                                                                          
+30-9ды -16              4262759                    193                                                                                                                                                                                                          
+SQL> 
+SQL> UNDEFINE sql_id
+SQL> UNDEFINE child_number
+SQL> 
+SQL> SELECT * FROM table(dbms_xplan.display_cursor(null, null,'iostats last'));
+
+PLAN_TABLE_OUTPUT                                                                                                                                                                                                                                               
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  07g9pz6k8qq9d, child number 0                                                                                                                                                                                                                           
+-------------------------------------                                                                                                                                                                                                                           
+SELECT /*+ gather_plan_statistics */ * FROM ( SELECT /*+ index(tce                                                                                                                                                                                              
+PK_T_CONTRACT_EXTEND) */ MIN (tce.due_date), MIN (tcp.item_id), MIN                                                                                                                                                                                             
+(tce.policy_period)   FROM t_contract_product tcp, t_contract_extend                                                                                                                                                                                            
+tce, t_contract_master tcm  WHERE tcp.policy_id = tcm.policy_id    AND                                                                                                                                                                                          
+tcp.liability_state = 1    AND tcp.item_id = tce.item_id    AND                                                                                                                                                                                                 
+tce.due_date <= TO_DATE('2016/09/01','YYYY/MM/DD') + 30    AND                                                                                                                                                                                                  
+tce.prem_status IN (1, 7)    AND tcp.renewal_type IN (5, 1, 2, 3, 4)                                                                                                                                                                                            
+AND tcp.pay_next NOT IN (8, 9)    AND (tcp.decision_id IS NULL OR                                                                                                                                                                                               
+tcp.decision_id NOT IN (3, 4))    --AND tcm.policy_id = 23300472    AND                                                                                                                                                                                         
+tcm.policy_id = 1877179    AND EXISTS (           SELECT 1                                                                                                                                                                                                      
+FROM t_prem_arap tpa            WHERE tpa.policy_id = tcm.policy_id                                                                                                                                                                                             
+         AND tpa.due_time = tce.due_date              AND                                                                                                                                                                                                       
+tpa.fee_status NOT IN (1, 2)              AND tpa.pay_mode NOT IN (37,                                                                                                                                                                                          
+48, 49, 50, 51, 52, 53, 54)              AND tpa.service_id = 3) )                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                
+Plan hash value: 3418114296                                                                                                                                                                                                                                     
+                                                                                                                                                                                                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------                                                                                                                          
+| Id  | Operation                                 | Name                           | Starts | E-Rows | A-Rows |   A-Time   | Buffers |                                                                                                                          
+--------------------------------------------------------------------------------------------------------------------------------------                                                                                                                          
+|   0 | SELECT STATEMENT                          |                                |      1 |        |      1 |00:00:00.01 |      13 |                                                                                                                          
+|   1 |  VIEW                                     |                                |      1 |      1 |      1 |00:00:00.01 |      13 |                                                                                                                          
+|   2 |   SORT AGGREGATE                          |                                |      1 |      1 |      1 |00:00:00.01 |      13 |                                                                                                                          
+|   3 |    NESTED LOOPS                           |                                |      1 |      1 |      1 |00:00:00.01 |      13 |                                                                                                                          
+|   4 |     NESTED LOOPS                          |                                |      1 |      1 |      1 |00:00:00.01 |      12 |                                                                                                                          
+|   5 |      NESTED LOOPS                         |                                |      1 |      1 |      1 |00:00:00.01 |       9 |                                                                                                                          
+|*  6 |       TABLE ACCESS BY INDEX ROWID BATCHED | T_CONTRACT_PRODUCT             |      1 |      1 |      1 |00:00:00.01 |       4 |                                                                                                                          
+|*  7 |        INDEX RANGE SCAN                   | IDX_CONTR_PROD__POL_MAS_PRD_ID |      1 |      1 |      1 |00:00:00.01 |       3 |                                                                                                                          
+|   8 |       SORT UNIQUE                         |                                |      1 |      1 |      1 |00:00:00.01 |       5 |                                                                                                                          
+|*  9 |        TABLE ACCESS BY INDEX ROWID BATCHED| T_PREM_ARAP                    |      1 |      1 |      1 |00:00:00.01 |       5 |                                                                                                                          
+|* 10 |         INDEX RANGE SCAN                  | IDX_P_ARAP_POLICY_ID_FEE_ST    |      1 |      4 |      2 |00:00:00.01 |       3 |                                                                                                                          
+|* 11 |      INDEX UNIQUE SCAN                    | PK_T_CONTRACT_EXTEND           |      1 |      1 |      1 |00:00:00.01 |       3 |                                                                                                                          
+|* 12 |     TABLE ACCESS BY INDEX ROWID           | T_CONTRACT_EXTEND              |      1 |      1 |      1 |00:00:00.01 |       1 |                                                                                                                          
+--------------------------------------------------------------------------------------------------------------------------------------                                                                                                                          
+                                                                                                                                                                                                                                                                
+Predicate Information (identified by operation id):                                                                                                                                                                                                             
+---------------------------------------------------                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                
+   6 - filter(("TCP"."LIABILITY_STATE"=1 AND (TO_NUMBER("TCP"."RENEWAL_TYPE")=1 OR TO_NUMBER("TCP"."RENEWAL_TYPE")=2 OR                                                                                                                                         
+              TO_NUMBER("TCP"."RENEWAL_TYPE")=3 OR TO_NUMBER("TCP"."RENEWAL_TYPE")=4 OR TO_NUMBER("TCP"."RENEWAL_TYPE")=5) AND                                                                                                                                  
+              (("TCP"."DECISION_ID"<>4 AND "TCP"."DECISION_ID"<>3) OR "TCP"."DECISION_ID" IS NULL) AND "TCP"."PAY_NEXT"<>8 AND                                                                                                                                  
+              "TCP"."PAY_NEXT"<>9))                                                                                                                                                                                                                             
+   7 - access("TCP"."POLICY_ID"=1877179)                                                                                                                                                                                                                        
+   9 - filter(("TPA"."DUE_TIME"<=TO_DATE(' 2016-10-01 00:00:00', 'syyyy-mm-dd hh24:mi:ss') AND "TPA"."SERVICE_ID"=3 AND                                                                                                                                         
+              "TPA"."PAY_MODE"<>37 AND "TPA"."PAY_MODE"<>48 AND "TPA"."PAY_MODE"<>49 AND "TPA"."PAY_MODE"<>50 AND "TPA"."PAY_MODE"<>51 AND                                                                                                                      
+              "TPA"."PAY_MODE"<>52 AND "TPA"."PAY_MODE"<>53 AND "TPA"."PAY_MODE"<>54))                                                                                                                                                                          
+  10 - access("TPA"."POLICY_ID"=1877179)                                                                                                                                                                                                                        
+       filter(("TPA"."FEE_STATUS"<>1 AND "TPA"."FEE_STATUS"<>2 AND "TPA"."POLICY_ID"="TCP"."POLICY_ID"))                                                                                                                                                        
+  11 - access("TCP"."ITEM_ID"="TCE"."ITEM_ID")                                                                                                                                                                                                                  
+  12 - filter(("TPA"."DUE_TIME"="TCE"."DUE_DATE" AND "TCE"."DUE_DATE"<=TO_DATE(' 2016-10-01 00:00:00', 'syyyy-mm-dd                                                                                                                                             
+              hh24:mi:ss') AND INTERNAL_FUNCTION("TCE"."PREM_STATUS")))                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                
+Note                                                                                                                                                                                                                                                            
+-----                                                                                                                                                                                                                                                           
+   - dynamic statistics used: dynamic sampling (level=2)                                                                                                                                                                                                        
+   - 8 Sql Plan Directives used for this statement                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                
+SQL> 
+SQL> spool off;

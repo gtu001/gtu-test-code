@@ -1,0 +1,31 @@
+<project name="example" default="basic">
+
+	<property name="target_dir" value="target" />
+	<property name="test_report_dir" value="${target_dir}/test-reports" />
+	<property name="class_path" value="../../bin" />
+
+	<target name="basic">
+		<delete dir="${target_dir}" />
+		<mkdir dir="${test_report_dir}" />
+
+		<junit fork="true" printSummary="true" showOutput="true">
+			<formatter type="plain" /><!--plain-->
+			<classpath>
+				<pathelement path="${class_path}" />
+				<pathelement location="c:\jar\junit-4.10.jar" />
+			</classpath>
+			<batchtest fork="false" todir="${test_report_dir}">
+				<fileset dir="${class_path}">
+					<include name="**/**" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${target_dir}">
+			<fileset dir="${test_report_dir}">
+				<include name="TEST-*.*" />
+			</fileset>
+		</junitreport>
+	</target>
+
+</project>

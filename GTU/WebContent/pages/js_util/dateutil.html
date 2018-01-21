@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+</head>
+<body>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+		});
+
+		/**
+		 * 取得台灣年月日 Date型態
+		 */
+		function parseTwDateToDate(twdate) {
+			if (twdate.indexOf("/" != -1)) {
+				var dates = twdate.split("/", -1);
+				return new Date(parseInt(dates[0]) + 1911,
+						parseInt(dates[1]) - 1, parseInt(dates[2]));
+			} else {
+				return new Date(twdate.substring(0, 3), twdate.substring(3, 5),
+						twdate.substring(5));
+			}
+		}
+
+		/**
+		 * 取得台灣年月日 Date型態
+		 */
+		function getTwDateDiffDays(startTwDate, endTwDate) {
+			var startDate = parseTwDateToDate(startTwDate);
+			var endDate = parseTwDateToDate(endTwDate);
+			var timeDiff = Math.abs(startDate.getTime() - endDate.getTime());
+			var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+			return diffDays;
+		}
+
+		/**
+		 * 檢查是否相依欄位都有填 (要馬都不填,要馬都填)
+		 */
+		function chkTextEmptyDependOther() {
+			var isAnyNotEmpty = false;
+			var isAnyIsEmpty = false;
+			for (var ii = 0; ii < arguments.length; ii++) {
+				var val = document.getElementsByName(arguments[ii])[0].value;
+				if ($.trim(val) != '' && isAnyNotEmpty == false) {
+					isAnyNotEmpty = true;
+				}
+				if ($.trim(val) == '' && isAnyIsEmpty == false) {
+					isAnyIsEmpty = true;
+				}
+			}
+			if (isAnyNotEmpty && isAnyIsEmpty) {
+				return false;
+			}
+			return true;
+		}
+	</script>
+</body>
+</html>

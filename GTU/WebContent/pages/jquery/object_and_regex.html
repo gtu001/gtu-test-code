@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+<script type="text/javascript">
+	//修改繳別(躉繳/分期繳)
+	function modxChange() {
+		var modxVal = $("input[name=modx]:checked").val();
+		var label = $("label[id=payMethodLabel]");
+		var label1 = $("label[id=payAmountLabel]");
+		switch (parseInt(modxVal)) {
+		case 0:
+			$(label).text("預計一次繳");
+			$(label1).text("(最低15,000元~最高200,000元)");
+			break;
+		case 12:
+			$(label).text("預計每年繳");
+			$(label1).text("(最低10,000元~最高200,000元)");
+			break;
+		}
+	}
+
+	//取得自行輸入金額的區間訊息
+	function PayAmountCheck() {
+		this.text = $("label[id=payAmountLabel]").text();
+		this.arry = new Array();
+		this.errMsg = '';
+		this.init = function() {
+			var newArry = this.arry;
+			var reg = /[\d\,]+/gmi;
+			this.errMsg = this.text.replace(reg, function(d) {
+				d = d.replace(',', '');
+				var val = parseInt(d);
+				newArry.push(val);
+				val = parseFloat(val) / 10000;
+				return val + "萬";
+			});
+		};
+		this.init();
+	};
+
+	function test(){
+		var payAmount = $("#payAmount").val();
+		var payAmountCheck = new PayAmountCheck();
+		var payAmountArry = payAmountCheck.arry;
+		var errMsg = '保費限制:' + payAmountCheck.errMsg + '，請重新確認！';
+		if (payAmount < payAmountArry[0]) {
+			alert(errMsg);
+			$("#payAmount").val("");
+			$("#trialC").hide();
+			$("#payAmount").focus();
+			return;
+		}
+		if (payAmount > payAmountArry[1]) {
+			alert(errMsg);
+			$("#payAmount").val("");
+			$("#payAmount").focus();
+			$("#trialC").hide();
+			return;
+		}
+		alert("測試成功!");
+	}
+</script>
+</head>
+<body>
+
+	<input type="radio" name="modx" value="0" onclick="modxChange()"/>躉繳(一次繳)
+	<br />
+	<input type="radio" name="modx" value="12" onclick="modxChange()"/>分期繳(年繳)
+	<br />
+
+	<label id="payMethodLabel"></label><br/>
+	<label id="payAmountLabel"></label><br/>
+	
+	金額 : <input type="text" id="payAmount" /><br />
+	
+	<input type="button" value="送出" onclick="test()" />
+
+</body>
+</html>

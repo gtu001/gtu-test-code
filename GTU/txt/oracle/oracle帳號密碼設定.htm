@@ -1,0 +1,1373 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="zh-TW" itemscope itemtype="http://schema.org/Blog">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta property="og:site_name" content="oracle園地">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:url" content="http://oracled2k.pixnet.net/blog/post/24680289">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="帳號, 密碼, 權限與角色(轉) @ oracle園地 :: 痞客邦 PIXNET ::" />
+<meta property="og:description" content="1. 新增帳號: CREATE USER 使用者名稱  IDENTIFIED BY 密碼;2. 權限設定: GRANT 權限 ON 資料庫物件 TO 使用者名稱;                   " />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="twitter:card" content="summary">
+<meta name="description" content="1. 新增帳號: CREATE USER 使用者名稱  IDENTIFIED BY 密碼;2. 權限設定: GRANT 權限 ON 資料庫物件 TO 使用者名稱;                   ">
+<meta name="twitter:description" content="1. 新增帳號: CREATE USER 使用者名稱  IDENTIFIED BY 密碼;2. 權限設定: GRANT 權限 ON 資料庫物件 TO 使用者名稱;                   ">
+<meta name="twitter:site" content="@pixnet">
+<meta name="author" content="oracleD2K (oracleD2K)">
+<meta name="author-avatar-20" content="http://s6.pimg.tw/avatar/oracled2k/0/0/zoomcrop/20x20.png?v=">
+<meta name="static-version" content="87b3c41b1bf2b342dd52ce8ea9c0dc67">
+<meta name="generator" content="PChoc">
+<meta name="keywords" content="oracle,d2k,form,report,dba,不設分類,帳號, 密碼, 權限與角色(轉)">
+<link rel="canonical" href="http://oracled2k.pixnet.net/blog/post/24680289--%e5%b8%b3%e8%99%9f%2c-%e5%af%86%e7%a2%bc%2c-%e6%ac%8a%e9%99%90%e8%88%87%e8%a7%92%e8%89%b2%28%e8%bd%89%29">
+<meta name="twitter:url" content="http://oracled2k.pixnet.net/blog/post/24680289">
+<meta name="cover_image" content="">
+<meta name="twitter:image" content="http://f9.wretch.yimg.com/elvismeng/32764/1277476204.jpg">
+<link rel="image_src" href="http://f9.wretch.yimg.com/elvismeng/32764/1277476204.jpg">
+<meta property="og:image" content="http://f9.wretch.yimg.com/elvismeng/32764/1277476204.jpg">
+<link rel="prev" href="http://oracled2k.pixnet.net/blog/post/24680212">
+<link rel="next" href="http://oracled2k.pixnet.net/blog/post/25057800">
+<link rel="alternate" type="application/json+oembed" href="http://api.pixnet.cc/oembed?url=http%3A%2F%2Foracled2k.pixnet.net%2Fblog%2Fpost%2F24680289&amp;format=json" title="PIXNET oEmbed Profile">
+<link rel="alternate" type="text/xml+oembed" href="http://api.pixnet.cc/oembed?url=http%3A%2F%2Foracled2k.pixnet.net%2Fblog%2Fpost%2F24680289&amp;format=xml" title="PIXNET oEmbed Profile">
+<link rel="search" type="application/opensearchdescription+xml" href="http://oracled2k.pixnet.net/blog/opensearch" title="oracle園地">
+<title>帳號, 密碼, 權限與角色(轉) @ oracle園地 :: 痞客邦 PIXNET ::</title>
+<meta name="twitter:title" content="帳號, 密碼, 權限與角色(轉) @ oracle園地 :: 痞客邦 PIXNET ::">
+<base href="http://oracled2k.pixnet.net/blog/post/24680289">
+<style type="text/css">
+#links-row-1 .d56d2a5-mib-aD-sidebar-v2-d56d2a5
+ {display: block !important; min-width: 160px !important; min-height: 
+270px !important; margin-top: 0; z-index:100;}
+.d56d2a5-mib-aD-sidebar-v2-d56d2a5 * { padding:
+ 0 ; margin: 0 ; border: 0; vertical-align: baseline; display: block; 
+line-height: 1; }
+.d56d2a5-mib-aD-sidebar-v2-d56d2a5 .box-text { overflow:hidden; padding:0; margin:0; }
+.d56d2a5-mib-bOrder-d56d2a5 { padding: 0; 
+min-width: 180px; min-height: 280px; margin: 12px auto; overflow: 
+hidden; text-align:center; }
+.d56d2a5-mib-bOrder-d56d2a5 img, 
+.d56d2a5-mib-bOrder-d56d2a5 div { margin:0 auto; display:inline-block; 
+min-width:160px; min-height:240px; }
+.d56d2a5-mib-bOrder-d56d2a5_1080 {padding: 0; width: 180px; height: 280px; margin: 12px auto; overflow: hidden;}
+.d56d2a5-mib-bOrder-d56d2a5 div {position: relative;}
+</style>
+<link rel="stylesheet" href="//front.pixfs.net/css/lang-css.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/iframe-popup.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/css">
+<link rel="stylesheet" href="//s.pixfs.net/blog/plugins/plugins.min.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/comment/openid-comment.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/guestbook/style.min.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" />
+<link rel="stylesheet" href="//front.pixfs.net/module/topbar/css/blogtopbar.min.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67">
+<link rel="stylesheet" href="//css.pixnet.in/blog/oracled2k/normal.css?v=1418876520" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/falcon-ad.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67">
+<link rel="stylesheet" href="//front.pixfs.net/css/iframe-popup.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://feed.pixnet.net/blog/posts/rss/oracled2k">
+<link rel="alternate" type="application/atom+xml" title="Atom 1.0" href="http://feed.pixnet.net/blog/posts/atom/oracled2k">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://api.pixnet.cc/blog/xmlrpc?rsd=oracleD2K">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://api.pixnet.cc/static/blog/wlwmanifest.xml">
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="//libs.pixfs.net/jquery.onappear/jquery.onAppear.min.js"></script>
+<script src="//libs.pixfs.net/json2/json2.min.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js" crossorigin="anonymous"></script>
+<script src="//libs.pixfs.net/spin.js/spin.min.js" type="text/javascript"></script>
+<script src="//libs.pixfs.net/angular-spinner/angular-spinner.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.panelsite = 'panel.pixnet.cc';
+pix.apisite = 'api.pixnet.cc';
+pix.login_name = '9ee35e1171d177e2bdd8b60dc9824c8c';
+pix.visitor = "ZmU1ODY1NDVhMWIwN2YyNmVkMjUxNDRkNmUzMDJmOTU=";
+pix.openid = "ZmU1ODY1NDVhMWIwN2YyNmVkMjUxNDRkNmUzMDJmOTU=";
+pix.owner = 'oracleD2K';
+pix.is_owner = false;
+pix.server_name = 'oracled2k.pixnet.net';
+pix.sToken = "221613880e1056af26013b3b8eebc1b6";
+pix.pixfssite = 's.pixfs.net';
+pix.falconsite = 'falcon.pixanalytics.com';
+pix.checklogin_version = 2;
+// timezone: null;
+//-->
+</script>
+<script src="//api.pixnet.cc/api/checklogin.php?js=1&amp;unique=2688568559&amp;timestamp=1458458209&amp;type=799" type="text/javascript"></script>
+<script src="//s.pixfs.net/js/pixnet/checklogin.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+jQuery.noConflict();
+var pix = pix || {};
+pix.ab_testing_seed = 940840196;
+dataLayer = window.dataLayer || [];
+//-->
+</script>
+<script src="//s.pixfs.net/js/lang/zh_TW.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript"></script>
+<script src="//s.pixfs.net/js/pix.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//s.pixfs.net/js/pix-addon.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/all.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/blog.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/search_selection.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript"></script>
+<script src="//front.pixfs.net/module/fullPage/dist/ad-full-page.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript" crossorigin="anonymous"></script>
+<meta itemprop="name" content="帳號, 密碼, 權限與角色(轉) @ oracle園地 :: 痞客邦 PIXNET ::">
+<meta itemprop="description" content="1. 新增帳號: CREATE USER 使用者名稱  IDENTIFIED BY 密碼;2. 權限設定: GRANT 權限 ON 資料庫物件 TO 使用者名稱;                   ">
+
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.js_error_type = pix.js_error_type || 'frontblog';
+//-->
+</script>
+<script async type="text/javascript" src="//s.pixfs.net/js/pixlogger.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+<script type="text/javascript">
+<!--
+(function(){
+    if (window.size().height > 10 && window.size().width > 10) {
+        var i = new Image(1,1);
+        i.src = 
+'//counter.pixplug.in/count.php?timestamp=1458458209&random=2661793637&check=1338044321&data[blog]=%7B%22blogid%22%3A%22742366%22%7D&data[blogarticle]=%7B%22blogid%22%3A%22742366%22%2C%22articleid%22%3A%2224680289%22%7D&height='
+ + window.size().height + '&width=' + window.size().width + 
+'&referer=' + encodeURI(document.referrer);
+        i.onload = function() { return; }
+    }
+})();
+//-->
+</script>
+<!-- Head Modified: 1458458209 -->
+<!-- async script -->
+<script type="text/javascript">
+<!--
+jQuery(document).ready(function () {
+    jQuery.ajaxSetup({ cache: true });
+    
+jQuery.getScript("//js.pixplug.in/addon/11/production.js?v=1455607293", 
+function(data, textStatus) { jQuery.ajaxSetup({cache: 
+true});jQuery.pixAddonRelatedArticle({"blog_relatedarticleshow":"post","blog_relatedarticle":"site","blog_relatedtemplate":"system","addon_username":"oracled2k","addon_expired_at":0,"addon_ismobile":false,"ab_testing_seed":940840196});jQuery.ajaxSetup({cache:
+ false}); });
+    jQuery.ajaxSetup({ cache: false });
+});
+//-->
+</script>
+
+<!-- load sync script -->
+
+<!-- execute sync addon -->
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.visitor_url = "http://oracled2k.pixnet.net/blog";
+pix.visitor_timestamp = "1458458209";
+pix.visitor_nonce = "635341700";
+pix.visitor_public = "LumrRMVHhADdttHSeUhMM8S3";
+pix.visitor_sig = "0ff05f9284f2d99fc92b43828b699ce0";
+pix.user_name = null;
+pix.avatar_version = 0;
+(function() {
+    var js = document.createElement('script');
+    js.src = "\/\/s.pixfs.net\/visitor.pixplug.in\/checklogin.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67";
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(js, s);
+})();
+//-->
+</script>
+    <script type="text/javascript" src="//front.pixfs.net/js/checkloop.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+<script type="text/javascript" src="//libs.pixfs.net/swfobject/1.5/swfobject.js"></script>
+<script src="//front.pixfs.net/js/mib_falcon.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" crossorigin="anonymous"></script>
+</head>
+
+<body id="article-main"
+  data-showing-advertisement="yep"
+  data-adsense-state=""
+  data-blog-site-category-id="5"
+  data-dfp-slot-id=""
+  data-mobile-mode="none"
+  data-article-id="24680289"
+  class="category_0 article_24680289"
+>
+
+
+<script type="text/javascript">
+_atrk_opts = { atrk_acct:"H00Mh1aIE700wg", domain:"pixnet.net",dynamic: true};
+(function() { var as = 
+document.createElement('script'); as.type = 'text/javascript'; as.async =
+ true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s =
+ 
+document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as,
+ s); })();
+</script>
+<noscript><img
+ 
+src="https://d5nxst8fruw4z.cloudfront.net/atrk.gif?account=H00Mh1aIE700wg"
+ style="display:none" height="1" width="1" alt="" /></noscript>
+
+
+<style>
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: -220px;
+    bottom: 0;
+    float: left;
+    width: 220px;
+    font-family: Arial;
+    font-weight: 100;
+    background: #e6e6e6;
+    overflow: hidden;
+}
+
+@media (min-width: 1280px) {
+    .sidebar {
+        position: relative;
+    }
+}
+
+/* 顯示 sidebar */
+.show-sidebar .sidebar { left: 0; }
+.show-sidebar .main-container { margin-left: 220px; }
+.show-sidebar .topbar--fixed { left: 220px; }
+
+/* fixed 的狀態 */
+.sidebar--fixed {
+    position: fixed;
+}
+
+.sidebar--fixed > .keyword-articles-container,
+.sidebar--fixed .keyword-articles {
+    position: absolute;
+}
+
+.keyword-header {
+    height: 40px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 40px;
+    text-align: center;
+    background: #3161dd;
+}
+
+.keyword-tags {
+    box-sizing: border-box;
+    padding: 5px 10px 10px;
+    background: #f3f3f3;
+}
+
+.keyword-tag {
+    display: inline-block;
+    box-sizing: border-box;
+    margin-top: 7px;
+    border: 1px solid #3161dd;
+    padding: 5px 15px 3px 7px;
+    color: #3161dd;
+    font-size: 12px;
+    line-height: 15px;
+    background: #fff url('//front.pixfs.net/images/icon-arrow--blue.png') no-repeat right 6px top 8px;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.keyword-tag.active {
+    color: #fff;
+    background-color: #3161dd;
+    background-image: url('//front.pixfs.net/images/icon-arrow--white.png');
+}
+
+.keyword-articles-container {
+    top: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 0;
+    white-space: nowrap;
+}
+
+.keyword-articles {
+    display: inline-block;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    white-space: normal;
+    overflow: scroll;
+}
+
+.keyword-articles:nth-of-type(2) { left: 220px; }
+.keyword-articles:nth-of-type(3) { left: 440px; }
+
+.keyword-article {
+    display: block;
+    margin: 5px 10px;
+    border-left: 3px solid transparent;
+    padding: 8px 10px 8px 7px;
+    background: #fff;
+}
+
+.keyword-article-min70 {
+    min-height: 70px;
+}
+
+.keyword-article:hover {
+    text-decoration: none;
+}
+
+.keyword-article:visited {
+    background: #eee;
+}
+
+.keyword-article.active,
+.keyword-article:hover {
+    border-color: #3161dd;
+    background: #fff;
+}
+
+.keyword-article__title {
+    color: #333;
+    font-size: 15px;
+    line-height: 20px;
+}
+
+.keyword-article:hover > .keyword-article__title {
+    color: #3161dd;
+    text-decoration: underline;
+}
+
+.keyword-article__desc {
+    margin-top: 10px;
+    color: #999;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.keyword-article span {
+    color: #f00;
+}
+
+.keyword-article:not(.active):visited span {
+    color: currentColor;
+}
+
+.keyword-article:visited:hover span {
+    color: #f00;
+}
+
+.keyword-article + iframe {
+    margin-bottom: -14px;
+    min-height: 15px;
+}
+</style>
+
+<div class="sidebar sidebar--fixed" data-obstruct="" data-search="search" data-type="0">
+    <div class="keyword-header">依據 Google 關鍵字搜尋結果</div>
+    <div class="keyword-tags"></div>
+    <div class="keyword-articles-container"></div>
+</div>
+
+<script src="//front.pixfs.net/js/ypa-resize-pixnet.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+
+<div class="main-container">
+
+            <div class="topbar-placeholder" data-in-test="">
+        
+<div id="topbar" class="topbar ">
+    <h2 class="topbar__logo"><a href="//www.pixnet.net/" title="痞客邦 PIXNET">痞客邦 PIXNET</a></h2>
+
+            <form class="topbar__search" id="topbar__search" action="//www.pixnet.net/searcharticle" target="_search">
+        <input type="text" name="q" class="topbar__search__input" id="topbar__search__input" placeholder="哈囉～你今天想搜尋什麼關鍵字呢？" value="" maxlength="32" tabindex="1" autocomplete="off">
+        <button type="reset" class="topbar__search__reset">×</button>
+
+        <div class="topbar__search__btns">
+            <button class="topbar__search__submit" name="search" type="submit" title="找文章" value="searcharticle" tabindex="2" data-counterlink="//counter.pixplug.in/count.php?timestamp=1458458209&random=2076102815&check=1664451336&no_timeout=1&data[counter]=%7B%22tag_id%22%3A30%2C%22id%22%3A%22search-articles-click%22%2C%22no_timeout%22%3Atrue%7D">找文章</button>
+            <button class="topbar__search__submit" name="search" type="submit" title="找部落客" value="searchblog" tabindex="3" data-counterlink="//counter.pixplug.in/count.php?timestamp=1458458209&random=4072649256&check=93789014&no_timeout=1&data[counter]=%7B%22tag_id%22%3A30%2C%22id%22%3A%22search-bloggers-click%22%2C%22no_timeout%22%3Atrue%7D">找部落客</button>
+        </div>
+
+        <ul class="topbar__search__suggestion"></ul>
+    </form>
+
+    <div class="topbar__announce">
+        <a href="http://admin.pixnet.net/blog/post/43345138-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6-pixnet-mib-%28money-in-blog%29-%e9%83%a8%e8%90%bd%e6%a0%bc%e5%bb%a3" class="topbar__announce__item" title="[公告] 痞客邦 PIXNET MIB (MONEY IN BLOG) 部落格廣告分潤計劃新增／調整" target="_announce" tabindex="-1">[公告] 痞客邦 PIXNET MIB (MONEY IN BLOG) 部落格廣告分潤計劃新增／調整</a><a href="http://admin.pixnet.net/blog/post/43342759-%5b%e5%85%ac%e5%91%8a%5d-2016%e5%b9%b4%e5%ba%a6%e8%be%b2%e6%9b%86%e6%98%a5%e7%af%80%e6%9c%9f%e9%96%93%e6%9c%8d%e5%8b%99%e5%85%ac%e5%91%8a" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 2016年度農曆春節期間服務公告" target="_announce" tabindex="-1">[公告] 2016年度農曆春節期間服務公告</a><a href="http://admin.pixnet.net/blog/post/43158973-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6%e3%80%8c%e5%bc%95%e7%94%a8%e3%80%8d%e5%8a%9f%e8%83%bd%e5%b0%87%e6%96%bc-2016-%e5%b9%b4-1-%e6%9c%88-11" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 痞客邦「引用」功能將於 2016 年 1 月 11 日正式終止" target="_announce" tabindex="-1">[公告] 痞客邦「引用」功能將於 2016 年 1 月 11 日正式終止</a><a href="http://admin.pixnet.net/blog/post/43145044-%5b%e5%85%ac%e5%91%8a%5d-%e7%95%99%e8%a8%80%e6%9d%bf%e5%b0%87%e6%96%bc-2016-%e5%b9%b4-1-%e6%9c%88-4-%e6%97%a5%e8%bd%89%e6%8f%9b%e7%82%ba%e6%87%89%e7%94%a8" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 留言板將於 2016 年 1 月 4 日轉換為應用市集「留言板」APP 服務" target="_announce" tabindex="-1">[公告] 留言板將於 2016 年 1 月 4 日轉換為應用市集「留言板」APP 服務</a><a href="http://admin.pixnet.net/blog/post/42929975-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6%e7%ac%ac%e4%ba%8c%e5%b1%86%e9%87%91%e9%bb%9e%e8%b3%9e%e7%99%bb%e5%a0%b4%ef%bc%81%e5%85%a8%e5%8f%b0%e6%9c%80%e5%85%b7%e5%85%ac" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 痞客邦第二屆金點賞登場！全台最具公信力的社群內容年度大賞" target="_announce" tabindex="-1">[公告] 痞客邦第二屆金點賞登場！全台最具公信力的社群內容年度大賞</a>    </div>
+    
+        
+    <div class="topbar__nav">
+
+        
+            <div class="topbar__user ">
+            <a class="topbar__user__login" id="topbar__user__login" href="https://www.pixnet.net/?done=http%3A%2F%2Foracled2k.pixnet.net%2Fblog%2Fpost%2F24680289--%25E5%25B8%25B3%25E8%2599%259F%2C-%25E5%25AF%2586%25E7%25A2%25BC%2C-%25E6%25AC%258A%25E9%2599%2590%25E8%2588%2587%25E8%25A7%2592%25E8%2589%25B2%28%25E8%25BD%2589%29">登入</a>
+        </div>
+            <div class="topbar__lang ">
+            <a href="###" class="topbar__lang__switcher topbar__dropdown-btn" title="語系">繁中</a>
+
+            <ul class="topbar__lang__lists topbar__dropdown-lists">
+                                <li class="topbar__lang__list"><a href="###" data-lang="en_US">EN</a></li>
+                                <li class="topbar__lang__list"><a href="###" data-lang="zh_CN">簡中</a></li>
+                                <li class="topbar__lang__list"><a href="###" data-lang="ja_JP">日語</a></li>
+                            </ul>
+        </div>
+
+    </div>
+
+</div>
+
+    </div>
+    
+  <div id="body-div">
+  <a name="top"></a>
+  <div id="container">
+    <div id="container2">
+      <div id="container3">
+          <div id="header">
+            <div id="banner">
+		<h1><a href="http://oracled2k.pixnet.net/blog">oracle園地</a></h1>
+              <p class="skiplink"><a href="#article-area" title="skip the page header to the main content">跳到主文</a></p>
+              <h2>這裡是到處搜括來的ORACLE技術及文章,也有自己發表的文章,希望大家可以互相討論!
+PS-若有侵權,請告知哦.
+</h2>
+	      <p id="blog-category">部落格全站分類：<a href="//www.pixnet.net/blog/bloggers/category/5" target="_blank">職場甘苦</a></p>
+            </div>
+            <ul id="navigation">
+              <li id="link-album"><a href="http://oracled2k.pixnet.net/album" title="go to gallery page of this user">相簿</a></li>
+              <li id="link-blog"><a href="http://oracled2k.pixnet.net/blog" title="go to index page of this blog">部落格</a></li>
+              <li id="link-guestbook">
+                                <a id="guestbook" data-msg="尚未安裝留言板，無法進行留言" data-action="none" href="#" title="go to guestbook page of this user">留言</a>
+                            </li>
+              <li id="link-profile"><a href="http://www.pixnet.net/blog/profile/oracleD2K" title="go to profile page of this user">名片</a></li>
+            </ul>
+          </div><!-- #header//-->
+          <div id="main">
+            <div id="content">
+				<div id="article-area">
+    <div id="article-box">
+    		<div class="article">
+	    <ul class="article-head">
+		<li class="publish"><span class="month">Apr </span><span class="date">02 </span><span class="day">Thu </span><span class="year">2009 </span><span class="time">15:26</span></li>
+		<li class="title" id="article-24680289" data-hot-link="//www.pixnet.net/blog/articles/category/0" data-site-category="不設分類" data-site-category-id="0" data-article-link="http://oracled2k.pixnet.net/blog/post/24680289"><h2><a href="http://oracled2k.pixnet.net/blog/post/24680289"> 帳號, 密碼, 權限與角色(轉)</a></h2></li>
+	    </ul>
+	    <div class="article-body">
+	    		<div class="article-content">
+		    
+		    <div class="article-content-inner">
+		    <p>1. <span style="color: #0000ff;">新增帳號</span>:&nbsp;<span style="color: #ff0000;">CREATE USER</span> 使用者名稱&nbsp;&nbsp;<span style="color: #ff0000;">IDENTIFIED BY</span> <span style="color: #000000;">密碼;</span><br />2. <span style="color: #0000ff;">權限設定</span>: <span style="color: #ff0000;">GRANT </span>權限&nbsp;<span style="color: #ff0000;">ON</span> 資料庫物件 <span style="color: #ff0000;">TO</span> 使用者名稱;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #ff0000;">GRANT </span><span style="color: #000000;">角色</span> <span style="color: #ff0000;">TO</span> 使用者名稱<br />3.<span style="color: #0000ff;"> 取消權限:</span> <span style="color: #ff0000;">REVOKE</span> 權限&nbsp;<span style="color: #ff0000;">ON</span> 資料庫物件 <span style="color: #ff0000;">FROM</span> 使用者名稱;<br />4. <span style="color: #0000ff;">新增角色:</span> <span style="color: #ff0000;">CREATE ROLE</span> 角色名稱 [ <span style="color: #0000ff;">NOT IDENTIFIED</span> | <span style="color: #0000ff;">IDENTIFIED</span> { BY 密碼 | USING [ 鋼要 .] PACKAGE | EXTERNALLY | GLOBALLY } ] ;<br />5. <span style="color: #0000ff;">取消角色:</span> <span style="color: #ff0000;">DROP ROLE</span> 角色名稱<br />6. <span style="color: #0000ff;">更改密碼</span>: <span style="color: #ff0000;">ALTER USER</span>&nbsp; 使用者名稱&nbsp;<span style="color: #ff0000;">IDENTIFIED BY</span> 密碼;<br />7. <span style="color: #0000ff;">強制變更密碼</span>: <span style="color: #ff0000;">ALTER USER</span> 使用者名稱 <span style="color: #ff0000;">PASSWORD EXPIRE</span>;<br />8. <span style="color: #0000ff;">鎖住現有的使用者</span>: <span style="color: #ff0000;">ALTER USER</span> 使用者名稱 <span style="color: #ff0000;">ACCOUNT LOCK;<br /></span>9. <span style="color: #0000ff;">解鎖</span><span style="color: #0000ff;">現有的使用者</span>: <span style="color: #ff0000;">ALTER USER</span> 使用者名稱 <span style="color: #ff0000;">ACCOUNT UNLOCK;<br /></span>10. <span style="color: #0000ff;">刪除現有的使用者</span>: <span style="color: #ff0000;">DROP USER</span> 使用者名稱;</p>
+<p><span style="background-color: #ccffff;">GRANT ALTER&nbsp;&nbsp; ON&nbsp;&nbsp;TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT DELETE ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT INDEX&nbsp;&nbsp; ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT INSERT ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT SELECT ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT UPDATE ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;<br />GRANT REFERENCES ON&nbsp; TABLE_NAME TO APPS WITH GRANT OPTION;</span></p>
+<p><span style="background-color: #ccffff;">1. 新增帳號:</span>&nbsp;<br /><br />SQL&gt; <span style="color: #ff0000;">CREATE USER</span> elvismeng&nbsp;&nbsp;<span style="color: #ff0000;">IDENTIFIED BY</span> elvismeng<span style="color: #0000ff;">;<br /><br /><span style="color: #000000;">如以此帳號立即登入, 系統會告知下列錯誤:<br /></span><br /></span><span style="color: #0000ff;">C:\Documents and Settings\elvismeng&gt;sqlplus elvismeng/elvismeng<br />SQL*Plus: Release 10.2.0.1.0 - Production on 星期三 3月 26 10:23:04 2008<br />Copyright (c) 1982, 2005, Oracle.&nbsp; All rights reserved.<br />ERROR:<br />ORA-01045: 使用者 ELVISMENG 缺乏 CREATE SESSION 權限; 登入被拒<br /></span><span style="color: #0000ff;"><br /></span><span style="color: #000000;">系統告知使用者elvismeng並沒有CREATE SESSION的權限 (Privilege), 所以無法登入.<br /><br /><span style="background-color: #ccffff;">2. 建立權限<br /></span><br />我們可透過IE瀏覽器來設定使用者elvismeng的權限:</span> </p>
+<p><a href="http://www.wretch.cc/album/show.php?i=elvismeng&amp;b=32764&amp;f=1277476204.jpg" target="_blank"><img src="http://f9.wretch.yimg.com/elvismeng/32764/1277476204.jpg" border="0" alt="" /></a>&nbsp;<br /><br />我們也可以Command Line的方式設定權限:<br /><br /><span style="color: #0000ff;">SQL&gt; GRANT CREATE SESSION TO elvismeng;<br />順利授權.<br /></span><br />接下來, 我們驗證帳號elvismeng是否有權限登入到資料庫:<br /><br /><span style="color: #0000ff;">SQL&gt; connect elvismeng/elvismeng;<br />已連線.<br /></span><br /><span style="background-color: #ccffff;">3 取消權限</span><br /><br />使用者權限亦可依需求取消:<br /><span style="color: #0000ff;"><br />SQL&gt; REVOKE CREATE SESSION FROM elvismeng;<br />順利撤銷.<br /></span><br /><span style="background-color: #ccffff;">4. 角色 (Role)<br /></span><br />建立角色:<br /><br /><span style="color: #0000ff;">SQL&gt; CREATE ROLE TEST_ROLE;<br />已建立角色.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; GRANT CREATE SESSION TO TEST_ROLE;<br />順利授權.<br /><br />SQL&gt; CREATE USER TEST IDENTIFIED BY TEST;<br />已建立使用者.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; GRANT TEST_ROLE TO TEST;<br />順利授權.<br /><br /><span style="color: #000000;">取消角色:<br /></span><br />SQL&gt; DROP ROLE TEST_ROLE;<br /></span><span style="color: #0000ff;">已刪除角色.<br /><br /><span style="color: #000000;"><span style="background-color: #ccffff;">5. 更改密碼</span><br /></span><br />SQL&gt; connect elvismeng/elvismeng<br />已連線.<br /><br />SQL&gt; ALTER USER elvismeng IDENTIFIED BY elvismeng01;<br /></span><span style="color: #0000ff;">已更改使用者.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; connect elvismeng/elvismeng<br />ERROR:<br />ORA-01017: 使用者名稱/密碼無效; 無法登入<br /></span><span style="color: #0000ff;">警告: 您已不再與 ORACLE 相連<br /><br />SQL&gt; connect elvismeng/elvismeng01<br />已連線.&nbsp;<br /><br /><span style="background-color: #ccffff;"><span style="color: #000000;">6. 強制變更密碼</span><br /></span><br />C:\Documents and Settings\elvismeng&gt;SQLPLUS</span></p>
+<p><span style="color: #0000ff;">SQL*Plus: Release 10.2.0.1.0 - Production on 星期三 3月 26 16:09:27 2008<br /></span><span style="color: #0000ff;">Copyright (c) 1982, 2005, Oracle.&nbsp; All rights reserved.</span></p>
+<p><span style="color: #0000ff;">輸入使用者名稱:&nbsp; SYSTEM<br />輸入密碼:</span></p>
+<p><span style="color: #0000ff;">連線到:<br />Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Production<br />With the Partitioning, OLAP and Data Mining options</span></p>
+<p><span style="color: #0000ff;">SQL&gt; ALTER USER elvismeng PASSWORD EXPIRE<br /></span><span style="color: #0000ff;">已更改使用者.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; GRANT CREATE SESSION TO elvismeng;<br /></span><span style="color: #0000ff;">順利授權.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; DISCONNECT<br />已切斷與 Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Production<br />With the Partitioning, OLAP and Data Mining options 的連線<br />SQL&gt; CONNECT elvismeng/elvismeng01<br />ERROR:<br />ORA-28001: 密碼已經屆滿</span></p>
+<p><span style="color: #0000ff;">為 elvismeng 變更密碼<br />新密碼:<br />重新輸入新密碼:<br />變更密碼<br />已連線.<br />SQL&gt;<br /><br /><span style="color: #000000; background-color: #ccffff;">7. 鎖住 / 解除現有的使用者</span><br /><br />SQL&gt; ALTER USER elvismeng ACCOUNT LOCK;<br /></span><span style="color: #0000ff;">已更改使用者.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; GRANT CREATE SESSION TO elvismeng;<br /></span><span style="color: #0000ff;">順利授權.</span></p>
+<p><span style="color: #0000ff;">SQL&gt; DISCONNECT<br />已切斷與 Oracle Database 10g Enterprise Edition Release 10.2.0.1.0 - Production<br />With the Partitioning, OLAP and Data Mining options 的連線<br />SQL&gt; CONNECT elvismeng/elvismeng<br />ERROR:<br />ORA-28000: 帳戶已被鎖定</span></p>
+<p><span style="color: #0000ff;">
+<p>SQL&gt; DISCONNECT<br /><br />SQL&gt; CONNECT SYSTEM/SYSTEM<br />已連線.<br /><br />SQL&gt; ALTER USER elvismeng ACCOUNT UNLOCK;<br />已更改使用者.</p>
+<p>SQL&gt; CONNECT elvismeng/elvismeng<br />已連線.<br />SQL&gt;<br /><br /><span style="color: #000000; background-color: #ccffff;">8. 刪除現有的使用者</span><br /><br />SQL&gt; DROP USER elvismeng;<br />已刪除使用者.</p>
+<p>SQL&gt; connect elvismeng/elvismeng;<br />ERROR:<br />ORA-01017: 使用者名稱/密碼無效; 無法登入<br />警告: 您已不再與 ORACLE 相連</p>
+</span></p>
+<p>&nbsp;</p>
+                        
+
+		    </div>
+		</div> <!-- .article-content //-->
+
+				<p class="author">
+		    oracleD2K 發表在 <a href="http://www.pixnet.net/">痞客邦 PIXNET</a>                    <a href="http://oracled2k.pixnet.net/blog/post/24680289#comments">留言</a>(0) <span class="author-views">人氣(<span id="BlogArticleCount-24680289"></span>)</span>
+		    		</p> <!-- .author //-->
+		<div class="forward">
+		    <a href="javascript:;" onclick="pix.sendForwardTo('%E6%82%A8%E7%9A%84%E5%A5%BD%E6%9C%8B%E5%8F%8B%E9%82%80%E8%AB%8B%E6%82%A8%E8%A7%80%E7%9C%8B%20oracleD2K%20%E7%9A%84%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%20%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%87%E7%AB%A0-%20%E5%B8%B3%E8%99%9F%2C%20%E5%AF%86%E7%A2%BC%2C%20%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2%28%E8%BD%89%29','%E6%82%A8%E5%A5%BD%EF%BC%8C%0A%0A%E6%82%A8%E7%9A%84%E5%A5%BD%E6%9C%8B%E5%8F%8B%E9%82%80%E8%AB%8B%E6%82%A8%E8%A7%80%E7%9C%8B%20oracleD2K%20%E7%9A%84%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%20%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%87%E7%AB%A0-%20%E5%B8%B3%E8%99%9F%2C%20%E5%AF%86%E7%A2%BC%2C%20%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2%28%E8%BD%89%29%0A%E8%B6%8A%E5%A4%9A%E4%BA%BA%E7%9C%8B%E5%88%B0%EF%BC%8C%E5%8F%AF%E5%B9%AB%E4%BB%96%E5%A2%9E%E5%8A%A0%E8%B6%8A%E5%A4%9A%E4%BA%BA%E6%B0%A3%E5%96%94%7EGO%EF%BC%81%0A----------%0AApril2%2C2009%0A%20%E5%B8%B3%E8%99%9F%2C%20%E5%AF%86%E7%A2%BC%2C%20%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2%28%E8%BD%89%29%0A----------%0A%E9%A6%AC%E4%B8%8A%E7%9C%8B%20http%3A%2F%2Foracled2k.pixnet.net%2Fblog%2Fpost%2F24680289%0A----------%0A%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%0Ahttp%3A%2F%2Fwww.pixnet.net%2F')">E-mail轉寄</a> <a href="javascript:;" onClick="pix.forwardToGB(24680289);">轉寄至留言板</a>
+		</div> <!-- .forward //-->
+		<br>
+<div style="position: static !important; display:block !important;visibility: visible !important; float: none !important; text-align: center">
+<div style="width: 620px; height: 250px; padding-bottom: 10px;">
+    <div id="w77fae7f068394438a2f41077" style="width: 300px; height: 250px; float: left; padding-right: 1px;">
+            </div>
+    <div id="w77fae7f068394438a2f41032" style="width: 300px; height: 250px; float: left;">
+    </div>
+</div>
+<script type="text/javascript">
+(function($) {
+    var w = $('.article-content:first').width();
+    if (w >= 600) {
+                
+jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=5&article_category=24&fields[]=w77fae7f068394438a2f41032,1032')
+    } else if (w >= 550 && w <= 599) {
+                
+jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=5&article_category=24&fields[]=w77fae7f068394438a2f41032,1603')
+    } else {
+                
+jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=5&article_category=24&fields[]=w77fae7f068394438a2f41032,1606')
+    }
+})(jQuery);
+</script>
+</div>
+	    </div> <!-- .article-body //-->
+	    <div class="article-footer">
+		<ul class="refer">
+		    <li>全站分類：<a href="//www.pixnet.net/blog/articles/category/0">不設分類</a></li>		    		    		    <li>上一篇： <a class="quick-nav--pre" rel="prev" href="http://oracled2k.pixnet.net/blog/post/24680212" data-public-at="1238655790" data-thumb="http://s.pixfs.net/mobile/images/blog/article-image.png">CONSTRAINT SQL運用</a></li>
+<li>下一篇： <a class="quick-nav--next" rel="next" href="http://oracled2k.pixnet.net/blog/post/25057800" data-public-at="1242802072" data-thumb="http://s4.pimg.tw/album/oracled2k/element/118893964_4a13b3392b4c9/zoomcrop/90x90.jpg">Order Import</a></li>
+		</ul>
+		<div class="history">
+<h6>歷史上的今天</h6>
+<ul>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24680212">CONSTRAINT SQL運用</a></li>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24680130">收料單號.日期.數量 SQL</a></li>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24680034">完工數量計算(轉)</a></li>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24680011">採購-收料 TABLE(轉)</a></li>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24679986">會計期具有一下五種狀態(轉)</a></li>
+<li>2009: <a href="http://oracled2k.pixnet.net/blog/post/24679981">ERP系統表命名介紹 (轉)</a></li>
+</ul>
+</div>
+	    		<div class="back-to-top"><a href="#top" title="back to the top of the page">▲top</a></div>
+	    </div> <!-- .article-footer //-->
+        </div>
+
+<script>
+// track 上下篇點擊
+(function ($) {
+    'use strict';
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-408650-10', 'auto', {'name': 'quickNavTracker'});
+
+    var referBlock = $('.refer'),
+        quickNav = {
+            catPre: {
+                selector: '.quick-nav--cat-pre',
+                name: '此分類上一篇',
+            },
+            catNext: {
+                selector: '.quick-nav--cat-next',
+                name: '此分類下一篇',
+            },
+            pre: {
+                selector: '.quick-nav--pre',
+                name: '上一篇',
+            },
+            next: {
+                selector: '.quick-nav--next',
+                name: '下一篇',
+            }
+        },
+
+        trackEvent = function (action, label) {
+            ga('quickNavTracker.send', 'event', 'blog-related-article', action, label, { nonInteraction: ('imps' === action) });
+        },
+
+        bindClick = function (selector, label) {
+            referBlock.on('click', selector, function () {
+                trackEvent('click', label);
+            });
+        };
+
+    for (var key in quickNav) {
+        var obj = quickNav[key];
+        if (referBlock.find(obj.selector).length) {
+            // 記錄曝光
+            trackEvent('imps', obj.name);
+
+            // 點擊時紀錄
+            bindClick(obj.selector, obj.name);
+        }
+    }
+})(jQuery);
+</script>
+	</div> <!-- #article-box //-->
+		  <div id="user-post">
+    <div id="comment-box" class="user-post-box">
+      <a name="comments"></a>
+      <h3 id="comment-title" class="user-post-title" onclick="pix.commentSwitch('comment-text','comment-text-switch');" style="cursor:hand;cursor:pointer;"><img id="comment-text-switch" src="//s.pixfs.net/blog/images/choc/minus.gif"> <span>留言列表 (0)</span></h3>
+      <div class="post-comment"><a href="/blog/post/24680289--%E5%B8%B3%E8%99%9F,-%E5%AF%86%E7%A2%BC,-%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2(%E8%BD%89)#comment-form">發表留言</a></div>
+
+      <div id="comment-text" class="user-post-text">
+            </div> <!-- #comment-text //-->
+      <div id='comment_form'>
+      </div>
+    </div> <!--  #comment-box //-->
+  </div> <!-- #user-post //-->
+<script type="text/javascript">
+<!--
+jQuery(function() {
+    //#40294 用ajax接postcommentAction產生的comment form
+    var action = location.href;
+    action = action.replace('/post/', '/postcomment/');
+    jQuery.ajaxSetup({ cache: true });
+    jQuery.ajax({
+        type:     'GET',
+        url:      action,
+        data:     {"getForm": 1, "isMobile": 0},
+        dataType: 'json',
+        success:  function(data)
+                  {
+                      jQuery('#comment_form').html(data.form);
+
+                      setTimeout(function () {
+                      if (jQuery.pixQuestionary && 'function' === typeof jQuery.pixQuestionary) {
+                          jQuery.pixQuestionary(pix.user_name);
+                      }
+                      }, 1000);
+
+                      // 用來判斷是否有安裝'留言插入表情符號' App
+                      if (jQuery.pixAddonCommentEmotion && 'function' === typeof jQuery.pixAddonCommentEmotion) {
+                          // 裝了App 但沒表情符號可選, 須重新call function
+                          if (! document.getElementById('comment-emotion')) {
+                              jQuery.pixAddonCommentEmotion();
+                          }
+                      }
+                  },
+        error:    function(error)
+                  {
+                      console.log(error);
+                  }
+    });
+    jQuery.ajaxSetup({ cache: false });
+
+    jQuery('.comment-icon').attr('style', 'vertical-align:middle;');
+});
+// -->
+</script>
+
+
+	    </div> <!-- #article-area //-->
+            </div> <!-- #content //-->
+            <div id="links">
+              <div id="links-row-1">
+                                    <div class="hslice box d56d2a5-mib-aD-sidebar-v2-d56d2a5">
+    <div class="box-text entry-content">
+        <div class="d56d2a5-mib-bOrder-d56d2a5">
+            <div class="d56d2a5-sitemAjidr-d56d2a5" model="180x280">
+
+            </div>
+        </div><!-- /.mib-border -->
+    </div>
+</div>
+<div class="hslice box folder" id="box1132843">
+    <h4 class="box-title entry-title">
+	痞客邦新服務7Headlines	    </h4>
+    <div class="box-text entry-content">
+
+<iframe src="http://www.7headlines.com/sticker" width="200" height="480" scrolling="no" frameborder="0"></iframe>    </div>
+</div> <!-- #box1132843 //-->
+<div class="hslice box" id="search">
+    <h4 class="box-title entry-title">
+	部落格文章搜尋	    </h4>
+    <div class="box-text entry-content">
+
+<form method="post" action="http://oracled2k.pixnet.net/blog/search/" id="search-form" data-wording-needkeyword="請輸入關鍵字">
+	<ul>
+	    <li><input name="search-target" id="search-target" type="text" ></li>
+	    <li><input id="search-submit" type="submit" value="搜尋" ></li>
+	</ul>
+    </form>
+    <script type="text/javascript">//<!--
+    jQuery('#search-form').submit(function(event){
+        if ('' === jQuery('#search-target').val()) {
+            alert(jQuery(this).attr('data-wording-needkeyword'));
+            event.preventDefault();
+        }
+    });
+    //--></script>
+    </div>
+</div> <!-- #search //-->
+<div class="hslice box" id="recent-article">
+    <h4 class="box-title entry-title">
+	近期文章	    </h4>
+    <div class="box-text entry-content">
+
+<ul>
+<li><a href="/blog/post/25577348">提交處理事務處理介面請求</a></li>
+<li><a href="/blog/post/25577316">ORALCE開發集</a></li>
+<li><a href="/blog/post/25577292">採購到入庫的全過程表</a></li>
+<li><a href="/blog/post/25577280">JAVA SCRIPT</a></li>
+<li><a href="/blog/post/25567915">DBA SQL</a></li>
+<li><a href="/blog/post/25567877">DBA 維護</a></li>
+<li><a href="/blog/post/25567858">JDeveloper 安裝教學(轉)</a></li>
+<li><a href="/blog/post/25288279">PO與收料 SQL</a></li>
+<li><a href="/blog/post/25119738">其他常用表</a></li>
+<li><a href="/blog/post/25119732">WIP模組常用表結構  </a></li>
+</ul>
+    </div>
+</div> <!-- #recent-article //-->
+<div class="hslice box" id="latest-comment">
+    <h4 class="box-title entry-title">
+	最新迴響	    </h4>
+    <div class="box-text entry-content">
+
+<script type="text/javascript"><!--
+jQuery('#latest-comment div').load('/blog/plugin/latestcomment');
+//--></script>
+    </div>
+</div> <!-- #latest-comment //-->
+<div class="hslice box" id="archive">
+    <h4 class="box-title entry-title">
+	文章彙整	    </h4>
+    <div class="box-text entry-content">
+
+<select onchange="pix.gotoArchive(this);">
+<option value="-pixnet-">文章彙整</option>
+<option value="/blog/archives/200907">2009 七月 (7)</option>
+<option value="/blog/archives/200906">2009 六月 (1)</option>
+<option value="/blog/archives/200905">2009 五月 (5)</option>
+<option value="/blog/archives/200904">2009 四月 (7)</option>
+<option value="/blog/archives/200903">2009 三月 (18)</option>
+<option value="/blog/archives/200902">2009 二月 (1)</option>
+<option value="/blog/archives/200812">2008 十二月 (7)</option>
+<option value="/blog/archives/200810">2008 十月 (2)</option>
+<option value="/blog/archives/200809">2008 九月 (16)</option>
+<option value="/blog/archives/200806">2008 六月 (9)</option>
+<option value="/blog/archives/200805">2008 五月 (10)</option>
+<option value="/blog/archives/200804">2008 四月 (3)</option>
+<option value="/blog/archives/200803">2008 三月 (1)</option>
+</select>
+<div class="box-more">
+<a href="/blog/listall/1">所有文章列表</a>
+</div>
+    </div>
+</div> <!-- #archive //-->
+<div class="hslice box" id="category">
+    <h4 class="box-title entry-title">
+	文章分類	    </h4>
+    <div class="box-text entry-content">
+
+<div class="box-more">
+<img src="//s.pixfs.net/blog/images/choc/expand.gif" alt="unfold all categories" style="cursor:hand;cursor:pointer;" onClick="pix.openAllCategory('open');">
+<img src="//s.pixfs.net/blog/images/choc/collapse.gif" alt="fold all categories" style="cursor:hand;cursor:pointer;" onClick="pix.openAllCategory('close');">
+</div>
+
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1334017','category-1334017-switch');"><img id="category-1334017-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> ORACLE JDeveloper (1)</h6>
+<ul id="category-1334017" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1408584">JDeveloper 安裝教學 (0)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1190368','category-1190368-switch');"><img id="category-1190368-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> Oracle Tools (4)</h6>
+<ul id="category-1190368" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1190364">Oracle Form (18)</a></li><!-- ie6bug --><li><a href="/blog/category/1190366">Oracle Reprot (0)</a></li><!-- ie6bug --><li><a href="/blog/category/1194170">Oracle Trigger (5)</a></li><!-- ie6bug --><li><a href="/blog/category/1194390">Oracle 工具安裝 (2)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1190382','category-1190382-switch');"><img id="category-1190382-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> Oracle SQL (3)</h6>
+<ul id="category-1190382" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1190383">Oracle SQL (15)</a></li><!-- ie6bug --><li><a href="/blog/category/1194366">Oracle PL/SQL (15)</a></li><!-- ie6bug --><li><a href="/blog/category/1408587">ORACLE DBA 指令 (2)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1320074','category-1320074-switch');"><img id="category-1320074-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> ORACLE ERP (8)</h6>
+<ul id="category-1320074" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1385438">財務模組 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1385439">製造模組 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1385440">庫存模組 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1385441">業務模組 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1385442">專業知識 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1396825">其它常用表結構 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1401643">採購模組 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1408861">工具下載 (1)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1329851','category-1329851-switch');"><img id="category-1329851-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 教學影音檔 (1)</h6>
+<ul id="category-1329851" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1382487">教學影音檔 (12)</a></li><!-- ie6bug --></ul>
+</div>
+<ul><!-- ie6bug
+--><li><a href="/blog/category/1408860">其它應用 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1327625">ORACLE INV (1)</a></li><!-- ie6bug --><li><a href="/blog/category/0">未分類文章 (3)</a></li><!-- ie6bug
+--></ul>
+    </div>
+</div> <!-- #category //-->
+<div class="hslice box" id="mylink">
+    <h4 class="box-title entry-title">
+	我的連結	    </h4>
+    <div class="box-text entry-content">
+
+          <div class="inner-box">
+	  <h6 >
+	    	    ORACLE ERP 	</h6>
+	<ul ><!-- ie6bug
+	        --></ul>
+      </div>
+          <div class="inner-box">
+	  <h6 >
+	    	    ORACLE 技術網站	</h6>
+	<ul ><!-- ie6bug
+	        --></ul>
+      </div>
+            <div class="inner-box">
+	<ul><!-- ie6bug
+              --><li><a title="" href="http://www.oracleappshub.com/category/om/" target="_blank">ORACLE FLOW</a></li><!-- ie6bug
+              --><li><a title="" href="http://webdesign.enjoyitsimply.com/sql/sql_insert" target="_blank">SQL 指令教學網站</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.docin.com/p-8097289.html" target="_blank">oracle 培訓資料-簡體文</a></li><!-- ie6bug
+              --><li><a title="有用心維護" href="http://www.oracleseeker.com/index.php/category/oracle_ebs_dev/ebs_form" target="_blank">ORACLE 探索者</a></li><!-- ie6bug
+              --><li><a title="不錯的文章" href="http://hb0xf0wk.itpub.net/category/36808/57024" target="_blank">hb0xf0wk的博客</a></li><!-- ie6bug
+              --><li><a title="有作整理" href="http://haoxiai.net/wangzhanzhizuo/shujuku/61258.html" target="_blank">好喜愛學習網</a></li><!-- ie6bug
+              --><li><a title="常常更新學習狀況" href="http://aloz0101.pixnet.net/blog/category/1235561" target="_blank">Aloz 的Oracle ERP天地</a></li><!-- ie6bug
+              --><li><a title="用心的作者" href="http://tomkuo139.blogspot.com/2008/12/oracle-form.html" target="_blank">昭知.天翔</a></li><!-- ie6bug
+              --><li><a title="" href="http://hi.baidu.com/winas/blog/item/ed456e8d71463817b31bba19.html" target="_blank">EBS 常用解釋</a></li><!-- ie6bug
+              --><li><a title="" href="http://mcu.edu.tw/~tinglili/OracleRef/" target="_blank">EBS 模組設定</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.oracle.com/technology/products/reports/htdocs/getstart/demonstrations/excel/viewlet.html" target="_blank">EXCEL 轉入 REPORT的作法</a></li><!-- ie6bug
+              --><li><a title="" href="http://wj99898.itpub.net/post/19921/284484" target="_blank">JOHN'S BLOG ORACLE</a></li><!-- ie6bug
+              --><li><a title="Alerts in Oracle Apps" href="http://www.erpschools.com/Alerts_in_Oracle_Apps.asp" target="_blank">ERP -SCHOOL</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.hackhome.com/InfoView/Article_163734_3.html" target="_blank">Oracle 9i SQL*Loader</a></li><!-- ie6bug
+              --><li><a title="" href="http://csevan.javaeye.com/blog/284630" target="_blank">SQL Loader</a></li><!-- ie6bug
+              --><li><a title="" href="http://sharp-c.blogspot.com/2008_02_01_archive.html" target="_blank">夏普視野</a></li><!-- ie6bug
+              --><li><a title="" href="http://osm1975.com.ne.kr/d2000/pack_in.html" target="_blank">韓國FORM的應用</a></li><!-- ie6bug
+              --><li><a title="" href="http://webdesign.enjoyitsimply.com/sql/" target="_blank">ORACLE SQL基本語法詳解</a></li><!-- ie6bug
+              --><li><a title="" href="http://kuanglian2000.wordpress.com/2006/12/29/sql-%E8%AA%9E%E6%B3%95%E6%94%B6%E9%9B%86/" target="_blank">SQL 語法收集</a></li><!-- ie6bug
+              --><li><a title="" href="http://oaunix.hlhs.hlc.edu.tw/~program/hkin/subquery.htm" target="_blank">SQL 語法收集</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.cs.uvm.edu/oracle9doc/server.901/a90125/toc.htm" target="_blank">Oracle9i SQL Reference</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.oracle.com/webapps/online-help/forms/10g/state/content/navId.3/navSetId._/vtTopicFile.f1_help%7Cerrorsfrm%7Cc_errorsfrm~html/" target="_blank">FORM ERROR_CODE</a></li><!-- ie6bug
+              --><li><a title="" href="http://book.csdn.net/bookfiles/737/10073722652.shtml" target="_blank">基礎FORM 開發教程</a></li><!-- ie6bug
+              --><li><a title="" href="http://download.oracle.com/docs/cd/B25516_18/current/html/docset.html" target="_blank">ORACLE 線上文件</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.psoug.org/library.html" target="_blank">ORACLE DB 指令集</a></li><!-- ie6bug
+              --><li><a title="登入帳號: username=TK9420, 密碼: 9420TK " href="http://vis1200.solutionbeacon.net/OA_HTML/RF.jsp?function_id=1032924&amp;resp_id=-1&amp;resp_appl_id=-1&amp;security_group_id=0&amp;lang_code=US&amp;params=MtQXdv14xSIrfpksxSpGZA&amp;oas=izGekgEQGyNWUYDMWpxOzg.." target="_blank">ORACLE R12 體驗網址</a></li><!-- ie6bug
+              --><li><a title="好用哦 !" href="http://www.hkln.net/" target="_blank">ORACLE 開發文件下載</a></li><!-- ie6bug
+              --><li><a title="" href="http://confluentminds.com/Trainings/SCM/index.html" target="_blank">OE操作圖示</a></li><!-- ie6bug
+              --><li><a title="" href="http://www.orafaq.com/forum/sf/thread/26/1/440/0/" target="_blank">ORACLE FAQ</a></li><!-- ie6bug
+        	--></ul>
+    </div>
+        </div>
+</div> <!-- #mylink //-->
+<script type="text/javascript">
+<!--
+jQuery(function($) {
+    $('#mylink h6.expandable').click(function() {
+	var plus_img = "\/\/s.pixfs.net\/blog\/images\/choc\/plus.gif";	
+	var minus_img = "\/\/s.pixfs.net\/blog\/images\/choc\/minus.gif";
+	$(this).siblings('ul').toggle();
+	$img = $('> img', this);
+	if ($img.attr('src') == plus_img) {
+	    $img.attr('src', minus_img);
+	} else {
+	    $img.attr('src', plus_img);
+	}
+    });
+});
+//-->
+</script>
+<div class="hslice box" id="visitor">
+    <h4 class="box-title entry-title">
+	誰來我家	    </h4>
+    <div class="box-text entry-content">
+
+<script type="text/javascript"><!--
+jQuery('#visitor div').load('/blog/plugin/visitor');
+//--></script>
+    </div>
+</div> <!-- #visitor //-->
+<div class="hslice box" id="counter">
+    <h4 class="box-title entry-title">
+	參觀人氣	    </h4>
+    <div class="box-text entry-content">
+
+<ul>
+    <li>本日人氣：<span id="blog_hit_daily"></span></li>
+    <li>累積人氣：<span id="blog_hit_total"></span></li>
+</ul>
+<script type="text/javascript"><!--
+    
+jQuery.getScript('//counter.pixplug.in/getcounter.php?now=1458458209&random=1802267606&data[%23BlogArticleCount-24680289]=%7B%22counter%22%3A%5B%22blogarticle%22%2C%22742366%22%2C%2224680289%22%2C%22total%22%5D%2C%22options%22%3A%5B%5D%7D&data[%23blog_hit_daily]=%7B%22counter%22%3A%5B%22blog%22%2C%22742366%22%2C1%2C%22daily%22%5D%2C%22options%22%3A%5B%5D%7D&data[%23blog_hit_total]=%7B%22counter%22%3A%5B%22blog%22%2C%22742366%22%2C1%2C%22total%22%5D%2C%22options%22%3A%5B%5D%7D&check=1966539799');
+//--></script>
+    </div>
+</div> <!-- #counter //-->
+<div class="hslice box folder" id="box602425">
+    <h4 class="box-title entry-title">
+	姓名學	    </h4>
+    <div class="box-text entry-content">
+
+JJ    </div>
+</div> <!-- #box602425 //-->
+
+              </div> <!-- #links-row-1 //-->
+              <div id="links-row-2">
+                  <div class="hslice box" id="qrcode">
+    <h4 class="box-title entry-title">
+	QR Code	    </h4>
+    <div class="box-text entry-content">
+
+<div class="qrcode">
+<img src="http://s.pimg.tw/qrcode/oracled2k/blog/post/24680289--%E5%B8%B3%E8%99%9F,-%E5%AF%86%E7%A2%BC,-%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2(%E8%BD%89).png" >
+</div>
+    </div>
+</div> <!-- #qrcode //-->
+              </div> <!-- #links-row-2 //-->
+                <div id="ad-mib">
+                    <script type="text/javascript">
+pix.MIB.config = {
+    hosthash: 'dd87025f07833d9629e3e8b8648bb4fa',
+    dr: {source: 'oracleD2K'},
+    goldAds: pix.MIB.util.Dom.getElementsByClassName('d56d2a5-sitemAjidr-d56d2a5'),
+    uniq: '03db013c70c428177d580875a00df0cd6013ef7c58209',
+    percentSite: 'http://falcon.pixanalytics.com/mib/vap',
+    falconSite: 'http://falcon.pixanalytics.com',
+    cate: '5',
+    hasMIB: 0,
+    article_cate_id: '24',
+    demo: {
+        hash: '',
+        demoOption: 0    },
+    availablePositions: [{
+        id: 1,
+        name: 'sidebar-1',
+        enable: 1
+    },{
+        id: 1,
+        name: 'sidebar-2',
+        enable: false    },{
+        id: 3,
+        name: 'video',
+        enable: false    },{
+        id: 8,
+        name: 'unfold',
+        enable: false    }],
+    ref: 'https%3A%2F%2Fwww.google.com.tw'
+};
+
+(function() {
+    var goldAds = pix.MIB.config.goldAds;
+    if (goldAds[0]) {
+        pix.MIB.build.adgen();
+        pix.MIB.build.videoadgen();
+        pix.MIB.build.detectPageScrollPlayback();
+    }
+})();
+</script>
+                </div><!-- #ad-mib //-->
+            </div> <!-- #links //-->
+          </div> <!-- #main //-->
+          <div id="footer">
+	  <p></p>
+            <div id="bottom">
+              <a class="bottom-skiplink" href="http://oracled2k.pixnet.net/blog/post/24680289--%E5%B8%B3%E8%99%9F,-%E5%AF%86%E7%A2%BC,-%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2(%E8%BD%89)/#top" title="back to the top of the page">回到頁首</a>
+              <a class="bottom-skiplink" href="http://oracled2k.pixnet.net/blog/post/24680289--%E5%B8%B3%E8%99%9F,-%E5%AF%86%E7%A2%BC,-%E6%AC%8A%E9%99%90%E8%88%87%E8%A7%92%E8%89%B2(%E8%BD%89)#article-area" title="back to the main cotent of the page">回到主文</a>
+	      <a class="bottom-pixnet" href="http://panel.pixnet.cc/signup/step2">免費註冊</a>
+	      <a target="_blank" class="bottom-pixnet" href="http://help.pixnet.tw/">客服中心</a>
+              <a target="_blank" class="bottom-pixnet" href="http://www.pixnet.net/">痞客邦首頁</a>
+	      &copy; 2003 - 2016 PIXNET
+            </div>
+          </div> <!-- #footer //-->
+        </div> <!-- #container3 //-->
+      <div id="extradiv11"></div>
+      <div id="extradiv10"></div>
+      <div id="extradiv9"></div>
+      <div id="extradiv8"></div>
+    </div> <!-- #container2 //-->
+    <div id="extradiv7"></div>
+    <div id="extradiv6"></div>
+    <div id="extradiv5"></div>
+    <div id="extradiv4"></div>
+  </div> <!-- #container //-->
+  <div id="extradiv3"></div>
+  <div id="extradiv2"></div>
+  <div id="extradiv1"></div>
+  <div id="extradiv0"></div>
+  </div> <!-- #body-div //-->
+
+</div>
+
+<div id="tipLang" style="display:none;z-index:2147483647" class="barmenu">
+    <ul class="lang-list" id="lang-list">
+	<li><a href="#"  onclick="pix.setLocale('zh_TW'); return false;">繁體中文</a></li>
+	<li><a href="#"  onclick="pix.setLocale('zh_CN'); return false;">简体中文</a></li>
+	<li><a href="#"  onclick="pix.setLocale('en_US'); return false;">English</a></li>
+	<li><a href="#"  onclick="pix.setLocale('ja_JP'); return false;">日本語</a></li>
+    </ul>
+</div>
+<script type="text/javascript">
+<!--
+jQuery(window).load(function() {
+    //autoImgResize
+  '1';
+      jQuery.settings = jQuery.settings || {};
+    jQuery.settings.autoImgResize = {
+      mode:+'1',
+      resizWidth:+'400',
+      selector:'content'
+    };
+
+    if (2 === jQuery.settings.autoImgResize.mode) {
+      jQuery.settings.autoImgResize.resizWidth = jQuery('.article-content').width();
+    }
+    pix.autoImgResize(jQuery.settings.autoImgResize.resizWidth, jQuery.settings.autoImgResize.selector);
+  
+
+});
+//-->
+</script>
+<script type="text/javascript">
+<!--
+jQuery(function() {
+    pix.fixPixnetPlayerID();
+    jQuery('.article-head').find('.column-star').each(function() {
+        var column_link = jQuery(this).attr('data-column-link');
+        jQuery(this).find('h2').append(' <a title="專欄之星" href="' + column_link + '" target="_blank"><img title="專欄之星" alt="column star article" src="http://s.pixfs.net/blog/images/choc/column_star.gif"></a>');
+    });
+    jQuery('.article-hot').each(function() {
+	jQuery(this).find('h2').append(' <a class="__dailyhotclass" title="本日熱門" href="' + jQuery(this).attr('data-hot-link') + '" target="_blank"><img title="熱門文章" alt="hot article today" src="http://s.pixfs.net/blog/images/choc/today_hot.gif"></a>');
+    });
+});
+//-->
+</script>
+<script src="//front.pixfs.net/js/mixpanel.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+<script src="//front.pixfs.net/js/blog-mixpanel.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+<script type="text/javascript">
+<!--
+  if (typeof dataLayer === 'undefined') dataLayer = [];
+  dataLayer.push({
+    "user_name"     : "oracleD2K",
+    "page_type"     : "blog",
+    "page_view"     : "/blog/",
+    "blog_name"     : "oracle園地",
+    "blog_cat"      : "5 - 職場甘苦",
+    "is_loggedin"   : "false",
+    "is_VIP"        : "false",
+    "is_obstruct"   : "false",
+    "viewer_type"   : "Regular Member",
+    "article_title" : " 帳號, 密碼, 權限與角色(轉)",
+    "article_id"    : "24680289",
+    "article_cat"   : "24 - 不設分類"
+  });
+
+  if (typeof pixdataLayer === 'undefined') {
+      pixdataLayer = [];
+  }
+  pixdataLayer.push({
+    "is_testing_43400": "false",
+    "is_mobile_mode": "false",
+    "user_name"     : "oracleD2K",
+    "page_type"     : "blog",
+    "page_view"     : "/blog/",
+    "blog_name"     : "oracle園地",
+    "blog_cat"      : "5 - 職場甘苦",
+    "is_loggedin"   : "false",
+    "is_VIP"        : "false",
+    "is_obstruct"   : "false",
+    "viewer_type"   : "Regular Member",
+    "article_title" : " 帳號, 密碼, 權限與角色(轉)",
+    "article_id"    : "24680289",
+    "article_cat"   : "24 - 不設分類"
+  });
+
+-->
+</script>
+
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGMWFG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MZ3SPM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+<script type="text/javascript">
+<!--
+  var _gaq = _gaq || [];
+  _gaq.push(
+    ['_setAccount', 'UA-408650-10'],
+    ['_setDetectTitle', false],
+    ['_setDomainName', 'none'],
+    ['_setAllowLinker', true],
+    ['_setCustomVar', 1, 'member', 'GUEST'],
+    ['_setCustomVar', 2, 'vip', 'nonVIP'],
+    ['_trackPageview', '/blog/']
+
+      );
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-KGMWFG');
+
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+ new Date().getTime(),event:'gtm.js'});var 
+f=d.getElementsByTagName(s)[0], 
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+ 
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+ })(window,document,'script','pixdataLayer','GTM-MZ3SPM');
+
+
+
+(function($, undefined) {
+$(function() {
+    var _topbar = $('#topbar');
+    _topbar.find('.topbar__logo').on('click', 'a', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-logo', 'GUEST']);
+    });
+    _topbar.find('#topbar__search').on('submit', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-search-button', 'GUEST']);
+    });
+    _topbar.find('.topbar__announce').on('click', '.topbar__announce__item', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-announce', 'GUEST']);
+    });
+
+    _topbar.find('.topbar__notification__counter').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-counter', 'GUEST']);
+    });
+    _topbar.find('.topbar__notification__list--header__link').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-setting', 'GUEST']);
+    });
+    _topbar.find('.topbar__notification__list--footer__link').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-showall', 'GUEST']);
+    });
+
+    _topbar.find('#topbar__user__login').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-login', 'GUEST']);
+    });
+
+    _topbar.find('#topbar__user__list__link--blog').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-myblog', '']);
+    });
+    _topbar.find('#topbar__user__list__link--articlenew').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-articlenew', '']);
+    });
+    _topbar.find('#topbar__user__list__link--panelsite').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-panelsite', '']);
+    });
+    _topbar.find('#topbar__user__list__link--panelapp').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-panelapp', '']);
+    });
+
+    _topbar.find('#topbar__user__list__link--logout').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-logout', '']);
+    });
+
+    _topbar.find('.topbar__lang').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-language-switcher', 'GUEST']);
+    });
+});
+})(jQuery);
+
+//-->
+</script>
+<div id="popup-frame" style="display:none">
+    <div id="frame-dimmer"></div>
+    <div id="frame-box">
+       <div id="frame-border"></div>
+       <div id="frame-header">
+           <h3></h3>
+	   <a href="#" class="frame-close" title="關閉視窗"><span>關閉視窗</span></a>
+       </div>
+       <div id="frame-content"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="//s.pixanalytics.com/js/c.js?v=9"></script>
+<script type="text/javascript">
+if ('undefined' === typeof window._uCount) {
+    window._uCount = function () {};
+}
+</script>
+<script type="text/javascript">
+<!--
+var _type = 'front_blog'; _uCount();
+var _type = 'front_blog_byarticlecategory:0'; _uCount();
+var _type = 'front_blog_bysitecategory:5'; _uCount();
+if (document.location.toString().indexOf('/post/') != -1) {
+    var _type = 'front_blog_post'; _uCount();
+    var _type = 'front_blog_post_nonvip'; _uCount();
+}
+
+if (document.location.toString().indexOf('/search/') != -1) {
+    var _type = 'front_blog_search'; _uCount();
+}
+//-->
+</script>
+<script src="http://referer.pixplug.in/static/r.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+_currentPageUsername = 'oracleD2K';
+_refererCount();
+//-->
+</script>
+<script>
+var _piq = _piq || [];
+
+_piq.push(
+    ['setCustomVar', 'venue', 'pixnet'],
+    ['setCustomVar', 'author_id', pix.owner],
+        ['setCustomVar', 'article_category_id', "0"],
+        ['setCustomVar', 'nonce', pix.login_name],
+    ['setCustomVar', 'visitor_id', pix.visitor],
+    ['setCustomVar', 'visitor_openid', pix.openid],
+    ['trackPageView']
+);
+(function(d, t, u, f, j) {
+    f = d.getElementsByTagName(t)[0];
+    j = d.createElement(t);
+    j.async = 1;
+    j.src = u;
+    f.parentNode.insertBefore(j, f);
+})(document, 'script', '//s.pixanalytics.com/js/pi.min.js');
+
+(function ($) {
+    $(function () {
+        var _startTime = Math.floor((new Date()).getTime() / 1000),
+            _driveMode = ('none' === $(document.body).data('mobileMode')) ? 'desktop' : 'mobile',
+            _send = false,
+            unload;
+
+        unload = function () {
+            if (_send) {
+                return;
+            }
+
+            var _endTime = Math.floor((new Date()).getTime() / 1000),
+                _isIdleAdClosed = '';
+
+            switch ($.adIdlePopClosed) {
+                case 'hasClosed' :
+                    _isIdleAdClosed = 'close idle ad';
+                    break;
+                case 'neverClosed' :
+                    _isIdleAdClosed = 'not close idle ad';
+                    break;
+                default :
+
+            }
+            _piq.push(['trackEvent', 'article stay time', _isIdleAdClosed, _driveMode, (_endTime - _startTime)]);
+            _send = true;
+        };
+
+        $(window).on({
+            'beforeunload.idlePI': unload,
+            'unload.idlePI':       unload,
+            'pagehide.idlePI':     unload
+        });
+
+        // #41767
+        $('#pixad1032').on('click', 'a', function() {
+            if ('styleme' === $(this).data('source')) {
+                _piq.push(['trackEvent', 'yahoo 大聯盟導購', '金鑽版位點擊']);
+            }
+        });
+
+        var pixad1032ImpTracking = function() {
+            var container = $('#pixad1032');
+
+            if (0 === container.find('a').length) {
+                setTimeout(pixad1032ImpTracking, 500);
+                return;
+            }
+
+            if ('styleme' == container.find('a').data('source')) {
+                _piq.push(['trackEvent', 'yahoo 大聯盟導購', '金鑽版位曝光']);
+            }
+        };
+        pixad1032ImpTracking();
+    });
+})(jQuery);
+</script>
+<script src="//front.pixfs.net/js/pixinsight.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67"></script>
+
+        <script type="text/javascript">
+        <!--
+            jQuery(function(){
+                
+jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=5&article_category=24&fields[]=w77fae7f068394438a2f41077,1077');
+            });
+        //-->
+        </script>
+        
+<!-- Modified: 1458458209 -->
+<!-- async script -->
+<script type="text/javascript">
+<!--
+jQuery.ajaxSetup({ cache: true });
+jQuery.getScript("//js.pixplug.in/addon/86/production.js?v=1384155619",
+ function(data, textStatus) { 
+jQuery.pixBookmarkButtons({"position":"top","addon_username":"oracled2k","addon_expired_at":0,"addon_ismobile":false,"ab_testing_seed":940840196});
+ });
+jQuery.getScript("//js.pixplug.in/addon/96/production.js?v=1380100897",
+ function(data, textStatus) { 
+jQuery.pix0rz({"addon_username":"oracled2k","addon_expired_at":0,"addon_ismobile":false,"ab_testing_seed":940840196});
+ });
+jQuery.ajaxSetup({ cache: false });
+//-->
+</script>
+
+<!-- load sync script -->
+
+<!-- execute sync addon -->
+<script type="text/javascript"></script>
+
+
+
+<script src="//front.pixfs.net/module/topbar/js/blogtopbar.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" crossorigin="anonymous"></script>
+
+
+<script>
+  var nineyi_group    = "X1";
+  var nineyi_keyindex = "0";
+  var nineyi_match    = "";
+  var nineyi_id       = "pix91_5f5e845b75e6d4843a4375d436de1bb1";
+  var nineyi_products = 
+[{"asset":"0104","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126120-4162329176_s.jpg?v=1446126272","title":"MissHana\u82b1\u5a1c\u5c0f\u59d0\u5b8c\u7f8e\u7121\u75d5\u4e09\u8272\u906e\u7455\u818f","oprice":"380","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1256490"},{"asset":"0138","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126147-4136062762_s.jpg?v=1446126272","title":"E\u2027Heart
+ \u4f0a\u5fc3 
+\u6301\u4e45\u96b1\u5f62\u96d9\u9762\u96d9\u773c\u76ae\u8cbc","oprice":"348","nprice":"180","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/344734"},{"asset":"0143","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126150-2749437497_s.jpg?v=1446126272","title":"3CE
+ (3CONCEPT EYES) 
+\u8d85\u986f\u8272\u5507\u818f","oprice":"499","nprice":"399","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1610019"},{"asset":"0223","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126232-3103690318_s.jpg?v=1446126273","title":"ND
+ \u812b\u6bdb\u871c\u881f\/\u9664\u6bdb\u871c\u881f 
+220g","oprice":"299","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1035850"},{"asset":"0160","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126167-2508883353_s.jpg?v=1446126272","title":"\u97d3\u570b
+ RiRe \u9ed1\u982d\u7c89\u523a\u6e05\u6f54\u5237 
+\u4e59\u652f\u5165(\u5167\u9644\u6e05\u6f54\u4e7320mL)","oprice":"290","nprice":"290","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/640966"},{"asset":"0109","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126124-168867797_s.jpg?v=1446126272","title":"Miss
+ Hana \u82b1\u5a1c\u5c0f\u59d0 
+\u6c34\u611f\u63a7\u8272CC\u971c","oprice":"349","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/668815"}];
+</script><script id="idleTemplate" type="text/x-jsrender" data-main="//front.pixfs.net/module/idlePop/js/idlePop.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67">
+<link rel="stylesheet" href="//front.pixfs.net/module/idlePop/css/idlePop.min.css?v=87b3c41b1bf2b342dd52ce8ea9c0dc67">
+<div class="modal idle-pop" tabindex="-1" role="dialog" aria-describedby="dialog">
+  <div class="modal-bg"></div>
+  <div class="modal-dialog">
+    <a class="modal-close" data-close="【 關閉 X 】"></a>
+
+    <div class="modal-content">
+      <div class="modal-header">本網頁已閒置超過 3 分鐘。請點 <kbd>關閉</kbd> 或 <kbd>點擊</kbd>任一空白處，即可回到網頁</div>
+      <div class="modal-body">
+        <div class="blogger-info">
+          <a class="blogger-info__avatar" href="//www.pixnet.net/blog/profile/{{:user.name}}"><img src="{{:user.avatar}}" alt="{{:user.name}} 的大頭貼"></a>
+
+          <div class="blogger-info__profile">
+            <div class="blogger-info__row">
+              <dl>
+                <dt>部落格名稱</dt>
+                <dd><a href="{{:blog.link}}">{{:blog.name}}</a></dd>
+              </dl>
+            </div>
+
+            <div class="blogger-info__row">
+              <dl>
+                <dt>人氣</dt>
+                <dd data-unit="人">{{:blog.hits.total}}</dd>
+
+                <dt>好友數</dt>
+                <dd data-unit="人">{{:user.friends_count}}</dd>
+
+                <dt>文章總數</dt>
+                <dd data-unit="篇">{{:blog.articles_count}}</dd>
+              </dl>
+            </div>
+
+            <div class="blogger-info__row">
+              <a
+ class="blogger-info__follow" 
+href="http://panel.pixnet.cc/pixfront/addsubspopup?fromuser={{:user.name}}&user={{:user.name}}&popup=1"
+ target="pix_add_sub" 
+data-followers="{{:user.subscribers_count}}">加入訂閱</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="idle-adsense">
+        </div>
+
+        <div class="idle-related-posts">
+          {{for posts}}
+          <a class="idle-related-post" href="{{:link}}">
+            <img src="{{:thumb}}" alt="文章縮圖">
+            <div class="idle-related-post__detail">
+              <h4>{{:title}}</h4>
+              <div class="idle-related-post__desc" data-readmore="繼續閱讀">{{:body}}</div>
+            </div>
+          </a>
+          {{/for}}
+        </div>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+</script>
+
+
+<script src="//front.pixfs.net/js/hide-ad-checker.min.js?v=87b3c41b1bf2b342dd52ce8ea9c0dc67" crossorigin="anonymous"></script>
+</body>
+</html>

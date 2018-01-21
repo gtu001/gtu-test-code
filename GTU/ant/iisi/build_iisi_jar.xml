@@ -1,0 +1,145 @@
+<project name="ris3ape-api-0.0.l-SNAPSHOT" default="main">
+
+	<property name="project_src_dir" location="C:\Users\gtu001\Desktop\workspace\GTU\src" />
+	<property name="build_dir" location="${basedir}/build" />
+
+	<!-- ant-contrib -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+	<path id="classPath">
+		<fileset dir="C:\Users\gtu001\.m2\repository">
+			<filename name="**/*.jar" />
+		</fileset>
+		<!--
+		<fileset dir="C:\Users\Troy\.m2\repository">
+			<filename name="**/*.jar" />
+		</fileset>
+		-->
+	</path>
+
+	<path id="copyRefence">
+		<fileset dir="${project_src_dir}">
+			<include name="**/*.properties" />
+			<include name="**/*.xml" />
+			<include name="**/*.xhtml" />
+		</fileset>
+	</path>
+
+	<target name="main">
+		<antcall target="makeBuildDir">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="compiler" />
+
+		<antcall target="copyRef">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="createJar">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="runJar">
+			<param name="enable" value="false" />
+		</antcall>
+		
+		<antcall target="jdJar">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="copyJarTo">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="clean">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="compiler">
+		<echo># compiler ...</echo>
+		<javac compiler="javac1.6" source="1.6" includeantruntime="true" srcdir="${project_src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+			<include name="com/iisigroup/ris/**/*.java" />
+			<include name="gtu/reflect/**/*.java" />
+			<classpath refid="classPath" />
+		</javac>
+	</target>
+
+	<target name="createJar" if="${enable}">
+		<echo># createJar ${ant.project.name}.jar = ${enable}</echo>
+		<jar destfile="${ant.project.name}.jar" basedir="${build_dir}" duplicate="add">
+			<manifest>
+				<attribute name="Main-Class" value="com.iisigroup.ris.IisiTest" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="runJar" if="${enable}">
+		<echo># run ${ant.project.name}.jar</echo>
+		<java jar="${ant.project.name}.jar" fork="true">
+			<classpath refid="classPath" />
+		</java>
+	</target>
+
+	<target name="copyRef" if="${enable}">
+		<echo># copyRef = ${enable}</echo>
+		<copy todir="${build_dir}">
+			<path refid="copyRefence" />
+		</copy>
+	</target>
+
+	<target name="makeBuildDir" if="${enable}">
+		<echo># makeBuildDir = ${enable}</echo>
+		<mkdir dir="${build_dir}" />
+	</target>
+
+	<target name="clean" if="${enable}">
+		<echo># clean = ${enable}</echo>
+		<delete dir="${build_dir}" />
+	</target>
+
+	<target name="jdJar" if="${enable}">
+		<exec dir="C:\apps\jd-gui-0.3.1.windows" command="cmd">
+			<arg value="/c call jd-gui.exe &quot;${basedir}/${ant.project.name}.jar&quot;" />
+		</exec>
+	</target>
+
+	<target name="copyJarTo" if="${enable}">
+		<echo># copyJarTo = ${enable}</echo>
+
+		<!--copy jar to dest-->
+		<copyJarTo_detial copyto="C:\Users\gtu001\Desktop" enable="true" />
+		<copyJarTo_detial copyto="C:\Users\Troy\Desktop" enable="false" />
+		<copyJarTo_detial copyto="C:\workspace_RS430\sris-rc-z\WebContent\WEB-INF\lib" enable="false" />
+		<copyJarTo_detial copyto="C:\workspace_RS430\sris-rl-z\WebContent\WEB-INF\lib" enable="false" />
+		<copyJarTo_detial copyto="C:\workspace_RS430\ris3rl2-z\WebContent\WEB-INF\lib" enable="false" />
+		<copyJarTo_detial copyto="C:\workspace_SRIS\sris-rc-z\WebContent\WEB-INF\lib" enable="false" />
+		<!--copy jar to dest-->
+
+		<delete file="${ant.project.name}.jar" />
+	</target>
+
+	<macrodef name="copyJarTo_detial">
+		<attribute name="copyto" />
+		<attribute name="enable" />
+		<sequential>
+			<if>
+				<equals arg1="@{enable}" arg2="true" />
+				<then>
+					<mkdir dir="@{copyto}" />
+					<copy file="${ant.project.name}.jar" todir="@{copyto}" overwrite="true" />
+				</then>
+				<elseif>
+					<equals arg1="${foo}" arg2="foo" />
+					<then>
+						<echo message="The value of property foo is 'foo'" />
+					</then>
+				</elseif>
+				<else>
+					<echo message="The value of property foo is not 'foo' or 'bar'" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+</project>

@@ -1,0 +1,36 @@
+
+<Field:text labelID="MSG_1256519" name="traderCertiCode" value=""
+	onblur="traderCertiCodeIsAgentCheck(event)" />
+
+
+<script type="text/javascript">
+	//交易人證件號檢查
+	function traderCertiCodeIsAgentCheck(e) {
+		var traderCertiCode = $("input[name=traderCertiCode]");
+		var content = {
+			"certiCode" : traderCertiCode.val()
+		};
+		var data = $.ajax({
+			url : "/ls/ajaxEntry.do",
+			async : false,
+			type : "GET",
+			dataType : "json",
+			data : {
+				"content" : JSON.stringify(content),
+				"beanName" : "checkUserAjaxService"
+			}
+		}).responseJSON;
+		if (data.hasOwnProperty("checkUser")) {
+			if (data.checkUser == "true") {
+				alert('交易人證件號碼同業務員，不允許儲存。');
+				if (e != undefined) {
+					var event = e || window.event;
+					var target = event.target || event.srcElement;
+					target.focus();
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+</script>

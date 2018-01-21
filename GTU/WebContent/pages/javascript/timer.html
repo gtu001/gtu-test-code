@@ -1,0 +1,25 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function onload(){
+		try{
+			var func = function(){
+				document.write("ok");
+			};
+			setInterval(func, 1000);
+			clearInterval(7000);
+			
+			setTimeout(func, 1000);
+		}catch(e){
+			alert(e);
+		}
+	}
+</script>
+</head>
+<body onload="onload()">
+</body>
+</html>

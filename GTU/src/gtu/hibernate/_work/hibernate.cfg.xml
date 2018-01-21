@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+	    <property name="connection.release_mode">auto</property>  
+	    <property name="dialect">org.hibernate.dialect.Informix10Dialect</property>  
+	    <property name="transaction.flush_before_completion">true</property>  
+	    <property name="transaction.auto_close_session">true</property>  
+	    <property name="hibernate.show_sql">true</property>  
+	    <property name="hibernate.format_sql">true</property>  
+	    <property name="hibernate.use_sql_comments">false</property>
+	    
+        <property name="hibernate.connection.driver_class">com.informix.jdbc.IfxDriver</property>
+        <property name="hibernate.connection.password">risappl</property>
+        <property name="hibernate.connection.url">jdbc:informix-sqli://192.168.10.11:4526/chun0000:informixserver=ibm;DB_LOCALE=zh_tw.utf8;CLIENT_LOCALE=zh_tw.utf8;GL_USEGLU=1</property>
+        <property name="hibernate.connection.username">risappl</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.InformixDialect</property>
+    </session-factory>
+</hibernate-configuration>

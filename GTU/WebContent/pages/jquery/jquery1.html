@@ -1,0 +1,222 @@
+
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+<script type="text/javascript">
+        $(function(){
+			/*
+				//對每個成員做處理
+				var arry1 = [3,4,5,6,7];
+				$.map(arry1, function(){
+					return $(this) * 2;
+				});
+				alert("arry1 = " + arry1);
+				
+				
+                //extends=附加,1~多
+				var target1 = {a:1,b:2,c:3};
+				var target2 = {d:4,e:5,f:6};
+				var target3 = {g:7,h:8,i:9};
+				$.extend(target1, target2, target3);
+				var extendMsg = '';
+				$.each(target1, function(key, value){
+					extendMsg += key + ":" + value;
+				});
+				alert(extendMsg);
+				
+				
+				//取得符合條件的值
+				var newArry = $.grep(arry1, function(value){
+					return value > 5;
+				});
+				alert(newArry);
+				
+				//取得所在陣列位置
+				alert($.inArray(5, arry1));
+				
+				
+				alert("space =" + $("div li").text());//獲取div下所有li(後代,子,子,子...)
+				alert("> =" + $("div>li").text());//獲取div下直接li
+				alert("+ =" + $(".menuitem+div").text());//獲取menuitem之後的第一個div
+				alert("~ =" + $("menuitem~div").text());//獲取menuitem之後的所有div
+				alert("siblinsg =" + $(".menuitem").siblings("div").text());//獲取同輩元素
+				
+				alert("first =" + $("div:first").text()); 
+				alert("last =" + $("div:last").text()); 
+				alert("even =" + $("div:even").text()); 
+				alert("odd =" + $("div:odd").text()); 
+				alert("not =" + $("div:not(#div1)").text()); 
+				alert("eq3 =" + $("div:eq(3)").text()); 
+				alert("gt3 =" + $("div:gt(3)").text()); 
+				alert("lt3 =" + $("div:lt(3)").text()); 
+				
+				$("li", $(this)).css("background", "red");
+				
+				$("#form:enabled");//取得啟用元素
+				$("#form:disabled");//取得非啟用元素
+				$("input:checked");//取得選擇項目
+				$("select option:selected");//取得選擇項目
+				
+				$("input[name=gender]").val(["女"]);//設定選中的值
+				$("input:disabled").css({"background":"gray"});//disabled設定為灰色
+				
+				$("tr").not(":last,:first").css("background-color", "red");
+				
+				$("a").hover(function(){
+						$(this).parents("p").css({"background-color":"aqua","color":"green"});
+					}, function(){
+						$(this).parents("p").removeAttr("style");
+					});
+				
+				$("table tr:nth-child(even)").addClass("even");
+				
+				$("form#myForm input.special").attr("disabled", true);
+				
+				var imgIndex = $("img").index($('img#findMe')[0]);
+				
+				$("td").filter(function(){
+					return this.innerHTML.match(/^\w+$/);
+				});
+				alert("filter = " + $("div").filter("[id=div1]").html());
+				
+				alert("slice = " + $("td").slice(1,3).text());
+				
+				$("tr").toggleClass("striped");
+				$("tr").hasClass("striped");
+				$("tr").is(".striped");
+				
+				$("*").each(function(){
+					var current = this;
+					this.onclick = function(event){
+						if(!event) {
+							event = window.event;	
+						}
+						var target = (event.target) ? event.target : event.srcElement;
+						$("#console").append("<div>" + current.tagName + "#"
+ + current.id + " target is " + target.id + "</div>");
+ 					};
+				});
+				
+				
+				//動態加載js(url, callback)
+				$.getScript("jquery-1.3.2.min.js", function(){
+					alert("done...");
+				});
+				
+				
+				$("#b01")[0].addEventListener("click", function(event){
+					alert("Whee once!");
+				}, false);
+				
+				//event命名空間
+				$("#b01").bind("click.editMode", function(){
+					alert("editMode");
+				});
+				$("#b01").bind("click.displayMode", function(){
+					alert("displayMode");
+				});
+				$("#b01").unbind("click.displayMode");
+				
+				//只執行一次
+				$("#b01").one("click.onlyOneTime", function(){
+					alert("onlyOneTime");
+				});
+				
+				//event事件
+				$("#b01").bind("click.showEvent", function(event){
+					alert(
+						"altKey = " + event.altKey + "\n"+
+						"ctrlKey = " + event.ctrlKey + "\n"+
+						"data = " + event.data + "\n"+
+						"keyCode = " + event.keyCode + "\n"+
+						"metaKey = " + event.metaKey + "\n"+
+						"pageX = " + event.pageX + "\n"+
+						"pageY = " + event.pageY + "\n"+
+						"relatedTarget = " + event.relatedTarget + "\n"+
+						"screenX = " + event.screenX + "\n"+
+						"screenY = " + event.screenY + "\n"+
+						"shiftKey = " + event.shiftKey + "\n"+
+						"target = " + event.target + "\n"+
+						"type = " + event.type + "\n"+
+						"which = " + event.which + "\n"
+					);
+				});
+				
+				//每click一次切換
+				$("*").toggle(function(event){
+					$(event.target).css("opacity", 0.4);
+				},function(event){
+					$(event.target).css("opacity", 1);
+				});
+				
+				//移入移出
+				$("#div2").bind("mouseover", function(event){
+					$("#console").append("<div>" + event.type + "</div>");
+				});
+				$("#div2").bind("mouseout", function(event){
+					$("#console").append("<div>" + event.type + "</div>");
+				});
+				$("#div2").hover(function(event){
+					$("#console").append("<div>" + event.type + "</div>");
+				}, function(event){
+					$("#console").append("<div>" + event.type + "</div>");
+				});
+				
+				*/
+				
+				alert('xxxxx');
+				
+				
+        });
+				
+</script>
+
+<input id="b01" type="button" value="load" />
+
+<span class="menuitem"></span>
+<div id="div1">
+	<li>1</li>
+</div>
+<div>
+	<li>2</li>
+</div>
+<div>
+	<li id="li2">3</li>
+</div>
+<div>
+	<li>4</li>
+</div>
+<div>
+	<li>5</li>
+</div>
+
+<input type="radio" value="男" name="gender" />男
+<input type="radio" value="女" name="gender" />女
+
+<input type="text" value="" disabled="true" />
+
+<table border="1">
+    <tr><td>aaa</td></tr>
+    <tr><td>bbb</td></tr>
+    <tr><td>ccc</td></tr>
+    <tr><td>ddd</td></tr>
+</table>
+
+<p>
+	<a>link</a>
+</p>
+
+<div class="injectMe">
+</div>
+
+<form id="myForm">
+	<input class="special" type="text" />
+</form>
+
+<div id="div2" style="border:1px solid darkmagenta;background-color:plum;">
+<br/>
+<br/>
+<br/>
+</div>
+
+<div id="console"></div>

@@ -1,0 +1,43 @@
+
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+<script type="text/javascript">
+        $(document).ready(function(){
+			showId(":input", $(":input"));
+			showId(":text",$(":text"));
+			showId(":checkbox",$(":checkbox"));
+			showId(":password",$(":password"));
+			showId(":radio",$(":radio"));
+			showId(":submit",$(":submit"));
+			showId(":image",$(":image"));
+			showId(":reset",$(":reset"));
+			showId(":button",$(":button"));
+			showId(":file",$(":file"));
+			showId(":hidden",$(":hidden"));
+			showId(":enabled",$(":enabled"));
+			showId(":disabled",$(":disabled"));
+			showId(":checked",$(":checked"));
+			showId(":selected",$(":selected"));		
+		});
+		
+		function showId(label, val){
+			var inputVal = '';
+			$(val).each(function(){
+				inputVal += $(this).attr("id") + ",";
+			});
+			alert(label + " = " + inputVal);
+		}
+</script>
+
+<textarea id="textarea">textarea</textarea>
+<input type="button" id="button" />
+<input type="checkbox" id="checkbox" />
+<input type="hidden" id="hidden" />
+<input type="image" id="image" />
+<input type="password" id="password" />
+<input type="radio" id="radio" />
+<input type="reset" id="reset" />
+<input type="text" id="text" />
+<input type="file" id="file" />
+<input type="submit" id="submit" />

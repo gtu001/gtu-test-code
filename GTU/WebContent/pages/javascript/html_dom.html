@@ -1,0 +1,57 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function onload(){
+		try{
+			document.getElementById("test").value = "AAAA";
+			document.getElementsByName("test22").value = "BBBB";	
+			document.getElementsById("vvvv").innerHTML = "XXXXXXX";
+			document.getElementsById("vvvv").attribute = "XXXXXXX";
+			document.getElementsById("vvvv").style.attribute = "XXXXXXX";
+			document.getElementsByClassName("intro").style.color = "blue";
+			
+			document.getElementsByName("test22").onclick = function(){};
+			
+			document.createElement("tagName");
+			document.removeChild("oldChild");
+			document.appendChild("newChild");
+			document.replaceChild("newChild", "oldChild");
+			
+			var para = document.createElement("p");
+			var node = document.createTextNode("This is new.");
+			para.appendChild(node);
+			
+			var form = document.getElementById("form");
+			var txt = "";
+			for(var ii = 0; ii < form.length; ii ++){
+				txt += "&" + form.elements[ii].name + "=" + form.elements[ii].value;
+			}
+			alert(txt);
+		}catch(e){
+			alert(e);
+		}
+	}
+	
+	//xml to string
+	function xmlToString(xmlData) { 
+        var xmlString;
+        //IE
+        if (window.ActiveXObject){
+            xmlString = xmlData.xml;
+        }
+        // code for Mozilla, Firefox, Opera, etc.
+        else{
+            xmlString = (new XMLSerializer()).serializeToString(xmlData);
+        }
+        return xmlString;
+    }   
+</script>
+</head>
+<body onload="onload()">
+	<input type="text" name="test22" id="test" value="" />
+</body>
+</html>

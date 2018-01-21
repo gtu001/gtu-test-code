@@ -1,0 +1,2 @@
+JAVA_HOME的jdk版本必須大於eclipse的jdk版本
+不然build的時候會出現錯誤

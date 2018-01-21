@@ -1,0 +1,160 @@
+<project name="example" default="compile">
+
+	<property name="src_dir" location="../../src" />
+	<property name="build_dir" location="build/build" />
+	<property name="backup_dir" location="build/bak" />
+	<property name="junit_dir" location="build/test" />
+	<property name="delete_temp_dir" value="false" />
+
+	<path id="class_path">
+		<pathelement location="${java.home}\lib\tools.jar" />
+		<fileset dir="c:\jar">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="prepare">
+		<show_target target="prepare" />
+		<mkdir dir="${build_dir}" />
+		<mkdir dir="${backup_dir}" />
+		<copy todir="${backup_dir}">
+			<fileset dir="${build_dir}" />
+		</copy>
+	</target>
+
+	<presetdef name="javac">
+		<javac includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on" />
+	</presetdef>
+
+	<macrodef name="show_target">
+		<attribute name="target" />
+		<element name="testelement" />
+		<sequential>
+			<echo>target = @{target}</echo>
+		</sequential>
+	</macrodef>
+
+	<target name="called">
+		<echo>ant call = ${message}</echo>
+	</target>
+
+	<target name="compile" depends="prepare">
+		<show_target target="compile">
+			<testelement>vvvvvsdfsdf</testelement>
+		</show_target>
+		<antcall target="called">
+			<param name="message" value="OK find!!" />
+		</antcall>
+		<javac compiler="javac1.6">
+			<exclude name="**/ArraysTest.java" />
+			<exclude name="**/ArrayTest.java" />
+			<exclude name="**/ArrayDequeTest.java" />
+			<exclude name="**/MessageDigestTest.java" />
+			<exclude name="**/PropertyDescriptorTest.java" />
+			<exclude name="**/RoleDao.java" />
+			<exclude name="**/RoleDaoImpl.java" />
+			<exclude name="**/RolePo.java" />
+			<exclude name="**/RoleService.java" />
+			<exclude name="**/URLTest.java" />
+			<exclude name="**/BuilderBeanVelocityTemplate.java" />
+			<exclude name="**/RoleServiceImpl.java" />
+			<exclude name="**/Rl04240Controller.java" />
+			<exclude name="**/Rl04240DTO.java" />
+			<exclude name="**/Rl04240Service.java" />
+			<exclude name="**/Rl04240ServiceImpl.java" />
+			<!-- 以下手動加 -->
+			<exclude name="**/RPTSpRtSingleQueryPC.java" />
+			<exclude name="**/StatusJobListener.java" />
+			<exclude name="**/ExportXMLActionImpl.java" />
+			<exclude name="**/ExportXsdActionImpl.java" />
+			<exclude name="**/ItsmCrCud.java" />
+			<exclude name="**/FileContentSearchUtil.java" />
+			<exclude name="**/URITest.java" />
+			<exclude name="**/QuartzServer.java" />
+			<exclude name="**/ScheduleManagerImp_Owlet2.java" />
+			<exclude name="**/ScheduleManagerImpl.java" />
+			<exclude name="**/SimpleJobTest.java" />
+			<exclude name="**/TestScheduler.java" />
+			<exclude name="**/BMSiteOwnerCheckCrossJob.java" />
+			<exclude name="**/ClearLogJob.java" />
+			<exclude name="**/Test.java" />
+			<exclude name="**/VelocitySimple.java" />
+			<exclude name="**/ItsmCrCudEasy.java" />
+			<exclude name="**/Log4jInit.java" />
+			<exclude name="**/PDFTransformController.java" />
+			<exclude name="**/BeanContextSupportTest.java"/>
+			<exclude name="**/BeansTest.java"/>
+			<exclude name="**/ClassTest.java"/>
+			<exclude name="**/NewStuff.java"/>
+			<exclude name="**/ScannerTest.java"/>
+			<exclude name="**/ThreadTest.java"/>
+			<exclude name="**/ByteArrayInputStreamTest.java"/>
+			<exclude name="**/DirectoryOpenUI.java"/>
+			<exclude name="**/ReflectToStringTest.java"/>
+			<exclude name="**/TextDirScanUI.java"/>
+			<exclude name="**/ThreadGroupMointerUI.java"/>
+			<exclude name="**/ThreadMointerUI.java"/>
+			<!-- 以上手動加 -->
+			<classpath refid="class_path" />
+		</javac>
+
+		<antcall target="junit" />
+
+		<!--
+		<tstamp>
+			<format property="current_date" pattern="yyyyMMdd"/>
+		</tstamp>
+		-->
+		<tstamp />
+		<!-- 不指定format的property預設可用 DSTAMP,TSTAMP,TODAY三種 -->
+
+		<jar destfile="${ant.project.name}_${DSTAMP}_${TSTAMP}.war">
+			<zipfileset dir="${build_dir}">
+				<include name="**/*.*" />
+				<exclude name="**/*.war" />
+			</zipfileset>
+		</jar>
+
+		<antcall target="delete_temp_dir" />
+	</target>
+
+	<target name="junit">
+		<show_target target="junit" />
+
+		<delete dir="${junit_dir}" />
+		<mkdir dir="${junit_dir}" />
+
+		<junit fork="true" printSummary="true" showOutput="true">
+			<formatter type="plain" />
+			<classpath>
+				<path refid="class_path" />
+				<pathelement path="${build_dir}" />
+			</classpath>
+			<formatter type="xml" usefile="true" />
+			<batchtest fork="false" todir="${junit_dir}">
+				<fileset dir="${build_dir}">
+					<include name="**/**" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<!--建立總表-->
+		<junitreport>
+			<fileset dir="${junit_dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+		</junitreport>
+		
+		<!--總表建好 個別的就不用了-->
+		<delete dir="${junit_dir}" />
+	</target>
+
+	<target name="delete_temp_dir" if="${delete_temp_dir}">
+		<show_target target="delete_temp_dir" />
+		<delete includeEmptyDirs="true">
+			<fileset dir="${build_dir}" />
+			<fileset dir="${backup_dir}" />
+		</delete>
+	</target>
+
+</project>

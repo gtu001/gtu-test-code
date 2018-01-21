@@ -1,0 +1,22 @@
+<project name="iisi_deployee_full_regular" default="main">
+
+	<import file="build_deployee_full.xml" as="full" />
+
+	<target name="main">
+		<antcall target="main_deployee" />
+	</target>
+
+	<target name="main_deployee">
+
+		<tstamp />
+		<war destfile="ris_web_${DSTAMP}_${TSTAMP}.war" webxml="${target_webapp}/WEB-INF/web.xml">
+			<fileset dir="${target_webapp}" />
+		</war>
+
+		<move file="ris_web_${DSTAMP}_${TSTAMP}.war" todir="C:\Users\Troy\Desktop\" />
+
+		<exec command="cmd">
+			<arg value="/c start echo &quot;ris_web_${DSTAMP}_${TSTAMP}.war create completed!!&quot;" />
+		</exec>
+	</target>
+</project>

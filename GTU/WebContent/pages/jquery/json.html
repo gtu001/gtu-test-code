@@ -1,0 +1,7 @@
+success: function(e){
+	var $jsonObj = $.parseJSON(e.XMLHttpRequest.responseText);
+	var success = $jsonObj.successLists;
+	var failed = $jsonObj.failedLists;
+	var successCount = $jsonObj.successCount;
+	var failedCount = $jsonObj.failedCount;
+}

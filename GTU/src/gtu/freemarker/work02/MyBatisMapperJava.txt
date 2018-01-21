@@ -1,0 +1,17 @@
+package com.ibt.dcs.mybatis.mapper;
+
+import java.util.List;
+
+import com.ibt.dcs.mybatis.vo.${voName};
+
+public interface ${mapperName} {
+
+	public int insert(${voName} ${voNameLower});
+
+	public int update(${voName} ${voNameLower});
+
+	public int delete(${voName} ${voNameLower});
+
+	public List<${voName}> query(${voName} ${voNameLower});
+
+}

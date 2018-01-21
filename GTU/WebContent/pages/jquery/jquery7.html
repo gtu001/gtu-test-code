@@ -1,0 +1,49 @@
+
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+<script type="text/javascript">
+        $(function(){
+			$("#testMe").click(function(){
+				alert($("form#testform").serialize());
+				var arry = $("form#testform").serializeArray();
+				var msg = '';
+				$.each(arry, function(index, val){
+					for(var ii in val){
+						msg += ii + " = " + encodeURIComponent(val[ii]) + "\n";	
+					}
+				});
+				alert(msg);
+			});
+			$("#load").click(function(){
+				$("#console").load("some.jsp", {aaa:"bbb"}, function(){
+					alert('done');
+				});
+			});
+			$("#get").click(function(){
+				$.get("some.jsp", {aaa:"bbb"}, function(data){
+					alert(data);
+				});
+			});
+			$("#getJSON").click(function(){
+				$.getJSON("some.jsp", {aaa:"bbb"}, function(data){
+					alert(data);
+				});
+			});
+        });
+				
+</script>
+
+<form id="testform">
+	<input type="text" name="text1" class="test class" />
+	<input type="text" name="text2" />
+    <input type="checkbox" name="chk1" value="okok" />
+    <input type="radio" name="radio1" value="r1" />
+    <input type="radio" name="radio1" value="r2" />
+    <input type="button" id="testMe" value="test me"/>
+</form>
+<input type="button" id="load" value="load"/>
+<input type="button" id="get" value="get"/>
+<input type="button" id="getJSON" value="getJSON"/>
+<div id="console"></div>
+

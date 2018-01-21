@@ -1,0 +1,6 @@
+
+ 
+alter table T_CHEQUE modify BANK_ID NUMBER(19)  NULL;
+ 
+comment on column T_CHEQUE.BANK_ID is 'Bank id';
+ 

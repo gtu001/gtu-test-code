@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.SelectOneMenu</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.selectonemenu.SelectOneMenu</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.SelectOneRadio</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.selectoneradio.SelectOneRadio</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.SelectManyCheckbox</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.selectmanycheckbox.SelectManyCheckbox</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.RisCalendar</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.riscalendar.RisCalendar</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.AutoComplete</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.autocomplete.AutoComplete</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.NoticeMessage</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.noticemessage.NoticeMessage</component-class>
+	</component>
+	
+	<component>
+		<component-type>com.iisigroup.ris.ae.ui.tag.PropertiesPickList</component-type>
+		<component-class>com.iisigroup.ris.ae.ui.tag.proppicklist.PropertiesPickList</component-class>
+	</component>
+	
+	<render-kit>
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.SelectOneMenuRender</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.selectonemenu.SelectOneMenuRender</renderer-class>
+		</renderer>
+		
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.SelectOneRadioRender</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.selectoneradio.SelectOneRadioRender</renderer-class>
+		</renderer>
+		
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.SelectManyCheckboxRender</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.selectmanycheckbox.SelectManyCheckboxRender</renderer-class>
+		</renderer>
+		
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.RisCalendarRenderer</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.riscalendar.RisCalendarRenderer</renderer-class>
+		</renderer>
+		
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.AutoCompleteRender</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.autocomplete.AutoCompleteRender</renderer-class>
+		</renderer>
+		
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.NoticeMessageRenderer</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.noticemessage.NoticeMessageRenderer</renderer-class>
+		</renderer>
+
+		<renderer>
+			<component-family>com.iisigroup.ris.ui.tag</component-family>
+			<renderer-type>com.iisigroup.ris.ae.ui.tag.PropertiesPickListRenderer</renderer-type>
+			<renderer-class>com.iisigroup.ris.ae.ui.tag.proppicklist.PropertiesPickListRenderer</renderer-class>
+		</renderer>
+	</render-kit>
+	
+</faces-config>

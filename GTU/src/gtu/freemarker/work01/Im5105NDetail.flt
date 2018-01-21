@@ -1,0 +1,757 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<head>
+<title>(簡5105)一般進口報單</title>
+
+<style>
+	 body{ margin:0px;}
+	  
+	.mainTable {
+		margin:5px;
+		width:728px;/*793px ie:649*/
+		height:978px;/*1120px ie:978*/
+		border:0px solid black;/* 測試時用black */
+	}
+	
+	table{
+		margin:0px;
+		padding:0px;
+		border-width:0px;
+		border-collapse:collapse;
+	}
+	
+	tr{
+		margin:0px;
+		padding:px;
+		border-width:0px;
+		border-collapse:collapse;
+	}
+	
+	td{
+		margin:0px;
+		padding:0px;
+		color: black;
+		font-family: 新細明體;
+		font-size: 7pt;
+		text-indent:2px;
+		border-width:0px;
+		border-collapse:collapse;
+	}
+	
+	.line{
+		border-style:solid;
+		border-color:black;//red
+	}
+	
+	.dottedLine{
+		border-style:dotted;
+		border-color:black;//red
+	}
+	
+	.thinTop{
+		border-top-width:1px;
+	}
+	.thickTop{
+		border-top-width:2px;
+	}
+	.thinRight{
+		border-right-width:1px;
+	}
+	.thickRight{
+		border-right-width:2px;
+	}
+	.thinBottom{
+		border-bottom-width:1px;
+	}
+	.thickBottom{
+		border-bottom-width:2px;
+	}
+	.thinLeft{
+		border-left-width:1px;
+	}
+	.thickLeft{
+		border-left-width:2px;
+	}
+	
+	.thinAll{
+		border-left-width:1px;
+		border-top-width:1px;
+		border-right-width:1px;
+		border-bottom-width:1px;
+	}
+	
+	.title{
+		color: black;
+		font-family: 新細明體;
+		font-size: 12pt;
+	}
+	
+	.mainHeader{
+		font-size: 18pt;
+		font-weight:bold;
+	}
+	
+</style>
+</head>
+
+<body>
+
+<#if nx5105mList?size == 0>
+	5105查無資料！
+</#if>
+
+<#list nx5105mList as declaration >
+	<#assign totalRows=0>
+	<#assign detailBeginIndex=0>
+	<#list 1..declaration.totalPage as pageNum >
+		<table class="mainTable">
+			<!--<tr style="height:32px;"><td class="title">附件510A:進口報單(N55105)表格格式(<#if (pageNum == 1)>首頁<#else>續頁</#if>)${pageNum!} / ${declaration.totalPage!}</td></tr>-->
+			<tr style="height:32px;"><td class="title">&nbsp;</td></tr>
+			<!-- 標簽頁的標題 -->
+			<tr style="height:64px;">
+				<td>
+					<table style="width:728px;">
+						<tr style="height:64px;">
+							<td class="title mainHeader line thickBottom" style="width:119px;">進口報單</td>
+							<td class="line thickLeft thickTop thickRight thinBottom" style="width:609px; vertical-align:top;">
+								<!-- 首頁顯示 -->
+								<#if pageNum == 1>
+								<table style="width:609px;">
+									<tr style="height:24px;">
+										<td>
+											<table style="width:609px;">
+												<tr style="height:24px;">
+													<td class="line thinRight thinBottom" style="width:72px;text-align:center;">海空運別(1)</td><td class="line thinRight thinBottom" style="width:50px; text-align:center;"><#if (declaration.asType! =="A")>空運<#elseif (declaration.asType! =="S")>海運</#if></td>
+													<td class="line thinRight thinBottom" style="width:72px;text-align:center;">報單類別(2)</td><td class="line thinRight thinBottom" style="width:129px;">${declaration.declType!}&nbsp;&nbsp;${declaration.declTypeDesc!}</td>
+													<td class="line thinRight thinBottom" style="width:48px;text-align:center;">聯&nbsp;&nbsp;別</td><td class="line thinRight thinBottom" style="width:64px;">&nbsp;</td>
+													<td class="line thinRight thinBottom" style="width:40px;text-align:center;">頁&nbsp;&nbsp;&nbsp;&nbsp;次</td><td class="line thinBottom" style="text-align:center;">第&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${pageNum!}&nbsp;&nbsp;&nbsp;&nbsp;頁&nbsp;&nbsp;/&nbsp;&nbsp;共&nbsp;&nbsp;&nbsp;&nbsp;${declaration.totalPage!}&nbsp;&nbsp;&nbsp;&nbsp;頁</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height:40px;">
+										<td>
+											<table style="width:609px;">
+												<tr style="height:40px;">
+													<td class="line thinRight" style="width:72px;text-align:center;">報單號碼(3)</td>
+	                                                <td class="line thinRight" style="width:184px;">${declaration.declNo!}</td>
+													<td class="line thinRight" style="width:182px;"></td>
+													<td class="line thinRight" style="width:100px;text-align:center;">海關通關號碼(4)</td><td style="">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<!-- 分頁顯示 -->
+								<#else>
+								<table style="width:609px;">
+									<tr style="height:24px">
+										<td>
+											<table style="width:609px;">
+												<tr style=" height:24px;">
+													<td class="line thinRight thinBottom" style="text-align:center; width:72px;">報單號碼</td><td class="line thinRight thinBottom" style="width:253px;">${declaration.declNo!}</td>
+													<td class="line thinRight thinBottom" style="text-align:center; width:48px;">聯&nbsp;&nbsp;別</td><td class="line thinRight thinBottom" style="width:64px;"></td>
+													<td class="line thinRight thinBottom" style="text-align:center; width:40px;">頁&nbsp;&nbsp;&nbsp;&nbsp;次</td><td class="line thinBottom"  style="text-align:center;">第&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${pageNum!}&nbsp;&nbsp;&nbsp;&nbsp;頁&nbsp;&nbsp;/&nbsp;&nbsp;共&nbsp;&nbsp;&nbsp;&nbsp;${declaration.totalPage!}&nbsp;&nbsp;&nbsp;&nbsp;頁</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height:40px">
+										<td>
+											<table style="width:609px;">
+												<tr style="height:40px;">
+													<td class="line thinRight" style="text-align:center; width:72px;">主提單號碼</td><td class="line thinRight" style="width:221px;">${declaration.mawbNo!}</td>
+													<td class="line thinRight" style="text-align:center; width:80px;">分提單碼號</td><td style="">${declaration.hawbNo!}</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								</#if>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+	        
+	        <!-- 首頁標題明細資料-->
+	        <#if (pageNum == 1)>
+			<tr style="height: 316px;">
+				<td style="vertical-align: top;">
+					<table style="width: 728px; height: 28px;">
+						<tr style="height: 28px;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 28px;">
+										<td class="line thickLeft thinRight thinBottom" style="width:84px;text-align:center;">船舶名稱/<br/>航機代碼(5)</td>
+										<td class="line thinRight thinBottom" style="width:170px;">${declaration.vesselId!}</td>
+										<td class="line thinRight thinBottom" style="width:75px;text-align:center;">主提單號碼(8)</td>
+										<td class="line thinRight thinBottom" style="width:224px;">${declaration.mawbNo!}</td>
+										<td class="line thinRight thinBottom" style="width:79px;text-align:center;">匯率(16)</td>
+										<td class="line thickRight thinBottom" style="">
+											${declaration.exchangeRate!}
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr style="height: 32px;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 32px;">
+										<td class="line thickLeft thinRight thinBottom" style="width:64px; text-align:center;">船舶呼號(6)</td>
+										<td class="line thinRight thinBottom" style="width:60px;">${declaration.vesselName!}</td>
+										<td class="line thinRight thinBottom" style="width:72px; text-align:center;">船舶航次/<br>航機班次(7)</td>
+										<td class="line thinRight thinBottom" style="width:56px;">${declaration.voyageFlightNo!}</td>
+										<td class="line thinRight thinBottom" style="width:75px; text-align:center;">分提單號碼(9)</td>
+										<td class="line thinRight thinBottom" style="width:144px;">${declaration.hawbNo!}</td>
+										<td class="line thinRight thinBottom" style="width:79px; text-align:center;">離岸價格(17)</td>
+										<td class="line thickRight thinBottom" style="text-align:center;">
+											<table style="">
+												<tr>
+													<td style="width:50px; vertical-align:top; text-align:center;">${declaration.currencyCode!}</td>
+													<td style="width:23px; vertical-align:top;">幣別</td>
+													<td style="width:45px; vertical-align:top; text-align:right;padding-right:15px;">${declaration.totFobValue!}</td>
+													<td style="vertical-align:top;">金額</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr style="height: 32px;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 32px;">
+										<td class="line thickLeft thinRight thinBottom" style="width:64px; text-align:center;">裝貨港名稱<br />代碼(8)</td>
+										<td class="line thinRight thinBottom" style="width: 100px;">
+											<table style="height: 32px; width: 100px;">
+												<tr style="height: 16px;">
+													<td style="width: 19px;">&nbsp;</td>
+													<td class="dottedLine thinLeft thickBottom" style="width: 39px;">${declaration.loadPortCode!}</td>
+												</tr>
+												<tr style="height: 16px;">
+													<td colspan="2">${declaration.loadPortCode!}</td>
+												</tr>
+											</table>
+										</td>
+										<td class="line thinRight thinBottom" style="width:72px; text-align:center;">外國出口日期(13)</td>
+										<td class="line thinRight thinBottom" style="width: 80px;">${declaration.frgnExportDate!}</td>
+										<td class="line thinRight thinBottom" style="width:75px; text-align:center;">進口日期(14)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.importDate!}</td>
+										<td class="line thinRight thinBottom" style="width:79px; text-align:center;">運費(18)</td>
+										<td class="line thickRight thinBottom" style="text-align:center;">
+											<table style="">
+												<tr>
+													<td style="width:50px; vertical-align:top; text-align:center;">${declaration.currencyCode!}</td>
+													<td style="width:23px; vertical-align:top;">&nbsp;</td>
+													<td style="width:45px; vertical-align:top; text-align:right;padding-right:15px;">${declaration.freightFee!}</td>
+													<td style="vertical-align:top;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr style="height: 32px;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 32px;">
+										<td class="line thickLeft thinRight thinBottom" style="width:84px; text-align:center;">缷存地代碼(11)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.storagePlaceCode!}</td>
+										<td class="line thinRight thinBottom" style="width:72px; text-align:center;">進口運輸方式代碼(12)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.imTransportMode!}</td>
+										<td class="line thinRight thinBottom" style="width:75px; text-align:center;">報關日期(15)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.declDate!}</td>
+										<td class="line thinRight thinBottom" style="width:79px; text-align:center;">保險費(19)</td>
+										<td class="line thickRight thinBottom" style="text-align:center;">
+											<table style="">
+												<tr>
+													<td style="width:50px; vertical-align:top; text-align:center;">${declaration.currencyCode!}</td>
+													<td style="width:23px; vertical-align:top;">&nbsp;</td>
+													<td style="width:45px; vertical-align:top; text-align:right;padding-right:15px;">${declaration.insuranceFee!}</td>
+													<td style="vertical-align:top;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr style="height: 96px; vertical-align: top;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 24px;">
+										<td class="line thickLeft thinRight thinBottom" rowspan="4" style="width: 15px; text-align: center;">納<br>稅<br>義<br>務<br>人<br>(24)</td>
+										<td class="line thinRight thinBottom" style="width:68px;  text-align:center;">統一編號(23)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.dutyPayerId!}</td>
+										<td class="line thinRight thinBottom" style="width:72px; text-align:center;">海關監管編號(25)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.dutyPayerBfNo!}</td>
+										<td class="line thinRight thinBottom" style="width:30px; text-align:center;">特殊關係(26)</td>
+										<td class="line thinRight thinBottom" style="width:47px;">&nbsp;</td>
+										<td class="line thinRight thinBottom" style="width:30px; text-align:center;">稅費繳納方式(27)</td>
+										<td class="line thinRight thinBottom" style="width:46px;">&nbsp;</td>
+										<td class="line thinRight thinBottom" style="width: 79px;">
+											<table style="height: 32px;">
+												<tr style="height: 16px;">
+													<td rowspan="2">應&nbsp;&nbsp;</td>
+													<td>加</td>
+													<td rowspan="2">&nbsp;&nbsp;費用&nbsp;&nbsp;</td>
+													<td>(19)</td>
+												</tr>
+												<tr style="height: 16px;">
+													<td>減</td>
+													<td>(20)</td>
+												</tr>
+											</table>
+										</td>
+										<td class="line thickRight thinBottom" style="">
+											<table style="height: 32px; width: 100%;">
+												<tr style="height: 16px;">
+													<td class="dottedLine thickBottom">
+														<table style="">
+															<tr>
+																<td style="width:50px; vertical-align:top; text-align:center;">${declaration.currencyCode!}&nbsp;</td>
+																<td style="width:23px; vertical-align:top;">&nbsp;</td>
+																<td style="width:45px; vertical-align:top; text-align:right;padding-right:15px;">${declaration.additionFee!}</td>
+																<td style="vertical-align:top;">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<tr style="height: 16px;">
+													<td>
+														<table style="">
+															<tr>
+																<td style="width:50px; vertical-align:top; text-align:center;">${declaration.currencyCode!}&nbsp;</td>
+																<td style="width:23px; vertical-align:top;">&nbsp;</td>
+																<td style="width:45px; vertical-align:top; text-align:right;padding-right:15px;">${declaration.deductionFee!}</td>
+																<td style="vertical-align:top;">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">中文名稱</td>
+										<td class="line " colspan="4">${declaration.dutyPayerNameC!}</td>
+										<td class="line thickRight" colspan="3">
+											<table style="height: 12px;">
+												<tr style="height: 12px;">
+													<td class="dottedLine thinLeft thickBottom" style="height: 12px;">AEO&nbsp;&nbsp;編號</td>
+													<td class="dottedLine thickBottom" style="height: 12px; width:80px;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+										<td class="line thinRight thinBottom" style="width:79px; text-align:center;">起岸價格(22)</td>
+										<td class="line thickRight thinBottom" style="">
+											<table style="">
+												<tr style="height:12px;">
+													<td style="width:74px; vertical-align:middle; text-align:center;">${declaration.currencyCode!}&nbsp;</td>
+													<td style="vertical-align:middle; text-align:right;padding-right:15px;">${declaration.cifValue!}</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">英文名稱</td>
+										<td class="line thickRight" colspan="7">${declaration.dutyPayerNameE!}</td>
+										<td class="line thinRight thinBottom" rowspan="2" style="width:79px; text-align:center;">
+											<table style="height:100%; width:100%;">
+												<tr>
+													<td class="line thickRight" style="width:40px; vertical-align:middle; text-align:center;">簽証情形<br>(28)&nbsp;</td>
+													<td class="line" style="vertical-align:middle; text-align:right;padding-right:15px;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+										<td class="line thickRight thinBottom" rowspan="2" style="" >
+											<table style="height:100%; width:100%;">
+												<tr>
+													<td class="line thickRight" style="width:40px; vertical-align:middle; text-align:center;">案號<br>(29)&nbsp;</td>
+													<td class="line" style="vertical-align:middle; text-align:right;padding-right:15px;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">中/英文地址</td>
+										<td class="line thickRight thinBottom" colspan="7">${declaration.dutyPayerAddressC!}/${declaration.dutyPayerAddressE!}</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr style="height: 96px; vertical-align: top;">
+							<td>
+								<table style="width: 728px;">
+									<tr style="height: 24px;">
+										<td class="line thickLeft thinRight thinBottom" rowspan="4" style="width:15px; text-align:center;">賣<br>方<br>(30)</td>
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">中文名稱</td>
+										<td class="line" colspan="7">${declaration.sellerNameC!}</td>
+										<td class="line thickRight" colspan="2">
+											<table style="height: 12px; width:100%;">
+												<tr style="height: 12px;">
+													<td class="dottedLine thinLeft thickBottom" style="height: 12px;">AEO&nbsp;&nbsp;編號</td>
+													<td class="dottedLine thickBottom" style="height: 12px; width:80px;">&nbsp;</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">英文名稱</td>
+										<td class="line thickRight" colspan="9">${declaration.sellerNameE!}</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width: 68px; text-align:center;">中/英文地址</td>
+										<td class="line thickRight thinBottom" colspan="9">${declaration.sellerNameC!}/${declaration.sellerNameE!}</td>
+									</tr>
+									<tr style="height: 24px;">
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">國家代碼(27)</td>
+										<td class="line thinRight thinBottom" style="width:40px;">${declaration.sellerCountryCode!}</td>
+										<td class="line thinRight thinBottom" style="width:68px; text-align:center;">統一編號(28)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.sellerId!}</td>
+										<td class="line thinRight thinBottom" style="width:89px; text-align:center;">海關監管編號(29)</td>
+										<td class="line thinRight thinBottom" style="width:80px;">${declaration.sellerBfNo!}</td>
+										<td class="line thickRight thinBottom" colspan="4" style="text-align:center;">&nbsp;</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			</#if>
+			
+			<!-- 明細資料的標題 -->
+			<tr style="height:100px;">
+				<td style="vertical-align:top;">
+					<table style="width:728px; height:100px;">
+						<tr style="height:100px;">
+							<td class="line thickLeft thinRight thinBottom" style="width:15px; text-align:center;">
+								<table style="padding:0px; margin:0px; width:100%; ">
+									<tr>
+										<td  style="padding:0px; margin:0px; width:100%;">
+											項<br>次<br>(34)
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td class="line thinRight thinBottom" style="width:280px;text-align:right;">
+								<table style="width:100%;">
+									<tr style="height:20px;">
+										<td class="dottedLine thinBottom" style="width:100%;text-align:right;" >
+											生產國別(36)
+										<td>
+									<tr>
+									<tr style="height:80px;">
+										<td style="width:100%;text-align:center;" >
+											貨物名稱、商標(名牌)及規格等(35)
+										<td>
+									<tr>
+								</table>
+							</td>
+							<td class="line thinRight thinBottom" style="width:132px;text-align:center;">
+								<table style="width:100%;">
+									<tr style="height:20px;">
+										<td class="dottedLine thinBottom" style="width:100%;" colspan="3">輸出入許可文件號碼-項次(37)</td>
+									</tr>
+									<tr style="height:20px;">
+										<td class="dottedLine thinRight thinBottom" style="width:90%;" colspan="2">輸出入貨品分類號列(38)</td>
+										<td class="dottedLine thinBottom" style="width:10%;" colspan="1" rowspan="2">檢<br>查<br>號<br>碼</td>
+									</tr>
+									<tr style="height:40px;">
+										<td class="dottedLine thinRight thinBottom" style="width:60%;" colspan="1" rowspan="1">稅則號列</td>
+										<td class="dottedLine thinRight thinBottom" style="width:30%;" colspan="1" rowspan="1">統計別號</td>
+									</tr>
+									<tr style="height:20px;">
+										<td style="width:100%;" colspan="3">(&nbsp;主&nbsp;管&nbsp;機&nbsp;關&nbsp;指&nbsp;定&nbsp;代&nbsp;號&nbsp;)</td>
+									</tr>
+								</table>
+							</td>
+							
+							<td class="line thinRight thinBottom" style="width:72px;text-align:center;">
+								<table style="width:100%;">
+									<tr style="height:50px;">
+										<td class="dottedLine thinRight" style="width:15px;" rowspan="2">單<br>價<br>(39)</td>
+										<td class="dottedLine thinBottom" style="height:100%; text-align:center;" colspan="1" rowspan="1">條件、幣別</td>
+									</tr>
+									<tr style="height:50px;">
+										<td style="height:100% text-align:center;" colspan="1" rowspan="1">金額</td>
+									</tr>
+								</table>
+							</td>
+							<td class="line thinRight thinBottom" style="width:72px;text-align:center;">
+								<table style="width:100%;">
+									<tr style="height:50px;">
+										<td class="dottedLine thinBottom" style="height:100%; text-align:center;" colspan="1" rowspan="1">淨重(公斤)(40)</td>
+									</tr>
+									<tr style="height:50px;">
+										<td style="height:100% text-align:center;" colspan="1" rowspan="1">數量(單位)(41)<br>(統計用)(42)</td>
+									</tr>
+								</table>							
+							</td>
+							<td class="line thinRight thinBottom" style="width:72px;text-align:center;" >
+								<table style="width:100%;">
+									<tr style="height:50px;">
+										<td style="width:24px;" rowspan="2">完稅</td>
+										<td style="height:100%; text-valign:bottom; text-align:center;" colspan="1" rowspan="1">價格</td>
+										<td style="width:24px;" rowspan="2">(43)</td>
+									</tr>
+									<tr style="height:50px;">
+										<td style="height:100%; text-valign:top; text-align:center;" colspan="1" rowspan="1">數量</td>
+									</tr>
+								</table>
+							</td>
+							<td class="line thinRight thinBottom" style="width:30px; text-align:center;" >
+								<table style="width:100%;">
+									<tr style="height:50px;">
+										<td  class="line thinRight" style="width:15px;" rowspan="2">進<br>口<br>稅<br>率<br>(44)</td>
+										<td class="dottedLine thinBottom" style="height:100%; text-valign:bottom; text-align:center;" colspan="1" rowspan="1">從價</td>
+									</tr>
+									<tr style="height:50px;">
+										<td style="height:100%; text-valign:top; text-align:center;" colspan="1" rowspan="1">從量</td>
+									</tr>
+								</table>
+							</td>
+							<td class="line thickRight thinBottom" style="text-align:center;" >
+								<table style="width:100%;">
+									<tr style="height:50px;">
+										<td class="dottedLine thinBottom" style="height:100%; width:24px;" text-valign:bottom;>納稅<br>辦法<br>(45)</td>
+									</tr>
+									<tr style="height:50px;">
+										<td style="height:100%; text-valign:top; text-align:center;" >貨物<br>稅率<br>(46)</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+			    	</table>
+			    </td>
+			</tr>
+			
+			<!-- 報單明細資料 -->
+			<#assign detailBreak = "false">
+			<#list declaration.list as detail>
+			<#if (detail_index >= detailBeginIndex)>
+			<#if (detailBreak == "false")>
+			<tr style="height:100px;">
+				<td style="vertical-align:top;">
+					<table style="width:728px; height:100px;">
+						<tr style="height:20px;">
+					    	<td class="line thinTop thickLeft thinRight" style="width:15px;text-align:center; vertical-align:top;padding-top:5px;" rowspan="5">${detail.itemNo!}</td>
+							<td class="line thinTop thinRight" style="width:280px;text-align:center;" rowspan="${detail.items?size!}">
+								<!--使用一個Table設計，預設存放8筆資料 goodsDesces-->
+							    <table>
+							    	<#assign itemBreak = "false">
+							    	<#list detail.items as item>
+							    	<#if (itemBreak=="false")>
+							    		<#assign totalRows = totalRows+1>
+							    		<tr style="height:20px;"><td style="text-align:left;">${item!}</td></tr>
+										<#if (pageNum==1 && totalRows==8)>
+											<#assign totalRows = 0>
+											<#assign itemBreak = "true">
+											<#assign detailBreak = "true">
+											<#assign detailBeginIndex = detail_index + 1>
+										<#elseif (pageNum >1 && totalRows==39)>
+											<#assign totalRows = 0>
+											<#assign detailBreak = "true">
+											<#assign detailBeginIndex = detail_index + 1>
+										</#if>
+									</#if>
+							    	</#list>
+							    </table>
+							</td>
+							<!-- 輸出入許可文件號碼 -->
+							<td class="line thinTop thinRight thinBottom" style="width:132px;text-align:center;border-bottom-style:none;">${detail.permitNoAndItem!}</td>
+							<!-- 單價條件、幣別 -->
+							<td class="line thinTop" style="width:35px;text-align:center;" rowspan="1">${detail.declPriceTermCode!}</td>
+							<td class="line thinTop thinRight" style="width:36px;text-align:center;" rowspan="1">${detail.unitCurrencyCode!}</td>
+							<!-- 淨重-->
+							<td class="line thinTop thinRight thinBottom" style="width:72px;text-align:center;border-bottom-style:none;" rowspan="1">${detail.netWeight!}</td>
+							<!-- 完稅價格 -->
+							<td class="line thinTop thinRight" style="width:72px;text-align:center;" rowspan="1">${detail.customsValueAmt!}</td>
+							<!-- 從價 -->
+							<td class="line thinTop thinRight" style="width:30px;text-align:center;" rowspan="1">${detail.imDutyPriceRate!}</td>
+							<!-- 納稅辦法 -->
+							<td class="line thinTop thickRight" style="text-align:center;" rowspan="1">${detail.dutyType!}</td>
+					    </tr>
+					    <tr style="height:20px;">
+					    	<!-- 稅則號列 -->
+							<td class="line thinRight thinBottom" style="width:132px;text-align:center;border-bottom-style:none;" rowspan="3">${detail.cccCode1!}</td>
+					    	<!-- 單價金額 -->
+					    	<td class="line thinRight" style="width:72px;text-align:center;" rowspan="1" colspan="2">${detail.declUnitPrice!}&nbsp</td>
+					    	<!-- 數量、單位 -->
+					    	<td class="line thinRight" style="width:72px;text-align:center;" rowspan="1">${detail.qty!}&nbsp;&nbsp;${detail.qtyUnit!}</td>
+					    	<!-- 完稅數量-->
+					    	<td class="line thinRight" style="width:72px;text-align:center;" rowspan="1">${detail.customsValueQty!}</td>
+					    	<!-- 從量 -->
+							<td class="line  thinRight" style="width:30px;text-align:center;" rowspan="1">${detail.imDutyQtyRatio!}</td>
+							<!-- 貨物稅率 -->
+							<td class="line  thickRight" style="text-align:center;" rowspan="1">尚未設定</td>
+					    </tr>
+					    <tr style="height:20px;">
+					    	<td class="line thinRight" style="width:72px;text-align:center;" rowspan="3" colspan="2"></td>
+							<td class="line thinRight" style="width:72px;text-align:center;" rowspan="3"></td>
+							<td class="line thinRight" style="width:72px;text-align:center;" rowspan="3">
+								<#if (detail.statQty?? && detail.statQty!="" && detail.statQty!="0")>
+									(&nbsp;&nbsp;${detail.statQty!} &nbsp;&nbsp; ${detail.statUnit!} &nbsp;&nbsp;)
+								</#if>
+							</td>
+							<td class="line thinRight" style="width:30px;text-align:center;" rowspan="3"></td>
+							<td class="line thickRight" style="text-align:center;" rowspan="3"></td>
+					    </tr>
+					    <tr style="height:20px;">
+					    	
+					    </tr>
+					    <tr style="height:20px;">
+							<td class="line thinRight" style="width:132px;text-align:center;">${detail.govAssignNo1!}</td>
+					    </tr>
+					    <!--使用迴圈補空白的item項次 -->
+					    <#if (detail.items?size >=6)>
+					    <#list 6..detail.items?size as i>
+					    <tr style="height:20px;">
+					    	<td class="line thickLeft thinRight" style="width:15px;"></td>
+							<td class="line thinRight" style="width:132px;"></td>
+							<td class="line thinRight" colspan="2" style="width:72px;"></td>
+							<td class="line thinRight" style="width:72px;"></td>
+							<td class="line thinRight" style="width:72px;"></td>
+							<td class="line thinRight" style="width:30px;"></td>
+							<td class="line thickRight"></td>
+					    </tr>
+					    </#list>
+					    </#if>
+					    <!-- 最後一頁的列數補滿39列(整頁列數) -->
+					    <#if (pageNum == declaration.totalPage && detail_index+1 == declaration.list?size)>
+					    	<#list totalRows..39 as i>
+					    		<tr style="height:20px;">
+							    	<td class="line thickLeft thinRight" style="width:15px;"></td>
+							    	<td class="line thinRight" style="width:280px;"></td>
+									<td class="line thinRight" style="width:132px;"></td>
+									<td class="line thinRight" colspan="2"  style="width:72px;"></td>
+									<td class="line thinRight" style="width:72px;"></td>
+									<td class="line thinRight" style="width:72px;"></td>
+									<td class="line thinRight" style="width:30px;"></td>
+									<td class="line thickRight"></td>
+							    </tr>
+					    	</#list>
+					    </#if>
+					</table>
+				</td>
+			</tr>
+			</#if>
+			</#if>
+			</#list>
+			
+			<!-- 標記、貨櫃號碼、其它申報事項-->
+			<#if (pageNum == 1)>
+			<tr style="height:305px;">
+	        	<td style="vertical-align:top;">
+					<table style="width:728px; height:305px;">
+						<tr style="height:20px;">
+	                    	<td class="line thinTop thickLeft thinRight thinBottom" style="width:84px;">總件數/單位(47)</td><td class="line thinTop thinRight thinBottom" style="width:150px;">${declaration.totPackageNumber!}&nbsp;&nbsp;&nbsp;&nbsp;${declaration.packageUnit!}</td>
+	                        <td class="line thinTop thinRight thinBottom" style="width:80px;">包裝說明(48)</td><td class="line thinTop thinRight thinBottom" style="width:175px;">${declaration.packageTypeDesc!}</td>
+	                        <td class="line thinTop thinRight thinBottom" style="width:119px; text-align:center;">總&nbsp;毛&nbsp;重&nbsp;(&nbsp;公&nbsp;斤&nbsp;)(49)</td><td class="line thinTop thickRight thinBottom" style="text-align:center;">${declaration.totGrossWeight!}</td>
+	                    </tr>
+	                    <tr style="height:20px;">
+	                    	<td class="line thinTop thickLeft thinRight thinBottom" style="width:489px;border-bottom-style:none;" colspan="4">標記(50)/貨櫃號碼(51)/其它申報事項(52)</td>
+	                        <td class="line thinTop thinRight thinBottom" style="width:119px; text-align:center;">進口稅</td><td class="line thinTop thickRight thinBottom" style="text-align:center;">尚需設定${declaration.dutyAmt2!}</td>
+	                    </tr>
+	                    <tr style="height:265px;">
+	                    	<td class="line  thickLeft thinRight" style="width:489px;" colspan="4">
+	                        	<table style="wdith:489px; height:265px;">
+	                            	<tr style="height:20px;">
+	                                	<td style="width:244px; vertical-align:top;">
+	                                    	<table style="wdith:244px; height:265px;">
+	                                    		<#list declaration.otherDeclItems as otherDeclItem>
+	                                    		<#if (otherDeclItem_index<11)>
+	                                    			<tr style="height:20px;"><td style="width:244px">${otherDeclItem.content!}</td></tr>
+	                                    		</#if>
+	                                            </#list>
+	                                        </table>
+	                                    </td>
+	                                	<td style="width:244px; vertical-align:top;">
+	                                    	<table style="wdith:244px; height:265px;">
+	                                        	<#list declaration.otherDeclItems as otherDeclItem>
+	                                    		<#if (otherDeclItem_index>=11)>
+	                                    			<tr style="height:20px;"><td style="width:244px">${otherDeclItem.content!}</td></tr>	
+	                                    		</#if>
+	                                        	</#list>
+	                                        </table>
+	                                    </td>
+	                                </tr>
+	                            </table>
+	                        </td>
+	                        <td class="line thinTop thickRight" colspan="2" style="width:238px;">
+	                        	<table style="wdith:238px; height:265px;">
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px; text-align:center;">推廣貿易服務費</td><td class="dottedLine thinBottom" style="width:113px;">尚需設定&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px;">&nbsp;</td><td class="dottedLine thinBottom">&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px;">&nbsp;</td><td class="dottedLine thinBottom">&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px;">&nbsp;</td><td class="dottedLine thinBottom">&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px;">&nbsp;</td><td class="dottedLine thinBottom">&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px; text-align:center;">稅&nbsp;&nbsp;費&nbsp;&nbsp;合&nbsp;&nbsp;計</td><td class="dottedLine thinBottom">尚需設定&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px; text-align:center;">營&nbsp;&nbsp;業&nbsp;&nbsp;稅&nbsp;&nbsp;稅&nbsp;&nbsp;基</td><td class="dottedLine thinBottom">尚需設定&nbsp;</td></tr>
+	                                <tr style="height:20px;"><td class="dottedLine thinRight thinBottom" style="width:120px; text-align:center;">滯&nbsp;&nbsp;納&nbsp;&nbsp;金&nbsp;&nbsp;(日)</td><td class="dottedLine thinBottom">尚需設定&nbsp;</td></tr>
+	                                <tr style="height:30px;">
+	                                	<td class="line thinTop thinRight thinBottom" style="width:120px; text-align:center;">
+	                                		<table style="width:100%; height:100%;">
+												<tr style="height:100%;">
+													<td class="line thinRight" style="width:48px;" rowspan="1">通關方式</td>
+													<td style="" rowspan="1">&nbsp;</td>
+												</tr>
+											</table>
+	                                	</td>
+	                                	<td class="line thinTop thinBottom" style="text-align:center;">
+	                                		<table style="width:100%; height:100%;">
+												<tr style="height:100%;">
+													<td class="line thinRight" style="width:48px;" rowspan="1">(申請)<br>審驗方式</td>
+													<td style="" rowspan="1">&nbsp;</td>
+												</tr>
+											</table>
+	                                	</td>
+	                                </tr>
+	                                <tr style="height:30px;">
+	                                	<td class="line thinBottom" colspan="2" style="width:100%;">
+	                                		<table style="width:100%; height:100%;">
+												<tr style="height:100%;">
+													<td class="line thinRight" style="width:48px; text-align:center;" rowspan="1">証明文件<br>&nbsp;申&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;請</td>
+													<td style="" rowspan="1">
+														<table style="width:100%; height:100%;">
+															<tr style="height:100%;">
+																<td style="width:24px; text-align:center;" rowspan="1">聯別</td>
+																<td style="" rowspan="1">&nbsp;</td>
+																<td style="width:24px; text-align:center;" rowspan="1">份數</td>
+																<td style="" rowspan="1">&nbsp;</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+											</table>
+	                                	</td>
+	                                </tr>
+	                                <tr style="height:20px;"><td class="line thinRight thinBottom" style="width:120px; text-align:center;">報關人/AEO&nbsp;&nbsp;AEO編號(53)</td><td class="line thinBottom" style="text-align:center;">專責人員(54)</td></tr>
+	                                <tr style="height:50px;"><td class="line thinRight" style="width:120px;">${declaration.boxNo!}&nbsp;</td><td>${declaration.brokerNo!}&nbsp;</td></tr>
+	                            </table>
+	                        </td>
+	                    </tr>
+	                </table>
+				</td>
+	        </tr>
+			</#if>
+			
+			<!-- 頁尾Ending畫線-->
+			<tr style="height:1px;">
+				<td class="line thickBottom" style="vertical-align:top;">
+				</td>
+			</tr>
+		</table>
+		<#if (pageNum < declaration.totalPage)>
+		<p style="page-break-before:always;"/>
+		</#if>
+	</#list>
+</#list>
+</body>
+</html>

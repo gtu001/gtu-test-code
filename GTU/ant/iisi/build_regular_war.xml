@@ -1,0 +1,48 @@
+<project name="iisi_deployee_full_regular" default="main">
+
+	<import file="build_deployee_full.xml" as="full" />
+
+	<property name="buildWeb" location="ris_web" />
+
+	<target name="main">
+		<antcall target="main_deployee" />
+	</target>
+
+	<target name="main_deployee">
+		<mkdir dir="${buildWeb}" />
+
+		<copy todir="${buildWeb}" verbose="true">
+			<fileset dir="${mavenWebContent}" />
+		</copy>
+
+		<sync todir="${buildWeb}/WEB-INF/lib" verbose="true" includeemptydirs="true">
+			<fileset dir="${myWebProject}/WebContent/WEB-INF/lib" />
+		</sync>
+
+		<sync todir="${buildWeb}\WEB-INF\classes" verbose="true" includeemptydirs="true">
+			<fileset dir="${myWebClassesDir}" />
+		</sync>
+
+		<antcall target="replaceMyClass">
+			<param name="enable" value="true" />
+			<param name="specialCompilerBuildDir" value="build_temp" />
+			<param name="target_webapp_classes_dir" value="${buildWeb}\WEB-INF\classes" />
+		</antcall>
+
+		<copy file="C:\workspace\GTU\src\com\iisigroup\ris\logback.xml" tofile="${buildWeb}/WEB-INF/classes/logback.xml" overwrite="true" />
+		<copy file="${myWebProject}\WebContent\WEB-INF\config\applicationContext.xml" tofile="${buildWeb}/WEB-INF\config\applicationContext.xml" overwrite="true" />
+
+		<tstamp />
+		<war destfile="ris_web_${DSTAMP}_${TSTAMP}.war" webxml="${buildWeb}/WEB-INF/web.xml">
+			<fileset dir="${buildWeb}" />
+		</war>
+
+		<delete dir="${buildWeb}" />
+		
+		<move file="ris_web_${DSTAMP}_${TSTAMP}.war" todir="C:\Documents and Settings\Administrator\桌面\" />
+		
+		<exec command="cmd">
+			<arg value="/c start echo &quot;ris_web_${DSTAMP}_${TSTAMP}.war create completed!!&quot;" />
+		</exec>
+	</target>
+</project>

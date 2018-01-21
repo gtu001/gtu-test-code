@@ -1,0 +1,46 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+
+	function onload() {
+		dynamicCreateFile();
+	}
+
+	function dynamicCreateFile() {
+		//動態產生一個file
+		var filePicker = document.createElement('input');
+		filePicker.type = 'file';
+		filePicker.style.overflow = 'hidden';
+		filePicker.style.width = '1px';
+		filePicker.style.height = '1px';
+		filePicker.style.opacity = 0.1;
+		filePicker.multiple = 'multiple';
+		filePicker.position = 'absolute';
+		filePicker.zIndex = 1000;
+
+		document.body.appendChild(filePicker);
+		filePicker.addEventListener('change', function() {
+			var count = filePicker.files.length;
+		});
+
+		filePicker.accept = '.jpg, .png, .jpeg, .gif, .bmp, .tiff|images/*';
+		filePicker.click();
+		
+		//取得檔案
+		var file = filePicker.files[0];
+		for (var key in file) {
+			alert(key + ":" + file[key]);
+		}
+		
+		//取得副檔名
+		var fileExtension = (/[.]/.exec(filename)) ? /[^.]+$/.exec(filename) : undefined;
+	}
+
+</script>
+</head>
+<body onload="onload()">
+</body>
+</html>

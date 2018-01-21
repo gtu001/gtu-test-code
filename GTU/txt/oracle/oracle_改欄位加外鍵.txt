@@ -1,0 +1,14 @@
+
+--UTF8 文件
+--1.4--------------------alter existing table:T_PA_TRADER
+ 
+alter table T_PA_TRADER modify TRADER_RELACTION NUMBER(3);
+ 
+--1.5--------------------commensts of tables and columns
+comment on column T_PA_TRADER.TRADER_RELACTION is '交易人關係';
+ 
+--2----------------------update script of table structue
+--2.2--------------------alter old table:T_PA_TRADER
+alter table T_PA_TRADER add constraint FK_PA_TRADER__TRADER_RELACTION foreign key (TRADER_RELACTION) references T_CHEQUE_RELATION (RELATION_ID);
+ 
+--3----------------------update script of other object

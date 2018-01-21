@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>${root.info}</title>
+<head>
+<style type="text/css">
+.CSSTableGenerator {
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	box-shadow: 10px 10px 5px #888888;
+	border: 1px solid #000000;
+	-moz-border-radius-bottomleft: 0px;
+	-webkit-border-bottom-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+	-moz-border-radius-bottomright: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+	-moz-border-radius-topright: 0px;
+	-webkit-border-top-right-radius: 0px;
+	border-top-right-radius: 0px;
+	-moz-border-radius-topleft: 0px;
+	-webkit-border-top-left-radius: 0px;
+	border-top-left-radius: 0px;
+}
+
+.CSSTableGenerator table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+.CSSTableGenerator tr:last-child td:last-child {
+	-moz-border-radius-bottomright: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.CSSTableGenerator table tr:first-child td:first-child {
+	-moz-border-radius-topleft: 0px;
+	-webkit-border-top-left-radius: 0px;
+	border-top-left-radius: 0px;
+}
+
+.CSSTableGenerator table tr:first-child td:last-child {
+	-moz-border-radius-topright: 0px;
+	-webkit-border-top-right-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+.CSSTableGenerator tr:last-child td:first-child {
+	-moz-border-radius-bottomleft: 0px;
+	-webkit-border-bottom-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+.CSSTableGenerator tr:hover td {
+	
+}
+
+.CSSTableGenerator tr:nth-child(odd) {
+	background-color: #aad4ff;
+}
+
+.CSSTableGenerator tr:nth-child(even) {
+	background-color: #ffffff;
+}
+
+.CSSTableGenerator td {
+	vertical-align: middle;
+	border: 1px solid #000000;
+	border-width: 0px 1px 1px 0px;
+	text-align: left;
+	padding: 7px;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: normal;
+	color: #000000;
+}
+
+.CSSTableGenerator tr:last-child td {
+	border-width: 0px 1px 0px 0px;
+}
+
+.CSSTableGenerator tr td:last-child {
+	border-width: 0px 0px 1px 0px;
+}
+
+.CSSTableGenerator tr:last-child td:last-child {
+	border-width: 0px 0px 0px 0px;
+}
+
+.CSSTableGenerator tr:first-child td {
+	background: -o-linear-gradient(bottom, #005fbf 5%, #003f7f 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #005fbf
+		), color-stop(1, #003f7f));
+	background: -moz-linear-gradient(center top, #005fbf 5%, #003f7f 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#005fbf",
+		endColorstr="#003f7f");
+	background: -o-linear-gradient(top, #005fbf, 003f7f);
+	background-color: #005fbf;
+	border: 0px solid #000000;
+	text-align: center;
+	border-width: 0px 0px 1px 1px;
+	font-size: 16px;
+	font-family: Arial;
+	font-weight: bold;
+	color: #ffffff;
+}
+
+.CSSTableGenerator tr:first-child:hover td {
+	background: -o-linear-gradient(bottom, #005fbf 5%, #003f7f 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #005fbf
+		), color-stop(1, #003f7f));
+	background: -moz-linear-gradient(center top, #005fbf 5%, #003f7f 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#005fbf",
+		endColorstr="#003f7f");
+	background: -o-linear-gradient(top, #005fbf, 003f7f);
+	background-color: #005fbf;
+}
+
+.CSSTableGenerator tr:first-child td:first-child {
+	border-width: 0px 0px 1px 0px;
+}
+
+.CSSTableGenerator tr:first-child td:last-child {
+	border-width: 0px 0px 1px 1px;
+}
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+
+//]]>
+</script>
+
+</head>
+<body>
+	<div class="CSSTableGenerator">
+		<table border="1">
+			<tr>
+				<td colspan="3">${root.info}</td>
+			</tr>
+			<#if root.hasFieldList>
+				<tr>
+					<th>class</th>
+					<th>field</th>
+					<th>value</th>
+				</tr>
+				<#list root.fieldList as var>
+					<tr>
+						<td>${var.className!"null"}</td>
+						<td>${var.fieldName!"null"}</td>
+						<td>
+							${var.hasExtraLink?string("<a href='${var.extraLink}'>", "")}
+							${var.info!"null"}
+							<#if var.hasExtraLink> 
+							<!-- 
+							<br/>
+							#S# extraLink = ${var.extraLink} #E#<br/>
+							#S# currentDir = ${var.currentDir} #E#<br/>
+							#S# currentFile = ${var.currentFile} #E#<br/>
+							#S# currentFileExist = ${var.currentFileExist?string} #E#<br/>
+							#S# all = ${var?string} #E#<br/>
+							 -->
+							</#if>
+							${var.hasExtraLink?string("</a>", "")}
+							<#if var.hasRelateMap> 
+								<br />
+								<table border="1">
+									<tr>
+										<th>${var.getRelateMapTh(0)}</th>
+										<th>${var.getRelateMapTh(1)}</th>
+									</tr>
+									<#list var.relateMap?keys as key_>
+									<tr>
+										<td>
+											${key_.hasExtraLink?string("<a href='${key_.extraLink}'>", "")} 
+											${key_.info!"null"} 
+											<#if key_.hasExtraLink> 
+											<!-- 
+											<br/>
+											#S# extraLink = ${key_.extraLink} #E#<br/>
+											#S# currentDir = ${key_.currentDir} #E#<br/>
+											#S# currentFile = ${key_.currentFile} #E#<br/>
+											#S# currentFileExist = ${key_.currentFileExist?string} #E#<br/>
+											#S# all = ${key_?string} #E#<br/>
+											</#if>
+											-->
+											${key_.hasExtraLink?string("</a>", "")}
+										</td>
+										<td>
+											${var.fetchRelateMapValue(key_).hasExtraLink?string("<a href='${var.fetchRelateMapValue(key_).extraLink}'>", "")}
+											${var.fetchRelateMapValueInfo(key_)}
+											<#if var.fetchRelateMapValue(key_).hasExtraLink> 
+											<!-- 
+											<br/>
+											#S# extraLink = ${var.fetchRelateMapValue(key_).extraLink} #E#<br/>
+											#S# currentDir = ${var.fetchRelateMapValue(key_).currentDir} #E#<br/>
+											#S# currentFile = ${var.fetchRelateMapValue(key_).currentFile} #E#<br/>
+											#S# currentFileExist = ${var.fetchRelateMapValue(key_).currentFileExist?string} #E#<br/>
+											#S# all = ${var?string} #E#<br/>
+											-->
+											</#if>
+											${var.fetchRelateMapValue(key_).hasExtraLink?string("</a>", "")}
+										</td>
+									</tr>
+									</#list>
+								</table> 
+							</#if>
+						</td>
+					</tr>
+				</#list>
+			</#if>
+			<#if root.hasMethodList>
+				<tr>
+					<th>returnType</th>
+					<th>method</th>
+					<th>parameter</th>
+				</tr>
+				<#list root.methodList as var>
+					<tr>
+						<td>${root.getModifier(var)}${root.getClassName(var.returnType)?string}</td>
+						<td>${var.name?string}</td>
+						<td>${root.getClassName(var)}</td>
+					</tr>
+				</#list>
+			</#if>
+			<#if root.hasRelateMap>
+				<tr>
+					<th>${root.getRelateMapTh(0)}</th>
+					<th>${root.getRelateMapTh(1)}</th>
+				</tr>
+				<#list root.relateMap?keys as key_>
+					<tr>
+						<td>
+							${key_.hasExtraLink?string("<a href='${key_.extraLink}'>", "")}
+							${key_.info!"null"} 
+							<#if key_.hasExtraLink> 
+							<!-- 
+							<br/>
+							#S# extraLink = ${key_.extraLink} #E#<br/>
+							#S# currentDir = ${key_.currentDir} #E#<br/>
+							#S# currentFile = ${key_.currentFile} #E#<br/>
+							#S# currentFileExist = ${key_.currentFileExist?string} #E#<br/>
+							#S# all = ${key_?string} #E#<br/>
+							-->
+							</#if>
+							${key_.hasExtraLink?string("</a>", "")}
+						</td>
+						<td>
+							${root.fetchRelateMapValue(key_).hasExtraLink?string("<a href='${root.fetchRelateMapValue(key_).extraLink}'>", "")}
+							${root.fetchRelateMapValueInfo(key_)}
+							<#if root.fetchRelateMapValue(key_).hasExtraLink> 
+							<!-- 
+							<br/>
+							#S# extraLink = ${root.fetchRelateMapValue(key_).extraLink} #E#<br/>
+							#S# currentDir = ${root.fetchRelateMapValue(key_).currentDir} #E#<br/>
+							#S# currentFile = ${root.fetchRelateMapValue(key_).currentFile} #E#<br/>
+							#S# currentFileExist = ${root.fetchRelateMapValue(key_).currentFileExist?string} #E#<br/>
+							#S# all = ${root.fetchRelateMapValue(key_)?string} #E#<br/>
+							-->
+							</#if>
+							${root.fetchRelateMapValue(key_).hasExtraLink?string("</a>", "")}
+						</td>
+					</tr>
+				</#list>
+			</#if>
+		</table>
+	</div>
+</body>
+</html>

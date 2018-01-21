@@ -1,0 +1,26 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function onload(){
+		try{
+			document.write("browser CodeName : " + navigator.appCodeName+"<br/>");
+			document.write("browser Name : " + navigator.appName+"<br/>");
+			document.write("browser Version : " + navigator.appVersion+"<br/>");
+			document.write("Cookies Enabled : " + navigator.cookieEnabled+"<br/>");
+			document.write("Platform : " + navigator.platform+"<br/>");
+			document.write("User-agent header : " + navigator.userAgent+"<br/>");
+			document.write("Geolocation : " + navigator.geolocation+"<br/>");
+			document.write("Plugins : " + navigator.plugins+"<br/>");
+		}catch(e){
+			alert(e);
+		}
+	}
+</script>
+</head>
+<body onload="onload()">
+</body>
+</html>

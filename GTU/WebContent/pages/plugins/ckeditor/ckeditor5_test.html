@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script src="jquery-1.8.0.js"></script>
+<script src="ckeditor.js"></script>
+<style>
+.ck-editor__editable {
+    min-height: 400px;
+}
+</style>
+<script type="text/javascript">
+		var editor = null;
+
+        $(document).ready(function(){
+            ClassicEditor
+			    .create( document.querySelector( '#editor' ), {
+			        toolbar: [ 'headings', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ],
+			        heading: {
+			            options: [
+			                { modelElement: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+			                { modelElement: 'heading1', viewElement: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+			                { modelElement: 'heading2', viewElement: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+			            ]
+			        },
+			    } )
+			    .then( editorInner => {
+			        console.log( editorInner );
+			        editor = editorInner;
+			    } )
+			    .catch( error => {
+			        console.log( error );
+			    } );
+			    
+			    $("#btn1").click(function(){
+			    	$("#testDiv").html(editor.getData());
+			    });
+			    
+			    $("#btn2").click(function(){
+			    	editor.setData("<h1>XXXXXXXXXXXX</h1>");
+			    });
+        });
+        
+</script>
+</head>
+<body>
+
+	<textarea name="content" id="editor">
+    </textarea>
+	<br />
+	<br />
+	<input type="button" id="btn1" value="手機顯示" />
+	<input type="button" id="btn2" value="網頁顯示" />
+	<input type="button" id="btn3" value="儲存" />
+
+	<div id="testDiv"></div>
+
+</body>
+</html>

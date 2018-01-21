@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+</head>
+<body>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+		});
+
+		function sendPicToServer() {
+			var dataurl = 'data:text/plain;base64,aGVsbG8gd29ybGQ=';
+			var blob = dataURLtoBlob(dataurl);
+			var fd = new FormData();
+			fd.append("file", blob, "hello.txt");
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', '/server.php', true);
+			xhr.onload = function() {
+				alert('upload complete');
+			};
+			xhr.send(fd);
+		}
+
+		function dataURLtoBlob(dataurl) {
+			var arr = dataurl.split(',');
+			var mime = arr[0].match(/:(.*?);/)[1];
+			var bstr = atob(arr[1]);
+			var n = bstr.length;
+			var u8arr = new Uint8Array(n);
+			while (n--) {
+				u8arr[n] = bstr.charCodeAt(n);
+			}
+			return new Blob([ u8arr ], {
+				type : mime
+			});
+		}
+	</script>
+</body>
+</html>

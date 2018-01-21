@@ -1,0 +1,56 @@
+function changeReadonly(id, readonly){
+	if(readonly){
+		$("#" + id).css( "background-color", "#EEEEEE" );
+		$("#" + id).attr("readOnly", "readOnly");
+		$("#" + id).attr("disabled", "disabled"); //for select
+	}else{
+		$("#" + id).css( "background-color", "#FFFFFF" );
+		$("#" + id).removeAttr("readOnly");
+		$("#" + id).removeAttr("disabled");	//for select
+	}
+}
+	
+	
+<style type="text/css">
+select[readonly]{
+    background: #eee;
+    cursor:no-drop;
+}
+select[readonly] option{
+    display:none;
+}
+</style>
+
+	
+
+//設定標籤disabled
+function setTagDisabled(name, disabled, valueClean){
+     var element = null;
+     if(typeof(name) == 'string'){
+          element = $("[name="+name+"]");
+     }else{
+          element = name;
+     }
+     if($(element).length == 0){
+          alert("找不到tag : " + name);
+          return;
+     }
+     if(disabled){
+          $(element).attr("readonly", true);
+          if(valueClean){
+              $(element).attr("disabled", true);
+              $(element).val("");
+          }
+          if($(element).prop("tagName") == 'SELECT'){
+              jQuery('option:not(:selected)', element).attr('disabled',true);
+          }
+     }else{
+          $(element).attr("readonly", false);
+          $(element).removeAttr("disabled");
+          if($(element).prop("tagName") == 'SELECT'){
+              jQuery('option', element).attr('disabled',false);
+          }
+     }
+}
+
+	

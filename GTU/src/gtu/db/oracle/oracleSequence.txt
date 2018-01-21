@@ -1,0 +1,11 @@
+create sequence S_TA_TRADER__LIST_ID 
+increment by 1
+start with 1
+nomaxvalue
+nocycle
+cache 10;
+
+
+select S_TA_TRADER__LIST_ID.Currval from dual ;
+
+select S_TA_TRADER__LIST_ID.Nextval from dual ;

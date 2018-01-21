@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<aop:config proxy-target-class="true">
+		<!-- 配置先後順序:pointcut,advisor,aspect 若在aspect中定義pointcut則沒有先後順序 -->
+		<aop:pointcut id="greetToPointcut"
+			expression="(target(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter) or target(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaughtyWaiter)) and execution(* greetTo(..))" />
+
+		<aop:aspect ref="adviceMethods">
+			<aop:before pointcut-ref="greetToPointcut" method="preGreeting" />
+		</aop:aspect>
+
+		<aop:aspect ref="adviceMethods">
+			<aop:after pointcut-ref="greetToPointcut" method="postGreeting" />
+		</aop:aspect>
+
+		<aop:aspect ref="adviceMethods">
+			<aop:after-returning method="afterReturning"
+				pointcut="target(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter)"
+				returning="retVal" />
+		</aop:aspect>
+
+		<aop:aspect ref="adviceMethods">
+			<aop:around method="aroundMethod"
+				pointcut="execution(* serveTo(..)) and within(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter)" />
+		</aop:aspect>
+
+		<aop:aspect ref="adviceMethods">
+			<aop:after-throwing method="afterThrowingMethod"
+				pointcut="target(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter) and execution(* checkBill(..))"
+				throwing="iae" />
+		</aop:aspect>
+
+		<!-- 引介增強 -->
+		<aop:aspect ref="adviceMethods">
+			<aop:declare-parents
+				implement-interface="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.Seller"
+				default-impl="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.SmartSeller"
+				types-matching="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter" />
+		</aop:aspect>
+
+		<aop:aspect ref="adviceMethods">
+			<aop:before method="bindParams"
+				pointcut="target(gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter) and args(name,num,..)" />
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="adviceMethods" class="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.AdviceMethods" />
+	<bean id="naiveWaiter" class="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaiveWaiter" />
+	<bean id="naughtyWaiter" class="gtu.spring.aop.aspectj.AspectJXmlConfig1Test.NaughtyWaiter" />
+</beans>

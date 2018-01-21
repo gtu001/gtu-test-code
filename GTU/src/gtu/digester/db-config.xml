@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<db-config>
+	<db-provider server="AMPMDB2_SERVER_PRD" connMode="1"
+		jndiName="java:">
+		<url>9E5mpMhzsIK8HuuF76mPsw==</url>
+		<db>vXAL/XMITgU=</db>
+		<ip>uiYALNJYjZrLRBYS8LyNeg==</ip>
+		<port>z2ufySMZm9Y=</port>
+		<usr>vXAL/XMITgU=</usr>
+		<pwd>LMlo9hRD27s=</pwd>
+		<driver>com.ibm.db2.jcc.DB2Driver</driver>
+	</db-provider>
+
+	<db-provider server="AMPMDB2_SERVER_UAT" connMode="1"
+		jndiName="java:">
+		<url>9E5mpMhzsIK8HuuF76mPsw==</url>
+		<db>VudWjYOcgxc=</db>
+		<ip>6iuH5ZdkehhpJbwS+UY1Tw==</ip>
+		<port>PxSrBdaQn0Q=</port>
+		<usr>vXAL/XMITgU=</usr>
+		<pwd>H08pzOuR6dg=</pwd>
+		<driver>com.ibm.db2.jcc.DB2Driver</driver>
+	</db-provider>
+
+	<db-provider server="FED_SERVER_UAT" connMode="1" jndiName="java:">
+		<url>9E5mpMhzsIK8HuuF76mPsw==</url>
+		<db>sqiRDs/ycMO63O7vsEbB5g==</db>
+		<ip>6iuH5ZdkehhpJbwS+UY1Tw==</ip>
+		<port>PxSrBdaQn0Q=</port>
+		<usr>uWwD3wVt91u63O7vsEbB5g==</usr>
+		<pwd>uWwD3wVt91u63O7vsEbB5g==</pwd>
+		<driver>com.ibm.db2.jcc.DB2Driver</driver>
+	</db-provider>
+
+	<db-provider server="FED_SERVER_PRD" connMode="1" jndiName="java:">
+		<url>9E5mpMhzsIK8HuuF76mPsw==</url>
+		<db>d1c8LLNunGE=</db>
+		<ip>uiYALNJYjZrLRBYS8LyNeg==</ip>
+		<port>z2ufySMZm9Y=</port>
+		<usr>GQAn8iGQ1u4=</usr>
+		<pwd>BSPpqTDoUZsEOrYZmWWWv7rc7u+wRsHm</pwd>
+		<driver>com.ibm.db2.jcc.DB2Driver</driver>
+	</db-provider>
+
+	<db-provider server="INFORMIX_SERVER_UAT" connMode="1"
+		jndiName="java:">
+		<url>Zf6aBQz3NWjMM63o4HVD4fBmVU2FdNgq</url>
+		<db>NYQ588qMU6cG4x0qZ1cMyRHQVxyevwYo7P7D43BECs+PgrnrOYWCHQ==</db>
+		<ip>6iuH5ZdkehhOKp7s67HxOQ==</ip>
+		<port>H19Ib7Rpus4=</port>
+		<usr>cj7uITT+DRm63O7vsEbB5g==</usr>
+		<pwd>eDQvOzi8a5C63O7vsEbB5g==</pwd>
+		<driver>com.informix.jdbc.IfxDriver</driver>
+	</db-provider>
+</db-config>

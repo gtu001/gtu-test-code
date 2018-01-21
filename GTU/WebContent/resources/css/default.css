@@ -1,0 +1,423 @@
+/* template */
+
+html,body	{
+	padding:0;
+	margin:0;
+	background-color: #FFF;
+}
+img		{border:0;}
+.imgB1		{
+	margin-bottom: 6px;
+	padding-bottom: 6px;
+}
+form		{margin:0;padding:0;border:0;}
+
+.pic		{
+	margin: 0px 10px 8px 5px;
+	padding: 0px 10px 8px 5px;
+}
+.pic2		{
+	margin: 4px 10px 10px 5px;
+}
+
+body,p,div,span,td,th,ol,ul,li,Input,select	{
+	font: 16px;
+	line-Height:30px;/*old:20px*/
+	font-family: 移民署宋體0字面, 移民署宋體2字面, 移民署宋體F字面;
+}
+
+/*add*/
+select {
+	font:16px Arial,新細明體;
+}
+
+body {background-repeat: repeat;}
+
+.gray		{background-color:#f3f3f3;}
+.companyimg {
+	margin-top: 20px;
+}
+
+ img {
+} 
+
+
+
+div#spacer01	{width:1px;Height:1px;font:0;line-Height:0;clear:both;}
+div#spacer05	{width:5px;Height:5px;font:0;line-Height:0;clear:both;}
+div#spacer10	{width:10px;Height:10px;font:0;line-Height:0;clear:both;}
+div#spacer20	{width:20px;Height:20px;font:0;line-Height:0;clear:both;}
+
+div#spacerbtn	{width:149px;Height:184px;font:0;}
+
+td.word {margin:5px;padding:5px;border:0;}
+
+td.spacer10	{height:5px;}
+
+.picimg {
+	margin: 0px 8px 5px 3px;
+	padding: 0px 8px 5px 3px;
+	border-top: none;
+	border-right: none;
+	border-bottom: none;
+	border-left: none;
+}
+
+table.hotjob{font-size: 12px;line-height: 18px;text-decoration: underline;}
+
+.br1 {border-RIGHT: #bfbfbf 1px solid; BORDER-TOP: #bfbfbf 1px solid; BORDER-LEFT: #bfbfbf 1px solid; BORDER-BOTTOM: #bfbfbf 1px solid}
+
+table#tb	{border-collapse:collapse;}
+table#tb td	{padding:0;}
+
+table#tb table.tbc td {padding:4;}
+
+
+.b		{font-weight:bold;}
+
+.txt000		{color:#000;}
+.txt099		{color:#099;}
+.txt036		{color:#036;}
+.txt063		{color:#063;}
+.txt09C		{color:#09C;}
+.txt333		{color:#333;}
+.txt360		{color:#360;}
+.txt366		{color:#428484;}
+.txt369		{color:#369;}
+.txt390		{color:#390;}
+.txt399		{color:#399;}
+.txt333		{color:#333;}
+.txt666		{color:#666;}
+.txt693		{color:#693;}
+.txt6C0		{color:#6C0;}
+.txt930		{color:#930;}
+.txt999		{color:#8E8E8E;}
+.txtC60		{color:#C60;}
+.txtC00		{color:#C00;}
+.txtCCC  	{color:#CCC;}
+.txtC93		{color:#C93;}
+.txtC66		{color:#C66;}
+.txtF60		{color:#F60;}
+.txtFFF		{color:#FFF;}
+.txt624		{color:#624711;}
+.txt11px	{font-size:11px;}
+.txt12px	{font-size:12px;}
+.txt13px	{
+	font-size:13px;
+	letter-spacing: 1px;
+	line-height: 22px;
+}
+.txt15px	{font-size:15px;}
+.txt16px	{font-size:16px;}
+.txt18px	{font-size:18px;}
+
+.13px_space {
+	line-height: 16px;
+	margin-top: 2px;
+	padding-top: 2px;
+	margin-bottom: 1px;
+	padding-bottom: 1px;
+}
+
+div.specialTH	{
+	float: right;
+	margin-left: 5px;
+}
+
+div.specialTH02	{
+	float: left;
+	margin-left: 5px;
+}
+
+
+
+
+/* search */
+table.searchBg {
+	border: 1px dotted #999999;
+}
+
+/* copyright */
+
+td.cpy		{color:#FFF;padding:40px 0 0 35px;}
+
+
+/* login */
+
+td.page_dashHLine	{Height:3px;line-Height:0;font:0;background:url("#{resource['images:line.jpg']}") repeat top;}
+td.page_dashHLine2	{
+	Height:10px;
+	line-Height:0;
+	font:0;
+	background-image: url("#{resource['images:line.jpg']}");
+	background-repeat: repeat-x;
+	background-position: bottom;
+}
+td.page_dashHLine3	{Height:20px;line-Height:0;font:0;background:url("#{resource['images:line.jpg']}") repeat top;}
+td.page_dashHLine5	{Width:5px;line-Height:0;font:0;background:url("#{resource['images:line.jpg']}") repeat left;}
+
+
+
+/*forward*/
+
+
+div.word {margin:8; padding:8;}
+td.word02{
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-color: 48a6d6;
+	border-bottom-color: 48a6d6;
+	border-left-color: 48a6d6;
+}
+
+
+
+/* search */
+
+
+.br1 {
+	BORDER-RIGHT: #bfbfbf 1px solid; BORDER-TOP: #bfbfbf 1px solid; BORDER-LEFT: #bfbfbf 1px solid; BORDER-BOTTOM: #bfbfbf 1px solid
+}
+
+.linkA  a:link , .linkA a:visited	{color:#015b88;text-decoration:none;}
+.linkA  a:hover						{color:#C00;text-decoration:underline;}
+
+table.linkA td.linkD a:link  , table.linkA td.linkD a:visited {color:#C30;text-decoration:underline;}
+table.linkA td.linkD a:hover						{color:#F60;text-decoration:underline;}
+
+
+table.linkB td.linkG a:link  , table.linkB td.linkG a:visited {color:#015b88;text-decoration:none;}
+table.linkB td.linkG a:hover						{color:#C00;text-decoration:underline;}
+
+
+
+
+.linkB  a:link , .linkB  a:visited	{color:#FF6633;text-decoration:none;}
+.linkB  a:hover						{color:#C00;text-decoration:underline;}
+
+
+.linkC a:link , .linkC a:visited	{color:#FFF;text-decoration:none;}
+.linkC a:hover						{
+	color:#FFFFFF;
+	font-weight: bold;
+}
+.menuline {
+	border-right: 1px dotted #FFFFFF;
+}
+
+
+
+table.linkF a:link , table.linkF a:visited	{
+	color:#624711;
+	text-decoration: none;
+}
+table.linkF a:hover		                {color:#C00;text-decoration:underline;}
+
+
+table.allbg {border: 4px solid #DBDBDB;}
+
+
+table.linkZ  a:link , table.linkZ a:visited	{color:#015b88;text-decoration:underline;letter-spacing: 0px;}
+table.linkZ  a:hover {color:#C00;text-decoration:underline;letter-spacing: 0px;}		
+
+
+
+
+.ddsmoothmenu{
+	font: 12px Verdana;
+	float: left;
+	/*margin-left: 0px;*/
+	position: relative;
+	left: -20px;
+}
+
+.ddsmoothmenu ul{
+	list-style-type: none;
+
+}
+
+/*Top level list items*/
+.ddsmoothmenu  .ppt a:link ,.ddsmoothmenu  .ppt a:visited {
+	color: #000;
+	text-decoration: none;
+	background-image: url("#{resource['images:btn.jpg']}");
+	font-size: 15px;
+	/*margin-bottom: 8px;*/
+	margin-left:37px; /*add*/
+	/*padding-left: 8px;*/
+	padding-top: 5px; /*old:3px;*/
+	height: 34px;/*old:37px*/
+	width: 184px;
+	display: block;
+	text-indent: -15px;/*add*/
+}	
+
+.ddsmoothmenu  .ppt  a:hover{
+	background-image: url("#{resource['images:btn04.jpg']}");
+}
+
+
+/*1st sub level menu*/
+.ddsmoothmenu ul li ul{
+	margin-bottom: 5px;/*old:15px*/
+	margin-top: 5px;/*old:15px*/
+	padding-left: 10px;/*old:25px*/
+	/*margin-left: 0px\9;*/
+}
+
+/*Sub level menu list items (undo style from Top level List Items)*/
+.ddsmoothmenu ul li ul li{
+	width: 120px;
+	font-size: 14px;/*old:13px;*/
+	background-image: url("#{resource['images:btn03.jpg']}");
+	line-height: 20px;
+	margin-bottom: 2px;
+}
+
+.ddsmoothmenu ul li ul li a:link , .ddsmoothmenu ul li ul li a:visited{
+color: #000;text-decoration: none;
+text-indent: -30px;/*add*/
+}
+
+.ddsmoothmenu ul li ul li a:hover{
+color: #f00;text-decoration: none;
+}
+
+.ddsmoothmenu ul li ul li ul {
+	margin-top: 4px;
+	/*margin-left: 6px;*/
+	padding-left: 0px;/*old:6px;*/
+
+
+}
+
+.ddsmoothmenu ul li ul li ul li{
+	width: 100px;
+	font-size: 14px;/*old:12px;*/
+	color: #666666;
+	margin-bottom: 3px;
+}
+
+.ddsmoothmenu ul li ul li ul li a:link , .ddsmoothmenu ul li ul li ul li a:visited{
+	width: 100px;
+	font-size: 14px;/*old:12px*/
+	color: #666666;
+	margin-bottom: 0px;
+	text-decoration: none;
+	text-indent: -30px;/*add*/
+
+}
+
+.ddsmoothmenu ul li ul li ul li a:hover{
+	color: #006633;
+	text-decoration: none;
+	font-family: cursive;
+	font: bolder;
+}
+
+
+
+
+
+td.title {
+	height: 8px;
+}
+
+td.introMore a:link , td.introMore a:visited	{color:#369;text-decoration:underline;font-size:12px;}
+
+table.trendTB	{border:2px solid #000;}
+table.trendTB td	{border:1px solid #000;text-align:center;Height:25px;}
+.oneline {
+	background: url("#{resource['images:line.jpg']}") repeat-y;
+}
+
+.tdline {
+	border-top: 1px solid #AFAFAF;
+	border-right: 1px solid #AFAFAF;
+	border-bottom: 1px solid #AFAFAF;
+	border-left-style: none;
+	border-left-color: #AFAFAF;
+}
+.alltdline {
+	border: 1px solid #AFAFAF;
+}
+.joblistline {
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #AFAFAF;
+	border-left-color: #AFAFAF;
+}
+.leftline {
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #BFBFBF;
+}
+
+table.searchTB2		{
+	border-collapse:collapse;
+}
+
+
+div.menu01 {
+	background-position: center;
+	float: left;
+	background-color: #FFFFFF;
+	margin-left: 10px;
+	font-size: 15px;
+	font-weight: bold;
+	color: #000000;
+	margin-top: 8px;
+}
+div.menu02 {
+	font-size: 15px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #489FCC;
+	float: left;
+	margin-left: 15px;
+	padding-top: 12px;
+}
+
+.link18  a:link , .link18 a:visited	    {
+	color:#0E7DA3;
+	text-decoration:underline;
+	font: bold 18px/30px Verdana, Arial, Helvetica, sans-serif;
+}
+.link18  a:hover						{color:#CC0000;text-decoration:underline;font: bold 18px/30px Verdana, Arial, Helvetica, sans-serif;}
+
+.link16  a:link , .link16 a:visited	    {color:#E75F5F;text-decoration:underline; font: bold 15px/30px Verdana, Arial, Helvetica, sans-serif;}
+.link16  a:hover						{color:#CC0000;text-decoration:underline;font: bold 15px/30px Verdana, Arial, Helvetica, sans-serif;}
+
+
+.link15  a:link , .link15 a:visited	    {color:#358A53;text-decoration:underline; font: bold 15px/30px Verdana, Arial, Helvetica, sans-serif;}
+.link15  a:hover						{color:#CC0000;text-decoration:underline;font: bold 15px/30px Verdana, Arial, Helvetica, sans-serif;}
+
+
+.link13  a:link , .link13 a:visited	    {color:#993300;text-decoration:underline; font: bold normal 13px/30px Verdana, Arial, Helvetica, sans-serif;}
+.link13  a:hover						{color:#CC0000;text-decoration:underline;font: bold 13px/30px Verdana, Arial, Helvetica, sans-serif;}
+
+.link12  a:link , .link12 a:visited	    {color:#7B537B;text-decoration:underline; font: normal 12px/30px Verdana, Arial, Helvetica, sans-serif;}
+.link12  a:hover						{color:#CC0000;text-decoration:underline;font: normal 12px/30px Verdana, Arial, Helvetica, sans-serif;}
+
+td.article {
+	font-size: 13px;
+	font-weight: bold;
+	color: #000000;
+	letter-spacing: 1px;
+}
+div.add{
+	background-image: url("#{resource['images:bg03.jpg']}");
+	width: 75px;
+	border: 1px solid #CCCCCC;
+	font-size: 13px;
+	font-weight: bold;
+	color: #000000;
+	height: 32px;
+	padding-top: 8px;
+}

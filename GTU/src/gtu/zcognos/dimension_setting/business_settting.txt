@@ -1,0 +1,63 @@
+			<querySubject status="valid">
+				<name locale="zh">rscdz006</name>
+				<lastChanged>2012-03-16T17:02:05</lastChanged>
+				<lastChangedBy>°Î¦W</lastChangedBy>
+				<definition>
+					<modelQuery>
+						<sql type="cognos">
+							Select
+							<column>*</column>
+							from
+							<table />
+						</sql>
+					</modelQuery>
+				</definition>
+				<queryItem>
+					<name locale="zh">gender</name>
+					<lastChanged>2012-03-16T17:02:05</lastChanged>
+					<lastChangedBy>°Î¦W</lastChangedBy>
+					<expression>
+						<refobj>[DatasourceView].[rscdz006].[gender]</refobj>
+					</expression>
+					<usage>attribute</usage>
+					<datatype>character</datatype>
+					<precision>1</precision>
+					<scale>0</scale>
+					<size>4</size>
+					<regularAggregate>unsupported</regularAggregate>
+					<semiAggregate>unsupported</semiAggregate>
+				</queryItem>
+				<queryItem>
+					<name locale="zh">gender_alias</name>
+					<lastChanged>2012-03-16T17:02:05</lastChanged>
+					<lastChangedBy>°Î¦W</lastChangedBy>
+					<expression>
+						<refobj>[DatasourceView].[rscdz006].[gender_alias]</refobj>
+					</expression>
+					<usage>attribute</usage>
+					<datatype>characterLength16</datatype>
+					<precision>50</precision>
+					<scale>0</scale>
+					<size>102</size>
+					<regularAggregate>unsupported</regularAggregate>
+					<semiAggregate>unsupported</semiAggregate>
+				</queryItem>
+			</querySubject>
+			<relationship status="valid">
+				<name>rscdzzzz &lt;--&gt; rscdz006</name>
+				<expression>
+					<refobj>[BusinessView].[rscdzzzz].[id2]</refobj>
+					=
+					<refobj>[BusinessView].[rscdz006].[gender]</refobj>
+				</expression>
+				<left>
+					<refobj>[BusinessView].[rscdzzzz]</refobj>
+					<mincard>zero</mincard>
+					<maxcard>many</maxcard>
+				</left>
+				<right>
+					<refobj>[BusinessView].[rscdz006]</refobj>
+					<mincard>one</mincard>
+					<maxcard>one</maxcard>
+				</right>
+			</relationship>

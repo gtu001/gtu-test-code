@@ -1,0 +1,30 @@
+
+
+Ubuntu 14.04 install Java 8
+
+最近需要在Ubuntu 安裝JAVA
+
+發現比以前容易安裝多了。
+
+http://tecadmin.net/install-oracle-java-8-jdk-8-ubuntu-via-ppa/
+
+按照上面這個文章指示
+
+去安裝
+
+$ sudo add-apt-repository ppa:webupd8team/java
+$ sudo apt-get update
+$ sudo apt-get install oracle-java8-installer
+
+安裝完，查詢是否正確安裝
+
+java -version
+
+再設定一下環境
+
+$ sudo apt-get install oracle-java8-set-default
+
+查詢Ubuntu版本 
+
+lsb_release -a 
+

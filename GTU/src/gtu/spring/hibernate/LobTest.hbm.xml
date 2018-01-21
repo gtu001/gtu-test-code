@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="true" default-lazy="false">
+    <class name="com.baobaotao.domain.Post" table="t_post">
+        <id name="postId" column="post_id">
+        	<generator class="identity" />
+        </id>
+        <property name="userId" column="user_id"/>
+        <property name="postText" column="post_text"
+        	type="org.springframework.orm.hibernate3.support.ClobStringType"/>
+        <property name="postAttach" column="post_attach"
+        	type="org.springframework.orm.hibernate3.support.BlobByteArrayType"/>
+        <property name="postTime" column="post_time" type="date" />
+        <many-to-one name="topic" column="topic_id" class="combaobaotao.domain.Topic" />
+        
+        <!-- BlobByteArrayType 對應Blob映射為byte[] -->
+        <!-- BlobStringType 對應Blob映射為String -->
+        <!-- BlobSerializableType 對應Blob映射為Serializable -->
+        <!-- ClobStringType 對應Clob映射為String -->
+    </class>
+</hibernate-mapping>

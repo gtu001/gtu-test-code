@@ -1,0 +1,231 @@
+<html>
+<head>
+<script type="text/javascript">
+	onerror = function(msg, url, line) {
+		alert(msg + url + line);
+	}
+	
+	function assignNewProperty(){
+		var object1 = new Object(); 
+		var object2 = object1; 
+		object1.myValue = "CSS"; 
+		document.write(object2.myValue);
+	}
+	
+	function functionCall(){
+		var array = []; 
+		array.push(1); 
+		array["push"](2); 
+		document.write(array);
+	}
+	
+	function functionBind(){
+		function writeLineForAll(label) {
+		    console.log(label + ":" + this.name); 
+		} 
+		var book1 = { 
+		    name : "Javascript" 
+		}; 
+		var book2 = { 
+		    name : "CSS" 
+		}; 
+		// create a function just for book1 
+		var writeLineForPerson1 = writeLineForAll.bind(book1); 
+		writeLineForPerson1("book1");      
+		// create a function just for book2 
+		var writeLineForPerson2 = writeLineForAll.bind(book2, "book2"); 
+		writeLineForPerson2();             
+		// attaching a method to an object doesn't change 'this' 
+		book2.writeLine = writeLineForPerson1; 
+		book2.writeLine("book2");        
+	}
+	
+	function propertyInObject(){
+		var book1 = { 
+		    name : "Javascript" 
+		}; 
+		var book2 = new Object(); 
+		book2.name = "Javascript"; 
+		book1.website = "java2s.com"; 
+		book2.website = "java2s.com"; 
+		book1.name = "CSS"; 
+		book2.name = "HTML"; 
+		console.log("name" in book1);     // true 
+		console.log("age" in book1);      // true 
+		console.log("title" in book1);    // false 
+	}
+	
+	function propertyInObject2(){
+		var book1 = { 
+		    name : "Javascript", 
+		    writeLine : function() { /*from ww  w  .  j ava  2 s  .  c om*/
+		        console.log(this.name); 
+		    } 
+		}; 
+		console.log("name" in book1);                     
+		console.log(book1.hasOwnProperty("name"));      
+		console.log("toString" in book1);               
+		console.log(book1.hasOwnProperty("toString"));  
+	}
+	
+	function removeProperty(){
+		var book1 = { 
+		    name : "Javascript" 
+		}; 
+		console.log("name" in book1);//true
+		delete book1.name;                
+		console.log("name" in book1);//false
+		console.log(book1.name);//undefined
+	}
+	
+	function enumerationObject(){
+		var book1 = { 
+		    name : "Javascript" 
+		}; 
+		var properties = Object.keys(book1); 
+		for (var i=0, len=properties.length; i < len; i++){ 
+		    console.log("Name: " + properties[i]); 
+		    console.log("Value: " + book1[properties[i]]); 
+		} 
+	}
+	
+	function getterSetter(){
+		var book1 = { 
+		   _name : "Javascript", 
+		   get name() { 
+		        console.log("Reading name"); 
+		        return this._name; 
+		    }, 
+		   set name(value) { 
+		        console.log("Setting name to %s", value); 
+		        this._name = value; 
+		    } 
+		}; 
+		console.log(book1.name); 
+		book1.name = "CSS"; 
+		console.log(book1.name); 
+		/*
+			Reading name
+			Javascript
+			Setting name to CSS
+			Reading name
+			CSS
+		*/
+	}
+	
+	function getterSetter2(){
+		var book1 = { 
+		    _name : "Javascript" 
+		};
+		Object.defineProperty(book1, "name", { 
+		    get : function() { 
+		        console.log("Reading name"); 
+		        return this._name; 
+		    }, 
+		    set : function(value) { 
+		        console.log("Setting name to %s", value); 
+		        this._name = value; 
+		    }, 
+		    enumerable : true, 
+		    configurable : true 
+		}); 
+	}
+	
+	function getterSetter3(){
+		var book1 = {}; 
+		Object.defineProperties(book1, { 
+		    // data property to store data 
+		    _name : { 
+		        value : "Javascript", 
+		        enumerable : true, 
+		        configurable : true, 
+		        writable : true 
+		    }, 
+		    // accessor property 
+		    name : { 
+		        get : function() { 
+		            console.log("Reading name"); 
+		            return this._name; 
+		        }, 
+		        set : function(value) { 
+		            console.log("Setting name to %s", value); 
+		            this._name = value; 
+		        }, 
+		        enumerable : true, 
+		        configurable : true 
+		    } 
+		}); 
+	}
+	
+	function propertyDefineCheck(){
+		var book1 = { 
+		    name : "Javascript" 
+		}; 
+		var descriptor = Object.getOwnPropertyDescriptor(book1, "name"); 
+		console.log(descriptor.enumerable);     // true 
+		console.log(descriptor.configurable);   // true 
+		console.log(descriptor.writable);       // true 
+		console.log(descriptor.value);          // "Javascript" 
+	}
+	
+	function preventExtensive(){
+		var book1 = { 
+		    name : "Javascript" 
+		}; //  www. ja  v a 2s.  c  o m
+		console.log(Object.isExtensible(book1));      // true 
+		Object.preventExtensions(book1); 
+		console.log(Object.isExtensible(book1));      // false 
+		book1.writeLine = function() { 
+		     console.log(this.name); 
+		}; 
+		console.log("writeLine" in book1);              // false
+	}
+	
+	function prototype1(){
+		function Book(name) {
+		    this.name = name; 
+		} 
+		Book.prototype.writeLine = function() { 
+		    console.log(this.name); 
+		};
+		var book1 = new Book("Javascript"); 
+		var book2 = new Book("CSS"); 
+		console.log(book1.name);          // "Javascript" 
+		console.log(book2.name);          // "CSS" 
+		book1.writeLine();                  // outputs "Javascript" 
+		book2.writeLine();                  // outputs "CSS" 
+	}
+	
+	function prototype2(){
+		function Book(name) {
+		    this.name = name; 
+		} 
+		Book.prototype = { 
+		    constructor : Book, 
+		    writeLine : function() { 
+		        console.log(this.name); 
+		    }, 
+		    toString : function() { 
+		        return "[Book " + this.name + "]"; 
+		    } 
+		}; 
+		var book1 = new Book("Javascript"); 
+		var book2 = new Book("CSS"); 
+		console.log(book1 instanceof Book);         // true 
+		console.log(book1.constructor === Book);    // true 
+		console.log(book1.constructor === Object);    // false 
+		console.log(book2 instanceof Book);         // true 
+		console.log(book2.constructor === Book);    // true 
+		console.log(book2.constructor === Object);    // false 
+	}
+	
+	//顯示原始類別 會比 typeof完整
+	function showObjectOrignType(){
+		var currentFruit = [];
+		alert(Object.prototype.toString.call(currentFruit));
+	}
+</script>
+</head>
+<body onload="functionCall()">
+</body>
+</html>

@@ -1,0 +1,18 @@
+--取得table所有欄位
+select t.COLUMN_NAME,
+       t.DATA_TYPE,
+       t.DATA_LENGTH,
+       t.DATA_PRECISION,
+       t.DATA_SCALE,
+       t.NULLABLE,
+       d.COMMENTS
+  from user_tab_columns t
+  left join user_col_comments d
+    on t.TABLE_NAME = d.TABLE_NAME
+   and t.COLUMN_NAME = d.COLUMN_NAME
+where t.TABLE_NAME = upper('t_pa_cash_refund')
+--// data_precision = 22, data_scale = 6 --> NUMBER(22,6)
+
+
+--取得所有table
+select t.TABLE_NAME from user_tables t 

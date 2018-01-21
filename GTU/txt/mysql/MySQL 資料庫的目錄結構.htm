@@ -1,0 +1,1323 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="zh-TW" itemscope itemtype="http://schema.org/Blog">
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta property="og:site_name" content="隨便寫寫的新天地">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:url" content="http://tsuozoe.pixnet.net/blog/post/21291702">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="MySQL 資料庫的目錄結構 @ 隨便寫寫的新天地 :: 痞客邦 PIXNET ::" />
+<meta property="og:description" content="mysql&amp;amp;gt; SHOW VARIABLES LIKE 'datadir';列出 MySQL 資料庫路徑ex. C:\Program Files\MySQL\MySQL Server 5." />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="twitter:card" content="summary">
+<meta name="description" content="mysql&amp;amp;gt; SHOW VARIABLES LIKE 'datadir';列出 MySQL 資料庫路徑ex. C:\Program Files\MySQL\MySQL Server 5.">
+<meta name="twitter:description" content="mysql&amp;amp;gt; SHOW VARIABLES LIKE 'datadir';列出 MySQL 資料庫路徑ex. C:\Program Files\MySQL\MySQL Server 5.">
+<meta name="twitter:site" content="@pixnet">
+<meta name="author" content="tsuozoe (tsuozoe)">
+<meta name="author-avatar-20" content="http://s5.pimg.tw/avatar/tsuozoe/0/0/zoomcrop/20x20.png?v=1252647271">
+<meta name="static-version" content="c5d357c4f8d81a7e8c7c244d14662713">
+<meta name="generator" content="PChoc">
+<meta name="keywords" content=",藝文評論,MySQL 資料庫,MySQL 資料庫的目錄結構">
+<link rel="canonical" href="http://tsuozoe.pixnet.net/blog/post/21291702-mysql-%e8%b3%87%e6%96%99%e5%ba%ab%e7%9a%84%e7%9b%ae%e9%8c%84%e7%b5%90%e6%a7%8b">
+<meta name="twitter:url" content="http://tsuozoe.pixnet.net/blog/post/21291702">
+<meta name="cover_image" content="">
+<meta name="twitter:image" content="">
+<link rel="prev" href="http://tsuozoe.pixnet.net/blog/post/21289210">
+<link rel="next" href="http://tsuozoe.pixnet.net/blog/post/21292827">
+<link rel="alternate" type="application/json+oembed" href="http://api.pixnet.cc/oembed?url=http%3A%2F%2Ftsuozoe.pixnet.net%2Fblog%2Fpost%2F21291702&amp;format=json" title="PIXNET oEmbed Profile">
+<link rel="alternate" type="text/xml+oembed" href="http://api.pixnet.cc/oembed?url=http%3A%2F%2Ftsuozoe.pixnet.net%2Fblog%2Fpost%2F21291702&amp;format=xml" title="PIXNET oEmbed Profile">
+<link rel="search" type="application/opensearchdescription+xml" href="http://tsuozoe.pixnet.net/blog/opensearch" title="隨便寫寫的新天地">
+<title>MySQL 資料庫的目錄結構 @ 隨便寫寫的新天地 :: 痞客邦 PIXNET ::</title>
+<meta name="twitter:title" content="MySQL 資料庫的目錄結構 @ 隨便寫寫的新天地 :: 痞客邦 PIXNET ::">
+<base href="http://tsuozoe.pixnet.net/blog/post/21291702">
+<style type="text/css">
+#links-row-1 .x1ad77a-mIb-ad-sidebar-v2-x1ad77a {display: block !important; min-width: 160px !important; min-height: 270px !important; margin-top: 0; z-index:100;}
+.x1ad77a-mIb-ad-sidebar-v2-x1ad77a * { padding: 0 ; margin: 0 ; border: 0; vertical-align: baseline; display: block; line-height: 1; }
+.x1ad77a-mIb-ad-sidebar-v2-x1ad77a .box-text { overflow:hidden; padding:0; margin:0; }
+.x1ad77a-mIb-ad-sidebar-v2-x1ad77a .box-text a {height: auto;}
+.x1ad77a-mIb-border-x1ad77a { padding: 0; min-width: 180px; min-height: 280px; margin: 12px auto; overflow: hidden; text-align:center; }
+.x1ad77a-mIb-border-x1ad77a img, .x1ad77a-mIb-border-x1ad77a div { margin:0 auto; display:inline-block; min-width:160px; min-height:240px; }
+.x1ad77a-mIb-border-x1ad77a_1080 {padding: 0; width: 180px; height: 280px; margin: 12px auto; overflow: hidden;}
+.x1ad77a-mIb-border-x1ad77a div {position: relative;}
+</style>
+<link rel="stylesheet" href="//front.pixfs.net/css/lang-css.css?v=53452873?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/iframe-popup.css?v=79127c7c?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/css">
+<link rel="stylesheet" href="//s.pixfs.net/blog/plugins/plugins.min.css?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/comment/openid-comment.css?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/guestbook/style.min.css?v=1aa05f6e?v=c5d357c4f8d81a7e8c7c244d14662713" />
+<link rel="stylesheet" href="//front.pixfs.net/module/topbar/css/blogtopbar.min.css?v=c5d357c4f8d81a7e8c7c244d14662713">
+<link rel="stylesheet" href="//css.pixnet.in/blog/tsuozoe/normal.css?v=1418875402" type="text/css">
+<link rel="stylesheet" href="//front.pixfs.net/css/falcon-ad.css?v=289c65e9?v=c5d357c4f8d81a7e8c7c244d14662713">
+<link rel="stylesheet" href="//front.pixfs.net/css/iframe-popup.css?v=79127c7c?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/css">
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://feed.pixnet.net/blog/posts/rss/tsuozoe">
+<link rel="alternate" type="application/atom+xml" title="Atom 1.0" href="http://feed.pixnet.net/blog/posts/atom/tsuozoe">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://api.pixnet.cc/blog/xmlrpc?rsd=tsuozoe">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://api.pixnet.cc/static/blog/wlwmanifest.xml">
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="//libs.pixfs.net/jquery.onappear/jquery.onAppear.min.js"></script>
+<script src="//libs.pixfs.net/json2/json2.min.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js" crossorigin="anonymous"></script>
+<script src="//libs.pixfs.net/spin.js/spin.min.js" type="text/javascript"></script>
+<script src="//libs.pixfs.net/angular-spinner/angular-spinner.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.panelsite = 'panel.pixnet.cc';
+pix.apisite = 'api.pixnet.cc';
+pix.login_name = '471e308f69d0dfd29e7a46a0cc977605';
+pix.visitor = "Njc5NGZkNTliNjljY2JlMjVkM2MwMWI4MjBiYjEzMDM=";
+pix.openid = "Njc5NGZkNTliNjljY2JlMjVkM2MwMWI4MjBiYjEzMDM=";
+pix.owner = 'tsuozoe';
+pix.is_owner = false;
+pix.server_name = 'tsuozoe.pixnet.net';
+pix.sToken = "cea47dcc911e974b72e766c631b2d942";
+pix.pixfssite = 's.pixfs.net';
+pix.falconsite = 'falcon.pixanalytics.com';
+pix.checklogin_version = 2;
+// timezone: null;
+//-->
+</script>
+<script src="//api.pixnet.cc/api/checklogin.php?js=1&amp;unique=194588905&amp;timestamp=1460513541&amp;type=799" type="text/javascript"></script>
+<script src="//s.pixfs.net/js/pixnet/checklogin.min.js?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+jQuery.noConflict();
+var pix = pix || {};
+pix.ab_testing_seed = 2665091164;
+dataLayer = window.dataLayer || [];
+//-->
+</script>
+<script src="//s.pixfs.net/js/lang/zh_TW.js?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript"></script>
+<script src="//s.pixfs.net/js/pix.min.js?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//s.pixfs.net/js/pix-addon.min.js?v=c5d357c4f8d81a7e8c7c244d14662713" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/all.min.js?v=3e39e623?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/blog.min.js?v=bcb8dc5f?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript" crossorigin="anonymous"></script>
+<script src="//front.pixfs.net/js/search_selection.min.js?v=86807582?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript"></script>
+<script src="//front.pixfs.net/module/fullPage/dist/ad-full-page.min.js?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript" crossorigin="anonymous"></script>
+<meta itemprop="name" content="MySQL 資料庫的目錄結構 @ 隨便寫寫的新天地 :: 痞客邦 PIXNET ::">
+<meta itemprop="description" content="mysql&amp;amp;gt; SHOW VARIABLES LIKE 'datadir';列出 MySQL 資料庫路徑ex. C:\Program Files\MySQL\MySQL Server 5.">
+
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.js_error_type = pix.js_error_type || 'frontblog';
+//-->
+</script>
+<script async type="text/javascript" src="//s.pixfs.net/js/pixlogger.min.js?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+<script type="text/javascript">
+<!--
+(function(){
+    if (window.size().height > 10 && window.size().width > 10) {
+        var i = new Image(1,1);
+        i.src = '//counter.pixplug.in/count.php?timestamp=1460513541&random=2799190978&check=1171878962&data[blog]=%7B%22blogid%22%3A%22701545%22%7D&data[blogarticle]=%7B%22blogid%22%3A%22701545%22%2C%22articleid%22%3A%2221291702%22%7D&height=' + window.size().height + '&width=' + window.size().width + '&referer=' + encodeURI(document.referrer);
+        i.onload = function() { return; }
+    }
+})();
+//-->
+</script>
+<!-- Head Modified: 1460513541 -->
+<!-- async script -->
+<script type="text/javascript">
+<!--
+jQuery(document).ready(function () {
+    jQuery.ajaxSetup({ cache: true });
+    jQuery.getScript("//js.pixplug.in/addon/11/production.js?v=1460513151", function(data, textStatus) { jQuery.ajaxSetup({cache: true});jQuery.pixAddonRelatedArticle({"blog_relatedarticleshow":"post","blog_relatedarticle":"site","blog_relatedtemplate":"system","addon_username":"tsuozoe","addon_expired_at":0,"addon_ismobile":false,"addon_isvip":false,"ab_testing_seed":2665091164});jQuery.ajaxSetup({cache: false}); });
+    jQuery.ajaxSetup({ cache: false });
+});
+//-->
+</script>
+
+<!-- load sync script -->
+
+<!-- execute sync addon -->
+<script type="text/javascript">
+<!--
+var pix = pix || {};
+pix.visitor_url = "http://tsuozoe.pixnet.net/blog";
+pix.visitor_timestamp = "1460513541";
+pix.visitor_nonce = "513502167";
+pix.visitor_public = "LumrRMVHhADdttHSeUhMM8S3";
+pix.visitor_sig = "f59dc7bfe400383c3c9b6cc2531e5b0f";
+pix.user_name = null;
+pix.avatar_version = 0;
+(function() {
+    var js = document.createElement('script');
+    js.src = "\/\/s.pixfs.net\/visitor.pixplug.in\/checklogin.min.js?v=c5d357c4f8d81a7e8c7c244d14662713";
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(js, s);
+})();
+//-->
+</script>
+    <script type="text/javascript" src="//front.pixfs.net/js/checkloop.min.js?v=e18dc181?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+<script type="text/javascript" src="//libs.pixfs.net/swfobject/1.5/swfobject.js"></script>
+<script src="//front.pixfs.net/js/mib_falcon.min.js?v=be161a29?v=c5d357c4f8d81a7e8c7c244d14662713" crossorigin="anonymous"></script>
+</head>
+
+<body id="article-main"
+  data-showing-advertisement="yep"
+  data-adsense-state=""
+  data-blog-site-category-id="28"
+  data-dfp-slot-id=""
+  data-mobile-mode="none"
+  data-article-id="21291702"
+  class="category_1305892 article_21291702 folder_1305891"
+>
+
+
+<script type="text/javascript">
+_atrk_opts = { atrk_acct:"H00Mh1aIE700wg", domain:"pixnet.net",dynamic: true};
+(function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+</script>
+<noscript><img src="https://d5nxst8fruw4z.cloudfront.net/atrk.gif?account=H00Mh1aIE700wg" style="display:none" height="1" width="1" alt="" /></noscript>
+
+
+<style>
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: -220px;
+    bottom: 0;
+    float: left;
+    width: 220px;
+
+    /* reset */
+    font: normal 100 100% / 1 Arial;
+    font-variant: normal;
+    text-align: left;
+    text-decoration: none;
+    text-transform: capitalize;
+    text-indent: 0;
+    word-spacing: 0;
+    letter-spacing: 0;
+
+    background: #e6e6e6;
+    overflow: hidden;
+}
+
+@media (min-width: 1280px) {
+    .sidebar {
+        position: relative;
+    }
+}
+
+/* 顯示 sidebar */
+.show-sidebar .sidebar { left: 0; }
+.show-sidebar .main-container { margin-left: 220px; }
+.show-sidebar .topbar--fixed { left: 220px; }
+
+/* fixed 的狀態 */
+.sidebar--fixed {
+    position: fixed;
+}
+
+.sidebar--fixed > .keyword-articles-container,
+.sidebar--fixed .keyword-articles {
+    position: absolute;
+}
+
+.keyword-header {
+    height: 40px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 40px;
+    text-align: center;
+    background: #3161dd;
+}
+
+.keyword-tags {
+    box-sizing: border-box;
+    padding: 5px 10px 10px;
+    background: #f3f3f3;
+}
+
+.keyword-tag {
+    display: inline-block;
+    box-sizing: border-box;
+    margin-top: 7px;
+    border: 1px solid #3161dd;
+    padding: 5px 15px 3px 7px;
+    color: #3161dd;
+    font-size: 12px;
+    line-height: 15px;
+    background: #fff url('//front.pixfs.net/images/icon-arrow--blue.png') no-repeat right 6px top 8px;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.keyword-tag:hover,
+.keyword-tag.active {
+    color: #fff;
+    background-color: #3161dd;
+    background-image: url('//front.pixfs.net/images/icon-arrow--white.png');
+}
+
+.keyword-articles-container {
+    top: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 0;
+    white-space: nowrap;
+}
+
+.keyword-articles {
+    display: inline-block;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.keyword-articles:nth-of-type(2) { left: 220px; }
+.keyword-articles:nth-of-type(3) { left: 440px; }
+
+.keyword-article {
+    display: block;
+    margin: 5px 10px;
+    border-left: 3px solid transparent;
+    padding: 8px 10px 8px 7px;
+    background: #fff;
+}
+
+.keyword-article-min70 {
+    min-height: 70px;
+}
+
+.keyword-article:hover {
+    text-decoration: none;
+}
+
+.keyword-article:visited {
+    background: #eee;
+}
+
+.keyword-article.active,
+.keyword-article:hover {
+    border-color: #3161dd;
+    background: #fff;
+}
+
+.keyword-article__title {
+    color: #333;
+    font-size: 15px;
+    line-height: 20px;
+}
+
+.keyword-article:hover > .keyword-article__title {
+    color: #3161dd;
+    text-decoration: underline;
+}
+
+.keyword-article__desc {
+    margin-top: 10px;
+    color: #999;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.keyword-article span {
+    color: #f00;
+}
+
+.keyword-article:not(.active):visited span {
+    color: currentColor;
+}
+
+.keyword-article:visited:hover span {
+    color: #f00;
+}
+
+.keyword-article + iframe {
+    margin-bottom: -14px;
+    min-height: 15px;
+}
+</style>
+
+<div class="sidebar sidebar--fixed" data-obstruct="ip" data-search="">
+    <div class="keyword-header">依據 Google 關鍵字搜尋結果</div>
+    <div class="keyword-tags"></div>
+    <div class="keyword-articles-container"></div>
+</div>
+
+<script src="//front.pixfs.net/js/ypa-resize-pixnet.min.js?v=7c1e56f6?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+
+<div class="main-container">
+
+    
+    
+    
+    
+    <div class="topbar-placeholder " data-in-test="" data-color-test="">
+        
+<div id="topbar" class="topbar ">
+    <h2 class="topbar__logo"><a href="//www.pixnet.net/" title="痞客邦 PIXNET">痞客邦 PIXNET</a></h2>
+
+            <form class="topbar__search" id="topbar__search" action="//www.pixnet.net/searcharticle" target="_search">
+        <input type="text" name="q" class="topbar__search__input" id="topbar__search__input" placeholder="哈囉～你今天想搜尋什麼關鍵字呢？" value="" maxlength="32" tabindex="1" autocomplete="off">
+        <button type="reset" class="topbar__search__reset">×</button>
+
+        <div class="topbar__search__btns">
+            <button class="topbar__search__submit" name="search" type="submit" title="找文章" value="searcharticle" tabindex="2" data-counterlink="//counter.pixplug.in/count.php?timestamp=1460513541&random=1409456095&check=4073975096&no_timeout=1&data[counter]=%7B%22tag_id%22%3A30%2C%22id%22%3A%22search-articles-click%22%2C%22no_timeout%22%3Atrue%7D">找文章</button>
+            <button class="topbar__search__submit" name="search" type="submit" title="找部落客" value="searchblog" tabindex="3" data-counterlink="//counter.pixplug.in/count.php?timestamp=1460513541&random=3549177308&check=2491051541&no_timeout=1&data[counter]=%7B%22tag_id%22%3A30%2C%22id%22%3A%22search-bloggers-click%22%2C%22no_timeout%22%3Atrue%7D">找部落客</button>
+        </div>
+
+        <ul class="topbar__search__suggestion"></ul>
+    </form>
+
+    <div class="topbar__announce">
+        <a href="http://admin.pixnet.net/blog/post/43345138-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6-pixnet-mib-%28money-in-blog%29-%e9%83%a8%e8%90%bd%e6%a0%bc%e5%bb%a3" class="topbar__announce__item" title="[公告] 痞客邦 PIXNET MIB (MONEY IN BLOG) 部落格廣告分潤計劃新增／調整" target="_announce" tabindex="-1">[公告] 痞客邦 PIXNET MIB (MONEY IN BLOG) 部落格廣告分潤計劃新增／調整</a><a href="http://admin.pixnet.net/blog/post/43342759-%5b%e5%85%ac%e5%91%8a%5d-2016%e5%b9%b4%e5%ba%a6%e8%be%b2%e6%9b%86%e6%98%a5%e7%af%80%e6%9c%9f%e9%96%93%e6%9c%8d%e5%8b%99%e5%85%ac%e5%91%8a" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 2016年度農曆春節期間服務公告" target="_announce" tabindex="-1">[公告] 2016年度農曆春節期間服務公告</a><a href="http://admin.pixnet.net/blog/post/43158973-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6%e3%80%8c%e5%bc%95%e7%94%a8%e3%80%8d%e5%8a%9f%e8%83%bd%e5%b0%87%e6%96%bc-2016-%e5%b9%b4-1-%e6%9c%88-11" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 痞客邦「引用」功能將於 2016 年 1 月 11 日正式終止" target="_announce" tabindex="-1">[公告] 痞客邦「引用」功能將於 2016 年 1 月 11 日正式終止</a><a href="http://admin.pixnet.net/blog/post/43145044-%5b%e5%85%ac%e5%91%8a%5d-%e7%95%99%e8%a8%80%e6%9d%bf%e5%b0%87%e6%96%bc-2016-%e5%b9%b4-1-%e6%9c%88-4-%e6%97%a5%e8%bd%89%e6%8f%9b%e7%82%ba%e6%87%89%e7%94%a8" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 留言板將於 2016 年 1 月 4 日轉換為應用市集「留言板」APP 服務" target="_announce" tabindex="-1">[公告] 留言板將於 2016 年 1 月 4 日轉換為應用市集「留言板」APP 服務</a><a href="http://admin.pixnet.net/blog/post/42929975-%5b%e5%85%ac%e5%91%8a%5d-%e7%97%9e%e5%ae%a2%e9%82%a6%e7%ac%ac%e4%ba%8c%e5%b1%86%e9%87%91%e9%bb%9e%e8%b3%9e%e7%99%bb%e5%a0%b4%ef%bc%81%e5%85%a8%e5%8f%b0%e6%9c%80%e5%85%b7%e5%85%ac" class="topbar__announce__item topbar__announce__item--hide" title="[公告] 痞客邦第二屆金點賞登場！全台最具公信力的社群內容年度大賞" target="_announce" tabindex="-1">[公告] 痞客邦第二屆金點賞登場！全台最具公信力的社群內容年度大賞</a>    </div>
+    
+        
+    <div class="topbar__nav">
+
+        
+            <div class="topbar__user">
+            <a class="topbar__user__login" id="topbar__user__login" href="https://www.pixnet.net/?done=http%3A%2F%2Ftsuozoe.pixnet.net%2Fblog%2Fpost%2F21291702-mysql-%25E8%25B3%2587%25E6%2596%2599%25E5%25BA%25AB%25E7%259A%2584%25E7%259B%25AE%25E9%258C%2584%25E7%25B5%2590%25E6%25A7%258B">登入</a>
+        </div>
+            <div class="topbar__lang">
+            <a href="###" class="topbar__lang__switcher topbar__dropdown-btn" title="語系">繁中</a>
+
+            <ul class="topbar__lang__lists topbar__dropdown-lists">
+                                <li class="topbar__lang__list"><a href="###" data-lang="en_US">EN</a></li>
+                                <li class="topbar__lang__list"><a href="###" data-lang="zh_CN">簡中</a></li>
+                                <li class="topbar__lang__list"><a href="###" data-lang="ja_JP">日語</a></li>
+                            </ul>
+        </div>
+
+    </div>
+
+</div>
+
+    </div>
+    
+  <div id="body-div">
+  <a name="top"></a>
+  <div id="container">
+    <div id="container2">
+      <div id="container3">
+          <div id="header">
+            <div id="banner">
+		<h1><a href="http://tsuozoe.pixnet.net/blog">隨便寫寫的新天地</a></h1>
+              <p class="skiplink"><a href="#article-area" title="skip the page header to the main content">跳到主文</a></p>
+              <h2>反正就是隨便寫寫囉~不要給他看的太認真啦~~~</h2>
+	      <p id="blog-category">部落格全站分類：<a href="//www.pixnet.net/blog/bloggers/category/28" target="_blank">生活綜合</a></p>
+            </div>
+            <ul id="navigation">
+              <li id="link-album"><a href="http://tsuozoe.pixnet.net/album" title="go to gallery page of this user">相簿</a></li>
+              <li id="link-blog"><a href="http://tsuozoe.pixnet.net/blog" title="go to index page of this blog">部落格</a></li>
+              <li id="link-guestbook">
+                                <a id="guestbook" data-msg="尚未安裝留言板，無法進行留言" data-action="none" href="#" title="go to guestbook page of this user">留言</a>
+                            </li>
+              <li id="link-profile"><a href="http://www.pixnet.net/blog/profile/tsuozoe" title="go to profile page of this user">名片</a></li>
+            </ul>
+          </div><!-- #header//-->
+          <div id="main">
+            <div id="content">
+				<div id="article-area">
+    <div id="article-box">
+    		<div class="article">
+	    <ul class="article-head">
+		<li class="publish"><span class="month">Aug </span><span class="date">13 </span><span class="day">Wed </span><span class="year">2008 </span><span class="time">15:42</span></li>
+		<li class="title" id="article-21291702" data-hot-link="//www.pixnet.net/blog/articles/category/0" data-site-category="藝文評論" data-site-category-id="17" data-article-link="http://tsuozoe.pixnet.net/blog/post/21291702"><h2><a href="http://tsuozoe.pixnet.net/blog/post/21291702">MySQL 資料庫的目錄結構</a></h2></li>
+	    </ul>
+	    <div class="article-body">
+	    		<div class="article-content">
+		    
+		    <div class="article-content-inner">
+		    <br />mysql&gt; <strong><font color="#003300">SHOW VARIABLES LIKE '<font color="#339966">datadir</font>';</font></strong><br />列出 MySQL 資料庫路徑<br />ex. <font face="Arial"><font color="#ff6600">C:\Program Files\MySQL\MySQL Server 5.0\Data\<br /></font><br />MySQL 利用一個目錄表示個別的資料庫，由此可知，資料庫與資料表名稱大小寫是否有分別要看檔案系統的規定。<br /><br /><strong>MySQL 資料表的檔案<br /></strong><table cellspacing="1" cellpadding="5" width="90%" align="center" bgcolor="#aaaaaa" summary="" border="0"><tbody><tr bgcolor="#cccccc"><td>檔案類型</td><td>副檔名</td><td>說明</td></tr><tr bgcolor="#ffffff"><td>Form file</td><td>.frm</td><td>紀錄資料表的結構</td></tr><tr bgcolor="#ffffff"><td>Data file</td><td>.ISD</td><td>儲存 ISAM 資料表的資料</td></tr><tr bgcolor="#ffffff"><td>&nbsp;</td><td>.MYD</td><td>儲存 MyISAM 資料表的資料</td></tr><tr bgcolor="#ffffff"><td>Index file</td><td>.ISM</td><td>儲存 ISAM 資料表的索引檔</td></tr><tr bgcolor="#ffffff"><td>&nbsp;</td><td>.MYI</td><td>儲存 MyISAM 資料表的索引檔</td></tr></tbody></table></font><br /><strong>MySQL 的 Status File</strong><br />位於 MySQL 資料庫的根目錄下<br /><table cellspacing="1" cellpadding="5" width="90%" align="center" bgcolor="#aaaaaa" summary="" border="0"><tbody><tr bgcolor="#cccccc"><td>檔案類型</td><td>檔名格式</td><td>說明</td></tr><tr bgcolor="#ffffff"><td>Process ID</td><td>HostName.pid</td><td>MySQL Server 的 PID</td></tr><tr bgcolor="#ffffff"><td>Error log</td><td>HostName.err</td><td>儲存錯誤訊息並紀錄 MySQL 的開啟與關閉</td></tr><tr bgcolor="#ffffff"><td>General log</td><td>HostName.log</td><td>記錄與 MySQLServer 的連線訊息和查詢</td></tr><tr bgcolor="#ffffff"><td>Update log</td><td>HostName.nnn</td><td>記錄所有的查詢與修改資料表的訊息</td></tr></tbody></table><!-- more -->
+                        
+
+		    </div>
+		</div> <!-- .article-content //-->
+
+				<p class="author">
+		    tsuozoe 發表在 <a href="http://www.pixnet.net/">痞客邦 PIXNET</a>                    <a href="http://tsuozoe.pixnet.net/blog/post/21291702#comments">留言</a>(0) <span class="author-views">人氣(<span id="BlogArticleCount-21291702"></span>)</span>
+		    		</p> <!-- .author //-->
+		<div class="forward">
+		    <a href="javascript:;" onclick="pix.sendForwardTo('%E6%82%A8%E7%9A%84%E5%A5%BD%E6%9C%8B%E5%8F%8B%E9%82%80%E8%AB%8B%E6%82%A8%E8%A7%80%E7%9C%8B%20tsuozoe%20%E7%9A%84%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%20%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%87%E7%AB%A0-MySQL%20%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B','%E6%82%A8%E5%A5%BD%EF%BC%8C%0A%0A%E6%82%A8%E7%9A%84%E5%A5%BD%E6%9C%8B%E5%8F%8B%E9%82%80%E8%AB%8B%E6%82%A8%E8%A7%80%E7%9C%8B%20tsuozoe%20%E7%9A%84%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%20%E9%83%A8%E8%90%BD%E6%A0%BC%E6%96%87%E7%AB%A0-MySQL%20%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B%0A%E8%B6%8A%E5%A4%9A%E4%BA%BA%E7%9C%8B%E5%88%B0%EF%BC%8C%E5%8F%AF%E5%B9%AB%E4%BB%96%E5%A2%9E%E5%8A%A0%E8%B6%8A%E5%A4%9A%E4%BA%BA%E6%B0%A3%E5%96%94%7EGO%EF%BC%81%0A----------%0AAugust13%2C2008%0AMySQL%20%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B%0A----------%0A%E9%A6%AC%E4%B8%8A%E7%9C%8B%20http%3A%2F%2Ftsuozoe.pixnet.net%2Fblog%2Fpost%2F21291702%0A----------%0A%E7%97%9E%E5%AE%A2%E9%82%A6%20PIXNET%0Ahttp%3A%2F%2Fwww.pixnet.net%2F')">E-mail轉寄</a> <a href="javascript:;" onClick="pix.forwardToGB(21291702);">轉寄至留言板</a>
+		</div> <!-- .forward //-->
+		<br>
+<div style="position: static !important; display:block !important;visibility: visible !important; float: none !important; text-align: center">
+<div style="width: 620px; height: 250px; padding-bottom: 10px;">
+    <div id="b2934ebd212f7450fb3341077" style="width: 300px; height: 250px; float: left; padding-right: 1px;">
+            </div>
+    <div id="b2934ebd212f7450fb3341032" style="width: 300px; height: 250px; float: left;">
+    </div>
+</div>
+<script type="text/javascript">
+(function($) {
+    var w = $('.article-content:first').width();
+    if (w >= 600) {
+                jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=28&article_category=17&fields[]=b2934ebd212f7450fb3341032,1032')    } else if (w >= 550 && w <= 599) {
+                jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=28&article_category=17&fields[]=b2934ebd212f7450fb3341032,1603')    } else {
+                jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=28&article_category=17&fields[]=b2934ebd212f7450fb3341032,1606')    }
+})(jQuery);
+</script>
+</div>
+	    </div> <!-- .article-body //-->
+	    <div class="article-footer">
+		<ul class="refer">
+		    <li>全站分類：<a href="//www.pixnet.net/blog/articles/category/17">藝文評論</a></li>		    <li>個人分類：<a href="http://tsuozoe.pixnet.net/blog/category/1305892">MySQL 資料庫</a></li>		    <li>此分類上一篇： <a class="quick-nav--cat-pre" href="http://tsuozoe.pixnet.net/blog/post/21289210">MySQL 欄位資料型別 Column Types</a></li>
+<li>此分類下一篇： <a class="quick-nav--cat-next" href="http://tsuozoe.pixnet.net/blog/post/21292827">MySQL 資料表的維護與修補</a></li>
+		    <li>上一篇： <a class="quick-nav--pre" rel="prev" href="http://tsuozoe.pixnet.net/blog/post/21289210" data-public-at="1218609085" data-thumb="http://s.pixfs.net/mobile/images/blog/article-image.png">MySQL 欄位資料型別 Column Types</a></li>
+<li>下一篇： <a class="quick-nav--next" rel="next" href="http://tsuozoe.pixnet.net/blog/post/21292827" data-public-at="1218615303" data-thumb="http://s.pixfs.net/mobile/images/blog/article-image.png">MySQL 資料表的維護與修補</a></li>
+		</ul>
+		<div class="history">
+<h6>歷史上的今天</h6>
+<ul>
+<li>2008: <a href="http://tsuozoe.pixnet.net/blog/post/21292827">MySQL 資料表的維護與修補</a></li>
+<li>2008: <a href="http://tsuozoe.pixnet.net/blog/post/21289210">MySQL 欄位資料型別 Column Types</a></li>
+<li>2008: <a href="http://tsuozoe.pixnet.net/blog/post/21288885">MySQL 資料表的類型</a></li>
+<li>2008: <a href="http://tsuozoe.pixnet.net/blog/post/21287238">MySQL 的權限控制系統 privilege system</a></li>
+<li>2008: <a href="http://tsuozoe.pixnet.net/blog/post/21283890">MySQL 基本操作語法</a></li>
+</ul>
+</div>
+	    		<div class="back-to-top"><a href="#top" title="back to the top of the page">▲top</a></div>
+	    </div> <!-- .article-footer //-->
+        </div>
+
+<script>
+// track 上下篇點擊
+(function ($) {
+    'use strict';
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-408650-10', 'auto', {'name': 'quickNavTracker'});
+
+    var referBlock = $('.refer'),
+        quickNav = {
+            catPre: {
+                selector: '.quick-nav--cat-pre',
+                name: '此分類上一篇',
+            },
+            catNext: {
+                selector: '.quick-nav--cat-next',
+                name: '此分類下一篇',
+            },
+            pre: {
+                selector: '.quick-nav--pre',
+                name: '上一篇',
+            },
+            next: {
+                selector: '.quick-nav--next',
+                name: '下一篇',
+            }
+        },
+
+        trackEvent = function (action, label) {
+            ga('quickNavTracker.send', 'event', 'blog-related-article', action, label, { nonInteraction: ('imps' === action) });
+        },
+
+        bindClick = function (selector, label) {
+            referBlock.on('click', selector, function () {
+                trackEvent('click', label);
+            });
+        };
+
+    for (var key in quickNav) {
+        var obj = quickNav[key];
+        if (referBlock.find(obj.selector).length) {
+            // 記錄曝光
+            trackEvent('imps', obj.name);
+
+            // 點擊時紀錄
+            bindClick(obj.selector, obj.name);
+        }
+    }
+})(jQuery);
+</script>
+	</div> <!-- #article-box //-->
+		  <div id="user-post">
+    <div id="comment-box" class="user-post-box">
+      <a name="comments"></a>
+      <h3 id="comment-title" class="user-post-title" onclick="pix.commentSwitch('comment-text','comment-text-switch');" style="cursor:hand;cursor:pointer;"><img id="comment-text-switch" src="//s.pixfs.net/blog/images/choc/minus.gif"> <span>留言列表 (0)</span></h3>
+      <div class="post-comment"><a href="/blog/post/21291702-mysql-%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B#comment-form">發表留言</a></div>
+
+      <div id="comment-text" class="user-post-text">
+            </div> <!-- #comment-text //-->
+      <div id='comment_form'>
+      </div>
+    </div> <!--  #comment-box //-->
+  </div> <!-- #user-post //-->
+<script type="text/javascript">
+<!--
+jQuery(function() {
+    //#40294 用ajax接postcommentAction產生的comment form
+    var action = location.href;
+    action = action.replace('/post/', '/postcomment/');
+    jQuery.ajaxSetup({ cache: true });
+    jQuery.ajax({
+        type:     'GET',
+        url:      action,
+        data:     {"getForm": 1, "isMobile": 0},
+        dataType: 'json',
+        success:  function(data)
+                  {
+                      jQuery('#comment_form').html(data.form);
+
+                      setTimeout(function () {
+                      if (jQuery.pixQuestionary && 'function' === typeof jQuery.pixQuestionary) {
+                          jQuery.pixQuestionary(pix.user_name);
+                      }
+                      }, 1000);
+
+                      // 用來判斷是否有安裝'留言插入表情符號' App
+                      if (jQuery.pixAddonCommentEmotion && 'function' === typeof jQuery.pixAddonCommentEmotion) {
+                          // 裝了App 但沒表情符號可選, 須重新call function
+                          if (! document.getElementById('comment-emotion')) {
+                              jQuery.pixAddonCommentEmotion();
+                          }
+                      }
+                  },
+        error:    function(error)
+                  {
+                      console.log(error);
+                  }
+    });
+    jQuery.ajaxSetup({ cache: false });
+
+    jQuery('.comment-icon').attr('style', 'vertical-align:middle;');
+});
+// -->
+</script>
+
+
+	    </div> <!-- #article-area //-->
+            </div> <!-- #content //-->
+            <div id="links">
+              <div id="links-row-1">
+                                    <div class="hslice box x1ad77a-mIb-ad-sidebar-v2-x1ad77a">
+    <div class="box-text entry-content">
+        <div class="x1ad77a-mIb-border-x1ad77a">
+            <div class="x1ad77a-sItemajidr-x1ad77a" model="180x280">
+
+            </div>
+        </div><!-- /.mib-border -->
+    </div>
+</div>
+<div class="hslice box" id="category">
+    <h4 class="box-title entry-title">
+	文章分類	    </h4>
+    <div class="box-text entry-content">
+
+<div class="box-more">
+<img src="//s.pixfs.net/blog/images/choc/expand.gif" alt="unfold all categories" style="cursor:hand;cursor:pointer;" onClick="pix.openAllCategory('open');">
+<img src="//s.pixfs.net/blog/images/choc/collapse.gif" alt="fold all categories" style="cursor:hand;cursor:pointer;" onClick="pix.openAllCategory('close');">
+</div>
+
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1330910','category-1330910-switch');"><img id="category-1330910-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 其他技術 (5)</h6>
+<ul id="category-1330910" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1525427">行動寬頻 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1423629">VirtualBox (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1388448">CSS (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1388455">jQuery (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1463733">PMP (0)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1036826','category-1036826-switch');"><img id="category-1036826-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 不可不知 (3)</h6>
+<ul id="category-1036826" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1109939">教養資訊收集 (14)</a></li><!-- ie6bug --><li><a href="/blog/category/1251858">童書繪本資訊 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1411374">健康資訊收集 (1)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1329430','category-1329430-switch');"><img id="category-1329430-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 英語學習 (3)</h6>
+<ul id="category-1329430" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1517962">英文文法 (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1411073">字彙 (0)</a></li><!-- ie6bug --><li><a href="/blog/category/1380335">英語學習教材初級 (1)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1333629','category-1333629-switch');"><img id="category-1333629-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 程式設計_CrystalReport (4)</h6>
+<ul id="category-1333629" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1135589">Crystal Report 基礎 (3)</a></li><!-- ie6bug --><li><a href="/blog/category/1485449">CrystalReport 設計 (3)</a></li><!-- ie6bug --><li><a href="/blog/category/1411103">Crystal Report 與 .NET (4)</a></li><!-- ie6bug --><li><a href="/blog/category/1411377">Crystal Report 與 Java (0)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1108406','category-1108406-switch');"><img id="category-1108406-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 程式設計_.NET (7)</h6>
+<ul id="category-1108406" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1123562">.NET_基礎 (9)</a></li><!-- ie6bug --><li><a href="/blog/category/1227381">.NET_設計 (13)</a></li><!-- ie6bug --><li><a href="/blog/category/1393403">.NET_網路 (9)</a></li><!-- ie6bug --><li><a href="/blog/category/1227415">.NET_繪圖 (13)</a></li><!-- ie6bug --><li><a href="/blog/category/1462454">.NET_資料庫 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1420728">.NET_部署 (2)</a></li><!-- ie6bug --><li><a href="/blog/category/1522741">.NET_WPF (0)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1328221','category-1328221-switch');"><img id="category-1328221-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 程式設計_Java (3)</h6>
+<ul id="category-1328221" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1434270">Struts (1)</a></li><!-- ie6bug --><li><a href="/blog/category/1308039">J2EE (0)</a></li><!-- ie6bug --><li><a href="/blog/category/1373863">Servlet2.4 / JSP2.0 (7)</a></li><!-- ie6bug --></ul>
+</div>
+<div class="inner-box">
+    <h6 style="cursor:hand;cursor:pointer;" onclick="pix.commentSwitch('category-1305891','category-1305891-switch');"><img id="category-1305891-switch" src="//s.pixfs.net/blog/images/choc/plus.gif" border="0" alt="展開分類"> 資料庫DB (3)</h6>
+<ul id="category-1305891" style="display: none;"><!-- ie6bug
+--><li><a href="/blog/category/1108407">MS SQL資料庫 (17)</a></li><!-- ie6bug --><li><a href="/blog/category/1305892">MySQL 資料庫 (9)</a></li><!-- ie6bug --><li><a href="/blog/category/1412710">Access 資料庫 (2)</a></li><!-- ie6bug --></ul>
+</div>
+<ul><!-- ie6bug
+--></ul>
+    </div>
+</div> <!-- #category //-->
+<div class="hslice box" id="archive">
+    <h4 class="box-title entry-title">
+	文章彙整	    </h4>
+    <div class="box-text entry-content">
+
+<select onchange="pix.gotoArchive(this);">
+<option value="-pixnet-">文章彙整</option>
+<option value="/blog/archives/201306">2013 六月 (1)</option>
+<option value="/blog/archives/201208">2012 八月 (1)</option>
+<option value="/blog/archives/201204">2012 四月 (1)</option>
+<option value="/blog/archives/201202">2012 二月 (1)</option>
+<option value="/blog/archives/201112">2011 十二月 (1)</option>
+<option value="/blog/archives/201111">2011 十一月 (1)</option>
+<option value="/blog/archives/201109">2011 九月 (1)</option>
+<option value="/blog/archives/201106">2011 六月 (1)</option>
+<option value="/blog/archives/201102">2011 二月 (2)</option>
+<option value="/blog/archives/201011">2010 十一月 (8)</option>
+<option value="/blog/archives/201007">2010 七月 (1)</option>
+<option value="/blog/archives/201006">2010 六月 (2)</option>
+<option value="/blog/archives/201005">2010 五月 (1)</option>
+<option value="/blog/archives/201004">2010 四月 (1)</option>
+<option value="/blog/archives/201003">2010 三月 (1)</option>
+<option value="/blog/archives/201002">2010 二月 (4)</option>
+<option value="/blog/archives/201001">2010 一月 (8)</option>
+<option value="/blog/archives/200912">2009 十二月 (1)</option>
+<option value="/blog/archives/200911">2009 十一月 (1)</option>
+<option value="/blog/archives/200910">2009 十月 (2)</option>
+<option value="/blog/archives/200908">2009 八月 (6)</option>
+<option value="/blog/archives/200907">2009 七月 (1)</option>
+<option value="/blog/archives/200906">2009 六月 (1)</option>
+<option value="/blog/archives/200905">2009 五月 (2)</option>
+<option value="/blog/archives/200904">2009 四月 (3)</option>
+<option value="/blog/archives/200903">2009 三月 (1)</option>
+<option value="/blog/archives/200812">2008 十二月 (2)</option>
+<option value="/blog/archives/200811">2008 十一月 (4)</option>
+<option value="/blog/archives/200810">2008 十月 (2)</option>
+<option value="/blog/archives/200809">2008 九月 (3)</option>
+<option value="/blog/archives/200808">2008 八月 (12)</option>
+<option value="/blog/archives/200807">2008 七月 (18)</option>
+<option value="/blog/archives/200806">2008 六月 (14)</option>
+<option value="/blog/archives/200805">2008 五月 (8)</option>
+</select>
+<div class="box-more">
+<a href="/blog/listall/1">所有文章列表</a>
+</div>
+    </div>
+</div> <!-- #archive //-->
+<div class="hslice box" id="recent-article">
+    <h4 class="box-title entry-title">
+	近期文章	    </h4>
+    <div class="box-text entry-content">
+
+<ul>
+<li><a href="/blog/post/30651200">Crystal Report 設計_如何顯示雙軸圖表(Dual Axes)</a></li>
+<li><a href="/blog/post/30154443">﹝轉摘﹞洪蘭：教養孩子要像放風箏</a></li>
+<li><a href="/blog/post/29844250">更改電腦名稱後 SQL Server 的 Server Name 變化</a></li>
+<li><a href="/blog/post/29649845">基本介紹(一)_行動通信發展歷程</a></li>
+<li><a href="/blog/post/29430721">.NET I/O 程式設計(一)</a></li>
+<li><a href="/blog/post/29334434">GRAMMAR_01_英文法的概論</a></li>
+<li><a href="/blog/post/29083700">【T-SQL】在 Left Join 語法中使用 Count</a></li>
+</ul>
+    </div>
+</div> <!-- #recent-article //-->
+<div class="hslice box" id="latest-comment">
+    <h4 class="box-title entry-title">
+	最新迴響	    </h4>
+    <div class="box-text entry-content">
+
+<script type="text/javascript"><!--
+jQuery('#latest-comment div').load('/blog/plugin/latestcomment');
+//--></script>
+    </div>
+</div> <!-- #latest-comment //-->
+
+              </div> <!-- #links-row-1 //-->
+              <div id="links-row-2">
+                  <div class="hslice box" id="search">
+    <h4 class="box-title entry-title">
+	部落格文章搜尋	    </h4>
+    <div class="box-text entry-content">
+
+<form method="post" action="http://tsuozoe.pixnet.net/blog/search/" id="search-form" data-wording-needkeyword="請輸入關鍵字">
+	<ul>
+	    <li><input name="search-target" id="search-target" type="text" ></li>
+	    <li><input id="search-submit" type="submit" value="搜尋" ></li>
+	</ul>
+    </form>
+    <script type="text/javascript">//<!--
+    jQuery('#search-form').submit(function(event){
+        if ('' === jQuery('#search-target').val()) {
+            alert(jQuery(this).attr('data-wording-needkeyword'));
+            event.preventDefault();
+        }
+    });
+    //--></script>
+    </div>
+</div> <!-- #search //-->
+<div id="user-info" class="hslice box">
+    <h4 class="box-title entry-title">
+	個人頭像	    </h4>
+    <div class="box-text entry-content">
+	<a class="user-img" href="http://www.pixnet.net/blog/profile/tsuozoe"><img src="http://s5.pimg.tw/avatar/tsuozoe/0/0/zoomcrop/90x90.png?v=1252647271" /></a>
+	<div class="user-action">
+	    				<input type="button" value="加入好友" class="add_friend">
+						<input type="button" value="加入訂閱" class="add_subs">
+			    	</div>
+	<dl>
+            <dt>暱稱：</dt><dd>tsuozoe</dd>
+	    <dt>分類：</dt><dd><a href="//www.pixnet.net/blog/bloggers/category/28">生活綜合</a></dd>
+	    	    <dt>好友：</dt><dd>共0位 <a href="#" id="user-info-open-friends-iframe">(看全部)</a></dd>
+	    	    	    	    	    	    	                	    		<dt>地區：</dt>
+		                <dd>新北市</dd>
+			    	    	    	    	    	    	    	    	    	    	    	    	    	</dl>
+    </div>
+</div>
+<script type="text/javascript">
+<!--
+jQuery(function($) {
+    pix.iframePopup.init('#popup-frame', "http:\/\/tsuozoe.pixnet.net\/friend\/list", '#user-info-open-friends-iframe', '#popup-frame .frame-close', "tsuozoe \u7684\u597d\u53cb\u5217\u8868");
+    var $add_friend = $('#user-info').find('input.add_friend');
+    var $add_subs = $('#user-info').find('input.add_subs');
+    $add_friend.add($add_subs).click(function(e){
+                    window.location = 'http://' + "www.pixnet.net" + '?done=' + encodeURIComponent(window.location);
+            });
+});
+//-->
+</script>
+<div class="hslice box" id="mylink">
+    <h4 class="box-title entry-title">
+	我的連結	    </h4>
+    <div class="box-text entry-content">
+
+          <div class="inner-box">
+	  <h6 >
+	    	    收集	</h6>
+	<ul ><!-- ie6bug
+	          --><li><a title="Java" href="http://caterpillar.onlyfun.net/Gossip/index.html" target="_blank">良葛格學習筆記</a></li><!-- ie6bug
+	          --><li><a title="http://www.wretch.cc/video/coserkaori&amp;func=list&amp;view=cat&amp;cid=48998動畫欣賞http://www.17saving.idv.tw/bbs/forumdisplay.php?fid=63" href="http://www.usavich.tv/s1_1.html" target="_blank">ウサビッチ特區 - 監獄兔子</a></li><!-- ie6bug
+	          --><li><a title="你/妳有多久沒被周遭的人、事、物所感動呢？讓我們靜下心慢慢欣賞...麗山高中圖書館更新分享回饋～" href="http://www2.lssh.tp.edu.tw/~lib/share/share.php" target="_blank">推薦閱讀～分享園地</a></li><!-- ie6bug
+	        --></ul>
+      </div>
+          <div class="inner-box">
+	  <h6 >
+	    	    理財收集	</h6>
+	<ul ><!-- ie6bug
+	          --><li><a title="17Saving - 一起省 討論區" href="http://www.17saving.idv.tw/bbs/index.php" target="_blank">17Saving - 一起省 討論區</a></li><!-- ie6bug
+	          --><li><a title="利用EXCEL來觀看外幣兌換的即時匯率" href="http://lusoft.idv.tw/index.php/archives/79" target="_blank">LuSoft’s BLOG</a></li><!-- ie6bug
+	          --><li><a title="使用vba自動登入網站" href="http://www.wretch.cc/blog/crdotlin&amp;article_id=8297601" target="_blank">Excel VBA Comics</a></li><!-- ie6bug
+	        --></ul>
+      </div>
+            </div>
+</div> <!-- #mylink //-->
+<script type="text/javascript">
+<!--
+jQuery(function($) {
+    $('#mylink h6.expandable').click(function() {
+	var plus_img = "\/\/s.pixfs.net\/blog\/images\/choc\/plus.gif";	
+	var minus_img = "\/\/s.pixfs.net\/blog\/images\/choc\/minus.gif";
+	$(this).siblings('ul').toggle();
+	$img = $('> img', this);
+	if ($img.attr('src') == plus_img) {
+	    $img.attr('src', minus_img);
+	} else {
+	    $img.attr('src', plus_img);
+	}
+    });
+});
+//-->
+</script>
+<div class="hslice box" id="visitor">
+    <h4 class="box-title entry-title">
+	誰來我家	    </h4>
+    <div class="box-text entry-content">
+
+<script type="text/javascript"><!--
+jQuery('#visitor div').load('/blog/plugin/visitor');
+//--></script>
+    </div>
+</div> <!-- #visitor //-->
+<div class="hslice box" id="counter">
+    <h4 class="box-title entry-title">
+	參觀人氣	    </h4>
+    <div class="box-text entry-content">
+
+<ul>
+    <li>本日人氣：<span id="blog_hit_daily"></span></li>
+    <li>累積人氣：<span id="blog_hit_total"></span></li>
+</ul>
+<script type="text/javascript"><!--
+    jQuery.getScript('//counter.pixplug.in/getcounter.php?now=1460513541&random=4009811592&data[%23BlogArticleCount-21291702]=%7B%22counter%22%3A%5B%22blogarticle%22%2C%22701545%22%2C%2221291702%22%2C%22total%22%5D%2C%22options%22%3A%5B%5D%7D&data[%23blog_hit_daily]=%7B%22counter%22%3A%5B%22blog%22%2C%22701545%22%2C1%2C%22daily%22%5D%2C%22options%22%3A%5B%5D%7D&data[%23blog_hit_total]=%7B%22counter%22%3A%5B%22blog%22%2C%22701545%22%2C1%2C%22total%22%5D%2C%22options%22%3A%5B%5D%7D&check=3796119657');
+//--></script>
+    </div>
+</div> <!-- #counter //-->
+<div class="hslice box" id="feed">
+    <h4 class="box-title entry-title">
+	新聞交換(RSS)	    </h4>
+    <div class="box-text entry-content">
+
+    <ul>
+      <li><a title="pixnet rss" href="/blog/feed/rss"><img alt="pixnet rss for articles" src="//s.pixfs.net/blog/images/choc/pixnet-rss.gif" ></a></li><!--
+      --><li><a title="pixnet atom rss" href="/blog/feed/atom"><img alt="pixnet atom rss for articles" src="//s.pixfs.net/blog/images/choc/pixnet-atom.gif" ></a></li><!--
+      --><li><a title="reply rss" href="/blog/comments/feed"><img alt="pixnet rss for reply" src="//s.pixfs.net/blog/images/choc/reply-rss.gif" ></a></li><!--
+    --></ul>
+    </div>
+</div> <!-- #feed //-->
+              </div> <!-- #links-row-2 //-->
+                <div id="ad-mib">
+                    <script type="text/javascript">
+pix.MIB.config = {
+    hosthash: '419bb24506422d9630a0eb2c5587a26d',
+    dr: {source: 'tsuozoe'},
+    goldAds: pix.MIB.util.Dom.getElementsByClassName('x1ad77a-sItemajidr-x1ad77a'),
+    uniq: 'fb06fe228bf272f8f914c53a570ed772f661cc1713541',
+    percentSite: 'http://falcon.pixanalytics.com/mib/vap',
+    falconSite: 'http://falcon.pixanalytics.com',
+    cate: '28',
+    hasMIB: 0,
+    article_cate_id: '17',
+    demo: {
+        hash: '',
+        demoOption: 0    },
+    availablePositions: [{
+        id: 1,
+        name: 'sidebar-1',
+        enable: 1
+    },{
+        id: 1,
+        name: 'sidebar-2',
+        enable: false    },{
+        id: 3,
+        name: 'video',
+        enable: false    },{
+        id: 8,
+        name: 'unfold',
+        enable: false    }],
+    ref: ''
+};
+
+(function() {
+    var goldAds = pix.MIB.config.goldAds;
+    if (goldAds[0]) {
+        pix.MIB.build.adgen();
+        pix.MIB.build.videoadgen();
+        pix.MIB.build.detectPageScrollPlayback();
+    }
+})();
+</script>
+                </div><!-- #ad-mib //-->
+            </div> <!-- #links //-->
+          </div> <!-- #main //-->
+          <div id="footer">
+	  <p></p>
+            <div id="bottom">
+              <a class="bottom-skiplink" href="http://tsuozoe.pixnet.net/blog/post/21291702-mysql-%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B/#top" title="back to the top of the page">回到頁首</a>
+              <a class="bottom-skiplink" href="http://tsuozoe.pixnet.net/blog/post/21291702-mysql-%E8%B3%87%E6%96%99%E5%BA%AB%E7%9A%84%E7%9B%AE%E9%8C%84%E7%B5%90%E6%A7%8B#article-area" title="back to the main cotent of the page">回到主文</a>
+	      <a class="bottom-pixnet" href="http://panel.pixnet.cc/signup/step2">免費註冊</a>
+	      <a target="_blank" class="bottom-pixnet" href="http://help.pixnet.tw/">客服中心</a>
+              <a target="_blank" class="bottom-pixnet" href="http://www.pixnet.net/">痞客邦首頁</a>
+	      &copy; 2003 - 2016 PIXNET
+            </div>
+          </div> <!-- #footer //-->
+        </div> <!-- #container3 //-->
+      <div id="extradiv11"></div>
+      <div id="extradiv10"></div>
+      <div id="extradiv9"></div>
+      <div id="extradiv8"></div>
+    </div> <!-- #container2 //-->
+    <div id="extradiv7"></div>
+    <div id="extradiv6"></div>
+    <div id="extradiv5"></div>
+    <div id="extradiv4"></div>
+  </div> <!-- #container //-->
+  <div id="extradiv3"></div>
+  <div id="extradiv2"></div>
+  <div id="extradiv1"></div>
+  <div id="extradiv0"></div>
+  </div> <!-- #body-div //-->
+
+</div>
+
+<div id="tipLang" style="display:none;z-index:2147483647" class="barmenu">
+    <ul class="lang-list" id="lang-list">
+	<li><a href="#"  onclick="pix.setLocale('zh_TW'); return false;">繁體中文</a></li>
+	<li><a href="#"  onclick="pix.setLocale('zh_CN'); return false;">简体中文</a></li>
+	<li><a href="#"  onclick="pix.setLocale('en_US'); return false;">English</a></li>
+	<li><a href="#"  onclick="pix.setLocale('ja_JP'); return false;">日本語</a></li>
+    </ul>
+</div>
+<script type="text/javascript">
+<!--
+jQuery(window).load(function() {
+    //autoImgResize
+  '1';
+      jQuery.settings = jQuery.settings || {};
+    jQuery.settings.autoImgResize = {
+      mode:+'1',
+      resizWidth:+'400',
+      selector:'content'
+    };
+
+    if (2 === jQuery.settings.autoImgResize.mode) {
+      jQuery.settings.autoImgResize.resizWidth = jQuery('.article-content').width();
+    }
+    pix.autoImgResize(jQuery.settings.autoImgResize.resizWidth, jQuery.settings.autoImgResize.selector);
+  
+
+});
+//-->
+</script>
+<script type="text/javascript">
+<!--
+jQuery(function() {
+    pix.fixPixnetPlayerID();
+    jQuery('.article-head').find('.column-star').each(function() {
+        var column_link = jQuery(this).attr('data-column-link');
+        jQuery(this).find('h2').append(' <a title="專欄之星" href="' + column_link + '" target="_blank"><img title="專欄之星" alt="column star article" src="http://s.pixfs.net/blog/images/choc/column_star.gif"></a>');
+    });
+    jQuery('.article-hot').each(function() {
+	jQuery(this).find('h2').append(' <a class="__dailyhotclass" title="本日熱門" href="' + jQuery(this).attr('data-hot-link') + '" target="_blank"><img title="熱門文章" alt="hot article today" src="http://s.pixfs.net/blog/images/choc/today_hot.gif"></a>');
+    });
+});
+//-->
+</script>
+<script src="//front.pixfs.net/js/mixpanel.js?v=4b36ae69?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+<script src="//front.pixfs.net/js/blog-mixpanel.min.js?v=09e150d3?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+<script type="text/javascript">
+<!--
+  if (typeof dataLayer === 'undefined') dataLayer = [];
+  dataLayer.push({
+    "is_testing_43400": "false",
+    "is_partner_program":  "false",
+    "is_mobile_mode": "false",
+    "user_name"     : "tsuozoe",
+    "page_type"     : "blog",
+    "page_view"     : "/blog/",
+    "blog_name"     : "隨便寫寫的新天地",
+    "blog_cat"      : "28 - 生活綜合",
+    "is_loggedin"   : "false",
+    "is_VIP"        : "false",
+    "is_obstruct"   : "ip",
+    "viewer_type"   : "Regular Member",
+    "article_title" : "MySQL 資料庫的目錄結構",
+    "article_id"    : "21291702",
+    "article_cat"   : "17 - 藝文評論"
+  });
+-->
+</script>
+
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-KGMWFG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MZ3SPM" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+<script type="text/javascript">
+<!--
+  var _gaq = _gaq || [];
+  _gaq.push(
+    ['_setAccount', 'UA-408650-10'],
+    ['_setDetectTitle', false],
+    ['_setDomainName', 'none'],
+    ['_setAllowLinker', true],
+    ['_setCustomVar', 1, 'member', 'GUEST'],
+    ['_setCustomVar', 2, 'vip', 'nonVIP'],
+    ['_trackPageview', '/blog/']
+
+      );
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-KGMWFG');
+
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src= '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); })(window,document,'script','dataLayer','GTM-MZ3SPM');
+
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M9S8TF');
+
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NDN8FB');
+
+
+
+(function($, undefined) {
+$(function() {
+    var _topbar = $('#topbar');
+    _topbar.find('.topbar__logo').on('click', 'a', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-logo', 'GUEST']);
+    });
+    _topbar.find('#topbar__search').on('submit', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-search-button', 'GUEST']);
+    });
+    _topbar.find('.topbar__announce').on('click', '.topbar__announce__item', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-announce', 'GUEST']);
+    });
+
+    _topbar.find('.topbar__notification__counter').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-counter', 'GUEST']);
+    });
+    _topbar.find('.topbar__notification__list--header__link').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-setting', 'GUEST']);
+    });
+    _topbar.find('.topbar__notification__list--footer__link').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-notification-showall', 'GUEST']);
+    });
+
+    _topbar.find('#topbar__user__login').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-login', 'GUEST']);
+    });
+
+    _topbar.find('#topbar__user__list__link--blog').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-myblog', '']);
+    });
+    _topbar.find('#topbar__user__list__link--articlenew').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-articlenew', '']);
+    });
+    _topbar.find('#topbar__user__list__link--panelsite').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-panelsite', '']);
+    });
+    _topbar.find('#topbar__user__list__link--panelapp').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-panelapp', '']);
+    });
+
+    _topbar.find('#topbar__user__list__link--logout').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-logout', '']);
+    });
+
+    _topbar.find('.topbar__lang').on('click', function() {
+        _gaq.push(['_trackEvent', 'blog-bar', 'click-language-switcher', 'GUEST']);
+    });
+});
+})(jQuery);
+
+//-->
+</script>
+<div id="popup-frame" style="display:none">
+    <div id="frame-dimmer"></div>
+    <div id="frame-box">
+       <div id="frame-border"></div>
+       <div id="frame-header">
+           <h3></h3>
+	   <a href="#" class="frame-close" title="關閉視窗"><span>關閉視窗</span></a>
+       </div>
+       <div id="frame-content"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="//s.pixanalytics.com/js/c.js?v=9"></script>
+<script type="text/javascript">
+if ('undefined' === typeof window._uCount) {
+    window._uCount = function () {};
+}
+</script>
+<script type="text/javascript">
+<!--
+var _type = 'front_blog'; _uCount();
+var _type = 'front_blog_byarticlecategory:17'; _uCount();
+var _type = 'front_blog_bysitecategory:28'; _uCount();
+if (document.location.toString().indexOf('/post/') != -1) {
+    var _type = 'front_blog_post'; _uCount();
+    var _type = 'front_blog_post_nonvip'; _uCount();
+}
+
+if (document.location.toString().indexOf('/search/') != -1) {
+    var _type = 'front_blog_search'; _uCount();
+}
+//-->
+</script>
+<script src="http://referer.pixplug.in/static/r.js?v=c5d357c4f8d81a7e8c7c244d14662713" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+_currentPageUsername = 'tsuozoe';
+_refererCount();
+//-->
+</script>
+<script>
+var _piq = _piq || [];
+
+_piq.push(
+    ['setCustomVar', 'venue', 'pixnet'],
+    ['setCustomVar', 'author_id', pix.owner],
+        ['setCustomVar', 'article_category_id', "17"],
+        ['setCustomVar', 'nonce', pix.login_name],
+    ['setCustomVar', 'visitor_id', pix.visitor],
+    ['setCustomVar', 'visitor_openid', pix.openid],
+    ['trackPageView']
+);
+(function(d, t, u, f, j) {
+    f = d.getElementsByTagName(t)[0];
+    j = d.createElement(t);
+    j.async = 1;
+    j.src = u;
+    f.parentNode.insertBefore(j, f);
+})(document, 'script', '//s.pixanalytics.com/js/pi.min.js');
+
+(function ($) {
+    $(function () {
+        var _startTime = Math.floor((new Date()).getTime() / 1000),
+            _driveMode = ('none' === $(document.body).data('mobileMode')) ? 'desktop' : 'mobile',
+            _send = false,
+            unload;
+
+        unload = function () {
+            if (_send) {
+                return;
+            }
+
+            var _endTime = Math.floor((new Date()).getTime() / 1000),
+                _isIdleAdClosed = '';
+
+            switch ($.adIdlePopClosed) {
+                case 'hasClosed' :
+                    _isIdleAdClosed = 'close idle ad';
+                    break;
+                case 'neverClosed' :
+                    _isIdleAdClosed = 'not close idle ad';
+                    break;
+                default :
+
+            }
+            _piq.push(['trackEvent', 'article stay time', _isIdleAdClosed, _driveMode, (_endTime - _startTime)]);
+            _send = true;
+        };
+
+        $(window).on({
+            'beforeunload.idlePI': unload,
+            'unload.idlePI':       unload,
+            'pagehide.idlePI':     unload
+        });
+
+        // #41767
+        $('#pixad1032').on('click', 'a', function() {
+            if ('styleme' === $(this).data('source')) {
+                _piq.push(['trackEvent', 'yahoo 大聯盟導購', '金鑽版位點擊']);
+            }
+        });
+
+        var pixad1032ImpTracking = function() {
+            var container = $('#pixad1032');
+
+            if (0 === container.find('a').length) {
+                setTimeout(pixad1032ImpTracking, 500);
+                return;
+            }
+
+            if ('styleme' == container.find('a').data('source')) {
+                _piq.push(['trackEvent', 'yahoo 大聯盟導購', '金鑽版位曝光']);
+            }
+        };
+        pixad1032ImpTracking();
+    });
+})(jQuery);
+</script>
+<script src="//front.pixfs.net/js/pixinsight.min.js?v=99980588?v=c5d357c4f8d81a7e8c7c244d14662713"></script>
+
+        <script type="text/javascript">
+        <!--
+            jQuery(function(){
+                jQuery.getScript('//falcon.pixanalytics.com/ad/js?blog_category=28&article_category=17&fields[]=b2934ebd212f7450fb3341077,1077');
+            });
+        //-->
+        </script>
+        
+<!-- Modified: 1460513541 -->
+<!-- async script -->
+<script type="text/javascript">
+<!--
+jQuery.ajaxSetup({ cache: true });
+jQuery.getScript("//js.pixplug.in/addon/86/production.js?v=1384155619", function(data, textStatus) { jQuery.pixBookmarkButtons({"position":"bottom","addon_username":"tsuozoe","addon_expired_at":0,"addon_ismobile":false,"addon_isvip":false,"ab_testing_seed":2665091164}); });
+jQuery.getScript("//js.pixplug.in/addon/96/production.js?v=1380100897", function(data, textStatus) { jQuery.pix0rz({"addon_username":"tsuozoe","addon_expired_at":0,"addon_ismobile":false,"addon_isvip":false,"ab_testing_seed":2665091164}); });
+jQuery.getScript("//js.pixplug.in/addon/98/production.js?v=1402911687", function(data, textStatus) { jQuery.pixShowPlurk({"addon_username":"tsuozoe","addon_expired_at":0,"addon_ismobile":false,"addon_isvip":false,"ab_testing_seed":2665091164}); });
+jQuery.getScript("//js.pixplug.in/addon/206/production.js?v=1402911599", function(data, textStatus) { jQuery.pixShowTwitter({"addon_username":"tsuozoe","addon_expired_at":0,"addon_ismobile":false,"addon_isvip":false,"ab_testing_seed":2665091164}); });
+jQuery.ajaxSetup({ cache: false });
+//-->
+</script>
+
+<!-- load sync script -->
+
+<!-- execute sync addon -->
+<script type="text/javascript"></script>
+
+
+
+<script>pix.stylemeTags = [];</script>
+<script src="//front.pixfs.net/js/styleme.min.js?v=832365f5?v=c5d357c4f8d81a7e8c7c244d14662713" crossorigin="anonymous"></script>
+
+<script src="//front.pixfs.net/module/topbar/js/blogtopbar.min.js?v=c5d357c4f8d81a7e8c7c244d14662713" crossorigin="anonymous"></script>
+
+<script>
+  var nineyi_group    = "X1";
+  var nineyi_keyindex = "0";
+  var nineyi_match    = "";
+  var nineyi_id       = "pix91_0c848fbe564eb5861ceec3c8035fffeb";
+  var nineyi_products = [{"asset":"0104","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126120-4162329176_s.jpg?v=1446126272","title":"MissHana\u82b1\u5a1c\u5c0f\u59d0\u5b8c\u7f8e\u7121\u75d5\u4e09\u8272\u906e\u7455\u818f","oprice":"380","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1256490"},{"asset":"0138","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126147-4136062762_s.jpg?v=1446126272","title":"E\u2027Heart \u4f0a\u5fc3 \u6301\u4e45\u96b1\u5f62\u96d9\u9762\u96d9\u773c\u76ae\u8cbc","oprice":"348","nprice":"180","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/344734"},{"asset":"0143","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126150-2749437497_s.jpg?v=1446126272","title":"3CE (3CONCEPT EYES) \u8d85\u986f\u8272\u5507\u818f","oprice":"499","nprice":"399","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1610019"},{"asset":"0223","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126232-3103690318_s.jpg?v=1446126273","title":"ND \u812b\u6bdb\u871c\u881f\/\u9664\u6bdb\u871c\u881f 220g","oprice":"299","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/1035850"},{"asset":"0160","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126167-2508883353_s.jpg?v=1446126272","title":"\u97d3\u570b RiRe \u9ed1\u982d\u7c89\u523a\u6e05\u6f54\u5237 \u4e59\u652f\u5165(\u5167\u9644\u6e05\u6f54\u4e7320mL)","oprice":"290","nprice":"290","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/640966"},{"asset":"0109","image":"http:\/\/pic.pimg.tw\/pixnetvisual\/1446126124-168867797_s.jpg?v=1446126272","title":"Miss Hana \u82b1\u5a1c\u5c0f\u59d0 \u6c34\u611f\u63a7\u8272CC\u971c","oprice":"349","nprice":"299","link":"http:\/\/www.86shops.com.tw\/SalePage\/Index\/668815"}];
+</script><script id="idleTemplate" type="text/x-jsrender" data-main="//front.pixfs.net/module/idlePop/js/idlePop.min.js?v=c5d357c4f8d81a7e8c7c244d14662713">
+<link rel="stylesheet" href="//front.pixfs.net/module/idlePop/css/idlePop.min.css?v=c5d357c4f8d81a7e8c7c244d14662713">
+<div class="modal idle-pop" tabindex="-1" role="dialog" aria-describedby="dialog">
+  <div class="modal-bg"></div>
+  <div class="modal-dialog">
+    <a class="modal-close" data-close="【 關閉 X 】"></a>
+
+    <div class="modal-content">
+      <div class="modal-header">本網頁已閒置超過 3 分鐘。請點 <kbd>關閉</kbd> 或 <kbd>點擊</kbd>任一空白處，即可回到網頁</div>
+      <div class="modal-body">
+        <div class="blogger-info">
+          <a class="blogger-info__avatar" href="//www.pixnet.net/blog/profile/{{:user.name}}"><img src="{{:user.avatar}}" alt="{{:user.name}} 的大頭貼"></a>
+
+          <div class="blogger-info__profile">
+            <div class="blogger-info__row">
+              <dl>
+                <dt>部落格名稱</dt>
+                <dd><a href="{{:blog.link}}">{{:blog.name}}</a></dd>
+              </dl>
+            </div>
+
+            <div class="blogger-info__row">
+              <dl>
+                <dt>人氣</dt>
+                <dd data-unit="人">{{:blog.hits.total}}</dd>
+
+                <dt>好友數</dt>
+                <dd data-unit="人">{{:user.friends_count}}</dd>
+
+                <dt>文章總數</dt>
+                <dd data-unit="篇">{{:blog.articles_count}}</dd>
+              </dl>
+            </div>
+
+            <div class="blogger-info__row">
+              <a class="blogger-info__follow" href="http://panel.pixnet.cc/pixfront/addsubspopup?fromuser={{:user.name}}&user={{:user.name}}&popup=1" target="pix_add_sub" data-followers="{{:user.subscribers_count}}">加入訂閱</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="idle-adsense">
+        </div>
+
+        <div class="idle-related-posts">
+          {{for posts}}
+          <a class="idle-related-post" href="{{:link}}">
+            <img src="{{:thumb}}" alt="文章縮圖">
+            <div class="idle-related-post__detail">
+              <h4>{{:title}}</h4>
+              <div class="idle-related-post__desc" data-readmore="繼續閱讀">{{:body}}</div>
+            </div>
+          </a>
+          {{/for}}
+        </div>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+</script>
+
+
+<script src="//front.pixfs.net/js/hide-ad-checker.min.js?v=8e1fb39e?v=c5d357c4f8d81a7e8c7c244d14662713" crossorigin="anonymous"></script>
+</body>
+</html>

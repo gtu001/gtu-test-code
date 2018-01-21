@@ -1,0 +1,5 @@
+CREATE PUBLIC SYNONYM ptr_billunit FOR SYSADM.ptr_billunit; --給別名
+GRANT SELECT ON       ptr_billunit  TO DCS_ROLE; --給查詢權限
+GRANT INSERT ON       ptr_billunit  TO DCS_ROLE; --給新增權限
+GRANT DELETE ON       ptr_billunit  TO DCS_ROLE; --給刪除權限
+GRANT UPDATE ON       ptr_billunit  TO DCS_ROLE; --給修改權限

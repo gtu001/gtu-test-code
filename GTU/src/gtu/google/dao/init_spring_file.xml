@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/task
+         http://www.springframework.org/schema/task/spring-task-3.0.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<bean id="aeSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="aeDataSource" />
+		<property name="packagesToScan">
+			<list>
+				<value>gtu.google.dao</value>
+			</list>
+		</property>
+		<!-- <property name="mappingLocations"> -->
+		<!-- <list> -->
+		<!-- <value>classpath:tw/gov/moi/ae/jms/internal/domain/${system.id}MqSender.hbm.xml -->
+		<!-- </value> -->
+		<!-- </list> -->
+		<!-- </property> -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Informix10Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="javax.persistence.validation.mode">none</prop>
+				<!-- 
+				<prop key="hibernate.current_session_context_class">thread</prop>
+				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory
+				</prop>
+				 -->
+			</props>
+		</property>
+	</bean>
+
+	<bean id="aeDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.informix.jdbc.IfxDriver" />
+		<property name="url"
+			value="jdbc:informix-sqli://192.168.9.94:4526/ausystem2:informixServer=aix2;DB_LOCALE=zh_tw.utf8;CLIENT_LOCALE=zh_tw.utf8;GL_USEGLU=1" />
+		<property name="username" value="srismapp" />
+		<property name="password" value="ris31123" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="aeSessionFactory"></property>
+	</bean>
+	<tx:advice id="txadvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut id="cut" expression="execution(* gtu.google.dao..*.*(..))" />
+		<aop:advisor advice-ref="txadvice" pointcut-ref="cut" />
+	</aop:config>
+
+	<bean id="batchJobDAO" class="gtu.google.dao.BatchJobDAOImpl" />
+	<bean id="batchLogDAO" class="gtu.google.dao.BatchLogDAOImpl" />
+	<bean id="batchMainTest" class="gtu.google.dao.BatchMainTest" />
+
+	<context:component-scan base-package="gtu.google.dao" />
+
+</beans>

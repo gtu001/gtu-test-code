@@ -1,0 +1,17 @@
+<project name="deployee_page_only" default="main">
+
+	<import file="build_gtu_web_full.xml" as="full" />
+
+	<target name="main">
+		<echo message="# main ..." />
+
+		<copy todir="${target_webapp}" overwrite="false">
+			<fileset dir="${project_webapp}">
+				<include name="**/*.html" />
+				<include name="**/*.jsp" />
+				<include name="**/*.xhtml" />
+				<include name="**/*.js" />
+			</fileset>
+		</copy>
+	</target>
+</project>

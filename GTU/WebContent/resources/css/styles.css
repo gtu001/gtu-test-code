@@ -1,0 +1,325 @@
+ul li a em{
+	float:left;
+	padding-right: 5px;
+}
+
+.scheduleStyle {
+	width: 1000px;
+	height: 400px;
+}
+
+/*ris:panelHeader panel左側文字行高*/
+.panelTitle {
+	line-height: 20px;
+}
+
+/*取代skin.css，dataTable及dataList分頁的行高*/
+.ui-paginator-bottom,.ui-paginator span {
+	line-height: 16px;
+}
+
+/*dataTable新增按鈕*/
+.add {
+	border: none;
+	border-color: #ffffff;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+/*dataTable刪除按鈕*/
+.delete {
+	border: none;
+	border-color: #ffffff;
+	color: #ffffff;
+	text-decoration: none;
+	padding-left: 10px;
+	float: left;
+	
+}
+
+/*lightbox 跳出視窗的樣版 ex:31基本資料查詢*/
+.lightboxStyle {
+	background: #FFF;
+	padding: 5px;
+} /*內容背景色:白色*/
+
+/*遷入登記-遷徙者資料表 movesTableStyle*/
+.movesTableStyle {
+	width: 720px;
+}
+
+/*for dataTable, 表頭表頭為灰底，取代skin.css .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default*/
+/*又因為p:column 不能只設styleClass在head，所以設一個假的 tableHeaderStyle，再用table thead tr th.tableHeaderStyle的方式，改掉表頭*/
+.tableHeaderStyle {
+	
+}
+
+table thead tr th.tableHeaderStyle {
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['images:bg09.jpg']}") repeat-x;
+	font-weight: bold;
+}
+
+/**待辦事項<p:columns>用，因為無法加styleClass*/
+table thead tr th.ui-state-default {
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['images:bg09.jpg']}") repeat-x;
+	font-weight: bold;
+}
+/*end for dataTable*/
+
+
+/**行事曆樣式，表頭第一欄*/
+.scheduleStyle div div div table thead tr th.fc-leftmost {
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['images:bg09.jpg']}") repeat-x;
+	font-weight: bold;
+}
+
+/**行事曆樣式，表頭非第一欄*/
+.scheduleStyle div div div table thead tr th.ui-state-default {
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['images:bg09.jpg']}") repeat-x;
+	font-weight: bold;
+}
+
+/**行事曆樣式，表格內容*/
+.scheduleStyle div div div table tbody tr td.fc-not-today {
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['css/bluesky/images:bg.gif']}") repeat;
+	font-weight: bold;
+}
+
+
+/*下面這二個是因為找不到skin.css的樣式，直接用tag name的方式修改*/
+/*for tab(	*/
+em {
+	font-style: normal;
+}
+
+/*超連結不要底線*/
+a {
+	font: #006aa8;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+/*去除連結時出現的虛線框*/
+a {
+	outline: none; /* for Firefox */
+	hlbr: expression(this.onFocus =         this.blur () ); /* for IE */
+}
+
+/*for p:panel 不要邊線*/
+.moveOutNoBorder {
+	border: none;
+	/*display: none;*/
+}
+
+/*分散對齊 暫無使用*/
+.textJustify {
+	margin: 0;
+	text-align: justify; /*only for IE*/
+	text-justify: newspaper;
+	text-align-last: justify;
+}
+
+/*for p:autoComplete, 自動完成不為藍底 ，改成白底灰框(#bfbfbf)，蓋過skin.css ui-inputfield ui-widget ui-state-default ui-corner-all →autoComplete預設的CSS樣式*/
+.autoCompleteStyle input{
+	border: 1px solid #bfbfbf;
+	background: #bfbfbf url("#{resource['images:bg10.gif']}") repeat-x;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+}
+
+/*定字右邊與值相距10px*/
+td p span {
+	padding-right: 10px;
+}
+
+/*資料:寬230*/
+.fieldValueA {
+	width: 230px; /*only for IE, firefox還是聽<td width>*/
+	text-align: left;
+}
+
+/*資料:寬150 for <ris:imageLightBox*/
+.fieldValueB {
+	width: 150px;
+	text-align: left;
+	/*display: inline-table; for IE*/
+}
+
+/*資料:寬380 = fieldValueA + fieldValueB */
+.fieldValueC {
+	width: 380px;
+	text-align: left;
+	/*display: inline-table; for IE*/
+}
+
+/*資料:寬930; 記事內容  = fieldValueC + fieldId + fieldValueC*/
+.fieldValueD {
+	width: 930px;
+	text-align: left;
+	/*display: inline-table; for IE*/
+}
+
+/*資料:寬100; 當事人之 */
+.fieldValueE {
+	width: 100px;
+	text-align: left;
+	/*display: inline-table; for IE*/
+}
+
+/*帶出來的字-有底線*/
+.lable16UnderLine {
+	color: #006aa8;
+	text-decoration: none;
+	border-bottom: 1px groove; /*槽状*/
+}
+
+/*pprAddr 聯動地址表頭樣式*/
+.new_tb_t4 {
+	font-size: 14px;
+	background-color: #9FD6B9;
+}
+
+.new_tb_t3 {
+	font-size: 14px;
+	background-color: #CAE8D8;
+}
+/*end pprAddr*/
+
+/*圖片不跳行顯示*/
+.imgNowrap {
+	float: left;
+	padding-top: -2px;	
+}
+
+/*strust-menu 樣式客製化*/
+.menuList {
+	margin: 0px;
+	padding: 10px 0px 10px 15px;
+}
+
+.menu,.submenu {
+	display: none;
+	margin-left: 15px;
+	padding: 0px;
+}
+
+.menu li,.submenu li {
+	background: url("#{resource['images:square.gif']}") no-repeat 0em 0.3em;
+	list-style: none outside;
+}
+
+li.menubar a.standalone {
+	background: url("#{resource['images:square.gif']}") no-repeat 0em 0.2em
+		!important;
+}
+
+a.actuator,a.standalone {
+	background-color: transparent;
+	color: #000;
+	font-size: 14px;
+	padding-left: 15px;
+	text-decoration: none;
+}
+
+.menu li a,.submenu li a {
+	background-color: transparent;
+	color: #000;
+	font-size: 14px;
+	padding-left: 15px;
+	text-decoration: none;
+}
+/*end strust-menu*/
+
+/*panel 樣式客製化:展開直立靠左 縮起來靠上方*/
+* {
+	margin: 0;
+}
+
+.panel-open {
+	padding: 0.3em 0.3em 0.3em;
+	position: relative;
+	border: 1px solid #bed6f8;
+	background: #bed6f8 url("#{resource['images:panelHeaderOpen.png']}")
+		repeat-y;
+	font-weight: bold;
+	color: #000000;
+	width: 18px;
+	float: left;
+	margin-bottom: -500px;
+	padding-bottom: 500px;
+}
+
+.panel-close {
+	padding: 0.1em 0.1em 0.1em;
+	position: relative;
+	border: 1px solid #bed6f8;
+	background: #bed6f8 url("#{resource['images:panelHeaderClose.png']}")
+		repeat-x;
+	font-weight: bold;
+	color: #000000;
+	/*white-space: nowrap;*/
+}
+
+.panel-style {
+	overflow: hidden;
+	margin: 10px; /*區塊間的距離*/
+	border: 2px solid #bed6f8; /*邊線*/
+	padding: 5px;
+}
+
+.panel-abreast {
+	float: inherit;
+	margin-bottom: -500px;
+	padding-bottom: 500px;
+	padding-left: 40px; /*讓出左邊的panel表頭空間*/
+	vertical-align: top;
+}
+/*end Panel*/
+
+/*公告訊息*/
+.whiteBulletins {
+	color: #ffffff;
+	font-size: 16px;
+}
+
+/*功能樹*/
+#tree {
+	font-size: 16px;
+}
+
+/*續辦按鈕*/
+.menubutton { /*only for IE*/
+	font-size: 16px;
+	font-variant: small-caps;
+	border: 1px;
+}
+
+/*登出按鈕*/
+.logoutButton {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	border: none;
+	background: url("#{resource['images:info_13.jpg']}");
+	height: 22px;
+	width: 52px;
+	cursor: pointer;
+}
+
+/*功能表搜尋按鈕*/
+.searchButton {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	border: none;
+	background: url("#{resource['images:info_09.jpg']}");
+	height: 22px;
+	width: 49px;
+	cursor: pointer;
+}

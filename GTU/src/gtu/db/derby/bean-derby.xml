@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.apache.derby.jdbc.ClientDriver"/>
+		<property name="url" value="jdbc:derby://localhost:1527/myDB;create=true;"/>
+        <property name="username" value="user"/>
+        <property name="password" value="1234"/>
+		
+		<!-- 初始化連接 -->
+        <property name="initialSize" value="10"/>
+		<!-- 最大空閒連接 -->
+        <property name="maxIdle" value="20"/>
+		<!-- 最小空閒連接 -->
+        <property name="minIdle" value="5"/>
+		 <!-- 最大連接數量 -->
+        <property name="maxActive" value="50"/>
+		<!-- 是否在自動回收超時連接的時候顯示連接的超時錯誤 -->
+        <property name="logAbandoned" value="true"/>
+		<!-- 是否自動回收超時連接 -->
+        <property name="removeAbandoned" value="true"/>
+		<!-- 超時時間(以秒數為單位) -->
+        <property name="removeAbandonedTimeout" value="180"/>
+        <!-- 超時等待時間已毫秒為單位 6000毫秒/1000等於60秒 -->
+        <property name="maxWait" value="1000"/>
+    </bean>
+    
+</beans>

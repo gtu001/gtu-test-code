@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean name="jobDetail" class="org.springframework.scheduling.quartz.JobDetailBean"
+		p:jobClass="gtu.quartz.SpringTestJob" p:applicationContextJobDataKey="applicationContext">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="size" value="10" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 引用bean:myService的method:doJob將其封裝成Job,該method可為靜態也可不靜態但不能有參數 -->
+	<!-- concurrent :指定封裝的任務是否有狀態 -->
+	<bean name="jobDetail_1"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+		p:targetObject-ref="myService" p:targetMethod="doJob" p:concurrent="false" />
+
+
+	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
+		p:jobDetail="jobDetail" p:startDelay="1000" p:repeatInterval="2000"
+		p:repeatCount="100">
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="count" value="10" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="checkImagesTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"
+		p:jobDetail="jobDetail"
+		p:cronExpression="0/5 * * * * ?" />
+		
+	
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+			</list>
+		</property>
+		<property name="schedulerContextAsMap">
+			<map>
+				<entry key="timeout" value="30" />
+			</map>
+		</property>
+		<property name="configLocation" value="classpath:com/baobaotao/quartz/quartz.properties" />
+	</bean>
+	
+	
+	<!-- Timer -->
+	<bean id="timeTask1" class="com.baobaotao.basic.timer.SimpleTimerTask" />
+	<bean id="scheduledTask"
+		class="org.springframework.scheduling.timer.ScheduledTimerTask" 
+		p:timerTask-ref="timeTask1"
+		p:delay="1000"
+		p:period="1000" />
+		
+	<bean id="timerTask1"
+		class="org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean"
+		p:targetClass-ref="myService"
+		p:targetMethod="doJob" />
+		
+	<bean id="timer" class="org.springframework.scheduling.timer.TimerFactoryBean">
+		<property name="scheduledTimerTasks">
+			<list>
+				<ref bean="scheduledTask" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>

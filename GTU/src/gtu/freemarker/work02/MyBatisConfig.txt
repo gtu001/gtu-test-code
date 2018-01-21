@@ -1,0 +1,2 @@
+<typeAlias alias="${voName}" type="com.ibt.dcs.mybatis.vo.${voName}" />
+<mapper resource="com/ibt/dcs/mybatis/mapper/${mapperName}.xml" />

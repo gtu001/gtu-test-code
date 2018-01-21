@@ -1,0 +1,57 @@
+
+private void ${methodName!"xxxxxxxxxxxxxxxxxxxx"}(
+	<#list paramList as x>
+		String ${x}<#if x?index != paramList?size - 1>,</#if>
+	</#list>
+	) throws Exception {
+	StringBuilder sb = new StringBuilder();
+	<#list sqlList as x>
+		sb.append("  ${x}  ");
+	</#list>
+	
+	Map<String,Object> param = new HashMap<String,Object>();
+	<#list paramList as x>
+		param.put("${x}",${x});
+	</#list>
+	NameMapping mapping = new NameMapping(sb.toString(), param);
+	mapping.execute();
+	
+	<#if sql?lower_case?contains('select ')>
+		List<Map<String, Object>> queryList = this.query(mapping.getQuestionSql(), mapping.getValueList().toArray());
+	    if (!queryList.isEmpty()) {
+	        Map<String,Object> map = queryList.get(0);
+	        Data_${methodName!"xxxxxxxxxxxxxxxxxxxx"} bean = new Data_${methodName!"xxxxxxxxxxxxxxxxxxxx"}();
+	        <#list paramList as x>
+				bean.${x} = (String)map.get("${x?upper_case}");
+			</#list>
+			return bean;
+	    }
+	    throw new RuntimeException("${methodName!"xxxxxxxxxxxxxxxxxxxx"} error");
+	    
+	    for(Map<String,Object> map : queryList){
+	    	<#list paramList as x>
+				String ${x} = (String)map.get("${x?upper_case}");
+			</#list>
+	    }
+	<#elseif sql?lower_case?contains('insert ')>
+		this.insert(mapping.getQuestionSql(), mapping.getValueList().toArray());
+	<#else>
+		this.modify(mapping.getQuestionSql(), mapping.getValueList().toArray());
+	</#if>
+}
+
+<#if sql?lower_case?contains('select ')>
+private static class Data_${methodName!"xxxxxxxxxxxxxxxxxxxx"} {
+	<#list paramList as x>
+		String ${x};
+	</#list>
+}
+</#if>
+
+
+//method call
+${methodName!"xxxxxxxxxxxxxxxxxxxx"}(
+<#list paramList as x>
+		${x}<#if x?index != paramList?size - 1>,</#if>
+</#list>
+);

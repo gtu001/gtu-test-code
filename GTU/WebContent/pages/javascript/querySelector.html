@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+	<p id="p1">Hello World!</p>
+	
+	<input name="Q1" type="checkbox" value='vvvv' checked />
+	<input type="button" onclick="ttt()" />
+
+	<script>
+		function ttt() {
+			var ss = document.querySelector('input[name="Q1"]:checked').value;
+			document.getElementById("p1").innerHTML = ss;
+		}
+	</script>
+
+	<p>The paragraph above was changed by a script.</p>
+
+</body>
+</html>

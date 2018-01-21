@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="505.0" prefWidth="704.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="_temp.tradevan.DBToolUI2">
+  <tabs>
+    <Tab text="轉檔查詢">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="422.0" prefWidth="637.0">
+               <children>
+                  <ComboBox fx:id="value1" layoutX="192.0" layoutY="89.0" onAction="#changeMessage" prefWidth="150.0" />
+                  <Label layoutX="70.0" layoutY="93.0" text="   訊息種類" />
+                  <Label layoutX="82.0" layoutY="148.0" text="  報關日期" />
+                  <Label layoutX="82.0" layoutY="176.0" text="  傳送日期" />
+                  <Label layoutX="70.0" layoutY="232.0" text="  提單號碼主號" />
+                  <Label layoutX="70.0" layoutY="265.0" text="  提單號碼分號" />
+                  <Label layoutX="82.0" layoutY="296.0" text="  統編" />
+                  <DatePicker fx:id="value3A" layoutX="192.0" layoutY="172.0" />
+                  <DatePicker fx:id="value3B" layoutX="362.0" layoutY="172.0" />
+                  <TextField fx:id="value7" layoutX="198.0" layoutY="322.0" />
+                  <TextField fx:id="value4" layoutX="198.0" layoutY="228.0" />
+                  <TextField fx:id="value5" layoutX="198.0" layoutY="261.0" />
+                  <TextField fx:id="value6" layoutX="198.0" layoutY="292.0" />
+                  <Label layoutX="85.0" layoutY="333.0" text="  箱號" />
+                  <DatePicker fx:id="value2A" layoutX="192.0" layoutY="144.0" />
+                  <DatePicker fx:id="value2B" layoutX="362.0" layoutY="144.0" />
+                  <Button fx:id="executeBtn" layoutX="399.0" layoutY="368.0" mnemonicParsing="false" onAction="#btnExecute" text="轉檔" />
+                  <Label fx:id="errorMessage" layoutX="19.0" layoutY="428.0" prefHeight="34.0" prefWidth="666.0" text="Label" textFill="#f53636" />
+                  <ComboBox fx:id="destDb" layoutX="192.0" layoutY="58.0" prefWidth="150.0" />
+                  <ComboBox fx:id="sysType" layoutX="192.0" layoutY="116.0" onAction="#changeMessage" prefWidth="150.0" />
+                  <Label layoutX="88.0" layoutY="120.0" text="系統別" />
+                  <ComboBox fx:id="srcDb" layoutX="192.0" layoutY="35.0" prefWidth="150.0" />
+                  <Label layoutX="91.0" layoutY="39.0" text="來源資料庫" />
+                  <Label layoutX="91.0" layoutY="62.0" text="目的資料庫" />
+                  <Label layoutX="85.0" layoutY="204.0" text="報單號碼" />
+                  <TextField fx:id="value35" layoutX="192.0" layoutY="200.0" />
+                  <Label layoutX="91.0" layoutY="361.0" text="公司別" />
+                  <TextField fx:id="value8" layoutX="198.0" layoutY="349.0" />
+                  <Button layoutX="399.0" layoutY="337.0" mnemonicParsing="false" onAction="#btnTestConnection" text="測試連線" />
+                  <Label layoutX="91.0" layoutY="384.0" text="交換控制馬" />
+                  <TextField fx:id="value9" layoutX="198.0" layoutY="380.0" />
+                  <ComboBox fx:id="value10" layoutX="199.0" layoutY="405.0" prefWidth="150.0" />
+                  <Label layoutX="91.0" layoutY="409.0" text="檢查重複" />
+               </children></AnchorPane>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eform id="USER_ACCOUNT">
+	<activity>
+		<form id="queryform">
+			<block id="USER_ACCOUNT" grid-widths="139,140,141,142,143">
+				<column id="userid" row="1" col="2" form-id="text" />
+				<column id="password" row="2" col="2" form-id="text" />
+				<column id="ps" row="3" col="4" form-id="label" />
+			</block>
+		</form>
+		<form id="queryResult">
+			<block id="USER_ACCOUNT" grid-widths="150,200,100,150,100">
+				<column id="userid" row="1" col="2" form-id="label" />
+				<column id="password" row="2" col="2" form-id="label" />
+				<column id="ps" row="3" col="4" form-id="label" />
+			</block>
+		</form>
+	</activity>
+	
+	<block id="USER_ACCOUNT" label="使用者資訊" table="USER_ACCOUNT">
+		<column id="userid" label="使用者帳號" db-field="USER_ID">
+			<form id="text">
+				<input type="text" onclick="alert('vv232323vv')" />
+			</form>
+			<form id="label">
+				<input type="label" onclick="alert('vv232323vv')" />
+			</form>
+		</column>
+		<column id="password" label="使用者密碼" db-field="PASSWORD">
+			<form id="text">
+				<input type="text" onclick="alert('tes43434t')" />
+			</form>
+			<form id="label">
+				<input type="label" onclick="alert('tes43434t')" />
+			</form>
+		</column>
+		<column id="ps">
+			<form id="label">請輸入帳號密碼</form>
+		</column>
+	</block>
+</eform>

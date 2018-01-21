@@ -1,0 +1,13 @@
+背景指令加 & 
+
+jobs 可看目前所有工作
+[+]是背景工作
+
+fg %num 
+bg %num
+切換背景與前景
+
+Send Signal to process
+Ctrl + \ --> Stop On Exit
+Ctrl + C --> kill
+Ctrl + Z --> 中斷前景切回背景

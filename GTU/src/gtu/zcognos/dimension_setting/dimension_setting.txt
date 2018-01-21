@@ -1,0 +1,79 @@
+			<dimension status="valid">
+				<name locale="zh">性別</name>
+				<lastChanged>2012-03-16T17:03:58</lastChanged>
+				<lastChangedBy>匿名</lastChangedBy>
+				<definition>
+					<modelQuery>
+						<sql />
+					</modelQuery>
+				</definition>
+				<type>regular</type>
+				<membersRollup>true</membersRollup>
+				<defaultHierarchy>[DimensionView].[性別].[性別]</defaultHierarchy>
+				<hierarchy>
+					<name locale="zh">性別</name>
+					<lastChanged>2012-03-16T17:03:47</lastChanged>
+					<lastChangedBy>匿名</lastChangedBy>
+					<level>
+						<name locale="zh">總計</name>
+						<lastChanged>2012-03-16T17:03:40</lastChanged>
+						<lastChangedBy>匿名</lastChangedBy>
+						<isManual>true</isManual>
+					</level>
+					<level>
+						<name locale="zh">性別</name>
+						<lastChanged>2012-03-16T17:03:36</lastChanged>
+						<lastChangedBy>匿名</lastChangedBy>
+						<queryItem>
+							<name locale="zh">gender</name>
+							<lastChanged>2012-03-16T17:03:21</lastChanged>
+							<lastChangedBy>匿名</lastChangedBy>
+							<expression>
+								<refobj>[BusinessView].[rscdz006].[gender]</refobj>
+							</expression>
+							<usage>attribute</usage>
+							<datatype>character</datatype>
+							<precision>1</precision>
+							<scale>0</scale>
+							<size>4</size>
+							<nullable>true</nullable>
+							<regularAggregate>unsupported</regularAggregate>
+							<semiAggregate>unsupported</semiAggregate>
+							<roles>
+								<role intrinsic="false">
+									<name locale="zh">_businessKey</name>
+								</role>
+							</roles>
+							<collationSequenceName>zh</collationSequenceName>
+							<collationSequenceLevel>1</collationSequenceLevel>
+						</queryItem>
+						<queryItem>
+							<name locale="zh">gender_alias</name>
+							<lastChanged>2012-03-16T17:03:18</lastChanged>
+							<lastChangedBy>匿名</lastChangedBy>
+							<expression>
+								<refobj>[BusinessView].[rscdz006].[gender_alias]
+								</refobj>
+							</expression>
+							<usage>attribute</usage>
+							<datatype>characterLength16</datatype>
+							<precision>50</precision>
+							<scale>0</scale>
+							<size>102</size>
+							<nullable>true</nullable>
+							<regularAggregate>unsupported</regularAggregate>
+							<semiAggregate>unsupported</semiAggregate>
+							<roles>
+								<role intrinsic="false">
+									<name locale="zh">_memberCaption</name>
+								</role>
+							</roles>
+							<collationSequenceName>zh</collationSequenceName>
+							<collationSequenceLevel>1</collationSequenceLevel>
+						</queryItem>
+						<isUnique>true</isUnique>
+					</level>
+					<rootMUN>[all]</rootMUN>
+					<rootCaption locale="zh">總計</rootCaption>
+				</hierarchy>
+			</dimension>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bookmarks>
+   <site url="https://dl-ssl.google.com/android/eclipse/" selected="true" name="ADT"/>
+   <site url="http://download.eclipse.org/tools/cdt/releases/8.6" selected="false" name="CDT"/>
+   <site url="http://pluginbox.sourceforge.net" selected="true" name="EasyShell"/>
+   <site url="http://update.eclemma.org/" selected="true" name="EclEmma"/>
+   <site url="http://eclipse-tools.sourceforge.net/updates/" selected="true" name="Implements"/>
+   <site url="http://jd.benow.ca/jd-eclipse/update" selected="true" name="JD"/>
+   <site url="http://propedit.sourceforge.jp/eclipse/updates/" selected="true" name="propedit"/>
+   <site url="http://sourceforge.jp/projects/propedit/" selected="true" name="propedit"/>
+   <site url="http://download.eclipse.org/windowbuilder/WB/release/R201406251200/4.4/" selected="true" name="WinBuilder"/>
+</bookmarks>

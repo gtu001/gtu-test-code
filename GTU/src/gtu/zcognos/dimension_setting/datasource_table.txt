@@ -1,0 +1,46 @@
+			<querySubject status="valid">
+				<name locale="zh">rscdz006</name>
+				<lastChanged>2012-03-16T17:01:59</lastChanged>
+				<lastChangedBy>°Î¦W</lastChangedBy>
+				<definition>
+					<dbQuery>
+						<sources>
+							<dataSourceRef>[].[dataSources].[Informix_RIS_12]</dataSourceRef>
+						</sources>
+						<sql type="cognos">
+							Select
+							<column>*</column>
+							from
+							<table>[Informix_RIS_12].rscdz006</table>
+						</sql>
+						<tableType>table</tableType>
+					</dbQuery>
+				</definition>
+				<determinants />
+				<queryItem>
+					<name locale="zh">gender</name>
+					<lastChanged>2012-03-16T17:01:59</lastChanged>
+					<externalName>gender</externalName>
+					<usage>attribute</usage>
+					<datatype>character</datatype>
+					<precision>1</precision>
+					<scale>0</scale>
+					<size>4</size>
+					<nullable>true</nullable>
+					<regularAggregate>unsupported</regularAggregate>
+					<semiAggregate>unsupported</semiAggregate>
+				</queryItem>
+				<queryItem>
+					<name locale="zh">gender_alias</name>
+					<lastChanged>2012-03-16T17:01:59</lastChanged>
+					<externalName>gender_alias</externalName>
+					<usage>attribute</usage>
+					<datatype>characterLength16</datatype>
+					<precision>50</precision>
+					<scale>0</scale>
+					<size>102</size>
+					<nullable>true</nullable>
+					<regularAggregate>unsupported</regularAggregate>
+					<semiAggregate>unsupported</semiAggregate>
+				</queryItem>
+			</querySubject>

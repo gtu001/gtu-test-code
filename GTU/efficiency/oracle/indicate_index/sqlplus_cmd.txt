@@ -1,0 +1,7 @@
+sqlplus username/password@host:port/service
+
+sqlplus ls_uat_read/ls_uat_read_only@10.67.67.70:1521/ebouat2
+
+SQL> @c:\my_scripts\my_sql_script.sql
+
+SQL> START /home/cjones/my_scripts/my_sql_script.sql

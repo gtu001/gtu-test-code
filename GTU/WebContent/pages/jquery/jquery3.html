@@ -1,0 +1,92 @@
+
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+<script type="text/javascript">
+        $(document).ready(function(){	
+			$("#btn01").bind("click", function(){
+				$("#test1").toggle(100, function(){
+				});
+			});
+			$("#btn02").bind("click", function(){
+				$("#test1").slideDown(500,function(){
+				});
+			});
+			$("#btn03").bind("click", function(){
+				$("#test1").slideUp(1000,function(){
+				});
+			});
+			$("#btn04").bind("click", function(){
+				$("#test1").slideToggle(200,function(){
+				});
+			});
+			$("#btn05").bind("click", function(){
+				$("#test1").fadeIn(500,function(){
+				});
+			});
+			$("#btn06").bind("click", function(){
+				$("#test1").fadeOut(1000,function(){
+				});
+			});
+			$("#btn07").bind("click", function(){
+				$("#test1").fadeTo("slow", 0.1,function(){
+				});
+			});
+			$("#btn08").bind("click", function(){
+				$("#test1").fadeTo("fast", 1,function(){
+				});
+			});
+			$("#btn09").toggle(function(event){
+				$("#test1")
+					.css("position", "relative")
+					.animate({
+					opacity:0,
+					top:$(window).height() - $(this).height() - $(this).position().top
+					}, 'slow',
+						function(){
+						}
+					);
+			}, function(event){
+				$("#test1")
+					.css("position", "relative")
+					.animate({
+					opacity:1,
+					top:$(this).position().top
+					}, 'slow',
+						function(){
+						}
+					);
+			});
+			
+			$("#btn10").bind("click", function(event){
+				var position = $(this).position();
+				$("#test1")
+					.css({position:"absolute", top:position.top, left:position.left})
+					.animate({
+						opacity:"hide",
+						width:$(this).width()*5,
+						height:$(this).height()*5,
+						top:position.top - ($(this).height() * 5/2),
+						left:position.left - ($(this).width() * 5/2)
+					},
+					"normal");
+			});
+		});
+</script>
+
+<input type="button" id="btn01" value="toggle" />
+<input type="button" id="btn02" value="slideDown" />
+<input type="button" id="btn03" value="slideUp" />
+<input type="button" id="btn04" value="slideToggle" />
+<input type="button" id="btn05" value="fadeIn" />
+<input type="button" id="btn06" value="fadeOut" />
+<input type="button" id="btn07" value="fadeTo" />
+<input type="button" id="btn08" value="fadeTo2" />
+<input type="button" id="btn09" value="animate" />
+<input type="button" id="btn10" value="animate2" />
+<div id="test1" style="border:1px solid darkmagenta;background-color:plum;">
+<br/>
+<br/>
+<br/>
+<br/>
+</div>

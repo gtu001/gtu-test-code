@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="waiter" class="gtu.spring.aop.StaticMethodMatcherPointcutAdvisorTest$Waiter" />
+	<bean id="seller" class="gtu.spring.aop.StaticMethodMatcherPointcutAdvisorTest$Seller" />
+
+	<bean id="greetingAdvice" class="gtu.spring.aop._TestBeforeAdvice$GreetingBeforeAdvice" />
+
+	<bean id="beanNameAutoProxyCreator"
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator"
+		p:beanNames="*er,waiter,seller"
+		p:interceptorNames="greetingAdvice"
+		p:optimize="true"
+		 />
+</beans>

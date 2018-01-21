@@ -1,0 +1,18 @@
+<project name="iisi_deployee_pages_only" default="main">
+
+	<import file="build_deployee_full.xml" as="nested" />
+
+	<target name="main">
+		<antcall target="shotdownTomcat">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="deleteTomcatLog">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="runTomcat">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+</project>

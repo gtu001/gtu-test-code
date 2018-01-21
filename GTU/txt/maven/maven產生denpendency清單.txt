@@ -1,0 +1,44 @@
+
+產生jar檔 :
+mvn dependency:copy-dependencies -DincludeScope=runtime
+
+列出jar檔清單 : 
+mvn dependency:build-classpath -DincludeScope=runtime -Dmdep.outputFile=d:/gtu_test_classpath.txt
+
+
+ 產生dependency jar檔清單  --> mvn generate-sources 
+<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-dependency-plugin</artifactId>
+	<executions>
+		<execution>
+			<phase>
+				generate-sources
+			</phase>
+			<goals>
+				<goal>build-classpath</goal>
+			</goals>
+			<configuration>
+				<outputFile>${project.basedir}/src/main/resources/classpath.txt</outputFile>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+
+匯出dependency jar檔 
+<plugin>
+	<artifactId>maven-dependency-plugin</artifactId>
+	<executions>
+		<execution>
+			<phase>install</phase>
+			<goals>
+				<goal>copy-dependencies</goal>
+			</goals>
+			<configuration>
+				<outputDirectory>${project.build.directory}/lib</outputDirectory>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+			
+			

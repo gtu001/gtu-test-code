@@ -1,0 +1,197 @@
+<project name="example" default="main">
+
+	<property environment="env" />
+	
+	<!--<loadproperties srcFile="build_config.properties"/>-->
+	<property name="src_base_dir" location="../" />
+	<!--改程式跟目錄-->
+
+	<property name="src_dir" location="${src_base_dir}/src" />
+	<property name="bin_dir" location="${src_base_dir}/bin" />
+	<property name="build_dir" location="build" />
+	<property name="jars_dir" location="jars" />
+	<property name="desktop" value="C:/Users/janna/Desktop" />
+	<!--改產生jar檔目的-->
+	<property name="jar_repsitory" location="${src_base_dir}/lib" />
+	<!--<property name="main_class" value="DbaA090" />-->
+	<!--改要包的程式路徑-->
+	<property name="main_class_full" value="com.ibt.dcs.batch.${main_class}" />
+	<!--改要包的程式完整路徑-->
+	<property name="rename_jarname" value="${main_class}" />
+
+
+	<path id="my_test_classpath">
+		<pathelement path="${bin_dir}" />
+		<fileset dir="${jar_repsitory}">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- 參考的jar -->
+	<path id="class_path">
+		<fileset dir="${jar_repsitory}">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="buildClassSet" if="${enable}">
+		<echo># buildClassSet = ${enable}</echo>
+		<mkdir dir="${jars_dir}" />
+		<!-- 特別指定要使用的jar檔 -->
+		<copy todir="${jars_dir}">
+			<fileset dir="${jar_repsitory}">
+				<filename name="**/*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- 參考的設定檔 -->
+	<path id="config">
+		<fileset dir="${src_dir}">
+			<exclude name="**/*.java" />
+		</fileset>
+	</path>
+
+	<target name="main">
+		<echo>worksapce : ${src_base_dir}</echo>
+
+		<antcall target="clean">
+			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="buildClassSet">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="copyReference">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="compiler" />
+
+		<antcall target="runClass">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="createJar">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="runJar">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="moveJarToDesktop">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="renameJar">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="clean">
+			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<exec executable="cmd">
+			<arg value="/c start echo create ${main_class}.jar complete!!" />
+		</exec>
+	</target>
+
+	<target name="compiler">
+		<echo># compiler ...</echo>
+		<javac compiler="javac1.7" source="1.7" target="1.7" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+			<include name="**/${main_class}.java" />
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="runClass" if="${enable}">
+		<echo># run ${main_class}.class</echo>
+		<java classname="${main_class_full}" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="createJar" if="${enable}">
+		<echo># create ${main_class}.jar</echo>
+		<jar destfile="${main_class}.jar">
+			<zipfileset dir="${build_dir}">
+				<exclude name="/META-INF/**" />
+				<include name="/META-INF/MANIFEST.MF" />
+				<include name="**/*" />
+			</zipfileset>
+			<manifest>
+				<attribute name="Main-Class" value="${main_class_full}" />
+				<attribute name="Class-Path" value="." />
+				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
+			</manifest>
+		</jar>
+	
+		<!--
+		<jar destfile="build/main/checksites.jar">
+			<fileset dir="build/main/classes" />
+			<restrict>
+				<name name="**/*.class" />
+				<archives>
+					<zips>
+						<fileset dir="lib/main" includes="**/*.jar" />
+					</zips>
+				</archives>
+			</restrict>
+			<manifest>
+				<attribute name="Main-Class" value="com.acme.checksites.Main" />
+			</manifest>
+		</jar>
+		-->
+	</target>
+
+	<target name="runJar" if="${enable}">
+		<echo># run ${main_class}.jar</echo>
+		<java jar="${main_class}.jar" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="moveJarToDesktop" if="${enable}">
+		<echo># move Jar : ${main_class}.jar</echo>
+		<move file="${main_class}.jar" todir="${desktop}" />
+	</target>
+
+	<target name="renameJar" if="${enable}">
+		<echo># rename Jar = ${enable}</echo>
+		<rename src="${desktop}/${main_class}.jar" dest="${desktop}/${rename_jarname}.jar" />
+	</target>
+
+	<target name="clean" if="${enable}">
+		<echo># clean = ${enable}</echo>
+		<delete dir="${build_dir}" />
+		<delete dir="${jars_dir}" />
+	</target>
+
+	<target name="copyReference" if="${enable}">
+		<echo># copyReference = ${enable}</echo>
+		<mkdir dir="${build_dir}" />
+		<mkdir dir="${jars_dir}" />
+
+		<copy todir="${build_dir}">
+			<path refid="config" />
+		</copy>
+
+		<!--<mkdir dir="${build_dir}/META-INF" />-->
+
+		<unjar dest="${build_dir}">
+			<fileset dir="${jars_dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</unjar>
+	</target>
+</project>

@@ -1,0 +1,423 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>A Using SQL Command Line</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta http-equiv="Content-Language" content="en" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="robots" content="all" scheme="http://www.robotstxt.org/" />
+<meta name="generator" content="Oracle DARB XHTML Converter - Version 4.5.2 Build 34" />
+<meta name="Date" content="2005-07-10T12:57:20+08:00" />
+<meta name="doctitle" content="Oracle&reg; Database Express Edition 2 Day Developer Guide 10g Release 2 (10.2)" />
+<meta name="partno" content="B25108-01" />
+<meta name="docid" content="XEDEV" />
+<link rel="Start" href="http://www.oracle.com/pls/xe102/homepage" title="Home" type="text/html" />
+<link rel="Copyright" href="../../dcommon/html/cpyr.htm" title="Copyright" type="text/html" />
+<link rel="Stylesheet" href="../../dcommon/css/blafdoc.css" title="Default" type="text/css" />
+<link rel="Contents" href="toc.htm" title="Contents" type="text/html" />
+<link rel="Index" href="index.htm" title="Index" type="text/html" />
+<link rel="Prev" href="xedev_global.htm" title="Previous" type="text/html" />
+<link rel="Next" href="xedev_reswords.htm" title="Next" type="text/html" />
+<link rel="alternate" href="../b25108.pdf" title="PDF version" type="application/pdf" />
+</head>
+<body>
+<div class="header">
+<div class="zz-skip-header"><a name="top" id="top" href="#BEGIN">Skip Headers</a></div>
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top"><b>Oracle&reg; Database Express Edition 2 Day Developer Guide<br />
+10<i>g</i> Release 2 (10.2)</b><br />
+Part Number B25108-01</td>
+<td valign="bottom" align="right">
+<table class="icons oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="294">
+<tr>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/homepage"><img   src="../../dcommon/gifs/doclib.gif" alt="Go to Documentation Home" /><br />
+<span class="icon">Home</span></a></td>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/portal.all_books"><img   src="../../dcommon/gifs/booklist.gif" alt="Go to Book List" /><br />
+<span class="icon">Book List</span></a></td>
+<td align="center" valign="top"><a href="toc.htm"><img   src="../../dcommon/gifs/toc.gif" alt="Go to Table of Contents" /><br />
+<span class="icon">Contents</span></a></td>
+<td align="center" valign="top"><a href="index.htm"><img   src="../../dcommon/gifs/index.gif" alt="Go to Index" /><br />
+<span class="icon">Index</span></a></td>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/show_mindex"><img   src="../../dcommon/gifs/masterix.gif" alt="Go to Master Index" /><br />
+<span class="icon">Master Index</span></a></td>
+<td align="center" valign="top"><a href="../../dcommon/html/feedback.htm"><img   src="../../dcommon/gifs/feedbck2.gif" alt="Go to Feedback page" /><br />
+<span class="icon">Contact Us</span></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<hr />
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td align="left" valign="top">
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="98">
+<tr>
+<td align="center" valign="top"><a href="xedev_global.htm"><img   src="../../dcommon/gifs/leftnav.gif" alt="Go to previous page" /><br />
+<span class="icon">Previous</span></a></td>
+<td align="center" valign="top"><a href="xedev_reswords.htm"><img   src="../../dcommon/gifs/rightnav.gif" alt="Go to next page" /><br />
+<span class="icon">Next</span></a></td>
+</tr>
+</table>
+</td>
+<td align="right" valign="top" style="font-size: 90%"><a href="../b25108.pdf">View PDF</a></td>
+</tr>
+</table>
+<a name="BEGIN" id="BEGIN"></a></div>
+<div class="IND"><!-- End Header --><a id="CJABIFFE" name="CJABIFFE"></a>
+<h1 class="appendix"><span class="secnum">A</span> <a name="XEDEV10000" id="XEDEV10000"></a> Using SQL Command Line</h1>
+<p>This
+ section provides an introduction to SQL Command Line (SQL*Plus), an 
+interactive and batch command-line query tool that is installed with 
+Oracle Database Express Edition.</p>
+<p>This section contains the following topics:</p>
+<ul>
+<li>
+<p><a href="#CJAGHDHG">Overview of SQL Command Line</a></p>
+</li>
+<li>
+<p><a href="#BJEEGJGJ">Using SQL Command Line</a></p>
+</li>
+</ul>
+<p>For information about running SQL language statements, see <a href="xedev_sql.htm#BJEFHCEG">Chapter 3, "Using SQL"</a>.</p>
+<div class="infoboxnotealso">
+<p class="notep1">See Also:</p>
+<ul>
+<li>
+<p><a class="xlinkSRC SQPUG008" href="http://www.oracle.com/pls/xe102/lookup?id=SQPUG008"><span class="italic">SQL*Plus User's Guide and Reference</span></a> for complete information about SQL*Plus</p>
+</li>
+<li>
+<p><a class="xlinkSRC SQLRF008" href="http://www.oracle.com/pls/xe102/lookup?id=SQLRF008"><span class="italic">Oracle Database SQL Reference</span></a> for information about using SQL statements</p>
+</li>
+<li>
+<p><a class="xlinkSRC XEDBA0010" href="../../admin.102/b25107/connecting.htm#XEDBA0010"><span class="italic">Oracle Database Express Edition 2 Day DBA</span></a> for information about connecting to Oracle Database XE with SQL Command Line</p>
+</li>
+</ul>
+</div>
+<a id="CJAGHDHG" name="CJAGHDHG"></a>
+<div class="sect1"><!-- infolevel="all" infotype="General" -->
+<h2 class="sect1"><a name="XEDEV10100" id="XEDEV10100"></a>Overview of SQL Command Line</h2>
+<p><a id="sthref1086" name="sthref1086"></a><a id="sthref1087" name="sthref1087"></a><a id="sthref1088" name="sthref1088"></a>SQL
+ Command Line (SQL*Plus) is a command-line tool for accessing Oracle 
+Database XE. It enables you to enter and run SQL, PL/SQL, and SQL*Plus 
+commands and statements to:</p>
+<ul>
+<li>
+<p>Query, insert, and update data</p>
+</li>
+<li>
+<p>Execute PL/SQL procedures</p>
+</li>
+<li>
+<p>Examine table and object definitions</p>
+</li>
+<li>
+<p>Develop and run batch scripts</p>
+</li>
+<li>
+<p>Perform database administration</p>
+</li>
+</ul>
+<p>You
+ can use SQL Command Line to generate reports interactively, to generate
+ reports as batch processes, and to write the results to a text file, to
+ a screen, or to an HTML file for browsing on the Internet.</p>
+</div>
+<!-- class="sect1" -->
+<a id="BJEEGJGJ" name="BJEEGJGJ"></a>
+<div class="sect1"><!-- infolevel="all" infotype="General" -->
+<h2 class="sect1"><a name="XEDEV10200" id="XEDEV10200"></a>Using SQL Command Line</h2>
+<p>This section describes SQL Command Line (SQL*Plus), a command-line utility to run SQL and PL/SQL.</p>
+<p>This contains the following topics:</p>
+<ul>
+<li>
+<p><a href="#BJECGGFH">Starting and Exiting SQL Command Line</a></p>
+</li>
+<li>
+<p><a href="#BJEIEGBF">Displaying Help With SQL Command Line</a></p>
+</li>
+<li>
+<p><a href="#CJAGGHGE">Entering and Executing SQL Statements and Commands</a></p>
+</li>
+<li>
+<p><a href="#BJEEGAII">SQL Command Line DESCRIBE Command</a></p>
+</li>
+<li>
+<p><a href="#BJEJEJIA">SQL Command Line SET Commands</a></p>
+</li>
+<li>
+<p><a href="#CJAGIECA">Running Scripts From SQL Command Line</a></p>
+</li>
+<li>
+<p><a href="#CJAIGGED">Spooling From SQL Command Line</a></p>
+</li>
+<li>
+<p><a href="#BJEFFIFB">Using Variables With SQL Command Line</a></p>
+</li>
+</ul>
+<div class="infoboxnote">
+<p class="notep1">Note:</p>
+Before starting SQL Command Line, make sure that the necessary environmental variables have been set up properly. See <a class="xlinkSRC XEDBA0009" href="../../admin.102/b25107/connecting.htm#XEDBA0009"><span class="italic">Oracle Database Express Edition 2 Day DBA</span></a> for information about setting environmental variables for SQL Command Line.</div>
+<a id="BJECGGFH" name="BJECGGFH"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10201" id="XEDEV10201"></a>Starting and Exiting SQL Command Line</h3>
+<p><a id="sthref1089" name="sthref1089"></a><a id="sthref1090" name="sthref1090"></a>To start SQL Command Line from the operating-system command prompt, enter the following:</p>
+<p><code>sqlplus</code></p>
+<p>When
+ prompted, enter the username and password of the user account (schema) 
+that you want to access in the local database. For example, enter <code>HR</code> for the username and <code><span class="codeinlineitalic">my_hr_password</span></code> for the password when prompted.</p>
+<p>You can also include the username and password when you start SQL Command Line. For example:</p>
+<p><code>sqlplus hr/</code><code><span class="codeinlineitalic">my_hr_password</span></code></p>
+<p>If
+ you want to connect to a database running on a remote system, you need 
+to include a connect string when starting SQL Command Line. For example:</p>
+<p><code>sqlplus hr/</code><code><span class="codeinlineitalic">my_hr_password</span></code><code>@</code><code><span class="codeinlineitalic">host_computer_name</span></code></p>
+<p>After you have started SQL Command Line, the <code>SQL&gt;</code> prompt displays as follows:</p>
+<p><code>SQL&gt;</code></p>
+<p>At the <code>SQL&gt;</code> prompt, you can enter SQL statements.</p>
+<p>When you want to exit SQL Command Line, enter <code>EXIT</code> at the SQL prompt, as follows:</p>
+<p><code>SQL&gt; EXIT</code></p>
+</div>
+<!-- class="sect2" -->
+<a id="BJEIEGBF" name="BJEIEGBF"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10202" id="XEDEV10202"></a>Displaying Help With SQL Command Line</h3>
+<p><a id="sthref1091" name="sthref1091"></a><a id="sthref1092" name="sthref1092"></a><a id="sthref1093" name="sthref1093"></a>To display a list of Help topics for SQL Command Line, enter <code>HELP</code> <code>INDEX</code> at the SQL prompt as follows:</p>
+<p><code>SQL&gt; HELP INDEX</code></p>
+<p>From the list of SQL Command Line Help topics, you can display Help about an individual topic by entering <code>HELP</code> with a topic name. For example, the following displays Help about the SQL Command Line <code>COLUMN</code> command, which enables you to format column output:</p>
+<p><code>SQL&gt; HELP COLUMN</code></p>
+</div>
+<!-- class="sect2" -->
+<a id="CJAGGHGE" name="CJAGGHGE"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10203" id="XEDEV10203"></a>Entering and Executing SQL Statements and Commands</h3>
+<p><a id="sthref1094" name="sthref1094"></a><a id="sthref1095" name="sthref1095"></a>To
+ enter and execute SQL statements or commands, enter the statement or 
+command at the SQL prompt. At the end of a SQL statement, put a 
+semi-colon (;) and then press the Enter key to execute the statement. 
+For example:</p>
+<p><code>SQL&gt; SELECT * FROM employees;</code></p>
+<p>If
+ the statement does not fit on one line, enter the first line and press 
+the Enter key. Continue entering lines, and terminate the last line with
+ a semi-colon (;). For example:</p>
+<br />
+<code>SQL&gt;&nbsp;SELECT employee_id, first_name, last_name</code><br />
+<code>&nbsp;&nbsp;2&nbsp;&nbsp;FROM employees</code><br />
+<code>&nbsp;&nbsp;3&nbsp;&nbsp;WHERE employee_id &gt;= 105 AND employee_id &lt;= 110;</code><br />
+<p>The output from the previous <code>SELECT</code> statement is similar to:</p>
+<br />
+<code>EMPLOYEE_ID FIRST_NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LAST_NAME</code><br />
+<code>----------- -------------------- -----------------------</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;105 David&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Austin</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;106 Valli&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pataballa</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;107 Diana&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Lorentz</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;108 Nancy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Greenberg</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;109 Daniel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Faviet</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;110 John&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Chen</code><br />
+<code>6 rows selected.</code><br />
+<p>Note that a terminating semi-colon (;) is optional with SQL Command Line commands, such as <code>DESCRIBE</code> o r <code>SET</code>, but required with SQL statements.</p>
+</div>
+<!-- class="sect2" -->
+<a id="BJEEGAII" name="BJEEGAII"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10204" id="XEDEV10204"></a>SQL Command Line DESCRIBE Command</h3>
+<p><a id="sthref1096" name="sthref1096"></a><a id="sthref1097" name="sthref1097"></a>SQL Command Line provides the <code>DESCRIBE</code> command to display a description of a database object. For example, the following displays the structure of the <code>employees</code> table. This description is useful when constructing SQL statements that manipulate the <code>employees</code> table.</p>
+<br />
+<code>SQL&gt; DESCRIBE employees</code><br />
+<code>Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Null? Type</code><br />
+<code>---------------------------------------- -------- ------------</code><br />
+<code>EMPLOYEE_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOT NULL NUMBER(6)</code><br />
+<code>FIRST_NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARCHAR2(20)</code><br />
+<code>LAST_NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOT NULL VARCHAR2(25)</code><br />
+<code>EMAIL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOT NULL VARCHAR2(25)</code><br />
+<code>PHONE_NUMBER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VARCHAR2(20)</code><br />
+<code>HIRE_DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOT NULL DATE</code><br />
+<code>JOB_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NOT NULL VARCHAR2(10)</code><br />
+<code>SALARY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NUMBER(8,2)</code><br />
+<code>COMMISSION_PCT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NUMBER(2,2)</code><br />
+<code>MANAGER_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NUMBER(6)</code><br />
+<code>DEPARTMENT_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NUMBER(4)</code><br /></div>
+<!-- class="sect2" -->
+<a id="BJEJEJIA" name="BJEJEJIA"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10205" id="XEDEV10205"></a>SQL Command Line SET Commands</h3>
+<p><a id="sthref1098" name="sthref1098"></a><a id="sthref1099" name="sthref1099"></a><a id="sthref1100" name="sthref1100"></a>The SQL Command Line <code>SET</code> commands can be used to specify various SQL Command Line settings, such as the format of the output from SQL <code>SELECT</code> statements. For example, the following <code>SET</code> commands specify the number of lines for each page and the number of characters for each line in the output:</p>
+<br />
+<code>SQL&gt; SET PAGESIZE 200</code><br />
+<code>SQL&gt; SET LINESIZE 140</code><br />
+<p>To enable output from PL/SQL blocks with <code>DBMS_OUTPUT.PUT_LIN</code>E, use the following:</p>
+<p><code>SQL&gt; SET SERVEROUTPUT ON</code></p>
+<p>To view all the settings, enter the following at the SQL prompt:</p>
+<p><code>SQL&gt; SHOW ALL</code></p>
+<p>For information about the SQL Command Line <code>SERVEROUTPUT</code> setting to display output from a PL/SQL program, see <a href="xedev_plsql.htm#CBJGHHBG">"Inputting and Outputting Data with PL/SQL"</a>.</p>
+<div class="infoboxnotealso">
+<p class="notep1">See Also:</p>
+<a class="xlinkSRC SQPUG012" href="http://www.oracle.com/pls/xe102/lookup?id=SQPUG012"><span class="italic">SQL*Plus User's Guide and Reference</span></a> for information about setting up the SQL Command Line environment with a login file</div>
+</div>
+<!-- class="sect2" -->
+<a id="CJAGIECA" name="CJAGIECA"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10206" id="XEDEV10206"></a>Running Scripts From SQL Command Line</h3>
+<p><a id="sthref1101" name="sthref1101"></a>You
+ can use a text editor to create SQL Command Line script files that 
+contain SQL*Plus, SQL, and PL/SQL statements. For consistency, use the <code>.sql</code> extension for the script file name.</p>
+<p>A SQL script file is executed with a <code>START</code> or <code>@</code> command. For example, in a Windows environment, you can execute a SQL script as follows:</p>
+<p><code>SQL&gt; @c:\my_scripts\my_sql_script.sql</code></p>
+<p>A SQL script file can be executed in a Linux environment as follows:</p>
+<p><code>SQL&gt; START /home/cjones/my_scripts/my_sql_script.sql</code></p>
+<p>You can use <code>SET</code> <code>ECHO</code> <code>ON</code> to cause a script to echo each statement that is executed. You can use <code>SET</code> <code>TERMOUT</code> <code>OFF</code> to prevent the script output from displaying on the screen.</p>
+<p>When
+ running a script, you need to include the full path name unless the 
+script is located in the directory from which SQL Command Line was 
+started, or the script is located in the default script location 
+specified by the <code>SQLPATH</code> environment variable.</p>
+<div class="infoboxnotealso">
+<p class="notep1">See Also:</p>
+<ul>
+<li>
+<p><a class="xlinkSRC XEDBA0009" href="../../admin.102/b25107/connecting.htm#XEDBA0009"><span class="italic">Oracle Database Express Edition 2 Day DBA</span></a> for information about setting environment variables for Oracle Database Express Edition</p>
+</li>
+<li>
+<p><a class="xlinkSRC SQPUG012" href="http://www.oracle.com/pls/xe102/lookup?id=SQPUG012"><span class="italic">SQL*Plus User's Guide and Reference</span></a> for information about setting the SQL Command Line <code>SQLPATH</code> environment variable to specify the default location of SQL scripts</p>
+</li>
+</ul>
+</div>
+</div>
+<!-- class="sect2" -->
+<a id="CJAIGGED" name="CJAIGGED"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10207" id="XEDEV10207"></a>Spooling From SQL Command Line</h3>
+<p><a id="sthref1102" name="sthref1102"></a><a id="sthref1103" name="sthref1103"></a><a id="sthref1104" name="sthref1104"></a>The <code>SPOOL</code>
+ command can be used to direct the output from SQL Command Line to a 
+disk file, which enables you to save the output for future review.</p>
+<p>To start spooling the output to an operating system file, you enter the <code>SPOOL</code> command followed by a file name. For example:</p>
+<p><code>SQL&gt; SPOOL</code> <code><span class="codeinlineitalic">my_log_file.log</span></code></p>
+<p>If you want to append the output to an existing file:</p>
+<p><code>SQL&gt; SPOOL</code> <code><span class="codeinlineitalic">my_log_file.log</span></code> <code>APPEND</code></p>
+<p>To stop spooling and close a file, enter the following:</p>
+<p><code>SQL&gt; SPOOL OFF</code></p>
+</div>
+<!-- class="sect2" -->
+<a id="BJEFFIFB" name="BJEFFIFB"></a>
+<div class="sect2"><!-- infolevel="all" infotype="General" -->
+<h3 class="sect2"><a name="XEDEV10208" id="XEDEV10208"></a>Using Variables With SQL Command Line</h3>
+<p><a id="sthref1105" name="sthref1105"></a><a id="sthref1106" name="sthref1106"></a>You can create queries that use variables to make <code>SELECT</code>
+ statements more flexible. You can define the variable before running a 
+SQL statement, or you specify that the statement prompts for a variable 
+value at the time that the SQL statement is run.</p>
+<p>When using a variable in a SQL statement, the variable name must be begin with an ampersand (&amp;).</p>
+<p>This section contains the following topics:</p>
+<ul>
+<li>
+<p><a href="#BJEJJBFI">Prompting for a Variable Value in a Query</a></p>
+</li>
+<li>
+<p><a href="#CJADBIJC">Reusing a Variable Value in a Query</a></p>
+</li>
+<li>
+<p><a href="#BJECDCAA">Defining a Variable Value for a Query</a></p>
+</li>
+</ul>
+<p>For information about using bind variables in PL/SQL code, see <a href="xedev_plsql.htm#CHDJFJBG">"Using Bind Variables With PL/SQL"</a>.</p>
+<a id="BJEJJBFI" name="BJEJJBFI"></a>
+<div class="sect3"><!-- infolevel="all" infotype="General" -->
+<h4 class="sect3">Prompting for a Variable Value in a Query</h4>
+<p><a id="sthref1107" name="sthref1107"></a>You can use <code>&amp;</code> to identify a variable that you want to define dynamically. In <a href="#BJEBJBFG">Example A-1</a>, including the <code>&amp;employee_id</code> variable causes the SQL statement to prompt for a value when the statement is executed. You can then enter a value for the <code>employee_id</code>
+ that corresponds to the employee information that you want to display, 
+such as employee ID 125. Note that you can use any name for the 
+variable, such as <code>&amp;my_variable</code>.</p>
+<div class="example"><a id="BJEBJBFG" name="BJEBJBFG"></a>
+<p class="titleinexample">Example A-1 Prompting for a Variable Value in SQL Command Line</p>
+<pre xml:space="preserve" class="oac_no_warn">-- prompt for employee_id in a query, you need to enter a valid ID such as 125
+SELECT employee_id, last_name, job_id FROM employees 
+  WHERE employee_id = <span class="bold">&amp;employee_id</span>;
+
+</pre></div>
+<!-- class="example" -->
+<p>When you run the previous <code>SELECT</code> statement, the output is similar to:</p>
+<br />
+<code>Enter value for employee_id:&nbsp;</code><code><span class="codeinlinebold">125</span></code><br />
+...<br />
+<code>EMPLOYEE_ID LAST_NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JOB_ID</code><br />
+<code>----------- ------------------------- ----------</code><br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;125 Nayer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ST_CLERK</code><br /></div>
+<!-- class="sect3" -->
+<a id="CJADBIJC" name="CJADBIJC"></a>
+<div class="sect3"><!-- infolevel="all" infotype="General" -->
+<h4 class="sect3">Reusing a Variable Value in a Query</h4>
+<p><a id="sthref1108" name="sthref1108"></a>You can use <code>&amp;&amp;</code> to identify a variable that you want to define dynamically multiple times, but only want to prompt the user once. In <a href="#CJAEDHDA">Example A-2</a>, including the <code>&amp;&amp;column_name</code>
+ variable causes the SQL statement to prompt for a value when the 
+statement is executed. The value that is entered is substituted for all 
+remaining occurrences of <code>&amp;&amp;column_name</code> in the SQL statement.</p>
+<div class="example"><a id="CJAEDHDA" name="CJAEDHDA"></a>
+<p class="titleinexample">Example A-2 Reusing a Variable Value in SQL Command Line</p>
+<pre xml:space="preserve" class="oac_no_warn">-- prompt for a column name, such as <span class="bold">job_id</span>, which is then substituted in the
+-- remaining identical substitution variables prefixed with &amp;&amp;
+SELECT employee_id, last_name, <span class="bold">&amp;&amp;column_name</span> FROM employees
+  ORDER BY <span class="bold">&amp;&amp;column_name</span>;
+</pre></div>
+<!-- class="example" --></div>
+<!-- class="sect3" -->
+<a id="BJECDCAA" name="BJECDCAA"></a>
+<div class="sect3"><!-- infolevel="all" infotype="General" -->
+<h4 class="sect3">Defining a Variable Value for a Query</h4>
+<p><a id="sthref1109" name="sthref1109"></a>In <a href="#BJEDDDGE">Example A-3</a>, the <code>&amp;job_id</code> variable is defined before running the SQL statement with the <code>DEFINE</code>
+ command, and the defined value is substituted for the variable when the
+ statement is executed. Because the variable has already been defined, 
+you are not prompted to enter a value.</p>
+<div class="example"><a id="BJEDDDGE" name="BJEDDDGE"></a>
+<p class="titleinexample">Example A-3 Defining a Variable for a Query in SQL Command Line</p>
+<pre xml:space="preserve" class="oac_no_warn">-- define a variable value for a query as follows
+<span class="bold">DEFINE</span> job_id = "ST_CLERK"
+-- run a query using the defined value for job_id (ST_CLERK)
+SELECT employee_id, last_name FROM employees WHERE job_id = '<span class="bold">&amp;job_id</span>';
+
+
+</pre></div>
+<!-- class="example" --></div>
+<!-- class="sect3" --></div>
+<!-- class="sect2" --></div>
+<!-- class="sect1" --></div>
+<div class="footer">
+<hr />
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td style="width: 33%;" align="left">
+<table class="simple oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="98">
+<tr>
+<td align="center" valign="top"><a href="xedev_global.htm"><img   src="../../dcommon/gifs/leftnav.gif" alt="Go to previous page" /><br />
+<span class="icon">Previous</span></a></td>
+<td align="center" valign="top"><a href="xedev_reswords.htm"><img   src="../../dcommon/gifs/rightnav.gif" alt="Go to next page" /><br />
+<span class="icon">Next</span></a></td>
+</tr>
+</table>
+</td>
+<td style="width: 34%; font-size: 90%" align="center" class="copyrightlogo"><img   src="../../dcommon/gifs/oracle.gif" alt="Oracle" /><br />
+<a href="../../dcommon/html/cpyr.htm">Copyright&nbsp;&copy;&nbsp;2005, 2006,&nbsp;Oracle.&nbsp;All&nbsp;rights&nbsp;reserved.</a></td>
+<td style="width: 33%;" align="right">
+<table class="icons oac_no_warn" summary="" cellspacing="0" cellpadding="0" width="294">
+<tr>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/homepage"><img   src="../../dcommon/gifs/doclib.gif" alt="Go to Documentation Home" /><br />
+<span class="icon">Home</span></a></td>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/portal.all_books"><img   src="../../dcommon/gifs/booklist.gif" alt="Go to Book List" /><br />
+<span class="icon">Book List</span></a></td>
+<td align="center" valign="top"><a href="toc.htm"><img   src="../../dcommon/gifs/toc.gif" alt="Go to Table of Contents" /><br />
+<span class="icon">Contents</span></a></td>
+<td align="center" valign="top"><a href="index.htm"><img   src="../../dcommon/gifs/index.gif" alt="Go to Index" /><br />
+<span class="icon">Index</span></a></td>
+<td align="center" valign="top"><a href="http://www.oracle.com/pls/xe102/show_mindex"><img   src="../../dcommon/gifs/masterix.gif" alt="Go to Master Index" /><br />
+<span class="icon">Master Index</span></a></td>
+<td align="center" valign="top"><a href="../../dcommon/html/feedback.htm"><img   src="../../dcommon/gifs/feedbck2.gif" alt="Go to Feedback page" /><br />
+<span class="icon">Contact Us</span></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+
+	<insertFromJNDI env-entry-name="java:comp/env/appName"
+		as="appName" />
+
+	<include file="src/main/java/chapters/configuration/includedConfig.xml" />
+	<include resource="includedConfig.xml" />
+	<include url="http://some.host.com/includedConfig.xml" />
+
+	<contextName>myAppName</contextName>
+
+	<property name="USER_HOME" value="/home/sebastien" scope="context" />
+	<!-- scope = "local", "context" , "system" -->
+	<property file="src/${rootLevel:-QQQ}/variables1.properties" />
+	<property name="test" value="${AAA:-aaa}" />
+	<!-- test 的 value 為 AAA參數 若 AAA未定義則值為 aaa -->
+
+	<!-- <if condition='property("HOSTNAME").contains("torino")'> <then> <appender 
+		name="CON" class="ch.qos.logback.core.ConsoleAppender"> <encoder> <pattern>%d 
+		%-5level %logger{35} - %msg %n</pattern> </encoder> </appender> <root> <appender-ref 
+		ref="CON" /> </root> </then> </if> -->
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>DEBUG</level> 
+			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
+		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<encoder>
+			<pattern>%date{HH:mm:ss:SSS}|%-5level|%thread|%method - %msg \(%class.java:%L\)%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="my_console" class="gtu.log.Slf4jTest$TestConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<encoder>
+			<pattern>%date{HH:mm:ss:SSS}|%-5level|%thread|%method - %msg \(%class.java:%L\)%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="full_console" class="gtu.log.Slf4jTest$TestConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<encoder>
+			<pattern># %class{0}.%method\(\) %date{HH:mm:ss:SSS}|%-5level|%thread \(%class.java:%L\)%n%caller{0}    %msg%n%n%throwable{full}</pattern>
+		</encoder>
+	</appender>
+
+	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
+
+	<appender name="file" class="ch.qos.logback.core.FileAppender">
+		<File>${USER_HOME}/log-${bySecond}.txt</File>
+		<Append>false</Append>
+		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>5MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<Pattern>%d{HH:mm:ss.SSS} %-5level %class{36}:%L %M - %msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="email" class="ch.qos.logback.classic.net.SMTPAppender">
+		<smtpHost>smtp.gmail.com</smtpHost>
+		<smtpPort>465</smtpPort>
+		<ssl>true</ssl>
+		<!-- <smtpPort>587</smtpPort> <STARTTLS>true</STARTTLS> -->
+
+		<username>gtu001@gmail.com</username>
+		<password>luv90cxc048c</password>
+		<to>gtu001@gmail.com</to><!-- EMAIL-DESTINATION -->
+		<to>gtu001@gmail.com</to> <!-- ANOTHER_EMAIL_DESTINATION additional destinations are possible -->
+		<from>gtu001@gmail.com</from>
+		<subject>TESTING: %logger{20} - %m</subject>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%date %-5level %logger{35} - %message%n</pattern>
+		</layout>
+	</appender>
+
+	<appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+		<connectionSource
+			class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+			<!-- <driverClass>org.hsqldb.jdbc.JDBCDriver</driverClass> <url>jdbc:hsqldb:file:db/hsql/testdb;shutdown=true</url> 
+				<user>SA</user> <password></password> -->
+			<dataSource class="com.mchange.v2.c3p0.ComboPooledDataSource">
+				<driverClass>org.hsqldb.jdbc.JDBCDriver</driverClass>
+				<jdbcUrl>jdbc:hsqldb:file:db/hsql/testdb;shutdown=true</jdbcUrl>
+				<user>SA</user>
+				<password></password>
+			</dataSource>
+		</connectionSource>
+	</appender>
+
+
+	<define name="rootLevel" class="gtu.log.Slf4jTest$TestPropertyDefiner">
+		<aProperty>of a.class.implementing.PropertyDefiner</aProperty>
+	</define>
+
+
+	<root>
+		<level value="trace" />
+		<!-- <appender-ref ref="my_console" /> -->
+		<appender-ref ref="db" />
+	</root>
+
+	<logger name="gtu.log" level="INFO" />
+	<!-- 若以class宣告, 或是名稱前置字元為gtu.log 的logger將不顯示debug level -->
+	<logger name="gtu.log.test" level="DEBUG" />
+	<!-- 雖然gtu.log的前置不顯示,但顯示前置gtu.log.test為debug level -->
+
+	<!-- additivity="false" 表示不繼承父但是影響子 -->
+	<logger name="test" level="trace" additivity="true">
+		<appender-ref ref="console" />
+	</logger>
+</configuration>

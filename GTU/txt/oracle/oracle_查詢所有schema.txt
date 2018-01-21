@@ -1,0 +1,6 @@
+
+
+--查詢系統schema
+select distinct owner from  dba_tables t ;
+
+select distinct tablespace_name from  dba_tables t 

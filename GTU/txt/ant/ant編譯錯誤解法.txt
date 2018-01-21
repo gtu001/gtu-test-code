@@ -1,0 +1,22 @@
+錯誤內容 : 
+compile:
+    [javac] Compiling 3 source files to H:\MYCOMPANY\portlets\build
+    [javac] H:\MYCOMPANY\portlets\src\com\mycompany\portlets\CourseList.java:3: cannot access java.io.IOException
+    [javac] bad class file: C:\Program Files\Java\jre1.6.0_07\lib\rt.jar(java/io/IOException.class)
+    [javac] class file has wrong version 49.0, should be 48.0
+    [javac] Please remove or make sure it appears in the correct subdirectory of the classpath.
+    [javac] import java.io.IOException;
+    [javac]                ^
+    [javac] 1 error
+    
+解法 : 
+
+You need to change the Java Version for ANT also because 
+If you are using your Run Time Environment as JDK1.8 then 
+Your ANT should be also point to same version or Ant should 
+refer tools.jar file from JDK1.8/lib/tools.jar location. 
+
+To fix this issue i your Eclipse Go to Window --> Preference --> Ant -->Runtime -->Global Entries . 
+Here check and update tools.jar path with latest version as below.: C:\Program Files\Java\jdk1.8.0_60\lib\tools.jar
+
+Then run your build script issue will be resolved. :)

@@ -1,0 +1,26 @@
+*.class
+*.pyc
+#*.jar
+**/.svn/**
+**/build/classes/**
+**/.metadata/**
+GTU/target/**
+
+**/bin/**
+**/target/**
+
+
+
+
+appcompat_v7/**
+/RemoteSystemsTempFiles/.project
+/Servers/.project
+/Servers/.settings/org.eclipse.wst.server.core.prefs
+/Servers/Tomcat v7.0 Server at localhost-config/catalina.policy
+/Servers/Tomcat v7.0 Server at localhost-config/catalina.properties
+/Servers/Tomcat v7.0 Server at localhost-config/context.xml
+/Servers/Tomcat v7.0 Server at localhost-config/server.xml
+/Servers/Tomcat v7.0 Server at localhost-config/tomcat-users.xml
+/Servers/Tomcat v7.0 Server at localhost-config/web.xml
+/.metadata/
+/.recommenders/

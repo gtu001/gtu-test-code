@@ -1,0 +1,72 @@
+
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+
+<script type="text/javascript">
+	(function($){
+		$.fn.setReadOnly = function(readonly){
+			return this.filter("input:text")
+			.attr("readonly", readonly)
+			.css("opacity", readonly?0.5:1.0);
+		}
+		$.fn.emptySelect = function(){
+			return this.each(function(){
+				if(this.tagName = 'select') {
+					$(this).find("option").remove();
+				}
+			});
+		}
+		$.fn.loadSelect = function(optionsDataArray){
+			return this.emptySelect().each(function(){
+				if(this.tagName.toLowerCase() == 'select'){
+					var selectElement = this;
+					$.each(optionsDataArray, function(key, value){
+						var option = new Option(key, value);
+						if($.browser.msie){
+							selectElement.add(option);	
+						}else{
+							selectElement.add(option, null);
+						}
+					});
+				}
+			});
+		}
+		$.fn.disable = function(){
+			return this.each(function(){
+				if(typeof this.disabled != "undefined") this.disabled = true;
+			});
+		};
+		$.fn.getClassNames = function(){
+			if(name = this.attr("className")){
+				return name.split(" ");	
+			}else{
+				return [];
+			}
+		};
+		$.say = function(text){
+			alert(text);
+		};
+	})(jQuery);
+	
+	$(function(){
+		$(":input#id1").setReadOnly(true);
+		$(":input#id2").disable();
+		$("input[value='reset select']").bind("click", function(){
+			$("select").emptySelect();
+		});
+		$("input[value='load select']").bind("click", function(){
+			$("select").loadSelect({11:"aa",22:"bb"});
+		});
+		$.say('hello');
+	});
+</script>
+
+<input type="text" id="id1" />
+<input type="text" id="id2" />
+<SELECT value="2">
+	<option value="">...</option>
+	<option value="1">111</option>
+	<option value="2">222</option>
+</SELECT>
+<input type="button" value="reset select" />
+<input type="button" value="load select" />
