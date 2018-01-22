@@ -573,6 +573,15 @@ public class DateUtil {
         return Integer.parseInt(sdf.format(date));
     }
 
+    // 太陽日
+    public Date getSunSolarDay(String yyyy, int dayOfMonth) throws ParseException {
+        int year = Integer.parseInt(yyyy);
+        int monthAndDay = dayOfMonth - 1;
+        Calendar calendar = new GregorianCalendar(year, 00, 01);
+        calendar.add(Calendar.DAY_OF_MONTH, monthAndDay);
+        return calendar.getTime();
+    }
+
     public static XMLGregorianCalendar getXmlNow() throws DatatypeConfigurationException {
         XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar();
         Calendar date = Calendar.getInstance();

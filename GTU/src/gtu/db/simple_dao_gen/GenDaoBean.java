@@ -54,6 +54,7 @@ public class GenDaoBean {
 
     public String execute(String sql, String tableName, Connection conn) {
         try {
+            tableName = StringUtils.trimToEmpty(tableName);
             List<DBColumn> dbColmnList = queryDBColumn(sql, conn);
             String className = StringUtils.capitalise(StringUtilForDb.dbFieldToJava(tableName));
             StringBuilder sb = new StringBuilder();

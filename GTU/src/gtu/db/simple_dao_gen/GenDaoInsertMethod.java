@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 
 public class GenDaoInsertMethod {
     
     public String execute(String tableName, List<String> colList) throws SQLException{
+        tableName = StringUtils.trimToEmpty(tableName);
+        GenDaoUpdateMethod.trimStringList(colList);
         String sql = this.createInsertSql(tableName, colList);
         String methodResult = getInsertMethod(sql, colList);
         System.out.println(methodResult);

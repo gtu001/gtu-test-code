@@ -12,6 +12,8 @@ import org.springframework.jdbc.support.JdbcUtils;
 public class GenDaoSelectMethod {
     
     public String execute(String tableName, List<String> pkList) throws SQLException{
+        tableName = StringUtils.trimToEmpty(tableName);
+        GenDaoUpdateMethod.trimStringList(pkList);
         String sql = this.createSelectSql(tableName, pkList);
         String methodResult = getQueryMethod(sql, pkList);
         System.out.println(methodResult);

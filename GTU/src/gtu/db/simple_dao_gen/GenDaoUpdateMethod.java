@@ -1,3 +1,4 @@
+
 package gtu.db.simple_dao_gen;
 
 import java.sql.Connection;
@@ -7,16 +8,27 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 
 
 public class GenDaoUpdateMethod {
     
     public String execute(String tableName, List<String> colList, List<String> pkList) throws SQLException{
+        tableName = StringUtils.trimToEmpty(tableName);
+        GenDaoUpdateMethod.trimStringList(colList);
+        GenDaoUpdateMethod.trimStringList(pkList);
         String sql = this.createUpdateSql(tableName, colList, pkList);
         String methodResult = getUpdateMethod(sql, colList, pkList);
         System.out.println(methodResult);
         return methodResult;
+    }
+    
+    static void trimStringList(List<String> lst){
+        for(int ii = 0 ; ii < lst.size() ; ii ++) {
+            String v = StringUtils.trimToEmpty(lst.get(ii));
+            lst.set(ii, v);
+        }
     }
     
     private List<String> getColumnList(String tableName, Connection conn) throws SQLException{

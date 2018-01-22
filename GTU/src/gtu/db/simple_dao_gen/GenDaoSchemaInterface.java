@@ -15,6 +15,7 @@ import gtu.string.StringUtilForDb;
 public class GenDaoSchemaInterface {
 
     public String execute(String tableName, List<String> colList) throws SQLException {
+        tableName = StringUtils.trimToEmpty(tableName);
         String methodResult = getInterfaceClass(tableName, colList);
         System.out.println(methodResult);
         return methodResult;

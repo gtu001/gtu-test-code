@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 
 public class GenDaoDeleteMethod {
 
     public String execute(String tableName, List<String> pkList) throws SQLException {
+        tableName = StringUtils.trimToEmpty(tableName);
+        GenDaoUpdateMethod.trimStringList(pkList);
         String sql = this.createDeleteSql(tableName, pkList);
         String methodResult = getDeleteMethod(sql, pkList);
         System.out.println(methodResult);
