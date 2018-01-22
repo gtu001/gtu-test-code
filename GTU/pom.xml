@@ -9,11 +9,11 @@
 	<url>http://maven.apache.org</url>
 	
 	<repositories>
-		<repository>
+		<!-- <repository>
 			<id>central</id>
 			<name>Fuco Repository</name>
 			<url>http://192.168.93.230:8081/artifactory/release</url>
-		</repository>
+		</repository>-->
 		<repository>
 			<id>local Repository</id>
 			<url>file://${basedir}/lib</url><!-- 專案目錄/lib/ -->
@@ -513,7 +513,7 @@
 			<artifactId>DebugMointerUI</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>i:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
+			<systemPath>e:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
 		</dependency><!-- ${project.basedir}/src/main/webapp/WEB-INF/lib/DebugMointerUI.jar -->
 
 		<!-- dropbox -->

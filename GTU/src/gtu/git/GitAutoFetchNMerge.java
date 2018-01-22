@@ -39,6 +39,7 @@ public class GitAutoFetchNMerge {
                 ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
                 newInstance.getStream(30000);
                 System.out.println(newInstance.getErrorStreamToString());
+                System.out.println(newInstance.getInputStreamToString());
                 System.out.println("processed " + (ii+1) + " -> " + files.length);
             } catch (java.util.concurrent.TimeoutException ex) {
                 System.err.println("Timeout !!");
