@@ -21,7 +21,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry kind="lib" path="I:/workstuff/jars/ojdbc7.jar"/>
-	<classpathentry kind="lib" path="I:/my_tool/simple_dao_gen/sqljdbc4-4.1.jar"/>
+	<classpathentry kind="lib" path="E:/workstuff/jars/ojdbc7.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

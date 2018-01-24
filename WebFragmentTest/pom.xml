@@ -17,23 +17,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>ProdCommon</groupId>
-			<artifactId>ProdCommon</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>ProdModule</groupId>
-			<artifactId>FucoProdTools</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope><!-- 關聯但不匯出 -->
-		</dependency>
-		<dependency>
-			<groupId>ProdModule</groupId>
-			<artifactId>FucoServiceAPI</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope><!-- 關聯但不匯出 -->
-		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>

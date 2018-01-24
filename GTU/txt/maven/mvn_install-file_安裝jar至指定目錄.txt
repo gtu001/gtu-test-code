@@ -1,10 +1,10 @@
-mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvj.jar  -DgroupId=eai  -DartifactId=tibrvj  -Dversion=1.0  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=C:\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
+mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvj.jar  -DgroupId=eai  -DartifactId=tibrvj  -Dversion=  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=E:\workstuff\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
 
 
-mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvjsd.jar  -DgroupId=eai  -DartifactId=tibrvjsd  -Dversion=1.0  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=C:\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
+mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvjsd.jar  -DgroupId=eai  -DartifactId=tibrvjsd  -Dversion=  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=E:\workstuff\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
 
 
-mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvnative.jar  -DgroupId=eai  -DartifactId=tibrvnative  -Dversion=1.0  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=C:\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
+mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvnative.jar  -DgroupId=eai  -DartifactId=tibrvnative  -Dversion=  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=E:\workstuff\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
 
 
-mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvnativesd.jar  -DgroupId=eai  -DartifactId=tibrvnativesd  -Dversion=1.0  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=C:\workstuff\workspace_scsb\SCSB_CCBill_AP\lib
+mvn install:install-file -Dfile=C:/tibco/tibrv/8.4/lib/tibrvnativesd.jar  -DgroupId=eai  -DartifactId=tibrvnativesd  -Dversion=  -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=E:\workstuff\workstuff\workspace_scsb\SCSB_CCBill_AP\lib

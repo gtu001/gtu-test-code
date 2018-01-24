@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu.db.DbConstant;
 import gtu.db.tradevan.DBCommon_tradevan;
 import gtu.db.tradevan.DBTypeMapping_tradevan;
 import gtu.string.StringUtilForDb;
@@ -20,21 +21,24 @@ public class GenDaoBean {
         Connection conn = null;
         try {
             GenDaoBean t = new GenDaoBean();
-//            conn = DbConstant.getTestDataSource_FucoOracle().getConnection();
+            conn = DbConstant.getTestDataSource_FucoOracle().getConnection();
             
             StringBuilder sb = new StringBuilder();
-            sb.append(" select a.adprjid,                                   ");
-            sb.append(" a.adprjname,                                        ");
-            sb.append(" b.BlockCode,                                        ");
-            sb.append(" b.BlockName,                                        ");
-            sb.append(" a.sTime,                                            ");
-            sb.append(" a.eTime,                                            ");
-            sb.append(" a.creater,                                           ");
-            sb.append(" a.approver,                                          ");
-            sb.append(" a.status                                            ");
-            sb.append(" from adCaseData a                                   ");
-            sb.append(" join BlockMap b on a.BlockCode = b.BlockCode        ");
-            sb.append(" where 1!=1                                          ");
+            sb.append(" select a.adprjid,                                 ");
+            sb.append(" a.adprjname,                                      ");
+            sb.append(" b.BlockCode,                                      ");
+            sb.append(" b.BlockName,                                      ");
+            sb.append(" a.sTime,                                          ");
+            sb.append(" a.eTime,                                          ");
+            sb.append(" a.creater,                                        ");
+            sb.append(" a.approver,                                       ");
+            sb.append(" a.approver2,                                      ");
+            sb.append(" a.status,                                         ");
+            sb.append(" a.status2,                                        ");
+            sb.append(" a.ctime                                           ");
+            sb.append(" from adCaseData a                                 ");
+            sb.append(" join BlockMap b on a.BlockCode = b.BlockCode      ");
+            sb.append(" order by a.ctime desc                             ");
             
             String result = t.execute(sb.toString(), "AD_LIST_VO", conn);
             System.out.println(result);
