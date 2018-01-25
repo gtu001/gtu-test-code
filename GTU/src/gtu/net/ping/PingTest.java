@@ -15,20 +15,17 @@ public class PingTest {
     public static void main(String[] args) throws UnknownHostException, IOException {
         // System.out.println(InetAddress.getAllByName("gtu_vm"));
 
-        for (int ii = 0; ii < 256; ii++) {
-            for (int jj = 0; jj < 256; jj++) {
-                String ip = String.format("192.168.%d.%d", ii, jj);
-                try {
-                    Socket server = new Socket();
-                    InetSocketAddress address = new InetSocketAddress(ip, 80);
-                    server.connect(address, 100);
-                    server.close();
-                    System.out.println(ip + " connect ok !!");
-                } catch (Exception e) {
-                }
-            }
-            System.out.println(ii);
-        }
+        String ip = "10.10.2.101";
+        int port = 1521;
+        
+        System.out.println("connect ip : " + ip + " " + port);
+        
+        Socket server = new Socket();
+        InetSocketAddress address = new InetSocketAddress(ip, port);
+        server.connect(address, 30000);
+        server.close();
+        System.out.println(" connect ok !!");
+        
         System.out.println("done...");
     }
 

@@ -1,17 +1,11 @@
 package _temp;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 public class Test35 {
 
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-        XXX x = null;
-        x.ok();
+    public static void main(String[] args) throws NoSuchMethodException, SecurityException {
     }
-    
-    private static class XXX {
-        public static void ok() {
-            System.out.println("xxxxx");
-        }
-    }
-
 }

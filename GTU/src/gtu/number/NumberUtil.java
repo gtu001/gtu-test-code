@@ -103,4 +103,13 @@ public class NumberUtil {
         }
         return al;
     }
+    
+    public void numberFormatTest() {
+        String value = "10000000000000.12341234324324";
+        NumberFormat nf = new DecimalFormat("#.###,###,###,###,###.###############");
+        nf.setMaximumFractionDigits(5);//設定最大小數位
+        nf.setMinimumFractionDigits(0);//設定最小小數位
+        String result =  nf.format(new BigDecimal(value));
+        System.out.println(result);
+    }
 }
