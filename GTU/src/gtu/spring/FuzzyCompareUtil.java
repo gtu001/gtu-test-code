@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/** 
+ * 請改使用 SimilarityUtil
+ */
+@Deprecated
 public class FuzzyCompareUtil {
 
     public static void main(String[] args) {

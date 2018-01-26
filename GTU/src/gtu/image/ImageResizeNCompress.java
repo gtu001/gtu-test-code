@@ -93,7 +93,7 @@ public class ImageResizeNCompress {
             destFile.getParentFile().mkdirs();
         }
         try {
-            String command = "cmd /c call \"I:/apps/ImageMagick-7.0.6-1-portable-Q16-x86/convert\" -quality %d -resize %s \"%s\" \"%s\" ";
+            String command = "cmd /c call \"E:/apps/ImageMagick-7.0.6-1-portable-Q16-x86/convert\" -quality %d -resize %s \"%s\" \"%s\" ";
             command = String.format(command, 50, width, srcFile, destFile);
             System.out.println(command);
             Runtime.getRuntime().exec(command);

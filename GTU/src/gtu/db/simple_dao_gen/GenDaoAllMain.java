@@ -29,6 +29,7 @@ public class GenDaoAllMain {
         sb.append(new GenDaoDeleteMethod().execute(tableName, pkList));
         sb.append(new GenDaoUpdateMethod().execute(tableName, colList, pkList));
         sb.append(new GenDaoSelectMethod().execute(tableName, pkList));
+        sb.append(new GenDaoTruncateMethod().execute(tableName));
         sb.append("}\n");
         
         return sb.toString();
