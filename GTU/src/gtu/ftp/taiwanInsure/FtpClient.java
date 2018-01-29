@@ -18,6 +18,13 @@ public class FtpClient {
 
     private FTPSClient client;
 
+    public static void main(String[] args) throws Exception {
+        FtpClient ftp = new FtpClient(true);
+        ftp.connect("10.10.2.108", "root", "root123", 22);
+        ftp.disconnect();
+        System.out.println("done...");
+    }
+
     public FtpClient(boolean ftps) {
         client = new FTPSClient(true);
     }

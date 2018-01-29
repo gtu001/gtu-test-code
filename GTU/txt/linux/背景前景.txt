@@ -11,3 +11,5 @@ Send Signal to process
 Ctrl + \ --> Stop On Exit
 Ctrl + C --> kill
 Ctrl + Z --> 中斷前景切回背景
+
+nohup task.sh &

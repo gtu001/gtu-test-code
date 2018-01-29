@@ -60,6 +60,21 @@ public class StringUtil_ {
         }
         return sb.toString();
     }
+    
+    /**
+     * 抓中文字(注音不抓)
+     * 
+     * @param str
+     * @param isChineseBool
+     * @return
+     */
+    public boolean hasChineseWord(String str) {
+        Matcher mth = Pattern.compile("[\u4e00-\u9fa5]").matcher(str);
+        if(mth.find()) {
+            return true;
+        }
+        return false;
+    }
 
     public void testScanner() {
         String str = null;

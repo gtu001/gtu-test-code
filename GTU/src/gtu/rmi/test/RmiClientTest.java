@@ -1,11 +1,11 @@
 package gtu.rmi.test;
 
-import gtu.rmi.test.RmiServerTest.MyRmiInterface;
-
 import java.rmi.Naming;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import gtu.rmi.test.RmiServerTest.MyRmiInterface;
 
 public class RmiClientTest {
     public static void main(String[] args) {
