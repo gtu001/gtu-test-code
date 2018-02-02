@@ -21,6 +21,9 @@
 .ck-editor__editable {
     min-height: 400px;
 }
+.text_align_center {
+	text-align : center;
+}
 </style>
 
 <meta charset="utf-8">
@@ -47,16 +50,16 @@
 					<table class="table table-striped">
 						<thead>
 							<tr>
-								<th>#</th>
-								<th>版本</th>
-								<th>動作</th>
+								<th v-bind:class="listClz">#</th>
+								<th v-bind:class="listClz">版本</th>
+								<th v-bind:class="listClz">動作</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr v-for="(vo, index) of versionControlLst">
-								<td>{{index + 1}}</td>
-								<td>{{vo.version}}</td>
-								<td>
+								<td v-bind:class="listClz">{{index + 1}}</td>
+								<td v-bind:class="listClz">{{vo.version}}</td>
+								<td v-bind:class="listClz">
 									<button class="btn btn-sm btn-outline-primary" 
 										v-on:click="previewMobileBtn(index, vo)"
 										v-show="true">手機預覽</button>
@@ -131,6 +134,9 @@
 	var app = new Vue({
 		el : '#app',
 		data : {
+			listClz : {
+				"text_align_center" : true,
+			},
 			versionControlLst : {},
 			version : "",
 			type : "",
@@ -157,7 +163,7 @@
 				$.ajax({
 					type : 'POST',
 					url : "versionControl_delete",
-					data : {version : vo.version},
+					data : {version : vo.version, type : app.type},
 					dataType : "JSON",
 					success : function(data) {
 						console.log('版本刪除完成');

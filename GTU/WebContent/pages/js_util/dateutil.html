@@ -18,17 +18,22 @@ focused {
 		$(document).ready(function() {
 		});
 
+		//----------------------------------------------------------------------------------------
 		/**
 		 * 取得台灣年月日 Date型態
 		 */
 		function parseTwDateToDate(twdate) {
-			if (twdate.indexOf("/" != -1)) {
+			if (twdate.indexOf("/") != -1) {
 				var dates = twdate.split("/", -1);
 				return new Date(parseInt(dates[0]) + 1911,
 						parseInt(dates[1]) - 1, parseInt(dates[2]));
+			} else if (twdate.indexOf("-") != -1) {
+				var dates = twdate.split("-", -1);
+				return new Date(parseInt(dates[0]) + 1911,
+						parseInt(dates[1]) - 1, parseInt(dates[2]));
 			} else {
-				return new Date(twdate.substring(0, 3), twdate.substring(3, 5),
-						twdate.substring(5));
+				return new Date(twdate.substring(0, 3),
+						twdate.substring(3, 5) - 1, twdate.substring(5));
 			}
 		}
 
@@ -38,9 +43,52 @@ focused {
 		function getTwDateDiffDays(startTwDate, endTwDate) {
 			var startDate = parseTwDateToDate(startTwDate);
 			var endDate = parseTwDateToDate(endTwDate);
-			var timeDiff = Math.abs(startDate.getTime() - endDate.getTime());
+			var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
 			var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 			return diffDays;
+		}
+
+		//----------------------------------------------------------------------------------------
+		/**
+		 * 取得年月日 Date型態
+		 */
+		function parseToDate(twdate) {
+			if (twdate.indexOf("/") != -1) {
+				var dates = twdate.split("/", -1);
+				return new Date(parseInt(dates[0]), parseInt(dates[1]) - 1,
+						parseInt(dates[2]));
+			} else if (twdate.indexOf("-") != -1) {
+				var dates = twdate.split("-", -1);
+				return new Date(parseInt(dates[0]), parseInt(dates[1]) - 1,
+						parseInt(dates[2]));
+			} else {
+				return new Date(twdate.substring(0, 4),
+						twdate.substring(4, 6) - 1, twdate.substring(6));
+			}
+		}
+		
+		/**
+		 * 取得年月日 Date型態
+		 */
+		function getDateDiffDays(startTwDate, endTwDate) {
+			var startDate = parseToDate(startTwDate);
+			var endDate = parseToDate(endTwDate);
+			var timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+			var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+			return diffDays;
+		}
+
+		//----------------------------------------------------------------------------------------
+		
+		/**
+		 * Date -> yyyy-MM-dd
+		 */
+		function dateToYMD(date) {
+			var d = date.getDate();
+			var m = date.getMonth() + 1;
+			var y = date.getFullYear();
+			return '' + y + '-' + (m <= 9 ? '0' + m : m) + '-'
+					+ (d <= 9 ? '0' + d : d);
 		}
 
 		/**

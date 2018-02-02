@@ -56,6 +56,9 @@ public class ScreenshotUtil {
     }
 
     private File getFormatFile() {
+        if (!this.parentDir.exists()) {
+            this.parentDir.mkdirs();
+        }
         serialNo++;
         String prefixData = prefix != null ? prefix + "_" : "";
         String dateData = dateFormat != null ? DateFormatUtils.format(System.currentTimeMillis(), dateFormat) + "_" : "";

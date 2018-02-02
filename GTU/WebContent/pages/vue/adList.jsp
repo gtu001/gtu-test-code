@@ -17,12 +17,6 @@
 	<link rel="stylesheet" href="css2/font-awesome.min.css">
 	<script src="js2/vue.min.js"></script>
 	<title>上海商銀</title>
-
-<script>
-	function doCreateAd() {
-		document.location.href = "createAd";
-	}
-</script>
 </head>
 <body>
 	<div class="container-fluid">
@@ -44,31 +38,45 @@
 						<thead>
 							<tr>
 								<th>#</th>
-								<th>廣告名稱</th>
-								<th>廣告區塊</th>
-								<th>開始日期</th>
-								<th>結束日期</th>
-								<th>創建者</th>
-								<th>審核者</th>
-								<th>審核狀態</th>
+								<th id="th_adprjname">廣告名稱</th>
+								<th id="th_blockname">廣告區塊</th>
+								<th id="th_stimeFix">開始日期</th>
+								<th id="th_etimeFix">結束日期</th>
+								<th id="th_ctimeFix">建立日期</th>
+								<th id="th_creater">創建者</th>
+								<th id="th_approverFix">審核者</th>
+								<th id="th_statusFix">審核狀態</th>
 							</tr>
 						</thead>
 						<tbody>
 
+							<%--
 							<c:forEach var="item" varStatus="idx" items="${adLst}">
-							
 								<tr>
 									<td>${idx.index + 1}<hidden name="${idx.index}" value="${item.adprjid}" /></td>
 									<td>${item.adprjname}</td>
 									<td>${item.blockname}</td>
 									<td>${item.stimeFix}</td>
 									<td>${item.etimeFix}</td>
+									<td>${item.ctimeFix}</td>
 									<td>${item.creater}</td>
-									<td>${item.approver}</td>
+									<td>${item.approverFix}</td>
 									<td>${item.statusFix}</td>
 								</tr>
-							
 							</c:forEach>
+							 --%>
+							 
+							 <tr v-for="(campaign, index) of campaigns">
+								<td>{{index + 1}}</td>
+								<td>{{campaign.adprjname}}</td>
+								<td>{{campaign.blockname}}</td>
+								<td>{{campaign.stimeFix}}</td>
+								<td>{{campaign.etimeFix}}</td>
+								<td>{{campaign.ctimeFix}}</td>
+								<td>{{campaign.creater}}</td>
+								<td>{{campaign.approverFix}}</td>
+								<td>{{campaign.statusFix}}</td>
+							</tr>
 
 						</tbody>
 					</table>
@@ -79,7 +87,36 @@
 </body>
 <script src="js2/popper.min.js"></script>
 <script src="js2/jquery-3.2.1.min.js"></script>
-<script src="js2/popper.min.js"></script>
+<script src="js2/jquery-ui.min.js"></script>
+<script src="js2/bootstrap.min.js"></script>
 <script src="js2/Business.js"></script>
 <script src="js2/main.js"></script>
+<script src="js2/sorting.js"></script>
+<script type="text/javascript">
+	var conf = null;
+	
+	$(document).ready(function() {
+		var campaignsArry = JSON.parse("<%=request.getAttribute("adLst2")%>");
+		app.campaigns = campaignsArry;
+		
+		conf = new SortConf("conf", resetTable, app.campaigns);
+		resetTable();
+	});
+	
+	function resetTable(){
+		$("#th_adprjname").html(conf.getTitleLink('adprjname', '廣告名稱'));
+		$("#th_blockname").html(conf.getTitleLink('blockname', '廣告區塊'));
+		$("#th_stimeFix").html(conf.getTitleLink('stimeFix', '開始日期'));
+		$("#th_etimeFix").html(conf.getTitleLink('etimeFix', '結束日期'));
+		$("#th_ctimeFix").html(conf.getTitleLink('ctimeFix', '建立日期'));
+		$("#th_creater").html(conf.getTitleLink('creater', '創建者'));
+		$("#th_approverFix").html(conf.getTitleLink('approverFix', '審核者'));
+		$("#th_statusFix").html(conf.getTitleLink('statusFix', '審核狀態'));
+		app.campaigns = conf.arry;
+	}
+	
+	function doCreateAd() {
+		document.location.href = "createAd";
+	}
+</script>
 </html>

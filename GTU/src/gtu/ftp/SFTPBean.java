@@ -15,6 +15,7 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.UserInfo;
 
 ;
+
 /**
  * <p>
  * Title: eBaoTech Life SYstem -- Foundation
@@ -35,6 +36,12 @@ import com.jcraft.jsch.UserInfo;
  * @author not attributable
  */
 public class SFTPBean {
+
+    public static void main(String[] args) throws Exception {
+        SFTPBean t = new SFTPBean("10.10.2.108");
+        boolean loginResult = t.login("root", "root123", 22);
+        System.out.println("loginResult : " + loginResult);
+    }
 
     private static Logger logger = Logger.getLogger(SFTPBean.class);
 
@@ -524,9 +531,9 @@ public class SFTPBean {
         }
         return isDir;
     }
-    
+
     private static class MyUserInfo implements UserInfo {
-        
+
         private String password;
 
         @Override

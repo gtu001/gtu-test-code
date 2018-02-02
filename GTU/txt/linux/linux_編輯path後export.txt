@@ -1,0 +1,1 @@
+vi PATH=$PATH:/opt/tibco/tibrv/8.4/lib; export PATH

@@ -15,7 +15,7 @@
 	$(document).ready(function(){
 		console.log("#. popup_win ready");
 		
-		var content = "<%=request.getAttribute("content")%>";
+		var content = decodeURIComponent("<%=request.getAttribute("content")%>");
 		$("#show_div").html(content);
 		
 		var width = "<%=request.getAttribute("width")%>";

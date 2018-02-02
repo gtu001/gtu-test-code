@@ -21,23 +21,80 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
 public class SftpUtil {
+    
+    public static void main_OLD(String[] args) throws JSchException, SftpException {
+        SftpUtil test = new SftpUtil();
+        String prePath = "/jboss/jboss-eap-7.0/standalone/deployments";
+        ChannelSftp sftp = test.connect("192.168.10.10", 22, "gtu001", "123474736");// 個人區
+//        ChannelSftp sftp = test.connect("195.19.8.13", 21, "srismapp", "Sth!aix1");// 外面戶所
+        List<SftpFileInfo> fileList = new ArrayList<SftpFileInfo>();
+        test.scanFileFind(prePath, ".*", fileList, true, sftp);
+        sftp.disconnect();
+        sftp.exit();
+        for (SftpFileInfo f : fileList) {
+            System.out.println(f.getAbsolutePath());
+        }
+    }
 
     public static void main(String[] args) throws JSchException, SftpException {
         SftpUtil test = new SftpUtil();
-        ChannelSftp sftp = test.connect("192.168.10.10", 22, "gtu001", "123474736");//個人區
-//        ChannelSftp sftp = test.connect("195.19.8.13", 21, "srismapp", "Sth!aix1");//外面戶所
-        String prePath = "/mnt/sftproot/99_個人區/張純毓";
-        List<SftpFileInfo> fileList = new ArrayList<SftpFileInfo>();
-        test.scanFileFind(prePath, ".*", fileList, sftp);
-        sftp.disconnect();
-        sftp.exit();
-        for(SftpFileInfo f : fileList){
-            System.out.println(f.getAbsolutePath());
+
+        String prePath = "/jboss/jboss-eap-7.0/standalone/deployments";
+        File dir = new File("C:\\Users\\gtu00\\OneDrive\\文件\\delpoyments\\20180131");
+        
+        {
+            ChannelSftp sftp = test.connect("10.10.2.108", 22, "root", "root123");
+            List<SftpFileInfo> currentRemoteLst = new ArrayList<SftpFileInfo>();
+            test.scanFileFind(prePath, ".*", currentRemoteLst, false, sftp);
+            for(SftpFileInfo s : currentRemoteLst) {
+                if(s.filename.endsWith(".war")) {
+                    continue;
+                }
+                test.delete(prePath, s.filename, sftp);
+                System.out.println("del : " + s.filename);
+            }
+
+            List<String> backLst = new ArrayList<String>();
+            for(File f : dir.listFiles()) {
+                if(!f.getName().equals("Web.war")) {
+                    backLst.add(f.getName());
+                }
+            }
+            
+            for(String name : backLst) {
+                test.upload(prePath, name, sftp);   
+                System.out.println("upload : " + name);
+            }
+            sftp.disconnect();
+            System.out.println("後臺完成!!");
         }
+        {
+            ChannelSftp sftp = test.connect("10.10.2.109", 22, "root", "root123");
+            List<SftpFileInfo> currentRemoteLst = new ArrayList<SftpFileInfo>();
+            test.scanFileFind(prePath, ".*", currentRemoteLst, false, sftp);
+            for(SftpFileInfo s : currentRemoteLst) {
+                if(s.filename.endsWith(".war")) {
+                    continue;
+                }
+                test.delete(prePath, s.filename, sftp);
+                System.out.println("del : " + s.filename);
+            }
+
+            List<String> frontLst = new ArrayList<String>();
+            frontLst.add("Web.war");
+            
+            for(String name : frontLst) {
+                test.upload(prePath, name, sftp);   
+                System.out.println("upload : " + name);
+            }
+            sftp.disconnect();
+            System.out.println("前台完成!!");
+        }
+        
         System.out.println("done...");
     }
     
-    public void scanFileFind(String prePath, String patternStr, List<SftpFileInfo> fileList, ChannelSftp sftp) throws SftpException{
+    public void scanFileFind(String prePath, String patternStr, List<SftpFileInfo> fileList, boolean recurring, ChannelSftp sftp) throws SftpException{
         Vector<ChannelSftp.LsEntry> vector = listFiles(prePath, sftp);
         for(Enumeration<ChannelSftp.LsEntry> enu = vector.elements(); enu.hasMoreElements();){
             ChannelSftp.LsEntry val = enu.nextElement();
@@ -48,8 +105,8 @@ public class SftpUtil {
                         fileList.add(info);
                     }
                 }
-                if(info.dir){
-                    scanFileFind(prePath + "/" + info.filename, patternStr, fileList, sftp);
+                if(info.dir && recurring){
+                    scanFileFind(prePath + "/" + info.filename, patternStr, fileList, recurring, sftp);
                 }
             }
         }

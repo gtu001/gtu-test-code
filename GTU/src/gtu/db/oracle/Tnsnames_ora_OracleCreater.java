@@ -5,7 +5,7 @@ import java.text.MessageFormat;
 /**
  * 貼到 tnsnames.ora
  */
-public class Tnsnames_ora_Creater {
+public class Tnsnames_ora_OracleCreater {
 
     public static void main(String[] args) {
 //        String tnsName = "R5_ED";

@@ -274,6 +274,7 @@
 												class="col-sm-3 col-form-label text-right">結束日期</label>
 											<div class="col-sm-9">
 												<date-picker @update-date="updateEndDate"
+													v-bind:min-date="true"
 													:placeholder="endDate" id="endDate"></date-picker>
 											</div>
 										</div>
@@ -319,7 +320,9 @@
 										</div>
 										<div class="form-group row">
 											<label for="exampleFormControlFile1"
-												class="col-sm-4 col-form-label">請選擇上傳圖片<br> <small>(建議圖片大小不超過200k)<br>(圖片請使用以下副檔名 : jpg,jpeg,png)</small></label>
+												class="col-sm-4 col-form-label">請選擇上傳圖片<br> 
+												<small>(建議圖片大小不超過200k)<br>(圖片請使用以下副檔名 : jpg,jpeg,png)<br>圖片檔名與副檔名請與CSV檔一致</small>
+											</label>
 											<div class="col-sm-8">
 												<input type="file" @change="onFileChange" id="File1">
 											</div>
@@ -435,6 +438,7 @@
 <script src="js2/bootstrap.min.js"></script>
 <script src="js2/Business.js"></script>
 <script src="js2/main.js"></script>
+<script src="js2/simpleDateCheck.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	initPage();

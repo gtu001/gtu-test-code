@@ -6,6 +6,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Troy 2009/02/02
  * 
@@ -111,5 +113,13 @@ public class NumberUtil {
         nf.setMinimumFractionDigits(0);//設定最小小數位
         String result =  nf.format(new BigDecimal(value));
         System.out.println(result);
+    }
+    
+    public boolean isNumber(String val, boolean thousandComma) {
+        String pattern = "\\-?[\\d]+\\.?\\d*";
+        if(thousandComma) {
+            pattern = "\\-?[\\d,]+\\.?\\d*";
+        }
+        return StringUtils.trimToEmpty(val).matches(pattern);
     }
 }

@@ -202,6 +202,7 @@ public class ScreenshotUI extends JFrame {
         testConfig.destDir = getDefaultDir().getAbsolutePath();
         testConfig.picType = "JPG";
         testConfig.listenKeyCode = NativeKeyEvent.VC_F12;
+        testConfig.listenModifier = 0;
         return testConfig;
     }
 

@@ -71,11 +71,32 @@
 			        "emoticons template paste textcolor colorpicker textpattern imagetools"
 			    ],
 			    toolbar1: "insertfile undo redo | formatselect fontselect fontsizeselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table hr pagebreak blockquote",
-			    toolbar2: "bold italic underline strikethrough subscript superscript | forecolor backcolor charmap emoticons | link unlink image media | cut copy paste | insertdatetime fullscreen code",
+			    toolbar2: "bold italic underline strikethrough subscript superscript | forecolor backcolor charmap emoticons | link unlink image media | cut copy paste | insertdatetime fullscreen code | checkbox radio newBtn1 newBtn2 ",
 			    menubar: false,
 			 image_advtab: true,
-			});
-		
+			 setup: function (editor) {
+			    editor.addButton('checkbox', {
+			      text: '',
+			      tooltip: 'Checkbox',
+			      image: tinymce.baseURL + '/plugins/custom/img/checkbox.jpg',
+			      icon: false,
+			      onclick: function () {
+			        editor.insertContent('<input type="checkbox" />');
+			      }
+			    });
+			    editor.addButton('radio', {
+			      text: '',
+			      tooltip: 'Radio',
+			      image: tinymce.baseURL + '/plugins/custom/img/radio.jpg',
+			      icon: false,
+			      onclick: function () {
+			        editor.insertContent('<input type="radio" />');
+			      }
+			    });
+			  },
+		});
+		 
+			  
 		$("#btn1").click(function(){
 			//showInPopupWindow(320, 568);
 			openWindowWithPostRequest(320, 568);

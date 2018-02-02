@@ -65,7 +65,7 @@
 											</div>
 										</div>
 										<div class="form-group row" v-for="(photo, index) of photoList">
-											<label for="inputPassword3" class="col-sm-3 col-form-label">圖片{{index + 1}}--連結</label>
+											<label for="inputPassword3" class="col-sm-3 col-form-label">圖片--連結</label>
 											<div class="col-sm-9">
 												<input type="text" class="form-control"
 													id="inputPassword3" placeholder="" v-bind:value="photo.liinkto" readonly="true">
