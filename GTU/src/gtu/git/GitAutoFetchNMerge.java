@@ -14,7 +14,13 @@ import gtu.runtime.ProcessWatcher;
 public class GitAutoFetchNMerge {
 
     public static void main(String[] args) throws IOException {
-        File fileDirs = new File("C:\\workstuff\\workspace_scsb");
+        File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_scsb");
+        String account = "gtu001";
+        if(args != null && args.length == 2) {
+            fileDirs = new File(args[0]);
+            account = args[1];
+        }
+        
         String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
         File[] files = fileDirs.listFiles();
         for (int ii = 0 ; ii < files.length ; ii ++) {
@@ -24,11 +30,12 @@ public class GitAutoFetchNMerge {
                 lst.add("cd " + f);
                 lst.add("i:");
                 if (ArrayUtils.contains(prodArry, f.getName())) {
-                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
+                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
                 } else {
-                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/" + f.getName() + ".git"));
+                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/SCSB_CCBILL/" + f.getName() + ".git"));
                 }
-                lst.add("git fetch -v --progress \"origin\"");
+//                lst.add("git fetch -v --progress \"origin\"");
+                lst.add("git fetch -v --all");
                 lst.add("git merge remotes/origin/master --edit --no-commit ");
             }
 
@@ -37,7 +44,7 @@ public class GitAutoFetchNMerge {
                 String commands = StringUtils.join(lst, " && ");
                 Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
                 ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-                newInstance.getStream(30000);
+                newInstance.getStream(60000);
                 System.out.println(newInstance.getErrorStreamToString());
                 System.out.println(newInstance.getInputStreamToString());
                 System.out.println("processed " + (ii+1) + " -> " + files.length);

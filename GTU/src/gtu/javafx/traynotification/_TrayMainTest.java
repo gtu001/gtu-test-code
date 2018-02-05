@@ -17,7 +17,8 @@ public class _TrayMainTest {
                             .title("title")//
                             .message("message")//
                             .notificationType(NotificationType.INFORMATION)//
-                            .rectangleFill("#FF0000")//
+//                            .rectangleFill("#FF0000")//
+                            .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())
                             .animationType(AnimationType.FADE)//
                             .onPanelClickCallback(new ActionListener() {
                                 @Override

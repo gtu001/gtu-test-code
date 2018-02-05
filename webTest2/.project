@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>webTest2</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>java_AP</name>
+			<type>2</type>
+			<location>I:/workstuff/workspace_scsb/SCSB_CCBill_AP/src/main/java</location>
+		</link>
+		<link>
+			<name>java_AP2</name>
+			<type>2</type>
+			<location>C:/workstuff/workspace_scsb/SCSB_CCBill_AP/src/main/java</location>
+		</link>
+		<link>
+			<name>java_Log</name>
+			<type>2</type>
+			<location>C:/workstuff/workspace_scsb/Log/src/main/java</location>
+		</link>
+	</linkedResources>
+</projectDescription>

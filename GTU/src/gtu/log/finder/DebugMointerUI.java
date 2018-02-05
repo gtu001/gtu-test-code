@@ -223,12 +223,6 @@ public class DebugMointerUI extends javax.swing.JDialog {
     private volatile AtomicBoolean isAutoExecute = new AtomicBoolean(false);// 是否自動化執行外掛
     private volatile Cache<Long, Object> tempModelTimeMointerMap;// 暫存區物件
     private volatile boolean initSysTrayOk;// 系統列初始化
-    // public static final File configFile = new
-    // File(PropertiesUtil.getJarCurrentPath(DebugMointerUI.class),
-    // DebugMointerUI.class.getSimpleName() + "_config.properties");// 設定黨
-    public static final File configFile = new File(FileUtil.DESKTOP_PATH, DebugMointerUI.class.getSimpleName() + "_config.properties");// 設定黨
-    // public static final File configFile = new File("d:/",
-    // DebugMointerUI.class.getSimpleName() + "_config.properties");// 設定黨
     private volatile Properties configProp = new Properties();
     private volatile SysTrayUtil sysTrayUtil;// 用來產生系統狀態用
     private volatile Object returnObject;// 回傳給呼叫端用
@@ -241,6 +235,16 @@ public class DebugMointerUI extends javax.swing.JDialog {
     private volatile ExecuteConfig indicateExecuteConfig;// 自訂執行外掛程式
     private volatile int defaultReturnIndex = -1;// 預設回傳index
     private MethodNameTextHandler methodNameHandler = new MethodNameTextHandler();
+
+    public final static File configFile;// 設定黨
+    static {
+        String confName = DebugMointerUI.class.getSimpleName() + "_config.properties";
+        File confFile = new File(FileUtil.DESKTOP_PATH, confName);
+        if (!new File(FileUtil.DESKTOP_PATH).exists()) {
+            confFile = new File(System.getProperty("user.dir"), confName);
+        }
+        configFile = confFile;
+    }
     // 重要變數
     // --------------------------------------------------------------------------------------
 
@@ -3711,21 +3715,21 @@ public class DebugMointerUI extends javax.swing.JDialog {
                     .title("執行成功!!")//
                     .message(successMessage)//
                     .notificationType(NotificationType.INFORMATION)//
-                    .rectangleFill("#FF0000")//
+                    .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
                     .animationType(AnimationType.FADE)//
                     .onPanelClickCallback(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             boolean useEditor = false;
                             String key = "logger_editor";
-                            if(inst.configProp.containsKey(key)) {
+                            if (inst.configProp.containsKey(key)) {
                                 File editor = new File(inst.configProp.getProperty(key));
-                                if(editor.exists()) {
+                                if (editor.exists()) {
                                     getLogger().showFileIndicateEditor(editor);
                                     useEditor = true;
                                 }
                             }
-                            if(!useEditor) {
+                            if (!useEditor) {
                                 getLogger().showFile();
                             }
                         }
@@ -3978,20 +3982,20 @@ public class DebugMointerUI extends javax.swing.JDialog {
         }
         return indicateNodeClassBtn;
     }
-    
-    //放在constructor 會需要改名為_init_
+
+    // 放在constructor 會需要改名為_init_
     private class MethodNameTextHandler {
         private String replace(String methodName) {
-            if("<init>".equals(methodName)) {
+            if ("<init>".equals(methodName)) {
                 return "__init__";
             }
             return methodName;
         }
-        
+
         private String getExecuteMethodNameText() {
             return replace(inst.executeMethodNameText.getText());
         }
-        
+
         private void setExecuteMethodNameText(String methodName) {
             inst.executeMethodNameText.setText(replace(methodName));
         }

@@ -1,10 +1,9 @@
 package gtu.javafx.traynotification;
 
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import gtu.javafx.traynotification.animations.AnimationType;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 
 public class TrayNotificationHelper {
@@ -99,5 +98,22 @@ public class TrayNotificationHelper {
                 }
             }
         });
+    }
+    
+    public static class RandomColorFill {
+        char[] charArry;
+        private RandomColorFill(){
+            charArry = "0123456789ABCDEF".toCharArray();
+        }
+        public static RandomColorFill getInstance() {
+            return new RandomColorFill();
+        }
+        public String get() {
+            StringBuilder sb = new StringBuilder("#");
+            for(int ii = 0 ; ii < 6 ; ii ++) {
+                sb.append(charArry[new Random().nextInt(charArry.length)]);
+            }
+            return sb.toString();
+        }
     }
 }

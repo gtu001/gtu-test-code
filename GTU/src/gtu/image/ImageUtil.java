@@ -51,7 +51,7 @@ public class ImageUtil {
             URL imgURL = this.getClass().getClassLoader().getResource(imagePath);
             List<BufferedImage> images = ICODecoder.read(imgURL.openStream());
             for (int ii = 0; ii < images.size(); ii++) {
-                System.out.println(String.format("%d - h:%d,w:%d", ii, images.get(ii).getHeight(), images.get(ii).getWidth()));
+                //System.out.println(String.format("%d - h:%d,w:%d", ii, images.get(ii).getHeight(), images.get(ii).getWidth()));
             }
             BufferedImage image = images.get(0);
             Image imgData = image.getScaledInstance(32, -1, Image.SCALE_SMOOTH);

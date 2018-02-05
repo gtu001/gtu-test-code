@@ -35,6 +35,9 @@ public class Logger2File {
         if (StringUtils.isNotBlank(basepath)) {
             path = basepath;
         }
+        if (!new File(path).exists()) {
+            path = System.getProperty("user.dir");
+        }
         String fileFullName = path + "/" + filename + ".log";
         logFile = new File(fileFullName);
         this.logAppend = logAppend;
@@ -169,14 +172,14 @@ public class Logger2File {
         try {
             if (logFile != null && logFile.exists()) {
                 Desktop.getDesktop().browse(logFile.toURI());
-            }else{
+            } else {
                 System.out.println("logFile不存在!");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * 顯示檔案
      */
@@ -186,7 +189,7 @@ public class Logger2File {
                 String command = String.format("cmd /c call \"%s\" \"%s\"", editorExe, logFile);
                 Runtime.getRuntime().exec(command);
                 System.out.println(command);
-            }else{
+            } else {
                 System.out.println("logFile不存在!");
             }
         } catch (IOException e) {
