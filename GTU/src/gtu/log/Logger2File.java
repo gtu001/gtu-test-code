@@ -196,4 +196,8 @@ public class Logger2File {
             e.printStackTrace();
         }
     }
+
+    public File getLogFile() {
+        return logFile;
+    }
 }

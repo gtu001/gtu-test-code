@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
@@ -86,6 +87,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
@@ -125,6 +127,12 @@ import javassist.Modifier;
  * methodName[index]
  */
 public class DebugMointerUI extends javax.swing.JDialog {
+
+    static {
+        // run in linux
+        System.setProperty("java.awt.headless", "true");
+        System.out.println("<<<" + GraphicsEnvironment.isHeadless());
+    }
 
     public static class Constant {
         /**
@@ -4025,19 +4033,26 @@ public class DebugMointerUI extends javax.swing.JDialog {
     public static Logger2File getLogger() {
         if (log == null) {
             if (inst == null) {
-                inst = getInstance(false);
-            }
-            final String basepathKey = "log.basepath";
-            final String isLogAppendKey = "log.append";
-            boolean isLogAppend = true;
-            if (inst.configProp.containsKey(isLogAppendKey)) {
-                isLogAppend = Boolean.parseBoolean(inst.configProp.getProperty(isLogAppendKey));
-            }
-            if (inst.configProp.containsKey(basepathKey)) {
-                String basePath = inst.configProp.getProperty(basepathKey);
-                log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
-            } else {
-                log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                try {
+                    inst = getInstance(false);
+                    final String basepathKey = "log.basepath";
+                    final String isLogAppendKey = "log.append";
+                    boolean isLogAppend = true;
+                    if (inst.configProp.containsKey(isLogAppendKey)) {
+                        isLogAppend = Boolean.parseBoolean(inst.configProp.getProperty(isLogAppendKey));
+                    }
+                    if (inst.configProp.containsKey(basepathKey)) {
+                        String basePath = inst.configProp.getProperty(basepathKey);
+                        log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                    } else {
+                        log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                    }
+                }catch(Exception ex) {
+                    ex.printStackTrace();
+                    
+                    //在linux上必須用此做法
+                    log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", true);
+                }
             }
         }
         return log;

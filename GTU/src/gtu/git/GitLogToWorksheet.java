@@ -92,8 +92,8 @@ public class GitLogToWorksheet {
             }
             sb.append(" --no-merges ");
             sb.append(" --all-match ");
-            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
-//            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
+//            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
+            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
             sb.append(" --date=iso  ");
             return sb.toString();
         }
@@ -101,7 +101,7 @@ public class GitLogToWorksheet {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d1 = sdf.parse("20180202");
+        Date d1 = sdf.parse("20171205");
         Calendar c1 = Calendar.getInstance();
         c1.setTime(d1);
         c1.set(Calendar.HOUR, 0);
@@ -110,8 +110,9 @@ public class GitLogToWorksheet {
         c1.set(Calendar.MILLISECOND, 0);
 
         Calendar c2 = Calendar.getInstance();
-        c2.setTime(c1.getTime());
-        c2.add(Calendar.DATE, 2);
+//        c2.setTime(c1.getTime());
+//        c2.add(Calendar.DATE, 300);
+        c2.setTime(sdf.parse("20180123"));
 
         String logCommand = GitLog.newInstance()//
                 .since(c1.getTime())//
