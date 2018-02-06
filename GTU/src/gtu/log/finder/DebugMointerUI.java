@@ -2,6 +2,7 @@ package gtu.log.finder;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -61,6 +62,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -87,7 +89,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
@@ -126,11 +127,11 @@ import javassist.Modifier;
  * 對應"目的", 表示設定到目的method的第幾個參數 Resource description 非數值, 對應"目的", 格式為
  * methodName[index]
  */
-public class DebugMointerUI extends javax.swing.JDialog {
+public class DebugMointerUI {
 
     static {
         // run in linux
-        System.setProperty("java.awt.headless", "true");
+        // System.setProperty("java.awt.headless", "true");
         System.out.println("<<<" + GraphicsEnvironment.isHeadless());
     }
 
@@ -243,6 +244,8 @@ public class DebugMointerUI extends javax.swing.JDialog {
     private volatile ExecuteConfig indicateExecuteConfig;// 自訂執行外掛程式
     private volatile int defaultReturnIndex = -1;// 預設回傳index
     private MethodNameTextHandler methodNameHandler = new MethodNameTextHandler();
+
+    private JDialog _ui;
 
     public final static File configFile;// 設定黨
     static {
@@ -439,7 +442,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
         getLogger().debug("DebugMointerUI dispose!!");
         inst.isEnabledUI = true;
         getLogger().close();
-        inst.dispose();
+        inst._ui.dispose();
         cleanSystray();
         inst.initSysTrayOk = false;
         cleanAllStaticValue();
@@ -547,12 +550,12 @@ public class DebugMointerUI extends javax.swing.JDialog {
     }
 
     public void setVisible(boolean visible) {
-        super.setVisible(visible);
+        _ui.setVisible(visible);
     }
 
     private static void standardProcess() {
-        if ((!inst.isVisible() || inst.isAutoExecute.get()) && inst.isEnabledUI) {
-            inst.setLocationRelativeTo(null);
+        if ((!inst._ui.isVisible() || inst.isAutoExecute.get()) && inst.isEnabledUI) {
+            inst._ui.setLocationRelativeTo(null);
             inst.setVisible(!inst.isAutoExecute.get());// 有問題
 
             if (!inst.isDynamicClassMode()) {
@@ -576,7 +579,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
 
     private static void displayStatus() {
         getLogger().debug("## - isEnabledUI = " + inst.isEnabledUI);
-        getLogger().debug("## - inst.isVisible() = " + inst.isVisible());
+        getLogger().debug("## - inst.isVisible() = " + inst._ui.isVisible());
         getLogger().debug("## - isAutoExecute = " + inst.isAutoExecute);
         getLogger().debug("## - inst.isExecuteComplete = " + inst.isExecuteComplete);
         getLogger().debug("## - isAutoExecuteMappingMethod = " + inst.isAutoExecuteMappingMethod);
@@ -767,7 +770,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
                 dynamicMvnProjectDir = new File(dynamic_mvnProjectText.getText());
             }
 
-            String className = getTitle().toString().replace('.', '_').replace(':', '_');
+            String className = _ui.getTitle().toString().replace('.', '_').replace(':', '_');
             dynamic_classNameText.setText(className);
 
             String javaContent = dynamicClassArea.getText();
@@ -910,7 +913,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
         if (!StringUtils.equals(value, val)) {
             inst.configProp.setProperty(key, value);
             try {
-                inst.configProp.store(new FileOutputStream(inst.configFile), getName());
+                inst.configProp.store(new FileOutputStream(inst.configFile), _ui.getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -942,10 +945,11 @@ public class DebugMointerUI extends javax.swing.JDialog {
 
     private void initGUI() {
         try {
-            setTitle("程式監控管理員 by gtu001");
+            _ui = new JDialog();
+            _ui.setTitle("程式監控管理員 by gtu001");
             BorderLayout thisLayout = new BorderLayout();
-            getContentPane().setLayout(thisLayout);
-            this.addWindowListener(new WindowAdapter() {
+            _ui.getContentPane().setLayout(thisLayout);
+            _ui.addWindowListener(new WindowAdapter() {
                 public void windowDeactivated(WindowEvent e) {
                     // 縮小視窗
                     if (isAutoDispose) {
@@ -956,7 +960,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
             });
             {
                 jTabbedPane1 = new JTabbedPane();
-                getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
+                _ui.getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
                 jTabbedPane1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent evt) {
                         if (jTabbedPane1.getSelectedIndex() == 4) {// 暫存區管理
@@ -1690,13 +1694,13 @@ public class DebugMointerUI extends javax.swing.JDialog {
                     }
                 }
             }
-            pack();
-            this.setSize(758, 530);
+            _ui.pack();
+            _ui.setSize(758, 530);
 
-            this.setDefaultCloseOperation(HIDE_ON_CLOSE);
-            this.setModalityType(ModalityType.APPLICATION_MODAL);
-            JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/fantasyForYou.ico");
+            _ui.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            _ui.setModalityType(ModalityType.APPLICATION_MODAL);
+            JCommonUtil.setJFrameCenter(_ui);
+            JCommonUtil.setJFrameIcon(_ui, "resource/images/ico/fantasyForYou.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1772,7 +1776,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
                         inst.isAutoExecute.set(false);
                     } else {
                         inst.isAutoExecute.set(true);
-                        if (inst.isVisible()) {
+                        if (_ui.isVisible()) {
                             inst.setVisible(false);
                             if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("現在是否立即執行?", "自動啟動")) {
                                 autoExecutePlugIn();
@@ -2788,7 +2792,7 @@ public class DebugMointerUI extends javax.swing.JDialog {
             }
 
             // 設定現在斷點名稱
-            setTitle(currentElement.getFileName() + "." + currentElement.getMethodName() + ":" + currentElement.getLineNumber());
+            _ui.setTitle(currentElement.getFileName() + "." + currentElement.getMethodName() + ":" + currentElement.getLineNumber());
 
             // 判斷目前斷點是否已存在
             MointerBreakPoint mp = new MointerBreakPoint();
@@ -4032,27 +4036,27 @@ public class DebugMointerUI extends javax.swing.JDialog {
 
     public static Logger2File getLogger() {
         if (log == null) {
-            if (inst == null) {
-                try {
+            try {
+                if (inst == null) {
                     inst = getInstance(false);
-                    final String basepathKey = "log.basepath";
-                    final String isLogAppendKey = "log.append";
-                    boolean isLogAppend = true;
-                    if (inst.configProp.containsKey(isLogAppendKey)) {
-                        isLogAppend = Boolean.parseBoolean(inst.configProp.getProperty(isLogAppendKey));
-                    }
-                    if (inst.configProp.containsKey(basepathKey)) {
-                        String basePath = inst.configProp.getProperty(basepathKey);
-                        log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
-                    } else {
-                        log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
-                    }
-                }catch(Exception ex) {
-                    ex.printStackTrace();
-                    
-                    //在linux上必須用此做法
-                    log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", true);
                 }
+                final String basepathKey = "log.basepath";
+                final String isLogAppendKey = "log.append";
+                boolean isLogAppend = true;
+                if (inst.configProp.containsKey(isLogAppendKey)) {
+                    isLogAppend = Boolean.parseBoolean(inst.configProp.getProperty(isLogAppendKey));
+                }
+                if (inst.configProp.containsKey(basepathKey)) {
+                    String basePath = inst.configProp.getProperty(basepathKey);
+                    log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                } else {
+                    log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+
+                // 在linux上必須用此做法
+                log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", true);
             }
         }
         return log;
