@@ -353,6 +353,27 @@ public class EnglishSearchUI extends JFrame {
 
         // 置中
         JCommonUtil.setJFrameCenter(this);
+        
+        //初始化checkbox
+        focusTopChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("focusTopChk")));
+        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
+        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
+        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
+        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
+        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
+
+        JCommonUtil.frameCloseDo(this, new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                propertyBean.getConfigProp().setProperty("focusTopChk", String.valueOf(focusTopChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("listenClipboardChk", String.valueOf(listenClipboardChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("rightBottomCornerChk", String.valueOf(rightBottomCornerChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("autoSearchChk", String.valueOf(autoSearchChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("showNewWordTxtBtn", String.valueOf(showNewWordTxtBtn.isSelected()));
+                propertyBean.getConfigProp().setProperty("mouseSelectionChk", String.valueOf(mouseSelectionChk.isSelected()));
+                propertyBean.store();
+                System.exit(0);
+            }
+        });
     }
 
     private void startListenClipboardThread() {
@@ -653,7 +674,7 @@ public class EnglishSearchUI extends JFrame {
             String english = getEnglish(StringUtils.trimToEmpty(word));
             String oldEnglish = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
             if (StringUtils.isNotBlank(english)) {
-                if(english.length() == 1) {
+                if (english.length() == 1) {
                     return;
                 }
 

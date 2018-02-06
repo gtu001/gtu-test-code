@@ -1,0 +1,2 @@
+ctrl + alt + F1 --> terminal mode
+alt + F7 --> GUI mode
