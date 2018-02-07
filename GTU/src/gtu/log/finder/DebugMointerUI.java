@@ -131,7 +131,7 @@ public class DebugMointerUI {
 
     static {
         // run in linux
-        // System.setProperty("java.awt.headless", "true");
+        System.setProperty("java.awt.headless", "true");
         System.out.println("<<<" + GraphicsEnvironment.isHeadless());
     }
 
