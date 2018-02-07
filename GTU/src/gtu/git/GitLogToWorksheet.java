@@ -92,8 +92,8 @@ public class GitLogToWorksheet {
             }
             sb.append(" --no-merges ");
             sb.append(" --all-match ");
-//            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
-            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
+            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
+//            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
             sb.append(" --date=iso  ");
             return sb.toString();
         }

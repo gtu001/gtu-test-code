@@ -1,0 +1,7 @@
+找java的位置
+
+which java
+-->/usr/bin/java
+
+readlink -f /usr/bin/java
+-->/usr/lib/jvm/java-9-oracle/bin/java

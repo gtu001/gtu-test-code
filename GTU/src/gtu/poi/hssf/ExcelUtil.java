@@ -12,7 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,15 +20,16 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelUtil {
 
@@ -44,9 +44,9 @@ public class ExcelUtil {
         return HSSFDateUtil.getJavaDate(dateValue);
     }
 
-    public String getDate(HSSFCell cell, String pattern) {
+    public String getDate(Cell cell, String pattern) {
         try {
-            return DateFormatUtils.format(getDate(Double.parseDouble(ExcelUtil.getInstance().readHSSFCell(cell))), pattern);
+            return DateFormatUtils.format(getDate(Double.parseDouble(ExcelUtil.getInstance().readCell(cell))), pattern);
         } catch (Exception ex) {
             System.out.println("cell日期轉型錯誤:" + ex.getMessage());
             return "";
@@ -112,16 +112,16 @@ public class ExcelUtil {
         return sb.toString();
     }
 
-    public HSSFRow getRowChk(HSSFSheet sheet, int rowPos) {
-        HSSFRow row = sheet.getRow(rowPos);
+    public Row getRowChk(Sheet sheet, int rowPos) {
+        Row row = sheet.getRow(rowPos);
         if (row == null) {
             row = sheet.createRow(rowPos);
         }
         return row;
     }
 
-    public HSSFCell getCellChk(HSSFRow row, int colPos) {
-        HSSFCell cell = row.getCell(colPos);
+    public Cell getCellChk(Row row, int colPos) {
+        Cell cell = row.getCell(colPos);
         if (cell == null) {
             cell = row.createCell(colPos);
         }
@@ -129,7 +129,7 @@ public class ExcelUtil {
     }
 
     /**
-     * 讀取檔案成HSSFWorkbook物件
+     * 讀取檔案成Workbook物件
      */
     public HSSFWorkbook readExcel(File file) throws Exception {
         int size = (int) (file.length() - file.length() % 512);
@@ -143,7 +143,7 @@ public class ExcelUtil {
     }
 
     /**
-     * 讀取檔案成HSSFWorkbook物件
+     * 讀取檔案成Workbook物件
      */
     public HSSFWorkbook readExcel2(File file) throws Exception {
         InputStream inputFile = new FileInputStream(file);
@@ -162,11 +162,46 @@ public class ExcelUtil {
         HSSFWorkbook workBook = new HSSFWorkbook(byteIS);
         return workBook;
     }
+    
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public XSSFWorkbook readExcel_xlsx(File file) throws Exception {
+        int size = (int) (file.length() - file.length() % 512);
+        byte[] buffer = new byte[size];
+        InputStream inputFile = new FileInputStream(file);
+        inputFile.read(buffer, 0, size);
+        inputFile.close();
+        InputStream byteIS = new ByteArrayInputStream(buffer);
+        byteIS.close();
+        return new XSSFWorkbook(byteIS);
+    }
+
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public XSSFWorkbook readExcel2_xlsx(File file) throws Exception {
+        InputStream inputFile = new FileInputStream(file);
+
+        // read entire stream into byte array:
+        ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int count;
+        while ((count = inputFile.read(buffer)) != -1)
+            byteOS.write(buffer, 0, count);
+        byteOS.close();
+        byte[] allBytes = byteOS.toByteArray();
+
+        // create workbook from array:
+        InputStream byteIS = new ByteArrayInputStream(allBytes);
+        XSSFWorkbook workBook = new XSSFWorkbook(byteIS);
+        return workBook;
+    }
 
     /**
      * 寫檔
      */
-    public void writeExcel(File file, HSSFWorkbook workbook) throws FileNotFoundException, IOException {
+    public void writeExcel(File file, Workbook workbook) throws FileNotFoundException, IOException {
         if (workbook.getNumberOfSheets() == 0) {
             workbook.createSheet();
         }
@@ -176,7 +211,7 @@ public class ExcelUtil {
     /**
      * 寫檔
      */
-    public void writeExcel(String filename, HSSFWorkbook workbook) throws FileNotFoundException, IOException {
+    public void writeExcel(String filename, Workbook workbook) throws FileNotFoundException, IOException {
         if (workbook.getNumberOfSheets() == 0) {
             workbook.createSheet();
         }
@@ -190,15 +225,15 @@ public class ExcelUtil {
      * @param columnslist
      * @return
      */
-    public List<List<Map<String, String>>> readHSSFWorkbook(HSSFWorkbook workbook, List<String[]> columnslist) {
+    public List<List<Map<String, String>>> readWorkbook(Workbook workbook, List<String[]> columnslist) {
         List<List<Map<String, String>>> rtnlist = new ArrayList<List<Map<String, String>>>();
         List<Map<String, String>> append = null;
         for (int ii = 0; ii < workbook.getNumberOfSheets(); ii++) {
             append = null;
             try {
-                append = this.readHSSFSheet(workbook.getSheetAt(ii), columnslist.get(ii));
+                append = this.readSheet(workbook.getSheetAt(ii), columnslist.get(ii));
             } catch (Exception ex) {
-                append = this.readHSSFSheet(workbook.getSheetAt(ii), null);
+                append = this.readSheet(workbook.getSheetAt(ii), null);
             }
             rtnlist.add(append);
         }
@@ -207,54 +242,54 @@ public class ExcelUtil {
 
     /**
      * @param sheet
-     *            HSSFSheet --> List
+     *            Sheet --> List
      * @param columns
      * @return
      */
-    public List<Map<String, String>> readHSSFSheet(HSSFSheet sheet, String[] columns) {
+    public List<Map<String, String>> readSheet(Sheet sheet, String[] columns) {
         List<Map<String, String>> rtnlist = new ArrayList<Map<String, String>>();
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
-            rtnlist.add(this.readHSSFRow(sheet.getRow(ii), columns));
+            rtnlist.add(this.readRow(sheet.getRow(ii), columns));
         }
         return rtnlist;
     }
 
     /**
      * @param row
-     *            HSSFRow --> Map
+     *            Row --> Map
      * @param columns
      * @return
      */
-    public Map<String, String> readHSSFRow(HSSFRow row, String[] columns) {
+    public Map<String, String> readRow(Row row, String[] columns) {
         Map<String, String> rowMap = new LinkedHashMap<String, String>();
         for (int ii = 0; ii < row.getLastCellNum(); ii++) {
-            HSSFCell cell = row.getCell(ii);
+            Cell cell = row.getCell(ii);
             if (columns != null) {
                 for (String col : columns) {
-                    rowMap.put(col, this.readHSSFCell(cell));
+                    rowMap.put(col, this.readCell(cell));
                 }
             } else {
-                rowMap.put(String.valueOf(ii), this.readHSSFCell(cell));
+                rowMap.put(String.valueOf(ii), this.readCell(cell));
             }
         }
         return rowMap;
     }
 
-    public String readHSSFCell(HSSFRow row, String cellStr) {
+    public String readCell(Row row, String cellStr) {
         int pos = cellEnglishToPos(cellStr);
         if (row == null) {
             return "";
         }
-        HSSFCell cell = row.getCell(pos);
-        return readHSSFCell(cell);
+        Cell cell = row.getCell(pos);
+        return readCell(cell);
     }
 
     /**
      * @param cell
-     *            HSSFCell-->String
+     *            Cell-->String
      * @return
      */
-    public String readHSSFCell(HSSFCell cell) {
+    public String readCell(Cell cell) {
         if (cell == null) {
             System.out.println("cell 為 null");
             return "";
@@ -262,20 +297,20 @@ public class ExcelUtil {
         final DecimalFormat df = new DecimalFormat("####################0.##########");
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_BLANK:
+        case Cell.CELL_TYPE_BLANK:
             return "";
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             return Boolean.valueOf(cell.getBooleanCellValue()).toString().trim();
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             if (HSSFDateUtil.isCellDateFormatted(cell)) {
                 return sdf.format(cell.getDateCellValue());
             }
             return df.format(cell.getNumericCellValue());
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             return cell.getRichStringCellValue().getString().trim();
-        case HSSFCell.CELL_TYPE_FORMULA:
+        case Cell.CELL_TYPE_FORMULA:
             return cell.getCellFormula();
-        case HSSFCell.CELL_TYPE_ERROR:
+        case Cell.CELL_TYPE_ERROR:
             return Byte.toString(cell.getErrorCellValue());
         default:
             return "##POI## Unknown cell type";
@@ -285,26 +320,26 @@ public class ExcelUtil {
     /**
      * 取得儲存格內容(多判斷日期欄位)
      */
-    public Object readHSSFCell2(HSSFCell cell) {
+    public Object readCell2(Cell cell) {
         if (cell == null) {
             System.out.println("cell 為 null");
             return "";
         }
         switch (cell.getCellType()) {
-        case HSSFCell.CELL_TYPE_BLANK:
+        case Cell.CELL_TYPE_BLANK:
             return "";
-        case HSSFCell.CELL_TYPE_BOOLEAN:
+        case Cell.CELL_TYPE_BOOLEAN:
             return Boolean.valueOf(cell.getBooleanCellValue()).toString();
-        case HSSFCell.CELL_TYPE_NUMERIC:
+        case Cell.CELL_TYPE_NUMERIC:
             if (HSSFDateUtil.isCellDateFormatted(cell)) {
                 return cell.getDateCellValue();
             }
             return cell.getNumericCellValue();
-        case HSSFCell.CELL_TYPE_STRING:
+        case Cell.CELL_TYPE_STRING:
             return cell.getRichStringCellValue().getString();
-        case HSSFCell.CELL_TYPE_FORMULA:
+        case Cell.CELL_TYPE_FORMULA:
             return cell.getCellFormula();
-        case HSSFCell.CELL_TYPE_ERROR:
+        case Cell.CELL_TYPE_ERROR:
             return Byte.toString(cell.getErrorCellValue());
         default:
             return "##POI## Unknown cell type";
@@ -314,7 +349,7 @@ public class ExcelUtil {
     /**
      * 設定儲存格內容
      */
-    public void setCellValue(HSSFCell cell, Object value) {
+    public void setCellValue(Cell cell, Object value) {
         if (value instanceof Number) {
             Number n = (Number) value;
             cell.setCellValue(n.doubleValue());
@@ -345,7 +380,7 @@ public class ExcelUtil {
     /**
      * 設定column寬度
      */
-    public void setSheetWidth(HSSFSheet sheet, short[] widths) {
+    public void setSheetWidth(Sheet sheet, short[] widths) {
         for (int i = 0; i < widths.length; i++) {
             sheet.setColumnWidth(i, widths[i]);
         }
@@ -360,40 +395,40 @@ public class ExcelUtil {
 
     // #############################################################################################
 
-    public void setContent(HSSFSheet sheet, List<?> contentList, String[] columns) {
-        HSSFRow hssfRow = null;
+    public void setContent(Sheet sheet, List<?> contentList, String[] columns) {
+        Row Row = null;
         for (int ii = 0; ii < contentList.size(); ii++) {
             Object innerObj = contentList.get(ii);
-            hssfRow = sheet.createRow(sheet.getLastRowNum() + 1);
+            Row = sheet.createRow(sheet.getLastRowNum() + 1);
             if (innerObj instanceof Map) {
-                this.setRowByMap(hssfRow, (Map) innerObj, columns);
+                this.setRowByMap(Row, (Map) innerObj, columns);
             } else if (innerObj instanceof List) {
-                this.setRowByList(hssfRow, (List) innerObj);
+                this.setRowByList(Row, (List) innerObj);
             }
         }
     }
 
-    public void setRowByMap(HSSFRow hssfRow, Map innerMap, String[] columns) {
-        HSSFCell cell = null;
+    public void setRowByMap(Row Row, Map innerMap, String[] columns) {
+        Cell cell = null;
         for (int ii = 0; ii < columns.length; ii++) {
-            Integer cellNum = (int) hssfRow.getLastCellNum();
+            Integer cellNum = (int) Row.getLastCellNum();
             if (cellNum < 0) {
                 cellNum = 0;
             }
-            cell = hssfRow.createCell(cellNum);
+            cell = Row.createCell(cellNum);
             Object value = innerMap.get(columns[ii]);
             this.setCellValue(cell, value);
         }
     }
 
-    public void setRowByList(HSSFRow hssfRow, List innerlist) {
-        HSSFCell cell = null;
+    public void setRowByList(Row Row, List innerlist) {
+        Cell cell = null;
         for (int ii = 0; ii < innerlist.size(); ii++) {
-            Integer cellNum = (int) hssfRow.getLastCellNum();
+            Integer cellNum = (int) Row.getLastCellNum();
             if (cellNum < 0) {
                 cellNum = 0;
             }
-            cell = hssfRow.createCell(cellNum);
+            cell = Row.createCell(cellNum);
             Object value = innerlist.get(ii);
             this.setCellValue(cell, value);
         }
@@ -404,12 +439,12 @@ public class ExcelUtil {
     /**
      * 設定matrix style
      */
-    public void setCellStyle(HSSFSheet sheet, int colStart, int rowStart, int colEnd, int rowEnd, HSSFCellStyle style) {
+    public void setCellStyle(Sheet sheet, int colStart, int rowStart, int colEnd, int rowEnd, CellStyle style) {
         for (int nowX = colStart; nowX <= colEnd; nowX++) {
             for (int nowY = rowStart; nowY <= rowEnd; nowY++) {
                 try {
-                    HSSFRow row = sheet.getRow(nowX);
-                    HSSFCell cell = row.getCell(nowY);
+                    Row row = sheet.getRow(nowX);
+                    Cell cell = row.getCell(nowY);
                     if (null == cell) {
                         cell = row.createCell(nowY);
                     }
@@ -422,31 +457,35 @@ public class ExcelUtil {
         }
     }
 
-    public short getDataFormat(String df, HSSFWorkbook workbook) {
+    public short getDataFormat(String df, Workbook workbook) {
         return workbook.createDataFormat().getFormat(df);
     }
 
-    public void setDataFormat(HSSFSheet sheet, short id) {
+    public void setDataFormat(Sheet sheet, short id) {
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-            HSSFRow row = sheet.getRow(i);
+            Row row = sheet.getRow(i);
             int f = row.getFirstCellNum();
-            HSSFCellStyle s = row.getCell(f).getCellStyle();
+            CellStyle s = row.getCell(f).getCellStyle();
             s.setDataFormat(id);
             row.getCell(f).setCellStyle(s);
         }
     }
 
-    public void debugShowSheetData(HSSFSheet sheet) {
-        HSSFRow row = null;
-        HSSFCell cell = null;
+    public void debugShowSheetData(Sheet sheet) {
+        Row row = null;
+        Cell cell = null;
         String value = null;
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             row = sheet.getRow(ii);
             System.out.format("row:%d", ii);
+            if(row == null) {
+                System.out.println();
+                continue;
+            }
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
                 cell = row.getCell(jj);
                 if (cell != null) {
-                    value = ExcelUtil.getInstance().readHSSFCell(cell);
+                    value = ExcelUtil.getInstance().readCell(cell);
                 } else {
                     value = null;
                 }
@@ -456,10 +495,10 @@ public class ExcelUtil {
         }
     }
 
-    public static void copyRow(HSSFSheet worksheet, int sourceRowNum, int destinationRowNum) {
+    public static void copyRow(Sheet worksheet, int sourceRowNum, int destinationRowNum) {
         // Get the source & new row
-        HSSFRow newRow = worksheet.getRow(destinationRowNum);
-        HSSFRow sourceRow = worksheet.getRow(sourceRowNum);
+        Row newRow = worksheet.getRow(destinationRowNum);
+        Row sourceRow = worksheet.getRow(sourceRowNum);
 
         // If the row exist in destination, push down all rows by 1 else create
         // a new row
@@ -475,8 +514,8 @@ public class ExcelUtil {
         // Loop through source columns to add to new row
         for (int i = 0; i < sourceRow.getLastCellNum(); i++) {
             // Grab a copy of the old/new cell
-            HSSFCell oldCell = sourceRow.getCell(i);
-            HSSFCell newCell = newRow.createCell(i);
+            Cell oldCell = sourceRow.getCell(i);
+            Cell newCell = newRow.createCell(i);
 
             // If the old cell is null jump to next cell
             if (oldCell == null) {
