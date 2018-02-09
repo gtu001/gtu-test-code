@@ -8,33 +8,25 @@ import java.text.MessageFormat;
 public class Tnsnames_ora_OracleCreater {
 
     public static void main(String[] args) {
-//        String tnsName = "R5_ED";
-//        String serviceName = "ebouat2";
-//        String ip = "10.67.67.70";
-//        String port = "1521";
-//        String username = "ls_uat_read";
-//        String password = "ls_uat_read_only";
         
-//        String tnsName = "R5_DEV";
-//        String serviceName = "ebosit1";
-//        String ip = "10.67.67.86";
+//        String tnsName = "DCS_122";
+//        String serviceName = "IBTDCS1";
+//        String ip = "122.116.167.154";
 //        String port = "1521";
-//        String username = "ls_sit_dev";
-//        String password = "ls_sit_devpwd";
-        
-//        String tnsName = "R5_ILP";
-//        String serviceName = "tgldcbak";
-//        String ip = "ploodse-scan.transglobe.com.tw";
-//        String port = "1521";
-//        String username = "TGL_TAR_PRE_read";
-//        String password = "TGL_TAR_PRE_read_only";
+//        String username = "sysadm";
+//        String password = "123456";
         
         String tnsName = "DCS_122";
-        String serviceName = "IBTDCS1";
-        String ip = "122.116.167.154";
+        String serviceName = "rd11g";
+        String ip = "10.10.2.140";
         String port = "1521";
-        String username = "sysadm";
-        String password = "123456";
+        String username = "ccbilldb";
+        String password = "Cc1234@!";
+        
+        
+//        bds.setUrl("jdbc:oracle:thin:@192.168.93.215:1521:SCSB");
+//        bds.setUsername("henry");
+//        bds.setPassword("Fuco1234");
         
         boolean isService = false;
         
@@ -55,6 +47,11 @@ public class Tnsnames_ora_OracleCreater {
         sb.append("    ("+serviceOrSid+" ={3})                                     \n");
         sb.append("  )                                                       \n");
         sb.append(" )                                                        \n");
+        
+        //密碼函@要特別處理
+        if(password.contains("@")) {
+            password = String.format("\\\"%s\\\"", password);
+        }
 
         String result = MessageFormat.format(sb.toString(), new Object[] { tnsName, ip, port, serviceName });
         System.out.println(result);

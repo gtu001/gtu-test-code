@@ -1,0 +1,8 @@
+//資料庫export
+exp ccbilldb/\"Cc1234@!\"@scsb_1 file=d:/expdat.dmp log=d:/dmp_log.txt full=y consistent=y direct=y
+
+//資料庫import
+imp henry/Fuco1234@scsb_fuco fromuser=ccbilldb touser=henry file=d:/expdat.dmp
+
+
+

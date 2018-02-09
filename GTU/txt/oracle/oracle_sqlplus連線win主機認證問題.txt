@@ -1,0 +1,6 @@
+修改此檔
+C:\app\gtu001\product\11.2.0\client_3\network\admin\sqlnet.ora
+
+改成None
+#SQLNET.AUTHENTICATION_SERVICES= (NTS)
+SQLNET.AUTHENTICATION_SERVICES= (NONE)
