@@ -92,6 +92,7 @@ public class EnglishSearchUI extends JFrame {
     private Thread checkFocusOwnerThread;
     private SearchEnglishIdTextController searchEnglishIdTextController = new SearchEnglishIdTextController();
     private HideInSystemTrayHelper sysutil;
+    private CheckboxMode _CURRENT_MODE = CheckboxMode.NONE;
 
     /**
      * Launch the application.
@@ -152,8 +153,8 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox listenClipboardChk;
     private JCheckBox rightBottomCornerChk;
     private JCheckBox autoSearchChk;
-    private JButton showNewWordTxtBtn;
     private JCheckBox mouseSelectionChk;
+    private JButton showNewWordTxtBtn;
 
     private void startCheckFocusOwnerThread() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
@@ -353,8 +354,8 @@ public class EnglishSearchUI extends JFrame {
 
         // 置中
         JCommonUtil.setJFrameCenter(this);
-        
-        //初始化checkbox
+
+        // 初始化checkbox
         focusTopChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("focusTopChk")));
         listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
         rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
@@ -591,6 +592,62 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
+    private enum CheckboxMode {
+        NONE() {
+            @Override
+            void apply(EnglishSearchUI this_) {
+                JCheckBox chk = this_.autoSearchChk;
+                chk.setSelected(false);
+                JCheckBox chk2 = this_.listenClipboardChk;
+                chk2.setSelected(false);
+                JCheckBox chk3 = this_.mouseSelectionChk;
+                chk3.setSelected(false);
+                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
+            }
+        },
+        CTRL_C() {
+            @Override
+            void apply(EnglishSearchUI this_) {
+                JCheckBox chk = this_.autoSearchChk;
+                chk.setSelected(true);
+                JCheckBox chk2 = this_.listenClipboardChk;
+                chk2.setSelected(true);
+                JCheckBox chk3 = this_.mouseSelectionChk;
+                chk3.setSelected(false);
+                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
+            }
+        },
+        MOUSE_MARK() {
+            @Override
+            void apply(EnglishSearchUI this_) {
+                JCheckBox chk = this_.autoSearchChk;
+                chk.setSelected(true);
+                JCheckBox chk2 = this_.listenClipboardChk;
+                chk2.setSelected(true);
+                JCheckBox chk3 = this_.mouseSelectionChk;
+                chk3.setSelected(true);
+                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
+            }
+        },;
+        CheckboxMode() {
+        }
+        
+        abstract void apply(EnglishSearchUI this_);
+        
+        private static CheckboxMode findNext(CheckboxMode current) {
+            for( int ii = 0 ; ii< CheckboxMode.values().length ; ii ++) {
+                if(CheckboxMode.values()[ii] ==  current) {
+                    if(ii + 1 >= CheckboxMode.values().length ) {
+                        return CheckboxMode.values()[0];
+                    }else {
+                        return CheckboxMode.values()[ii + 1];
+                    }
+                }
+            }
+            throw new RuntimeException("error find : " + current);
+        }
+    }
+
     private class GlobalKeyListenerExampleForEnglishUI extends NativeKeyAdapter {
         public void close() {
             try {
@@ -602,22 +659,11 @@ public class EnglishSearchUI extends JFrame {
 
         public void nativeKeyReleased(NativeKeyEvent e) {
             System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
-            // 監聽剪貼簿開啟關閉
+            // 模式check
             if ((e.getModifiers() & NativeInputEvent.CTRL_MASK) != 0 && //
-                    e.getKeyCode() == NativeKeyEvent.VC_F1) {
-                JCheckBox chk = EnglishSearchUI.this.listenClipboardChk;
-                chk.setSelected(!chk.isSelected());
-                EnglishSearchUI.this.sysutil.displayMessage("字典", "監聽剪貼簿" + (chk.isSelected() ? "開啟" : "關閉"), MessageType.INFO);
-                // 設定開啟時自動查詢
-            } else if ((e.getModifiers() & NativeInputEvent.CTRL_MASK) != 0 && //
                     e.getKeyCode() == NativeKeyEvent.VC_F2) {
-                JCheckBox chk = EnglishSearchUI.this.autoSearchChk;
-                chk.setSelected(!chk.isSelected());
-                JCheckBox chk2 = EnglishSearchUI.this.listenClipboardChk;
-                chk2.setSelected(chk.isSelected());
-                JCheckBox chk3 = EnglishSearchUI.this.mouseSelectionChk;
-                chk3.setSelected(chk.isSelected());
-                EnglishSearchUI.this.sysutil.displayMessage("字典", "開啟剪貼簿自動查詢" + (chk.isSelected() ? "開啟" : "關閉"), MessageType.INFO);
+                _CURRENT_MODE = CheckboxMode.findNext(_CURRENT_MODE);
+                _CURRENT_MODE.apply(EnglishSearchUI.this);
                 // 監聽開啟UI
             } else if ((e.getModifiers() & NativeInputEvent.SHIFT_MASK) != 0 && //
                     (e.getModifiers() & NativeInputEvent.ALT_MASK) != 0 && //

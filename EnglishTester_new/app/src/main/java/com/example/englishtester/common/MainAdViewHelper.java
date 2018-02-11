@@ -29,7 +29,12 @@ public class MainAdViewHelper {
      * 載入廣告
      */
     public void initAdView(NativeExpressAdView mAdView, Context context) {
-        MobileAds.initialize(context, context.getString(R.string.ad_app_id));
+        try{
+            MobileAds.initialize(context, context.getString(R.string.ad_app_id));
+        }catch(Throwable ex){
+            Log.e(TAG, "handler ignore error by gtu001 : " + ex.getMessage(), ex);
+        }
+
 
         // Create a banner ad. The ad size and ad unit ID must be set before calling loadAd.
 //        mAdView = (NativeExpressAdView) findViewById(R.id.adView);
