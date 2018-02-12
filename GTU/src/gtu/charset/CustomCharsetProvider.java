@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * 將此package包成檔案 CP937_FUCO.jar
  * 放到 C:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\CP937_FUCO.jar
+ * 
+ * Example : new String(bytearry, "CP937-FUCO")
  */
 public class CustomCharsetProvider extends CharsetProvider {
 
