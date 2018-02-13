@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import gtu.log.Logger2File;
@@ -114,6 +116,19 @@ public class WebTestUtil {
 
         response.getOutputStream().close();
         response.flushBuffer();
+    }
+    
+    public static String getFullQueryString() {
+        ServletRequestAttributes reqAttr = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes());
+        HttpServletRequest request = reqAttr.getRequest();
+        String uri = request.getScheme() + "://" + // "http" + "://
+                request.getServerName() + // "myhost"
+                ":" + // ":"
+                request.getServerPort() + // "8080"
+                request.getRequestURI() + // "/people"
+                "?" + // "?"
+                request.getQueryString(); // "lastname=Fox&age=30"
+        return uri;
     }
 
     public static class WebParamterWrapper {
