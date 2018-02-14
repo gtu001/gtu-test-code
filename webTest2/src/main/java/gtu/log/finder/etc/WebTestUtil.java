@@ -118,17 +118,28 @@ public class WebTestUtil {
         response.flushBuffer();
     }
     
-    public static String getFullQueryString() {
+    public HttpServletRequest getStaticRequest() {
         ServletRequestAttributes reqAttr = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes());
         HttpServletRequest request = reqAttr.getRequest();
-        String uri = request.getScheme() + "://" + // "http" + "://
-                request.getServerName() + // "myhost"
-                ":" + // ":"
-                request.getServerPort() + // "8080"
-                request.getRequestURI() + // "/people"
-                "?" + // "?"
-                request.getQueryString(); // "lastname=Fox&age=30"
-        return uri;
+        return request;
+    }
+    
+    public static String getFullQueryString() {
+        try {
+            ServletRequestAttributes reqAttr = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes());
+            HttpServletRequest request = reqAttr.getRequest();
+            String uri = request.getScheme() + "://" + // "http" + "://
+                    request.getServerName() + // "myhost"
+                    ":" + // ":"
+                    request.getServerPort() + // "8080"
+                    request.getRequestURI() + // "/people"
+                    "?" + // "?"
+                    request.getQueryString(); // "lastname=Fox&age=30"
+            return uri;
+        }catch(IllegalStateException ex) {
+            System.out.println("can't access getFullQueryString : " + ex.getMessage());
+            return "";
+        }
     }
 
     public static class WebParamterWrapper {

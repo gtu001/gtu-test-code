@@ -9,49 +9,62 @@ import java.util.List;
  * @author gtu001
  */
 public class StringUtil4FullChar {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         String str = "公司名稱 : 聯陽半導體 統一編號 : 84149717 本次出口物品為非保稅品之正貨交易,需正式出口報關 商標 :型號IT開頭為ITE，UT開頭為USBest，CAT、CP開 頭為CAT, AT開頭為AFA 請於103年09月29日09:00至ITE成品庫提貨(新竹 科學園區創新一路9號1樓) 報關日期與提單日期需與INVOICE 日期同一天，或晚於INVOICE 日期";
-        for(String s : fixLength(str, 70)){
+        for (String s : fixLength(str, 70)) {
             System.out.println(s);
         }
         System.out.println("done...");
     }
-    
-    public static List<String> fixLength(String value, int length){
+
+    private static EncodeTypeLength ENCODE_TYPE = EncodeTypeLength.UTF8;
+
+    private enum EncodeTypeLength {
+        BIG5(2), //
+        UTF8(3),//
+        ;
+        int length;
+
+        EncodeTypeLength(int length) {
+            this.length = length;
+        }
+    }
+
+    public static List<String> fixLength(String value, int length) {
         char[] array = value.toCharArray();
         List<String> list = new ArrayList<String>();
         StringBuilder sb = new StringBuilder();
         for (int i = 0, count = 0, lastTime = 0; i < array.length; i++) {
             if (String.valueOf(array[i]).matches("[^\\x00-\\xff]")) {
-                count += 2;
-                lastTime = 2;
+                count += ENCODE_TYPE.length;
+                lastTime = ENCODE_TYPE.length;
             } else {
                 count++;
                 lastTime = 1;
             }
-            if(count > length){
+            if (count > length) {
                 list.add(sb.toString());
                 sb = new StringBuilder();
-//                sb.append(count + "" + array[i]);
+                // sb.append(count + "" + array[i]);
                 sb.append(array[i]);
                 count = lastTime;
-            }else if(count == length){
-//                sb.append(count + "" + array[i]);
+            } else if (count == length) {
+                // sb.append(count + "" + array[i]);
                 sb.append(array[i]);
                 list.add(sb.toString());
                 sb = new StringBuilder();
                 count = 0;
-            }else{
-//                sb.append(count + "" + array[i]);
+            } else {
+                // sb.append(count + "" + array[i]);
                 sb.append(array[i]);
             }
         }
-        if(sb.length() > 0){
+        if (sb.length() > 0) {
             list.add(sb.toString());
         }
         return list;
     }
-    
+
     public static int length(String str) {
         if (str == null) {
             return 0;
@@ -59,7 +72,7 @@ public class StringUtil4FullChar {
         int counts = 0;
         for (int i = 0; i < str.length(); i++) {
             if (str.substring(i, i + 1).matches("[^\\x00-\\xff]")) {
-                counts += 2;
+                counts += ENCODE_TYPE.length;
             } else {
                 counts++;
             }
@@ -79,7 +92,7 @@ public class StringUtil4FullChar {
         for (int i = 0, counts = 0; i < str.length(); i++) {
             int countClone = counts;
             if (str.substring(i, i + 1).matches("[^\\x00-\\xff]")) {
-                counts += 2;
+                counts += ENCODE_TYPE.length;
             } else {
                 counts++;
             }
@@ -89,11 +102,12 @@ public class StringUtil4FullChar {
         }
         return sb.toString();
     }
-    
-    public static String rightPad(String value, int length, char padChar){
+
+    public static String rightPad(String value, int length, char padChar) {
         return pad(value, length, padChar, true);
     }
-    public static String leftPad(String value, int length, char padChar){
+
+    public static String leftPad(String value, int length, char padChar) {
         return pad(value, length, padChar, false);
     }
 
