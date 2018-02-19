@@ -318,6 +318,11 @@ public class EnglishSearchUI extends JFrame {
         panel.add(focusTopChk, "4, 4");
 
         listenClipboardChk = new JCheckBox("監聽剪貼簿");
+        listenClipboardChk.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
+            }
+        });
         panel.add(listenClipboardChk, "4, 6");
 
         autoSearchChk = new JCheckBox("開啟時自動查詢");
@@ -343,6 +348,24 @@ public class EnglishSearchUI extends JFrame {
         this.addWindowListener(new WindowAdapter() {
             public void windowOpened(WindowEvent e) {
                 focusSearchEnglishIdText();
+            }
+        });
+
+        this.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // 使用word模式時需要自動隱藏
+                if (EnglishSearchUI.this.autoSearchChk.isSelected() && //
+                EnglishSearchUI.this.listenClipboardChk.isSelected() && //
+                EnglishSearchUI.this.mouseSelectionChk.isSelected()//
+                ) {
+                    EnglishSearchUI.this.setVisible(false);
+                }
+            }
+
+            @Override
+            public void focusGained(FocusEvent e) {
             }
         });
 
@@ -631,15 +654,15 @@ public class EnglishSearchUI extends JFrame {
         },;
         CheckboxMode() {
         }
-        
+
         abstract void apply(EnglishSearchUI this_);
-        
+
         private static CheckboxMode findNext(CheckboxMode current) {
-            for( int ii = 0 ; ii< CheckboxMode.values().length ; ii ++) {
-                if(CheckboxMode.values()[ii] ==  current) {
-                    if(ii + 1 >= CheckboxMode.values().length ) {
+            for (int ii = 0; ii < CheckboxMode.values().length; ii++) {
+                if (CheckboxMode.values()[ii] == current) {
+                    if (ii + 1 >= CheckboxMode.values().length) {
                         return CheckboxMode.values()[0];
-                    }else {
+                    } else {
                         return CheckboxMode.values()[ii + 1];
                     }
                 }
@@ -720,7 +743,7 @@ public class EnglishSearchUI extends JFrame {
             String english = getEnglish(StringUtils.trimToEmpty(word));
             String oldEnglish = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
             if (StringUtils.isNotBlank(english)) {
-                if (english.length() == 1) {
+                if (StringUtils.trimToEmpty(english).length() == 1) {
                     return;
                 }
 
