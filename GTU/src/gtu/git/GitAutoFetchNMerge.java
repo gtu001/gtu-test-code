@@ -14,7 +14,7 @@ import gtu.runtime.ProcessWatcher;
 public class GitAutoFetchNMerge {
 
     public static void main(String[] args) throws IOException {
-        File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_scsb");
+        File fileDirs = new File("E:/workstuff/workstuff/workspace_scsb");
         String account = "gtu001";
         if(args != null && args.length == 2) {
             fileDirs = new File(args[0]);
@@ -28,7 +28,7 @@ public class GitAutoFetchNMerge {
             List<String> lst = new ArrayList<String>();
             if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
                 lst.add("cd " + f);
-                lst.add("i:");
+                lst.add("e:");
                 if (ArrayUtils.contains(prodArry, f.getName())) {
                     lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
                 } else {

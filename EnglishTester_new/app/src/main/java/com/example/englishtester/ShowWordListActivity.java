@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import com.example.englishtester.common.DialogSingleInput.DialogConfirmClickList
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.TextToSpeechComponent;
 
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -65,13 +67,14 @@ public class ShowWordListActivity extends ListActivity {
     EnglishwordInfoDAO englishwordInfoDAO;
     RecentSearchService recentSearchService;
     EnglishTester_Diectory diectory = new EnglishTester_Diectory();
+    EnglishDescKeeper englishDescKeeper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
         super.onCreate(savedInstanceState);
 
-        if(!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)){
+        if (!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)) {
             FullPageMentionDialog.builder(R.drawable.full_page_mention_001, this).showDialog();
         }
 
@@ -80,11 +83,12 @@ public class ShowWordListActivity extends ListActivity {
         talkComponent = new TextToSpeechComponent(getApplicationContext());
         englishwordInfoDAO = new EnglishwordInfoDAO(getApplicationContext());
         recentSearchService = new RecentSearchService(getApplicationContext());
+        englishDescKeeper = new EnglishDescKeeper(getApplicationContext());
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         Log.v(TAG, "extras -- " + extras);
-        if(extras != null){
+        if (extras != null) {
             dto = (MainActivityDTO) extras.getParcelable(ShowWordListActivity_DTO);
         }
 
@@ -530,11 +534,41 @@ public class ShowWordListActivity extends ListActivity {
         // 為勾選時隱藏
         Map<String, Object> itemMap = (Map<String, Object>) l.getItemAtPosition(position);
         if (word.check) {
+
+            //過濾若沒有解釋要即時翻譯
+            desc = englishDescKeeper.getDesc(word.word, word.desc);
+            word.desc = desc;
+
             itemMap.put("item_text", desc);
             itemMap.put("item_image_check", R.drawable.icon_check);
         } else {
             itemMap.put("item_text", "");
             itemMap.put("item_image_check", null);
+        }
+    }
+
+    private class EnglishDescKeeper {
+        EnglishTester_Diectory diectory = new EnglishTester_Diectory();
+        Map<String, WordInfo> englishMap = new LRUMap<String, WordInfo>(50);
+        Context context;
+        Handler handler = new Handler();
+
+        private EnglishDescKeeper(Context context) {
+            this.context = context;
+        }
+
+        private String getDesc(String english, String desc) {
+            if (StringUtils.isNotBlank(desc)) {
+                return desc;
+            }
+            english = StringUtils.trimToEmpty(english).toLowerCase();
+            if(englishMap.containsKey(english)){
+                return englishMap.get(english).getMeaning();
+            }else{
+                WordInfo word = diectory.parseToWordInfo(english, context, handler);
+                englishMap.put(english, word);
+                return word.getMeaning();
+            }
         }
     }
 

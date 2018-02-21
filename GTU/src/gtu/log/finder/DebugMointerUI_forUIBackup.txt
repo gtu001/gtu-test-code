@@ -93,7 +93,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
@@ -111,7 +110,6 @@ import gtu.javafx.traynotification.animations.AnimationType;
 import gtu.log.Logger2File;
 import gtu.log.finder.DebugMointerParameterParserMF.ParseToObject;
 import gtu.log.finder.DebugMointerTypeUtil.TempValueEnum;
-import gtu.log.finder.DebugMointerUIUIContent.JTextFieldKeeper;
 import gtu.runtime.ClipboardUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -132,27 +130,9 @@ import javassist.Modifier;
 public class DebugMointerUI {
 
     static {
-        if (System.getProperty("os.name").toLowerCase().contains("window")) {
-            forceUIMode(true);
-        } else {
-            forceUIMode(false);
-        }
-        
-        //測試
-        forceUIMode(false);
-    }
-
-    private static void forceUIMode(boolean isUseUIMode) {
-        boolean headLess = !isUseUIMode;
-        System.setProperty("java.awt.headless", String.valueOf(headLess));// 使用ui為false
-        if (!GraphicsEnvironment.isHeadless()) {
-            try {
-                FieldUtils.writeDeclaredStaticField(GraphicsEnvironment.class, "headless", headLess, true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        System.out.println("<<< java.awt.headless - " + GraphicsEnvironment.isHeadless());
+        // run in linux
+        System.setProperty("java.awt.headless", "true");
+        System.out.println("<<<" + GraphicsEnvironment.isHeadless());
     }
 
     public static class Constant {
@@ -180,7 +160,67 @@ public class DebugMointerUI {
          */
     }
 
-    static Logger2File log;
+    private static final long serialVersionUID = 1L;
+    private JTabbedPane jTabbedPane1;
+    private JPanel jPanel1;
+    private JTree compositeTree;
+    private JComboBox tempObjClassCombox;
+    private JTextArea errorLogArea;
+    private JTextArea callStackArea;
+    private JButton indicateNodeClassBtn;
+    private JComboBox nodeInfoComboBox;
+    private JCheckBox tempModelCheckBox;
+    private JScrollPane jScrollPane12;
+    private JList executeList;
+    private JPanel jPanel16;
+    private JLabel jLabel5;
+    private JTextField executeMethodNameText;
+    private JButton executeMethodBtn;
+    private JScrollPane jScrollPane11;
+    private JEditorPane showInfoArea2;
+    private JScrollPane jScrollPane10;
+    private JEditorPane showInfoArea;
+    private JPanel jPanel15;
+    private JPanel jPanel14;
+    private JTabbedPane jTabbedPane2;
+    private JScrollPane jScrollPane9;
+    private JPanel jPanel13;
+    private JButton importClassBtn;
+    private JTextField classNameText;
+    private JLabel jLabel4;
+    private JTextField classpathText;
+    private JLabel jLabel3;
+    private JPanel jPanel12;
+    private JPanel jPanel11;
+    private JLabel jLabel2;
+    private JButton tempValueSetBtn;
+    private JTextField tempValueSetText;
+    private JComboBox tempValueCombox;
+    private JScrollPane jScrollPane8;
+    private JList tempList;
+    private JScrollPane jScrollPane7;
+    private JTable tempValueTable;
+    private JPanel jPanel10;
+    private JPanel jPanel9;
+    private JScrollPane jScrollPane5;
+    private JTable parameterTable;
+    private JPanel jPanel7;
+    private JScrollPane jScrollPane4;
+    private JTable breakpointTable;
+    private JScrollPane jScrollPane3;
+    private JTextArea conditionArea;
+    private JToggleButton conditionActivationBtn;
+    private JPanel jPanel6;
+    private JPanel jPanel5;
+    private JComboBox moniterComboBox;
+    private JScrollPane jScrollPane2;
+    private JLabel jLabel1;
+    private JTable compositeTable;
+    private JPanel jPanel4;
+    private JScrollPane jScrollPane1;
+    private JPanel jPanel3;
+    private JPanel jPanel2;
+    private JTreeUtil jtreeUtil;
 
     // 重要變數
     // --------------------------------------------------------------------------------------
@@ -205,7 +245,7 @@ public class DebugMointerUI {
     private volatile int defaultReturnIndex = -1;// 預設回傳index
     private MethodNameTextHandler methodNameHandler = new MethodNameTextHandler();
 
-    private DebugMointerUIUIContent uiCarrier;
+    private JDialog _ui;
 
     public final static File configFile;// 設定黨
     static {
@@ -226,7 +266,6 @@ public class DebugMointerUI {
             inst = new DebugMointerUI();
             cleanSystray();
         }
-        inst.uiCarrier = new DebugMointerUIUIContent();
         inst.initConfigProp();// 初始化configProp
         inst.mointerObjects = null;
         inst.returnObject = null;// 清空回傳直
@@ -262,10 +301,7 @@ public class DebugMointerUI {
             inst.keepForRemoveTray = new HashSet<SysTrayUtil>();
         }
         for (SysTrayUtil sys : inst.keepForRemoveTray) {
-            try {
-                SystemTray.getSystemTray().remove(sys.getTrayIcon());
-            } catch (java.awt.HeadlessException ex) {
-            }
+            SystemTray.getSystemTray().remove(sys.getTrayIcon());
         }
         inst.keepForRemoveTray.clear();
     }
@@ -339,8 +375,8 @@ public class DebugMointerUI {
             throw new RuntimeException("必須為i,u,d");
         }
         // 更新暫存區清單
-        inst.uiCarrier.getTempList().setModel(inst.getTempModel());
-        getLogger().debug("size : " + inst.uiCarrier.getTempList().getSize());
+        inst.tempList.setModel(inst.getTempModel());
+        getLogger().debug("size : " + inst.tempList.getSize());
         getLogger().debug("#. appendToTempModel .e");
     }
 
@@ -406,7 +442,7 @@ public class DebugMointerUI {
         getLogger().debug("DebugMointerUI dispose!!");
         inst.isEnabledUI = true;
         getLogger().close();
-        inst.uiCarrier.get_ui().dispose();
+        inst._ui.dispose();
         cleanSystray();
         inst.initSysTrayOk = false;
         cleanAllStaticValue();
@@ -514,21 +550,18 @@ public class DebugMointerUI {
     }
 
     public void setVisible(boolean visible) {
-        uiCarrier.get_ui().setVisible(visible);
+        _ui.setVisible(visible);
     }
 
     private static void standardProcess() {
-        // 重設mointerObject下拉
-        inst.initMointerObjects();
-
-        if ((!inst.uiCarrier.get_ui().isVisible() || inst.isAutoExecute.get()) && inst.isEnabledUI) {
-            inst.uiCarrier.get_ui().setLocationRelativeTo(null);
+        if ((!inst._ui.isVisible() || inst.isAutoExecute.get()) && inst.isEnabledUI) {
+            inst._ui.setLocationRelativeTo(null);
             inst.setVisible(!inst.isAutoExecute.get());// 有問題
 
             if (!inst.isDynamicClassMode()) {
-                autoExecutePlugIn();// 讀取外部workspace的classes執行
+                autoExecutePlugIn();
             } else {
-                inst.dynamicExecuteButtonAction();// 使用maven從textarea編譯class執行
+                inst.dynamicExecuteButtonAction();
             }
         }
         // displayStatus();
@@ -546,7 +579,7 @@ public class DebugMointerUI {
 
     private static void displayStatus() {
         getLogger().debug("## - isEnabledUI = " + inst.isEnabledUI);
-        getLogger().debug("## - inst.isVisible() = " + inst.uiCarrier.get_ui().isVisible());
+        getLogger().debug("## - inst.isVisible() = " + inst._ui.isVisible());
         getLogger().debug("## - isAutoExecute = " + inst.isAutoExecute);
         getLogger().debug("## - inst.isExecuteComplete = " + inst.isExecuteComplete);
         getLogger().debug("## - isAutoExecuteMappingMethod = " + inst.isAutoExecuteMappingMethod);
@@ -606,14 +639,14 @@ public class DebugMointerUI {
         }
         try {
             ExecuteConfig exe = inst.indicateExecuteConfig;
-            textfieldSetValue(inst.uiCarrier.getClassNameText(), StringUtils.trimToEmpty(exe.className));
-            textfieldSetValue(inst.uiCarrier.getClasspathText(), _autoExecutePlugIn_getExecutePath());
-            textfieldSetValue(inst.uiCarrier.getExecuteMethodNameText(), inst.methodNameHandler.replace(exe.executeMethodName));
+            textfieldSetValue(inst.classNameText, StringUtils.trimToEmpty(exe.className));
+            textfieldSetValue(inst.classpathText, _autoExecutePlugIn_getExecutePath());
+            textfieldSetValue(inst.executeMethodNameText, inst.methodNameHandler.replace(exe.executeMethodName));
 
             getLogger().debug("##Plugin Info↓↓↓↓↓↓↓-----------------------------------");
             getLogger().debug(String.format("\t時間:%tY/%<tm/%<td %<tH:%<tM:%<tS", System.currentTimeMillis()));
-            getLogger().debug("\tclasspathText = " + inst.uiCarrier.getClasspathText().getText());
-            getLogger().debug("\tclassNameText = " + inst.uiCarrier.getClassNameText().getText());
+            getLogger().debug("\tclasspathText = " + inst.classpathText.getText());
+            getLogger().debug("\tclassNameText = " + inst.classNameText.getText());
             getLogger().debug("\texecuteMethodNameText = " + inst.methodNameHandler.getExecuteMethodNameText());
             getLogger().debug("##Plugin Info↑↑↑↑↑↑↑-----------------------------------");
 
@@ -644,7 +677,7 @@ public class DebugMointerUI {
      */
     private static String _autoExecutePlugIn_getExecutePath() {
         try {
-            DefaultListModel model = (DefaultListModel) inst.uiCarrier.getExecuteList().getModel();
+            DefaultListModel model = (DefaultListModel) inst.executeList.getModel();
             for (int ii = 0; ii < model.getSize(); ii++) {
                 ExecuteConfig e = (ExecuteConfig) model.get(ii);
                 if (StringUtils.isNotBlank(e.classPath)) {
@@ -662,20 +695,19 @@ public class DebugMointerUI {
      */
     private boolean isDynamicClassMode() {
         try {
-            textfieldSetValue(inst.uiCarrier.getClassNameText(), inst.indicateExecuteConfig.className);
-            textfieldSetValue(inst.uiCarrier.getClasspathText(), inst.indicateExecuteConfig.classPath);
-            textfieldSetValue(inst.uiCarrier.getExecuteMethodNameText(), methodNameHandler.replace(inst.indicateExecuteConfig.executeMethodName));
+            textfieldSetValue(inst.classNameText, inst.indicateExecuteConfig.className);
+            textfieldSetValue(inst.classpathText, inst.indicateExecuteConfig.classPath);
+            textfieldSetValue(inst.executeMethodNameText, methodNameHandler.replace(inst.indicateExecuteConfig.executeMethodName));
 
             setDynamicClassArea();
             dynamicLoadingConfigAction(true);
 
-            File targetDir = new File(uiCarrier.getDynamic_classesDirText().getText());
+            File targetDir = new File(dynamic_classesDirText.getText());
             if (!targetDir.exists()) {
                 return false;
             }
-
-            String classPath = uiCarrier.getDynamic_classPathText().getText();
-            String className = uiCarrier.getDynamic_classNameText().getText();
+            String classPath = dynamic_classPathText.getText();
+            String className = dynamic_classNameText.getText();
             classPath = classPath.replace('.', '/');
             // File classFile = new File(targetDir + "/" + classPath + "/" +
             // className + ".class");
@@ -698,59 +730,59 @@ public class DebugMointerUI {
             // 目的目錄
             File dynamicTargetDir = null;
             final String DYNAMIC_TARGET_DIR_KEY = "dynamic_target_dir";
-            if (StringUtils.isBlank(uiCarrier.getDynamic_classesDirText().getText())) {
+            if (StringUtils.isBlank(dynamic_classesDirText.getText())) {
                 String path = inst.configProp.getProperty(DYNAMIC_TARGET_DIR_KEY);
                 if (StringUtils.isBlank(path)) {
                     Validate.isTrue(false, "classes目錄未設定");
                 }
-                uiCarrier.getDynamic_classesDirText().setText(path);
+                dynamic_classesDirText.setText(path);
                 dynamicTargetDir = new File(path);
             } else {
-                dynamicTargetDir = new File(uiCarrier.getDynamic_classesDirText().getText());
+                dynamicTargetDir = new File(dynamic_classesDirText.getText());
             }
 
             // JAVA_HOME
             File dynamicJavaHomeDir = null;
             final String DYNAMIC_JAVA_HOME_KEY = "dynamic_java_home";
-            if (StringUtils.isBlank(uiCarrier.getDynamic_javaHomeText().getText())) {
+            if (StringUtils.isBlank(dynamic_javaHomeText.getText())) {
                 String path = inst.configProp.getProperty(DYNAMIC_JAVA_HOME_KEY);
                 if (StringUtils.isBlank(path)) {
                     Validate.isTrue(false, "JAVA_HOME目錄未設定");
                 }
-                uiCarrier.getDynamic_javaHomeText().setText(path);
+                dynamic_javaHomeText.setText(path);
                 dynamicJavaHomeDir = new File(path);
             } else {
-                dynamicJavaHomeDir = new File(uiCarrier.getDynamic_javaHomeText().getText());
+                dynamicJavaHomeDir = new File(dynamic_javaHomeText.getText());
             }
 
             // maven專案目錄設定
             File dynamicMvnProjectDir = null;
             final String DYNAMIC_MVN_PROJECT_DIR_KEY = "dynamic_mvn_project_dir";
-            if (StringUtils.isBlank(uiCarrier.getDynamic_mvnProjectText().getText())) {
+            if (StringUtils.isBlank(dynamic_mvnProjectText.getText())) {
                 String path = inst.configProp.getProperty(DYNAMIC_MVN_PROJECT_DIR_KEY);
                 if (StringUtils.isBlank(path)) {
                     // throw new RuntimeException("Mvn Project目錄未設定");
                 } else {
-                    uiCarrier.getDynamic_mvnProjectText().setText(path);
+                    dynamic_mvnProjectText.setText(path);
                     dynamicMvnProjectDir = new File(path);
                 }
             } else {
-                dynamicMvnProjectDir = new File(uiCarrier.getDynamic_mvnProjectText().getText());
+                dynamicMvnProjectDir = new File(dynamic_mvnProjectText.getText());
             }
 
-            String className = uiCarrier.get_ui().getTitle().toString().replace('.', '_').replace(':', '_');
-            uiCarrier.getDynamic_classNameText().setText(className);
+            String className = _ui.getTitle().toString().replace('.', '_').replace(':', '_');
+            dynamic_classNameText.setText(className);
 
-            String javaContent = uiCarrier.getDynamicClassArea().getText();
+            String javaContent = dynamicClassArea.getText();
             if (StringUtils.isBlank(javaContent)) {
                 return false;
             }
 
-            String replaceFromClassName = StringUtils.defaultString(uiCarrier.getClassNameText().getText());
+            String replaceFromClassName = StringUtils.defaultString(classNameText.getText());
             String repClassName = replaceFromClassName.substring(replaceFromClassName.lastIndexOf(".") + 1);
             String packagePath = replaceFromClassName.substring(0, replaceFromClassName.lastIndexOf("."));
 
-            uiCarrier.getDynamic_classPathText().setText(packagePath);
+            dynamic_classPathText.setText(packagePath);
 
             javaContent = javaContent.replaceAll(repClassName, className);
 
@@ -764,7 +796,7 @@ public class DebugMointerUI {
                 javaContent = FileUtil.loadFromFile(javaFile, "utf8");
             }
 
-            uiCarrier.getRunningClassArea().setText(javaContent);
+            runningClassArea.setText(javaContent);
             return true;
         } catch (Throwable ex) {
             System.out.println("silentMode =" + silentMode);
@@ -780,12 +812,12 @@ public class DebugMointerUI {
      */
     private void dynamicExecuteButtonAction() {
         try {
-            String javaContent = uiCarrier.getRunningClassArea().getText();
-            String packagePath = uiCarrier.getDynamic_classPathText().getText();
-            String className = uiCarrier.getDynamic_classNameText().getText();
-            File targetDir = new File(uiCarrier.getDynamic_classesDirText().getText());
-            File javaHome = new File(uiCarrier.getDynamic_javaHomeText().getText());
-            File mvnProjectDir = new File(uiCarrier.getDynamic_mvnProjectText().getText());
+            String javaContent = runningClassArea.getText();
+            String packagePath = dynamic_classPathText.getText();
+            String className = dynamic_classNameText.getText();
+            File targetDir = new File(dynamic_classesDirText.getText());
+            File javaHome = new File(dynamic_javaHomeText.getText());
+            File mvnProjectDir = new File(dynamic_mvnProjectText.getText());
 
             Validate.notEmpty(packagePath, "請先點選物件概觀/類別範例");
             Validate.notEmpty(className, "請先點選物件概觀/類別範例");
@@ -809,14 +841,14 @@ public class DebugMointerUI {
             String classPath = targetDir.getAbsolutePath();
             String methodName = StringUtils.defaultString(methodNameHandler.getExecuteMethodNameText());
 
-            textfieldSetValue(inst.uiCarrier.getClassNameText(), classNameZ);
-            textfieldSetValue(inst.uiCarrier.getClasspathText(), classPath);
-            textfieldSetValue(inst.uiCarrier.getExecuteMethodNameText(), methodNameHandler.replace(methodName));
+            textfieldSetValue(inst.classNameText, classNameZ);
+            textfieldSetValue(inst.classpathText, classPath);
+            textfieldSetValue(inst.executeMethodNameText, methodNameHandler.replace(methodName));
 
             getLogger().debug("##Plugin Info↓↓↓↓↓↓↓-----------------------------------");
             getLogger().debug(String.format("\t時間:%tY/%<tm/%<td %<tH:%<tM:%<tS", System.currentTimeMillis()));
-            getLogger().debug("\tclasspathText = " + inst.uiCarrier.getClasspathText().getText());
-            getLogger().debug("\tclassNameText = " + inst.uiCarrier.getClassNameText());
+            getLogger().debug("\tclasspathText = " + inst.classpathText.getText());
+            getLogger().debug("\tclassNameText = " + inst.classNameText.getText());
             getLogger().debug("\texecuteMethodNameText = " + inst.methodNameHandler.getExecuteMethodNameText());
             getLogger().debug("##Plugin Info↑↑↑↑↑↑↑-----------------------------------");
 
@@ -881,18 +913,30 @@ public class DebugMointerUI {
         if (!StringUtils.equals(value, val)) {
             inst.configProp.setProperty(key, value);
             try {
-                inst.configProp.store(new FileOutputStream(inst.configFile), uiCarrier.get_ui().getName());
+                inst.configProp.store(new FileOutputStream(inst.configFile), _ui.getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private static void textfieldSetValue(JTextFieldKeeper textField, String value) {
+    private static void textfieldSetValue(JTextField textField, String value) {
         if (StringUtils.isBlank(value)) {
             return;
         }
-        textField.setText(value);
+        final int RETRY = 20;
+        int time = 0;
+        do {
+            textField.setText(value);
+            if (time != 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                }
+            } else if (time > RETRY) {
+                break;
+            }
+        } while (!StringUtils.equals(textField.getText(), value));
     }
 
     private DebugMointerUI() {
@@ -901,12 +945,11 @@ public class DebugMointerUI {
 
     private void initGUI() {
         try {
-            uiCarrier.initUI();
-
-            uiCarrier.get_ui().setTitle("程式監控管理員 by gtu001");
+            _ui = new JDialog();
+            _ui.setTitle("程式監控管理員 by gtu001");
             BorderLayout thisLayout = new BorderLayout();
-            uiCarrier.get_ui().getContentPane().setLayout(thisLayout);
-            uiCarrier.get_ui().addWindowListener(new WindowAdapter() {
+            _ui.getContentPane().setLayout(thisLayout);
+            _ui.addWindowListener(new WindowAdapter() {
                 public void windowDeactivated(WindowEvent e) {
                     // 縮小視窗
                     if (isAutoDispose) {
@@ -916,36 +959,40 @@ public class DebugMointerUI {
                 }
             });
             {
-                uiCarrier.get_ui().getContentPane().add(uiCarrier.getjTabbedPane1(), BorderLayout.CENTER);
-                uiCarrier.getjTabbedPane1().addChangeListener(new ChangeListener() {
+                jTabbedPane1 = new JTabbedPane();
+                _ui.getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
+                jTabbedPane1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent evt) {
-                        if (uiCarrier.getjTabbedPane1().getSelectedIndex() == 4) {// 暫存區管理
-                            uiCarrier.getTempList().setModel(getTempModel());
-                        } else if (uiCarrier.getjTabbedPane1().getSelectedIndex() == 7) {// 動態類別
+                        if (jTabbedPane1.getSelectedIndex() == 4) {// 暫存區管理
+                            tempList.setModel(getTempModel());
+                        } else if (jTabbedPane1.getSelectedIndex() == 7) {// 動態類別
                             dynamicLoadingConfigAction(false);
                         }
-                        System.out.println("tabIndex : " + uiCarrier.getjTabbedPane1().getSelectedIndex());
+                        System.out.println("tabIndex : " + jTabbedPane1.getSelectedIndex());
                     }
                 });
                 {
+                    jPanel1 = new JPanel();
                     BorderLayout jPanel1Layout = new BorderLayout();
-                    uiCarrier.getjPanel1().setLayout(jPanel1Layout);
-                    uiCarrier.getjTabbedPane1().addTab("主物件", null, uiCarrier.getjPanel1(), null);
+                    jPanel1.setLayout(jPanel1Layout);
+                    jTabbedPane1.addTab("主物件", null, jPanel1, null);
                     {
-                        uiCarrier.getjPanel1().add(uiCarrier.getjScrollPane1(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane1().setPreferredSize(new java.awt.Dimension(648, 349));
+                        jScrollPane1 = new JScrollPane();
+                        jPanel1.add(jScrollPane1, BorderLayout.CENTER);
+                        jScrollPane1.setPreferredSize(new java.awt.Dimension(648, 349));
                         {
+                            compositeTree = new JTree();
                             DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
                             DefaultTreeModel model = new DefaultTreeModel(rootNode);
-                            uiCarrier.getCompositeTree().setModel(model);
-                            uiCarrier.getjScrollPane1().setViewportView(uiCarrier.getCompositeTree());
-                            uiCarrier.getCompositeTree().addKeyListener(new KeyAdapter() {
+                            compositeTree.setModel(model);
+                            jScrollPane1.setViewportView(compositeTree);
+                            compositeTree.addKeyListener(new KeyAdapter() {
                                 public void keyPressed(KeyEvent evt) {
                                     compositeTreeKeyPressed(evt);
                                 }
                             });
-                            uiCarrier.setJtreeUtil(JTreeUtil.newInstance(uiCarrier.getCompositeTree()));
-                            uiCarrier.getCompositeTree().addMouseListener(new MouseAdapter() {
+                            jtreeUtil = JTreeUtil.newInstance(compositeTree);
+                            compositeTree.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     compositeTreeMouseClicked(evt);
                                 }
@@ -953,92 +1000,90 @@ public class DebugMointerUI {
                         }
                     }
                     {
-                        uiCarrier.getjPanel1().add(uiCarrier.getjPanel3(), BorderLayout.NORTH);
-                        uiCarrier.getjPanel3().setPreferredSize(new java.awt.Dimension(648, 36));
+                        jPanel3 = new JPanel();
+                        jPanel1.add(jPanel3, BorderLayout.NORTH);
+                        jPanel3.setPreferredSize(new java.awt.Dimension(648, 36));
                         {
-                            uiCarrier.getjPanel3().add(uiCarrier.getjLabel1());
-                            uiCarrier.getjLabel1().setText("監控物件");
+                            jLabel1 = new JLabel();
+                            jPanel3.add(jLabel1);
+                            jLabel1.setText("\u76e3\u63a7\u7269\u4ef6");
                         }
                         {
                             DefaultComboBoxModel moniterComboBoxModel = new DefaultComboBoxModel();
-                            uiCarrier.getjPanel3().add(uiCarrier.getMoniterComboBox());
-                            uiCarrier.getMoniterComboBox().addActionListener(new ActionListener() {
+                            moniterComboBox = new JComboBox();
+                            jPanel3.add(moniterComboBox);
+                            moniterComboBox.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
                                     moniterComboBoxActionPerformed(evt);
                                 }
                             });
-                            uiCarrier.getMoniterComboBox().setModel(moniterComboBoxModel);
+                            moniterComboBox.setModel(moniterComboBoxModel);
                         }
                     }
                 }
                 {
+                    jPanel2 = new JPanel();
                     BorderLayout jPanel2Layout = new BorderLayout();
-                    uiCarrier.getjPanel2().setLayout(jPanel2Layout);
-                    uiCarrier.getjTabbedPane1().addTab("節點內容", null, uiCarrier.getjPanel2(), null);
+                    jPanel2.setLayout(jPanel2Layout);
+                    jTabbedPane1.addTab("節點內容", null, jPanel2, null);
                     {
+                        jPanel4 = new JPanel();
                         FlowLayout jPanel4Layout = new FlowLayout();
-                        uiCarrier.getjPanel4().setLayout(jPanel4Layout);
-                        uiCarrier.getjPanel2().add(uiCarrier.getjPanel4(), BorderLayout.NORTH);
-                        uiCarrier.getjPanel4().setPreferredSize(new java.awt.Dimension(648, 46));
-
-                        // 以指定類別顯示細節 ↓↓↓↓↓↓
-                        DefaultComboBoxModel nodeInfoComboBoxModel = new DefaultComboBoxModel();
-                        uiCarrier.getNodeInfoComboBox().setModel(nodeInfoComboBoxModel);
-                        uiCarrier.getNodeInfoComboBox().addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                Object clz = uiCarrier.getNodeInfoComboBox().getSelectedItem();
-                                if (!(clz instanceof Class)) {
-                                    return;
-                                }
-                                appendInChrildren(getSelectNodeObject(), null, (Class<?>) clz);
-                            }
-                        });
-
-                        uiCarrier.getjPanel4().add(uiCarrier.getNodeInfoComboBox());
-                        uiCarrier.getjPanel4().add(getIndicateNodeClassBtn());
+                        jPanel4.setLayout(jPanel4Layout);
+                        jPanel2.add(jPanel4, BorderLayout.NORTH);
+                        jPanel4.setPreferredSize(new java.awt.Dimension(648, 46));
+                        jPanel4.add(getNodeInfoComboBox());
+                        jPanel4.add(getIndicateNodeClassBtn());
                     }
                     {
-                        uiCarrier.getjPanel2().add(uiCarrier.getjScrollPane2(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane2().setPreferredSize(new java.awt.Dimension(648, 352));
+                        jScrollPane2 = new JScrollPane();
+                        jPanel2.add(jScrollPane2, BorderLayout.CENTER);
+                        jScrollPane2.setPreferredSize(new java.awt.Dimension(648, 352));
                         {
-                            uiCarrier.getjScrollPane2().setViewportView(uiCarrier.getCompositeTable());
-                            uiCarrier.getCompositeTable().setModel(JTableUtil.createModel(true, "名稱", "資料"));
+                            compositeTable = new JTable();
+                            jScrollPane2.setViewportView(compositeTable);
+                            compositeTable.setModel(JTableUtil.createModel(true, "名稱", "資料"));
                         }
                     }
                 }
                 {
-                    uiCarrier.getjTabbedPane1().addTab("監控條件", null, uiCarrier.getjPanel5(), null);
+                    jPanel5 = new JPanel();
+                    jTabbedPane1.addTab("監控條件", null, jPanel5, null);
                     BorderLayout jPanel5Layout = new BorderLayout();
-                    uiCarrier.getjPanel5().setLayout(jPanel5Layout);
+                    jPanel5.setLayout(jPanel5Layout);
                     {
+                        jPanel6 = new JPanel();
                         BorderLayout jPanel6Layout = new BorderLayout();
-                        uiCarrier.getjPanel6().setLayout(jPanel6Layout);
-                        uiCarrier.getjPanel5().add(uiCarrier.getjPanel6(), BorderLayout.NORTH);
-                        uiCarrier.getjPanel6().setPreferredSize(new java.awt.Dimension(648, 80));
+                        jPanel6.setLayout(jPanel6Layout);
+                        jPanel5.add(jPanel6, BorderLayout.NORTH);
+                        jPanel6.setPreferredSize(new java.awt.Dimension(648, 80));
                         {
-                            uiCarrier.getjPanel6().add(uiCarrier.getConditionActivationBtn(), BorderLayout.EAST);
+                            conditionActivationBtn = new JToggleButton();
+                            jPanel6.add(conditionActivationBtn, BorderLayout.EAST);
                             // default -------------------------
                             // conditionActivationBtn.setText("enable");
                             // conditionActivationBtn.setSelected(true);
                             // default -------------------------
-                            uiCarrier.getConditionActivationBtn().setPreferredSize(new java.awt.Dimension(100, 80));
-                            uiCarrier.getConditionActivationBtn().addFocusListener(new FocusAdapter() {
+                            conditionActivationBtn.setPreferredSize(new java.awt.Dimension(100, 80));
+                            conditionActivationBtn.addFocusListener(new FocusAdapter() {
                                 public void focusLost(FocusEvent evt) {
                                     updateCurrentMointerBreakPoint(evt);
                                 }
                             });
-                            uiCarrier.getConditionActivationBtn().addActionListener(new ActionListener() {
+                            conditionActivationBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
-                                    JCommonUtil.setJToggleButtonText(uiCarrier.getConditionActivationBtn(), new String[] { "enable", "disable" });
+                                    JCommonUtil.setJToggleButtonText(conditionActivationBtn, new String[] { "enable", "disable" });
                                 }
                             });
                         }
                         {
-                            uiCarrier.getjPanel6().add(uiCarrier.getjScrollPane3(), BorderLayout.CENTER);
-                            uiCarrier.getjScrollPane3().setPreferredSize(new java.awt.Dimension(548, 80));
+                            jScrollPane3 = new JScrollPane();
+                            jPanel6.add(jScrollPane3, BorderLayout.CENTER);
+                            jScrollPane3.setPreferredSize(new java.awt.Dimension(548, 80));
                             {
-                                uiCarrier.getjScrollPane3().setViewportView(uiCarrier.getConditionArea());
-                                uiCarrier.getConditionArea().addFocusListener(new FocusAdapter() {
+                                conditionArea = new JTextArea();
+                                jScrollPane3.setViewportView(conditionArea);
+                                conditionArea.addFocusListener(new FocusAdapter() {
                                     public void focusLost(FocusEvent evt) {
                                         updateCurrentMointerBreakPoint(evt);
                                     }
@@ -1047,32 +1092,37 @@ public class DebugMointerUI {
                         }
                     }
                     {
-                        uiCarrier.getjPanel5().add(uiCarrier.getjScrollPane4(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane4().setPreferredSize(new java.awt.Dimension(648, 325));
+                        jScrollPane4 = new JScrollPane();
+                        jPanel5.add(jScrollPane4, BorderLayout.CENTER);
+                        jScrollPane4.setPreferredSize(new java.awt.Dimension(648, 325));
                         {
-                            uiCarrier.getjScrollPane4().setViewportView(uiCarrier.getBreakpointTable());
-                            uiCarrier.getBreakpointTable().addMouseListener(new MouseAdapter() {
+                            breakpointTable = new JTable();
+                            jScrollPane4.setViewportView(breakpointTable);
+                            breakpointTable.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     breakpointTableMouseClicked(evt);
                                 }
                             });
                             DefaultTableModel model = JTableUtil.createModel(true, "程式行數", "條件", "符合", "啟用");
-                            uiCarrier.getBreakpointTable().setModel(model);
+                            breakpointTable.setModel(model);
                         }
                     }
                 }
                 {
+                    jPanel7 = new JPanel();
                     BorderLayout jPanel7Layout = new BorderLayout();
-                    uiCarrier.getjPanel7().setLayout(jPanel7Layout);
-                    uiCarrier.getjTabbedPane1().addTab("變數", null, uiCarrier.getjPanel7(), null);
+                    jPanel7.setLayout(jPanel7Layout);
+                    jTabbedPane1.addTab("變數", null, jPanel7, null);
                     {
-                        uiCarrier.getjPanel7().add(uiCarrier.getjScrollPane5(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane5().setPreferredSize(new java.awt.Dimension(648, 405));
+                        jScrollPane5 = new JScrollPane();
+                        jPanel7.add(jScrollPane5, BorderLayout.CENTER);
+                        jScrollPane5.setPreferredSize(new java.awt.Dimension(648, 405));
                         {
-                            uiCarrier.getjScrollPane5().setViewportView(uiCarrier.getParameterTable());
+                            parameterTable = new JTable();
+                            jScrollPane5.setViewportView(parameterTable);
                             DefaultTableModel model = JTableUtil.createModel(false, "變數", "值");
-                            uiCarrier.getParameterTable().setModel(model);
-                            uiCarrier.getParameterTable().addFocusListener(new FocusAdapter() {
+                            parameterTable.setModel(model);
+                            parameterTable.addFocusListener(new FocusAdapter() {
                                 public void focusGained(FocusEvent evt) {
                                     updateParameter(evt);
                                 }
@@ -1081,7 +1131,7 @@ public class DebugMointerUI {
                                     updateParameter(evt);
                                 }
                             });
-                            uiCarrier.getParameterTable().getTableHeader().addMouseListener(new MouseAdapter() {
+                            parameterTable.getTableHeader().addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     final JMenuItem importItem = new JMenuItem("匯入參數設定");
                                     importItem.addActionListener(new ActionListener() {
@@ -1092,7 +1142,7 @@ public class DebugMointerUI {
                                                     JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
                                                     return;
                                                 }
-                                                DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
+                                                DefaultTableModel model = (DefaultTableModel) parameterTable.getModel();
                                                 Properties prop = new Properties();
                                                 prop.load(new FileInputStream(file));
                                                 for (Object okey : prop.keySet()) {
@@ -1113,10 +1163,10 @@ public class DebugMointerUI {
                                                     JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
                                                     return;
                                                 }
-                                                DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
+                                                DefaultTableModel model = (DefaultTableModel) parameterTable.getModel();
                                                 Properties prop = new Properties();
                                                 for (int ii = 0; ii < model.getRowCount(); ii++) {
-                                                    String val = (String) uiCarrier.getParameterTable().getValueAt(ii, 0);
+                                                    String val = (String) parameterTable.getValueAt(ii, 0);
                                                     prop.put(val, "");
                                                 }
                                                 prop.store(new FileOutputStream(file), "參數黨");
@@ -1130,7 +1180,7 @@ public class DebugMointerUI {
                                     cleanAllItem.addActionListener(new ActionListener() {
                                         public void actionPerformed(ActionEvent e) {
                                             try {
-                                                uiCarrier.getParameterTable().setModel(JTableUtil.createModel(false, "變數", "值"));
+                                                parameterTable.setModel(JTableUtil.createModel(false, "變數", "值"));
                                             } catch (Exception ex) {
                                                 JCommonUtil.handleException(ex);
                                                 showErrorLogInArea(ex);
@@ -1138,8 +1188,8 @@ public class DebugMointerUI {
                                         }
                                     });
 
-                                    JTableUtil util = JTableUtil.newInstance(uiCarrier.getParameterTable());
-                                    JPopupMenuUtil.newInstance(uiCarrier.getParameterTable()).applyEvent(evt)//
+                                    JTableUtil util = JTableUtil.newInstance(parameterTable);
+                                    JPopupMenuUtil.newInstance(parameterTable).applyEvent(evt)//
                                             .addJMenuItem(util.jMenuItem_addRow(false, null))//
                                             .addJMenuItem(importItem)//
                                             .addJMenuItem(exportItem)//
@@ -1147,10 +1197,10 @@ public class DebugMointerUI {
                                             .show();
                                 }
                             });
-                            uiCarrier.getParameterTable().addMouseListener(new MouseAdapter() {
+                            parameterTable.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
-                                    JTableUtil util = JTableUtil.newInstance(uiCarrier.getParameterTable());
-                                    JPopupMenuUtil.newInstance(uiCarrier.getParameterTable()).applyEvent(evt)//
+                                    JTableUtil util = JTableUtil.newInstance(parameterTable);
+                                    JPopupMenuUtil.newInstance(parameterTable).applyEvent(evt)//
                                             .addJMenuItem(util.jMenuItem_addRow(false, null))//
                                             .addJMenuItem(util.jMenuItem_removeRow(null))//
                                             .show();
@@ -1160,62 +1210,49 @@ public class DebugMointerUI {
                     }
                 }
                 {
+                    jPanel9 = new JPanel();
                     BorderLayout jPanel9Layout = new BorderLayout();
-                    uiCarrier.getjPanel9().setLayout(jPanel9Layout);
-                    uiCarrier.getjTabbedPane1().addTab("暫存區管理", null, uiCarrier.getjPanel9(), null);
+                    jPanel9.setLayout(jPanel9Layout);
+                    jTabbedPane1.addTab("暫存區管理", null, jPanel9, null);
                     {
+                        jPanel10 = new JPanel();
                         FlowLayout jPanel10Layout = new FlowLayout();
-                        uiCarrier.getjPanel9().add(uiCarrier.getjPanel10(), BorderLayout.NORTH);
-                        uiCarrier.getjPanel10().setPreferredSize(new java.awt.Dimension(648, 60));
-                        uiCarrier.getjPanel10().setLayout(jPanel10Layout);
+                        jPanel9.add(jPanel10, BorderLayout.NORTH);
+                        jPanel10.setPreferredSize(new java.awt.Dimension(648, 60));
+                        jPanel10.setLayout(jPanel10Layout);
                         {
-                            uiCarrier.getjPanel10().add(uiCarrier.getjLabel2());
-                            uiCarrier.getjLabel2().setText("\u5efa\u7acb\u57fa\u672c\u7269\u4ef6");
+                            jLabel2 = new JLabel();
+                            jPanel10.add(jLabel2);
+                            jLabel2.setText("\u5efa\u7acb\u57fa\u672c\u7269\u4ef6");
                         }
                         {
                             DefaultComboBoxModel tempValueComboxModel = new DefaultComboBoxModel();
                             for (TempValueEnum e : TempValueEnum.values()) {
                                 tempValueComboxModel.addElement(e);
                             }
-                            uiCarrier.getjPanel10().add(uiCarrier.getTempValueCombox());
-                            uiCarrier.getTempValueCombox().setModel(tempValueComboxModel);
+                            tempValueCombox = new JComboBox();
+                            jPanel10.add(tempValueCombox);
+                            tempValueCombox.setModel(tempValueComboxModel);
                         }
                         {
-                            uiCarrier.getjPanel10().add(uiCarrier.getTempValueSetText());
-                            uiCarrier.getTempValueSetText().setPreferredSize(new java.awt.Dimension(346, 24));
+                            tempValueSetText = new JTextField();
+                            jPanel10.add(tempValueSetText);
+                            tempValueSetText.setPreferredSize(new java.awt.Dimension(346, 24));
                         }
                         {
-                            uiCarrier.getjPanel10().add(uiCarrier.getTempValueSetBtn());
-
-                            DefaultComboBoxModel tempObjClassComboxModel = new DefaultComboBoxModel();
-                            uiCarrier.getTempObjClassCombox().addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    try {
-                                        Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
-                                        if (object == null) {
-                                            JCommonUtil._jOptionPane_showMessageDialog_info("請選擇暫存區物件");
-                                            return;
-                                        }
-                                        showInfoAtTempTable(object, (Class<?>) uiCarrier.getTempObjClassCombox().getSelectedItem());
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex, false);
-                                        showErrorLogInArea(ex);
-                                    }
-                                }
-                            });
-                            uiCarrier.getTempObjClassCombox().setModel(tempObjClassComboxModel);
-
-                            uiCarrier.getjPanel10().add(uiCarrier.getTempObjClassCombox());
-                            uiCarrier.getTempValueSetBtn().setText("新增至暫存區");// 設定至當前
-                            uiCarrier.getTempValueSetBtn().addActionListener(new ActionListener() {
+                            tempValueSetBtn = new JButton();
+                            jPanel10.add(tempValueSetBtn);
+                            jPanel10.add(getTempObjClassCombox());
+                            tempValueSetBtn.setText("新增至暫存區");// 設定至當前
+                            tempValueSetBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
                                     try {
                                         // int pos =
                                         // tempList.getSelectedIndex();
                                         // Validate.isTrue(pos != -1, "未選擇項目!");
-                                        Validate.notEmpty(uiCarrier.getTempValueSetText().getText());
-                                        String tempStr = uiCarrier.getTempValueSetText().getText();
-                                        TempValueEnum tempValueEnum = (TempValueEnum) uiCarrier.getTempValueCombox().getSelectedItem();
+                                        Validate.notEmpty(tempValueSetText.getText());
+                                        String tempStr = tempValueSetText.getText();
+                                        TempValueEnum tempValueEnum = (TempValueEnum) tempValueCombox.getSelectedItem();
                                         // getTempModel().setElementAt(tempValueEnum.applyString(tempStr),
                                         // pos);
                                         appendToTempModel(tempValueEnum.applyString(tempStr), 'i');
@@ -1228,18 +1265,20 @@ public class DebugMointerUI {
                         }
                     }
                     {
-                        uiCarrier.getjPanel9().add(uiCarrier.getjScrollPane7(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane7().setPreferredSize(new java.awt.Dimension(648, 345));
+                        jScrollPane7 = new JScrollPane();
+                        jPanel9.add(jScrollPane7, BorderLayout.CENTER);
+                        jScrollPane7.setPreferredSize(new java.awt.Dimension(648, 345));
                         {
-                            uiCarrier.getjScrollPane7().setViewportView(uiCarrier.getTempValueTable());
-                            uiCarrier.getTempValueTable().addMouseListener(new MouseAdapter() {
+                            tempValueTable = new JTable();
+                            jScrollPane7.setViewportView(tempValueTable);
+                            tempValueTable.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     try {
                                         if (evt.getButton() != MouseEvent.BUTTON1 || evt.getClickCount() != 2) {
                                             return;
                                         }
-                                        DefaultTableModel model = JTableUtil.newInstance(uiCarrier.getTempValueTable()).getModel();
-                                        Object value = model.getValueAt(JTableUtil.newInstance(uiCarrier.getTempValueTable()).getSelectedRow(), 0);
+                                        DefaultTableModel model = JTableUtil.newInstance(tempValueTable).getModel();
+                                        Object value = model.getValueAt(JTableUtil.newInstance(tempValueTable).getSelectedRow(), 0);
                                         if (value instanceof JObject) {
                                             JObject obj = (JObject) value;
                                             if (obj.field != null) {
@@ -1260,27 +1299,29 @@ public class DebugMointerUI {
                                     }
                                 }
                             });
-                            uiCarrier.getTempValueTable().setModel(JTableUtil.createModel(false, "變數", "值"));
+                            tempValueTable.setModel(JTableUtil.createModel(false, "變數", "值"));
                         }
                     }
                     {
-                        uiCarrier.getjPanel9().add(uiCarrier.getjScrollPane8(), BorderLayout.EAST);
-                        uiCarrier.getjScrollPane8().setPreferredSize(new java.awt.Dimension(154, 345));
+                        jScrollPane8 = new JScrollPane();
+                        jPanel9.add(jScrollPane8, BorderLayout.EAST);
+                        jScrollPane8.setPreferredSize(new java.awt.Dimension(154, 345));
                         {
-                            uiCarrier.getjScrollPane8().setViewportView(uiCarrier.getTempList());
-                            uiCarrier.getTempList().setModel(getTempModel());
-                            uiCarrier.getTempList().addMouseListener(new MouseAdapter() {
+                            tempList = new JList();
+                            jScrollPane8.setViewportView(tempList);
+                            tempList.setModel(getTempModel());
+                            tempList.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     try {
                                         if (evt.getButton() == MouseEvent.BUTTON1) {
-                                            Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
+                                            Object object = JListUtil.getLeadSelectionObject(tempList);
                                             showInfoAtTempTable(object, null);
                                         } else if (evt.getButton() == MouseEvent.BUTTON3) {
-                                            JPopupMenuUtil.newInstance(uiCarrier.getTempList()).applyEvent(evt)//
+                                            JPopupMenuUtil.newInstance(tempList).applyEvent(evt)//
                                                     .addJMenuItem("刪除選擇項目", new ActionListener() {
                                                         @Override
                                                         public void actionPerformed(ActionEvent e) {
-                                                            Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
+                                                            Object object = JListUtil.getLeadSelectionObject(tempList);
                                                             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(//
                                                                     ReflectionToStringBuilder.toString(object, ToStringStyle.MULTI_LINE_STYLE) + //
                                                             "\n是否要刪除?", "將選擇項目刪除");
@@ -1292,7 +1333,7 @@ public class DebugMointerUI {
                                                     }).addJMenuItem("複製選擇項目並新增", new ActionListener() {
                                                         @Override
                                                         public void actionPerformed(ActionEvent e) {
-                                                            Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
+                                                            Object object = JListUtil.getLeadSelectionObject(tempList);
                                                             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(//
                                                                     ReflectionToStringBuilder.toString(object, ToStringStyle.MULTI_LINE_STYLE) + //
                                                             "\n是否要複製後新增這個項目?", "複製後新增項目");
@@ -1305,7 +1346,7 @@ public class DebugMointerUI {
                                                     }).addJMenuItem("設定為回傳值", new ActionListener() {
                                                         @Override
                                                         public void actionPerformed(ActionEvent e) {
-                                                            Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
+                                                            Object object = JListUtil.getLeadSelectionObject(tempList);
                                                             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(//
                                                                     ReflectionToStringBuilder.toString(object, ToStringStyle.MULTI_LINE_STYLE) + //
                                                             "\n是否要設定?", "將選擇項目回傳");
@@ -1322,14 +1363,14 @@ public class DebugMointerUI {
                                     }
                                 }
                             });
-                            uiCarrier.getTempList().addKeyListener(new KeyAdapter() {
+                            tempList.addKeyListener(new KeyAdapter() {
                                 public void keyPressed(KeyEvent evt) {
                                     // JListUtil.newInstance(tempList).defaultJListKeyPressed(evt);
-                                    Object objects[] = uiCarrier.getTempList().getSelectedValues();
+                                    Object objects[] = tempList.getSelectedValues();
                                     if (objects == null || objects.length == 0) {
                                         return;
                                     }
-                                    DefaultListModel model = (DefaultListModel) uiCarrier.getTempList().getModel();
+                                    DefaultListModel model = (DefaultListModel) tempList.getModel();
                                     int lastIndex = model.getSize() - 1;
                                     Object swap = null;
                                     for (Object current : objects) {
@@ -1361,56 +1402,62 @@ public class DebugMointerUI {
                     }
                 }
                 {
+                    jPanel11 = new JPanel();
                     BorderLayout jPanel11Layout = new BorderLayout();
-                    uiCarrier.getjPanel11().setLayout(jPanel11Layout);
-                    uiCarrier.getjTabbedPane1().addTab("掛載類別", null, uiCarrier.getjPanel11(), null);
+                    jPanel11.setLayout(jPanel11Layout);
+                    jTabbedPane1.addTab("掛載類別", null, jPanel11, null);
                     {
-                        uiCarrier.getjPanel11().add(uiCarrier.getjPanel12(), BorderLayout.NORTH);
-                        uiCarrier.getjPanel12().setPreferredSize(new java.awt.Dimension(648, 95));
+                        jPanel12 = new JPanel();
+                        jPanel11.add(jPanel12, BorderLayout.NORTH);
+                        jPanel12.setPreferredSize(new java.awt.Dimension(648, 95));
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getjLabel3());
-                            uiCarrier.getjLabel3().setText("\u8a2d\u5b9aclasspath");
+                            jLabel3 = new JLabel();
+                            jPanel12.add(jLabel3);
+                            jLabel3.setText("\u8a2d\u5b9aclasspath");
                         }
                         {
-                            JCommonUtil.jTextFieldSetFilePathMouseEvent(uiCarrier.getClasspathText().get(), true);
-                            uiCarrier.getjPanel12().add(uiCarrier.getClasspathText().get());
-
-                            uiCarrier.getTempModelCheckBox().setText("\u66ab\u5b58\u5340\u6aa2\u67e5");
-                            uiCarrier.getTempModelCheckBox().setSelected(true);
-
-                            uiCarrier.getjPanel12().add(uiCarrier.getTempModelCheckBox());
-                            uiCarrier.getClasspathText().get().setPreferredSize(new java.awt.Dimension(526, 24));
+                            classpathText = new JTextField();
+                            JCommonUtil.jTextFieldSetFilePathMouseEvent(classpathText, true);
+                            jPanel12.add(classpathText);
+                            jPanel12.add(getTempModelCheckBox());
+                            classpathText.setPreferredSize(new java.awt.Dimension(526, 24));
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getjLabel4());
-                            uiCarrier.getjLabel4().setText("\u985e\u5225\u540d\u7a31");
+                            jLabel4 = new JLabel();
+                            jPanel12.add(jLabel4);
+                            jLabel4.setText("\u985e\u5225\u540d\u7a31");
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getClassNameText().get());
-                            uiCarrier.getClassNameText().get().setPreferredSize(new java.awt.Dimension(461, 24));
+                            classNameText = new JTextField();
+                            jPanel12.add(classNameText);
+                            classNameText.setPreferredSize(new java.awt.Dimension(461, 24));
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getImportClassBtn());
-                            uiCarrier.getImportClassBtn().setText("\u8f09\u5165\u985e\u5225");
-                            uiCarrier.getImportClassBtn().addActionListener(new ActionListener() {
+                            importClassBtn = new JButton();
+                            jPanel12.add(importClassBtn);
+                            importClassBtn.setText("\u8f09\u5165\u985e\u5225");
+                            importClassBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
                                     importClassBtnActionPerformed(false);
                                 }
                             });
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getjLabel5());
-                            uiCarrier.getjLabel5().setText("\u57f7\u884cmethod");
-                            uiCarrier.getjLabel5().setPreferredSize(new java.awt.Dimension(85, 17));
+                            jLabel5 = new JLabel();
+                            jPanel12.add(jLabel5);
+                            jLabel5.setText("\u57f7\u884cmethod");
+                            jLabel5.setPreferredSize(new java.awt.Dimension(85, 17));
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getExecuteMethodNameText().get());
-                            uiCarrier.getExecuteMethodNameText().get().setPreferredSize(new java.awt.Dimension(424, 24));
+                            executeMethodNameText = new JTextField();
+                            jPanel12.add(executeMethodNameText);
+                            executeMethodNameText.setPreferredSize(new java.awt.Dimension(424, 24));
                         }
                         {
-                            uiCarrier.getjPanel12().add(uiCarrier.getExecuteMethodBtn());
-                            uiCarrier.getExecuteMethodBtn().setText("\u57f7\u884c");
-                            uiCarrier.getExecuteMethodBtn().addActionListener(new ActionListener() {
+                            executeMethodBtn = new JButton();
+                            jPanel12.add(executeMethodBtn);
+                            executeMethodBtn.setText("\u57f7\u884c");
+                            executeMethodBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
                                     executeImportClass(false, true);
                                 }
@@ -1418,16 +1465,19 @@ public class DebugMointerUI {
                         }
                     }
                     {
+                        jPanel16 = new JPanel();
                         BorderLayout jPanel16Layout = new BorderLayout();
-                        uiCarrier.getjPanel16().setLayout(jPanel16Layout);
-                        uiCarrier.getjPanel11().add(uiCarrier.getjPanel16(), BorderLayout.CENTER);
+                        jPanel16.setLayout(jPanel16Layout);
+                        jPanel11.add(jPanel16, BorderLayout.CENTER);
                         {
-                            uiCarrier.getjPanel16().add(uiCarrier.getjScrollPane12(), BorderLayout.CENTER);
-                            uiCarrier.getjScrollPane12().setPreferredSize(new java.awt.Dimension(648, 310));
+                            jScrollPane12 = new JScrollPane();
+                            jPanel16.add(jScrollPane12, BorderLayout.CENTER);
+                            jScrollPane12.setPreferredSize(new java.awt.Dimension(648, 310));
                             {
                                 ListModel exeucteListModel = new DefaultListModel();
-                                uiCarrier.getjScrollPane12().setViewportView(uiCarrier.getExecuteList().get());
-                                uiCarrier.getExecuteList().get().addFocusListener(new FocusAdapter() {
+                                executeList = new JList();
+                                jScrollPane12.setViewportView(executeList);
+                                executeList.addFocusListener(new FocusAdapter() {
                                     public void focusLost(FocusEvent evt) {
                                         try {
                                             saveAndAddExecuteConfig(false);
@@ -1437,15 +1487,15 @@ public class DebugMointerUI {
                                         }
                                     }
                                 });
-                                uiCarrier.getExecuteList().get().setModel(exeucteListModel);
-                                uiCarrier.getExecuteList().get().addMouseListener(new MouseAdapter() {
+                                executeList.setModel(exeucteListModel);
+                                executeList.addMouseListener(new MouseAdapter() {
                                     public void mouseClicked(MouseEvent evt) {
-                                        ExecuteConfig exe = (ExecuteConfig) JListUtil.getLeadSelectionObject(uiCarrier.getExecuteList().get());
+                                        ExecuteConfig exe = (ExecuteConfig) JListUtil.getLeadSelectionObject(executeList);
                                         if (exe == null) {
                                             return;
                                         }
-                                        uiCarrier.getClassNameText().setText(StringUtils.trimToEmpty(exe.className));
-                                        uiCarrier.getClasspathText().setText(StringUtils.trimToEmpty(exe.classPath));
+                                        classNameText.setText(StringUtils.trimToEmpty(exe.className));
+                                        classpathText.setText(StringUtils.trimToEmpty(exe.classPath));
                                         methodNameHandler.setExecuteMethodNameText(StringUtils.trimToEmpty(exe.executeMethodName));
 
                                         if (evt.getClickCount() == 2 && evt.getButton() == MouseEvent.BUTTON1) {
@@ -1455,9 +1505,9 @@ public class DebugMointerUI {
                                         }
                                     }
                                 });
-                                uiCarrier.getExecuteList().get().addKeyListener(new KeyAdapter() {
+                                executeList.addKeyListener(new KeyAdapter() {
                                     public void keyPressed(KeyEvent evt) {
-                                        JListUtil.newInstance(uiCarrier.getExecuteList().get()).defaultJListKeyPressed(evt);
+                                        JListUtil.newInstance(executeList).defaultJListKeyPressed(evt);
                                     }
                                 });
                             }
@@ -1465,25 +1515,31 @@ public class DebugMointerUI {
                     }
                 }
                 {
+                    jPanel13 = new JPanel();
                     BorderLayout jPanel13Layout = new BorderLayout();
-                    uiCarrier.getjPanel13().setLayout(jPanel13Layout);
-                    uiCarrier.getjTabbedPane1().addTab("物件概觀", null, uiCarrier.getjPanel13(), null);
+                    jPanel13.setLayout(jPanel13Layout);
+                    jTabbedPane1.addTab("物件概觀", null, jPanel13, null);
                     {
-                        uiCarrier.getjPanel13().add(uiCarrier.getjScrollPane9(), BorderLayout.CENTER);
-                        uiCarrier.getjScrollPane9().setPreferredSize(new java.awt.Dimension(648, 405));
+                        jScrollPane9 = new JScrollPane();
+                        jPanel13.add(jScrollPane9, BorderLayout.CENTER);
+                        jScrollPane9.setPreferredSize(new java.awt.Dimension(648, 405));
                         {
-                            uiCarrier.getjScrollPane9().setViewportView(uiCarrier.getjTabbedPane2());
+                            jTabbedPane2 = new JTabbedPane();
+                            jScrollPane9.setViewportView(jTabbedPane2);
                             {
+                                jPanel14 = new JPanel();
                                 BorderLayout jPanel14Layout = new BorderLayout();
-                                uiCarrier.getjPanel14().setLayout(jPanel14Layout);
-                                uiCarrier.getjTabbedPane2().addTab("主物件", null, uiCarrier.getjPanel14(), null);
+                                jPanel14.setLayout(jPanel14Layout);
+                                jTabbedPane2.addTab("主物件", null, jPanel14, null);
                                 {
-                                    uiCarrier.getjPanel14().add(uiCarrier.getjScrollPane10(), BorderLayout.CENTER);
-                                    uiCarrier.getjScrollPane10().setPreferredSize(new java.awt.Dimension(640, 373));
+                                    jScrollPane10 = new JScrollPane();
+                                    jPanel14.add(jScrollPane10, BorderLayout.CENTER);
+                                    jScrollPane10.setPreferredSize(new java.awt.Dimension(640, 373));
                                     {
-                                        uiCarrier.getjScrollPane10().setViewportView(uiCarrier.getShowInfoArea());
-                                        uiCarrier.getShowInfoArea().setEditable(false);
-                                        uiCarrier.getShowInfoArea().addMouseListener(new MouseAdapter() {
+                                        showInfoArea = new JEditorPane();
+                                        jScrollPane10.setViewportView(showInfoArea);
+                                        showInfoArea.setEditable(false);
+                                        showInfoArea.addMouseListener(new MouseAdapter() {
                                             public void mouseClicked(MouseEvent evt) {
                                                 showInfoAreaMouseClicked(evt);
                                             }
@@ -1492,46 +1548,56 @@ public class DebugMointerUI {
                                 }
                             }
                             {
+                                jPanel15 = new JPanel();
                                 BorderLayout jPanel15Layout = new BorderLayout();
-                                uiCarrier.getjPanel15().setLayout(jPanel15Layout);
-                                uiCarrier.getjTabbedPane2().addTab("變數", null, uiCarrier.getjPanel15(), null);
-                                uiCarrier.getjTabbedPane2().addTab("呼叫順序", null, inst.uiCarrier.getCallStackArea(), null);
-                                uiCarrier.getjTabbedPane2().addTab("錯誤Log", null, inst.uiCarrier.getErrorLogArea(), null);
+                                jPanel15.setLayout(jPanel15Layout);
+                                jTabbedPane2.addTab("變數", null, jPanel15, null);
+                                jTabbedPane2.addTab("呼叫順序", null, getCallStackArea(), null);
+                                jTabbedPane2.addTab("錯誤Log", null, getErrorLogArea(), null);
                                 {
-                                    uiCarrier.getjPanel15().add(uiCarrier.getjScrollPane11(), BorderLayout.CENTER);
-                                    uiCarrier.getjScrollPane11().setPreferredSize(new java.awt.Dimension(640, 373));
+                                    jScrollPane11 = new JScrollPane();
+                                    jPanel15.add(jScrollPane11, BorderLayout.CENTER);
+                                    jScrollPane11.setPreferredSize(new java.awt.Dimension(640, 373));
                                     {
-                                        uiCarrier.getjScrollPane11().setViewportView(uiCarrier.getShowInfoArea2());
-                                        uiCarrier.getShowInfoArea2().setEditable(false);
+                                        showInfoArea2 = new JEditorPane();
+                                        jScrollPane11.setViewportView(showInfoArea2);
+                                        showInfoArea2.setEditable(false);
                                         {
-                                            uiCarrier.getjTabbedPane2().addTab("類別範例", null, uiCarrier.getPanel(), null);
-                                            uiCarrier.getPanel().setLayout(new BorderLayout(0, 0));
+                                            panel = new JPanel();
+                                            jTabbedPane2.addTab("類別範例", null, panel, null);
+                                            panel.setLayout(new BorderLayout(0, 0));
                                             {
-                                                uiCarrier.getPanel().add(uiCarrier.getScrollPane(), BorderLayout.CENTER);
+                                                scrollPane = new JScrollPane();
+                                                panel.add(scrollPane, BorderLayout.CENTER);
                                                 {
-                                                    uiCarrier.getScrollPane().setViewportView(uiCarrier.getDynamicClassArea());
+                                                    dynamicClassArea = new JTextArea();
+                                                    scrollPane.setViewportView(dynamicClassArea);
                                                 }
                                             }
                                         }
                                         {
-                                            uiCarrier.getjTabbedPane1().addTab("動態類別", null, uiCarrier.getPanel_1(), null);
-                                            uiCarrier.getPanel_1().setLayout(new BorderLayout(0, 0));
+                                            panel_1 = new JPanel();
+                                            jTabbedPane1.addTab("動態類別", null, panel_1, null);
+                                            panel_1.setLayout(new BorderLayout(0, 0));
                                             {
-                                                uiCarrier.getPanel_2().setPreferredSize(new Dimension(0, 50));
-                                                uiCarrier.getPanel_1().add(uiCarrier.getPanel_2(), BorderLayout.NORTH);
-                                                uiCarrier.getPanel_2().setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+                                                panel_2 = new JPanel();
+                                                panel_2.setPreferredSize(new Dimension(0, 50));
+                                                panel_1.add(panel_2, BorderLayout.NORTH);
+                                                panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
                                                 {
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getLblJavahome());
+                                                    lblJavahome = new JLabel("JAVA_HOME");
+                                                    panel_2.add(lblJavahome);
                                                 }
                                                 {
-                                                    uiCarrier.getDynamic_javaHomeText().setColumns(20);
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_javaHomeText());
-                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(uiCarrier.getDynamic_javaHomeText(), true);
-                                                    uiCarrier.getDynamic_javaHomeText().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                                    dynamic_javaHomeText = new JTextField();
+                                                    dynamic_javaHomeText.setColumns(20);
+                                                    panel_2.add(dynamic_javaHomeText);
+                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(dynamic_javaHomeText, true);
+                                                    dynamic_javaHomeText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                                                         @Override
                                                         public void process(DocumentEvent event) {
                                                             final String DYNAMIC_JAVA_HOME_KEY = "dynamic_java_home";
-                                                            File dir = new File(uiCarrier.getDynamic_javaHomeText().getText());
+                                                            File dir = new File(dynamic_javaHomeText.getText());
                                                             if (dir.exists() && dir.isDirectory()) {
                                                                 setConfigPropProperties(DYNAMIC_JAVA_HOME_KEY, dir.getAbsolutePath());
                                                             }
@@ -1539,18 +1605,19 @@ public class DebugMointerUI {
                                                     }));
                                                 }
                                                 {
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getLblMvn());
+                                                    lblMvn = new JLabel("mvn專案目錄");
+                                                    panel_2.add(lblMvn);
                                                 }
                                                 {
-
-                                                    uiCarrier.getDynamic_mvnProjectText().setColumns(20);
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_mvnProjectText());
-                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(uiCarrier.getDynamic_mvnProjectText(), true);
-                                                    uiCarrier.getDynamic_mvnProjectText().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                                    dynamic_mvnProjectText = new JTextField();
+                                                    dynamic_mvnProjectText.setColumns(20);
+                                                    panel_2.add(dynamic_mvnProjectText);
+                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(dynamic_mvnProjectText, true);
+                                                    dynamic_mvnProjectText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                                                         @Override
                                                         public void process(DocumentEvent event) {
                                                             final String DYNAMIC_MVN_PROJECT_DIR_KEY = "dynamic_mvn_project_dir";
-                                                            File dir = new File(uiCarrier.getDynamic_mvnProjectText().getText());
+                                                            File dir = new File(dynamic_mvnProjectText.getText());
                                                             if (dir.exists() && dir.isDirectory()) {
                                                                 setConfigPropProperties(DYNAMIC_MVN_PROJECT_DIR_KEY, dir.getAbsolutePath());
                                                             }
@@ -1558,17 +1625,19 @@ public class DebugMointerUI {
                                                     }));
                                                 }
                                                 {
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getLblClasses());
+                                                    lblClasses = new JLabel("classes目錄");
+                                                    panel_2.add(lblClasses);
                                                 }
                                                 {
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_classesDirText());
-                                                    uiCarrier.getDynamic_classesDirText().setColumns(20);
-                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(uiCarrier.getDynamic_classesDirText(), true);
-                                                    uiCarrier.getDynamic_classesDirText().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                                    dynamic_classesDirText = new JTextField();
+                                                    panel_2.add(dynamic_classesDirText);
+                                                    dynamic_classesDirText.setColumns(20);
+                                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(dynamic_classesDirText, true);
+                                                    dynamic_classesDirText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                                                         @Override
                                                         public void process(DocumentEvent event) {
                                                             final String DYNAMIC_TARGET_DIR_KEY = "dynamic_target_dir";
-                                                            File dir = new File(uiCarrier.getDynamic_classesDirText().getText());
+                                                            File dir = new File(dynamic_classesDirText.getText());
                                                             if (dir.exists() && dir.isDirectory()) {
                                                                 setConfigPropProperties(DYNAMIC_TARGET_DIR_KEY, dir.getAbsolutePath());
                                                             }
@@ -1576,38 +1645,44 @@ public class DebugMointerUI {
                                                     }));
                                                 }
                                                 {
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getLblClass());
+                                                    lblClass = new JLabel("class名");
+                                                    panel_2.add(lblClass);
                                                 }
                                                 {
-                                                    uiCarrier.getDynamic_classPathText().setEditable(false);
-                                                    uiCarrier.getDynamic_classPathText().setColumns(20);
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_classPathText());
+                                                    dynamic_classPathText = new JTextField();
+                                                    dynamic_classPathText.setEditable(false);
+                                                    dynamic_classPathText.setColumns(20);
+                                                    panel_2.add(dynamic_classPathText);
                                                 }
                                                 {
-                                                    uiCarrier.getDynamic_classNameText().setEditable(false);
-                                                    uiCarrier.getDynamic_classNameText().setColumns(20);
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_classNameText());
+                                                    dynamic_classNameText = new JTextField();
+                                                    dynamic_classNameText.setEditable(false);
+                                                    dynamic_classNameText.setColumns(20);
+                                                    panel_2.add(dynamic_classNameText);
                                                 }
                                                 {
-                                                    uiCarrier.getDynamic_executeBtn().addActionListener(new ActionListener() {
+                                                    dynamic_executeBtn = new JButton("執行");
+                                                    dynamic_executeBtn.addActionListener(new ActionListener() {
                                                         public void actionPerformed(ActionEvent paramActionEvent) {
                                                             dynamicExecuteButtonAction();
                                                         }
                                                     });
-                                                    uiCarrier.getPanel_2().add(uiCarrier.getDynamic_executeBtn());
+                                                    panel_2.add(dynamic_executeBtn);
                                                 }
                                             }
                                             {
-                                                uiCarrier.getPanel_1().add(uiCarrier.getPanel_3(), BorderLayout.SOUTH);
+                                                panel_3 = new JPanel();
+                                                panel_1.add(panel_3, BorderLayout.SOUTH);
                                             }
                                             {
-                                                uiCarrier.getRunningClassArea().setFont(new Font("微軟正黑體", Font.PLAIN, 13));
-                                                JScrollPane jScrollPane1_1 = uiCarrier.createJScrollPane();
-                                                uiCarrier.getPanel_1().add(jScrollPane1_1, BorderLayout.CENTER);
-                                                jScrollPane1_1.setViewportView(uiCarrier.getRunningClassArea());
+                                                runningClassArea = new JTextArea();
+                                                runningClassArea.setFont(new Font("微軟正黑體", Font.PLAIN, 13));
+                                                JScrollPane jScrollPane1_1 = new JScrollPane();
+                                                panel_1.add(jScrollPane1_1, BorderLayout.CENTER);
+                                                jScrollPane1_1.setViewportView(runningClassArea);
                                             }
                                         }
-                                        uiCarrier.getShowInfoArea2().addMouseListener(new MouseAdapter() {
+                                        showInfoArea2.addMouseListener(new MouseAdapter() {
                                             public void mouseClicked(MouseEvent evt) {
                                                 showInfoArea2MouseClicked(evt);
                                             }
@@ -1619,22 +1694,22 @@ public class DebugMointerUI {
                     }
                 }
             }
-            uiCarrier.get_ui().pack();
-            uiCarrier.get_ui().setSize(758, 530);
+            _ui.pack();
+            _ui.setSize(758, 530);
 
-            uiCarrier.get_ui().setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-            uiCarrier.get_ui().setModalityType(ModalityType.APPLICATION_MODAL);
-            JCommonUtil.setJFrameCenter(uiCarrier.get_ui());
-            JCommonUtil.setJFrameIcon(uiCarrier.get_ui(), "resource/images/ico/fantasyForYou.ico");
+            _ui.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+            _ui.setModalityType(ModalityType.APPLICATION_MODAL);
+            JCommonUtil.setJFrameCenter(_ui);
+            JCommonUtil.setJFrameIcon(_ui, "resource/images/ico/fantasyForYou.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 重新設定 mointerObjects
+     * 初始化UI
      */
-    private void initMointerObjects() {
+    private synchronized void initGUI_detail() {
         DefaultComboBoxModel moniterComboBoxModel = new DefaultComboBoxModel();
         if (mointerObjects != null && mointerObjects.length > 0) {
             for (int ii = 0; ii < mointerObjects.length; ii++) {
@@ -1645,31 +1720,27 @@ public class DebugMointerUI {
                 moniterComboBoxModel.addElement(obj);
             }
         }
-        uiCarrier.getMoniterComboBox().setModel(moniterComboBoxModel);
+        moniterComboBox.setModel(moniterComboBoxModel);
         if (moniterComboBoxModel.getSize() != 0) {
-            uiCarrier.getMoniterComboBox().setSelectedIndex(0);
-            MoniterObjectComboBox moniterObject = (MoniterObjectComboBox) uiCarrier.getMoniterComboBox().getSelectedItem();
+            moniterComboBox.setSelectedIndex(0);
+            MoniterObjectComboBox moniterObject = (MoniterObjectComboBox) moniterComboBox.getSelectedItem();
             if (moniterObject != null) {
                 setRootObject(moniterObject.object);
             }
         } else {
             DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
             DefaultTreeModel model = new DefaultTreeModel(rootNode);
-            uiCarrier.getCompositeTree().setModel(model);
+            compositeTree.setModel(model);
         }
-    }
+        compositeTable.setModel(JTableUtil.createModel(true, "名稱", "資料"));
 
-    /**
-     * 初始化UI
-     */
-    private synchronized void initGUI_detail() {
         // 設定系統列
         if (!initSysTrayOk) {
-            final MenuItem menuItemD1 = uiCarrier.createMenuItem();
+            final MenuItem menuItemD1 = new MenuItem();
             menuItemD1.setLabel(DateUtil.getCurrentDateTime(true));
             menuItemD1.setEnabled(false);
             // 啟動 or 關閉 UI
-            final MenuItem menuItem1 = uiCarrier.createMenuItem();
+            final MenuItem menuItem1 = new MenuItem();
             sysTrayPopupMenuLabelChangeMap.put(menuItem1, new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -1691,7 +1762,7 @@ public class DebugMointerUI {
                 }
             });
             // 自動執行
-            final MenuItem menuItem2 = uiCarrier.createMenuItem();
+            final MenuItem menuItem2 = new MenuItem();
             sysTrayPopupMenuLabelChangeMap.put(menuItem2, new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -1705,7 +1776,7 @@ public class DebugMointerUI {
                         inst.isAutoExecute.set(false);
                     } else {
                         inst.isAutoExecute.set(true);
-                        if (uiCarrier.get_ui().isVisible()) {
+                        if (_ui.isVisible()) {
                             inst.setVisible(false);
                             if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("現在是否立即執行?", "自動啟動")) {
                                 autoExecutePlugIn();
@@ -1719,7 +1790,7 @@ public class DebugMointerUI {
                 }
             });
             // 自動執行mapping的method名稱
-            final MenuItem menuItem3 = uiCarrier.createMenuItem();
+            final MenuItem menuItem3 = new MenuItem();
             sysTrayPopupMenuLabelChangeMap.put(menuItem3, new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -1739,7 +1810,7 @@ public class DebugMointerUI {
                 }
             });
             // 自動unload
-            final MenuItem menuItem4 = uiCarrier.createMenuItem();
+            final MenuItem menuItem4 = new MenuItem();
             sysTrayPopupMenuLabelChangeMap.put(menuItem4, new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -1759,7 +1830,7 @@ public class DebugMointerUI {
                 }
             });
             // 清空暫存
-            final MenuItem menuItem5 = uiCarrier.createMenuItem();
+            final MenuItem menuItem5 = new MenuItem();
             sysTrayPopupMenuLabelChangeMap.put(menuItem5, new Callable<String>() {
                 @Override
                 public String call() throws Exception {
@@ -1816,19 +1887,19 @@ public class DebugMointerUI {
                     model.addElement(exe);
                 }
             }
-            uiCarrier.getExecuteList().setModel(model);
+            executeList.setModel(model);
             configProp = prop;
         }
 
         // 設定物件概觀
-        uiCarrier.getShowInfoArea().setText("");
+        showInfoArea.setText("");
         if (mointerObjects != null && mointerObjects.length > 0) {
             StringBuilder sb = new StringBuilder();
             for (int ii = 0; ii < mointerObjects.length; ii++) {
                 Object toObj = mointerObjects[ii];
                 this.appendShowInfoAreaData(ii, "", toObj, sb);
             }
-            uiCarrier.getShowInfoArea().setText(sb.toString());
+            showInfoArea.setText(sb.toString());
         }
     }
 
@@ -1877,7 +1948,7 @@ public class DebugMointerUI {
         obj.object = object;
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(obj);
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
-        uiCarrier.getCompositeTree().setModel(model);
+        compositeTree.setModel(model);
     }
 
     /**
@@ -2046,7 +2117,7 @@ public class DebugMointerUI {
             }
         } else if (evt.getButton() == MouseEvent.BUTTON3) {
             // 設定下拉選單第二項title
-            JPopupMenuUtil popup = JPopupMenuUtil.newInstance(uiCarrier.getCompositeTree()).applyEvent(evt);
+            JPopupMenuUtil popup = JPopupMenuUtil.newInstance(compositeTree).applyEvent(evt);
             if (obj instanceof JObjectIsArrayDetail) {
                 final JObjectIsArrayDetail detail = (JObjectIsArrayDetail) obj;
                 popup.addJMenuItem("排序:" + (detail.isSort ? "on" : "off"), new ActionListener() {
@@ -2064,7 +2135,7 @@ public class DebugMointerUI {
                     public void actionPerformed(ActionEvent arg0) {
                         try {
                             selectNode.removeAllChildren();
-                            uiCarrier.getCompositeTree().updateUI();
+                            compositeTree.updateUI();
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                             showErrorLogInArea(ex);
@@ -2097,7 +2168,7 @@ public class DebugMointerUI {
                                 try {
                                     String path = "_#" + getFullPath(selectNode) + "#_";
                                     getLogger().debug("getPath = " + path);
-                                    DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
+                                    DefaultTableModel model = (DefaultTableModel) parameterTable.getModel();
                                     model.addRow(new Object[] { path, "" });
                                     JCommonUtil._jOptionPane_showMessageDialog_info("路徑:" + path + "\n值:" + //
                                     addEnterToOrignStr(String.valueOf(getParseObject(path))));
@@ -2133,7 +2204,7 @@ public class DebugMointerUI {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
                                 try {
-                                    Object tempValue = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
+                                    Object tempValue = JListUtil.getLeadSelectionObject(tempList);
                                     boolean result = JCommonUtil
                                             ._JOptionPane_showConfirmDialog_yesNoOption("是否要將暫存區資料設定至物件:\n" + ReflectionToStringBuilder.toString(tempValue, ToStringStyle.MULTI_LINE_STYLE), "設定資料");
                                     if (result) {
@@ -2218,7 +2289,7 @@ public class DebugMointerUI {
                             public void actionPerformed(ActionEvent arg0) {
                                 try {
                                     selectNode.removeAllChildren();
-                                    uiCarrier.getCompositeTree().updateUI();
+                                    compositeTree.updateUI();
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                     showErrorLogInArea(ex);
@@ -2388,7 +2459,7 @@ public class DebugMointerUI {
             getLogger().debug("row = " + Arrays.toString(rows));
             tableModel.addRow(rows);
         }
-        uiCarrier.getCompositeTable().setModel(tableModel);
+        compositeTable.setModel(tableModel);
     }
 
     private void appendInChrildren(Object object, DefaultMutableTreeNode selectNode, Class<?> indicateClass) {
@@ -2497,7 +2568,7 @@ public class DebugMointerUI {
                 tableModel.addRow(new Object[] { obj, obj.get() });
             }
         }
-        uiCarrier.getCompositeTable().setModel(tableModel);
+        compositeTable.setModel(tableModel);
     }
 
     /**
@@ -2526,7 +2597,7 @@ public class DebugMointerUI {
         }
         if (indicateClz == null) {
             DefaultComboBoxModel model = new DefaultComboBoxModel();
-            uiCarrier.getTempObjClassCombox().setModel(model);
+            tempObjClassCombox.setModel(model);
             Class<?> clz = object.getClass();
             while (true) {
                 model.addElement(clz);
@@ -2618,11 +2689,11 @@ public class DebugMointerUI {
                 tableModel.addRow(new Object[] { obj, obj.get() });
             }
         }
-        uiCarrier.getTempValueTable().setModel(tableModel);
+        tempValueTable.setModel(tableModel);
     }
 
     private void compositeTreeMouseClicked(MouseEvent evt) {
-        DefaultMutableTreeNode selectNode = uiCarrier.getJtreeUtil().getSelectItem();
+        DefaultMutableTreeNode selectNode = jtreeUtil.getSelectItem();
         if (selectNode != null) {
             try {
                 this.modifyOrInvoke(selectNode, evt);
@@ -2691,10 +2762,10 @@ public class DebugMointerUI {
             StackTraceElement currentElement = null;
             StackTraceElement[] sks = Thread.currentThread().getStackTrace();
             // xxxxxxxxxxxxxxxxx debug ↓↓↓↓↓
-            uiCarrier.getCallStackArea().setText("");
+            callStackArea.setText("");
             File threadLog = new File(FileUtil.DESKTOP_PATH, "currentThread_" + DateUtil.getCurrentDate(false) + ".txt");
             for (int ii = 0; ii < sks.length; ii++) {
-                uiCarrier.getCallStackArea().append(sks[ii] + "\n");
+                callStackArea.append(sks[ii] + "\n");
             }
             // xxxxxxxxxxxxxxxxx debug ↑↑↑↑↑
             boolean findThisOk = false;
@@ -2721,7 +2792,7 @@ public class DebugMointerUI {
             }
 
             // 設定現在斷點名稱
-            uiCarrier.get_ui().setTitle(currentElement.getFileName() + "." + currentElement.getMethodName() + ":" + currentElement.getLineNumber());
+            _ui.setTitle(currentElement.getFileName() + "." + currentElement.getMethodName() + ":" + currentElement.getLineNumber());
 
             // 判斷目前斷點是否已存在
             MointerBreakPoint mp = new MointerBreakPoint();
@@ -2744,7 +2815,7 @@ public class DebugMointerUI {
                     }
                     model.addRow(new Object[] { mp2, mp2.condition, result, mp2.isEnable });
                 }
-                uiCarrier.getBreakpointTable().setModel(model);
+                breakpointTable.setModel(model);
             }
 
             // 判斷目前段點是否符合條件
@@ -2812,24 +2883,24 @@ public class DebugMointerUI {
     private void breakpointTableMouseClicked(MouseEvent evt) {
         if (evt.getButton() == MouseEvent.BUTTON1) {
             updateCurrentMointerBreakPoint(evt);
-            int rowId = JTableUtil.newInstance(uiCarrier.getBreakpointTable()).getSelectedRow();
-            MointerBreakPoint mp = (MointerBreakPoint) uiCarrier.getBreakpointTable().getValueAt(rowId, 0);
+            int rowId = JTableUtil.newInstance(breakpointTable).getSelectedRow();
+            MointerBreakPoint mp = (MointerBreakPoint) breakpointTable.getValueAt(rowId, 0);
             Boolean result = null;
             try {
                 result = parseConditionStr(mp.condition);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            uiCarrier.getBreakpointTable().setValueAt(mp.condition, rowId, 1);
-            uiCarrier.getBreakpointTable().setValueAt(result, rowId, 2);
-            uiCarrier.getBreakpointTable().setValueAt(mp.isEnable, rowId, 3);
-            uiCarrier.getConditionArea().setText(mp.condition);
-            uiCarrier.getConditionActivationBtn().setSelected(mp.isEnable);
-            uiCarrier.getConditionActivationBtn().setText(mp.isEnable ? "enable" : "disable");
+            breakpointTable.setValueAt(mp.condition, rowId, 1);
+            breakpointTable.setValueAt(result, rowId, 2);
+            breakpointTable.setValueAt(mp.isEnable, rowId, 3);
+            conditionArea.setText(mp.condition);
+            conditionActivationBtn.setSelected(mp.isEnable);
+            conditionActivationBtn.setText(mp.isEnable ? "enable" : "disable");
             currentEditMointerBreakPoint = mp;
         }
         if (evt.getButton() == MouseEvent.BUTTON3) {
-            JPopupMenuUtil.newInstance(uiCarrier.getBreakpointTable()).applyEvent(evt)//
+            JPopupMenuUtil.newInstance(breakpointTable).applyEvent(evt)//
                     .addJMenuItem("刷新狀態", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -2844,7 +2915,7 @@ public class DebugMointerUI {
                                 }
                                 model.addRow(new Object[] { mp2, condition, bool, mp2.isEnable });
                             }
-                            uiCarrier.getBreakpointTable().setModel(model);
+                            breakpointTable.setModel(model);
                         }
                     })//
                     .show();
@@ -2854,10 +2925,10 @@ public class DebugMointerUI {
     private void updateCurrentMointerBreakPoint(EventObject evt) {
         try {
             if (currentEditMointerBreakPoint != null) {
-                if (StringUtils.isNotBlank(uiCarrier.getConditionArea().getText())) {
+                if (StringUtils.isNotBlank(conditionArea.getText())) {
                     try {
-                        boolean result = this.parseConditionStr(uiCarrier.getConditionArea().getText());
-                        getLogger().debug(uiCarrier.getConditionArea().getText() + " => " + result);
+                        boolean result = this.parseConditionStr(conditionArea.getText());
+                        getLogger().debug(conditionArea.getText() + " => " + result);
                     } catch (Exception ex) {
                         // JCommonUtil.handleException(ex.getMessage(), ex,
                         // false);//有錯誤也無須提醒,因為不同斷點一定會錯
@@ -2868,8 +2939,8 @@ public class DebugMointerUI {
                 }
 
                 // 條件無誤設定值給設定黨
-                currentEditMointerBreakPoint.condition = uiCarrier.getConditionArea().getText();
-                currentEditMointerBreakPoint.isEnable = uiCarrier.getConditionActivationBtn().isSelected();
+                currentEditMointerBreakPoint.condition = conditionArea.getText();
+                currentEditMointerBreakPoint.isEnable = conditionActivationBtn.isSelected();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -2879,7 +2950,7 @@ public class DebugMointerUI {
 
     private void updateParameter(EventObject evt) {
         try {
-            DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
+            DefaultTableModel model = (DefaultTableModel) parameterTable.getModel();
             for (int ii = 0; ii < model.getRowCount(); ii++) {
                 String parseStr = (String) model.getValueAt(ii, 0);
                 if (StringUtils.isBlank(parseStr)) {
@@ -2908,9 +2979,9 @@ public class DebugMointerUI {
             return;
         }
         try {
-            uiCarrier.getShowInfoArea2().setText("");
+            showInfoArea2.setText("");
             StringBuilder sb = new StringBuilder();
-            DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
+            DefaultTableModel model = (DefaultTableModel) parameterTable.getModel();
             for (int ii = 0; ii < model.getRowCount(); ii++) {
                 String parseStr = (String) model.getValueAt(ii, 0);
                 if (StringUtils.isBlank(parseStr)) {
@@ -2927,7 +2998,7 @@ public class DebugMointerUI {
                 }
             }
             // 設定參數物件概觀
-            uiCarrier.getShowInfoArea2().setText(sb.toString());
+            showInfoArea2.setText(sb.toString());
             JCommonUtil._jOptionPane_showMessageDialog_info("已更新參數資料!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -2940,14 +3011,14 @@ public class DebugMointerUI {
             return;
         }
         try {
-            uiCarrier.getShowInfoArea().setText("");
+            showInfoArea.setText("");
             if (mointerObjects != null && mointerObjects.length > 0) {
                 StringBuilder sb = new StringBuilder();
                 for (int ii = 0; ii < mointerObjects.length; ii++) {
                     Object toObj = mointerObjects[ii];
                     this.appendShowInfoAreaData(ii, "", toObj, sb);
                 }
-                uiCarrier.getShowInfoArea().setText(sb.toString());
+                showInfoArea.setText(sb.toString());
             }
             JCommonUtil._jOptionPane_showMessageDialog_info("已更新參數資料!");
         } catch (Exception ex) {
@@ -3353,7 +3424,7 @@ public class DebugMointerUI {
     private StringBuffer tempSearchKey = new StringBuffer();
 
     private void compositeTreeKeyPressed(KeyEvent evt) {
-        DefaultMutableTreeNode node = JTreeUtil.newInstance(uiCarrier.getCompositeTree()).getSelectItem();
+        DefaultMutableTreeNode node = JTreeUtil.newInstance(compositeTree).getSelectItem();
         if (node.getParent() == null) {
             tempSearchKey = new StringBuffer();
             return;
@@ -3379,8 +3450,8 @@ public class DebugMointerUI {
                 if (findIndex != -1 && findIndex + 1 == index) {
                     TreePath path = new TreePath(list2.toArray());
                     getLogger().debug("next " + findIndex + " -->" + list2);
-                    uiCarrier.getCompositeTree().setSelectionPath(path);
-                    getLogger().debug(">>>" + JTreeUtil.newInstance(uiCarrier.getCompositeTree()).getSelectItem());
+                    compositeTree.setSelectionPath(path);
+                    getLogger().debug(">>>" + JTreeUtil.newInstance(compositeTree).getSelectItem());
                     return;
                 }
                 index++;
@@ -3440,14 +3511,14 @@ public class DebugMointerUI {
             if (!list2.isEmpty()) {
                 TreePath path = new TreePath(list2.toArray());
                 getLogger().debug("find-->" + list2);
-                uiCarrier.getCompositeTree().setSelectionPath(path);
+                compositeTree.setSelectionPath(path);
             }
         }
     }
 
     private void saveAndAddExecuteConfig(boolean saveTextboxData) throws FileNotFoundException, IOException {
-        String classPath = uiCarrier.getClasspathText().getText();
-        String className = uiCarrier.getClassNameText().getText();
+        String classPath = classpathText.getText();
+        String className = classNameText.getText();
         String executeMethodName = methodNameHandler.getExecuteMethodNameText();
         Validate.notEmpty(classPath, "輸入classpath");
         Validate.notEmpty(className, "輸入類別路徑");
@@ -3456,7 +3527,7 @@ public class DebugMointerUI {
         exe.className = StringUtils.trimToEmpty(className);
         exe.classPath = StringUtils.trimToEmpty(classPath);
         exe.executeMethodName = StringUtils.trimToEmpty(executeMethodName);
-        DefaultListModel model = (DefaultListModel) uiCarrier.getExecuteList().getModel();
+        DefaultListModel model = (DefaultListModel) executeList.getModel();
         // 移除掉所有設定
         for (int ii = 0;; ii++) {
             String propKey = ExecuteConfig.class.getSimpleName() + "_" + ii;
@@ -3493,8 +3564,8 @@ public class DebugMointerUI {
 
     private void importClassBtnActionPerformed(boolean slientMode) {
         try {
-            String classPath = uiCarrier.getClasspathText().getText();
-            String className = uiCarrier.getClassNameText().getText();
+            String classPath = classpathText.getText();
+            String className = classNameText.getText();
             // String executeMethodName = getExecuteMethodNameText();
 
             Validate.notEmpty(classPath, "輸入classpath");
@@ -3529,8 +3600,8 @@ public class DebugMointerUI {
             }
 
             // 不知道為何會被蓋掉,很詭異
-            uiCarrier.getClasspathText().setText(classPath);
-            uiCarrier.getClassNameText().setText(className);
+            classpathText.setText(classPath);
+            classNameText.setText(className);
 
             boolean autowire = false;
             if (!slientMode) {
@@ -3542,7 +3613,7 @@ public class DebugMointerUI {
             // 自動綁定物件
             if (autowire) {
                 // 執行mapping
-                DebugMointerMappingField mappingObj = new DebugMointerMappingField(newObject, this, mointerObjects, uiCarrier.getTempModelCheckBox());
+                DebugMointerMappingField mappingObj = new DebugMointerMappingField(newObject, this, mointerObjects, tempModelCheckBox);
                 mappingObj.executeMapping();
 
                 if (!slientMode) {
@@ -3560,8 +3631,8 @@ public class DebugMointerUI {
     private void executeImportClass(boolean slientMode, boolean saveConfig) {
         String classInfo = "";
         try {
-            String classPath = uiCarrier.getClasspathText().getText();
-            String className = uiCarrier.getClassNameText().getText();
+            String classPath = classpathText.getText();
+            String className = classNameText.getText();
             String executeMethodName = methodNameHandler.getExecuteMethodNameText();
 
             Validate.notEmpty(classPath, "輸入classpath");
@@ -3799,9 +3870,37 @@ public class DebugMointerUI {
         return tempModel;
     }
 
+    private JCheckBox getTempModelCheckBox() {
+        if (tempModelCheckBox == null) {
+            tempModelCheckBox = new JCheckBox();
+            tempModelCheckBox.setText("\u66ab\u5b58\u5340\u6aa2\u67e5");
+            tempModelCheckBox.setSelected(true);
+        }
+        return tempModelCheckBox;
+    }
+
+    // 以指定類別顯示細節 ↓↓↓↓↓↓
+    private JComboBox getNodeInfoComboBox() {
+        if (nodeInfoComboBox == null) {
+            DefaultComboBoxModel nodeInfoComboBoxModel = new DefaultComboBoxModel();
+            nodeInfoComboBox = new JComboBox();
+            nodeInfoComboBox.setModel(nodeInfoComboBoxModel);
+            nodeInfoComboBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    Object clz = nodeInfoComboBox.getSelectedItem();
+                    if (!(clz instanceof Class)) {
+                        return;
+                    }
+                    appendInChrildren(getSelectNodeObject(), null, (Class<?>) clz);
+                }
+            });
+        }
+        return nodeInfoComboBox;
+    }
+
     private Object getSelectNodeObject() {
         Object object = null;
-        DefaultMutableTreeNode currentNode = uiCarrier.getJtreeUtil().getSelectItem();
+        DefaultMutableTreeNode currentNode = jtreeUtil.getSelectItem();
         if (currentNode != null && currentNode.getUserObject() != null) {
             Object userObject = currentNode.getUserObject();
             if (userObject instanceof JObject && ((JObject) userObject).object != null) {
@@ -3832,65 +3931,68 @@ public class DebugMointerUI {
         if (model.getSize() == 0) {
             model.addElement("NA");
         }
-        uiCarrier.getNodeInfoComboBox().setModel(model);
+        nodeInfoComboBox.setModel(model);
     }
 
     private JButton getIndicateNodeClassBtn() {
-        uiCarrier.getIndicateNodeClassBtn().setText("報告");
-        uiCarrier.getIndicateNodeClassBtn().addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                Object object = getSelectNodeObject();
-                if (object == null) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("物件為null,或是不支援顯示的類型!");
-                    return;
-                }
-                Object clzX = uiCarrier.getNodeInfoComboBox().getSelectedItem();
-                if (!(clzX instanceof Class)) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("類別有誤:" + clzX);
-                    return;
-                }
-                Class<?> clz = (Class<?>) clzX;
-                JObject mod = new JObject();
-                StringBuilder sb = new StringBuilder();
-                sb.append("[" + object + "]\n");
-                sb.append("\tas class[" + clz.getName() + "]\n");
-                for (Field f : clz.getDeclaredFields()) {
-                    f.setAccessible(true);
-                    try {
-                        Object value = f.get(object);
-                        String modifiers = mod.getModifier(f.getModifiers());
-                        sb.append("[F][" + modifiers + "]" + f.getName() + "(" + f.getType() + ")\n");
+        if (indicateNodeClassBtn == null) {
+            indicateNodeClassBtn = new JButton();
+            indicateNodeClassBtn.setText("報告");
+            indicateNodeClassBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    Object object = getSelectNodeObject();
+                    if (object == null) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("物件為null,或是不支援顯示的類型!");
+                        return;
+                    }
+                    Object clzX = nodeInfoComboBox.getSelectedItem();
+                    if (!(clzX instanceof Class)) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("類別有誤:" + clzX);
+                        return;
+                    }
+                    Class<?> clz = (Class<?>) clzX;
+                    JObject mod = new JObject();
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("[" + object + "]\n");
+                    sb.append("\tas class[" + clz.getName() + "]\n");
+                    for (Field f : clz.getDeclaredFields()) {
+                        f.setAccessible(true);
                         try {
-                            sb.append("\t" + ReflectionToStringBuilder.toString(value, ToStringStyle.MULTI_LINE_STYLE) + "\n");
+                            Object value = f.get(object);
+                            String modifiers = mod.getModifier(f.getModifiers());
+                            sb.append("[F][" + modifiers + "]" + f.getName() + "(" + f.getType() + ")\n");
+                            try {
+                                sb.append("\t" + ReflectionToStringBuilder.toString(value, ToStringStyle.MULTI_LINE_STYLE) + "\n");
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                sb.append("\t" + value + "\n");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    for (Method m : clz.getDeclaredMethods()) {
+                        m.setAccessible(true);
+                        try {
+                            List<String> parameterList = new ArrayList<String>();
+                            if (m.getParameterTypes() != null && m.getParameterTypes().length > 0) {
+                                for (Class<?> clz2 : m.getParameterTypes()) {
+                                    parameterList.add(clz2.getSimpleName());
+                                }
+                            }
+                            String modifiers = mod.getModifier(m.getModifiers());
+                            sb.append("[M][" + modifiers + "]" + "(" + m.getReturnType().getSimpleName() + ")" + m.getName() + parameterList + "\n");
+                            sb.append("\t" + DebugMointerUI.this.getMethodValue(object, m) + "\n");
                         } catch (Exception ex) {
                             ex.printStackTrace();
-                            sb.append("\t" + value + "\n");
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                    showInfoArea2.setText(sb.toString());
+                    JCommonUtil._jOptionPane_showMessageDialog_info("報告於[物件蓋觀->變數]");
                 }
-                for (Method m : clz.getDeclaredMethods()) {
-                    m.setAccessible(true);
-                    try {
-                        List<String> parameterList = new ArrayList<String>();
-                        if (m.getParameterTypes() != null && m.getParameterTypes().length > 0) {
-                            for (Class<?> clz2 : m.getParameterTypes()) {
-                                parameterList.add(clz2.getSimpleName());
-                            }
-                        }
-                        String modifiers = mod.getModifier(m.getModifiers());
-                        sb.append("[M][" + modifiers + "]" + "(" + m.getReturnType().getSimpleName() + ")" + m.getName() + parameterList + "\n");
-                        sb.append("\t" + DebugMointerUI.this.getMethodValue(object, m) + "\n");
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                uiCarrier.getShowInfoArea2().setText(sb.toString());
-                JCommonUtil._jOptionPane_showMessageDialog_info("報告於[物件蓋觀->變數]");
-            }
-        });
-        return uiCarrier.getIndicateNodeClassBtn();
+            });
+        }
+        return indicateNodeClassBtn;
     }
 
     // 放在constructor 會需要改名為_init_
@@ -3903,15 +4005,34 @@ public class DebugMointerUI {
         }
 
         private String getExecuteMethodNameText() {
-            return replace(inst.uiCarrier.getExecuteMethodNameText().getText());
+            return replace(inst.executeMethodNameText.getText());
         }
 
         private void setExecuteMethodNameText(String methodName) {
-            inst.uiCarrier.getExecuteMethodNameText().setText(replace(methodName));
+            inst.executeMethodNameText.setText(replace(methodName));
         }
     }
 
     // 以指定類別顯示細節 ↑↑↑↑↑↑
+
+    static Logger2File log;
+    private JPanel panel;
+    private JScrollPane scrollPane;
+    private JTextArea dynamicClassArea;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JTextArea runningClassArea;
+    private JLabel lblClasses;
+    private JTextField dynamic_classesDirText;
+    private JLabel lblClass;
+    private JTextField dynamic_classNameText;
+    private JButton dynamic_executeBtn;
+    private JTextField dynamic_classPathText;
+    private JLabel lblJavahome;
+    private JTextField dynamic_javaHomeText;
+    private JLabel lblMvn;
+    private JTextField dynamic_mvnProjectText;
 
     public static Logger2File getLogger() {
         if (log == null) {
@@ -3958,10 +4079,25 @@ public class DebugMointerUI {
         return prop;
     }
 
+    private JTextArea getCallStackArea() {
+        if (callStackArea == null) {
+            callStackArea = new JTextArea();
+            callStackArea.setText("");
+        }
+        return callStackArea;
+    }
+
+    private JTextArea getErrorLogArea() {
+        if (errorLogArea == null) {
+            errorLogArea = new JTextArea();
+        }
+        return errorLogArea;
+    }
+
     private void showErrorLogInArea(Throwable ex) {
         try {
-            if (ex != null && inst.uiCarrier.getErrorLogArea() != null) {
-                ex.printStackTrace(JCommonUtil.getNewPrintStream2JTextArea(inst.uiCarrier.getErrorLogArea(), -1, false));
+            if (ex != null && inst.errorLogArea != null) {
+                ex.printStackTrace(JCommonUtil.getNewPrintStream2JTextArea(inst.errorLogArea, -1, false));
             }
         } catch (Exception ex2) {
             ex2.printStackTrace();
@@ -4007,16 +4143,36 @@ public class DebugMointerUI {
         return true;
     }
 
+    private JComboBox getTempObjClassCombox() {
+        if (tempObjClassCombox == null) {
+            DefaultComboBoxModel tempObjClassComboxModel = new DefaultComboBoxModel();
+            tempObjClassCombox = new JComboBox();
+            tempObjClassCombox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    try {
+                        Object object = JListUtil.getLeadSelectionObject(tempList);
+                        if (object == null) {
+                            JCommonUtil._jOptionPane_showMessageDialog_info("請選擇暫存區物件");
+                            return;
+                        }
+                        showInfoAtTempTable(object, (Class<?>) tempObjClassCombox.getSelectedItem());
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex, false);
+                        showErrorLogInArea(ex);
+                    }
+                }
+            });
+            tempObjClassCombox.setModel(tempObjClassComboxModel);
+        }
+        return tempObjClassCombox;
+    }
+
     /**
      * 設定 動態類別資訊
      */
     private void setDynamicClassArea() {
-        if (uiCarrier.isUseMockUI()) {
-            return;
-        }
-
-        String classpath = StringUtils.defaultString(uiCarrier.getClasspathText().getText());
-        String className = StringUtils.defaultString(uiCarrier.getClassNameText().getText());
+        String classpath = StringUtils.defaultString(classpathText.getText());
+        String className = StringUtils.defaultString(classNameText.getText());
         String methodName = StringUtils.defaultString(methodNameHandler.getExecuteMethodNameText());
         StringBuilder sb = new StringBuilder();
         try {
@@ -4071,6 +4227,6 @@ public class DebugMointerUI {
             ex.printStackTrace();
             sb = new StringBuilder();
         }
-        uiCarrier.getDynamicClassArea().setText(sb.toString());
+        dynamicClassArea.setText(sb.toString());
     }
 }

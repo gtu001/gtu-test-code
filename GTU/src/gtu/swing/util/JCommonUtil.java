@@ -81,9 +81,9 @@ public class JCommonUtil {
      */
     public static void setPanelBorderTitle(String title, JPanel panel) {
         panel.setBorder(new TitledBorder(title));
-//        BorderFactory.createTitledBorder("Bottom Panel")
+        // BorderFactory.createTitledBorder("Bottom Panel")
     }
-    
+
     /**
      * 設定panel帶寬度邊框
      */
@@ -146,6 +146,11 @@ public class JCommonUtil {
      * 設定視窗致中
      */
     public static void setJFrameCenter(Window frame) {
+        //非視窗系統不做事
+        if(GraphicsEnvironment.isHeadless() == true) {
+            return;
+        }
+        
         // 方法一
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation((scr_size.width - frame.getWidth()) / 2, //
@@ -153,7 +158,7 @@ public class JCommonUtil {
         // 方法2
         // frame.setLocationRelativeTo(null);
     }
-    
+
     /**
      * 設定視窗於右下角
      */
@@ -163,7 +168,7 @@ public class JCommonUtil {
         try {
             Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration());
             taskBarSize = scnMax.bottom;
-        }catch(Exception ex) {
+        } catch (Exception ex) {
         }
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(scr_size.width - frame.getWidth(), //
@@ -177,7 +182,7 @@ public class JCommonUtil {
         Image img = ImageUtil.getInstance().getImageAutoChoice(resourcePath);
         frame.setIconImage(img);
     }
-    
+
     /**
      * 預設設定
      */
@@ -439,7 +444,7 @@ public class JCommonUtil {
     public static File handleExceptionDetails(Object message, Throwable ex) {
         return JCommonUtil.handleException(message, ex, true, "yyyyMMdd.HHmmss.SSS");// true寫檔
     }
-    
+
     /**
      * 錯誤處理
      */
@@ -476,7 +481,10 @@ public class JCommonUtil {
                 count++;
             }
             if (validateFindOk) {
-                JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), "欄位輸入錯誤");
+                try {
+                    JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), "欄位輸入錯誤");
+                } catch (java.awt.HeadlessException uiError) {
+                }
                 return null;
             }
 
@@ -508,7 +516,14 @@ public class JCommonUtil {
                         }
                     }
 
-                    writeIfNeed = new File(FileUtil.DESKTOP_DIR, "swing_error_" + dateStr + ".log");
+                    if (GraphicsEnvironment.isHeadless() == false) {
+                        // 使用ui模式
+                        writeIfNeed = new File(FileUtil.DESKTOP_DIR, "swing_error_" + dateStr + ".log");
+                    } else {
+                        // 使用非ui模式
+                        writeIfNeed = new File(System.getProperty("user.dir"), "swing_error_" + dateStr + ".log");
+                    }
+
                     PrintWriter pw = new PrintWriter(writeIfNeed);
                     pw.write("案發時間:" + DateUtil.getCurrentDateTime(true) + "\n");
                     ex.printStackTrace(pw);
@@ -525,7 +540,10 @@ public class JCommonUtil {
                 messageStr = "不知名錯誤!";
             }
         }
-        JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(messageStr, title);
+        try {
+            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(messageStr, title);
+        } catch (java.awt.HeadlessException uiError) {
+        }
         return writeIfNeed;
     }
 
@@ -722,7 +740,7 @@ public class JCommonUtil {
         // jScrollPane1.setPreferredSize(new java.awt.Dimension(411, 262));
         jScrollPane1.setViewportView(jcommponent);
     }
-    
+
     public static JScrollPane createScrollComponent(JComponent jcommponent) {
         return createScrollComponent(jcommponent, true, true);
     }
@@ -796,10 +814,9 @@ public class JCommonUtil {
         }
         return useRobotFocus;
     }
-    
+
     /**
-     * 發出關閉視窗event
-     * 會觸發WindowListener.windowClosing
+     * 發出關閉視窗event 會觸發WindowListener.windowClosing
      */
     public static void sendWindowClosingEvent(Window window) {
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));

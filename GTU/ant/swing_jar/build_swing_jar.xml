@@ -77,6 +77,7 @@
 			<packagename mode="small">freemarker.template</packagename>
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">org.mockito.Mockito</packagename>
 			
 			<packagename mode="exact" name="webTest2.jar">gtu.log.finder.etc.WebTestUtil</packagename>
 		</jarfinder>

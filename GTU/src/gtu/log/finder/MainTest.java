@@ -6,13 +6,16 @@ public class MainTest {
 
     public static void main(String[] args) {
         MainTest test = new MainTest();
-
         MyTest t = test.new MyTest();
+        t.test();
     }
     
     private class MyTest {
         public MyTest() {
-            DebugMointerUI.startWithReflectAndDispose(this);
+        }
+        
+        private void test() {
+            DebugMointerUI.startWithReflectAndDispose(this, "VVVVVV");
         }
     }
 
