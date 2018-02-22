@@ -44,7 +44,7 @@ public class JOptionPaneUtil {
     public String showInputDialog(Object message, String title) {
         return JOptionPane.showInputDialog(null, message, title, messageType);
     }
-    
+
     /**
      * 顯示JOptionPane.showInputDialog
      * 
@@ -53,7 +53,7 @@ public class JOptionPaneUtil {
     public Object showInputDialog(Object message, String title, Object defaultValue) {
         return JOptionPane.showInputDialog(null, message, title, messageType, null, null, defaultValue);
     }
-    
+
     /**
      * 顯示JOptionPane.showInputDialog
      * 
@@ -111,8 +111,11 @@ public class JOptionPaneUtil {
     }
 
     public static enum ComfirmDialogResult {
-        YES_OK_OPTION(JOptionPane.YES_OPTION), NO_OPTION(JOptionPane.NO_OPTION), CANCEL_OPTION(
-                JOptionPane.CANCEL_OPTION), CLOSED_OPTION(JOptionPane.CLOSED_OPTION), ;
+        YES_OK_OPTION(JOptionPane.YES_OPTION), //
+        NO_OPTION(JOptionPane.NO_OPTION), //
+        CANCEL_OPTION(JOptionPane.CANCEL_OPTION), //
+        CLOSED_OPTION(JOptionPane.CLOSED_OPTION),//
+        ;
 
         private static Map<Integer, ComfirmDialogResult> VALUE_TO_ENUM = new HashMap<Integer, ComfirmDialogResult>();
         static {

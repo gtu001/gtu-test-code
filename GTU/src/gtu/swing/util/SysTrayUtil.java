@@ -149,11 +149,22 @@ public class SysTrayUtil {
         }
     }
 
+    public static void removeTrayIcon(TrayIcon icon) {
+        try {
+            SystemTray.getSystemTray().remove(icon);
+        } catch (java.awt.HeadlessException ex) {
+        }
+    }
+
     public void displayMessage(String caption, String text, MessageType messageType) {
-        trayIconHandler.addIfNeed();
-        System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
-        trayIcon.displayMessage(caption, text, messageType);
-//        trayIconHandler.removeIfExists();
+        try {
+            trayIconHandler.addIfNeed();
+            System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
+            trayIcon.displayMessage(caption, text, messageType);
+            // trayIconHandler.removeIfExists();
+        } catch (java.awt.HeadlessException ex) {
+            System.err.println("Non UI Mode !!");
+        }
     }
 
     public static Image createTrayImage() {

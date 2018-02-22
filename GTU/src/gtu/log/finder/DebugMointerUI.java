@@ -133,26 +133,10 @@ public class DebugMointerUI {
 
     static {
         if (System.getProperty("os.name").toLowerCase().contains("window")) {
-            forceUIMode(true);
+            JCommonUtil.forceUIMode(true);
         } else {
-            forceUIMode(false);
+            JCommonUtil.forceUIMode(false);
         }
-        
-        //測試
-        forceUIMode(false);
-    }
-
-    private static void forceUIMode(boolean isUseUIMode) {
-        boolean headLess = !isUseUIMode;
-        System.setProperty("java.awt.headless", String.valueOf(headLess));// 使用ui為false
-        if (!GraphicsEnvironment.isHeadless()) {
-            try {
-                FieldUtils.writeDeclaredStaticField(GraphicsEnvironment.class, "headless", headLess, true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        System.out.println("<<< java.awt.headless - " + GraphicsEnvironment.isHeadless());
     }
 
     public static class Constant {
@@ -262,10 +246,7 @@ public class DebugMointerUI {
             inst.keepForRemoveTray = new HashSet<SysTrayUtil>();
         }
         for (SysTrayUtil sys : inst.keepForRemoveTray) {
-            try {
-                SystemTray.getSystemTray().remove(sys.getTrayIcon());
-            } catch (java.awt.HeadlessException ex) {
-            }
+            SysTrayUtil.removeTrayIcon(sys.getTrayIcon());
         }
         inst.keepForRemoveTray.clear();
     }
@@ -1089,7 +1070,7 @@ public class DebugMointerUI {
                                             try {
                                                 File file = JCommonUtil._jFileChooser_selectFileOnly();
                                                 if (file == null) {
-                                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
+                                                    JCommonUtil._jOptionPane_showMessageDialog_error_NonUICompatible("檔案錯誤!");
                                                     return;
                                                 }
                                                 DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
@@ -1110,7 +1091,7 @@ public class DebugMointerUI {
                                             try {
                                                 File file = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
                                                 if (file == null) {
-                                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
+                                                    JCommonUtil._jOptionPane_showMessageDialog_error_NonUICompatible("檔案錯誤!");
                                                     return;
                                                 }
                                                 DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
@@ -1193,7 +1174,7 @@ public class DebugMointerUI {
                                     try {
                                         Object object = JListUtil.getLeadSelectionObject(uiCarrier.getTempList());
                                         if (object == null) {
-                                            JCommonUtil._jOptionPane_showMessageDialog_info("請選擇暫存區物件");
+                                            JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("請選擇暫存區物件");
                                             return;
                                         }
                                         showInfoAtTempTable(object, (Class<?>) uiCarrier.getTempObjClassCombox().getSelectedItem());
@@ -1250,7 +1231,7 @@ public class DebugMointerUI {
                                                         "是否要將結果資料新增至暫存區:\n" + tempValue, "設定暫存資料");
                                                 if (result) {
                                                     appendToTempModel(tempValue, 'u');
-                                                    JCommonUtil._jOptionPane_showMessageDialog_info("設定資料到暫存區:" + tempValue + ",成功!");
+                                                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("設定資料到暫存區:" + tempValue + ",成功!");
                                                 }
                                             }
                                         }
@@ -1286,7 +1267,7 @@ public class DebugMointerUI {
                                                             "\n是否要刪除?", "將選擇項目刪除");
                                                             if (result) {
                                                                 appendToTempModel(object, 'd');
-                                                                JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功!");
+                                                                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("刪除成功!");
                                                             }
                                                         }
                                                     }).addJMenuItem("複製選擇項目並新增", new ActionListener() {
@@ -1299,7 +1280,7 @@ public class DebugMointerUI {
                                                             if (result) {
                                                                 Serializable serialObj = SerializationUtils.clone((Serializable) object);
                                                                 appendToTempModel(serialObj, 'i');
-                                                                JCommonUtil._jOptionPane_showMessageDialog_info("複製成功!");
+                                                                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("複製成功!");
                                                             }
                                                         }
                                                     }).addJMenuItem("設定為回傳值", new ActionListener() {
@@ -1311,7 +1292,7 @@ public class DebugMointerUI {
                                                             "\n是否要設定?", "將選擇項目回傳");
                                                             if (result) {
                                                                 inst.returnObject = object;
-                                                                JCommonUtil._jOptionPane_showMessageDialog_info("設定成功!");
+                                                                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("設定成功!");
                                                             }
                                                         }
                                                     }).show();
@@ -1930,7 +1911,7 @@ public class DebugMointerUI {
             Object newObj = obj.field.get(obj.object);
             String rtnValue = JCommonUtil._jOptionPane_showInputDialog("設值:" + obj.field.getName(), "" + newObj);
             if (Modifier.isFinal(obj.field.getModifiers())) {
-                JCommonUtil._jOptionPane_showMessageDialog_info("這是final無法修改");
+                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("這是final無法修改");
                 return;
             }
             if ("null".equalsIgnoreCase(rtnValue)) {
@@ -1985,10 +1966,10 @@ public class DebugMointerUI {
                     if (result2 == ComfirmDialogResult.YES_OK_OPTION) {
                         File writeFile = new File(FileUtil.DESKTOP_PATH, title + "_" + DateUtil.getCurrentDateTime(false) + ".log");
                         FileUtils.writeStringToFile(writeFile, sb2.toString(), "utf8");
-                        JCommonUtil._jOptionPane_showMessageDialog_info("寫擋成功\n" + writeFile);
+                        JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("寫擋成功\n" + writeFile);
                     }
                 } else {
-                    JCommonUtil._jOptionPane_showMessageDialog_info(successMessage);
+                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible(successMessage);
                 }
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
@@ -2077,12 +2058,13 @@ public class DebugMointerUI {
                 String title = (String) twoValue[0];
                 final Optional objectOptional = (Optional) twoValue[1];
                 popup.addJMenuItem("設定路徑到記是本", new ActionListener() {
+
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
                         try {
                             String path = "_#" + getFullPath(selectNode) + "#_";
                             getLogger().debug("getPath = " + path);
-                            JCommonUtil._jOptionPane_showMessageDialog_info("路徑:" + path + "\n值:" + //
+                            JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("路徑:" + path + "\n值:" + //
                             addEnterToOrignStr(String.valueOf(getParseObject(path))));
                             ClipboardUtil.getInstance().setContents(path);
                         } catch (Exception ex) {
@@ -2099,7 +2081,7 @@ public class DebugMointerUI {
                                     getLogger().debug("getPath = " + path);
                                     DefaultTableModel model = (DefaultTableModel) uiCarrier.getParameterTable().getModel();
                                     model.addRow(new Object[] { path, "" });
-                                    JCommonUtil._jOptionPane_showMessageDialog_info("路徑:" + path + "\n值:" + //
+                                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("路徑:" + path + "\n值:" + //
                                     addEnterToOrignStr(String.valueOf(getParseObject(path))));
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
@@ -2121,7 +2103,7 @@ public class DebugMointerUI {
                                             "是否要將資料新增至暫存區:\n" + tempValue, "設定暫存資料");
                                     if (result) {
                                         appendToTempModel(tempValue, 'u');
-                                        JCommonUtil._jOptionPane_showMessageDialog_info("設定資料到暫存區:" + tempValue + ",成功!");
+                                        JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("設定資料到暫存區:" + tempValue + ",成功!");
                                     }
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
@@ -2138,7 +2120,7 @@ public class DebugMointerUI {
                                             ._JOptionPane_showConfirmDialog_yesNoOption("是否要將暫存區資料設定至物件:\n" + ReflectionToStringBuilder.toString(tempValue, ToStringStyle.MULTI_LINE_STYLE), "設定資料");
                                     if (result) {
                                         String message = setRealObject(obj, tempValue);
-                                        JCommonUtil._jOptionPane_showMessageDialog_info(message);
+                                        JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible(message);
                                     }
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
@@ -2160,7 +2142,7 @@ public class DebugMointerUI {
                                     os.writeObject(toObj);
                                     os.flush();
                                     os.close();
-                                    JCommonUtil._jOptionPane_showMessageDialog_info(objectToString(toObj) + " : 資料匯出成功!");
+                                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible(objectToString(toObj) + " : 資料匯出成功!");
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                     showErrorLogInArea(ex);
@@ -2181,7 +2163,7 @@ public class DebugMointerUI {
                                     Object toObj = os.readObject();
                                     os.close();
                                     String messgae = setRealObject(obj, toObj);
-                                    JCommonUtil._jOptionPane_showMessageDialog_info(messgae + "\n" + objectToString(toObj) + " : 資料寫入成功!");
+                                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible(messgae + "\n" + objectToString(toObj) + " : 資料寫入成功!");
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                     showErrorLogInArea(ex);
@@ -2206,7 +2188,7 @@ public class DebugMointerUI {
                                         File file = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
                                         Validate.isTrue(file != null, "檔案錄竟錯誤");
                                         FileUtils.write(file, export, "utf8");
-                                        JCommonUtil._jOptionPane_showMessageDialog_info("資料印出成功!");
+                                        JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("資料印出成功!");
                                     }
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
@@ -2261,7 +2243,7 @@ public class DebugMointerUI {
                                     htmlUtil.executeAll(toObj, null, file, ignoreContains, layerCount, true);
                                     startTime = System.currentTimeMillis() - startTime;
 
-                                    JCommonUtil._jOptionPane_showMessageDialog_info(objectToString(toObj) + " : 資料建立成功!\n耗時:" + startTime);
+                                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible(objectToString(toObj) + " : 資料建立成功!\n耗時:" + startTime);
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                     showErrorLogInArea(ex);
@@ -2274,6 +2256,7 @@ public class DebugMointerUI {
                         });
             }
             popup.show();
+
         }
     }
 
@@ -2716,7 +2699,7 @@ public class DebugMointerUI {
                 }
                 // throw new RuntimeException("無法找到正確stackTraceElement : \n" +
                 // sb);//TODO
-                JCommonUtil._jOptionPane_showMessageDialog_info("無法找到正確stackTraceElement : \n" + sb);
+                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("無法找到正確stackTraceElement : \n" + sb);
                 return false;
             }
 
@@ -2928,7 +2911,7 @@ public class DebugMointerUI {
             }
             // 設定參數物件概觀
             uiCarrier.getShowInfoArea2().setText(sb.toString());
-            JCommonUtil._jOptionPane_showMessageDialog_info("已更新參數資料!");
+            JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("已更新參數資料!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
             showErrorLogInArea(ex);
@@ -2949,7 +2932,7 @@ public class DebugMointerUI {
                 }
                 uiCarrier.getShowInfoArea().setText(sb.toString());
             }
-            JCommonUtil._jOptionPane_showMessageDialog_info("已更新參數資料!");
+            JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("已更新參數資料!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
             showErrorLogInArea(ex);
@@ -3525,7 +3508,7 @@ public class DebugMointerUI {
             inst.initGUI_detail();
             int index = inst.mointerObjects.length - 1;
             if (!slientMode) {
-                JCommonUtil._jOptionPane_showMessageDialog_info("載入自訂物件[" + index + "] :\n" + newObject + "\n成功!");
+                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("載入自訂物件[" + index + "] :\n" + newObject + "\n成功!");
             }
 
             // 不知道為何會被蓋掉,很詭異
@@ -3546,7 +3529,7 @@ public class DebugMointerUI {
                 mappingObj.executeMapping();
 
                 if (!slientMode) {
-                    JCommonUtil._jOptionPane_showMessageDialog_info("自動對應完成!\n成功:\n" + mappingObj.getOkSb() + "\n失敗:\n" + mappingObj.getErrSb());
+                    JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("自動對應完成!\n成功:\n" + mappingObj.getOkSb() + "\n失敗:\n" + mappingObj.getErrSb());
                 } else {
                     getLogger().debug("自動綁定注入完成!\n成功:\n" + mappingObj.getOkSb() + "\n失敗:\n" + mappingObj.getErrSb());
                 }
@@ -3641,7 +3624,7 @@ public class DebugMointerUI {
         getLogger().debug("#END    ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑");
         getLogger().debug(timeMessage);
         if (!slientMode) {
-            JCommonUtil._jOptionPane_showMessageDialog_info("執行成功!!\n" + successMessage);
+            JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("執行成功!!\n" + successMessage);
         } else {
             executeSuccessMessage(successMessage);
             if (isAutoExecute.get()) {
@@ -3676,7 +3659,7 @@ public class DebugMointerUI {
                         }
                     }).show(1500);
         } catch (Exception ex) {
-            sysTrayUtil.getTrayIcon().displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
+            sysTrayUtil.displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
             ex.printStackTrace();
         }
     }
@@ -3841,12 +3824,12 @@ public class DebugMointerUI {
             public void actionPerformed(ActionEvent evt) {
                 Object object = getSelectNodeObject();
                 if (object == null) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("物件為null,或是不支援顯示的類型!");
+                    JCommonUtil._jOptionPane_showMessageDialog_error_NonUICompatible("物件為null,或是不支援顯示的類型!");
                     return;
                 }
                 Object clzX = uiCarrier.getNodeInfoComboBox().getSelectedItem();
                 if (!(clzX instanceof Class)) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("類別有誤:" + clzX);
+                    JCommonUtil._jOptionPane_showMessageDialog_error_NonUICompatible("類別有誤:" + clzX);
                     return;
                 }
                 Class<?> clz = (Class<?>) clzX;
@@ -3887,7 +3870,7 @@ public class DebugMointerUI {
                     }
                 }
                 uiCarrier.getShowInfoArea2().setText(sb.toString());
-                JCommonUtil._jOptionPane_showMessageDialog_info("報告於[物件蓋觀->變數]");
+                JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("報告於[物件蓋觀->變數]");
             }
         });
         return uiCarrier.getIndicateNodeClassBtn();

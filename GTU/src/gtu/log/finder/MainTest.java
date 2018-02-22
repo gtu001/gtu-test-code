@@ -12,10 +12,10 @@ public class MainTest {
     
     private class MyTest {
         public MyTest() {
+            DebugMointerUI.startWithReflectAndDispose(this, "VVVVVV");
         }
         
         private void test() {
-            DebugMointerUI.startWithReflectAndDispose(this, "VVVVVV");
         }
     }
 

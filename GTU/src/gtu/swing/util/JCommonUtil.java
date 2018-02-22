@@ -35,6 +35,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -55,6 +56,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -146,11 +148,11 @@ public class JCommonUtil {
      * 設定視窗致中
      */
     public static void setJFrameCenter(Window frame) {
-        //非視窗系統不做事
-        if(GraphicsEnvironment.isHeadless() == true) {
+        // 非視窗系統不做事
+        if (GraphicsEnvironment.isHeadless() == true) {
             return;
         }
-        
+
         // 方法一
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation((scr_size.width - frame.getWidth()) / 2, //
@@ -357,8 +359,32 @@ public class JCommonUtil {
     /**
      * 顯示alert視窗
      */
+    public static void _jOptionPane_showMessageDialog_error_NonUICompatible(Object message) {
+        try {
+            JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (java.awt.HeadlessException ex) {
+            System.out.println("<<showMessageDialog>> " + "ERROR" + " : " + message);
+            System.err.println("Non UI Mode!");
+        }
+    }
+
+    /**
+     * 顯示alert視窗
+     */
     public static void _jOptionPane_showMessageDialog_error(Object message, String title) {
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * 顯示alert視窗
+     */
+    public static void _jOptionPane_showMessageDialog_error_NonUICompatible(Object message, String title) {
+        try {
+            JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+        } catch (java.awt.HeadlessException ex) {
+            System.out.println("<<showMessageDialog>>[ERR] " + title + " : " + message);
+            System.err.println("Non UI Mode!");
+        }
     }
 
     /**
@@ -368,11 +394,29 @@ public class JCommonUtil {
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public static void _jOptionPane_showMessageDialog_info_NonUICompatible(Object message, String title) {
+        try {
+            JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+        } catch (java.awt.HeadlessException ex) {
+            System.out.println("<<showMessageDialog>>[INFO] " + title + " : " + message);
+            System.err.println("Non UI Mode!");
+        }
+    }
+
     /**
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_info(Object message) {
         JOptionPane.showMessageDialog(null, message, "INFO", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void _jOptionPane_showMessageDialog_info_NonUICompatible(Object message) {
+        try {
+            JOptionPane.showMessageDialog(null, message, "INFO", JOptionPane.INFORMATION_MESSAGE);
+        } catch (java.awt.HeadlessException ex) {
+            System.out.println("<<showMessageDialog>> " + "INFO" + " : " + message);
+            System.err.println("Non UI Mode!");
+        }
     }
 
     /**
@@ -829,11 +873,29 @@ public class JCommonUtil {
         jframe.setState(java.awt.Frame.ICONIFIED);
     }
 
-    public static void main(String[] args) {
-        try {
-            Validate.isTrue(false);
-        } catch (Exception ex) {
-            JCommonUtil.handleException(ex);
+    /**
+     * 強制使用UI
+     */
+    public static void forceUIMode(boolean isUseUIMode) {
+        boolean headLess = !isUseUIMode;
+        System.setProperty("java.awt.headless", String.valueOf(headLess));// 使用ui為false
+        if (!GraphicsEnvironment.isHeadless()) {
+            try {
+                FieldUtils.writeDeclaredStaticField(GraphicsEnvironment.class, "headless", headLess, true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
+        System.out.println("<<< java.awt.headless - " + GraphicsEnvironment.isHeadless());
+    }
+
+    /**
+     * 是否支援UI
+     */
+    public static boolean isUIMode() {
+        return !GraphicsEnvironment.isHeadless();
+    }
+
+    public static void main(String[] args) {
     }
 }
