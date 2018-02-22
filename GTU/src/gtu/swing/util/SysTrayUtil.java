@@ -122,6 +122,9 @@ public class SysTrayUtil {
 
     private class TrayIconHandler {
         private boolean exists() {
+            if (tray == null) {
+                return false;
+            }
             for (int ii = 0; ii < tray.getTrayIcons().length; ii++) {
                 TrayIcon icon = tray.getTrayIcons()[ii];
                 if (icon == trayIcon) {
@@ -132,6 +135,9 @@ public class SysTrayUtil {
         }
 
         private void addIfNeed() {
+            if (tray == null) {
+                return;
+            }
             if (!exists()) {
                 try {
                     tray.add(trayIcon);
@@ -143,6 +149,9 @@ public class SysTrayUtil {
 
         @Deprecated
         private void removeIfExists() {
+            if (tray == null) {
+                return;
+            }
             if (exists()) {
                 tray.remove(trayIcon);
             }
@@ -158,8 +167,11 @@ public class SysTrayUtil {
 
     public void displayMessage(String caption, String text, MessageType messageType) {
         try {
-            trayIconHandler.addIfNeed();
             System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
+            if (tray == null) {
+                return;
+            }
+            trayIconHandler.addIfNeed();
             trayIcon.displayMessage(caption, text, messageType);
             // trayIconHandler.removeIfExists();
         } catch (java.awt.HeadlessException ex) {

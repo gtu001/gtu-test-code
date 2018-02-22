@@ -566,6 +566,7 @@ public class JCommonUtil {
                     } else {
                         // 使用非ui模式
                         writeIfNeed = new File(System.getProperty("user.dir"), "swing_error_" + dateStr + ".log");
+                        System.out.println("Error log File Position : " + writeIfNeed);
                     }
 
                     PrintWriter pw = new PrintWriter(writeIfNeed);

@@ -135,7 +135,7 @@ public class DebugMointerUI {
         if (System.getProperty("os.name").toLowerCase().contains("window")) {
             JCommonUtil.forceUIMode(true);
         } else {
-            JCommonUtil.forceUIMode(false);
+            // JCommonUtil.forceUIMode(false);
         }
     }
 
@@ -3593,14 +3593,15 @@ public class DebugMointerUI {
             String errorMessage = "執行失敗 : " + classInfo + ", message : " + ex.getMessage();
             File errFile = JCommonUtil.handleException(errorMessage, ex);
             showErrorLogInArea(ex);
-            if (errFile != null && errFile.exists()) {
+            if (errFile != null && errFile.exists() && !uiCarrier.isUseMockUI()) {
                 try {
                     Desktop.getDesktop().browse(errFile.toURI());
                     File exeLogFile = new File(FileUtil.DESKTOP_PATH, "Logger.log");
                     if (exeLogFile.exists()) {
                         Desktop.getDesktop().browse(exeLogFile.toURI());
                     }
-                } catch (IOException e) {
+                } catch (java.awt.HeadlessException ignore) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     showErrorLogInArea(e);
                 }
@@ -3659,8 +3660,8 @@ public class DebugMointerUI {
                         }
                     }).show(1500);
         } catch (Exception ex) {
+            System.err.println(ex.getMessage());
             sysTrayUtil.displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
-            ex.printStackTrace();
         }
     }
 

@@ -1,0 +1,15 @@
+
+#顯示以安中套件
+dpkg --list
+dpkg --list | less
+dpkg --list | grep -i 'http'
+
+#反安裝
+sudo apt-get remove lighttpd
+
+#反安裝(含設定)
+sudo apt-get --purge remove lighttpd
+
+#UI軟體管理工具
+synaptic (執行)
+sudo apt-get install synaptic

@@ -1,0 +1,6 @@
+#安裝字形指令
+sudo apt-get install fonts-dejavu-core
+sudo apt-get install dejavu-sans-fonts
+
+#看字形指令
+fc-list
