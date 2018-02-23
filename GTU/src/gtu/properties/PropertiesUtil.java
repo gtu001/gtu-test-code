@@ -1,67 +1,118 @@
 package gtu.properties;
 
-import gtu.log.Log;
-import gtu.swing.util.JCommonUtil;
-
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import gtu.log.Log;
+import gtu.swing.util.JCommonUtil;
 
 public class PropertiesUtil {
 
     public static void main(String[] args) throws IOException, Exception {
+        File file = new File("E:\\workstuff\\workstuff\\workspace_scsb\\Config\\UAT_Config\\AS.conf");
+        Properties prop = PropertiesUtil.loadByChineseUTF8(file);
+        for (Object key : prop.keySet()) {
+            String val = prop.getProperty((String) key);
+            System.out.println("-->>" + key + "\t" + val);
+        }
         System.out.println("done...");
     }
 
     private PropertiesUtil() {
     }
 
-    public static Properties loadAskeys(InputStream in) throws IOException {
+    public static Properties loadByChineseUTF8(InputStream in) {
         Properties prop = new Properties();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF8"));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-            if (line.length() != 0) {
-                prop.put(line, line);
+        BufferedInputStream data = new BufferedInputStream(in);
+        data.mark(0);
+        // 可直接讀取中文黨
+        try {
+            List<String> lst = IOUtils.readLines(data, "utf8");
+            for (String line : lst) {
+                if (line.startsWith("#") || StringUtils.isBlank(line)) {
+                    continue;
+                }
+                if (line.contains("=")) {
+                    String[] vals = line.split("=", -1);
+                    prop.setProperty(vals[0], vals[1]);
+                } else {
+                    prop.setProperty(line, line);
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("loadByChineseUTF8 ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                data.reset();
+            } catch (Exception e) {
             }
         }
-        reader.close();
         return prop;
     }
 
-    public static Properties loadAskeys(File file) throws IOException {
-        return loadAskeys(new FileInputStream(file));
-    }
-
-    public static void storeAsKeys(File file, Properties prop) throws IOException {
-        storeAsKeys(new FileOutputStream(file), prop);
-    }
-
-    public static void storeAsKeys(OutputStream out, Properties prop) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF8"));
-        for (Object key : prop.keySet()) {
-            writer.write((String) key);
-            writer.newLine();
+    public static Properties loadByChineseUTF8(File file) {
+        try {
+            return loadByChineseUTF8(new FileInputStream(file));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException("loadByChineseUTF8 ERR : " + ex.getMessage(), ex);
         }
-        writer.flush();
-        writer.close();
+    }
+
+    public static void saveByChineseUTF8(OutputStream out, Properties prop) {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(out, "utf8"));
+            List<String> keys = new ArrayList<String>();
+            for (Object k : prop.keySet()) {
+                keys.add((String) k);
+            }
+            Collections.sort(keys);
+            for (String k : keys) {
+                writer.write(k + "=" + prop.getProperty(k));
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("saveByChineseUTF8 ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                writer.flush();
+            } catch (IOException e) {
+            }
+            try {
+                writer.close();
+            } catch (IOException e) {
+            }
+        }
     }
     
-    private static File checkFilePath(File file){
+    public static void saveByChineseUTF8(File file, Properties prop) {
         try {
-            if(!file.exists()){
+            saveByChineseUTF8(new FileOutputStream(file), prop);
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException("saveByChineseUTF8 ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    private static File checkFilePath(File file) {
+        try {
+            if (!file.exists()) {
                 file = new File(URLDecoder.decode(file.getAbsolutePath(), "utf8"));
                 System.err.println("---->" + file);
             }
@@ -76,7 +127,7 @@ public class PropertiesUtil {
         URL url = clz.getResource(clz.getSimpleName() + ".class");
         String protocal = url.getProtocol();
         String filepath = url.getFile();
-        
+
         String path = null;
         if (protocal.equals("zip")) {
             path = filepath;

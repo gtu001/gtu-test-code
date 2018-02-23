@@ -15,6 +15,7 @@ public class GitAutoFetchNMerge {
 
     public static void main(String[] args) throws IOException {
         File fileDirs = new File("E:/workstuff/workstuff/workspace_scsb");
+        
         String account = "gtu001";
         if(args != null && args.length == 2) {
             fileDirs = new File(args[0]);

@@ -10,12 +10,15 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil;
@@ -33,6 +36,37 @@ public class Worksheet4Fuco {
         List<WorkInfo> lst = new ArrayList<WorkInfo>();
         Map<Integer, List<WorkInfo>> valMap = new LinkedHashMap<Integer, List<WorkInfo>>();
 
+        Map<Integer, AtomicReference<String>> refMap = new TreeMap<Integer, AtomicReference<String>>();
+        for (int ii = 0; ii < sheet.getMergedRegions().size(); ii++) {
+            CellRangeAddress range = sheet.getMergedRegions().get(ii);
+            AtomicReference<String> ref = new AtomicReference<String>();
+            for (int jj = range.getFirstRow(); jj <= range.getLastRow(); jj++) {
+                refMap.put(jj, ref);
+            }
+
+            for (int jj = range.getFirstRow(); jj <= range.getLastRow(); jj++) {
+                Row row = sheet.getRow(jj);
+                String cellVal0 = ExcelUtil.getInstance().readCell(ExcelUtil.getInstance().getCellChk(row, 0));
+                if (StringUtils.isNotBlank(cellVal0)) {
+                    refMap.get(jj).set(cellVal0);
+                }
+            }
+        }
+
+        for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
+            Row row = sheet.getRow(ii);
+            if (row == null) {
+                System.out.println("row idx : " + ii + " is null");
+                continue;
+            }
+            String cellVal0 = ExcelUtil.getInstance().readCell(ExcelUtil.getInstance().getCellChk(row, 0));
+            if (!refMap.containsKey(ii)) {
+                AtomicReference<String> ref = new AtomicReference<String>();
+                ref.set(cellVal0);
+                refMap.put(ii, ref);
+            }
+        }
+
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             Row row = sheet.getRow(ii);
             if (row == null) {
@@ -47,12 +81,13 @@ public class Worksheet4Fuco {
 
             try {
                 WorkInfo info = new WorkInfo();
-                info.cal = t.getDate(cellVal0);
+                info.cal = (t.getDate(refMap.get(ii).get()));
                 info.project = cellVal1;
                 info.item = cellVal2;
                 info.hours = cellVal3;
                 lst.add(info);
             } catch (Exception ex) {
+                System.out.println("err index : " + ii);
                 ex.printStackTrace();
                 continue;
             }
@@ -82,7 +117,7 @@ public class Worksheet4Fuco {
                 vsbArry[pos].add(v.item);
             }
 
-            System.out.println("週數 : " + weekOfYear);
+            System.out.println("週數 : " + weekOfYear + "-" + t.getWeekRange(vlst));
             System.out.print("上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[1]), ","));
             System.out.print("上下班時間:09:30~18:30 ");
@@ -95,10 +130,23 @@ public class Worksheet4Fuco {
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[5]), ","));
         }
 
-        System.out.println("done...");
+    }
+
+    private String getWeekRange(List<WorkInfo> lst) {
+        long maxVal = Long.MIN_VALUE;
+        long minVal = Long.MAX_VALUE;
+        for (WorkInfo vo : lst) {
+            maxVal = Math.max(vo.cal.getTimeInMillis(), maxVal);
+            minVal = Math.min(vo.cal.getTimeInMillis(), minVal);
+        }
+        return DateFormatUtils.format(minVal, "yyyyMMdd") + "~" + //
+                DateFormatUtils.format(maxVal, "yyyyMMdd");
     }
 
     private List<String> markNumLst(List<String> lst) {
+        if (lst == null) {
+            lst = new ArrayList<String>();
+        }
         List<String> rtnLst = new ArrayList<String>(lst);
         for (int ii = 0; ii < rtnLst.size(); ii++) {
             rtnLst.set(ii, (ii + 1) + "." + rtnLst.get(ii));
@@ -107,15 +155,14 @@ public class Worksheet4Fuco {
     }
 
     private static class WorkInfo {
-        Calendar cal;
         String project;
+        Calendar cal;
         String item;
         String hours;
-        // 日期 專案 項目 工時
     }
 
+    // 2018/02/02 00:00:00
     private Calendar getDate(String dateStr) throws ParseException {
-//        2018/01/22 00:00:00
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date d1 = sdf.parse(dateStr);
         Calendar cal = Calendar.getInstance();

@@ -573,6 +573,13 @@ public class ExcelUtil {
             }
         }
     }
+    
+    /**
+     * sheet.addMergedRegion(CellRangeAddress.valueOf("B2:D5"));
+     */
+    public void mergeCell(Sheet sheet, String rangeStr) {
+        sheet.addMergedRegion(CellRangeAddress.valueOf(rangeStr));
+    }
 
     private static final ExcelUtil INSTANCE = new ExcelUtil();
 }

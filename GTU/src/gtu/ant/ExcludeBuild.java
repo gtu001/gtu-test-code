@@ -1,22 +1,20 @@
 package gtu.ant;
 
-import gtu.collection.ListUtil;
-import gtu.console.SystemInUtil;
-import gtu.properties.PropertiesUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+
+import gtu.console.SystemInUtil;
 
 /**
  * 讀取config將符合錯誤格式的java掃出來 設定為exclude
@@ -37,8 +35,7 @@ public class ExcludeBuild {
 
     private ExcludeBuild() throws Exception {
         try {
-            Properties prop = PropertiesUtil.loadAskeys(getClass().getResourceAsStream("needadd.properties"));
-            List<String> list = ListUtil.getList(prop.keys(), String.class);
+            List<String> list = IOUtils.readLines(getClass().getResourceAsStream("needadd.properties"));
             needAdd = new String[list.size()];
             needAdd = list.toArray(needAdd);
             // ListUtil.showListInfo(list);

@@ -184,7 +184,9 @@
 			<zipfileset dir="${build_dir}">
 				<exclude name="/META-INF/**" />
 				<include name="/META-INF/MANIFEST.MF" />
-				<include name="**/*" />
+				<!--<include name="**/*" />-->
+				<include name="**/*.class" />
+				<include name="**/janna.ico" />
 			</zipfileset>
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />

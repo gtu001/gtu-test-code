@@ -1606,7 +1606,7 @@ public class DebugMointerUI {
             uiCarrier.get_ui().setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
             uiCarrier.get_ui().setModalityType(ModalityType.APPLICATION_MODAL);
             JCommonUtil.setJFrameCenter(uiCarrier.get_ui());
-            JCommonUtil.setJFrameIcon(uiCarrier.get_ui(), "resource/images/ico/fantasyForYou.ico");
+            //JCommonUtil.setJFrameIcon(uiCarrier.get_ui(), "resource/images/ico/fantasyForYou.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }

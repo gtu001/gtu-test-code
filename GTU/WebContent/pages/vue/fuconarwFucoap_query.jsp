@@ -15,7 +15,6 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/Skin2.css" />
 
 <link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/bootstrap.min.css" />
-<!-- <link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/styles.css" /> -->
 <link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/css/bill-form.css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/jquery-ui.min.css">
 <style>
@@ -31,11 +30,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script src="<%=request.getContextPath()%>/js/jquery.min.js"></script>
 <script src="<%=request.getContextPath()%>/js/bootstrap.min.js"></script>
-
 <script src="<%=request.getContextPath()%>/js/bill-form.js"></script>
-<script
-	src="<%=request.getContextPath()%>/js/jquery.stickytableheaders.min.js"></script>
-<!-- <script src="<%=request.getContextPath()%>/js/ckeditor.js"></script>-->
+<script	src="<%=request.getContextPath()%>/js/jquery.stickytableheaders.min.js"></script>
 <script src="<%=request.getContextPath()%>/js/jquery-ui.min.js"></script>
 <script src="js/vue.min.js"></script>
 
@@ -81,20 +77,22 @@
 								<th v-bind:class="listClz">分期帳單年月</th>
 								<th v-bind:class="listClz">分期期數</th>
 								<th v-bind:class="listClz">申請金額</th>
-								<th v-bind:class="listClz">驗證碼</th>
+								<!-- <th v-bind:class="listClz">驗證碼</th>-->
 								<th v-bind:class="listClz">申請時間</th>
-								<th v-bind:class="listClz">總約定書版本資訊</th>
+								<th v-bind:class="listClz">總約定書版本</th>
+								<!-- <th v-bind:class="listClz">注意事項版本</th>-->
 							</tr>
 						</thead>
 						<tbody>
 							<tr v-for="(vo, index) of fuconarwFucoapLst">
 								<td v-bind:class="listClz">{{index + 1}}</td>
-								<td v-bind:class="listClz">{{vo.ibkApplDate}}</td>
+								<td v-bind:class="listClz">{{formatDateStr(vo.ibkApplDate)}}</td>
 								<td v-bind:class="listClz">{{vo.ibkTransTimes}}</td>
 								<td v-bind:class="listClz">{{vo.ibkTransAmt}}</td>
-								<td v-bind:class="listClz"></td>
-								<td v-bind:class="listClz">{{vo.ibkApplDate}}&nbsp;{{vo.ibkApplTime}}</td>
+								<!-- <td v-bind:class="listClz"></td> -->
+								<td v-bind:class="listClz">{{formatDateStr(vo.ibkApplDate)}}&nbsp;{{vo.ibkApplTime}}</td>
 								<td v-bind:class="listClz">{{vo.fucoApplNo}}</td>
+								<!-- <td v-bind:class="listClz">{{vo.fucoNoteNo}}</td>-->
 							</tr>
 						</tbody>
 					</table>
@@ -168,6 +166,11 @@
 			endDate : null,
 		},
 		methods : {
+			formatDateStr : function(dateStr){
+				return dateStr.substring(0,4) + "/" +
+				dateStr.substring(4,6) + "/" + 
+				dateStr.substring(6); 
+			},
 			updateStartDate : function(date) {
 				this.startDate = date;
 			},
