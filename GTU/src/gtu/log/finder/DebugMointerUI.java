@@ -6,9 +6,7 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
-import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
@@ -60,21 +58,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -93,7 +80,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
@@ -103,7 +89,9 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
 import gtu.class_.ClassCompilerUtil;
+import gtu.class_.ClassUtil;
 import gtu.date.DateUtil;
+import gtu.exception.ExceptionStackUtil;
 import gtu.file.FileUtil;
 import gtu.javafx.traynotification.NotificationType;
 import gtu.javafx.traynotification.TrayNotificationHelper;
@@ -137,6 +125,11 @@ public class DebugMointerUI {
         } else {
             // JCommonUtil.forceUIMode(false);
         }
+
+        // 放有相關必須要載入的classes
+        Class<?>[] classes = new Class[] { //
+                DebugMointerUI_forCglib.class, //
+        }; //
     }
 
     public static class Constant {
@@ -152,6 +145,10 @@ public class DebugMointerUI {
          * 執行路徑 : C\:\\workspace\\workspace\\WebTest\\target\\classes
          */
         public static final String INDICATE_CLASS_PATH = "classPath";
+        /**
+         * 指定使用的Parameters 20180224加入
+         */
+        public static final String INDICATE_PARAMETERS = "parameters";
 
         /*
          * Map<String,String> map = new HashMap<String,String>();
@@ -350,6 +347,34 @@ public class DebugMointerUI {
         standardProcess();// 主邏輯於此
         return (T) getReturnObject();
     }
+    
+    /**
+     * 監控物件
+     * 
+     * @param objects
+     *            the objects
+     */
+    public static <T> T startWithAndDispose(Object... objects) {
+        List<Object> lists = new ArrayList<Object>();
+        if (objects != null) {
+            for (Object v : objects) {
+                lists.add(v);
+            }
+        }
+        T rtn = startWith(lists.toArray());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                disposeTool();
+            }
+        }).start();
+        return rtn;
+    }
 
     /**
      * 監控物件
@@ -429,7 +454,7 @@ public class DebugMointerUI {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -458,7 +483,7 @@ public class DebugMointerUI {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -561,6 +586,11 @@ public class DebugMointerUI {
                     StringUtils.isNotBlank((String) classInfo.get(Constant.INDICATE_METHOD_NAME))) {
                 settingOk = true;
                 config.executeMethodName = (String) classInfo.get(Constant.INDICATE_METHOD_NAME);
+            }
+            if (classInfo.containsKey(Constant.INDICATE_PARAMETERS) && //
+                    classInfo.get(Constant.INDICATE_PARAMETERS) != null && //
+                    classInfo.get(Constant.INDICATE_PARAMETERS).getClass().isArray()) {
+                config.indicateParameters = (Object[]) classInfo.get(Constant.INDICATE_PARAMETERS);
             }
             if (settingOk) {
                 inst.indicateExecuteConfig = config;
@@ -1606,7 +1636,8 @@ public class DebugMointerUI {
             uiCarrier.get_ui().setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
             uiCarrier.get_ui().setModalityType(ModalityType.APPLICATION_MODAL);
             JCommonUtil.setJFrameCenter(uiCarrier.get_ui());
-            //JCommonUtil.setJFrameIcon(uiCarrier.get_ui(), "resource/images/ico/fantasyForYou.ico");
+            // JCommonUtil.setJFrameIcon(uiCarrier.get_ui(),
+            // "resource/images/ico/fantasyForYou.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3502,10 +3533,13 @@ public class DebugMointerUI {
                     ii--;
                 }
             }
+
             inst.mointerObjects = ArrayUtils.add(objects, newObject);
             // getLogger().debug("mointerObjects=>" +
             // Arrays.toString(inst.mointerObjects));
-            inst.initGUI_detail();
+
+            // inst.initGUI_detail(); XXX 20180224 應該不用再做一次
+
             int index = inst.mointerObjects.length - 1;
             if (!slientMode) {
                 JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("載入自訂物件[" + index + "] :\n" + newObject + "\n成功!");
@@ -3557,6 +3591,8 @@ public class DebugMointerUI {
                 Object obj = mointerObjects[ii];
                 if (obj != null && StringUtils.equals(obj.getClass().getName(), className)) {
                     findObj = true;
+                    
+                    //無參數執行
                     for (Method method : obj.getClass().getMethods()) {
                         if (StringUtils.equals(method.getName(), executeMethodName) && method.getParameterTypes().length == 0) {
                             findMethod = true;
@@ -3565,6 +3601,19 @@ public class DebugMointerUI {
                             break;
                         }
                     }
+                    
+                    //使用cglib時使用指定參數
+                    if (inst.indicateExecuteConfig != null && //
+                            inst.indicateExecuteConfig.indicateParameters != null && inst.indicateExecuteConfig.indicateParameters.length != 0) {
+                        for (Method method : obj.getClass().getMethods()) {
+                            if(this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
+                                exactExecute(method, obj, inst.indicateExecuteConfig.indicateParameters, slientMode);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    //多參數執行
                     for (Method method : obj.getClass().getMethods()) {
                         if (StringUtils.equals(method.getName(), executeMethodName) && method.getParameterTypes().length != 0) {
                             findMethod = true;
@@ -3610,6 +3659,21 @@ public class DebugMointerUI {
                 throw new RuntimeException(errorMessage, ex);
             }
         }
+    }
+    
+    private boolean isObjectParamaterClassMatch_forCglib(Class<?>[] clz, Object[] params) {
+        if(clz.length != params.length) {
+            return false;
+        }
+        for(int ii = 0 ; ii < clz.length; ii ++) {
+            if(params[ii]== null) {
+                continue;
+            }
+            if(!ClassUtil.isAssignFrom(clz[ii], params[ii].getClass())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void exactExecute(Method method, Object obj, Object[] params, boolean slientMode) throws Throwable {
@@ -3709,6 +3773,7 @@ public class DebugMointerUI {
         String classPath;
         String className;
         String executeMethodName;
+        Object[] indicateParameters;// 20180224加入
 
         @Override
         public int hashCode() {

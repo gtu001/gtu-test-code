@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 public class ExceptionStackUtil {
-    
+
     public static String parseToString(Throwable ge) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
