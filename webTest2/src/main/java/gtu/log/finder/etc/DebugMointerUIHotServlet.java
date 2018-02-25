@@ -25,6 +25,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import gtu.class_.ClassUtil;
 import gtu.exception.ExceptionStackUtil;
 import gtu.log.finder.DebugMointerUI;
 import gtu.log.finder.DebugMointerUI_forCglib;
@@ -183,10 +184,13 @@ public class DebugMointerUIHotServlet extends HttpServlet {
             Object bean = context.getBean(name);
             if (bean.getClass().getDeclaredFields() != null) {
                 for (Field f : bean.getClass().getDeclaredFields()) {
-                    if (f.getType() == orignClass) {
+                    if (ClassUtil.isAssignFrom(f.getType(), orignClass)) {
                         try {
-                            FieldUtils.writeDeclaredField(bean, f.getName(), newProxy, true);
-                            log("更換 " + bean.getClass().getName() + "." + f.getName() + " - 成功! : " + newProxy, writer);
+                            Object orignBean = FieldUtils.readDeclaredField(bean, f.getName(), true);
+                            if(StringUtils.equals(orignBean.getClass().getName(), orignClass.getName())) {
+                                FieldUtils.writeDeclaredField(bean, f.getName(), newProxy, true);
+                                log("更換 " + bean.getClass().getName() + "." + f.getName() + " - 成功! : " + newProxy, writer);
+                            }
                         } catch (IllegalAccessException ex) {
                             log("[ERROR]更換 " + bean.getClass().getName() + "." + f.getName() + " - 失敗!", writer);
                             log(ExceptionStackUtil.parseToString(ex), writer);

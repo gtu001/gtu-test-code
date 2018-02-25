@@ -347,7 +347,7 @@ public class DebugMointerUI {
         standardProcess();// 主邏輯於此
         return (T) getReturnObject();
     }
-    
+
     /**
      * 監控物件
      * 
@@ -3587,33 +3587,33 @@ public class DebugMointerUI {
 
             boolean findObj = false;
             boolean findMethod = false;
-            for (int ii = 0; ii < mointerObjects.length; ii++) {
+            A : for (int ii = 0; ii < mointerObjects.length; ii++) {
                 Object obj = mointerObjects[ii];
                 if (obj != null && StringUtils.equals(obj.getClass().getName(), className)) {
                     findObj = true;
-                    
-                    //無參數執行
+
+                    // 使用cglib時使用指定參數
+                    if (inst.indicateExecuteConfig != null && //
+                            inst.indicateExecuteConfig.indicateParameters != null && inst.indicateExecuteConfig.indicateParameters.length != 0) {
+                        for (Method method : obj.getClass().getMethods()) {
+                            if (this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
+                                exactExecute(method, obj, inst.indicateExecuteConfig.indicateParameters, slientMode);
+                                break A;
+                            }
+                        }
+                    }
+
+                    // 無參數執行
                     for (Method method : obj.getClass().getMethods()) {
                         if (StringUtils.equals(method.getName(), executeMethodName) && method.getParameterTypes().length == 0) {
                             findMethod = true;
                             classInfo = obj.getClass().getName() + "." + method.getName() + "()";
                             exactExecute(method, obj, new Object[0], slientMode);
-                            break;
+                            break A;
                         }
                     }
-                    
-                    //使用cglib時使用指定參數
-                    if (inst.indicateExecuteConfig != null && //
-                            inst.indicateExecuteConfig.indicateParameters != null && inst.indicateExecuteConfig.indicateParameters.length != 0) {
-                        for (Method method : obj.getClass().getMethods()) {
-                            if(this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
-                                exactExecute(method, obj, inst.indicateExecuteConfig.indicateParameters, slientMode);
-                                break;
-                            }
-                        }
-                    }
-                    
-                    //多參數執行
+
+                    // 多參數執行
                     for (Method method : obj.getClass().getMethods()) {
                         if (StringUtils.equals(method.getName(), executeMethodName) && method.getParameterTypes().length != 0) {
                             findMethod = true;
@@ -3622,7 +3622,7 @@ public class DebugMointerUI {
                                 DebugMointerMappingFieldForMethod mappingObj = new DebugMointerMappingFieldForMethod(this, mointerObjects, method);
                                 List<Object> parameterList = mappingObj.getExactExecuteParameterList();
                                 exactExecute(method, obj, parameterList.toArray(), slientMode);
-                                break;
+                                break A;
                             } catch (UnsupportedOperationException ex) {
                                 getLogger().debug(ex.getMessage());
                                 continue;
@@ -3660,16 +3660,16 @@ public class DebugMointerUI {
             }
         }
     }
-    
+
     private boolean isObjectParamaterClassMatch_forCglib(Class<?>[] clz, Object[] params) {
-        if(clz.length != params.length) {
+        if (clz.length != params.length) {
             return false;
         }
-        for(int ii = 0 ; ii < clz.length; ii ++) {
-            if(params[ii]== null) {
+        for (int ii = 0; ii < clz.length; ii++) {
+            if (params[ii] == null) {
                 continue;
             }
-            if(!ClassUtil.isAssignFrom(clz[ii], params[ii].getClass())) {
+            if (!ClassUtil.isAssignFrom(clz[ii], params[ii].getClass())) {
                 return false;
             }
         }
