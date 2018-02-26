@@ -3597,6 +3597,8 @@ public class DebugMointerUI {
                             inst.indicateExecuteConfig.indicateParameters != null && inst.indicateExecuteConfig.indicateParameters.length != 0) {
                         for (Method method : obj.getClass().getMethods()) {
                             if (this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
+                                findMethod = true;
+                                classInfo = obj.getClass().getName() + "." + method.getName() + "()";
                                 exactExecute(method, obj, inst.indicateExecuteConfig.indicateParameters, slientMode);
                                 break A;
                             }

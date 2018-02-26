@@ -6,7 +6,20 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import gtu.log.finder.etc.HtmlUtil;
+
 public class ExceptionStackUtil {
+    
+    public static String parseToStringBr(Throwable ge) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ge.printStackTrace(pw);
+        Throwable parentThrowEx = ge;
+        while ((parentThrowEx = parentThrowEx.getCause()) != null) {
+            parentThrowEx.printStackTrace(pw);
+        }
+        return HtmlUtil.replaceChangeLineToBr(sw.toString());
+    }
 
     public static String parseToString(Throwable ge) {
         StringWriter sw = new StringWriter();

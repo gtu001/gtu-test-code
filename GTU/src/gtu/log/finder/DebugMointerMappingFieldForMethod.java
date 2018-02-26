@@ -127,8 +127,8 @@ public class DebugMointerMappingFieldForMethod {
                 for (int jj = 0; jj < Array.getLength(o); jj++) {
                     Object o2 = Array.get(o, jj);
                     if (o2 != null && ClassUtil.isAssignFrom(clz, o2.getClass())) {
-                        logger.debug("取得參數 param[" + index + "] = mointerObjects[" + ii + "][" + jj + "] -> " + DebugMointerMappingField.getObjSimpleStr(o));
-                        return o;
+                        logger.debug("取得參數 param[" + index + "] = mointerObjects[" + ii + "][" + jj + "] -> " + DebugMointerMappingField.getObjSimpleStr(o2));
+                        return o2;
                     }
                 }
             }

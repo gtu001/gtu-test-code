@@ -70,7 +70,7 @@
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
-			
+
 			<packagename mode="small">javassist.Modifier</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.FileUtils</packagename>
 			<packagename mode="exact" name="guava-20.0.jar">com.google.common.base.Optional</packagename>
@@ -78,7 +78,7 @@
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="exact" name="mockito-all-1.8.5.jar">org.mockito.Mockito</packagename>
-			
+
 			<packagename mode="exact" name="webTest2.jar">gtu.log.finder.etc.WebTestUtil</packagename>
 		</jarfinder>
 
@@ -187,6 +187,14 @@
 				<!--<include name="**/*" />-->
 				<include name="**/*.class" />
 				<include name="**/janna.ico" />
+				<!-- TrayNotification -->
+				<include name="**/arrow.png" />
+				<include name="**/error.png" />
+				<include name="**/info.png" />
+				<include name="**/notice.png" />
+				<include name="**/success.png" />
+				<include name="**/warning.png" />
+				<include name="**/TrayNotification.fxml" />
 			</zipfileset>
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />

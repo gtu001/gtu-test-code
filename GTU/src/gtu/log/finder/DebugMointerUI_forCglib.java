@@ -1,5 +1,7 @@
 package gtu.log.finder;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -122,8 +124,15 @@ public class DebugMointerUI_forCglib {
     }
 
     private void log(String message) {
-        System.out.println(message);
+        logDo.actionPerformed(new ActionEvent(message, 1, message));
     }
+
+    private ActionListener logDo = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println(e.getActionCommand());
+        }
+    };
 
     public <T> T createProxy(Class<?> orignClass, Object orignBean, List<?> mappingField) {
         MethodInterceptor handler = new Handler(orignBean, mappingField.toArray());
@@ -141,6 +150,10 @@ public class DebugMointerUI_forCglib {
             System.out.println("####### orign test");
             return "BBBBBB";
         }
+    }
+
+    public void setLogDo(ActionListener logDo) {
+        this.logDo = logDo;
     }
 
     public static void main(String[] args) {

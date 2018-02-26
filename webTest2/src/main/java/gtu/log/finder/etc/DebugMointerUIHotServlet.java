@@ -7,9 +7,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -20,6 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.ApplicationContext;
@@ -28,6 +32,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import gtu.class_.ClassUtil;
 import gtu.exception.ExceptionStackUtil;
 import gtu.log.finder.DebugMointerUI;
+import gtu.log.finder.DebugMointerUI.Constant;
 import gtu.log.finder.DebugMointerUI_forCglib;
 
 public class DebugMointerUIHotServlet extends HttpServlet {
@@ -38,101 +43,140 @@ public class DebugMointerUIHotServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
-        super.doGet(req, response);
         this.process(req, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, final HttpServletResponse response) throws ServletException, IOException {
-        super.doPost(req, response);
         this.process(req, response);
     }
 
     private void process(HttpServletRequest req, final HttpServletResponse response) {
         System.out.println("#. DebugMointerUIHotServlet start");
-        PrintWriter writer = null;
+        final StringBuilder sb = new StringBuilder();
         try {
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("text/html; charset=UTF-8");
-
-            writer = response.getWriter();
-
-            DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
-
             // WebParamterWrapper request = new WebParamterWrapper(req, "utf8");
 
-            String file = req.getParameter("file");
+            String classpathStr = req.getParameter("classpath");
             String orignClz = req.getParameter("orignClz");
+            String invoke = req.getParameter("invoke");
 
             File classpathFile = null;
-            if (StringUtils.isNotBlank(file)) {
-                classpathFile = new File(file);
+            if (StringUtils.isNotBlank(classpathStr)) {
+                classpathFile = new File(classpathStr);
                 if (!classpathFile.exists()) {
-                    log("路徑不存在  : " + file, writer);
+                    log("[classpath] 路徑不存在  : " + classpathStr, sb);
                 }
             } else {
-                log("參數為空[file] : " + file, writer);
+                log("[classpath]參數為空 : " + classpathStr, sb);
             }
 
             if (classpathFile == null || !classpathFile.exists()) {
                 classpathFile = getDefaultClasspathFile();
-                log("使用預設路徑  : " + classpathFile, writer);
+                log("[classpath] 使用預設路徑  : " + classpathFile, sb);
             }
 
             if (StringUtils.isBlank(orignClz)) {
-                log("參數為空[orignClz] : " + orignClz, writer);
+                log("[orignClz]參數為空 : " + orignClz, sb);
             }
 
+            ApplicationContext context = getContext(sb);
+
+            // 取得原始物件[可能已被proxy]
             Class<?> orignClass = null;
+            Object orignBean = null;
             try {
                 orignClass = Class.forName(orignClz);
-            } catch (Exception e1) {
-                log("無法找到Class : " + orignClz, writer);
-            }
-
-            if (orignClass != null) {
-                ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-                context = getContextCustom();
-
-                // 取得原始物件[可能已被proxy]
-                Object orignBean = context.getBean(orignClass);
+                orignBean = getOrignBean(orignClass, context, sb);
                 log("取得原始Bean物件[可能已被proxy] : " + orignBean);
 
                 // 取得原始物件
                 orignBean = orignPool.get(orignClass, orignBean);
                 log("取得原始Bean物件 : " + orignBean);
+            } catch (Exception e1) {
+                log("無法找到Orign Class Bean : " + orignClz, sb);
+            }
 
-                if (orignBean == null) {
-                    log("原始Class為空 !" + orignClz, writer);
-                }
+            if (orignBean == null) {
+                log("原始Class為空 ! : " + orignClz, sb);
+            }
 
+            if (orignBean != null) {
                 String classname = orignClz + "_";
                 log("外掛Bean class : " + classname);
+
+                DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
+                cglib.setLogDo(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        log(e.getActionCommand(), sb);
+                    }
+                });
                 cglib.loadPluginClass(classpathFile, classname);
                 Object newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
 
-                this.replaceAllAutowired(orignClass, newProxy, context, writer);
+                this.replaceAllAutowired(orignClass, newProxy, context, sb);
+            }
+
+            if (StringUtils.isNotBlank(invoke)) {
+                String classname = orignClz + "_";
+                String method = invoke;
+                if (invoke.contains(".")) {
+                    String[] vals = invoke.split(".");
+                    classname = vals[0];
+                    method = vals[1];
+                }
+
+                log("<br/><h1>執行外掛</h1>");
+                log(">> " + classname + "." + method + "()!! <<", sb);
+
+                if (orignBean == null) {
+                    log("原始Class為空 !" + orignClz, sb);
+                }
+
+                Object[] refArry = new Object[] { //
+                        context, //
+                        req, //
+                        response,//
+                };//
+                
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put(Constant.INDICATE_CLASS_PATH, classpathFile.getAbsolutePath());
+                map.put(Constant.INDICATE_CLASS_NAME, classname);
+                map.put(Constant.INDICATE_METHOD_NAME, method);
+                Object rtnVal = DebugMointerUI.startWithAndDispose(map, orignBean, refArry);
+
+                try {
+                    log("執行結果 ↓↓↓↓↓↓↓↓↓↓↓↓ ");
+                    log(HtmlUtil.replaceChangeLineToBr(ReflectionToStringBuilder.toString(rtnVal, ToStringStyle.MULTI_LINE_STYLE)), sb);
+                    log("執行結果 ↑↑↑↑↑↑↑↑↑↑↑↑ ");
+                } catch (Exception ex) {
+                    log(ExceptionStackUtil.parseToStringBr(ex), sb);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
 
-            if (writer != null) {
+            if (sb != null) {
                 try {
-                    log(ExceptionStackUtil.parseToString(ex), writer);
+                    log(ExceptionStackUtil.parseToStringBr(ex), sb);
                 } catch (Exception ex2) {
                     ex2.printStackTrace();
                 }
             }
         } finally {
             try {
-                writer.flush();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            try {
-                writer.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("text/html; charset=UTF-8");
+                PrintWriter out = response.getWriter();
+                out.println("<html><body>");
+                out.println("<h1>掛載結果</h1>");
+                out.println(sb.toString());
+                out.println("</body></html>");
+                out.println("<html><body>");
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             System.out.println("#. DebugMointerUIHotServlet end");
         }
@@ -142,6 +186,9 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         private Map<Class<?>, Object> orignPool = new HashMap<Class<?>, Object>();
 
         private Object get(Class<?> clz, Object orignBean) {
+            if (clz == null) {
+                return null;
+            }
             if (orignPool.containsKey(clz)) {
                 return orignPool.get(clz);
             } else {
@@ -149,6 +196,22 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 return orignBean;
             }
         }
+    }
+
+    private ApplicationContext getContext(StringBuilder sb) {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        context = getContextCustom();
+        log("取得spring context : " + context);
+        return context;
+    }
+
+    private Object getOrignBean(Class<?> orignClass, ApplicationContext context, StringBuilder sb) {
+        try {
+            return context.getBean(orignClass);
+        } catch (Exception ex) {
+            log(ExceptionStackUtil.parseToStringBr(ex), sb);
+        }
+        return null;
     }
 
     private File getDefaultClasspathFile() {
@@ -173,12 +236,12 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         }
     }
 
-    private void log(String message, PrintWriter writer) {
+    private void log(String message, StringBuilder sb) {
         System.out.println(message);
-        writer.write(message + CHANGELINE);
+        sb.append(message + CHANGELINE);
     }
 
-    private <T> void replaceAllAutowired(Class<?> orignClass, Object newProxy, ApplicationContext context, PrintWriter writer) {
+    private <T> void replaceAllAutowired(Class<?> orignClass, Object newProxy, ApplicationContext context, StringBuilder sb) {
         log("Bean size : " + context.getBeanDefinitionCount());
         for (String name : context.getBeanDefinitionNames()) {
             Object bean = context.getBean(name);
@@ -187,13 +250,13 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                     if (ClassUtil.isAssignFrom(f.getType(), orignClass)) {
                         try {
                             Object orignBean = FieldUtils.readDeclaredField(bean, f.getName(), true);
-                            if(StringUtils.equals(orignBean.getClass().getName(), orignClass.getName())) {
+                            if (orignBean == null || StringUtils.equals(orignBean.getClass().getName(), orignClass.getName())) {
                                 FieldUtils.writeDeclaredField(bean, f.getName(), newProxy, true);
-                                log("更換 " + bean.getClass().getName() + "." + f.getName() + " - 成功! : " + newProxy, writer);
+                                log("更換 " + bean.getClass().getName() + "." + f.getName() + " - 成功! : " + newProxy, sb);
                             }
                         } catch (IllegalAccessException ex) {
-                            log("[ERROR]更換 " + bean.getClass().getName() + "." + f.getName() + " - 失敗!", writer);
-                            log(ExceptionStackUtil.parseToString(ex), writer);
+                            log("[ERROR]更換 " + bean.getClass().getName() + "." + f.getName() + " - 失敗!", sb);
+                            log(ExceptionStackUtil.parseToStringBr(ex), sb);
                         }
                     }
                 }
