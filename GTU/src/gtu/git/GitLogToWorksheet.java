@@ -101,7 +101,7 @@ public class GitLogToWorksheet {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d1 = sdf.parse("20180223");
+        Date d1 = sdf.parse("20180226");
         Calendar c1 = Calendar.getInstance();
         c1.setTime(d1);
         c1.set(Calendar.HOUR, 0);
@@ -111,7 +111,7 @@ public class GitLogToWorksheet {
 
         Calendar c2 = Calendar.getInstance();
         c2.setTime(c1.getTime());
-        c2.add(Calendar.DATE, 1);
+        c2.add(Calendar.DATE, 5);//1
 
         String logCommand = GitLog.newInstance()//
                 .since(c1.getTime())//

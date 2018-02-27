@@ -96,14 +96,18 @@ public class SysTrayUtil {
                 defaultExit.setLabel("Exit");
                 defaultExit.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        trayIcon.displayMessage(title, title + " exiting...", TrayIcon.MessageType.INFO);
                         try {
-                            defaultExitActionListener.actionPerformed(e);
-                            Thread.sleep(500);
-                        } catch (InterruptedException e1) {
-                            e1.printStackTrace();
+                            trayIcon.displayMessage(title, title + " exiting...", TrayIcon.MessageType.INFO);
+                            try {
+                                defaultExitActionListener.actionPerformed(e);
+                                Thread.sleep(500);
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                            tray.remove(trayIcon);
+                        }catch(Throwable ex) {
+                            ex.printStackTrace();
                         }
-                        tray.remove(trayIcon);
                     }
                 });
                 jPopupMenu1.add(defaultExit);

@@ -112,7 +112,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
             }
 
             if (classpathFile == null || !classpathFile.exists()) {
-                classpathFile = getDefaultClasspathFile();
+                classpathFile = getDefaultClasspathFile(sb);
                 logH("[classpath] 使用預設路徑  : " + classpathFile, sb);
             }
 
@@ -144,51 +144,57 @@ public class DebugMointerUIHotServlet extends HttpServlet {
 
             // 替換proxy
             if (orignBean != null) {
-                String classname = orignClz + "_";
-                log("外掛Bean class : " + classname);
+                try {
+                    String classname = orignClz + "_";
+                    log("外掛Bean class : " + classname);
 
-                DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
-                cglib.setLogDo(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        logH(e.getActionCommand(), sb);
-                    }
-                });
-                cglib.loadPluginClass(classpathFile, classname);
-                Object newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
+                    DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
+                    cglib.setLogDo(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            logH(e.getActionCommand(), sb);
+                        }
+                    });
+                    cglib.loadPluginClass(classpathFile, classname);
+                    Object newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
 
-                springHandler.replaceAllAutowired(orignClass, newProxy, context, sb);
+                    springHandler.replaceAllAutowired(orignClass, newProxy, context, sb);
+                } catch (Throwable ex) {
+                    exceptioinHandler(ex, sb);
+                }
             }
 
             // 執行外掛
             if (StringUtils.isNotBlank(invoke)) {
-                invoke = URLDecoder.decode(invoke, "utf8");
-                String classname = orignClz + "_";
-                String method = invoke;
-                if (invoke.contains(".")) {
-                    String[] vals = invoke.split(",", -1);
-                    classname = vals[0];
-                    method = vals[1];
-                }
-
-                logH("<br/><h2>" + getRandomColorString("執行外掛") + "</h2>", sb);
-                logH(">>" + getRandomColorString(classname + "." + method + "()!!") + " <<", sb);
-
-                if (orignBean == null) {
-                    logH("原始Class為空 !" + orignClz, sb);
-                }
-
-                Object[] refArry = new Object[] { //
-                        context, //
-                        req, //
-                        response,//
-                };//
-
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put(Constant.INDICATE_CLASS_PATH, classpathFile.getAbsolutePath());
-                map.put(Constant.INDICATE_CLASS_NAME, classname);
-                map.put(Constant.INDICATE_METHOD_NAME, method);
-                Object rtnVal = DebugMointerUI.startWithAndDispose(map, orignBean, refArry);
                 try {
+                    invoke = URLDecoder.decode(invoke, "utf8");
+                    String classname = orignClz + "_";
+                    String method = invoke;
+                    if (invoke.contains(".")) {
+                        String[] vals = invoke.split(",", -1);
+                        classname = vals[0];
+                        method = vals[1];
+                    }
+
+                    logH("<br/><h2>" + getRandomColorString("執行外掛") + "</h2>", sb);
+                    logH(">>" + getRandomColorString(classname + "." + method + "()!!") + " <<", sb);
+
+                    if (orignBean == null) {
+                        logH("原始Class為空 !" + orignClz, sb);
+                    }
+
+                    Object[] refArry = new Object[] { //
+                            context, //
+                            req, //
+                            response,//
+                    };//
+
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put(Constant.INDICATE_CLASS_PATH, classpathFile.getAbsolutePath());
+                    map.put(Constant.INDICATE_CLASS_NAME, classname);
+                    map.put(Constant.INDICATE_METHOD_NAME, method);
+
+                    Object rtnVal = DebugMointerUI.startWithAndDispose(map, orignBean, refArry);
+
                     StringBuilder tableSb = new StringBuilder();
                     tableSb.append("<table border='1'>\n");
                     tableSb.append("<tr><td width='10%'>回傳值</td><td width='90%'>內容</td></tr>\n");
@@ -320,7 +326,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         }
     }
 
-    private File getDefaultClasspathFile() {
+    private File getDefaultClasspathFile(StringBuilder sb) {
         try {
             Properties prop = new Properties();
             prop.load(new FileInputStream(DebugMointerUI.configFile));
@@ -335,21 +341,19 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 }
             }
             String valueStr = prop.getProperty(propKey + val);
-            if(valueStr == null) {
-                return new File(System.getProperty("user.dir"), "classes");
-            }
             File classespath = new File(valueStr.split(",")[0]);
             return classespath;
         } catch (Exception e) {
-            throw new RuntimeException("getDefaultClasspathFile ERR : " + e.getMessage(), e);
+            logH("getDefaultClasspathFile ERR : " + e.getMessage(), sb);
+            return new File(System.getProperty("user.dir"), "classes");
         }
     }
 
     private String getFormStr(HttpServletRequest request) {
         StringBuilder sb = new StringBuilder();
         sb.append("<script type=\"text/javascript\">\n");
-        sb.append("function showHide(){                                  \n");
-        sb.append("  var divForm = document.getElementById('divForm');   \n");
+        sb.append("function showHide(id){                                  \n");
+        sb.append("  var divForm = document.getElementById(id);   \n");
         sb.append("  if(divForm.style.display == \"none\"){              \n");
         sb.append("    divForm.style.display = \"block\";             \n");
         sb.append("  }else{                                              \n");
@@ -357,7 +361,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         sb.append("  }                                                   \n");
         sb.append("}                                                     \n");
         sb.append("</script>\n");
-        sb.append("<br/><a href=\"javascript:showHide();\"><i>表單</i></a><br/>\n");
+        sb.append("<br/><a href=\"javascript:showHide('divForm');\"><i>表單</i></a><br/>\n");
         sb.append("<div id='divForm' style=\"background-color:" + RandomColorFill.getInstance().get() + "; padding:10px;margin-bottom:5px; display:none\">\n");
         sb.append(String.format("<form action=\"\">\n", this.getURL(request)));
         sb.append("<table border='1'>\n");

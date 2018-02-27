@@ -196,6 +196,7 @@ public class DebugMointerUI {
             confFile = new File(System.getProperty("user.dir"), confName);
         }
         configFile = confFile;
+        System.out.println("# configFile : " + configFile);
     }
     // 重要變數
     // --------------------------------------------------------------------------------------
@@ -4000,6 +4001,7 @@ public class DebugMointerUI {
         try {
             if (!configFile.exists()) {
                 configFile.createNewFile();
+                System.out.println("# configFile create : " + configFile);
             }
             prop.load(new FileInputStream(configFile));
             inst.configProp = prop;
