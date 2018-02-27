@@ -3740,7 +3740,7 @@ public class DebugMointerUI {
                 try {
                     method.setAccessible(true);
                     returnMap.setValue(method.invoke(object, parameters));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     errorMap.setValue(e);
                 }
             }

@@ -45,60 +45,60 @@ public class DebugMointerMappingFieldForMethod {
     public List<Object> getExactExecuteParameterList() {
         List<Object> rtnList = new ArrayList<Object>();
         Class<?>[] paramClzs = method.getParameterTypes();
-        //已預設的搜尋參數
+        // 已預設的搜尋參數
         for (int ii = 0; ii < paramClzs.length; ii++) {
             Object val = getParameter(ii, paramClzs[ii]);
             rtnList.add(val);
         }
-        
-        //取得強制對應參數
+
+        // 取得強制對應參數
         Map<Integer, DebugMointerUIMapping> defMap = getDebugMointerUIMappingDefine(method);
-        if(!defMap.isEmpty()){
+        if (!defMap.isEmpty()) {
             replaceIndicateMapping(rtnList, defMap, paramClzs);
         }
-        
+
         return rtnList;
     }
-    
+
     /**
      * 替換指定參數
      */
-    private void replaceIndicateMapping(List<Object> rtnList, Map<Integer, DebugMointerUIMapping> defMap, Class<?>[] paramClzs){
-        for(Integer index : defMap.keySet()){
+    private void replaceIndicateMapping(List<Object> rtnList, Map<Integer, DebugMointerUIMapping> defMap, Class<?>[] paramClzs) {
+        for (Integer index : defMap.keySet()) {
             DebugMointerUIMapping def = defMap.get(index);
-            if(def.index() != -1){
-                try{
+            if (def.index() != -1) {
+                try {
                     Object o = mointerObjects[def.index()];
                     Class<?> clz = paramClzs[index];
-                    if(o != null){
-                        if(ClassUtil.isAssignFrom(clz, o.getClass())){
+                    if (o != null) {
+                        if (ClassUtil.isAssignFrom(clz, o.getClass())) {
                             rtnList.set(index, o);
                             logger.debug("使用指定index成功  -> index : " + index + " , obj = " + DebugMointerMappingField.getObjSimpleStr(o));
-                        }else{
+                        } else {
                             logger.error("使用指定index型別不符 : " + def + " index = " + index + ", " + DebugMointerMappingField.getObjSimpleStr(o));
-                        } 
+                        }
                     }
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     logger.error("使用指定index 錯誤 : " + def, ex);
                 }
             }
         }
     }
-    
+
     /**
      * 取得method 定義
      */
     /**
      * 取得method 定義
      */
-    private Map<Integer, DebugMointerUIMapping> getDebugMointerUIMappingDefine(Method method){
+    private Map<Integer, DebugMointerUIMapping> getDebugMointerUIMappingDefine(Method method) {
         Map<Integer, DebugMointerUIMapping> defMap = new TreeMap<Integer, DebugMointerUIMapping>();
         Annotation[][] annotations = method.getParameterAnnotations();
-        for (int ii = 0 ; ii < annotations.length ; ii ++) {
+        for (int ii = 0; ii < annotations.length; ii++) {
             Annotation[] ann = annotations[ii];
-            if(ann.length!=0){
-                for(int jj = 0 ; jj < ann.length ; jj ++){
-                    if(ann[jj].annotationType() == DebugMointerUIMapping.class){
+            if (ann.length != 0) {
+                for (int jj = 0; jj < ann.length; jj++) {
+                    if (ann[jj].annotationType() == DebugMointerUIMapping.class) {
                         defMap.put(ii, (DebugMointerUIMapping) ann[jj]);
                     }
                 }
@@ -123,7 +123,7 @@ public class DebugMointerMappingFieldForMethod {
         // 若物件為array
         for (int ii = 0; ii < mointerObjects.length; ii++) {
             Object o = mointerObjects[ii];
-            if (o.getClass().isArray()) {
+            if (o != null && o.getClass().isArray()) {
                 for (int jj = 0; jj < Array.getLength(o); jj++) {
                     Object o2 = Array.get(o, jj);
                     if (o2 != null && ClassUtil.isAssignFrom(clz, o2.getClass())) {
@@ -137,11 +137,13 @@ public class DebugMointerMappingFieldForMethod {
         // 取得物件內的field
         for (int ii = 0; ii < mointerObjects.length; ii++) {
             Object o = mointerObjects[ii];
-            for (Field f : o.getClass().getDeclaredFields()) {
-                Object o2 = getObject(f, o);
-                if (o2 != null && ClassUtil.isAssignFrom(clz, f.getType())) {
-                    logger.debug("取得參數 param[" + index + "] = mointerObjects[" + ii + "]." + f.getName() + " -> " + DebugMointerMappingField.getObjSimpleStr(o2));
-                    return o2;
+            if(o != null) {
+                for (Field f : o.getClass().getDeclaredFields()) {
+                    Object o2 = getObject(f, o);
+                    if (o2 != null && ClassUtil.isAssignFrom(clz, f.getType())) {
+                        logger.debug("取得參數 param[" + index + "] = mointerObjects[" + ii + "]." + f.getName() + " -> " + DebugMointerMappingField.getObjSimpleStr(o2));
+                        return o2;
+                    }
                 }
             }
         }
@@ -173,7 +175,7 @@ public class DebugMointerMappingFieldForMethod {
         // 若物件為array
         for (int ii = 0; ii < model.getSize(); ii++) {
             Object o = model.getElementAt(ii);
-            if (o.getClass().isArray()) {
+            if (o != null && o.getClass().isArray()) {
                 for (int jj = 0; jj < Array.getLength(o); jj++) {
                     Object o2 = Array.get(o, jj);
                     if (o2 != null && ClassUtil.isAssignFrom(clz, o2.getClass())) {
@@ -187,11 +189,13 @@ public class DebugMointerMappingFieldForMethod {
         // 取得物件內的field
         for (int ii = 0; ii < model.getSize(); ii++) {
             Object o = model.getElementAt(ii);
-            for (Field f : o.getClass().getDeclaredFields()) {
-                Object o2 = getObject(f, o);
-                if (o2 != null && ClassUtil.isAssignFrom(clz, f.getType())) {
-                    logger.debug("取得參數 param[" + index + "] = 暫存區[" + ii + "]." + f.getName() + " -> " + DebugMointerMappingField.getObjSimpleStr(o2));
-                    return o2;
+            if (o != null) {
+                for (Field f : o.getClass().getDeclaredFields()) {
+                    Object o2 = getObject(f, o);
+                    if (o2 != null && ClassUtil.isAssignFrom(clz, f.getType())) {
+                        logger.debug("取得參數 param[" + index + "] = 暫存區[" + ii + "]." + f.getName() + " -> " + DebugMointerMappingField.getObjSimpleStr(o2));
+                        return o2;
+                    }
                 }
             }
         }

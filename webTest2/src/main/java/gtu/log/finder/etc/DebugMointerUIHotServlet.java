@@ -335,6 +335,9 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 }
             }
             String valueStr = prop.getProperty(propKey + val);
+            if(valueStr == null) {
+                return new File(System.getProperty("user.dir"), "classes");
+            }
             File classespath = new File(valueStr.split(",")[0]);
             return classespath;
         } catch (Exception e) {

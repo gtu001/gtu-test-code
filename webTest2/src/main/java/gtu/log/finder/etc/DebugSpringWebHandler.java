@@ -39,7 +39,7 @@ public class DebugSpringWebHandler {
         try {
             context = MethodUtils.invokeStaticMethod(WebApplicationContextUtils, "getWebApplicationContext", servlet.getServletContext());
         } catch (Exception ex) {
-            DebugMointerUIHotServlet.exceptioinHandler(ex, sb);
+            DebugMointerUIHotServlet.logH("getContext [context] ERR : " + ex.getMessage(), sb);
         }
         Object context2 = null;
         try {
@@ -47,7 +47,7 @@ public class DebugSpringWebHandler {
             Object val1 = FieldUtils.readDeclaredStaticField(clz, "instance", true);
             context2 = FieldUtils.readDeclaredField(val1, "applicationContext", true);
         } catch (Exception ex) {
-            DebugMointerUIHotServlet.exceptioinHandler(ex, sb);
+            DebugMointerUIHotServlet.logH("getContext [context2] ERR : " + ex.getMessage(), sb);
         }
         if (context2 != null) {
             DebugMointerUIHotServlet.logH("取得spring context2 : " + context2, sb);
