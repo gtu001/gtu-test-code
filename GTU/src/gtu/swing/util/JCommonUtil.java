@@ -29,13 +29,14 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -590,6 +591,30 @@ public class JCommonUtil {
         } catch (java.awt.HeadlessException uiError) {
         }
         return writeIfNeed;
+    }
+
+    /**
+     * 錯誤處理
+     */
+    public static File handleException_getFile() {
+        File writeIfNeed = null;
+        if (GraphicsEnvironment.isHeadless() == false) {
+            // 使用ui模式
+            writeIfNeed = FileUtil.DESKTOP_DIR;
+        } else {
+            // 使用非ui模式
+            writeIfNeed = new File(System.getProperty("user.dir"));
+        }
+        Long maxDate = 0L;
+        Map<Long, File> fileMap = new HashMap<Long, File>();
+        for (File f : writeIfNeed.listFiles()) {
+            if (f.getName().matches("swing_error_(.*).log")) {
+                long v1 = f.lastModified();
+                fileMap.put(v1, f);
+                maxDate = Math.max(maxDate, v1);
+            }
+        }
+        return fileMap.get(maxDate);
     }
 
     /**

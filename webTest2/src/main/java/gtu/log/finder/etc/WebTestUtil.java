@@ -80,6 +80,16 @@ public class WebTestUtil {
             }
         }
     }
+    
+    public boolean hasParameterKey(String key) {
+        for(Enumeration enu = request.getParameterNames(); enu.hasMoreElements();) {
+            String key2 = (String)enu.nextElement();
+            if(StringUtils.equals(key, key2)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public WebTestUtil debugParameter() {
         Map<String, String[]> reqMap = request.getParameterMap();

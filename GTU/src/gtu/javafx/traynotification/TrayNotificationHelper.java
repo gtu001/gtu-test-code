@@ -105,6 +105,8 @@ public class TrayNotificationHelper {
     }
 
     public static class RandomColorFill {
+        private static RandomColorFill _INST = new RandomColorFill();
+
         char[] charArry;
 
         private RandomColorFill() {
@@ -112,7 +114,7 @@ public class TrayNotificationHelper {
         }
 
         public static RandomColorFill getInstance() {
-            return new RandomColorFill();
+            return _INST;
         }
 
         public String get() {

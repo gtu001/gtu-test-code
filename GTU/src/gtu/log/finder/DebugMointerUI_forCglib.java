@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -98,11 +99,13 @@ public class DebugMointerUI_forCglib {
             URLClassLoader loader = new URLClassLoader(new URL[] { classespath.toURL() }, Thread.currentThread().getContextClassLoader());
             Class<?> clz = Class.forName(className, true, loader);
             for (Method mth : clz.getDeclaredMethods()) {
-                PluginMethod vo = new PluginMethod();
-                vo.methodName = mth.getName();
-                vo.parameterClasses = mth.getParameterTypes();
-                lst.add(vo);
-                this.logDetected(className, vo);
+                if (Modifier.isPublic(mth.getModifiers())) {
+                    PluginMethod vo = new PluginMethod();
+                    vo.methodName = mth.getName();
+                    vo.parameterClasses = mth.getParameterTypes();
+                    lst.add(vo);
+                    this.logDetected(className, vo);
+                }
             }
             usePluginLst = lst;
             log("<<< loadPluginClass success !!");

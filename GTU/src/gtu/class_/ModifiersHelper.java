@@ -11,11 +11,11 @@ public class ModifiersHelper {
         if (Modifier.isPrivate(modifiers)) {
             sb.append("private ");
         }
-        if (Modifier.isPrivate(modifiers)) {
-            sb.append("private ");
+        if (Modifier.isProtected(modifiers)) {
+            sb.append("protected ");
         }
         if (Modifier.isPublic(modifiers)) {
-            sb.append("private ");
+            sb.append("public ");
         }
         if (Modifier.isAbstract(modifiers)) {
             sb.append("abstract ");
