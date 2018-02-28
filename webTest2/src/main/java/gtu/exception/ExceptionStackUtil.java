@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import gtu.log.finder.etc.HtmlUtil;
+import gtu.log.finder.etc.DebugMointerUIHtmlUtil;
 
 public class ExceptionStackUtil {
     
@@ -18,7 +18,7 @@ public class ExceptionStackUtil {
         while ((parentThrowEx = parentThrowEx.getCause()) != null) {
             parentThrowEx.printStackTrace(pw);
         }
-        return HtmlUtil.replaceChangeLineToBr(sw.toString());
+        return DebugMointerUIHtmlUtil.replaceChangeLineToBr(sw.toString());
     }
 
     public static String parseToString(Throwable ge) {

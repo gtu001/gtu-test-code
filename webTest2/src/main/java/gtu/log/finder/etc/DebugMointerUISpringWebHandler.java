@@ -12,7 +12,7 @@ import org.apache.commons.lang.reflect.MethodUtils;
 
 import gtu.class_.ClassUtil;
 
-public class DebugSpringWebHandler {
+public class DebugMointerUISpringWebHandler {
 
     private boolean useSpringMode = false;
     private ServletConfig servlet;
@@ -20,7 +20,7 @@ public class DebugSpringWebHandler {
     private Class<?> ApplicationContext;
     private Class<?> WebApplicationContextUtils;
 
-    public DebugSpringWebHandler(ServletConfig servlet) {
+    public DebugMointerUISpringWebHandler(ServletConfig servlet) {
         try {
             this.servlet = servlet;
             ApplicationContext = Class.forName("org.springframework.context.ApplicationContext");

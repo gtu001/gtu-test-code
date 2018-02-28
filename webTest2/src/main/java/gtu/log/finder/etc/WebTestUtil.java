@@ -211,5 +211,13 @@ public class WebTestUtil {
                 }
             }
         }
+        
+        public void debugParameter() {
+            DebugMointerUI.getLogger().debug("Parameter------------------------------start");
+            for (String key : map.keySet()) {
+                DebugMointerUI.getLogger().debug(String.format("\tk:%s \t v:%s", key, map.get(key)));
+            }
+            DebugMointerUI.getLogger().debug("Parameter------------------------------end");
+        }
     }
 }

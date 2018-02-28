@@ -52,15 +52,18 @@ public class DebugMointerUIHotServlet extends HttpServlet {
     private void process(HttpServletRequest req, final HttpServletResponse response) {
         System.out.println("#. DebugMointerUIHotServlet start");
         final StringBuilder sb = new StringBuilder();
-
         try {
-            String classpathStr = req.getParameter("classpath");
-            String orignClz = req.getParameter("orignClz");
-            String invoke = req.getParameter("invoke");
-            String log = req.getParameter("log");
-            String exceptionLog = req.getParameter("exceptionLog");
-            String del = req.getParameter("del");
-
+            //如果上傳classpath.zip
+            DebugMointerUIClassesUpload upload = new DebugMointerUIClassesUpload(req, sb);
+            upload.uploadFile();    
+            
+            String classpathStr = upload.getParameter("classpath");
+            String orignClz = upload.getParameter("orignClz");
+            String invoke = upload.getParameter("invoke");
+            String log = upload.getParameter("log");
+            String exceptionLog = upload.getParameter("exceptionLog");
+            String del = upload.getParameter("del");
+            
             WebTestUtil webUtil = WebTestUtil.newInstnace().request(req).response(response);
 
             // DebugMointerUI.log
@@ -115,12 +118,17 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 classpathFile = getDefaultClasspathFile(sb);
                 logH("[classpath] 使用預設路徑  : " + classpathFile, sb);
             }
+            
+            //判斷是否上傳classpath.zip檔案
+            if(upload.isUploadClassesZip()) {
+                upload.extractClasspath(classpathFile.getAbsolutePath());
+            }
 
             if (StringUtils.isBlank(orignClz)) {
                 logH("[orignClz]參數為空 : " + orignClz, sb);
             }
 
-            DebugSpringWebHandler springHandler = new DebugSpringWebHandler(this);
+            DebugMointerUISpringWebHandler springHandler = new DebugMointerUISpringWebHandler(this);
             Object context = springHandler.getContext(sb);
 
             // 取得原始物件[可能已被proxy]
@@ -199,7 +207,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                     tableSb.append("<table border='1'>\n");
                     tableSb.append("<tr><td width='10%'>回傳值</td><td width='90%'>內容</td></tr>\n");
                     tableSb.append("<tr><td>原始</td><td>" + DebugMointerMappingField.getObjSimpleStr(rtnVal) + "</td></tr>\n");
-                    tableSb.append("<tr><td>formatter</td><td>" + HtmlUtil.replaceChangeLineToBr(ReflectionToStringBuilder.toString(rtnVal, ToStringStyle.MULTI_LINE_STYLE)) + "</td></tr>\n");
+                    tableSb.append("<tr><td>formatter</td><td>" + DebugMointerUIHtmlUtil.replaceChangeLineToBr(ReflectionToStringBuilder.toString(rtnVal, ToStringStyle.MULTI_LINE_STYLE)) + "</td></tr>\n");
                     tableSb.append("</table>\n");
                     logH(tableSb.toString(), sb);
                 } catch (Throwable ex) {
@@ -265,6 +273,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 request.getServerPort() + // "8080"
                 request.getRequestURI() + // "/people"
                 "";
+        System.out.println("))))))))))))" + uri);
         return uri;
     }
 
@@ -291,6 +300,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
     }
 
     static void exceptioinHandler(Throwable ex, StringBuilder sb) {
+        ex.printStackTrace();
         String message = ExceptionStackUtil.parseToStringBr(ex);
         StringBuilder tableSb = new StringBuilder();
         tableSb.append("<table border='1'>\n");
@@ -363,12 +373,13 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         sb.append("</script>\n");
         sb.append("<br/><a href=\"javascript:showHide('divForm');\"><i>表單</i></a><br/>\n");
         sb.append("<div id='divForm' style=\"background-color:" + RandomColorFill.getInstance().get() + "; padding:10px;margin-bottom:5px; display:none\">\n");
-        sb.append(String.format("<form action=\"\">\n", this.getURL(request)));
+        sb.append(String.format("<form action=\"\" method=\"post\" enctype=\"multipart/form-data\">\n", this.getURL(request)));
         sb.append("<table border='1'>\n");
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[classpath]外掛位置", "classpath"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[orignClz]替換類別", "orignClz"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[invoke](Ex:類別,方法)", "invoke"));
-        sb.append("<tr><td colspan='2'><input type=\"submit\" value=\"送出\" /></td></tr>\n");
+        sb.append(String.format("<tr><td>%1$s</td><td><input id=\"%2$s\" name=\"%2$s\" type=\"file\" style=\"width:500px\" /></td></tr>\n", "上傳classes.zip", "classesZip"));
+        sb.append("<tr><td colspan='2' align=\"right\"><input type=\"submit\" value=\"送出\" /></td></tr>\n");
         sb.append("</table>\n");
         sb.append("</div>\n");
         return sb.toString();

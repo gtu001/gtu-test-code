@@ -80,6 +80,7 @@
 			<packagename mode="exact" name="mockito-all-1.8.5.jar">org.mockito.Mockito</packagename>
 
 			<packagename mode="exact" name="webTest2.jar">gtu.log.finder.etc.WebTestUtil</packagename>
+			<packagename mode="small">org.apache.commons.fileupload.disk.DiskFileItemFactory</packagename><!-- for webTest2 -->
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->

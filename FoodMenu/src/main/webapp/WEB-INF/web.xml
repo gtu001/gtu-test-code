@@ -63,6 +63,15 @@
 		<servlet-name>HtmlJavascriptEscapeServlet</servlet-name>
 		<url-pattern>/HtmlJavascriptEscapeServlet</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DebugMointerUIHotServlet</servlet-name>
+		<servlet-class>gtu.log.finder.etc.DebugMointerUIHotServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DebugMointerUIHotServlet</servlet-name>
+		<url-pattern>/debug</url-pattern>
+	</servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

@@ -1,4 +1,4 @@
-package gtu.zip;
+package gtu.log.finder.etc;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,9 +11,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import gtu.log.finder.etc.DebugMointerUIZipUtils;
-
-public class ZipUtils {
+public class DebugMointerUIZipUtils {
 
     public static void main(String[] a) {
         File srcFile = new File("C:\\11111");
@@ -88,7 +86,7 @@ public class ZipUtils {
      * @param zipFileName
      * @param outputDirectory
      * @throws Exception
-     *             // * org.apache.tools.zip.
+//     * org.apache.tools.zip.
      */
     private void unZip(File ZIPFile, String outputDirectory) throws Exception {
         try {

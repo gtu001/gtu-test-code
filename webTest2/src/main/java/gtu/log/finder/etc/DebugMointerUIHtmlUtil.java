@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-public class HtmlUtil {
+public class DebugMointerUIHtmlUtil {
 
     public static String replaceChangeLineToBr(String message) {
         if (message == null) {

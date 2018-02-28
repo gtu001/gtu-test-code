@@ -7,9 +7,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StaticContextAccessor {
+public class DebugMointerUIStaticContextAccessor {
 
-    private static StaticContextAccessor instance;
+    private static DebugMointerUIStaticContextAccessor instance;
 
     @Autowired
     private ApplicationContext applicationContext;

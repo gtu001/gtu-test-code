@@ -14,13 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.springframework.web.util.HtmlUtils;
-import org.springframework.web.util.JavaScriptUtils;
 
 //@WebServlet("/HtmlJavascriptEscapeServlet")
 public class HtmlJavascriptEscapeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
+
     private static final Logger logger = Logger.getLogger(HtmlJavascriptEscapeServlet.class);
 
     public HtmlJavascriptEscapeServlet() {
@@ -33,11 +31,11 @@ public class HtmlJavascriptEscapeServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         logger.info("#. HtmlJavascriptEscapeServlet .s");
-        String html = HtmlUtils.htmlEscape(StringUtils.trimToEmpty(request.getParameter("html")));
-        String javascript = JavaScriptUtils.javaScriptEscape(StringUtils.trimToEmpty(request.getParameter("javascript")));
+        String html = org.springframework.web.util.HtmlUtils.htmlEscape(StringUtils.trimToEmpty(request.getParameter("html")));
+        String javascript = org.springframework.web.util.JavaScriptUtils.javaScriptEscape(StringUtils.trimToEmpty(request.getParameter("javascript")));
         logger.info("orign html - " + html);
         logger.info("orign javascript - " + javascript);
-        Map<String,String> valMap = new LinkedHashMap<String,String>();
+        Map<String, String> valMap = new LinkedHashMap<String, String>();
         valMap.put("html", html);
         valMap.put("javascript", javascript);
         logger.info("valMap - " + valMap);
@@ -56,7 +54,7 @@ public class HtmlJavascriptEscapeServlet extends HttpServlet {
             out.println(jobj.toString());
             out.flush();
             out.close();
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
