@@ -63,6 +63,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
             String log = upload.getParameter("log");
             String exceptionLog = upload.getParameter("exceptionLog");
             String del = upload.getParameter("del");
+            String reverse = upload.getParameter("reverse");
             
             WebTestUtil webUtil = WebTestUtil.newInstnace().request(req).response(response);
 
@@ -155,15 +156,23 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 try {
                     String classname = orignClz + "_";
                     log("外掛Bean class : " + classname);
+                    
+                    Object newProxy = null; 
 
-                    DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
-                    cglib.setLogDo(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            logH(e.getActionCommand(), sb);
-                        }
-                    });
-                    cglib.loadPluginClass(classpathFile, classname);
-                    Object newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
+                    if(StringUtils.isBlank(reverse)) {
+                        DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
+                        cglib.setLogDo(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                logH(e.getActionCommand(), sb);
+                            }
+                        });
+                        cglib.loadPluginClass(classpathFile, classname);
+                        newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
+                    }else {
+                        // 取得原始物件
+                        newProxy = orignBean;
+                        logH("[復原resverse]取得原始Bean物件 : " + orignBean, sb);
+                    }
 
                     springHandler.replaceAllAutowired(orignClass, newProxy, context, sb);
                 } catch (Throwable ex) {
@@ -273,7 +282,6 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 request.getServerPort() + // "8080"
                 request.getRequestURI() + // "/people"
                 "";
-        System.out.println("))))))))))))" + uri);
         return uri;
     }
 
@@ -379,6 +387,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[orignClz]替換類別", "orignClz"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[invoke](Ex:類別,方法)", "invoke"));
         sb.append(String.format("<tr><td>%1$s</td><td><input id=\"%2$s\" name=\"%2$s\" type=\"file\" style=\"width:500px\" /></td></tr>\n", "上傳classes.zip", "classesZip"));
+        sb.append(String.format("<tr><td>%s</td><td><input id=\"%s\" name=\"%2$s\" type=\"checkbox\" value=\"Y\" /></td></tr>\n", "[reverse]復原", "reverse"));
         sb.append("<tr><td colspan='2' align=\"right\"><input type=\"submit\" value=\"送出\" /></td></tr>\n");
         sb.append("</table>\n");
         sb.append("</div>\n");
