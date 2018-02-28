@@ -16,8 +16,8 @@ android {
         applicationId "com.gtu.example.englishtester"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 21
-        versionName "1.0.6.11"
+        versionCode 22
+        versionName "1.0.6.12"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true //method量超標
         signingConfig signingConfigs.config
