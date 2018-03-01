@@ -8,17 +8,17 @@ import java.awt.datatransfer.Transferable;
 
 public abstract class ClipboardListener extends Thread implements ClipboardOwner {
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
-    
+
     boolean isMointerOn = true;
 
     public void run() {
         Transferable trans = sysClip.getContents(this);
-        if(isMointerOn) {
+        if (isMointerOn) {
             regainOwnership(trans);
         }
         System.out.println("Listening to board...");
         while (true) {
-            //不設sleep會瘋狂吃掉cpu
+            // 不設sleep會瘋狂吃掉cpu
             try {
                 Thread.sleep(10L);
             } catch (InterruptedException e) {
@@ -29,7 +29,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
     public void lostOwnership(Clipboard c, Transferable t) {
         while (true) {
             try {
-                sleep(5);
+                sleep(50);
                 Transferable contents = sysClip.getContents(this);
                 processContents(contents);
                 regainOwnership(contents);
@@ -38,7 +38,6 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                 System.out.println("Exception: " + e);
             }
         }
-
     }
 
     public void processContents(Transferable t) {

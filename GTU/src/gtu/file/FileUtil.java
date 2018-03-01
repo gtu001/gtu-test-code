@@ -29,6 +29,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -944,11 +947,28 @@ public class FileUtil {
     }
 
     /**
-     * 移除掉特殊字元
-     * 解法式把路徑貼到 *.properties　會顯示無法正常顯示的特殊字元
+     * 移除掉特殊字元 解法式把路徑貼到 *.properties 會顯示無法正常顯示的特殊字元
      */
     public static String replaceSpecialChar(String path) {
         return path.replace("\u202A", "");
+    }
+
+    public static long getCreateTime(File file) {
+        Path path = file.toPath();
+        BasicFileAttributes attr = null;
+        try {
+            attr = Files.readAttributes(path, BasicFileAttributes.class);
+        } catch (IOException e) {
+            System.out.println("Exception handled when trying to get file " + "attributes: " + e.getMessage());
+        }
+        if(attr != null) {
+//            System.out.println("creationTime: " + attr.creationTime());
+//            System.out.println("lastAccessTime: " + attr.lastAccessTime());
+//            System.out.println("lastModifiedTime: " + attr.lastModifiedTime());
+            return attr.creationTime().toMillis();
+        }else {
+            return -1;
+        }
     }
 
     public static class FileZ {

@@ -14,3 +14,8 @@ Image
 wheel
 pymysql
 sqlalchemy
+
+#openCV
+imutils
+numpy
+opencv-python
