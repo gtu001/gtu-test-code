@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
@@ -51,7 +52,8 @@ public class ImageUtil {
             URL imgURL = this.getClass().getClassLoader().getResource(imagePath);
             List<BufferedImage> images = ICODecoder.read(imgURL.openStream());
             for (int ii = 0; ii < images.size(); ii++) {
-                //System.out.println(String.format("%d - h:%d,w:%d", ii, images.get(ii).getHeight(), images.get(ii).getWidth()));
+                // System.out.println(String.format("%d - h:%d,w:%d", ii,
+                // images.get(ii).getHeight(), images.get(ii).getWidth()));
             }
             BufferedImage image = images.get(0);
             Image imgData = image.getScaledInstance(32, -1, Image.SCALE_SMOOTH);
@@ -78,7 +80,7 @@ public class ImageUtil {
         }
 
         // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);// TYPE_INT_RGB
 
         // Draw the image on to the buffered image
         Graphics2D bGr = bimage.createGraphics();
@@ -95,5 +97,15 @@ public class ImageUtil {
         Image img = tk.getImage(imgURL);
         System.out.println("icon : " + img);
         return img;
+    }
+
+    public BufferedImage getBufferedImage(String resourceUrl) {
+        try {
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream(resourceUrl);
+            BufferedImage bufferedImage = ImageIO.read(in);
+            return bufferedImage;
+        } catch (Exception ex) {
+            throw new RuntimeException("getBufferedImage ERR : " + ex.getMessage(), ex);
+        }
     }
 }

@@ -597,7 +597,15 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.3</version>
 		</dependency>
-	</dependencies><!-- 对xerces有依赖，所以增加exclusion即可 -->
+
+		<!-- ocr -->
+		<dependency>
+			<groupId>net.sourceforge.tess4j</groupId>
+			<artifactId>tess4j</artifactId>
+			<version>3.4.4</version>
+		</dependency>
+
+	</dependencies>
 
 
 	<build>
