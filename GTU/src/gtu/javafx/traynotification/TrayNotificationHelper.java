@@ -2,6 +2,8 @@ package gtu.javafx.traynotification;
 
 import java.awt.event.ActionListener;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import gtu.javafx.traynotification.animations.AnimationType;
 import javafx.scene.image.Image;
@@ -66,39 +68,70 @@ public class TrayNotificationHelper {
             }
             // keep the thread alive
             javafx.application.Platform.setImplicitExit(false);
+
+            final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
+            final AtomicReference<Throwable> errMsg = new AtomicReference<Throwable>();
             javafx.application.Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    final TrayNotification tray = new TrayNotification();
-                    if (title != null) {
-                        tray.setTitle(title);
-                    }
-                    if (message != null) {
-                        tray.setMessage(message);
-                    }
-                    if (notificationType != null) {
-                        tray.setNotificationType(notificationType);
-                    }
-                    if (animationType != null) {
-                        tray.setAnimationType(animationType);
-                    }
-                    if (onPanelClickCallback != null) {
-                        tray.setOnPanelClickCallBack(onPanelClickCallback);
-                    }
-                    if (rectangleFill != null) {
-                        tray.setRectangleFill(javafx.scene.paint.Paint.valueOf(rectangleFill));
-                    }
-                    if (image != null) {
-                        tray.setImage(image);
-                    }
+                    try {
+                        final TrayNotification tray = new TrayNotification();
+                        if (title != null) {
+                            tray.setTitle(title);
+                        }
+                        if (message != null) {
+                            tray.setMessage(message);
+                        }
+                        if (notificationType != null) {
+                            tray.setNotificationType(notificationType);
+                        }
+                        if (animationType != null) {
+                            tray.setAnimationType(animationType);
+                        }
+                        if (onPanelClickCallback != null) {
+                            tray.setOnPanelClickCallBack(onPanelClickCallback);
+                        }
+                        if (rectangleFill != null) {
+                            tray.setRectangleFill(javafx.scene.paint.Paint.valueOf(rectangleFill));
+                        }
+                        if (image != null) {
+                            tray.setImage(image);
+                        }
 
-                    if (dismissTime <= 0) {
-                        tray.showAndWait();
-                    } else {
-                        tray.showAndDismiss(javafx.util.Duration.valueOf(dismissTime + "ms"));
+                        if (dismissTime <= 0) {
+                            tray.showAndWait();
+                        } else {
+                            tray.showAndDismiss(javafx.util.Duration.valueOf(dismissTime + "ms"));
+                        }
+
+                        result.set(true);
+                    } catch (Throwable ex) {
+                        result.set(false);
+                        errMsg.set(ex);
                     }
                 }
             });
+
+            final long waitTime = 5;
+            long totalWaitTime = 0;
+            final long FINAL_WAIT_TIME = 10000;
+            for (;;) {
+                if (result.get() != null) {
+                    break;
+                }
+                try {
+                    Thread.sleep(waitTime);
+                    totalWaitTime += waitTime;
+                } catch (Exception ex) {
+                }
+                if (totalWaitTime > FINAL_WAIT_TIME) {
+                    throw new Exception("TrayNotificationHelper等待時間過長");
+                }
+            }
+
+            if (result.get() == false) {
+                throw errMsg.get();
+            }
         } catch (Throwable ex) {
             throw new RuntimeException("JavaFx not support!", ex);
         }

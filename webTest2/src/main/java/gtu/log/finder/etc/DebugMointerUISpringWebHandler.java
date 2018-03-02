@@ -123,10 +123,12 @@ public class DebugMointerUISpringWebHandler {
 
                             if (orignBean == null || StringUtils.equals(orignBeanName, orignClass.getName())) {
                                 FieldUtils.writeDeclaredField(bean, f.getName(), newProxy, true);
-                                DebugMointerUIHotServlet.logH("更換 " + DebugMointerUIHotServlet.getRandomColorString(bean.getClass().getName() + "." + f.getName()) + " - 成功! : " + newProxy, sb);
+                                DebugMointerUIHotServlet.logH("更換 " + (bean.getClass().getName() + "." + f.getName()) + " - " + //
+                                        DebugMointerUIHotServlet.getRandomColorString("成功!") + " : " + newProxy, sb);
                             }
                         } catch (IllegalAccessException ex) {
-                            DebugMointerUIHotServlet.logH("[ERROR]更換 " + bean.getClass().getName() + "." + f.getName() + " - 失敗!", sb);
+                            DebugMointerUIHotServlet.logH("[ERROR]更換 " + bean.getClass().getName() + "." + f.getName() + " - " + //
+                                    DebugMointerUIHotServlet.getRandomColorString("失敗!") + " : " + newProxy, sb);
                             DebugMointerUIHotServlet.exceptioinHandler(ex, sb);
                         }
                     }

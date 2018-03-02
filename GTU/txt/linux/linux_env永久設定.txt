@@ -1,8 +1,10 @@
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export PATH=%{PATH}:${JAVA_HOME}/bin
-存到 /etc/envirment (全局)
 
+存到 /etc/envirment (全局)
 
 修改by User
 ~/.profile
-加入JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+修改~/.bashrc
+
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME

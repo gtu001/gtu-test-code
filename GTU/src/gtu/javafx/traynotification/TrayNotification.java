@@ -102,8 +102,8 @@ public final class TrayNotification {
 
             setTray(title, message, type);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException("initTrayNotification ERR " + e.getMessage(), e);
         }
     }
 
@@ -350,7 +350,7 @@ public final class TrayNotification {
         animator = animationProvider.findFirstWhere(new Predicate() {
             @Override
             public boolean evaluate(Object object) {
-                return ((TrayAnimation)object).getAnimationType() == type;
+                return ((TrayAnimation) object).getAnimationType() == type;
             }
         });
     }

@@ -1,6 +1,6 @@
-#¦w¸Ë¦r§Î«ü¥O
+#å®‰è£å­—å½¢æŒ‡ä»¤
 sudo apt-get install fonts-dejavu-core
 sudo apt-get install dejavu-sans-fonts
 
-#¬İ¦r§Î«ü¥O
+#çœ‹å­—å½¢æŒ‡ä»¤
 fc-list

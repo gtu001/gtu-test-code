@@ -1,0 +1,9 @@
+﻿顯示user群組
+
+grep 'grpup-name-here' /etc/group
+grep 'ftponly' /etc/group
+grep -i --color 'ftponly' /etc/group
+
+members ftponly
+
+lid -g ftponly

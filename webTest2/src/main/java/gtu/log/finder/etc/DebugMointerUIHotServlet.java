@@ -193,7 +193,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                     }
 
                     logH("<br/><h2>" + getRandomColorString("執行外掛") + "</h2>", sb);
-                    logH(">>" + getRandomColorString(classname + "." + method + "()!!") + " <<", sb);
+                    logH(">>" + (classname + "." + method + "()!!") + " <<", sb);
 
                     if (orignBean == null) {
                         logH("原始Class為空 !" + orignClz, sb);

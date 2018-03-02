@@ -37,12 +37,16 @@ public class DebugMointerUI_forCglib {
             boolean usePlugIn = false;
             for (PluginMethod vo : usePluginLst) {
                 if (StringUtils.equals(vo.methodName, method.getName())) {
-                    if (method.getParameterTypes() == null && method.getParameterTypes() == null) {
+                    if (method.getParameterTypes() == null && method.getParameterTypes() == null && //
+                            isClassesEqual(method.getReturnType(), vo.returnType) //
+                    ) {
                         usePlugIn = true;
                         break;
                     } else if ((method.getParameterTypes() != null && vo.parameterClasses != null) && //
                             (method.getParameterTypes().length == vo.parameterClasses.length) && //
-                            isClassesEqual(method.getParameterTypes(), vo.parameterClasses)) {
+                            isClassesEqual(method.getParameterTypes(), vo.parameterClasses) && //
+                            isClassesEqual(method.getReturnType(), vo.returnType) //
+                    ) {
                         usePlugIn = true;
                         break;
                     }
@@ -85,11 +89,19 @@ public class DebugMointerUI_forCglib {
         return true;
     }
 
+    private boolean isClassesEqual(Class<?> clz1, Class<?> clz2) {
+        if (!StringUtils.equals(clz1.getClass().getName(), clz2.getClass().getName())) {
+            return false;
+        }
+        return true;
+    }
+
     private List<PluginMethod> usePluginLst = new ArrayList<PluginMethod>();
 
     private class PluginMethod {
         String methodName;
         Class[] parameterClasses;
+        Class returnType;
     }
 
     public void loadPluginClass(File classespath, String className) {
@@ -103,6 +115,7 @@ public class DebugMointerUI_forCglib {
                     PluginMethod vo = new PluginMethod();
                     vo.methodName = mth.getName();
                     vo.parameterClasses = mth.getParameterTypes();
+                    vo.returnType = mth.getReturnType();
                     lst.add(vo);
                     this.logDetected(className, vo);
                 }
@@ -116,13 +129,13 @@ public class DebugMointerUI_forCglib {
 
     private void logDetected(String className, PluginMethod vo) {
         if (vo.parameterClasses == null || vo.parameterClasses.length == 0) {
-            log("\t" + className + "." + vo.methodName + "()" + " -- detected!");
+            log("\t" + vo.returnType.getName() + " " + className + "." + vo.methodName + "()" + " -- detected!");
         } else {
             List<String> clzLst = new ArrayList<String>();
             for (Class<?> c : vo.parameterClasses) {
                 clzLst.add(c.getName());
             }
-            log("\t" + className + "." + vo.methodName + "(" + StringUtils.join(clzLst, ", ") + ")" + " -- detected!");
+            log("\t" + vo.returnType.getName() + " " + className + "." + vo.methodName + "(" + StringUtils.join(clzLst, ", ") + ")" + " -- detected!");
         }
     }
 

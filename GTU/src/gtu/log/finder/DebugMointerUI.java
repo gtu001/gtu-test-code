@@ -3726,9 +3726,13 @@ public class DebugMointerUI {
                             }
                         }
                     }).show(1500);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             System.err.println(ex.getMessage());
-            sysTrayUtil.displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
+            try {
+                sysTrayUtil.displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
+                System.out.println("執行成功!! : " + successMessage);
+            }catch(Throwable ex2) {
+            }
         }
     }
 

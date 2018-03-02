@@ -16,7 +16,8 @@ ap.add_argument("-r", "--reference", required=True, help="path to reference OCR-
 #args = vars(ap.parse_args()) #使用console帶參數
 args = {
         "image":"C:/Users/gtu00/OneDrive/Desktop/IMG_20180301_170454_HDR.jpg", 
-        "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/OCR_A.png"
+        #"reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/OCR_A.png"
+        "reference":"C:/Users/gtu00/OneDrive/Desktop/IMG_20180301_170454_HDR.jpg"
         }
 
 
