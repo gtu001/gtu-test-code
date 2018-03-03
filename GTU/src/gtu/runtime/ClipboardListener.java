@@ -27,6 +27,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
     }
 
     public void lostOwnership(Clipboard c, Transferable t) {
+        int time = 0;
         while (true) {
             try {
                 sleep(50);
@@ -35,7 +36,11 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                 regainOwnership(contents);
                 break;
             } catch (Exception e) {
-                System.out.println("Exception: " + e);
+                System.out.println("Exception: " + e.getMessage());
+                time ++;
+                if(time > 10) {
+                    break;
+                }
             }
         }
     }
