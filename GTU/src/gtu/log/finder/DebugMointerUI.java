@@ -3539,8 +3539,6 @@ public class DebugMointerUI {
             // getLogger().debug("mointerObjects=>" +
             // Arrays.toString(inst.mointerObjects));
 
-            // inst.initGUI_detail(); XXX 20180224 應該不用再做一次
-
             int index = inst.mointerObjects.length - 1;
             if (!slientMode) {
                 JCommonUtil._jOptionPane_showMessageDialog_info_NonUICompatible("載入自訂物件[" + index + "] :\n" + newObject + "\n成功!");

@@ -64,6 +64,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
             String exceptionLog = upload.getParameter("exceptionLog");
             String del = upload.getParameter("del");
             String reverse = upload.getParameter("reverse");
+            String customSpring = upload.getParameter("customSpring");
             
             WebTestUtil webUtil = WebTestUtil.newInstnace().request(req).response(response);
 
@@ -129,7 +130,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 logH("[orignClz]參數為空 : " + orignClz, sb);
             }
 
-            DebugMointerUISpringWebHandler springHandler = new DebugMointerUISpringWebHandler(this);
+            DebugMointerUISpringWebHandler springHandler = new DebugMointerUISpringWebHandler(this, customSpring);
             Object context = springHandler.getContext(sb);
 
             // 取得原始物件[可能已被proxy]
@@ -383,6 +384,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         sb.append("<div id='divForm' style=\"background-color:" + RandomColorFill.getInstance().get() + "; padding:10px;margin-bottom:5px; display:none\">\n");
         sb.append(String.format("<form action=\"\" method=\"post\" enctype=\"multipart/form-data\">\n", this.getURL(request)));
         sb.append("<table border='1'>\n");
+        sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[customSpring]外掛位置", "customSpring"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[classpath]外掛位置", "classpath"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[orignClz]替換類別", "orignClz"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[invoke](Ex:類別,方法)", "invoke"));

@@ -1,6 +1,7 @@
 package gtu.log.finder.etc;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,14 +20,22 @@ public class DebugMointerUISpringWebHandler {
 
     private Class<?> ApplicationContext;
     private Class<?> WebApplicationContextUtils;
+    private Class<?> customFetchSpringClass;
 
-    public DebugMointerUISpringWebHandler(ServletConfig servlet) {
+    public DebugMointerUISpringWebHandler(ServletConfig servlet, String customFetchSpringClass) {
         try {
             this.servlet = servlet;
             ApplicationContext = Class.forName("org.springframework.context.ApplicationContext");
             WebApplicationContextUtils = Class.forName("org.springframework.web.context.support.WebApplicationContextUtils");
             useSpringMode = true;
         } catch (Exception ex) {
+        }
+        
+        if(StringUtils.isNotBlank(customFetchSpringClass)) {
+            try {
+                this.customFetchSpringClass = Class.forName(customFetchSpringClass);
+            }catch(Exception ex) {
+            }
         }
     }
 
@@ -35,24 +44,27 @@ public class DebugMointerUISpringWebHandler {
             return null;
         }
 
+        //預設取得springContext
         Object context = null;
         try {
             context = MethodUtils.invokeStaticMethod(WebApplicationContextUtils, "getWebApplicationContext", servlet.getServletContext());
         } catch (Exception ex) {
             DebugMointerUIHotServlet.logH("getContext [context] ERR : " + ex.getMessage(), sb);
         }
-        Object context2 = null;
+        
+        //使用自訂取得springContext
+        Object contextCustom = null;
         try {
-            Class<?> clz = Class.forName("com.fuco.mb.bill.controller.StaticContextAccessor");
-            Object val1 = FieldUtils.readDeclaredStaticField(clz, "instance", true);
-            context2 = FieldUtils.readDeclaredField(val1, "applicationContext", true);
+            Object customBean = customFetchSpringClass.newInstance();
+            contextCustom = MethodUtils.invokeMethod(customBean, "call", new Object[0]);
+            if (contextCustom != null) {
+                DebugMointerUIHotServlet.logH("取得spring context [Custom] : " + contextCustom, sb);
+                return contextCustom;
+            }
         } catch (Exception ex) {
-            DebugMointerUIHotServlet.logH("getContext [context2] ERR : " + ex.getMessage(), sb);
+            DebugMointerUIHotServlet.logH("getContext [Custom] ERR : " + ex.getMessage(), sb);
         }
-        if (context2 != null) {
-            DebugMointerUIHotServlet.logH("取得spring context2 : " + context2, sb);
-            return context2;
-        }
+        
         DebugMointerUIHotServlet.logH("取得spring context : " + context, sb);
         return context;
     }

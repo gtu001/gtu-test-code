@@ -1,33 +1,37 @@
 package gtu.log.finder;
 
-import gtu.class_.ClassUtil;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 import javax.swing.JCheckBox;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
+
+import gtu.class_.ClassUtil;
 
 public class DebugMointerMappingField {
-    
+
     private Object newObject;
-    private DebugMointerUI _this;    private Object[] mointerObjects;
+    private DebugMointerUI _this;
+    private Object[] mointerObjects;
     private JCheckBox tempModelCheckBox;
-    
+    private SpringContextHolder springHolder;
+
     public DebugMointerMappingField(Object newObject, DebugMointerUI _this, Object[] mointerObjects, JCheckBox tempModelCheckBox) {
         super();
         this.newObject = newObject;
         this._this = _this;
         this.mointerObjects = mointerObjects;
         this.tempModelCheckBox = tempModelCheckBox;
+        this.springHolder = new SpringContextHolder(mointerObjects);
     }
 
     private StringBuilder okSb = new StringBuilder();
     private StringBuilder errSb = new StringBuilder();
 
-    public void executeMapping(){
-        for (Field fld : newObject.getClass().getDeclaredFields()) {
+    public void executeMapping() {
+        A: for (Field fld : newObject.getClass().getDeclaredFields()) {
             String msg1 = "";
             String indicateFieldNameMessage = "";
             try {
@@ -52,76 +56,85 @@ public class DebugMointerMappingField {
                 }
 
                 // 開始綁定
+                boolean bindOk = false;
                 fld.setAccessible(true);
-                if (fld.get(newObject) == null || indicatePathObject != null || StringUtils.isNotBlank(indicateFieldName)) {
-                    boolean bindOk = false;
-                    if (DebugMointerUI.class.isAssignableFrom(fld.getType())) {
-                        msg1 = fld.getName() + " = [DebugMointerUI 監控工具]";
-                        fld.set(newObject, this);
-                        bindOk = true;
-                        okSb.append(msg1 + indicateFieldNameMessage + "\n");
-                        continue;
-                    } else if (indicatePathObject != null && //
+
+                Object currentObj = fld.get(newObject);
+                if (currentObj != null) {
+                    msg1 = fld.getName() + " = [物件不為空無須注入]";
+                    bindOk = true;
+                    okSb.append(msg1 + "\n");
+                    continue A;
+
+                } else if (currentObj == null) {
+
+                    // 使用路徑綁定物件[自定]
+                    if (indicatePathObject != null && //
                             ClassUtil.isAssignFrom(fld.getType(), indicatePathObject.getClass())) {
-                        // 使用路徑綁定物件[自定]
-                        msg1 = fld.getName() + " = [取得指定物件 : " + indicatePathObject + "]";
+                        msg1 = fld.getName() + " = [取得指定物件 : " + getObjSimpleStr(indicatePathObject) + "]";
                         fld.set(newObject, indicatePathObject);
                         bindOk = true;
                         okSb.append(msg1 + indicateFieldNameMessage + "\n");
-                        continue;
+                        continue A;
                     }
+
+                    // 使用springContext注入
+                    if (this.springHolder.isReady()) {
+                        try {
+                            Object springBean = this.springHolder.getBean(fld.getType());
+                            msg1 = fld.getName() + " = [spring注入物件 : " + getObjSimpleStr(springBean) + "]";
+                            fld.set(newObject, springBean);
+                            bindOk = true;
+                            okSb.append(msg1 + getObjSimpleStr(springBean) + "\n");
+                            continue A;
+                        }catch(Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+                    // 使用搜尋
                     for (int ii = 0; ii < mointerObjects.length; ii++) {
                         Object condidate = mointerObjects[ii];
                         if (condidate == newObject) {
                             continue;
                         }
-                        if (condidate != null && ClassUtil.isAssignFrom(fld.getType(), condidate.getClass()) && StringUtils.isBlank(indicateFieldName)) {
+
+                        if (condidate != null && ClassUtil.isAssignFrom(fld.getType(), condidate.getClass())) {
                             // 以監控物件直接綁定
-                            msg1 = fld.getName() + " = [" + ii + "] , " + getObjSimpleStr(condidate);
+                            msg1 = fld.getName() + " = mointerObjects[" + ii + "] , " + getObjSimpleStr(condidate);
                             fld.set(newObject, condidate);
                             okSb.append(msg1 + "\n");
                             bindOk = true;
-                            break;
-                        } else if (condidate != null && condidate.getClass().isArray() && StringUtils.isBlank(indicateFieldName)) {
+                            continue A;
+
+                        } else if (condidate != null && condidate.getClass().isArray()) {
                             // 綁定來源為陣列物件
                             for (int jj = 0; jj < Array.getLength(condidate); jj++) {
                                 Object arrayObj = Array.get(condidate, jj);
                                 if (arrayObj != null && ClassUtil.isAssignFrom(fld.getType(), arrayObj.getClass())) {
-                                    msg1 = fld.getName() + " = [" + ii + "] , [" + jj + "]" + getObjSimpleStr(arrayObj);
+                                    msg1 = fld.getName() + " = mointerObjects[" + ii + "][" + jj + "]" + getObjSimpleStr(arrayObj);
                                     fld.set(newObject, arrayObj);
                                     okSb.append(msg1 + "\n");
                                     bindOk = true;
-                                    break;
+                                    continue A;
                                 }
                             }
+
                         } else if (condidate != null) {
                             // 取得物件內部物件來綁定
                             for (Class<?> tempClass = condidate.getClass(); tempClass != Object.class; tempClass = tempClass.getSuperclass()) {
                                 for (Field fld2 : tempClass.getDeclaredFields()) {
-                                    String msg2 = fld.getName() + " = [" + ii + "] , "//
-                                            + condidate.getClass().getSimpleName() + "." + fld2.getName() //
-                                            + indicateFieldNameMessage;
+                                    String msg2 = fld.getName() + " = mointerObjects[" + ii + "]." + fld2.getName();
                                     try {
                                         fld2.setAccessible(true);
-                                        Object condidateInnerObject = fld2.get(condidate);
-                                        if (condidateInnerObject != null && //
-                                                ClassUtil.isAssignFrom(fld.getType(), condidateInnerObject.getClass()) //
+                                        Object innerObj = fld2.get(condidate);
+                                        if (innerObj != null && //
+                                                ClassUtil.isAssignFrom(fld.getType(), innerObj.getClass()) //
                                         ) {
-                                            // 未指定
-                                            if (StringUtils.isBlank(indicateFieldName)) {
-                                                fld.set(newObject, condidateInnerObject);
-                                                okSb.append(msg2 + "\n");
-                                                bindOk = true;
-                                                break;
-                                            } else {
-                                                // 指定物件為綁定物件[自定]
-                                                if (StringUtils.equals(indicateFieldName, fld2.getName())) {
-                                                    fld.set(newObject, condidateInnerObject);
-                                                    okSb.append(msg2 + "\n");
-                                                    bindOk = true;
-                                                    break;
-                                                }
-                                            }
+                                            fld.set(newObject, innerObj);
+                                            okSb.append(msg2 + "\n");
+                                            bindOk = true;
+                                            continue A;
                                         }
                                     } catch (Exception ex) {
                                         errSb.append(msg2 + "設定錯誤:" + ex.getMessage() + "\n");
@@ -139,25 +152,18 @@ public class DebugMointerMappingField {
                                 fld.set(newObject, tempObj);
                                 okSb.append(msg2 + "\n");
                                 bindOk = true;
-                                break;
+                                continue A;
                             }
-                        }
-                    }
-                    if (!bindOk) {
-                        Object checkBind = fld.get(newObject);
-                        if (checkBind != null) {
-                            errSb.append(fld.getName() + "已存在資料未綁定  = " + getObjSimpleStr(checkBind) + "\n");
-                        } else {
-                            errSb.append(fld.getName() + "未找到對象!\n");
                         }
                     }
                 }
             } catch (Exception ex) {
-                errSb.append(msg1 + "\n");
+                errSb.append("[ERROR]自動注入field失敗 : " + fld.getName() + "\n");
+                ex.printStackTrace();
             }
         }
     }
-    
+
     public static String getObjSimpleStr(Object value) {
         if (value == null) {
             return "<null>";
@@ -181,5 +187,49 @@ public class DebugMointerMappingField {
 
     public StringBuilder getErrSb() {
         return errSb;
+    }
+
+    private class SpringContextHolder {
+        boolean isSpringReady = false;
+        Object context;
+        Class<?> springClz;
+
+        private SpringContextHolder(Object[] mointerObjects) {
+            try {
+                springClz = Class.forName("org.springframework.context.ApplicationContext");
+                if (mointerObjects != null) {
+                    A: for (Object obj : mointerObjects) {
+                        if (obj != null && ClassUtil.isAssignFrom(springClz, obj.getClass())) {
+                            context = obj;
+                            isSpringReady = true;
+                            break A;
+                        }
+                        if (obj != null && obj.getClass().isArray()) {
+                            for (int ii = 0; ii < Array.getLength(obj); ii++) {
+                                Object objInArry = Array.get(obj, ii);
+                                if (objInArry != null && ClassUtil.isAssignFrom(springClz, objInArry.getClass())) {
+                                    context = objInArry;
+                                    isSpringReady = true;
+                                    break A;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+            }
+        }
+
+        public boolean isReady() {
+            return isSpringReady && context != null;
+        }
+
+        public <T> T getBean(Class<?> clz) {
+            try {
+                return (T) MethodUtils.invokeMethod(context, "getBean", new Object[] { clz });
+            } catch (Exception e) {
+                throw new RuntimeException("SpringContextHolder.getBean ERROR : " + e.getMessage(), e);
+            }
+        }
     }
 }
