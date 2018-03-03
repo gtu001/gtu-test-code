@@ -109,24 +109,26 @@ public class Worksheet4Fuco {
         for (Integer weekOfYear : valMap.keySet()) {
             List<WorkInfo> vlst = valMap.get(weekOfYear);
             List<String>[] vsbArry = new List[7];
+            String[] dayArry = new String[7];
             for (WorkInfo v : vlst) {
                 int pos = v.cal.get(Calendar.DAY_OF_WEEK) - 1;
                 if (vsbArry[pos] == null) {
                     vsbArry[pos] = new ArrayList<String>();
                 }
                 vsbArry[pos].add(v.item);
+                dayArry[pos] = DateFormatUtils.format(v.cal, "yyyy/MM/dd");
             }
 
             System.out.println("週數 : " + weekOfYear + "-" + t.getWeekRange(vlst));
-            System.out.print("上下班時間:09:30~18:30 ");
+            System.out.print(dayArry[1] + "上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[1]), ","));
-            System.out.print("上下班時間:09:30~18:30 ");
+            System.out.print(dayArry[2] + "上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[2]), ","));
-            System.out.print("上下班時間:09:30~18:30 ");
+            System.out.print(dayArry[3] + "上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[3]), ","));
-            System.out.print("上下班時間:09:30~18:30 ");
+            System.out.print(dayArry[4] + "上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[4]), ","));
-            System.out.print("上下班時間:09:30~18:30 ");
+            System.out.print(dayArry[5] + "上下班時間:09:30~18:30 ");
             System.out.println(StringUtils.join(t.markNumLst(vsbArry[5]), ","));
         }
 

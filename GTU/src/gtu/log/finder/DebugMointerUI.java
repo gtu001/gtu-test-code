@@ -3588,7 +3588,7 @@ public class DebugMointerUI {
 
             boolean findObj = false;
             boolean findMethod = false;
-            A : for (int ii = 0; ii < mointerObjects.length; ii++) {
+            A: for (int ii = 0; ii < mointerObjects.length; ii++) {
                 Object obj = mointerObjects[ii];
                 if (obj != null && StringUtils.equals(obj.getClass().getName(), className)) {
                     findObj = true;
@@ -3597,7 +3597,8 @@ public class DebugMointerUI {
                     if (inst.indicateExecuteConfig != null && //
                             inst.indicateExecuteConfig.indicateParameters != null && inst.indicateExecuteConfig.indicateParameters.length != 0) {
                         for (Method method : obj.getClass().getMethods()) {
-                            if (this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
+                            if (StringUtils.equals(method.getName(), executeMethodName) && //
+                                    this.isObjectParamaterClassMatch_forCglib(method.getParameterTypes(), inst.indicateExecuteConfig.indicateParameters)) {
                                 findMethod = true;
                                 classInfo = obj.getClass().getName() + "." + method.getName() + "()";
                                 exactExecute(method, obj, inst.indicateExecuteConfig.indicateParameters, slientMode);
@@ -3731,7 +3732,7 @@ public class DebugMointerUI {
             try {
                 sysTrayUtil.displayMessage("執行成功!!", successMessage, TrayIcon.MessageType.INFO);
                 System.out.println("執行成功!! : " + successMessage);
-            }catch(Throwable ex2) {
+            } catch (Throwable ex2) {
             }
         }
     }
