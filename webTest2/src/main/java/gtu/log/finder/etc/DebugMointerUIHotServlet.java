@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.reflect.MethodUtils;
 
 import gtu.exception.ExceptionStackUtil;
 import gtu.javafx.traynotification.TrayNotificationHelper.RandomColorFill;
@@ -53,10 +57,10 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         System.out.println("#. DebugMointerUIHotServlet start");
         final StringBuilder sb = new StringBuilder();
         try {
-            //如果上傳classpath.zip
+            // 如果上傳classpath.zip
             DebugMointerUIClassesUpload upload = new DebugMointerUIClassesUpload(req, sb);
-            upload.uploadFile();    
-            
+            upload.uploadFile();
+
             String classpathStr = upload.getParameter("classpath");
             String orignClz = upload.getParameter("orignClz");
             String invoke = upload.getParameter("invoke");
@@ -65,7 +69,8 @@ public class DebugMointerUIHotServlet extends HttpServlet {
             String del = upload.getParameter("del");
             String reverse = upload.getParameter("reverse");
             String customSpring = upload.getParameter("customSpring");
-            
+            String springInvoke = upload.getParameter("springInvoke");
+
             WebTestUtil webUtil = WebTestUtil.newInstnace().request(req).response(response);
 
             // DebugMointerUI.log
@@ -120,9 +125,9 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 classpathFile = getDefaultClasspathFile(sb);
                 logH("[classpath] 使用預設路徑  : " + classpathFile, sb);
             }
-            
-            //判斷是否上傳classpath.zip檔案
-            if(upload.isUploadClassesZip()) {
+
+            // 判斷是否上傳classpath.zip檔案
+            if (upload.isUploadClassesZip()) {
                 upload.extractClasspath(classpathFile.getAbsolutePath());
             }
 
@@ -157,10 +162,10 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 try {
                     String classname = orignClz + "_";
                     log("外掛Bean class : " + classname);
-                    
-                    Object newProxy = null; 
 
-                    if(StringUtils.isBlank(reverse)) {
+                    Object newProxy = null;
+
+                    if (StringUtils.isBlank(reverse)) {
                         DebugMointerUI_forCglib cglib = new DebugMointerUI_forCglib();
                         cglib.setLogDo(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
@@ -169,7 +174,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                         });
                         cglib.loadPluginClass(classpathFile, classname);
                         newProxy = cglib.createProxy(orignClass, orignBean, Arrays.asList(context));
-                    }else {
+                    } else {
                         // 取得原始物件
                         newProxy = orignBean;
                         logH("[復原resverse]取得原始Bean物件 : " + orignBean, sb);
@@ -217,10 +222,40 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                     tableSb.append("<table border='1'>\n");
                     tableSb.append("<tr><td width='10%'>回傳值</td><td width='90%'>內容</td></tr>\n");
                     tableSb.append("<tr><td>原始</td><td>" + DebugMointerMappingField.getObjSimpleStr(rtnVal) + "</td></tr>\n");
-                    tableSb.append("<tr><td>formatter</td><td>" + DebugMointerUIHtmlUtil.replaceChangeLineToBr(ReflectionToStringBuilder.toString(rtnVal, ToStringStyle.MULTI_LINE_STYLE)) + "</td></tr>\n");
+                    tableSb.append(
+                            "<tr><td>formatter</td><td>" + DebugMointerUIHtmlUtil.replaceChangeLineToBr(ReflectionToStringBuilder.toString(rtnVal, ToStringStyle.MULTI_LINE_STYLE)) + "</td></tr>\n");
                     tableSb.append("</table>\n");
                     logH(tableSb.toString(), sb);
                 } catch (Throwable ex) {
+                    logH("<b>" + getRandomColorString("掛載失敗!!") + "</b>", sb);
+                    exceptioinHandler(ex, sb);
+                }
+            }
+
+            // 直接執行spring bean
+            if (StringUtils.isNotBlank(springInvoke)) {
+                try {
+                    logH("<br/><H3>" + getRandomColorString("直接執行SpringBean") + "</H3>", sb);
+                    String[] vals = springInvoke.split(",", -1);
+                    if (vals.length != 2) {
+                        logH("ERROR 參數錯誤, 必須為 : classpath,method", sb);
+                    } else {
+                        String classStr = vals[0];
+                        String methodStr = vals[1];
+
+                        logH("執行 : " + classStr + "." + methodStr + "()!", sb);
+                        Class<?> clz = Class.forName(classStr);
+                        Object springBean = springHandler.getOrignBean(clz, context, sb);
+
+                        if (springBean == null) {
+                            logH("ERROR 無法取得springBean!!", sb);
+                        } else {
+                            //真正執行springInvoke
+                            invokeSpringBeanMethod(springBean, methodStr, sb);
+                        }
+                    }
+                } catch (Exception ex) {
+                    logH("<b>" + getRandomColorString("執行失敗!!") + "</b>", sb);
                     exceptioinHandler(ex, sb);
                 }
             }
@@ -256,6 +291,33 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                 e.printStackTrace();
             }
             System.out.println("#. DebugMointerUIHotServlet end");
+        }
+    }
+
+    private void invokeSpringBeanMethod(Object springBean, String methodStr, StringBuilder sb) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        TreeMap<Integer, Method> methodMap = new TreeMap<Integer, Method>();
+        for (Method m : springBean.getClass().getDeclaredMethods()) {
+            if (StringUtils.equals(m.getName(), methodStr)) {
+                if (m.getParameterTypes() == null || m.getParameterTypes().length == 0) {
+                    methodMap.put(0, m);
+                } else {
+                    methodMap.put(m.getParameterTypes().length, m);
+                }
+            }
+        }
+        if (methodMap.isEmpty()) {
+            logH("無法取得對應method : " + methodStr, sb);
+        } else {
+            Method mth = methodMap.get(methodMap.keySet().iterator().next());
+
+            if (mth.getParameterTypes() == null || mth.getParameterTypes().length == 0) {
+                mth.invoke(springBean, new Object[0]);
+                logH("<b>" + getRandomColorString("執行成功!!") + "</b>", sb);
+            } else {
+                Object params = new Object[mth.getParameterTypes().length];
+                mth.invoke(springBean, params);
+                logH("<b>" + getRandomColorString("執行成功!!") + "</b>", sb);
+            }
         }
     }
 
@@ -388,6 +450,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[classpath]外掛位置", "classpath"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[orignClz]替換類別", "orignClz"));
         sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[invoke](Ex:類別,方法)", "invoke"));
+        sb.append(String.format("<tr><td>%s</td><td><input type=\"text\" name=\"%s\" style=\"width:500px\" /></td></tr>\n", "[springInvoke](Ex:類別,方法)", "springInvoke"));
         sb.append(String.format("<tr><td>%1$s</td><td><input id=\"%2$s\" name=\"%2$s\" type=\"file\" style=\"width:500px\" /></td></tr>\n", "上傳classes.zip", "classesZip"));
         sb.append(String.format("<tr><td>%s</td><td><input id=\"%s\" name=\"%2$s\" type=\"checkbox\" value=\"Y\" /></td></tr>\n", "[reverse]復原", "reverse"));
         sb.append("<tr><td colspan='2' align=\"right\"><input type=\"submit\" value=\"送出\" /></td></tr>\n");

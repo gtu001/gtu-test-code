@@ -1,0 +1,6 @@
+
+alter table CREDIT_NARROW_PAYMENT       move tablespace CCBILLDB ; --移到CCBILLDB
+
+alter index     IDX_CREDIT_ACCOUNT_STATUS      rebuild; --切換tablespace 後要重build index
+
+

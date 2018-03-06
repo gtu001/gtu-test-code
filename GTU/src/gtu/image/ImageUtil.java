@@ -108,4 +108,8 @@ public class ImageUtil {
             throw new RuntimeException("getBufferedImage ERR : " + ex.getMessage(), ex);
         }
     }
+
+    public javafx.scene.image.WritableImage getImageForJavaFx(BufferedImage capture) {
+        return javafx.embed.swing.SwingFXUtils.toFXImage(capture, null);
+    }
 }

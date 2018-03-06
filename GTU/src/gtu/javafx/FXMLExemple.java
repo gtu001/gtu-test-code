@@ -23,40 +23,40 @@ import javafx.stage.Stage;
 import sun.applet.Main;
 
 public class FXMLExemple extends Application {
-    
+
     private Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-//        Parent root = FXMLLoader.load(getClass().getResource("test.fxml"));
+        // Parent root = FXMLLoader.load(getClass().getResource("test.fxml"));
         try {
             stage = primaryStage;
             stage.setTitle("FXML Login Sample");
             stage.setMinWidth(390);
             stage.setMinHeight(500);
-            
-            TestController test = (TestController)replaceSceneContent("test.fxml");
+
+            TestController test = (TestController) replaceSceneContent(this.getClass(), "test.fxml");
             System.out.println(test);
             test.setApp(this);
-            
+
             primaryStage.show();
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private Initializable replaceSceneContent(String fxml) throws Exception {
+
+    private Initializable replaceSceneContent(Class<?> clz, String fxml) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-        InputStream in = FXMLExemple.class.getResourceAsStream(fxml);
+        InputStream in = clz.getResourceAsStream(fxml);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
-        loader.setLocation(FXMLExemple.class.getResource(fxml));
-        AnchorPane page;
+        loader.setLocation(clz.getResource(fxml));
+        javafx.scene.Parent page;
         try {
-            page = (AnchorPane) loader.load(in);
+            page = (javafx.scene.Parent) loader.load(in);
         } finally {
             in.close();
-        } 
-        Scene scene = new Scene(page, 800, 600);
+        }
+        Scene scene = new Scene(page);
         stage.setScene(scene);
         stage.sizeToScene();
         return (Initializable) loader.getController();

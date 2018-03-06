@@ -6,6 +6,8 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 
+import gtu.swing.util.JCommonUtil;
+
 public abstract class ClipboardListener extends Thread implements ClipboardOwner {
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
@@ -28,20 +30,36 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
 
     public void lostOwnership(Clipboard c, Transferable t) {
         int time = 0;
+        Throwable ex = null;
         while (true) {
             try {
                 sleep(50);
-                Transferable contents = sysClip.getContents(this);
+                Transferable contents = getContentsTransferable();
+                if (contents == null) {
+                    break;
+                }
                 processContents(contents);
                 regainOwnership(contents);
                 break;
             } catch (Exception e) {
-                System.out.println("Exception: " + e.getMessage());
-                time ++;
-                if(time > 10) {
+                ex = e;
+                time++;
+                if (time > 10) {
                     break;
                 }
             }
+        }
+        if (ex != null) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private Transferable getContentsTransferable() {
+        try {
+            return sysClip.getContents(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 
@@ -51,7 +69,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
             System.out.println("ProcessContents : " + text);
             processText(text);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            ex.printStackTrace();
         }
     }
 
