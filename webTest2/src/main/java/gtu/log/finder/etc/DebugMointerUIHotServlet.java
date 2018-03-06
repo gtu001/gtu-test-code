@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -250,7 +251,7 @@ public class DebugMointerUIHotServlet extends HttpServlet {
                         if (springBean == null) {
                             logH("ERROR 無法取得springBean!!", sb);
                         } else {
-                            //真正執行springInvoke
+                            // 真正執行springInvoke
                             invokeSpringBeanMethod(springBean, methodStr, sb);
                         }
                     }
@@ -310,13 +311,31 @@ public class DebugMointerUIHotServlet extends HttpServlet {
         } else {
             Method mth = methodMap.get(methodMap.keySet().iterator().next());
 
-            if (mth.getParameterTypes() == null || mth.getParameterTypes().length == 0) {
-                mth.invoke(springBean, new Object[0]);
-                logH("<b>" + getRandomColorString("執行成功!!") + "</b>", sb);
+            boolean result = false;
+            if (!Modifier.isStatic(mth.getModifiers())) {
+                if (mth.getParameterTypes() == null || mth.getParameterTypes().length == 0) {
+                    mth.invoke(springBean, new Object[0]);
+                    result = true;
+                } else {
+                    Object[] params = new Object[mth.getParameterTypes().length];
+                    mth.invoke(springBean, params);
+                    result = true;
+                }
             } else {
-                Object params = new Object[mth.getParameterTypes().length];
-                mth.invoke(springBean, params);
+                if (mth.getParameterTypes() == null || mth.getParameterTypes().length == 0) {
+                    mth.invoke(springBean.getClass(), new Object[0]);
+                    result = true;
+                } else {
+                    Object[] params = new Object[mth.getParameterTypes().length];
+                    mth.invoke(springBean.getClass(), params);
+                    result = true;
+                }
+            }
+
+            if (result) {
                 logH("<b>" + getRandomColorString("執行成功!!") + "</b>", sb);
+            }else {
+                logH("<b>" + getRandomColorString("執行失敗!!") + "</b>", sb);
             }
         }
     }

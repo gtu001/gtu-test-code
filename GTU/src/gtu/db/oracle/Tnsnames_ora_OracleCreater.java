@@ -22,7 +22,7 @@ public class Tnsnames_ora_OracleCreater {
         String port = "1521";
         String username = "ccbilldb";
         String password = "Cc1234@!";
-        
+
         
 //        bds.setUrl("jdbc:oracle:thin:@192.168.93.215:1521:SCSB");
 //        bds.setUsername("henry");
