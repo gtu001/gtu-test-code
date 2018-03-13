@@ -1,7 +1,5 @@
 package gtu.zip;
 
-import gtu.file.FileUtil;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,6 +12,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import gtu.file.FileUtil;
+
 public class UnZipBean {
 
     public static void main(String[] args) {
@@ -24,16 +24,39 @@ public class UnZipBean {
         System.out.println("done...");
     }
 
+    // 寫入緩衝大小
+    final public static int FileWriteBuffer = 5 * 1024 * 1024;
+
     public static final int EOF = -1;
     static final int BUFFER = 2048;
 
     private String zipFile;
     private String targetDirectory;
-
     private ZipFile zf;
 
     /** Constructor */
     public UnZipBean() {
+    }
+
+    public UnZipBean(String zipFile, String targetDirectory) {
+        this.zipFile = zipFile;
+        this.targetDirectory = targetDirectory;
+    }
+
+    public void setZipFile(String zipFile) {
+        this.zipFile = zipFile;
+    }
+
+    public String getZipFile() {
+        return zipFile;
+    }
+
+    public void setTargetDirectory(String targetDirectory) {
+        this.targetDirectory = targetDirectory;
+    }
+
+    public String getTargetDirectory() {
+        return targetDirectory;
     }
 
     public boolean unzip() {
@@ -44,22 +67,22 @@ public class UnZipBean {
                 Enumeration enumeration = zf.entries();
                 while (enumeration.hasMoreElements()) {
                     ZipEntry target = (ZipEntry) enumeration.nextElement();
-                    System.out.print(target.getName() + " .");
+                    // System.out.print(target.getName() + " .");
                     saveEntry(target);
-                    System.out.println(". unpacked");
+                    // System.out.println(". unpacked");
                 }
                 done = true;
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                System.out.println("zipfile not found" + e.getMessage());
             } catch (ZipException e) {
-                e.printStackTrace();
+                System.out.println("zip error..." + e.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("IO error..." + e.getMessage());
             } finally {
                 try {
                     zf.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("IO error...Can't close zip file" + e.getMessage());
                 }
             }
         }
@@ -77,7 +100,7 @@ public class UnZipBean {
                 File dir = new File(file.getParent());
                 dir.mkdirs();
                 FileOutputStream fos = new FileOutputStream(file);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                BufferedOutputStream bos = new BufferedOutputStream(fos, FileWriteBuffer);
 
                 int c;
                 byte[] data = new byte[BUFFER];
