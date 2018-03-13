@@ -3,7 +3,7 @@ import decimal
 import math
 import numbers
 import re
-
+from gtu.reflect import checkSelf
 
 def roundHalfUp2(value, scale):
     '''四捨五入,小數點後多的零會保留'''
@@ -78,6 +78,32 @@ def trimDotRightZero(strVal):
         return strVal
 
 
+def roundTest(value, scale):
+    scaleStr = "0."
+    for i in range(scale) :
+        scaleStr += "0"
+    print("ROUND_05UP\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_05UP))
+    print("ROUND_CEILING\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_CEILING))
+    print("ROUND_DOWN\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_DOWN))
+    print("ROUND_FLOOR\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_FLOOR))
+    print("ROUND_HALF_DOWN\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_HALF_DOWN))
+    print("ROUND_HALF_EVEN\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_HALF_EVEN))
+    print("ROUND_HALF_UP\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_HALF_UP))
+    print("ROUND_UP\t", Decimal(value).quantize(Decimal(scaleStr), rounding = decimal.ROUND_UP))
+    
+
+def fixdScale(strVal, scale):
+    pattern = r"^([-]?\d+)\.?(\d{0," + str(scale) + "})"
+    mth = re.match(pattern, str(strVal), re.DOTALL | re.MULTILINE)
+    if mth :
+        num1 = mth.group(1)
+        num2 = mth.group(2)
+        if len(num2) == 0:
+            return num1
+        num2 = num2.ljust(scale, '0')
+        return num1 + "." + num2
+    return strVal
+
 
 if __name__ == '__main__' :
     print(roundHalfUp(4.42, 3))
@@ -85,6 +111,6 @@ if __name__ == '__main__' :
     print(roundHalfUp(4.4446, 3))
     print(floor(4.4446))
     print(ceil(4.4446))
-
+    print(fixdScale(103330.1, 3))
 
 

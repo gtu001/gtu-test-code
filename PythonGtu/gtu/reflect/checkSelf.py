@@ -3,6 +3,7 @@ from inspect import getmembers
 import inspect
 import re
 
+#####from gtu.reflect import checkSelf
 
 def checkMembers(testObj, doc=False):
     '''檢查物件成員'''

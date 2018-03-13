@@ -38,7 +38,7 @@ def getAgeDef(sheet):
 
 class CellDef():    
     def __init__(self, value, rowIndex, cellIndex, defMap, sheetName, sheetIndex):
-        self.value = value
+        self.value = numberUtil.fixdScale(value, 3)
         self.rowIndex = rowIndex
         self.cellIndex = cellIndex
         self.sheetIndex = sheetIndex
