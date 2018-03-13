@@ -12,50 +12,19 @@ import numpy
 
 import numpy as np
 
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="path to input image")
-ap.add_argument("-r", "--reference", required=True, help="path to reference OCR-A image")
-# args = vars(ap.parse_args()) #使用console帶參數
-args = {
-        "image":"C:/Users/gtu00/OneDrive/Desktop/IMG_20180301_170454_HDR.jpg",
-        "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/OCR_A.png"
-        }
+from gtu.reflect import checkSelf
 
 
 
-# define a dictionary that maps the first digit of a credit card
-# number to the credit card type
-FIRST_NUMBER = {
-    "3": "American Express",
-    "4": "Visa",
-    "5": "MasterCard",
-    "6": "Discover Card"
-}
-
-
-# load the reference OCR-A image from disk, convert it to grayscale,
-# and threshold it, such that the digits appear as *white* on a
-# *black* background
-# and invert it, such that the digits appear as *white* on a *black*
-ref = cv2.imread(args["reference"])
-ref = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)  # 轉成灰階
-ref = cv2.threshold(ref, 10, 255, cv2.THRESH_BINARY_INV)[1]  # 顏色invert
-
-# find contours in the OCR-A image (i.e,. the outlines of the digits)
-# sort them from left to right, and initialize a dictionary to map
-# digit name to the ROI
-refCnts = cv2.findContours(ref.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-refCnts = refCnts[0] if imutils.is_cv2() else refCnts[1]
-refCnts = contours.sort_contours(refCnts, method="left-to-right")[0]
-digits = {}
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 
 def fixImg(img, contrast=1.5, brightness=0.7):
-    img = np.array(img)
+    img = np.array(img, dtype=np.uint8)
     mean = np.mean(img)
     img = img - mean
-    img = img * contrast+ mean * brightness  # 修对比度和亮度
+    img = img * contrast + mean * brightness  # 修对比度和亮度
     img = img / 255.  # 非常关键，没有会白屏
     return img
 
@@ -63,9 +32,9 @@ def fixImg(img, contrast=1.5, brightness=0.7):
 def showImg(ref):
     cv2.imshow("Image", ref)
     cv2.waitKey(0)
-    
 
-#用來判斷 數值是否落在平均值
+
+# 用來判斷 數值是否落在平均值
 class InnerCompare :
     def __init__(self, percent=0.05):
         self.map = dict()
@@ -99,31 +68,7 @@ class InnerCompare :
     def getLst(self, k):
         return self.map2.get(k)
     
-#用來判斷 數值是否落在平均值
-class InnerCompare_SmallChange :
-    def __init__(self, percent=0.05):
-        self.map = dict()
-        self.map2 = dict()
-        self.percent = percent
-        pass
-    
-    def isLikeNum(self, val1, val2):
-        if v1 >= val2 and v2 <= val2 :
-            return True
-        return False
-    
-    def putMap(self, val, arry):
-        for k, v in self.map.items():
-            if self.isLikeNum(k, val):
-                self.map[k] += 1
-                self.putMapArry(k, arry)
-                return
-        self.map[val] = 1
-        self.putMapArry(val, arry)
-        
-    def getLst(self, k):
-        return self.map2.get(k)
-            
+# 用來判斷 數值是否落在平均值
 class CreditBlockChecker :
  
     def __init__(self):
@@ -135,9 +80,9 @@ class CreditBlockChecker :
         self.lst.append(arry)
         
     def getAverageNum(self):
-        #比較Y軸位置
+        # 比較Y軸位置
         compareY = InnerCompare()
-        for (i,v) in enumerate(self.lst) :
+        for (i, v) in enumerate(self.lst) :
             (x, y, w, h) = v
             compareY.putMap(y, v)
         
@@ -146,7 +91,7 @@ class CreditBlockChecker :
             if v == 4 :
                 return compareY.getLst(k)
             elif v > 4 :
-                #比較寬度
+                # 比較寬度
                 groupLst = compareY.map2[k]
                 compareWidth = InnerCompare(0.20)
                 for (i, v) in enumerate(groupLst):
@@ -158,6 +103,55 @@ class CreditBlockChecker :
                         print("寬度值為 {}, 有 {}組 --> {}".format(k , v, compareWidth.getLst(k)))
                         return compareWidth.map2[k]
         return None
+
+#-----------------------------------------------------------------------------------------------
+# main process
+#-----------------------------------------------------------------------------------------------
+
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--image", required=True, help="path to input image")
+ap.add_argument("-r", "--reference", required=True, help="path to reference OCR-A image")
+# args = vars(ap.parse_args()) #使用console帶參數
+args = {
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180301_170454_HDR.jpg", #正常(差一點)
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120247.jpg",  #正常
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120239.jpg", #沒抓到
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120231.jpg",#正常(差一點)
+
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131252.jpg", #一整塊
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131302.jpg", #前面被判定為一塊
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131310.jpg", #抓到三個
+            "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131319.jpg",
+        "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/OCR_A.png"
+        }
+
+
+# define a dictionary that maps the first digit of a credit card
+# number to the credit card type
+FIRST_NUMBER = {
+    "3": "American Express",
+    "4": "Visa",
+    "5": "MasterCard",
+    "6": "Discover Card"
+}
+
+
+# load the reference OCR-A image from disk, convert it to grayscale,
+# and threshold it, such that the digits appear as *white* on a
+# *black* background
+# and invert it, such that the digits appear as *white* on a *black*
+ref = cv2.imread(args["reference"])
+ref = cv2.cvtColor(ref, cv2.COLOR_BGR2GRAY)  # 轉成灰階
+ref = cv2.threshold(ref, 10, 255, cv2.THRESH_BINARY_INV)[1]  # 顏色invert
+
+# find contours in the OCR-A image (i.e,. the outlines of the digits)
+# sort them from left to right, and initialize a dictionary to map
+# digit name to the ROI
+refCnts = cv2.findContours(ref.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+refCnts = refCnts[0] if imutils.is_cv2() else refCnts[1]
+refCnts = contours.sort_contours(refCnts, method="left-to-right")[0]
+digits = {}
 
 # loop over the OCR-A reference contours
 for (i, c) in enumerate(refCnts):
@@ -180,8 +174,11 @@ sqKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 
 # load the input image, resize it, and convert it to grayscale
 image = cv2.imread(args["image"])
+#image = fixImg(image, contrast=3, brightness=1.2)  #---------------------------------custom
 image = imutils.resize(image, width=300)
-gray = fixImg(image, contrast=3, brightness=1.2) #---------------------------------custom
+
+image = image.astype("uint8")
+
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 
@@ -190,7 +187,6 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # apply a tophat (whitehat) morphological operator to find light
 # regions against a dark background (i.e., the credit card numbers)
 tophat = cv2.morphologyEx(gray, cv2.MORPH_TOPHAT, rectKernel)
-
 
 
 # compute the Scharr gradient of the tophat image, then scale
@@ -203,19 +199,18 @@ gradX = gradX.astype("uint8")
 
 
 
+
 # apply a closing operation using the rectangular kernel to help
 # cloes gaps in between credit card number digits, then apply
 # Otsu's thresholding method to binarize the image
 gradX = cv2.morphologyEx(gradX, cv2.MORPH_CLOSE, rectKernel)
-thresh = cv2.threshold(gradX, 0, 255,
-    cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+thresh = cv2.threshold(gradX, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
     
 
  
 # apply a second closing operation to the binary image, again
 # to help close gaps between credit card number regions
 thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, sqKernel)
-
 
 
 # find contours in the thresholded image, then initialize the
@@ -231,9 +226,8 @@ locs = []
 # loop over the contours
 for (i, c) in enumerate(cnts):
     
-    def showInnerBlock(var):#---------------------------------custom
+    def showInnerBlock(var):  #---------------------------------custom
         (x, y, w, h) = var
-        print("x={}, y={}, w={}, h={}".format(x, y, w, h))
         group = gray[y - 5:y + h + 5, x - 5:x + w + 5]
         showImg(group)
         
@@ -243,24 +237,31 @@ for (i, c) in enumerate(cnts):
     (x, y, w, h) = cv2.boundingRect(c)
     ar = w / float(h)
     
+    print("x={}, y={}, w={}, h={} --> ar:{}".format(x, y, w, h, ar))
+    
+#     showInnerBlock((x, y, w, h))
+    
     # since credit cards used a fixed size fonts with 4 groups
     # of 4 digits, we can prune potential contours based on the
     # aspect ratio
-    if ar >= 2.5 and ar <= 4.0:
+    
+    # if ar >= 2.5 and ar <= 4.0: #---------------------------------custom
+    if ar >= 1.6 and ar <= 4.0:
         # contours can further be pruned on minimum/maximum width
         # and height
-        if (w >= 40 and w <= 55) and (h >= 10 and h <= 20):
+        # if (w >= 40 and w <= 55) and (h >= 10 and h <= 20):#---------------------------------custom
+        if (w >= 40 and w <= 55) and (h >= 10 and h <= 30):
             # append the bounding box region of the digits group
             # to our locations list
             locs.append((x, y, w, h))
-            #showInnerBlock((x, y, w, h)) #---------------------------------custom
+            # showInnerBlock((x, y, w, h)) #---------------------------------custom
             print("# append -", (x, y, w, h));
             
 
 
-avg = CreditBlockChecker()#---------------------------------custom
+avg = CreditBlockChecker()  #---------------------------------custom
 for (i, c) in enumerate(locs) :
-    avg.append(c) #取得平均y的平均值 
+    avg.append(c)  # 取得平均y的平均值 
 avg.getAverageNum()
  
 # for (i, c) in enumerate(locs):
@@ -332,7 +333,7 @@ for (i, (gX, gY, gW, gH)) in enumerate(locs):
     output.extend(groupOutput)
     
     
-#print("groupOutput : ", groupOutput)
+# print("groupOutput : ", groupOutput)
 # display the output credit card information to the screen
 # print("Credit Card Type: {}".format(FIRST_NUMBER[output[0]]))
 print("Credit Card #: {}".format("".join(output)))

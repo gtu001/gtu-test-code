@@ -42,15 +42,13 @@ public class DebugMointerUIZipUtils {
      * @return
      */
     public boolean unzipFile(File zipfile, File extractDir) {
-
         try {
             unZip(zipfile, extractDir.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException(ex.getMessage(), ex);
+//            return false;
         }
-
         return true;
     }
 
@@ -81,7 +79,7 @@ public class DebugMointerUIZipUtils {
     }
 
     /**
-     * 解壓縮主程式
+     * 解壓縮主程式 [若檔案已存在會自動覆蓋]
      * 
      * @param zipFileName
      * @param outputDirectory
@@ -130,9 +128,8 @@ public class DebugMointerUIZipUtils {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-
     }
 
     /**

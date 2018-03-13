@@ -11,20 +11,20 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import gtu.log.finder.etc.DebugMointerUIZipUtils;
+import gtu.file.FileUtil;
 
 public class ZipUtils {
 
-    public static void main(String[] a) {
+    public static void main(String[] a) throws Exception {
         File srcFile = new File("C:\\11111");
         File targetZip = new File("C:\\11111\\123.zip");
         File extractDir = new File("C:\\22222");
 
         try {
             // 壓縮
-            new DebugMointerUIZipUtils().makeZip(srcFile, targetZip);
+            new ZipUtils().makeZip(srcFile, targetZip);
             // 解壓縮
-            new DebugMointerUIZipUtils().unzipFile(targetZip, extractDir);
+            new ZipUtils().unzipFile(targetZip, extractDir);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -32,6 +32,7 @@ public class ZipUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        System.out.println("done...");
     }
 
     /**
@@ -44,15 +45,13 @@ public class ZipUtils {
      * @return
      */
     public boolean unzipFile(File zipfile, File extractDir) {
-
         try {
             unZip(zipfile, extractDir.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException(ex.getMessage(), ex);
+            // return false;
         }
-
         return true;
     }
 
@@ -83,7 +82,7 @@ public class ZipUtils {
     }
 
     /**
-     * 解壓縮主程式
+     * 解壓縮主程式 [若檔案已存在會自動覆蓋]
      * 
      * @param zipFileName
      * @param outputDirectory
@@ -132,9 +131,8 @@ public class ZipUtils {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-
     }
 
     /**

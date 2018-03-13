@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -560,6 +561,18 @@ public class DateUtil {
             System.out.println("getTimestamp error:" + e);
         }
         return time;
+    }
+
+    private void testTimezone() {
+        Calendar calendar = new GregorianCalendar();
+        TimeZone timeZone = calendar.getTimeZone();
+        System.out.println(timeZone);
+        // Asia/Taipei
+        TimeZone timeZone2 = TimeZone.getTimeZone("Asia/Taipei");
+        System.out.println(timeZone2);
+        // -Duser.timezone=Asia/Taipei
+        // -Duser.timezone=GMT+8
+        //Jboss 的 standalone.conf 加入 JAVA_OPTS="$JAVA_OPTS -Duser.timezone=GMT+8"
     }
 
     /**

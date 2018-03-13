@@ -19,3 +19,7 @@ sqlalchemy
 imutils
 numpy
 opencv-python
+
+#統計
+pandas
+matplotlib

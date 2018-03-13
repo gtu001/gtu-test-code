@@ -87,8 +87,8 @@ public class DebugMointerMappingField {
                             bindOk = true;
                             okSb.append(msg1 + getObjSimpleStr(springBean) + "\n");
                             continue A;
-                        }catch(Exception ex) {
-                            ex.printStackTrace();
+                        } catch (Exception ex) {
+                            errSb.append("[spring注入失敗]" + fld.getType() + " " + fld.getName() + " -> " + ex.getMessage() + "\n");
                         }
                     }
 

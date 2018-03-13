@@ -423,12 +423,14 @@ class RegionGroupDetail(Enum):
                 return e.regionCode
         return ""
     
+
     @staticmethod
     def getRegionDefMap(sheet, offset):
         map = {}
         for i, row in enumerate(sheet, 1):
             strVal = stringUtil.trimSpace(str(row[0].value))
             strVal = strVal.replace("※", "")
+            strVal = stringUtil.getChinese(strVal)
             if stringUtil.isChinese(strVal):
                 region = RegionGroupDetail.findRegion(strVal)
                 if region != None :

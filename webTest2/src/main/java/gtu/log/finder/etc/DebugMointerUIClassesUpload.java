@@ -44,14 +44,37 @@ public class DebugMointerUIClassesUpload {
         return parameterMap.get(key);
     }
 
-    public void extractClasspath(String targetDir) {
+    public void extractClasspath(String targetDir, String unzipOptions) {
         try {
             File zipFile = tempFileArry.get(0);
-
+            
             File dir = new File(targetDir);
-            if (dir.exists() && dir.isDirectory()) {
-                FileUtils.cleanDirectory(dir);
+
+            switch(UnzipMode.valueOf(unzipOptions)) {
+            case no:
+                DebugMointerUIHotServlet.logH("extractClasspath [不更動class目錄]", sb);
+                break;
+            case all:
+                DebugMointerUIHotServlet.logH("extractClasspath [淨空目錄]", sb);
+                if (dir.exists() && dir.isDirectory()) {
+                    FileUtils.cleanDirectory(dir);
+                }
+                break;
+            case clazz:
+                DebugMointerUIHotServlet.logH("extractClasspath [只清除class]", sb);
+                if (dir.exists() && dir.isDirectory()) {
+                    List<File> clzList = new ArrayList<File>();
+                    FileUtil.searchFileMatchs(dir, ".*\\.class", clzList);
+                    for(File f : clzList) {
+                        FileUtils.forceDelete(f);
+                    }
+                }
+                break;
+            default:
+                DebugMointerUIHotServlet.logH("extractClasspath [不更動class目錄]", sb);
+                break;
             }
+            
 
             DebugMointerUIZipUtils zipUtil = new DebugMointerUIZipUtils();
             zipUtil.unzipFile(zipFile, dir);
@@ -108,6 +131,28 @@ public class DebugMointerUIClassesUpload {
             }
         } catch (Exception e1) {
             DebugMointerUIHotServlet.exceptioinHandler(e1, sb);
+        }
+    }
+    
+    enum UnzipMode {
+        no("不更動", true), clazz("僅刪除class", false), all("刪除全部", false);
+        
+        String label;
+        boolean isSelected = false;
+
+        UnzipMode(String label, boolean isSelected) {
+            this.label = label;
+            this.isSelected = isSelected;
+        }
+        
+        static String generateHtml(String tagName) {
+            final String tag = "<input name=\"%1$s\" type=\"radio\" value=\"%2$s\" %4$s />%3$s";
+            StringBuilder sb= new StringBuilder();
+            for(UnzipMode e : UnzipMode.values()) {
+                String selected = e.isSelected ? " checked=\"checked\" " : "";
+                sb.append(String.format(tag, tagName, e.name(), e.label, selected));
+            }
+            return sb.toString();
         }
     }
 }

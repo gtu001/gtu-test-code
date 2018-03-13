@@ -1,6 +1,15 @@
 import re
 
 from gtu.number import numberUtil
+from gtu.regex import replaceContent
+
+
+def getChinese(strVal):
+    matchList = re.finditer("[\u4e00-\u9fa5]", strVal)
+    rtnStr = ""
+    for mth in matchList:
+        rtnStr += mth.group()
+    return rtnStr
 
 
 def isChinese(strVal):
