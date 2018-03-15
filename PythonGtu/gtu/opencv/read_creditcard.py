@@ -13,6 +13,8 @@ import numpy
 import numpy as np
 
 from gtu.reflect import checkSelf
+from gtu.io import tempFileUtil
+from gtu.tesseract import tesseract_util
 
 
 
@@ -20,7 +22,7 @@ def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 
-def fixImg(img, contrast=1.5, brightness=0.7):
+def contrastImg(img, contrast=1.5, brightness=0.7):
     img = np.array(img, dtype=np.uint8)
     mean = np.mean(img)
     img = img - mean
@@ -33,6 +35,13 @@ def showImg(ref):
     cv2.imshow("Image", ref)
     cv2.waitKey(0)
 
+
+def getPicText(img):
+    filepath = tempFileUtil.createTempFile(".png")
+    cv2.imwrite(filepath, img)
+    text = tesseract_util.image_to_string(filepath)
+    print(text)
+    
 
 # 用來判斷 數值是否落在平均值
 class InnerCompare :
@@ -114,7 +123,7 @@ ap.add_argument("-i", "--image", required=True, help="path to input image")
 ap.add_argument("-r", "--reference", required=True, help="path to reference OCR-A image")
 # args = vars(ap.parse_args()) #使用console帶參數
 args = {
-#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180301_170454_HDR.jpg", #正常(差一點)
+        "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180301_170454_HDR.jpg", #正常(差一點)
 #         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120247.jpg",  #正常
 #         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120239.jpg", #沒抓到
 #         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120231.jpg",#正常(差一點)
@@ -122,8 +131,8 @@ args = {
 #             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131252.jpg", #一整塊
 #             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131302.jpg", #前面被判定為一塊
 #             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131310.jpg", #抓到三個
-            "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131319.jpg",
-        "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/OCR_A.png"
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131319.jpg",
+        "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/ocr-b-font-254x300.png"
         }
 
 
@@ -174,9 +183,11 @@ sqKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 
 # load the input image, resize it, and convert it to grayscale
 image = cv2.imread(args["image"])
-#image = fixImg(image, contrast=3, brightness=1.2)  #---------------------------------custom
-image = imutils.resize(image, width=300)
 
+image2 = contrastImg(image, contrast=3, brightness=1.2)  #---------------------------------custom
+image2 = imutils.resize(image2, width=300)
+
+image = imutils.resize(image, width=300)
 image = image.astype("uint8")
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -288,6 +299,11 @@ for (i, (gX, gY, gW, gH)) in enumerate(locs):
     # background of the credit card
     group = gray[gY - 5:gY + gH + 5, gX - 5:gX + gW + 5]
     group = cv2.threshold(group, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    
+    
+#     group2 = image2[gY - 5:gY + gH + 5, gX - 5:gX + gW + 5]
+#     getPicText(group2)
+#     showImg(group2)
  
     # detect the contours of each individual digit in the group,
     # then sort the digit contours from left to right

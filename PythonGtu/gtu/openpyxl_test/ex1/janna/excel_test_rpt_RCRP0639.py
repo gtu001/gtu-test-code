@@ -180,7 +180,8 @@ def isDuplicate(lst, single):
        
 
 if __name__ == '__main__' :
-    main("C:/SA/綠色便民案/年刊季刊/06.開發文件/myTest/639/RCRP0C639_一頁.xlsx", "105")
+#     main("C:/SA/綠色便民案/年刊季刊/06.開發文件/myTest/639/RCRP0C639_一頁.xlsx", "105")
+    main("C:/Users/gtu00/OneDrive/Desktop/RCRP0C639_一頁.xlsx", "105")
     print("done...")
         
         

@@ -3,6 +3,8 @@ import os
 from os.path import expanduser
 from pathlib import Path
 
+### from gtu.io import fileUtil
+
 
 def mkdirs(path):
 	'''建立多個目錄'''
@@ -94,6 +96,31 @@ def copyDir(fromDir, toDir):
 				print("copy from: {}, to: {}".format(f1, newToDir))
 				mkdirs(str(newToDir.parent))
 				copyFile(str(f1), str(newToDir))
+
+
+def saveToFile(filePath, content):
+	f = open(filePath, "w", encoding = 'utf8')
+	f.write(content)
+	f.flush()
+	f.close()
+
+
+def saveToFileBytes(filePath, byteArry):
+	f = open(filePath, "wb")
+	f.write(byteArry)
+	f.flush()
+	f.close()
+	
+
+def loadFile(filePath):
+	file = open(filePath, "r", encoding = 'utf8')
+	return file.read() 
+
+
+def loadFileBytes(filePath):
+	file = open(filePath, "rb") 
+	return file.read() 
+
 
 if __name__ == '__main__':
 	print(copyFile("C:/Users/Administrator/Desktop/southpark.rar", "c:/southpark.rar"))

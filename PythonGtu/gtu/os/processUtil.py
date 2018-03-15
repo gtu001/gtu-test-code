@@ -5,6 +5,8 @@ import psutil
 import subprocess 
 from unittest.test.testmock.support import is_instance
 
+### from gtu.os import processUtil
+
 
 def WindowExists(classname):
     try:
@@ -13,6 +15,7 @@ def WindowExists(classname):
         return False
     else:
         return True
+
 
 def processNameExists(processName):
     return processName in (p.name() for p in psutil.process_iter())
@@ -40,16 +43,18 @@ def processNameExists2(processname):
     
     
 def running():
-    n=0# number of instances of the program running 
-    prog=[line.split() for line in subprocess.check_output("tasklist").splitlines()]
-    [prog.pop(e) for e in [0,1,2]] #useless 
+    n = 0  # number of instances of the program running 
+    prog = [line.split() for line in subprocess.check_output("tasklist").splitlines()]
+    [prog.pop(e) for e in [0, 1, 2]]  # useless 
     for task in prog:
-        if task[0]=="itunes.exe":
-            n=n+1
-    if n>0:
+        if task[0] == "itunes.exe":
+            n = n + 1
+    if n > 0:
         return True
     else:
         return False
+    
+    
     
 
 if __name__ == '__main__' :
