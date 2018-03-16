@@ -1,5 +1,7 @@
 package gtu.ftp.taiwanInsure;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,6 +9,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -23,6 +26,26 @@ public class FtpClient {
         ftp.connect("10.10.2.108", "root", "root123", 22);
         ftp.disconnect();
         System.out.println("done...");
+    }
+    
+    public void tryConnectionIfNeed(ActionListener connectAction) {
+        try {
+            client.list();
+        } catch (FTPConnectionClosedException ex) {
+            connectAction.actionPerformed(new ActionEvent(client, 1, "need reconnect"));
+        } catch (java.io.IOException ex) {
+            if ("Connection is not open".equals(ex.getMessage())) {
+                connectAction.actionPerformed(new ActionEvent(client, 1, "need reconnect"));
+            } else {
+                throw new RuntimeException(ex);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    public void setBufferSize(int bufSize) {
+        client.setBufferSize(bufSize);
     }
 
     public FtpClient(boolean ftps) {
