@@ -12,11 +12,11 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class DbConstant {
     
     public static void main(String[] args) {
-        DataSource ds = getTestDataSource_FucoOracle();
+//        DataSource ds = getTestDataSource_FucoOracle();
         Connection conn = null;
         try {
-//            conn = ds.getConnection();
-//            System.out.println("test fine ...");
+            conn = getDB2Connection();
+            System.out.println("test fine ...");
             
             int v = Integer.parseInt("01");
             System.out.println(v);
@@ -190,7 +190,8 @@ public class DbConstant {
     public static Connection getDB2Connection() {
         try {
             Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
-            Connection conn = DriverManager.getConnection("jdbc:db2://10.1.249.35:50000/odstest1", "dpezbao", "dpezbao");
+//            Connection conn = DriverManager.getConnection("jdbc:db2://10.1.249.35:50000/odstest1", "dpezbao", "dpezbao");
+            Connection conn = DriverManager.getConnection("jdbc:db2://10.0.75.1:50000/test", "db2inst1", "db2inst1-pwd");
             return conn;
         } catch (Exception e) {
             throw new RuntimeException(e);

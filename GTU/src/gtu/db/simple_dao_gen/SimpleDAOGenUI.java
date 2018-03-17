@@ -32,6 +32,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.db.simple_dao_gen.forSpring.GenDaoAllMain_forSpring;
+import gtu.db.simple_dao_gen.forSpring_ex2.GenDaoAllMain_forSpring_Ex2;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.PropertiesGroupUtils_ByKey;
@@ -155,6 +156,7 @@ public class SimpleDAOGenUI extends JFrame {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.addElement("simple");
         model.addElement("spring");
+        model.addElement("spring_fuco");
         daoTypeCombox.setModel(model);
         panel_2.add(daoTypeCombox);
         panel_2.add(button_2);
@@ -241,8 +243,13 @@ public class SimpleDAOGenUI extends JFrame {
                 Connection conn = getConnection();
                 List<String> columnList = t.getColumnList(tableName, conn);
                 txt = t.execute(tableName, columnList, pkList, getConnection());
-            }else {
+            }else if("spring".equals(daoType)) {
                 GenDaoAllMain_forSpring t = new GenDaoAllMain_forSpring();
+                Connection conn = getConnection();
+                List<String> columnList = t.getColumnList(tableName, conn);
+                txt = t.execute(tableName, columnList, pkList, getConnection());
+            }else if("spring_fuco".equals(daoType)) {
+                GenDaoAllMain_forSpring_Ex2 t = new GenDaoAllMain_forSpring_Ex2();
                 Connection conn = getConnection();
                 List<String> columnList = t.getColumnList(tableName, conn);
                 txt = t.execute(tableName, columnList, pkList, getConnection());

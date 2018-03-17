@@ -120,7 +120,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -128,7 +128,7 @@
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="moveJarToDesktop">

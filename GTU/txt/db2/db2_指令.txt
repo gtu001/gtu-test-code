@@ -1,0 +1,46 @@
+﻿
+
+### 按照步驟安裝此版db2即可使用 [db2express-c]
+https://store.docker.com/community/images/ibmcom/db2express-c
+
+
+
+#1.指定db2 所屬 os
+$ docker run -i --name=db2_data_1 -v /home [os id] true
+#2.將db2 run在os上
+$ docker run --privileged=true -i -t —-volumes-from=db2_data_1 --name=db2_inst_1  [db2 client id]
+
+#3.run cli mode 於 db_inst_1 
+$ docker start db_inst_1 
+$ docker exec -it db_inst_1 cli
+
+#4.掛載ip與port
+db_catalog --add 127.0.0.1:50000
+
+
+
+<<<做db2操作前必須先登入 db2inst1>>>
+
+
+#顯示DB2 instance清單
+$ db2ilist
+
+As the db2 instance owner you can run db2start, 
+db2stop, and db2sampl to start working with a database right away
+
+
+
+#看service ip
+$ db2 get database manager configuration | findstr /i svce
+#會有下內容
+ TCP/IP Service name                          (SVCENAME) = db2c_DB2
+ SSL service name                         (SSL_SVCENAME) =
+ 
+ 
+#建立scheam [必須先start]
+$db2 create database [name]
+
+#連線
+$ db2 CONNECT TO <databasename> user <Username> using <password>
+#修改密碼
+$ db2 "CONNECT TO <database> USER <userid> USING <password> NEW <new_password> CONFIRM <new_password>" 

@@ -1,0 +1,9 @@
+
+$ cd E:\mysql-5.5.40-win32\bin
+
+$ mysql -u root -p
+
+CREATE USER 'sa'@'localhost' IDENTIFIED BY '';
+
+# test2 是 schema
+GRANT all privileges ON test2.* TO 'sa'@'localhost';

@@ -1,0 +1,43 @@
+﻿#running containers
+$ docker ps
+#all containers
+$ docker ps -a
+
+#列出images
+$ docker images
+
+
+#停止container 
+$ docker stop [container name or id]
+#移除container 
+$ docker rm [container name or id]
+
+
+#掛載images
+$ docker run -dit --net=host -v [本地位置]  --name=[container name]  [image id]
+Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
+
+#刪除image
+$ docker rmi [image id]
+
+#顯示container log
+$ docker logs --follow [container name]
+
+#連線使用container console
+$ docker exec -it [container name] cli
+$ docker exec -it [container name] bash
+
+#安裝image
+$ docker build [放Dockerfile的目錄路徑]
+
+
+#下載image or container 去 docker store 或 docker hub
+$ docker pull [image name]
+
+
+#無法pull任何image時
+--> 右鍵Settings -> Network -> DNS Server -> 選 Fixed : 8.8.8.8
+
+
+#查詢container ip組態
+docker inspect keen_swanson | findstr IPAddress
