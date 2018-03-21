@@ -72,6 +72,8 @@
 			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			
+			<packagename mode="small">org.json.JSONObject</packagename>
 
 		</jarfinder>
 

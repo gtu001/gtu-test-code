@@ -1,0 +1,11 @@
+create sequence seq__bill_user --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+INSERT INTO BILL_USER (ID, ...)
+VALUES (NEXT VALUE FOR seq__bill_user, ...)

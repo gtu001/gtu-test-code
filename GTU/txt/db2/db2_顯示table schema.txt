@@ -1,0 +1,17 @@
+#顯示table schema
+
+db2 CONNECT TO test user db2inst1 using db2inst1-pwd
+
+DESCRIBE TABLE test.bill_user
+
+
+
+--顯示表結構
+SELECT DISTINCT
+    (t.name),
+    t.ColType,
+    t.Length
+FROM
+    Sysibm.syscolumns t
+WHERE
+    t.tbname = 'BILL_USER';

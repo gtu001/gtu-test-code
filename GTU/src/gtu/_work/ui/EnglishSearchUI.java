@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +58,9 @@ import org.jnativehook.keyboard.NativeKeyAdapter;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.mouse.NativeMouseAdapter;
 import org.jnativehook.mouse.NativeMouseEvent;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -87,12 +91,15 @@ public class EnglishSearchUI extends JFrame {
 
     PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     private static final String NEW_WORD_PATH = "new_word_path";
+    private static final String OFFLINE_WORD_PATH = "offline_word_path";
     private GlobalKeyListenerExampleForEnglishUI keyUtil;
     private __ClipboardListener listenClipboardThread = null;
     private Thread checkFocusOwnerThread;
     private SearchEnglishIdTextController searchEnglishIdTextController = new SearchEnglishIdTextController();
     private HideInSystemTrayHelper sysutil;
     private CheckboxMode _CURRENT_MODE = CheckboxMode.NONE;
+
+    private Properties offlineProp;
 
     /**
      * Launch the application.
@@ -149,12 +156,17 @@ public class EnglishSearchUI extends JFrame {
             focusSearchEnglishIdText();
         }
     };
-    private JCheckBox focusTopChk;
     private JCheckBox listenClipboardChk;
     private JCheckBox rightBottomCornerChk;
     private JCheckBox autoSearchChk;
     private JCheckBox mouseSelectionChk;
     private JButton showNewWordTxtBtn;
+    private JCheckBox focusTopChk;
+    private JPanel panel_3;
+    private JTextField offlineConfigText;
+    private JCheckBox offlineModeChk;
+    private JLabel label;
+    private JCheckBox offlineModeFirstChk;
 
     private void startCheckFocusOwnerThread() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
@@ -278,7 +290,7 @@ public class EnglishSearchUI extends JFrame {
         JPanel panel = new JPanel();
         tabbedPane.addTab("設定", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -293,6 +305,7 @@ public class EnglishSearchUI extends JFrame {
 
         JPanel pp1 = new JPanel();
         pp1.add(newWordTxtPathText);
+        pp1.setPreferredSize(new Dimension(0, 100));
         panel.add(pp1, "4, 2, fill, default");
 
         showNewWordTxtBtn = new JButton("開啟new_word.txt");
@@ -314,15 +327,24 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
-        focusTopChk = new JCheckBox("鎖定最上層");
-        panel.add(focusTopChk, "4, 4");
-
         listenClipboardChk = new JCheckBox("監聽剪貼簿");
         listenClipboardChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
             }
         });
+
+        label = new JLabel("離線檔路徑");
+        panel.add(label, "2, 4");
+
+        panel_3 = new JPanel();
+        panel_3.setPreferredSize(new Dimension(0, 100));
+        panel.add(panel_3, "4, 4, fill, fill");
+
+        offlineConfigText = new JTextField();
+        offlineConfigText.setColumns(20);
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(offlineConfigText, true);
+        panel_3.add(offlineConfigText);
         panel.add(listenClipboardChk, "4, 6");
 
         autoSearchChk = new JCheckBox("開啟時自動查詢");
@@ -334,6 +356,16 @@ public class EnglishSearchUI extends JFrame {
         rightBottomCornerChk = new JCheckBox("視窗位置鎖定右下角");
         rightBottomCornerChk.setSelected(true);
         panel.add(rightBottomCornerChk, "4, 12");
+
+        focusTopChk = new JCheckBox("鎖定最上層");
+        focusTopChk.setSelected(false);
+        panel.add(focusTopChk, "4, 14");
+
+        offlineModeChk = new JCheckBox("離線模式");
+        panel.add(offlineModeChk, "4, 16");
+
+        offlineModeFirstChk = new JCheckBox("離線模式優先");
+        panel.add(offlineModeFirstChk, "4, 18");
         panel.add(configSettingBtn, "2, 22");
 
         sysutil = HideInSystemTrayHelper.newInstance();
@@ -377,14 +409,14 @@ public class EnglishSearchUI extends JFrame {
 
         // 置中
         JCommonUtil.setJFrameCenter(this);
-
-        // 初始化checkbox
-        focusTopChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("focusTopChk")));
         listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
         rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
         autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
         showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
         mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
+        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
+        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
+        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -394,10 +426,15 @@ public class EnglishSearchUI extends JFrame {
                 propertyBean.getConfigProp().setProperty("autoSearchChk", String.valueOf(autoSearchChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("showNewWordTxtBtn", String.valueOf(showNewWordTxtBtn.isSelected()));
                 propertyBean.getConfigProp().setProperty("mouseSelectionChk", String.valueOf(mouseSelectionChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("offlineModeChk", String.valueOf(offlineModeChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("offlineModeFirstChk", String.valueOf(offlineModeFirstChk.isSelected()));
                 propertyBean.store();
                 System.exit(0);
             }
         });
+
+        // 讀取離線檔
+        loadOfflineConfig();
     }
 
     private void startListenClipboardThread() {
@@ -448,6 +485,87 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
+    private void loadOfflineConfig() {
+        try {
+            Properties prop = new Properties();
+            if (StringUtils.isNotBlank(offlineConfigText.getText())) {
+                File file = new File(offlineConfigText.getText());
+                if (file.exists()) {
+                    String content = FileUtil.loadFromFile(file, "utf8");
+                    JSONArray arry = new JSONArray(content);
+                    for (int ii = 0; ii < arry.length(); ii++) {
+                        JSONObject obj = (JSONObject) arry.get(ii);
+                        String englishId = obj.getString("englishId");
+                        String englishDesc = obj.getString("englishDesc");
+                        prop.setProperty(englishId, englishDesc);
+                    }
+                }
+            }
+            offlineProp = prop;
+        } catch (JSONException e1) {
+            JCommonUtil.handleException(e1);
+        }
+    }
+
+    private boolean queryButtonAction_offline(String text) {
+        if (offlineProp.isEmpty()) {
+            this.loadOfflineConfig();
+        }
+        if (offlineProp.containsKey(text)) {
+            String content = offlineProp.getProperty(text);
+            meaningText.setText(content);
+            searchResultArea.setText("");
+            return true;
+        } else {
+            meaningText.setText("查無此字!!");
+            searchResultArea.setText("");
+            return false;
+        }
+    }
+
+    private void queryButtonAction_online(final String text) {
+        final EnglishTester_Diectory t = new EnglishTester_Diectory();
+        final EnglishTester_Diectory2 t2 = new EnglishTester_Diectory2();
+
+        WordInfo info = new WordInfo();
+        try {
+            info = t.parseToWordInfo(text);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        final StringBuffer sb = new StringBuffer();
+        sb.append(text + "\n");
+        sb.append(info.getPronounce() + "\n");
+        sb.append(info.getMeaning() + "\n");
+        sb.append("\n");
+
+        meaningText.setText(info.getMeaning());
+
+        final Set<String> meaningSet = new HashSet<String>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int ii = 0; ii < 10; ii++) {
+                    WordInfo2 info2 = t2.parseToWordInfo(text, 1);
+                    List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
+                    if (exampleSentanceList.isEmpty()) {
+                        break;
+                    }
+                    for (Pair<String, String> p : exampleSentanceList) {
+                        sb.append(p.getKey() + "\n");
+                        sb.append(p.getValue() + "\n");
+                        sb.append("\n");
+                    }
+
+                    meaningSet.add(info2.getMeaning2());
+                }
+                searchResultArea.setText(sb.toString());
+                meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
+            }
+        }).start();
+    }
+
     private void queryButtonAction(boolean bringToFront) {
         try {
             if (!queryButton.isEnabled()) {
@@ -460,51 +578,21 @@ public class EnglishSearchUI extends JFrame {
                 return;
             }
 
-            final StringBuffer sb = new StringBuffer();
-
-            final EnglishTester_Diectory t = new EnglishTester_Diectory();
-            final EnglishTester_Diectory2 t2 = new EnglishTester_Diectory2();
-
-            WordInfo info = new WordInfo();
-            try {
-                info = t.parseToWordInfo(text);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            if (offlineModeFirstChk.isSelected()) {
+                if (!this.queryButtonAction_offline(text)) {
+                    this.queryButtonAction_online(text);
+                }
+            } else {
+                if (offlineModeChk.isSelected()) {
+                    this.queryButtonAction_offline(text);
+                } else {
+                    this.queryButtonAction_online(text);
+                }
             }
-
-            sb.append(text + "\n");
-            sb.append(info.getPronounce() + "\n");
-            sb.append(info.getMeaning() + "\n");
-            sb.append("\n");
-
-            meaningText.setText(info.getMeaning());
 
             // writeNewData(text);
             int wordSize = writeNewData2(text);
             setTitle("生字數 : " + wordSize);
-
-            final Set<String> meaningSet = new HashSet<String>();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int ii = 0; ii < 10; ii++) {
-                        WordInfo2 info2 = t2.parseToWordInfo(text, 1);
-                        List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
-                        if (exampleSentanceList.isEmpty()) {
-                            break;
-                        }
-                        for (Pair<String, String> p : exampleSentanceList) {
-                            sb.append(p.getKey() + "\n");
-                            sb.append(p.getValue() + "\n");
-                            sb.append("\n");
-                        }
-
-                        meaningSet.add(info2.getMeaning2());
-                    }
-                    searchResultArea.setText(sb.toString());
-                    meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
-                }
-            }).start();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         } finally {
@@ -604,6 +692,10 @@ public class EnglishSearchUI extends JFrame {
             if (!f.getName().equals("new_word.txt")) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案名稱必須為 new_word.txt!");
                 return;
+            }
+
+            if (new File(offlineConfigText.getText()).exists()) {
+                propertyBean.getConfigProp().setProperty(OFFLINE_WORD_PATH, offlineConfigText.getText());
             }
 
             propertyBean.getConfigProp().put(NEW_WORD_PATH, f.getCanonicalPath());

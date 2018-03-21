@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,7 +22,7 @@ public class Test_FucoCreateTable {
 
     public static void main(String[] args) throws Exception {
         Test_FucoCreateTable t = new Test_FucoCreateTable();
-        File file = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\SZRCB_DB物件说明表.xlsx");
+        File file = new File("C:/Users/gtu00/OneDrive/Desktop/9tai/SZRCB_DB物件说明表.xlsx");
         XSSFWorkbook wb = ExcelUtil.getInstance().readExcel_xlsx(file);
 
         for (int ii = 0; ii < wb.getNumberOfSheets(); ii++) {
