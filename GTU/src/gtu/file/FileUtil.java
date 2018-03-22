@@ -242,18 +242,22 @@ public class FileUtil {
      * @return
      */
     public static String loadFromStream(InputStream is, String encode) {
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, encode));
+            reader = new BufferedReader(new InputStreamReader(is, encode));
             String line = null;
             StringBuilder sb = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 sb.append(line + "\r\n");
             }
-            reader.close();
             return sb.toString();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
+            throw new RuntimeException("loadFromStream ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
         }
     }
 
