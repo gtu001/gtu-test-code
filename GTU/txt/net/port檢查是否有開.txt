@@ -1,0 +1,11 @@
+
+#window
+
+--看port是否開啟
+netstat -annetstat -an | findstr 50000
+--看port被誰占用
+netstat -a -b
+
+
+#linux
+netstat -nlp|grep 9000

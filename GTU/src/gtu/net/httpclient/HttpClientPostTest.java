@@ -39,13 +39,9 @@ public class HttpClientPostTest {
     private static final Logger logger = Logger.getLogger(HttpClientPostTest.class);
 
     public static void main(String[] args) throws JSONException, IOException {
-
-        // String cardNbr = request.getParameter("cardNbr");// 卡号
-        // String tranYm = request.getParameter("tranYm");// 账单年月
-        // String option = request.getParameter("option");// 币种选项
-        // String pinFlag = request.getParameter("pinFlag");// 是否检查密码标志
-        // String pin = request.getParameter("pin");// 密码
-
+//        16604305779|手机一|6252058105000640
+//        16604305770|手机九|6252058105000723   
+//        18598250378|手机三|6252058105000665   
         Map<String,String> req = new HashMap<String,String>();
         req.put("cardNbr", "6252051105000983");
         req.put("tranYm", "2412");

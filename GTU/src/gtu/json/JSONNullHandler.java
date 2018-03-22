@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONNull;
 import net.sf.json.JSONObject;
 
 public class JSONNullHandler {
@@ -28,7 +29,7 @@ public class JSONNullHandler {
         for (Iterator<?> it = jsonObj.keys(); it.hasNext();) {
             String key = (String) it.next();
             Object val = jsonObj.get(key);
-            if (val instanceof JSONObject && ((JSONObject) val).isNullObject()) {
+            if (val instanceof JSONNull) {
                 jsonObj.put(key, "");
                 logger.info("reset null key : " + key);
             } else if (val instanceof JSONObject) {
@@ -37,7 +38,7 @@ public class JSONNullHandler {
                 JSONArray arry = (JSONArray) val;
                 for (int ii = 0; ii < arry.size(); ii++) {
                     Object v = arry.get(ii);
-                    if (v instanceof JSONObject && ((JSONObject) v).isNullObject()) {
+                    if (v instanceof JSONNull) {
                         arry.set(ii, "");
                         logger.info("reset null key : " + key + " index : " + ii);
                     } else if (v instanceof JSONObject) {

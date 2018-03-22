@@ -22,7 +22,6 @@ public class GitAutoFetchNMerge_jtnsh {
             account = args[1];
         }
         
-        String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
         File[] files = fileDirs.listFiles();
         for (int ii = 0 ; ii < files.length ; ii ++) {
             File f = files[ii];
@@ -30,11 +29,9 @@ public class GitAutoFetchNMerge_jtnsh {
             if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
                 lst.add("cd " + f);
                 lst.add("e:");
-                if (ArrayUtils.contains(prodArry, f.getName())) {
-                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
-                } else {
-                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/SCSB_CCBILL/" + f.getName() + ".git"));
-                }
+                
+                lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/jtnsh/" + f.getName() + ".git"));
+                
 //                lst.add("git fetch -v --progress \"origin\"");
                 lst.add("git fetch -v --all");
                 lst.add("git merge remotes/origin/master --edit --no-commit ");
