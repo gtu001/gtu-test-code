@@ -511,14 +511,14 @@ public class EnglishSearchUI extends JFrame {
         if (offlineProp.isEmpty()) {
             this.loadOfflineConfig();
         }
+        meaningText.setText("");
+        searchResultArea.setText("");
         if (offlineProp.containsKey(text)) {
             String content = offlineProp.getProperty(text);
             meaningText.setText(content);
-            searchResultArea.setText("");
             return true;
         } else {
             meaningText.setText("查無此字!!");
-            searchResultArea.setText("");
             return false;
         }
     }

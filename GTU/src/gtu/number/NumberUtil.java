@@ -108,11 +108,22 @@ public class NumberUtil {
     
     public void numberFormatTest() {
         String value = "10000000000000.12341234324324";
-        NumberFormat nf = new DecimalFormat("#.###,###,###,###,###.###############");
+        NumberFormat nf = new DecimalFormat("####,###,###,###,###.###############");
         nf.setMaximumFractionDigits(5);//設定最大小數位
         nf.setMinimumFractionDigits(0);//設定最小小數位
         String result =  nf.format(new BigDecimal(value));
         System.out.println(result);
+    }
+    
+    /**
+     * 移動小數點 
+     * @param value
+     * @moveDigit 負值往左移,正值往右移
+     */
+    public static BigDecimal moveDigit(String value, int moveDigit) {
+        BigDecimal orignVal = new BigDecimal(value);
+        orignVal = orignVal.movePointRight(moveDigit);
+        return orignVal;
     }
     
     public boolean isNumber(String val, boolean thousandComma) {

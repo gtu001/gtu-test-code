@@ -68,11 +68,11 @@ public class HttpClientPostTest {
             System.out.println(url);
             System.out.println("result -- " + result);
 
-            JSONObject json = new JSONObject(result);
-            String returnCode = json.getJSONObject("system").getString("returnCode");
-            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-            System.out.println("returnCode : " + returnCode);
-            System.out.println("returnMessage : " + returnMessage);
+//            JSONObject json = new JSONObject(result);
+//            String returnCode = json.getJSONObject("system").getString("returnCode");
+//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
+//            System.out.println("returnCode : " + returnCode);
+//            System.out.println("returnMessage : " + returnMessage);
         }
         
         if(true){
@@ -94,11 +94,11 @@ public class HttpClientPostTest {
             System.out.println(url);
             System.out.println("result -- " + result);
 
-            JSONObject json = new JSONObject(result);
-            String returnCode = json.getJSONObject("system").getString("returnCode");
-            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-            System.out.println("returnCode : " + returnCode);
-            System.out.println("returnMessage : " + returnMessage);
+//            JSONObject json = new JSONObject(result);
+//            String returnCode = json.getJSONObject("system").getString("returnCode");
+//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
+//            System.out.println("returnCode : " + returnCode);
+//            System.out.println("returnMessage : " + returnMessage);
         }
         
         if(false){
@@ -124,11 +124,11 @@ public class HttpClientPostTest {
             System.out.println(url);
             System.out.println("result -- " + result);
 
-            JSONObject json = new JSONObject(result);
-            String returnCode = json.getJSONObject("system").getString("returnCode");
-            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-            System.out.println("returnCode : " + returnCode);
-            System.out.println("returnMessage : " + returnMessage);
+//            JSONObject json = new JSONObject(result);
+//            String returnCode = json.getJSONObject("system").getString("returnCode");
+//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
+//            System.out.println("returnCode : " + returnCode);
+//            System.out.println("returnMessage : " + returnMessage);
         }
         System.out.println("done...");
     }
