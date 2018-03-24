@@ -1,11 +1,11 @@
 
 #window
 
---¬İport¬O§_¶}±Ò
-netstat -annetstat -an | findstr 50000
---¬İport³Q½Ö¥e¥Î
-netstat -a -b
+--çœ‹portæ˜¯å¦é–‹å•Ÿ
+netstat -an | findstr 50000
+--çœ‹portè¢«èª°å ç”¨
+netstat -a -b 
 
 
 #linux
-netstat -nlp|grep 9000
+netstat -nlp|grep 9000 

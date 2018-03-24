@@ -126,6 +126,17 @@ public class NumberUtil {
         return orignVal;
     }
     
+    /**
+     * -1 = 負值
+     * 0 = 0
+     * 1 = 正值
+     * @param value
+     * @return
+     */
+    public static int numberType(String value) {
+        return new BigDecimal(value).signum();
+    }
+    
     public boolean isNumber(String val, boolean thousandComma) {
         String pattern = "\\-?[\\d]+\\.?\\d*";
         if(thousandComma) {
