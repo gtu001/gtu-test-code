@@ -53,7 +53,7 @@ public class HttpClientPostTest {
         // 16604305770|手机九|6252058105000723 nodata
         // 18598250378|手机三|6252058105000665
         
-        if(false){
+        if(true){
             JSONObject req = new JSONObject();
             req.put("cardNbr", "6252058105000640");
             req.put("tranYm", "");
@@ -75,7 +75,7 @@ public class HttpClientPostTest {
 //            System.out.println("returnMessage : " + returnMessage);
         }
         
-        if(true){
+        if(false){
             JSONObject req = new JSONObject();
             req.put("cardnbr", "6252058105000665");
             req.put("opt", "1");
