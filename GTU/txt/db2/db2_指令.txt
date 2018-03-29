@@ -44,3 +44,10 @@ $db2 create database [name]
 $ db2 CONNECT TO <databasename> user <Username> using <password>
 #修改密碼
 $ db2 "CONNECT TO <database> USER <userid> USING <password> NEW <new_password> CONFIRM <new_password>" 
+
+
+#啟動db
+db2start
+#關閉db
+db2 force application all
+db2stop force

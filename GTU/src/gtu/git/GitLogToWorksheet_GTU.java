@@ -16,6 +16,88 @@ import gtu.git.GitLogToWorksheet.GitLog;
 import gtu.runtime.ProcessWatcher;
 
 public class GitLogToWorksheet_GTU {
+    
+    static class GitLog {
+        // git log --since="2018-01-22T00:00:00" --before="2018-01-23T00:00:00"
+        // --author=gtu001 --no-merges --encoding=utf8 --all-match
+
+        Date since;
+        Date before;
+        String author;
+        String encode = "utf-8";
+        String nameType;
+
+        public static GitLog newInstance() {
+            return new GitLog();
+        }
+
+        public GitLog since(Date since) {
+            this.since = since;
+            return this;
+        }
+
+        public GitLog before(Date before) {
+            this.before = before;
+            return this;
+        }
+
+        public GitLog author(String author) {
+            this.author = author;
+            return this;
+        }
+
+        public GitLog encode(String encode) {
+            this.encode = encode;
+            return this;
+        }
+        
+        public GitLog nameType(int type) {
+            switch (type) {
+            case 1:
+                // For full path names of changed files
+                nameType = " --name-only ";
+                break;
+            case 2:
+                // For full path names and status of changed files
+                nameType = " --name-status ";
+                break;
+            case 3:
+                // For abbreviated pathnames and a diffstat of changed files
+                nameType = " --stat ";
+                break;
+            }
+            return this;
+        }
+
+        public String build() {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            StringBuilder sb = new StringBuilder();
+            sb.append("git log ");
+            if (since != null) {
+                String val = sdf.format(since);
+                sb.append(String.format(" --since=\"%s\" ", val));
+            }
+            if (before != null) {
+                String val = sdf.format(before);
+                sb.append(String.format(" --before=\"%s\" ", val));
+            }
+            if (author != null) {
+                sb.append(String.format(" --author=\"%s\" ", author));
+            }
+            if (encode != null) {
+                sb.append(" --encoding=" + encode + " ");
+            }
+            if (nameType != null) {
+                sb.append(" " + nameType + " ");
+            }
+            sb.append(" --no-merges ");
+            sb.append(" --all-match ");
+            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
+//            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
+            sb.append(" --date=iso  ");
+            return sb.toString();
+        }
+    }
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

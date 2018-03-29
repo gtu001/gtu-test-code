@@ -5,11 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,23 +19,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import gtu.net.HttpUtil;
@@ -53,7 +47,7 @@ public class HttpClientPostTest {
         // 16604305770|手机九|6252058105000723 nodata
         // 18598250378|手机三|6252058105000665
         
-        if(true){
+        if(false){
             JSONObject req = new JSONObject();
             req.put("cardNbr", "6252058105000640");
             req.put("tranYm", "");
@@ -130,6 +124,31 @@ public class HttpClientPostTest {
 //            System.out.println("returnCode : " + returnCode);
 //            System.out.println("returnMessage : " + returnMessage);
         }
+        
+        if(true){
+            JSONObject req = new JSONObject();
+            req.put("lxdh", "18577186804");// 联系人电话
+            req.put("sndmsg", "哈哈");// 短信内容
+            req.put("yxq", "11520");// 有效期 (单位分钟，默认8天即11520)
+            req.put("apptype", "01101001");// 业务类型
+            req.put("feetype", "3");// 收费类型 (默认3，不收费)
+            req.put("acct", "6231810090700273143");// 签约账号
+            req.put("jzjg", "071040101");// 计费机构
+            
+            String paramStr = mapToParameterString_JSON(req);
+
+            String url = "http://127.0.0.1:8081/applySmsCode";
+//             String url = "http://127.0.0.1:8080/WARBill/BBCQAP";
+            String result = HttpUtil.doPostRequest(url, paramStr);
+            System.out.println(url);
+            System.out.println("result -- " + result);
+
+//            JSONObject json = new JSONObject(result);
+//            String returnCode = json.getJSONObject("system").getString("returnCode");
+//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
+//            System.out.println("returnCode : " + returnCode);
+//            System.out.println("returnMessage : " + returnMessage);
+        }
         System.out.println("done...");
     }
 
@@ -176,6 +195,13 @@ public class HttpClientPostTest {
             System.out.println("#. adConverterReq end");
         }
     }
+    
+    @RequestMapping(value = "/getPersionalBillJson", produces = "application/json;charset=utf-8")
+    public String getPersionBillJson(@RequestParam(value="serial") String serial) {
+        System.out.println("getPersionalBillJson serial:" + serial);
+        return "";
+    }
+    
 
     // sendRequest 後 , 伺服端處理方式
     private String getPostServerSideString(HttpServletRequest request) {

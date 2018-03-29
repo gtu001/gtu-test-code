@@ -1,0 +1,11 @@
+SELECT
+    *
+FROM
+    history_bill
+WHERE
+    id = ?
+ORDER BY
+    DATE DESC,
+    no DESC
+FETCH
+    FIRST 4 rows only

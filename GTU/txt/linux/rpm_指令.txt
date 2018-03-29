@@ -1,0 +1,8 @@
+#查詢某package版本
+rpm -q <package name>
+
+#安裝package [i:install,v:verbose,h:hash marks]
+rpm -ivh <rpm full name>
+
+#升級package
+rpm -Uvh <package name>

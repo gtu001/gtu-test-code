@@ -15,7 +15,7 @@ import gtu.file.FileUtil;
 import gtu.git.GitLogToWorksheet_GTU.GitLog;
 import gtu.runtime.ProcessWatcher;
 
-public class GitLogToWorksheet {
+public class GitLogToWorksheet_jtnsh {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -31,7 +31,7 @@ public class GitLogToWorksheet {
 
         Calendar c2 = Calendar.getInstance();
         c2.setTime(c1.getTime());
-        c2.add(Calendar.DATE, 1);//1
+        c2.add(Calendar.DATE, 100);//1
 
         String logCommand = GitLog.newInstance()//
                 .since(c1.getTime())//
@@ -44,7 +44,7 @@ public class GitLogToWorksheet {
         
         StringBuilder sb = new StringBuilder();
 
-        File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_scsb");
+        File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_jtnsh");
         String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
         File[] files = fileDirs.listFiles();
         for (int ii = 0; ii < files.length; ii++) {
