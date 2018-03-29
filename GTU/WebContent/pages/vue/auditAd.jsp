@@ -49,21 +49,30 @@
 								<td>{{campaign.approverFix}}</td>
 								<td>{{campaign.statusFix}}</td>
 								<td>
-								<!-- "0: 待審核
+								<%-- "0: 待審核
 										1: 審核中
 										3: 未通過
 										4: 已通過"
-								 -->
+										5: 下架
+								 --%>
 									<button class="btn btn-sm btn-outline-primary" 
 										v-on:click="sendAudit(index, campaign)"
 										v-show="(campaign.status=='1'||campaign.status=='0') && 
-												(campaign.status!='3') &&
+												(campaign.status!='3') && (campaign.status2!='3') &&
 												(campaign.status2!='4') && 
 												(auditLevel == '1' || auditLevel == '2')">審核[1]</button>
 									<button class="btn btn-sm btn-outline-primary" 
 										v-on:click="sendAudit(index, campaign)"
 										v-show="(campaign.status=='4'&&campaign.status2!='4') && 
 												(auditLevel == '2')">審核[2]</button>
+									<button class="btn btn-sm btn-outline-primary" 
+										v-on:click="editAgain(index, campaign)"
+										v-show="(campaign.status=='3'||campaign.status2=='3') &&
+												(auditLevel == '1' || auditLevel == '2')">重新編輯</button>
+									<button class="btn btn-sm btn-outline-primary" 
+										v-on:click="stopAD(index, campaign)"
+										v-show="(campaign.status2=='4') && 
+												(auditLevel == '2')">下架</button>
 								</td>
 							</tr>
 						</tbody>
@@ -73,7 +82,7 @@
 		</div>
 	</div>
 
-	<!-- Modal -->
+	<%-- Modal --%>
 	<div class="modal fade" id="exampleModalLong" tabindex="-1"
 		role="dialog" aria-labelledby="exampleModalLongTitle"
 		aria-hidden="true">
@@ -133,6 +142,41 @@
 	   							"&adprjid=" + encodeURIComponent(campaign['adprjid']) + 
 	   							"&blockcode=" + encodeURIComponent(campaign['blockcode']);
 	   	document.location.href = url;
+	}
+	
+	function editAgainHandler(idx, campaign) {
+		//alert("" + idx + "..." + JSON.stringify(campaign));
+	   	var url = "editAd" + "?adprjid=" + encodeURIComponent(campaign['adprjid']);
+	   	document.location.href = url;
+	}
+	
+	function stopADHandler(idx, campaign){
+	   	var data = {
+	   		'idx' : encodeURIComponent(idx),
+	   		'adprjid' : encodeURIComponent(campaign['adprjid']),
+	   		'blockcode' : encodeURIComponent(campaign['blockcode']),
+	   	};
+	   	$.ajax({
+			type : 'GET',
+			url : "auditAdStopSubmit",
+			data : data,
+			dataType : "JSON",
+			success : function(data) {
+				console.log('廣告下架成功');
+				if (data.status == "0000") {
+					alert(data.msg);
+					document.location.href = "adManager";
+				} else if (data.status == "0001") {
+					alert(data.msg);
+				} else if (data.status == "0002") {
+					alert(data.msg);
+				}
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				console.log("廣告下架失敗");
+				alert('廣告下架失敗！！，請聯繫系統管理人員，謝謝');
+			}
+		});
 	}
 </script>
 </html>

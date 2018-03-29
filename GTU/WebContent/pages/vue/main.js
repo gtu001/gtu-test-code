@@ -20,27 +20,53 @@ Vue
 							showMonthAfterYear : true,
 							dateFormat : "yy-mm-dd",
 							onSelect : function(date) {
+								//alert("onSelect : " + date);
 								self.$emit('update-date', date);
 							},
+							change : function(date){
+								//alert("change : " + date);
+								self.$emit('update-date', date);
+							}
 						};
 
 						// 設定最小日
 						var _hasMinDate = $(this.$el).attr("hasMinDate");
-						if (_hasMinDate && _hasMinDate == "true") {
+						if (_hasMinDate || _hasMinDate == "true") {
 							$.extend(ops, {
 								minDate : new Date()
 							});
 						}
 
 						$(this.$el).datepicker(ops);
+						/*
 						$(this.$el).blur(function() {
-							self.$emit('update-date', $(this).val());
+							var dateElement = $(this);
+							setTimeout(function() {
+								var dateStr = $(dateElement).datepicker("getDate");
+								alert("blur : " + dateStr);
+								self.$emit('update-date', dateStr);
+							}, 1);
 						});
+						*/
 					},
 					beforeDestroy : function() {
 						$(this.$el).datepicker('hide').datepicker('destroy');
 					}
 				});
+
+function dataURLtoBlob(dataurl) {
+	var arr = dataurl.split(',');
+	var mime = arr[0].match(/:(.*?);/)[1];
+	var bstr = atob(arr[1]);
+	var n = bstr.length;
+	var u8arr = new Uint8Array(n);
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	}
+	return new Blob([ u8arr ], {
+		type : mime
+	});
+}
 
 var app = new Vue(
 		{
@@ -65,6 +91,11 @@ var app = new Vue(
 				adGroup : [],
 				isDefault : '',
 				auditLevel : '',
+				blockphoto : '',
+				nowAdImages : [],
+				imageSize : null,
+				image2Size : null,
+				newAdMode : true,
 			},
 			methods : {
 				submitPage : function(e) {
@@ -119,6 +150,7 @@ var app = new Vue(
 					info.image2Name = this.image2Name;
 					info.adGroup = this.adGroup;
 					info.isDefault = this.isDefault;
+					info.newAdMode = this.newAdMode;
 					setValue(info);
 
 				},
@@ -227,7 +259,12 @@ var app = new Vue(
 
 					reader.onload = function(e) {
 						vm.image = e.target.result;
-						vm.imageName = file.name;
+
+						// 新增模式才能改檔名
+						if (this.newAdMode) {
+							vm.imageName = file.name;
+						}
+
 						vm.imageSize = format_float(e.total / 1024, 2);
 					};
 					reader.readAsDataURL(file);
@@ -267,6 +304,9 @@ var app = new Vue(
 				sendAudit : function(idx, campaign) {
 					sendAuditHandler(idx, campaign);
 				},
+				editAgain : function(idx, campaign) {
+					editAgainHandler(idx, campaign);
+				},
 				orderby : function(orderColumn, ascOrDesc) {
 					var isAsc = false;
 					if (ascOrDesc == 'asc') {
@@ -274,6 +314,42 @@ var app = new Vue(
 					}
 					document.location.href = "adEdit?orderColumn="
 							+ orderColumn + "&isAsc=" + isAsc;
+				},
+				stopAD : function(idx, campaign) {
+					stopADHandler(idx, campaign);
+				},
+				blockRadioChoice : function(business) {
+					this.blockphoto = business.blockphoto;
+					this.getNowAdmobPics(business.blockcode, '');
+				},
+				getNowAdmobPics : function(blockcode, ugid) {
+					getNowAdmobPicsHandler(blockcode, ugid);
+				},
+				applyForEditPage : function(mainVo, picVo) {
+					this.adBlock = mainVo.blockcode;
+					this.adName = mainVo.adprjname;
+					this.startDate = mainVo.stimeForUI;
+					this.endDate = mainVo.etimeForUI;
+					this.imgAlt = picVo.desc;
+					this.imgUrl = picVo.liinkto;
+					this.image = picVo.photo;
+					this.imageName = mainVo.adprjid;
+					this.isDefault = picVo.isDefault;
+					this.imageSize = this.toPicSize(picVo.photo);
+					this.image2Size = 0;
+					this.newAdMode = false;// update mode
+					$('#startDate').datepicker('setDate', this.startDate);
+					$('#endDate').datepicker('setDate', this.endDate);
+				},
+				toPicSize : function(dataurl) {
+					var d = dataURLtoBlob(dataurl);
+					return Math.round(d.size / 1024);
+				},
+			},
+			watch : {
+				step : function(val, oldVal) {
+					// alert("step == "+ val + " , " + oldVal + " --> " +
+					// this.step);
 				},
 			}
 		});
