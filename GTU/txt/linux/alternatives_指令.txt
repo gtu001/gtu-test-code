@@ -1,0 +1,24 @@
+﻿
+#安裝java 路徑版本
+
+alternatives --install <link> <name> <path> <priority>
+
+alternatives --install /usr/bin/java java /home/ibapp/openjdk1.8/jdk1.8.0_172/bin/java 400
+
+
+
+#選擇使用 java 版本
+
+alternatives --config java
+
+#移除
+
+alternatives --remove java /usr/lib/jvm/jre-1.6.0-openjdk/bin/java
+
+#移除第一個項目
+
+alternatives -–remove java 1 <--不work
+
+#顯示可用
+
+alternatives --display java

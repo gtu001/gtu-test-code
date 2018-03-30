@@ -6,3 +6,7 @@ rpm -ivh <rpm full name>
 
 #升級package
 rpm -Uvh <package name>
+
+
+#查詢已經安裝的JAVA與JRE環境
+rpm -qa | grep java

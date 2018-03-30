@@ -47,7 +47,13 @@ public class HttpClientPostTest {
         // 16604305770|手机九|6252058105000723 nodata
         // 18598250378|手机三|6252058105000665
         
-        if(false){
+//      JSONObject json = new JSONObject(result);
+//      String returnCode = json.getJSONObject("system").getString("returnCode");
+//      String returnMessage = json.getJSONObject("system").getString("returnMessage");
+//      System.out.println("returnCode : " + returnCode);
+//      System.out.println("returnMessage : " + returnMessage);
+        
+        if(true){
             JSONObject req = new JSONObject();
             req.put("cardNbr", "6252058105000640");
             req.put("tranYm", "");
@@ -56,17 +62,13 @@ public class HttpClientPostTest {
             req.put("pin", "");
             String paramStr = mapToParameterString_JSON(req);
 
-            String url = "http://127.0.0.1:8081/queryPeriod";
+            //String url = "http://127.0.0.1:8081/queryPeriod";
 //             String url = "http://127.0.0.1:8080/WARBill/BillingStatementAP";
+          String url = "http://172.19.0.63:8080/WARBill/BillingStatementAP";            
+                
             String result = HttpUtil.doPostRequest(url, paramStr);
             System.out.println(url);
             System.out.println("result -- " + result);
-
-//            JSONObject json = new JSONObject(result);
-//            String returnCode = json.getJSONObject("system").getString("returnCode");
-//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-//            System.out.println("returnCode : " + returnCode);
-//            System.out.println("returnMessage : " + returnMessage);
         }
         
         if(false){
@@ -87,12 +89,6 @@ public class HttpClientPostTest {
             String result = HttpUtil.doPostRequest(url, paramStr);
             System.out.println(url);
             System.out.println("result -- " + result);
-
-//            JSONObject json = new JSONObject(result);
-//            String returnCode = json.getJSONObject("system").getString("returnCode");
-//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-//            System.out.println("returnCode : " + returnCode);
-//            System.out.println("returnMessage : " + returnMessage);
         }
         
         if(false){
@@ -117,15 +113,9 @@ public class HttpClientPostTest {
             String result = HttpUtil.doPostRequest(url, paramStr);
             System.out.println(url);
             System.out.println("result -- " + result);
-
-//            JSONObject json = new JSONObject(result);
-//            String returnCode = json.getJSONObject("system").getString("returnCode");
-//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-//            System.out.println("returnCode : " + returnCode);
-//            System.out.println("returnMessage : " + returnMessage);
         }
         
-        if(true){
+        if(false) {
             JSONObject req = new JSONObject();
             req.put("lxdh", "18577186804");// 联系人电话
             req.put("sndmsg", "哈哈");// 短信内容
@@ -134,21 +124,14 @@ public class HttpClientPostTest {
             req.put("feetype", "3");// 收费类型 (默认3，不收费)
             req.put("acct", "6231810090700273143");// 签约账号
             req.put("jzjg", "071040101");// 计费机构
-            
             String paramStr = mapToParameterString_JSON(req);
-
-            String url = "http://127.0.0.1:8081/applySmsCode";
-//             String url = "http://127.0.0.1:8080/WARBill/BBCQAP";
+            
+             String url = "http://127.0.0.1:8080/WARBill/applySmsMessage";
             String result = HttpUtil.doPostRequest(url, paramStr);
             System.out.println(url);
             System.out.println("result -- " + result);
-
-//            JSONObject json = new JSONObject(result);
-//            String returnCode = json.getJSONObject("system").getString("returnCode");
-//            String returnMessage = json.getJSONObject("system").getString("returnMessage");
-//            System.out.println("returnCode : " + returnCode);
-//            System.out.println("returnMessage : " + returnMessage);
         }
+        
         System.out.println("done...");
     }
 
