@@ -38,7 +38,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.file.FileUtil;
 import gtu.image.ScreenshotUtil;
 import gtu.image.ScreenshotUtil.PicType;
-import gtu.swing.util.ButtonGroupUtil;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 
@@ -147,7 +147,7 @@ public class ScreenshotUI extends JFrame {
         JRadioButton messageRadioBtn = new JRadioButton("message");
         panel_2.add(messageRadioBtn);
 
-        btnGroup = ButtonGroupUtil.createRadioButtonGroup(beepRadioBtn, messageRadioBtn);
+        btnGroup = JButtonGroupUtil.createRadioButtonGroup(beepRadioBtn, messageRadioBtn);
 
         JPanel panel_1 = new JPanel();
         panel.add(panel_1, "4, 16, fill, fill");
@@ -220,7 +220,7 @@ public class ScreenshotUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File bmpFile = (File) e.getSource();
-                String text = ((JRadioButton) ButtonGroupUtil.getSelectedButton(btnGroup)).getText();
+                String text = ((JRadioButton) JButtonGroupUtil.getSelectedButton(btnGroup)).getText();
                 if ("beep".equalsIgnoreCase(text)) {
                     Toolkit.getDefaultToolkit().beep();
                 } else if ("message".equalsIgnoreCase(text)) {

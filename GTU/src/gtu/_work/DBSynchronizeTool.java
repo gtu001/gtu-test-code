@@ -135,19 +135,19 @@ public class DBSynchronizeTool {
             }
 
             int COLUMN_START = 1;// 資料讀取開始位置
-            String tagDef = ExcelUtil.getInstance().readHSSFCell(row.getCell(0));// 第一欄位TAG定義藍
+            String tagDef = ExcelUtil.getInstance().readCell(row.getCell(0));// 第一欄位TAG定義藍
             if (TAG_TABLE.equals(tagDef)) {
                 if (tab != null) {
                     tableList.add(tab);
                     tab = null;
                 }
                 tab = new TableInfo();
-                tab.tableName = ExcelUtil.getInstance().readHSSFCell(row.getCell(1));
+                tab.tableName = ExcelUtil.getInstance().readCell(row.getCell(1));
             } else if (TAG_COLUMN.equals(tagDef) && tab != null) {
 
                 for (int jj = COLUMN_START; jj < row.getLastCellNum(); jj++) {
                     HSSFCell cell = row.getCell(jj);
-                    String value = ExcelUtil.getInstance().readHSSFCell(cell);
+                    String value = ExcelUtil.getInstance().readCell(cell);
                     if(StringUtils.isBlank(value)){
                         throw new RuntimeException("定義欄位 " + jj + " 為空 ");
                     }
@@ -158,7 +158,7 @@ public class DBSynchronizeTool {
                 List<String> dataList = new ArrayList<String>();
                 for (int jj = COLUMN_START; jj < row.getLastCellNum(); jj++) {
                     HSSFCell cell = row.getCell(jj);
-                    String value = ExcelUtil.getInstance().readHSSFCell(cell);
+                    String value = ExcelUtil.getInstance().readCell(cell);
                     dataList.add(value);
                 }
 

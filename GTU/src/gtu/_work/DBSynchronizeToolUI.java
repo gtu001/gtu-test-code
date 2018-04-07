@@ -42,6 +42,7 @@ public class DBSynchronizeToolUI extends JFrame {
     // File currentJarFile = new File("C:/Users/gtu001_5F/Desktop");
     File connectionConfigFile = new File(currentJarFile, "dbConfig.properties");
     PropertiesGroupUtils connectionConfigPropUtil = new PropertiesGroupUtils(connectionConfigFile);
+    private JTextField driverText;
 
     /**
      * Launch the application.
@@ -96,12 +97,44 @@ public class DBSynchronizeToolUI extends JFrame {
 
             JPanel panel_1 = new JPanel();
             tabbedPane.addTab("New tab", null, panel_1, null);
-            panel_1.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                    ColumnSpec.decode("default:grow"), }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+            panel_1.setLayout(new FormLayout(new ColumnSpec[] {
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    ColumnSpec.decode("default:grow"),},
+                new RowSpec[] {
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,}));
 
             JLabel lblUrl = new JLabel("url");
             panel_1.add(lblUrl, "4, 4");
@@ -123,22 +156,29 @@ public class DBSynchronizeToolUI extends JFrame {
             passwordText = new JTextField();
             panel_1.add(passwordText, "10, 12, fill, default");
             passwordText.setColumns(10);
-
-            JButton applyConfigBtn = new JButton("使用");
-            applyConfigBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    applyConfigBtnAction();
-                }
-            });
-            panel_1.add(applyConfigBtn, "4, 16");
-
-            nextConfigBtn = new JButton("下一組");
-            nextConfigBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    nextConfigBtnAction();
-                }
-            });
-            panel_1.add(nextConfigBtn, "6, 16");
+            
+                        JButton applyConfigBtn = new JButton("使用");
+                        applyConfigBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                applyConfigBtnAction();
+                            }
+                        });
+                        
+                        JLabel lblDriver = new JLabel("driver");
+                        panel_1.add(lblDriver, "4, 16");
+                        
+                        driverText = new JTextField();
+                        driverText.setColumns(10);
+                        panel_1.add(driverText, "10, 16, fill, default");
+                        panel_1.add(applyConfigBtn, "4, 26");
+                        
+                                    nextConfigBtn = new JButton("下一組");
+                                    nextConfigBtn.addActionListener(new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            nextConfigBtnAction();
+                                        }
+                                    });
+                                    panel_1.add(nextConfigBtn, "6, 26");
             
             nextConfigBtnAction();
         }catch(Throwable ex){

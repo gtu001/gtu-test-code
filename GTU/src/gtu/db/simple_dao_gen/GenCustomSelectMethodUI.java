@@ -37,7 +37,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu.swing.util.ButtonGroupUtil;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
@@ -136,7 +136,7 @@ public class GenCustomSelectMethodUI extends JFrame {
 
         JRadioButton updateRadio = new JRadioButton("update");
         panel_1.add(updateRadio, "2, 6, left, top");
-        sqlTypeRadioGroup = ButtonGroupUtil.createRadioButtonGroup(selectRadio, updateRadio);
+        sqlTypeRadioGroup = JButtonGroupUtil.createRadioButtonGroup(selectRadio, updateRadio);
 
         sqlArea = new JTextArea();
         sqlArea.setPreferredSize(new Dimension(0, 75));
@@ -221,7 +221,7 @@ public class GenCustomSelectMethodUI extends JFrame {
             GenCustomUpdateMethod t2 = new GenCustomUpdateMethod();
             
             String returnStr = "";
-            JRadioButton choiceRadio = ((JRadioButton)ButtonGroupUtil.getSelectedButton(sqlTypeRadioGroup));
+            JRadioButton choiceRadio = ((JRadioButton)JButtonGroupUtil.getSelectedButton(sqlTypeRadioGroup));
             Validate.isTrue(choiceRadio != null, "請選擇方法類型radio");
             
             String sqlType= choiceRadio.getText();

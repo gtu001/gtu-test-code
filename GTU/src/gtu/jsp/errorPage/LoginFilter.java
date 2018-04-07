@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class LoginFilter implements Filter {
 
@@ -26,8 +27,7 @@ public class LoginFilter implements Filter {
         dispatcherRegister = config.getServletContext().getRequestDispatcher(REGISTER_PAGE);
     }
 
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
-            ServletException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         // if a request is made directly for Register.jsf send them to it
         if (request.getServletPath().equals(REGISTER_PAGE)) {
@@ -47,6 +47,15 @@ public class LoginFilter implements Filter {
         else {
             dispatcherLogin.forward(req, res);
         }
+    }
+
+    //XXX
+    private void redirectJspPage(ServletRequest request, ServletResponse response) {
+        HttpServletRequest httpsr = (HttpServletRequest) request;
+        HttpServletResponse httpresponse = (HttpServletResponse) response;
+        String directpage = httpsr.getContextPath().concat("/verify.jsp");
+        httpresponse.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+        httpresponse.setHeader("Location", directpage);
     }
 
     public void destroy() {

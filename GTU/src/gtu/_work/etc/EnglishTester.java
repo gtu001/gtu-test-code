@@ -259,6 +259,7 @@ public class EnglishTester extends javax.swing.JFrame {
                                         ClipboardUtil.getInstance().setContents(word);
                                         word = word.replace(" ", "%20");
                                         URI uri = new URI("https://www.google.com.tw/search?num=10&hl=zh-TW&site=imghp&tbm=isch&source=hp&biw=1280&bih=696&q=" + word);
+                                        //URI uri = new URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word=" + word);
                                         Desktop.getDesktop().browse(uri);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);
@@ -337,6 +338,7 @@ public class EnglishTester extends javax.swing.JFrame {
                                         ClipboardUtil.getInstance().setContents(text);
                                         text = text.replace(" ", "%20");
                                         URI uri = new URI("https://www.google.com.tw/search?num=10&hl=zh-TW&site=imghp&tbm=isch&source=hp&biw=1280&bih=696&q=" + text);
+                                        //URI uri = new URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word=" + text);
                                         Desktop.getDesktop().browse(uri);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);

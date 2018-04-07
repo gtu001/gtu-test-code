@@ -5,7 +5,7 @@ import java.util.Enumeration;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 
-public class ButtonGroupUtil {
+public class JButtonGroupUtil {
 
     /**
      * @param args

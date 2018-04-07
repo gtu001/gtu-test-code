@@ -19,7 +19,9 @@ public class GitLogToWorksheet {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String startDateStr = "20180315";
+        String startDateStr = "20180402";
+//        String startDateStr = baseStartDateStr + StringUtils.leftPad(String.valueOf(jj), 2, "0");
+
         System.out.println("## " + startDateStr);
         Date d1 = sdf.parse(startDateStr);
         Calendar c1 = Calendar.getInstance();
@@ -31,17 +33,17 @@ public class GitLogToWorksheet {
 
         Calendar c2 = Calendar.getInstance();
         c2.setTime(c1.getTime());
-        c2.add(Calendar.DATE, 1);//1
+        c2.add(Calendar.DATE, 1);// 1
 
         String logCommand = GitLog.newInstance()//
                 .since(c1.getTime())//
                 .before(c2.getTime())//
                 .author("gtu001")//
                 .encode("big5")//
-//                .nameType(1)//
+                // .nameType(1)//
                 .build();
         System.out.println(logCommand);
-        
+
         StringBuilder sb = new StringBuilder();
 
         File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_scsb");
@@ -53,11 +55,15 @@ public class GitLogToWorksheet {
             if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
                 lst.add(FileUtil.replaceSpecialChar("cd " + f));
                 lst.add("e:");
-//                if (ArrayUtils.contains(prodArry, f.getName())) {
-//                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
-//                } else {
-//                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/" + f.getName() + ".git"));
-//                }
+                // if (ArrayUtils.contains(prodArry, f.getName())) {
+                // lst.add(FileUtil.replaceSpecialChar("git remote set-url
+                // origin http://gtu001@192.168.93.205:8448/r/ProdModule/" +
+                // f.getName() + ".git"));
+                // } else {
+                // lst.add(FileUtil.replaceSpecialChar("git remote set-url
+                // origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/"
+                // + f.getName() + ".git"));
+                // }
                 lst.add(logCommand);
             }
 
@@ -71,8 +77,8 @@ public class GitLogToWorksheet {
                 // System.out.println(newInstance.getInputStreamToString());
                 String logContent = newInstance.getInputStreamToString();
                 System.out.println("processed " + (ii + 1) + " -> " + files.length);
-                
-                if(StringUtils.isNotBlank(logContent)) {
+
+                if (StringUtils.isNotBlank(logContent)) {
                     sb.append("--->/" + f.getName() + "\r\n");
                     sb.append(logContent + "\r\n");
                 }
@@ -80,9 +86,13 @@ public class GitLogToWorksheet {
                 System.err.println("Timeout !!");
             }
         }
-        
+
         System.out.println("===============================================================");
         System.out.println(sb);
+
+//        if (sb.length() > 0) {
+//            FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH + "/xxxx/", startDateStr + ".txt"), sb.toString(), "utf8");
+//        }
         System.out.println("done...");
     }
 

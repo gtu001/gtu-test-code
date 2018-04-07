@@ -1,10 +1,4 @@
 package gtu._work.ui;
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.Template;
-import gtu.poi.hssf.ExcelUtil;
-import gtu.swing.util.JCommonUtil;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -19,7 +13,9 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,24 +35,29 @@ import javax.swing.WindowConstants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.Template;
+import gtu.poi.hssf.ExcelUtil;
+import gtu.swing.util.JCommonUtil;
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
+ * Builder, which is free for non-commercial use. If Jigloo is being used
+ * commercially (ie, by a corporation, company or business for any purpose
+ * whatever) then you should purchase a license for each developer using Jigloo.
+ * Please visit www.cloudgarden.com for details. Use of Jigloo implies
+ * acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN
+ * PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR
+ * ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class SqlCreaterUI extends javax.swing.JFrame {
     private JTabbedPane jTabbedPane1;
     private JPanel jPanel1;
@@ -76,8 +77,8 @@ public class SqlCreaterUI extends javax.swing.JFrame {
     private JTextField tableNameText;
 
     /**
-    * Auto-generated main method to display this JFrame
-    */
+     * Auto-generated main method to display this JFrame
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -87,12 +88,12 @@ public class SqlCreaterUI extends javax.swing.JFrame {
             }
         });
     }
-    
+
     public SqlCreaterUI() {
         super();
         initGUI();
     }
-    
+
     private void initGUI() {
         try {
             BorderLayout thisLayout = new BorderLayout();
@@ -184,7 +185,7 @@ public class SqlCreaterUI extends javax.swing.JFrame {
                         excelFilePathText2 = new JTextField();
                         JCommonUtil.jTextFieldSetFilePathMouseEvent(excelFilePathText2, false);
                         jPanel3.add(excelFilePathText2);
-                        excelFilePathText2.setPreferredSize(new java.awt.Dimension(455,22));
+                        excelFilePathText2.setPreferredSize(new java.awt.Dimension(455, 22));
                     }
                     {
                         firstRowMakeInsertSqlBtn = new JButton();
@@ -202,154 +203,163 @@ public class SqlCreaterUI extends javax.swing.JFrame {
             pack();
             this.setSize(595, 409);
         } catch (Exception e) {
-            //add your error handling code here
+            // add your error handling code here
             e.printStackTrace();
         }
     }
-    
-    private void executeBtnPreformed(){
-        try{
+
+    private void executeBtnPreformed() {
+        try {
             logArea.setText("");
             File srcFile = JCommonUtil.filePathCheck(excelFilePathText.getText(), "來源黨", false);
-            if(srcFile == null){
+            if (srcFile == null) {
                 return;
             }
-            if(!srcFile.getName().endsWith(".xlsx")){
+            if (!srcFile.getName().endsWith(".xlsx")) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("必須為excel黨");
                 return;
             }
-            if(StringUtils.isBlank(sqlArea.getText())){
+            if (StringUtils.isBlank(sqlArea.getText())) {
                 return;
             }
             File saveFile = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
-            if(saveFile == null){
+            if (saveFile == null) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("選擇目的檔錯誤");
                 return;
             }
-            
+
             String sqlText = sqlArea.getText();
-            
+
             StringBuffer sb = new StringBuffer();
-            Map<Integer, String> refMap = new HashMap<Integer, String>(); 
+            Map<Integer, String> refMap = new HashMap<Integer, String>();
             Pattern sqlPattern = Pattern.compile("\\$\\{(\\w+)\\}", Pattern.MULTILINE);
             Matcher matcher = sqlPattern.matcher(sqlText);
-            while(matcher.find()){
+            while (matcher.find()) {
                 String val = StringUtils.trim(matcher.group(1)).toUpperCase();
                 refMap.put(ExcelUtil.cellEnglishToPos(val), val);
                 matcher.appendReplacement(sb, "\\$\\{" + val + "\\}");
             }
             matcher.appendTail(sb);
             appendLog(refMap.toString());
-            
+
             sqlText = sb.toString();
             sqlArea.setText(sqlText);
-            
-            
+
             Configuration cfg = new Configuration();
             StringTemplateLoader stringTemplatge = new StringTemplateLoader();
             stringTemplatge.putTemplate("aaa", sqlText);
             cfg.setTemplateLoader(stringTemplatge);
             cfg.setObjectWrapper(new DefaultObjectWrapper());
             Template temp = cfg.getTemplate("aaa");
-            
+
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), "utf8"));
-            
+
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(srcFile));
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(bis);
             Sheet sheet = xssfWorkbook.getSheetAt(0);
             for (int j = 0; j < sheet.getPhysicalNumberOfRows(); j++) {
                 Row row = sheet.getRow(j);
+                if (row == null) {
+                    continue;
+                }
                 Map<String, Object> root = new HashMap<String, Object>();
-                for(int index : refMap.keySet()){
+                for (int index : refMap.keySet()) {
                     root.put(refMap.get(index), formatCellType(row.getCell(index)));
                 }
                 appendLog(root.toString());
-                
+
                 StringWriter out = new StringWriter();
                 temp.process(root, out);
                 out.flush();
                 String writeStr = out.getBuffer().toString();
                 appendLog(writeStr);
-                
+
                 writer.write(writeStr);
                 writer.newLine();
             }
             bis.close();
-            
+
             writer.flush();
             writer.close();
-            
+
             JCommonUtil._jOptionPane_showMessageDialog_info("檔案寫入成功 : \n" + saveFile);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
-    
-    private void appendLog(String message){
+
+    private void appendLog(String message) {
         logArea.append(message + "\n");
     }
-    
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMdd");
+
     private String formatCellType(Cell cell) {
         String returnVal = StringUtils.EMPTY;
-        if(cell == null){
+        if (cell == null) {
             return "";
         }
         if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
-            final NumberFormat formatter = new DecimalFormat("##");
-            returnVal = formatter.format(Float.valueOf(cell.toString()));
+            if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                Date d = cell.getDateCellValue();
+                returnVal = " to_date('" + SDF.format(d) + "', 'yyyymmdd' ) ";
+            } else {
+                final NumberFormat formatter = new DecimalFormat("##");
+                returnVal = formatter.format(Float.valueOf(cell.toString()));
+            }
         } else {
             returnVal = cell.toString();
         }
         return returnVal;
     }
-    
+
     private void firstRowMakeInsertSqlBtn(ActionEvent evt) {
-        try{
+        try {
             String tableName = Validate.notBlank(tableNameText.getText(), "資料表名稱為輸入");
             File srcFile = JCommonUtil.filePathCheck(excelFilePathText2.getText(), "來源黨", "xlsx");
             File saveFile = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
-            if(saveFile == null){
+            if (saveFile == null) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("選擇目的檔錯誤");
                 return;
             }
-            
+
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(saveFile), "utf8"));
-            
+
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(srcFile));
             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(bis);
             Sheet sheet = xssfWorkbook.getSheetAt(0);
-            
+
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-            for(int ii = 0; ii < sheet.getRow(0).getLastCellNum() ; ii ++){
+            for (int ii = 0; ii < sheet.getRow(0).getLastCellNum(); ii++) {
                 valueMap.put(formatCellType(sheet.getRow(0).getCell(ii)), "");
             }
-            
+
             for (int j = 0; j < sheet.getPhysicalNumberOfRows(); j++) {
                 Row row = sheet.getRow(j);
-                LinkedHashMap<String, String> valueMap2 = (LinkedHashMap<String, String>)valueMap.clone();
+                LinkedHashMap<String, String> valueMap2 = (LinkedHashMap<String, String>) valueMap.clone();
                 int ii = 0;
-                for(String key : valueMap2.keySet()){
+                for (String key : valueMap2.keySet()) {
                     valueMap2.put(key, formatCellType(row.getCell(ii)));
-                    ii ++;
+                    ii++;
                 }
-                appendLog(""+valueMap2);
+                appendLog("" + valueMap2);
                 String insertSql = this.fetchInsertSQL(tableName, valueMap2);
-                appendLog(""+insertSql);
+                appendLog("" + insertSql);
                 writer.write(insertSql);
                 writer.newLine();
             }
             bis.close();
-            
+
             writer.flush();
             writer.close();
-            
+
             JCommonUtil._jOptionPane_showMessageDialog_info("檔案寫入成功 : \n" + saveFile);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
-    
-    private String fetchInsertSQL(String tableName, Map<String, String> wkDataObjectMapCopy){
+
+    private String fetchInsertSQL(String tableName, Map<String, String> wkDataObjectMapCopy) {
         List<String> insertFieldList = new ArrayList<String>();
         List<String> insertValueList = new ArrayList<String>();
         for (String key : wkDataObjectMapCopy.keySet()) {
