@@ -14,10 +14,8 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
     boolean isMointerOn = true;
 
     public void run() {
-        Transferable trans = sysClip.getContents(this);
-        if (isMointerOn) {
-            regainOwnership(trans);
-        }
+        Transferable trans = getContentsTransferable();
+        regainOwnership(trans);
         System.out.println("Listening to board...");
         while (true) {
             // 不設sleep會瘋狂吃掉cpu
@@ -38,6 +36,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                 if (contents == null) {
                     break;
                 }
+
                 processContents(contents);
                 regainOwnership(contents);
                 break;
@@ -63,7 +62,12 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
         }
     }
 
+    public abstract void processText(String text);
+
     public void processContents(Transferable t) {
+        if (!isMointerOn) {
+            return;
+        }
         try {
             String text = (String) sysClip.getContents(null).getTransferData(DataFlavor.stringFlavor);
             System.out.println("ProcessContents : " + text);
@@ -72,8 +76,6 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
             ex.printStackTrace();
         }
     }
-
-    public abstract void processText(String text);
 
     private void regainOwnership(Transferable t) {
         sysClip.setContents(t, this);

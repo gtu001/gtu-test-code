@@ -331,6 +331,7 @@ public class EnglishSearchUI extends JFrame {
         listenClipboardChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
+                mouseSelectionChk.setSelected(listenClipboardChk.isSelected());//XXX
             }
         });
 
@@ -828,10 +829,6 @@ public class EnglishSearchUI extends JFrame {
         }
 
         public void getclipboardText(String word) {
-            if (!listenClipboardChk.isSelected()) {
-                return;
-            }
-
             String english = getEnglish(StringUtils.trimToEmpty(word));
             String oldEnglish = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
             if (StringUtils.isNotBlank(english)) {

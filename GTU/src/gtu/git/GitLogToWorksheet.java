@@ -19,7 +19,7 @@ public class GitLogToWorksheet {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String startDateStr = "20180402";
+        String startDateStr = "20180409";
 //        String startDateStr = baseStartDateStr + StringUtils.leftPad(String.valueOf(jj), 2, "0");
 
         System.out.println("## " + startDateStr);

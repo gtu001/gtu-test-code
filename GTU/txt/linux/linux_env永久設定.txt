@@ -1,5 +1,7 @@
 
 存到 /etc/envirment (全局)
+   /etc/profile
+
 
 修改by User
 ~/.profile
@@ -8,3 +10,6 @@
 
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_HOME
+
+
+
