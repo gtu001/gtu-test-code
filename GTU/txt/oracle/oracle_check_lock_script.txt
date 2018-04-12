@@ -1,0 +1,478 @@
+REM SCRIPT: FULLY DECODED LOCKING
+
+set echo off
+set lines 200
+set pagesize 66
+break on Kill on sid on  username on terminal
+column Kill heading 'Kill String' format a13
+column res heading 'Resource Type' format 999
+column id1 format 9999990
+column id2 format 9999990
+column locking heading 'Lock Held/Lock Requested' format a40
+column lmode heading 'Lock Held' format a20
+column request heading 'Lock Requested' format a20
+column serial# format 99999
+column username  format a10  heading "Username"
+column terminal heading Term format a6
+column obj format a30 heading "Table/Sequence Name"
+column owner format a9
+column LAddr heading "ID1 - ID2" format a18
+column Lockt heading "Lock Type" format a40
+column command heading "Command" format a25
+column sid format 990
+
+select
+    nvl(s.username,'Internal') username,
+    l.sid,
+    nvl(s.terminal,'None') terminal,
+    decode(l.type,'TM',u.name||'.'||substr(t.name,1,20),
+           'DL',u.name||'.'||substr(t.name,1,20),
+           'SQ',u.name||'.'||substr(t.name,1,20),'None') obj,
+    decode(command,
+        0,'None',
+        1,'CREATE TABLE',
+        2,'INSERT',
+        3,'SELECT',
+        4,'CREATE CLUSTER',
+        5,'ALTER CLUSTER',
+        6,'UPDATE',
+        7,'DELETE',
+        8,'DROP CLUSTER',
+        9,'CREATE INDEX',
+        10,'DROP INDEX',
+        11,'ALTER INDEX',
+        12,'DROP TABLE',
+        13,'CREATE SEQUENCE',
+        14,'ALTER SEQUENCE',
+        15,'ALTER TABLE',
+        16,'DROP SEQUENCE',
+        17,'GRANT',
+        18,'REVOKE',
+        19,'CREATE SYNONYM',
+        20,'DROP SYNONYM',
+        21,'CREATE VIEW',
+        22,'DROP VIEW',
+        23,'VALIDATE INDEX',
+        24,'CREATE PROCEDURE',
+        25,'ALTER PROCEDURE',
+        26,'LOCK TABLE',
+        27,'NO OPERATION',
+        28,'RENAME',
+        29,'COMMENT',
+        30,'AUDIT',
+        31,'NOAUDIT',
+        32,'CREATE DATABASE LINK',
+        33,'DROP DATABASE LINK',
+        34,'CREATE DATABASE',
+        35,'ALTER DATABASE',
+        36,'CREATE ROLLBACK SEGMENT',
+        37,'ALTER ROLLBACK SEGMENT',
+        38,'DROP ROLLBACK SEGMENT',
+        39,'CREATE TABLESPACE',
+        40,'ALTER TABLESPACE',
+        41,'DROP TABLESPACE',
+        42,'ALTER SESSION',
+        43,'ALTER USER',
+        44,'COMMIT',
+        45,'ROLLBACK',
+        46,'SAVEPOINT',
+        47,'PL/SQL EXECUTE',
+        48,'SET TRANSACTION',
+        49,'ALTER SYSTEM SWITCH LOG',
+        50,'EXPLAIN',
+        51,'CREATE USER',
+        52,'CREATE ROLE',
+        53,'DROP USER',
+        54,'DROP ROLE',
+        55,'SET ROLE',
+        56,'CREATE SCHEMA',
+        57,'CREATE CONTROL FILE',
+        58,'ALTER TRACING',
+        59,'CREATE TRIGGER',
+        60,'ALTER TRIGGER',
+        61,'DROP TRIGGER',
+        62,'ANALYZE TABLE',
+        63,'ANALYZE INDEX',
+        64,'ANALYZE CLUSTER',
+        65,'CREATE PROFILE',
+        66,'DROP PROFILE',
+        67,'ALTER PROFILE',
+        68,'DROP PROCEDURE',
+        69,'-',
+        70,'ALTER RESOURCE COST',
+        71,'CREATE SNAPSHOT LOG',
+        72,'ALTER SNAPSHOT LOG',
+        73,'DROP SNAPSHOT LOG',
+        74,'CREATE SNAPSHOT',
+        75,'ALTER SNAPSHOT',
+        76,'DROP SNAPSHOT',
+        77,'CREATE TYPE',
+        78,'DROP TYPE',
+        79,'ALTER ROLE',
+        80,'ALTER TYPE',
+        81,'CREATE TYPE BODY',
+        82,'ALTER TYPE BODY',
+        83,'DROP TYPE BODY',
+        84,'DROP LIBRARY',
+        85,'TRUNCATE TABLE',
+        86,'TRUNCATE CLUSTER',
+        87,'CREATE BITMAP FILE',
+        88,'ALTER VIEW',
+        89,'DROP BITMAP FILE',
+        90,'SET CONSTRAINTS',
+        91,'CREATE FUNCTION',
+        92,'ALTER FUNCTION',
+        93,'DROP FUNCTION',
+        94,'CREATE PACKAGE',
+        95,'ALTER PACKAGE',
+        96,'DROP PACKAGE',
+        97,'CREATE PACKAGE BODY',
+        98,'ALTER PACKAGE BODY',
+        99,'DROP PACKAGE BODY',
+        command||' - ???') command,
+    decode(l.lmode,1,'No Lock',
+        2,'Row Share',
+        3,'Row Exclusive',
+        4,'Share',
+        5,'Share Row Exclusive',
+        6,'Exclusive','NONE') lmode,
+    decode(l.request,1,'No Lock',
+        2,'Row Share',
+        3,'Row Exclusive',
+        4,'Share',
+        5,'Share Row Exclusive',
+        6,'Exclusive','NONE') request,
+    l.id1||'-'||l.id2 Laddr,
+    l.type||' - '||
+    decode(l.type,
+        'BL','Buffer hash table instance',
+        'CF',' Control file schema global enqueue',
+        'CI','Cross-instance function invocation instance',
+        'CU','Cursor bind',
+        'DF','Data file instance',
+        'DL','Direct loader parallel index create',
+        'DM','Mount/startup db primary/secondary instance',
+        'DR','Distributed recovery process',
+        'DX','Distributed transaction entry',
+        'FS','File set',
+        'HW','Space management operations on a specific segment',
+        'IN','Instance number',
+        'IR','Instance recovery serialization global enqueue',
+        'IS','Instance state',
+        'IV','Library cache invalidation instance',
+        'JQ','Job queue',
+        'KK','Thread kick',
+        'LA','Library cache lock instance (A=namespace)',
+        'LB','Library cache lock instance (B=namespace)',
+        'LC','Library cache lock instance (C=namespace)',
+        'LD','Library cache lock instance (D=namespace)',
+        'LE','Library cache instance lock (E=namespace)',
+        'LF','Library cache instance lock (F=namespace)',
+        'LG','Library cache instance lock (G=namespace)',
+        'LH','Library cache instance lock (H=namespace)',
+        'LI','Library cache instance lock (I=namespace)',
+        'LJ','Library cache instance lock (J=namespace)',
+        'LK','Library cache instance lock (K=namespace)',
+        'LL','Library cache instance lock (L=namespace)',
+        'LM','Library cache instance lock (M=namespace)',
+        'LN','Library cache instance lock (N=namespace)',
+        'LO','Library cache instance lock (O=namespace)',
+        'LP','Library cache instance lock (P=namespace)',
+        'MM','Mount definition gloabal enqueue',
+        'MR','Media recovery',
+        'NA','Library cache pin instance (A=namespace)',
+        'NB','Library cache pin instance (B=namespace)',
+        'NC','Library cache pin instance (C=namespace)',
+        'ND','Library cache pin instance (D=namespace)',
+        'NE','Library cache pin instance (E=namespace)',
+        'NF','Library cache pin instance (F=namespace)',
+        'NG','Library cache pin instance (G=namespace)',
+        'NH','Library cache pin instance (H=namespace)',
+        'NI','Library cache pin instance (I=namespace)',
+        'NJ','Library cache pin instance (J=namespace)',
+        'NL','Library cache pin instance (K=namespace)',
+        'NK','Library cache pin instance (L=namespace)',
+        'NM','Library cache pin instance (M=namespace)',
+        'NN','Library cache pin instance (N=namespace)',
+        'NO','Library cache pin instance (O=namespace)',
+        'NP','Library cache pin instance (P=namespace)',
+        'NQ','Library cache pin instance (Q=namespace)',
+        'NR','Library cache pin instance (R=namespace)',
+        'NS','Library cache pin instance (S=namespace)',
+        'NT','Library cache pin instance (T=namespace)',
+        'NU','Library cache pin instance (U=namespace)',
+        'NV','Library cache pin instance (V=namespace)',
+        'NW','Library cache pin instance (W=namespace)',
+        'NX','Library cache pin instance (X=namespace)',
+        'NY','Library cache pin instance (Y=namespace)',
+        'NZ','Library cache pin instance (Z=namespace)',
+        'PF','Password file',
+        'PI','Parallel operation',
+        'PR','Process startup',
+        'PS','Parallel operation',
+        'QA','Row cache instance (A=cache)',
+        'QB','Row cache instance (B=cache)',
+        'QC','Row cache instance (C=cache)',
+        'QD','Row cache instance (D=cache)',
+        'QE','Row cache instance (E=cache)',
+        'QF','Row cache instance (F=cache)',
+        'QG','Row cache instance (G=cache)',
+        'QH','Row cache instance (H=cache)',
+        'QI','Row cache instance (I=cache)',
+        'QJ','Row cache instance (J=cache)',
+        'QL','Row cache instance (K=cache)',
+        'QK','Row cache instance (L=cache)',
+        'QM','Row cache instance (M=cache)',
+        'QN','Row cache instance (N=cache)',
+        'QO','Row cache instance (O=cache)',
+        'QP','Row cache instance (P=cache)',
+        'QQ','Row cache instance (Q=cache)',
+        'QR','Row cache instance (R=cache)',
+        'QS','Row cache instance (S=cache)',
+        'QT','Row cache instance (T=cache)',
+        'QU','Row cache instance (U=cache)',
+        'QV','Row cache instance (V=cache)',
+        'QW','Row cache instance (W=cache)',
+        'QX','Row cache instance (X=cache)',
+        'QY','Row cache instance (Y=cache)',
+        'QZ','Row cache instance (Z=cache)',
+        'RT','Redo thread global enqueue',
+        'SC','System commit number instance',
+        'SM','SMON',
+        'SN','Sequence number instance',
+        'SQ','Sequence number enqueue',
+        'SS','Sort segment',
+        'ST','Space transaction enqueue',
+        'SV','Sequence number value',
+        'TA','Generic enqueue',
+        'TM','DML enqueue',
+        'TS',decode(l.id2,0,'Temporary segment enqueue',
+                    'New block allocation enqueue lock'),
+        'TT','Temporary table enqueue',
+        'TX','Transaction enqueue',
+        'UL','User supplied',
+        'UN','User name',
+        'US','Undo segment DDL',
+        'WL','Being-written redo log instance', '????') Lockt
+from    V$LOCK l,
+        V$SESSION s,
+        SYS.USER$ u,
+        SYS.OBJ$ t
+where   l.sid = s.sid
+and     t.obj#  = decode(l.type,'TM',l.id1,'DL',l.id1,'SQ',l.id1,1)
+and     u.user# = t.owner#
+and     s.type != 'BACKGROUND'
+order by 1,2,5 ;
+
+select /*+ rule */ s.username, s.sid, s.serial#, l.type "LOCK TYPE", l.id1||'-'||l.id2 id1_id2,
+       decode(l.lmode,0,'NONE',
+                      1,'NULL',
+                      2,'  RS',
+                      3,'  RX',
+                      4,'   S',
+                      5,' SRX',
+                      6,'   X',
+                        '   ?') HELD,
+       decode(l.request,0,'     NONE',
+                        1,'     NULL',
+                        2,'       RS',
+                        3,'       RX',
+                        4,'        S',
+                        5,'      SRX',
+                        6,'        X',
+                          '        ?') REQUESTED
+   from v$lock l,v$session s
+   where l.sid = s.sid
+   and s.username like upper('%%')
+   order by id1_id2, s.sid, l.type;
+
+
+  col gtxid form a50
+  select 
+   s.ksusenum SID
+   ,r.ksqrsidt TYPE
+   ,r.ksqrsid1 ID1
+   ,r.ksqrsid2 ID2
+   ,l.lmode lmode
+   ,l.request request
+   ,l.ctime ctime
+   ,t.ktcxbstm tran_start_time
+   ,g.K2GTIFMT||'-'||g.K2GTITID_EXT||'-'||g.K2GTIBID XID
+  from 
+   v$_lock l
+   ,x$ksuse s
+   ,x$ksqrs r 
+   ,x$k2gte g
+   ,x$ktcxb t
+  where 
+   l.saddr=s.addr(+) 
+   and l.raddr=r.addr 
+   and r.ksqrsidt ='TX'
+   and l.laddr = t.ktcxbxba(+)
+   and l.laddr = g.k2gtdxcb(+)
+  ;
+
+
+oradebug setmypid;
+oradebug ulimite;   
+oradebug dump hanganalyze 3;
+oradebug dump systemstate 10;
+
+REM check lock script
+
+--- begin [lockchk9.sql] ---
+define spoolfile = &1
+spool &spoolfile
+alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS';
+alter session set timed_statistics = true;
+alter session set max_dump_file_size = UNLIMITED;
+set feedback on
+set term on
+set wrap on
+set trimspool on
+set pagesize 1000
+set linesize 2000
+set numwidth 10
+set echo on
+select to_char(sysdate) start_time from dual;
+alter session set events 'immediate trace name systemstate level 10';
+alter session set events 'immediate trace name hanganalyze level 3';
+column host_name format a20 tru
+select instance_name, host_name, version, status, startup_time from v$instance;
+select * from v$session;
+select * from v$process;
+select * from v$bgprocess;
+select * from v$lock;
+select * from v$locked_object;
+select * from v$session_wait;
+select * from v$latch;
+select * from v$latchholder;
+select * from v$rowcache;
+/* For MTS */
+select * from v$dispatcher;
+select * from v$shared_server;
+select * from v$circuit;
+select * from v$queue;
+select * from v$dispatcher_rate;
+set echo off
+Prompt;
+Prompt Output file name is:;
+define spoolfile
+Prompt;
+Prompt ALERT.LOG and TRACE FILES are located in:;
+column host_name format a12 tru
+column name format a20 tru
+column value format a60 tru
+select distinct i.host_name, p.name, p.value from v$instance i, v$parameter p
+ where p.name like '%_dump_dest'
+   and p.name != 'core_dump_dest';
+select to_char(sysdate) end_time from dual;
+spool off
+exit
+--- end [lockchk9.sql] ---
+
+lockchk10.sql:
+
+--- begin [lockchk10.sql] ---
+define spoolfile = &1
+spool &spoolfile
+alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS';
+alter session set timed_statistics = true;
+alter session set max_dump_file_size = UNLIMITED;
+set feedback on
+set term on
+set wrap on
+set trimspool on
+set pagesize 1000
+set linesize 2000
+set numwidth 10
+set echo on
+select to_char(sysdate) start_time from dual;
+alter session set events 'immediate trace name systemstate level 266';
+alter session set events 'immediate trace name hanganalyze level 3';
+column host_name format a20 tru
+select instance_name, host_name, version, status, startup_time from v$instance;
+select * from v$session;
+select * from v$process;
+select * from v$bgprocess;
+select * from v$lock;
+select * from v$locked_object;
+select * from v$session_wait;
+select * from v$latch;
+select * from v$latchholder;
+select * from v$rowcache;
+/* FOR MTS */
+select * from v$dispatcher;
+select * from v$shared_server;
+select * from v$circuit;
+select * from v$queue;
+select * from v$dispatcher_rate;
+set echo off
+Prompt;
+Prompt Output file name is:;
+define spoolfile
+Prompt;
+Prompt ALERT.LOG and TRACE FILES are located in:;
+column host_name format a12 tru
+column name format a20 tru
+column value format a60 tru
+select distinct i.host_name, p.name, p.value from v$instance i, v$parameter p
+ where p.name like '%_dump_dest'
+   and p.name != 'core_dump_dest';
+select to_char(sysdate) end_time from dual;
+spool off
+exit
+--- end [lockchk10.sql] ---
+
+lockchk10win.sql
+
+--- begin [lockchk10win.sql] ---
+define spoolfile = &1
+spool &spoolfile
+alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS';
+alter session set timed_statistics = true;
+alter session set max_dump_file_size = UNLIMITED;
+set feedback on
+set term on
+set wrap on
+set trimspool on
+set pagesize 1000
+set linesize 2000
+set numwidth 10
+set echo on
+select to_char(sysdate) start_time from dual;
+alter session set events 'immediate trace name systemstate level 10';
+alter session set events 'immediate trace name hanganalyze level 3';
+column host_name format a20 tru
+select instance_name, host_name, version, status, startup_time from v$instance;
+select * from v$session;
+select * from v$process;
+select * from v$bgprocess;
+select * from v$lock;
+select * from v$locked_object;
+select * from v$session_wait;
+select * from v$latch;
+select * from v$latchholder;
+select * from v$rowcache;
+/* FOR MTS */
+select * from v$dispatcher;
+select * from v$shared_server;
+select * from v$circuit;
+select * from v$queue;
+select * from v$dispatcher_rate;
+set echo off
+Prompt;
+Prompt Output file name is:;
+define spoolfile
+Prompt;
+Prompt ALERT.LOG and TRACE FILES are located in:;
+column host_name format a12 tru
+column name format a20 tru
+column value format a60 tru
+select distinct i.host_name, p.name, p.value from v$instance i, v$parameter p
+ where p.name like '%_dump_dest'
+   and p.name != 'core_dump_dest';
+select to_char(sysdate) end_time from dual;
+spool off
+exit
+--- end [lockchk10win.sql] ---

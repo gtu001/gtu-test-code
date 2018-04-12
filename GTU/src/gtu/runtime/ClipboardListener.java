@@ -17,37 +17,42 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
         Transferable trans = getContentsTransferable();
         regainOwnership(trans);
         System.out.println("Listening to board...");
-        while (true) {
-            // 不設sleep會瘋狂吃掉cpu
-            try {
-                Thread.sleep(10L);
-            } catch (InterruptedException e) {
-            }
-        }
+        
+        //just keep alive 看起來不需要
+//        while (true) {
+//            try {
+//                Thread.sleep(10000L);
+//            } catch (InterruptedException e) {
+//            }
+//        }
     }
 
     public void lostOwnership(Clipboard c, Transferable t) {
-        int time = 0;
         Throwable ex = null;
         while (true) {
             try {
                 sleep(50);
+
                 Transferable contents = getContentsTransferable();
                 if (contents == null) {
                     break;
                 }
 
-                processContents(contents);
-                regainOwnership(contents);
+                boolean result = processContents(contents);
+
+                // 非文字格式不重新取得owner
+                if (result) {
+                    regainOwnership(contents);
+                }else {
+                    continue;
+                }
+
                 break;
             } catch (Exception e) {
                 ex = e;
-                time++;
-                if (time > 10) {
-                    break;
-                }
             }
         }
+
         if (ex != null) {
             JCommonUtil.handleException(ex);
         }
@@ -64,16 +69,18 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
 
     public abstract void processText(String text);
 
-    public void processContents(Transferable t) {
+    public boolean processContents(Transferable t) {
         if (!isMointerOn) {
-            return;
+            return true;
         }
         try {
             String text = (String) sysClip.getContents(null).getTransferData(DataFlavor.stringFlavor);
             System.out.println("ProcessContents : " + text);
             processText(text);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return false;
         }
     }
 

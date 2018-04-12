@@ -434,7 +434,7 @@ public class EnglishwordInfoService {
                     dialog02.cancel();
                     return;
                 }
-                final int MaxCount = 1000;
+                final int MaxCount = 2000;
                 if (prop.size() > MaxCount) {
                     handler.post(new Runnable() {
                         @Override

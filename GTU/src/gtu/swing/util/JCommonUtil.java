@@ -921,6 +921,19 @@ public class JCommonUtil {
     public static boolean isUIMode() {
         return !GraphicsEnvironment.isHeadless();
     }
+    
+    /**
+     * 觸發actionPerformed事件
+     */
+    public static void triggerButtonActionPerformed(AbstractButton btn) {
+        for(ActionListener a: btn.getActionListeners()) {
+            a.actionPerformed(new ActionEvent(btn, ActionEvent.ACTION_PERFORMED, null) {
+                private static final long serialVersionUID = 1L;
+                  //Nothing need go here, the actionPerformed method (with the
+                  //above arguments) will trigger the respective listener
+            });
+        }
+    }
 
     public static void main(String[] args) {
     }

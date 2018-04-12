@@ -1052,6 +1052,9 @@ public class ReciteMainActivity extends Activity {
                     @Override
                     public void beforeProcess() {
                         try {
+                            //刪除舊資料只保留n筆
+                            activity.recentSearchService.deleteOldData(200);
+                            //查詢最近n筆
                             List<EnglishWord> wordList = activity.recentSearchService.recentSearchHistoryForWord(100);
 
                             MainActivityDTO dto = activity.dto;

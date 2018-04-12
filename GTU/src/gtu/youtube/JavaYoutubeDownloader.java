@@ -43,6 +43,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import gtu.file.FileUtil;
+
 /**
  * Locally download a YouTube.com video.
  */
@@ -83,6 +85,7 @@ public class JavaYoutubeDownloader extends Formatter {
 
     public static void main(String[] args) {
         try {
+            args = new String[] {"FPeUc_cEqrU", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp3", "-format", "18", "-verboseall"};
             new JavaYoutubeDownloader().run(args);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -196,9 +199,18 @@ public class JavaYoutubeDownloader extends Formatter {
         if (entity != null && response.getStatusLine().getStatusCode() == 200) {
             InputStream instream = entity.getContent();
             String videoInfo = getStringFromInputStream(encoding, instream);
+            System.out.println("videoInfo = " + videoInfo);
             if (videoInfo != null && videoInfo.length() > 0) {
                 List<NameValuePair> infoMap = new ArrayList<NameValuePair>();
                 URLEncodedUtils.parse(infoMap, new Scanner(videoInfo), encoding);
+                System.out.println("infoMap = " + infoMap);
+                
+                for (NameValuePair pair : infoMap) {
+                    String key = pair.getName();
+                    String val = pair.getValue();
+                    System.out.println(">>>" + key + "\t" + val);
+                }
+                
                 String downloadUrl = null;
                 String filename = videoId;
 
@@ -208,7 +220,7 @@ public class JavaYoutubeDownloader extends Formatter {
                     log.finest(key + "=" + val);
                     if (key.equals("title")) {
                         filename = val;
-                    } else if (key.equals("fmt_url_map")) {
+                    } else if (key.equals("fmt_url_map")) { //原來的
                         String[] formats = commaPattern.split(val);
                         boolean found = false;
                         for (String fmt : formats) {
@@ -219,6 +231,7 @@ public class JavaYoutubeDownloader extends Formatter {
                                 if (pieceFormat == format) {
                                     // found what we want
                                     downloadUrl = fmtPieces[1];
+                                    System.out.println(">>> downloadUrl = " + downloadUrl);
                                     found = true;
                                     break;
                                 }
@@ -309,6 +322,7 @@ public class JavaYoutubeDownloader extends Formatter {
 
     private static URI getUri(String path, List<NameValuePair> qparams) throws URISyntaxException {
         URI uri = URIUtils.createURI(scheme, host, -1, "/" + path, URLEncodedUtils.format(qparams, DEFAULT_ENCODING), null);
+        System.out.println("getUri = " + uri);
         return uri;
     }
 

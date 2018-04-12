@@ -1,0 +1,43 @@
+--改名
+RENAME SEQ__ESTMT_APLOG TO sqq__aplog;
+
+--改現在直
+ALTER SEQUENCE seq__aplog INCREMENT BY 200; --要加的直(可負) Ex:200
+select seq__aplog.nextval from dual; --讓他跑一次改現值
+ALTER SEQUENCE seq__aplog INCREMENT BY 1; --再改回初始直
+
+
+
+
+--SET SERVEROUTPUT ON SIZE 1000000
+DECLARE
+    v_sequence_id NUMBER;
+    v_temp_seq NUMBER;
+BEGIN
+    select nvl(max(to_number(seq_id)), 0) + 1 into v_sequence_id from aplog ;
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE seq__aplog INCREMENT BY ' || v_sequence_id;
+    SELECT seq__aplog.nextval into v_temp_seq FROM dual;
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE seq__aplog INCREMENT BY 1';
+    DBMS_OUTPUT.put_line('Executed "ALTER SEQUENCE seq__aplog INCREMENT BY ' || v_sequence_id || '"');
+END;
+
+
+--SET SERVEROUTPUT ON SIZE 1000000
+DECLARE
+    v_set_to_val NUMBER := 500;
+    v_sequence_id NUMBER;
+    v_temp_seq NUMBER;
+BEGIN
+    select seq__aplog.currval into v_sequence_id from dual;
+    v_set_to_val := v_set_to_val - v_sequence_id;
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE seq__aplog INCREMENT BY ' || v_set_to_val;
+    SELECT seq__aplog.nextval into v_temp_seq FROM dual;
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE seq__aplog INCREMENT BY 1';
+    DBMS_OUTPUT.put_line('Executed "ALTER SEQUENCE seq__aplog INCREMENT BY ' || v_set_to_val || '"');
+END;
+
+
+
+
+select seq__aplog.currval from dual ;
+select seq__aplog.nextval from dual ;

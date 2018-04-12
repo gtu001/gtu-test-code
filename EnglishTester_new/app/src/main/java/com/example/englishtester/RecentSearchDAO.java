@@ -1,18 +1,18 @@
 package com.example.englishtester;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RecentSearchDAO {
 
@@ -26,6 +26,15 @@ public class RecentSearchDAO {
 //        helper = new DBConnection(context);
     }
 
+    /**
+     * 查詢總筆數
+     */
+    long totalSize(){
+        List<Map<String,String>> lst = queryBySQL("select count(*) as CNT from " + RecentSearchSchema.TABLE_NAME, new String[0]);
+        long result = Long.parseLong(lst.get(0).get("CNT"));
+        return result;
+    }
+
     String[] queryAllWord() {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.FROM, null, null, null, null, null);
@@ -33,6 +42,24 @@ public class RecentSearchDAO {
         String[] list = new String[c.getCount()];
         for (int ii = 0; ii < list.length; ii++) {
             list[ii] = c.getString(0);
+            c.moveToNext();
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    List<RecentSearch> query(String whereCondition, String[] whereArray, String orderBy){
+        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+        Cursor c = db.query(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.FROM, whereCondition, whereArray, null, null, orderBy);
+        c.moveToFirst();
+        List<RecentSearch> list = new ArrayList<RecentSearch>();
+        int total = c.getCount();
+        if (total == 0) {
+            return list;
+        }
+        for (int ii = 0; ii < total; ii++) {
+            list.add(transferWord(c));
             c.moveToNext();
         }
         c.close();
@@ -161,6 +188,13 @@ public class RecentSearchDAO {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         String where = RecentSearchSchema.ENGLISH_ID + "=?";
         int result = db.delete(RecentSearchSchema.TABLE_NAME, where, new String[]{currentId});
+        db.close();
+        return result;
+    }
+
+    int delete(String whereCondition, String[] whereParams) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
+        int result = db.delete(RecentSearchSchema.TABLE_NAME, whereCondition, whereParams);
         db.close();
         return result;
     }

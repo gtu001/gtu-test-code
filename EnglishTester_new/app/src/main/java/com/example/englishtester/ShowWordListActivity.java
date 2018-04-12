@@ -617,9 +617,15 @@ public class ShowWordListActivity extends ListActivity {
         DropboxEnglishService.getRunOnUiThread(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
+                //刪除超過n的歷史資料
+                recentSearchService.deleteOldData(200);
+
+                //查詢最近的歷史紀錄
                 List<String> list = recentSearchService.recentSearchHistory(100);
+
                 dto.wordsList = list;
                 dto.wordsListCopy = list;
+
                 Map<String, EnglishWord> englishMap = new HashMap<String, EnglishWord>();
                 for (String word : dto.wordsList) {
                     EnglishWord word2 = englishwordInfoDAO.queryOneWord(word);
@@ -634,6 +640,7 @@ public class ShowWordListActivity extends ListActivity {
                     }
                     englishMap.put(word, word2);
                 }
+
                 dto.englishProp = englishMap;
                 handler.post(new Runnable() {
                     @Override

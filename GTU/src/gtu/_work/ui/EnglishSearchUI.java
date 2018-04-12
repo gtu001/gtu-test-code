@@ -331,7 +331,7 @@ public class EnglishSearchUI extends JFrame {
         listenClipboardChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
-                mouseSelectionChk.setSelected(listenClipboardChk.isSelected());//XXX
+                mouseSelectionChk.setSelected(listenClipboardChk.isSelected());// XXX
             }
         });
 
@@ -402,12 +402,6 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
-        // 確認是否Focus
-        startCheckFocusOwnerThread();
-
-        // 確認是否監聽記事本
-        startListenClipboardThread();
-
         // 置中
         JCommonUtil.setJFrameCenter(this);
         listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
@@ -433,6 +427,13 @@ public class EnglishSearchUI extends JFrame {
                 System.exit(0);
             }
         });
+        
+        // 確認是否Focus
+        startCheckFocusOwnerThread();
+
+        // 確認是否監聽記事本
+        startListenClipboardThread();
+
 
         // 讀取離線檔
         loadOfflineConfig();
@@ -444,6 +445,7 @@ public class EnglishSearchUI extends JFrame {
                 listenClipboardThread = new __ClipboardListener();
                 listenClipboardThread.setDaemon(true);
                 listenClipboardThread.start();
+                listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -491,6 +493,10 @@ public class EnglishSearchUI extends JFrame {
             Properties prop = new Properties();
             if (StringUtils.isNotBlank(offlineConfigText.getText())) {
                 File file = new File(offlineConfigText.getText());
+                if (!file.getName().equals("exportFileJson.bin")) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔名必須為exportFileJson.bin!");
+                    return;
+                }
                 if (file.exists()) {
                     String content = FileUtil.loadFromFile(file, "utf8");
                     JSONArray arry = new JSONArray(content);

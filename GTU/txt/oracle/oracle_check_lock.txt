@@ -1,0 +1,53 @@
+--以上處理需要權限
+
+C:\> sqlplus "/ as sysdba"
+
+SQL> GRANT SELECT ANY DICTIONARY TO MY_USER;
+
+Grant succeeded
+
+----------------------------------------------------------------
+
+Please Kill Oracle Session
+
+Use below query to check active session info
+
+
+SELECT
+    O.OBJECT_NAME,
+    S.SID,
+    S.SERIAL#,
+    P.SPID,
+    S.PROGRAM,
+    S.USERNAME,
+    S.MACHINE,
+    S.PORT ,
+    S.LOGON_TIME,
+    SQ.SQL_FULLTEXT
+FROM
+    V$LOCKED_OBJECT L,
+    DBA_OBJECTS O,
+    V$SESSION S,
+    V$PROCESS P,
+    V$SQL SQ
+WHERE
+    L.OBJECT_ID = O.OBJECT_ID
+AND L.SESSION_ID = S.SID
+AND S.PADDR = P.ADDR
+AND S.SQL_ADDRESS = SQ.ADDRESS;
+
+
+kill like
+
+↓↓↓↓↓↓↓↓
+alter system kill session 'SID,SERIAL#';
+↑↑↑↑↑↑↑↑
+
+(For example, alter system kill session '13,36543';)
+
+Reference http://abeytom.blogspot.com/2012/08/finding-and-fixing-ora-00054-resource.html
+
+
+
+
+

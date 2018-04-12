@@ -43,6 +43,9 @@
 		$("#blockUITestBtn").bind("click", function() {
 			window.location = "/FoodMenu/page/blockUITest.jsp";
 		});
+		$("#blockUITest2Btn").bind("click", function() {
+			window.location = "/FoodMenu/page/blockUITest2.jsp";
+		});
 		$("#dialogTestBtn").bind("click", function() {
 			window.location = "/FoodMenu/page/dialogTest.jsp";
 		});
@@ -73,6 +76,12 @@
 		<tr>
 			<td><input type="button" id="htmlJavascriptEscapeBtn" value="htmlJavascriptEscape測試" /></td>
 			<td><input type="button" id="datePickerChsBtn" value="中文日曆" /></td>
+			<td><input type="button" id="blockUITest2Btn" value="blockUI測試2" /></td>
+			<td><input type="button" id="" value="" /></td>
+		</tr>
+		<tr>
+			<td><input type="button" id="" value="" /></td>
+			<td><input type="button" id="" value="" /></td>
 			<td><input type="button" id="" value="" /></td>
 			<td><input type="button" id="" value="" /></td>
 		</tr>

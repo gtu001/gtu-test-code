@@ -7,14 +7,23 @@ netstat -an | findstr 50000
 netstat -a -b 
 --看port被哪個PID占用(工作管理員->詳細資料[可看PID])
 netstat -ano | findstr 50000
+
 --刪除程序
 taskkill /PID typeYourPIDhere /F
 
 
 #linux
+
 netstat -nlp|grep 9000 
 #running as the superuser the -p option will say what the process is
 netstat -anp 
+
 --刪除程序
 ps aux | grep [keyword]
 kill -9 [PID]
+
+
+netstat -ap | grep 34465
+會顯示
+tcp        0      0 machine.name:34465  oracle.db.com:ncube-lm ESTABLISHED 4030/java
+程序為 PID : 4030, kill即可
