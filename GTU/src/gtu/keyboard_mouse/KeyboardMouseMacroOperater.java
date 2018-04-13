@@ -59,6 +59,7 @@ import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.keyboard_mouse.KeyEventMapping.KeyCodeNotFoundException;
 import gtu.keyboard_mouse.KeyEventMapping.NativeKeyEventToSwingKeyMapping;
@@ -73,7 +74,6 @@ import gtu.keyboard_mouse.KeyboardMouseMacroCreater.PasteInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.ScreenshotInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.WheelInputType;
 import gtu.log.Log;
-import gtu.runtime.ClipboardUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;

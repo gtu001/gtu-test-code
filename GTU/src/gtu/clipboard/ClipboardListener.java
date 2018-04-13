@@ -1,4 +1,4 @@
-package gtu.runtime;
+package gtu.clipboard;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

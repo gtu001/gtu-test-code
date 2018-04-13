@@ -1,6 +1,6 @@
 package gtu._work.ui;
 
-import gtu.runtime.ClipboardUtil;
+import gtu.clipboard.ClipboardUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JOptionPaneUtil;
 

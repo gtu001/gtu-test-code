@@ -6,7 +6,7 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
-import gtu.runtime.ClipboardUtil;
+import gtu.clipboard.ClipboardUtil;
 
 public class Test32 {
 

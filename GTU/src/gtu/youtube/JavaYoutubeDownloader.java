@@ -91,7 +91,8 @@ public class JavaYoutubeDownloader extends Formatter {
 
     public static void main(String[] args) {
         try {
-            args = new String[] { "MktYEm17NsI", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp4", "-format", "18" }; // -verboseall
+//            args = new String[] { "MktYEm17NsI", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp4", "-format", "18", "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" }; // -verboseall
+            args = new String[] { "vBM2tg5FDH8", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp4", "-format", "18", "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" }; // -verboseall
             new JavaYoutubeDownloader().run(args);
             System.out.println("v2 done...");
         } catch (Throwable t) {
@@ -184,6 +185,10 @@ public class JavaYoutubeDownloader extends Formatter {
     }
 
     private static void play(String videoId, int format, String encoding, String userAgent, File outputdir, String extension) throws Throwable {
+        //取得Youtube下載網址
+        YoutubeVideoUrlHandler urlHandler = new YoutubeVideoUrlHandler(videoId, String.valueOf(format), userAgent);
+        
+        //原來邏輯
         log.fine("Retrieving " + videoId);
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
         qparams.add(new BasicNameValuePair("video_id", videoId));
@@ -245,8 +250,6 @@ public class JavaYoutubeDownloader extends Formatter {
                     }
                 }
 
-                YoutubeUrlHandler handler = new YoutubeUrlHandler(infoMap);
-
                 filename = cleanFilename(filename);
                 if (filename.length() == 0) {
                     filename = videoId;
@@ -256,7 +259,8 @@ public class JavaYoutubeDownloader extends Formatter {
                 filename += "." + extension;
                 File outputfile = new File(outputdir, filename);
                 
-                downloadUrl = handler.getUrl(format);
+                downloadUrl = urlHandler.getUrl(format);
+                System.out.println(">>>>>>>" + downloadUrl);
 
                 if (downloadUrl != null) {
                     downloadWithHttpClient(userAgent, downloadUrl, outputfile);
@@ -268,190 +272,6 @@ public class JavaYoutubeDownloader extends Formatter {
             }
         } else {
             log.severe("Could not contact youtube: " + response.getStatusLine());
-        }
-    }
-
-    private static class YoutubeUrlHandler {
-        
-        public String getUrl(int format) {
-            for(int ii = 0 ; ii < typeLst.size() ; ii ++) {
-                DataFinal d = typeLst.get(ii);
-                if(Integer.parseInt(d.itag.paramStr) == format) {
-                    return d.url.paramStr;
-                }
-            }
-            throw new RuntimeException("找步道對應 format :" + format);
-        }
-        
-        List<DataFinal> typeLst = new ArrayList<DataFinal>();
-
-        private YoutubeUrlHandler(List<NameValuePair> infoMap) throws UnsupportedEncodingException {
-            String orignData = null;
-            for (NameValuePair pair : infoMap) {
-                String key = pair.getName();
-                String val = pair.getValue();
-                if ("url_encoded_fmt_stream_map".equals(key)) {
-                    orignData = val;
-                    break;
-                }
-            }
-
-            String baseUrlString = URLDecoder.decode(orignData, DEFAULT_ENCODING);
-            System.out.println("baseUrlString = " + baseUrlString);
-
-            typeLst = findDataGroup(baseUrlString);
-            
-            for(DataFinal d : typeLst) {
-                System.out.println("YoutubeUrlHandler >> : " + d);
-            }
-        }
-
-        private List<DataFinal> findDataGroup(String baseUrlString) {
-            List<DataFinal> rtnLst = new ArrayList<DataFinal>();
-            List<DataConfig> lst = new ArrayList<DataConfig>();
-            
-            // parse Paramster
-            for (Field f : DataFinal.class.getDeclaredFields()) {
-                Pattern ptn = Pattern.compile(f.getName());
-                Matcher mth = ptn.matcher(baseUrlString);
-                while (mth.find()) {
-
-                    String paramStr = "";
-                    if (f.getName().equals("url")) {
-                        paramStr = this.getParamStr(baseUrlString, mth.end() + "=".length(), "\\,");
-                    } else if (f.getName().equals("quality")) {
-                        paramStr = this.getParamStr_forCatch(f.getName(), baseUrlString, mth.end() + "=".length(), "\\w+");
-                    } else if (f.getName().equals("type")) {
-                        paramStr = this.getParamStr_forCatch(f.getName(), baseUrlString, mth.end() + "=".length(), "video\\/\\w+\\;\\scodecs\\=\".*?\"");
-                    } else if (f.getName().equals("itag")) {
-                        paramStr = this.getParamStr_forCatch(f.getName(), baseUrlString, mth.end() + "=".length(), "\\d+");
-                    }
-
-                    DataConfig d = new DataConfig();
-                    d.paramStr = paramStr;
-                    d.name = f.getName();
-                    d.start = mth.start();
-                    d.end = mth.end() + ("=" + paramStr).length();
-
-                    lst.add(d);
-                }
-            }
-
-            // 修正URL
-            for (int ii = 0; ii < lst.size(); ii++) {
-                DataConfig d1 = lst.get(ii);
-
-                if (d1.name.equals("url")) {
-                    // 取代 type
-                    d1.paramStr = d1.paramStr.replaceAll("type\\=video\\/\\w+\\;\\scodecs\\=\"[\\w\\.]+,?", "");
-                    d1.paramStr = d1.paramStr.replaceAll("type\\=video\\/\\w+\\;\\scodecs\\=\"[\\w\\.]+,\\s[\\w\\.]+\"", "");
-
-                    // 取代 quality
-                    d1.paramStr = d1.paramStr.replaceAll("quality\\=\\w+", "");
-
-                    System.out.println("correct url = " + d1.paramStr);
-                }
-            }
-
-            // Grouping
-            List<DataConfig> urlLst = getMatchIndexDataConfig("url", lst);
-            for(int ii = 0 ; ii < urlLst.size() ; ii ++) {
-                DataConfig urlData = urlLst.get(ii);
-                DataConfig qualityData = getIndex("quality", getMatchIndexDataConfig("url", lst), ii);
-                DataConfig typeData = getIndex("type", getMatchIndexDataConfig("url", lst), ii);
-                
-                DataFinal dd = new DataFinal();
-                dd.url = urlData;
-                dd.quality = qualityData;
-                dd.type = typeData;
-                dd.itag = getMockItag(urlData.paramStr);
-                
-                rtnLst.add(dd);
-            }
-            return rtnLst;
-        }
-        
-        private DataConfig getMockItag(String url) {
-            Pattern ptn = Pattern.compile("itag\\=(\\d+)");
-            Matcher mth = ptn.matcher(url);
-            DataConfig d = new DataConfig();
-            if(mth.find()) {
-                d.paramStr = mth.group(1);
-            }
-            return d;
-        }
-        
-        private DataConfig getIndex(String name, List<DataConfig> singleLst, int index) {
-            try {
-                return singleLst.get(index);
-            } catch (Exception ex) {
-                throw new RuntimeException("超出arry範圍 " + name + ": index : " + index + " -> size : " + singleLst.size());
-            }
-        }
-        
-        private List<DataConfig> getMatchIndexDataConfig(String name, List<DataConfig> lst) {
-            List<DataConfig> singleLst = new ArrayList<DataConfig>();
-            for (int ii = 0; ii < lst.size(); ii++) {
-                DataConfig d1 = lst.get(ii);
-                if (d1.name.equals(name)) {
-                    singleLst.add(d1);
-                }
-            }
-            Collections.sort(singleLst, new Comparator<DataConfig>() {
-                @Override
-                public int compare(DataConfig o1, DataConfig o2) {
-                    return new Integer(o1.start).compareTo(o2.start);
-                }
-            });
-            return singleLst;
-        }
-
-        private String getParamStr_forCatch(String title, String baseUrlString, int start, String catchPattern) {
-            String tmpUrl = StringUtils.substring(baseUrlString, start);
-            Pattern ptn = Pattern.compile(catchPattern);
-            Matcher mth = ptn.matcher(tmpUrl);
-            if (mth.find()) {
-                return mth.group();
-            }
-            throw new RuntimeException("找步道" + title + " : " + tmpUrl);
-        }
-
-        private String getParamStr(String baseUrlString, int start, String endPattern) {
-            String tmpUrl = StringUtils.substring(baseUrlString, start);
-            Pattern ptn = Pattern.compile(endPattern);
-            Matcher mth = ptn.matcher(tmpUrl);
-            int pos = -1;
-            if (mth.find()) {
-                pos = mth.start();
-            } else {
-                pos = baseUrlString.length();
-            }
-            String paramStr = StringUtils.substring(tmpUrl, 0, pos);
-            return paramStr;
-        }
-
-        private static class DataConfig {
-            String name;
-            int start;
-            int end;
-            String paramStr;
-
-            @Override
-            public String toString() {
-//                return "DataConfig [name=" + name + ", start=" + start + ", end=" + end + ", paramStr=" + paramStr + "]";
-                return name + "=" + paramStr;
-            }
-        }
-
-        private static class DataFinal {
-            DataConfig itag;
-            DataConfig type;
-            DataConfig quality;
-            DataConfig url;
-            @Override
-            public String toString() {
-                return "DataFinal [itag=" + itag + ", type=" + type + ", quality=" + quality + ", url=" + url + "]";
-            }
         }
     }
 

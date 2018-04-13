@@ -90,6 +90,7 @@ import com.google.common.cache.RemovalNotification;
 
 import gtu.class_.ClassCompilerUtil;
 import gtu.class_.ClassUtil;
+import gtu.clipboard.ClipboardUtil;
 import gtu.date.DateUtil;
 import gtu.exception.ExceptionStackUtil;
 import gtu.file.FileUtil;
@@ -100,7 +101,6 @@ import gtu.log.Logger2File;
 import gtu.log.finder.DebugMointerParameterParserMF.ParseToObject;
 import gtu.log.finder.DebugMointerTypeUtil.TempValueEnum;
 import gtu.log.finder.DebugMointerUIUIContent.JTextFieldKeeper;
-import gtu.runtime.ClipboardUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;

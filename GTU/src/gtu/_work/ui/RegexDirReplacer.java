@@ -1,8 +1,8 @@
 package gtu._work.ui;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
-import gtu.runtime.ClipboardUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JListUtil;

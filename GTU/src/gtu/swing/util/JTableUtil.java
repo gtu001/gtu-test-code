@@ -56,7 +56,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import gtu.runtime.ClipboardUtil;
+import gtu.clipboard.ClipboardUtil;
 
 public class JTableUtil {
 

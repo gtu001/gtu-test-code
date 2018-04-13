@@ -1,23 +1,33 @@
 package gtu.maven;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+
+import gtu.runtime.ProcessRuntimeExec;
 
 public class MavenInstallJarFile {
-    
-    public static void main(String[] args) {
-//        MavenInstallJarFile.newInstance()//
-//        .artifactId("CP937-FUCO").groupId("font").version("1.0")//
-//        .targetJarPath("C:/Program Files/Java/jdk1.8.0_73/jre/lib/ext/CP937_FUCO.jar")//
-//        .targetRespositoryDir("E:/workstuff/workstuff/workspace_scsb/SCSB_CCBill_DC/lib")//
-//        .build();
-        MavenInstallJarFile.newInstance()//
-        .artifactId("sqljdbc4").groupId("com.microsoft.sqlserver").version("4.1")//
-        .targetJarPath("E:/my_tool/simple_dao_gen/sqljdbc4-4.1.jar")//
-//        .targetRespositoryDir("E:/workstuff/workstuff/workspace_scsb/SCSB_CCBill_DC/lib")//
-        .build();
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        String command = MavenInstallJarFile.newInstance()//
+                .mavenBinDir("E:/apps/apache-maven-3.3.9/bin")//
+                .targetJarPath("E:/my_tool/simple_dao_gen/sqljdbc4-4.1.jar")//
+                .groupId("com.microsoft.sqlserver")//
+                .artifactId("sqljdbc4")//
+                .version("4.1")//
+                // .targetRespositoryDir("E:/workstuff/workstuff/workspace_scsb/SCSB_CCBill_DC/lib")//
+                .buildCommand_singleLine();
+        
+        System.out.println(command);
+
+        boolean result = ProcessRuntimeExec.runCommandForWin(command);
+        System.out.println(result);
+        System.out.println("done...v4");
     }
 
     private MavenInstallJarFile() {
@@ -27,6 +37,7 @@ public class MavenInstallJarFile {
         return new MavenInstallJarFile();
     }
 
+    private String mavenBinDir;
     private String targetJarPath;
     private String groupId;
     private String artifactId;
@@ -35,6 +46,11 @@ public class MavenInstallJarFile {
 
     public MavenInstallJarFile targetJarPath(String targetJarPath) {
         this.targetJarPath = targetJarPath;
+        return this;
+    }
+
+    public MavenInstallJarFile mavenBinDir(String mavenBinDir) {
+        this.mavenBinDir = mavenBinDir;
         return this;
     }
 
@@ -58,46 +74,30 @@ public class MavenInstallJarFile {
         return this;
     }
 
-    public void build() {
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format(" %smvn install:install-file ", "E:/apps/apache-maven-3.3.9/bin/"));
-            sb.append(" -Dpackaging=jar ");
+    public String[] buildCommand() {
+        Validate.notBlank(mavenBinDir, "maven 的 Bin 目錄 不可為空(mavenBinDir)");
+        Validate.notBlank(targetJarPath, "目標 jar路徑  不可為空(targetJarPath)");
+        Validate.notBlank(groupId, "groupId  不可為空(groupId)");
+        Validate.notBlank(artifactId, "artifactId  不可為空(artifactId)");
+        Validate.notBlank(version, "version  不可為空(version)");
 
-            if (StringUtils.isNotBlank(targetJarPath)) {
-                sb.append(String.format(" -Dfile=\"%s\" ", targetJarPath));
-            }
+        List<String> lst = new ArrayList<String>();
 
-            if (StringUtils.isNotBlank(groupId)) {
-                sb.append(String.format(" -DgroupId=%s ", groupId));
-            }
+        lst.add(String.format(" %smvn install:install-file ", mavenBinDir + File.separator));
+        lst.add(" -Dpackaging=jar ");
+        lst.add(String.format(" -Dfile=\"%s\" ", targetJarPath));
+        lst.add(String.format(" -DgroupId=%s ", groupId));
+        lst.add(String.format(" -DartifactId=%s ", artifactId));
+        lst.add(String.format(" -Dversion=%s ", version));
 
-            if (StringUtils.isNotBlank(artifactId)) {
-                sb.append(String.format(" -DartifactId=%s ", artifactId));
-            }
-
-            if (StringUtils.isNotBlank(version)) {
-                sb.append(String.format(" -Dversion=%s ", version));
-            }
-
-            if (StringUtils.isNotBlank(targetRespositoryDir)) {
-                sb.append(String.format(" -DlocalRepositoryPath=\"%s\" ", targetRespositoryDir));
-            }
-            
-            System.out.println(sb.toString());
-
-//            Process exec = Runtime.getRuntime().exec(sb.toString());
-//            List<String> inLst = IOUtils.readLines(exec.getInputStream());
-//            List<String> exLst = IOUtils.readLines(exec.getErrorStream());
-//            
-//            for(String line : inLst) {
-//                System.out.println(">>" + line);
-//            }
-//            for(String line : exLst) {
-//                System.out.println("Err>>" + line);
-//            }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        if (StringUtils.isNotBlank(targetRespositoryDir)) {
+            lst.add(String.format(" -DlocalRepositoryPath=\"%s\" ", targetRespositoryDir));
         }
+
+        return lst.toArray(new String[0]);
+    }
+
+    public String buildCommand_singleLine() {
+        return StringUtils.join(buildCommand(), " ");
     }
 }
