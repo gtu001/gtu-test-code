@@ -12,16 +12,16 @@ from gtu.opencv.ex1 import opencv_draw_util
 
 class _ParentDraw :
     def __init__(self):
-        self.thick = 1
-        self.rgb = (0, 0, 255)
+        self.thick1 = 1
+        self.rgb1 = (0, 0, 255)
     def rgb(self, red, green, blue):
-        self.rgb = (blue, green, red)
+        self.rgb1 = (blue, green, red)
         return self
     def thick(self, val):
-        self.thick = val
+        self.thick1 = val
         return self
     def full(self):
-        self.thick = -1
+        self.thick1 = -1
         return self
     
 
@@ -39,7 +39,7 @@ class Line(_ParentDraw) :
     def full(self):
         raise Exception("不支援")
     def draw(self, img):
-        cv2.line(img, self.startPos, self.endPos, self.rgb, self.thick)
+        cv2.line(img, self.startPos, self.endPos, self.rgb1, self.thick1)
         
         
         
@@ -54,7 +54,7 @@ class Rectangle(_ParentDraw) :
         self.endPos = (x, y)
         return self
     def draw(self, img):
-        cv2.rectangle(img, self.startPos, self.endPos, self.rgb, self.thick)
+        cv2.rectangle(img, self.startPos, self.endPos, self.rgb1, self.thick1)
         
         
         
@@ -69,7 +69,7 @@ class Circle(_ParentDraw) :
         self.radius = radius
         return self
     def draw(self, img):
-        cv2.circle(img, self.centerPos, self.radius, self.rgb, self.thick)
+        cv2.circle(img, self.centerPos, self.radius, self.rgb1, self.thick1)
         
         
 
@@ -77,14 +77,19 @@ class Polygon(_ParentDraw) :
     def __init__(self):
         _ParentDraw.__init__(self)
         self.arry = []
+        self.connectAll = True
         pass
     def point(self, x, y):
         self.arry.append([x, y])
         return self
+    #False : 從第一個點連到最後一個點(不封閉)
+    def connectClose(self, val):
+        self.connectAll = val
+        return self
     def draw(self, img):
         pts = np.array(self.arry, np.int32)
         pts = pts.reshape((-1, 1, 2))
-        img = cv2.polylines(img, [pts], True, self.rgb)
+        img = cv2.polylines(img, [pts], self.connectAll, self.rgb1)
     
 
 class Ellipse(_ParentDraw):
@@ -97,6 +102,7 @@ class Ellipse(_ParentDraw):
     def center(self, x, y):
         self.centerPos = (x, y)
         return self
+    #寬高
     def axes_wh(self, w, h):
         self.axes = (w, h)
         return self
@@ -112,7 +118,33 @@ class Ellipse(_ParentDraw):
             raise Exception("請輸入 0~360")
         return self
     def draw(self, img):
-        cv2.ellipse(img, self.centerPos, self.axes, self.startAngle, self.endAngle, self.circle, self.rgb, self.thick)
+        cv2.ellipse(img, self.centerPos, self.axes, self.startAngle, self.endAngle, self.circle, self.rgb1, self.thick1)
+        
+
+
+class Text(_ParentDraw):
+    def __init__(self):
+        _ParentDraw.__init__(self)
+        self.font1 = cv2.FONT_HERSHEY_SIMPLEX
+        self.scale1 = 1
+        self.thick1 = 2
+        self.rgb(0, 0, 255)
+        pass
+    def full(self):
+        raise Exception("不支援")
+    def position(self, x, y):
+        self.pos = (x, y)
+        return self
+    def font(self, font):
+        self.font1 = font
+        return self
+    def scale(self, fontSize):
+        self.scale1 = fontSize
+        return self
+    def draw(self, img, text):
+        cv2.putText(img, text, self.pos, self.font1, self.scale1, self.rgb1, self.thick1)
+        
+        
 
 
 if __name__ == '__main__':
@@ -125,9 +157,10 @@ if __name__ == '__main__':
     Rectangle().start(100, 100).end(200, 200).draw(img)
     Circle().center(300, 200).radius(100).draw(img)
     Ellipse().center(400, 100).axes_wh(300, 100).draw(img)
-    Polygon().point(10,5).point(20,30).point(70,20).point(50,10).draw(img)
+    Polygon().point(10,105).point(20,130).point(70,120).point(50,110).connectClose(True).draw(img)
+    Text().position(200, 400).draw(img, "test text ok !!")
     
     gtu_cv2.Imshow().default("test", img)
-
+    
     print("done...")
     

@@ -1,13 +1,13 @@
 
-import numpy as np
+''' import 這行
+from gtu.opencv.ex1 import opencv_image_util
+'''
+
 import cv2
 from matplotlib import pyplot as plt
 
 from gtu.reflect import checkSelf
-
-''' import 這行
-from gtu.opencv.ex1 import opencv_image_util
-'''
+import numpy as np
 
 
 class Imread :
@@ -59,11 +59,20 @@ class Imshow :
         self.__process(winId, img)
         
     def __process(self, winId, img):
+        def logXYEvent(event, x, y, flags, param):
+            if event == cv2.EVENT_LBUTTONDOWN:
+                print("pos : x{}, y{}".format(x, y))
+        cv2.setMouseCallback(winId, logXYEvent)
         cv2.imshow(winId, img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         
-    def save(self, winId, img, savepath):
+    def showAsPlt(self, img):
+        plt.imshow(img, cmap='gray', interpolation='bicubic')
+        plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis  隱藏x,y軸
+        plt.show()
+        
+    def showThenSave(self, winId, img, savepath):
         cv2.namedWindow(winId, cv2.WINDOW_AUTOSIZE)
         cv2.imshow(winId, img)
         k = cv2.waitKey(0)
@@ -79,11 +88,6 @@ class NonCategories :
     def __init__(self):
         pass
     
-    def unknown_test001(self, img):
-        plt.imshow(img, cmap='gray', interpolation='bicubic')
-        plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis  隱藏x,y軸
-        plt.show()
-
     def createBlackImg(self, height, width):
         img = np.zeros((height, width, 3), np.uint8)
         return img
@@ -103,18 +107,13 @@ class NonCategories :
 
 if __name__ == '__main__':
     
-#     img = Imread.default("E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/ocr_a_font-254x300.jpg")
-#     IDontKnow().test001(img)
-#     Imshow.default("test", img)
+    img = Imread().default("E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/ocr_a_font-254x300.jpg")
     
-    
-#     
-#     # Draw a diagonal blue line with thickness of 5 px
-#     img = cv2.line(img,(0,0),(511,511),(255,0,0),5)
-#     
-#     Imshow.default("test", img)
+#     Imshow.showAsPlt("test", img)
+    Imshow().default("test", img)
 
-#     checkSelf.document(cv2.line)
+#     checkSelf.checkMatchPtnMembers(cv2, "^EVENT\_")
+    checkSelf.document(cv2.waitKey)
 
     print("done...")
     

@@ -73,6 +73,7 @@ import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.clipboard.ClipboardListener;
 import gtu.file.FileUtil;
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
@@ -116,6 +117,7 @@ public class EnglishSearchUI extends JFrame {
         // }
         // }
         // });
+        JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         FRAME = new EnglishSearchUI();
         FRAME.keyUtil = FRAME.new GlobalKeyListenerExampleForEnglishUI();
         FRAME.keyUtil.init();
@@ -799,6 +801,7 @@ public class EnglishSearchUI extends JFrame {
                 GlobalScreen.registerNativeHook();
                 GlobalScreen.addNativeKeyListener(new GlobalKeyListenerExampleForEnglishUI());
                 GlobalScreen.addNativeMouseListener(new GlobalNativeMouseExampleForEnglishUI());
+                JnativehookKeyboardMouseHelper.getInstance().disableLogger();
                 startNewUI();
             } catch (NativeHookException ex) {
                 JCommonUtil.handleException(ex);

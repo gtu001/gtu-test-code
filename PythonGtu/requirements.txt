@@ -23,3 +23,6 @@ opencv-python
 #統計
 pandas
 matplotlib
+
+#keyboard listener
+pynput
