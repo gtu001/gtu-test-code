@@ -60,7 +60,9 @@ public class JavaYoutubeDownloader extends Formatter {
     private static final String host = "www.youtube.com";
     private static final String YOUTUBE_WATCH_URL_PREFIX = scheme + "://" + host + "/watch?v=";
     private static final String ERROR_MISSING_VIDEO_ID = "Missing video id. Extract from " + YOUTUBE_WATCH_URL_PREFIX + "VIDEO_ID";
-    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13";
+    // private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows;
+    // U; Windows NT 6.1; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13";
+    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
     private static final String DEFAULT_ENCODING = "UTF-8";
     private static final String newline = System.getProperty("line.separator");
     private static final Logger log = Logger.getLogger(JavaYoutubeDownloader.class.getCanonicalName());
@@ -72,6 +74,8 @@ public class JavaYoutubeDownloader extends Formatter {
     private static final DecimalFormat commaFormatNoPrecision = new DecimalFormat("###,###");
     private static final double ONE_HUNDRED = 100;
     private static final double KB = 1024;
+
+    private String customDownloadUrl_by_gtu001;// 自訂下載網址
 
     private void usage(String error) {
         if (error != null) {
@@ -88,15 +92,33 @@ public class JavaYoutubeDownloader extends Formatter {
         System.err.println("\t[-verboseall] - Verbose logging for all components (e.g. HttpClient).");
         System.exit(-1);
     }
-
+    
     public static void main(String[] args) {
+        JavaYoutubeDownloader.mainRun("vBM2tg5FDH8", "", DEFAULT_ENCODING);
+    }
+
+    public String[] makeFakeArgs(String videoId, String outputDir) {
+        if (StringUtils.isBlank(outputDir)) {
+            outputDir = FileUtil.DESKTOP_PATH;
+        }
+        String[] args = new String[] { //
+                videoId, // 
+                "-dir", outputDir, //
+                "-format", "18", //
+                "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0", //
+                "-verboseall" }; //
+        return args;
+    }
+
+    public static void mainRun(String videoId, String realUrl, String outputDir) {
         try {
-//            args = new String[] { "MktYEm17NsI", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp4", "-format", "18", "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" }; // -verboseall
-            args = new String[] { "vBM2tg5FDH8", "-dir", FileUtil.DESKTOP_PATH + File.separator + "xxxxx.mp4", "-format", "18", "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0" }; // -verboseall
-            new JavaYoutubeDownloader().run(args);
-            System.out.println("v2 done...");
+            JavaYoutubeDownloader t = new JavaYoutubeDownloader();
+            String[] args = t.makeFakeArgs(videoId, outputDir);
+            t.customDownloadUrl_by_gtu001 = StringUtils.trimToNull(realUrl);
+            t.run(args);
+            System.out.println("done...");
         } catch (Throwable t) {
-            t.printStackTrace();
+            throw new RuntimeException(t);
         }
     }
 
@@ -175,7 +197,7 @@ public class JavaYoutubeDownloader extends Formatter {
         log.fine("Finished");
     }
 
-    private static String getExtension(int format) {
+    private String getExtension(int format) {
         switch (format) {
         case 18:
             return "mp4";
@@ -184,11 +206,11 @@ public class JavaYoutubeDownloader extends Formatter {
         }
     }
 
-    private static void play(String videoId, int format, String encoding, String userAgent, File outputdir, String extension) throws Throwable {
-        //取得Youtube下載網址
+    private void play(String videoId, int format, String encoding, String userAgent, File outputdir, String extension) throws Throwable {
+        // 取得Youtube下載網址
         YoutubeVideoUrlHandler urlHandler = new YoutubeVideoUrlHandler(videoId, String.valueOf(format), userAgent);
-        
-        //原來邏輯
+
+        // 原來邏輯
         log.fine("Retrieving " + videoId);
         List<NameValuePair> qparams = new ArrayList<NameValuePair>();
         qparams.add(new BasicNameValuePair("video_id", videoId));
@@ -258,9 +280,17 @@ public class JavaYoutubeDownloader extends Formatter {
                 }
                 filename += "." + extension;
                 File outputfile = new File(outputdir, filename);
+
+                //自訂下載網址1
+                if (downloadUrl == null) {
+                    downloadUrl = customDownloadUrl_by_gtu001;
+                }
                 
-                downloadUrl = urlHandler.getUrl(format);
-                System.out.println(">>>>>>>" + downloadUrl);
+                //自訂下載網址2
+                if (downloadUrl == null) {
+                    YoutubeVideoUrlHandler gtu001 = new YoutubeVideoUrlHandler(videoId, "", userAgent);
+                    downloadUrl = gtu001.getUrl(format);
+                }
 
                 if (downloadUrl != null) {
                     downloadWithHttpClient(userAgent, downloadUrl, outputfile);
@@ -275,7 +305,7 @@ public class JavaYoutubeDownloader extends Formatter {
         }
     }
 
-    private static void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile) throws Throwable {
+    private void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile) throws Throwable {
         HttpGet httpget2 = new HttpGet(downloadUrl);
         if (userAgent != null && userAgent.length() > 0) {
             httpget2.setHeader("User-Agent", userAgent);
@@ -324,14 +354,14 @@ public class JavaYoutubeDownloader extends Formatter {
         }
     }
 
-    private static String cleanFilename(String filename) {
+    private String cleanFilename(String filename) {
         for (char c : ILLEGAL_FILENAME_CHARACTERS) {
             filename = filename.replace(c, '_');
         }
         return filename;
     }
 
-    private static URI getUri(String path, List<NameValuePair> qparams) throws URISyntaxException {
+    private URI getUri(String path, List<NameValuePair> qparams) throws URISyntaxException {
         URI uri = URIUtils.createURI(scheme, host, -1, "/" + path, URLEncodedUtils.format(qparams, DEFAULT_ENCODING), null);
         System.out.println("getUri = " + uri);
         return uri;
@@ -347,14 +377,14 @@ public class JavaYoutubeDownloader extends Formatter {
         return arg0.getMessage() + newline;
     }
 
-    private static void changeFormatter(Formatter formatter) {
+    private void changeFormatter(Formatter formatter) {
         Handler[] handlers = rootlog.getHandlers();
         for (Handler handler : handlers) {
             handler.setFormatter(formatter);
         }
     }
 
-    private static void explicitlySetAllLogging(Level myLevel, Level globalLevel) {
+    private void explicitlySetAllLogging(Level myLevel, Level globalLevel) {
         rootlog.setLevel(Level.ALL);
         for (Handler handler : rootlog.getHandlers()) {
             handler.setLevel(Level.ALL);
@@ -363,7 +393,7 @@ public class JavaYoutubeDownloader extends Formatter {
         rootlog.setLevel(globalLevel);
     }
 
-    private static String getStringFromInputStream(String encoding, InputStream instream) throws UnsupportedEncodingException, IOException {
+    private String getStringFromInputStream(String encoding, InputStream instream) throws UnsupportedEncodingException, IOException {
         Writer writer = new StringWriter();
 
         char[] buffer = new char[1024];

@@ -17,18 +17,11 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
         Transferable trans = getContentsTransferable();
         regainOwnership(trans);
         System.out.println("Listening to board...");
-        
-        //just keep alive 看起來不需要
-//        while (true) {
-//            try {
-//                Thread.sleep(10000L);
-//            } catch (InterruptedException e) {
-//            }
-//        }
     }
 
     public void lostOwnership(Clipboard c, Transferable t) {
-        Throwable ex = null;
+        Throwable exceptoin = null;
+        
         while (true) {
             try {
                 sleep(50);
@@ -43,18 +36,19 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                 // 非文字格式不重新取得owner
                 if (result) {
                     regainOwnership(contents);
-                }else {
+                } else {
+                    sleep(500);
                     continue;
                 }
 
                 break;
-            } catch (Exception e) {
-                ex = e;
+            } catch (Throwable e) {
+                exceptoin = e;
             }
         }
 
-        if (ex != null) {
-            JCommonUtil.handleException(ex);
+        if (exceptoin != null) {
+            JCommonUtil.handleException(exceptoin);
         }
     }
 
@@ -71,7 +65,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
 
     public boolean processContents(Transferable t) {
         if (!isMointerOn) {
-            return true;
+            return false;
         }
         try {
             String text = (String) sysClip.getContents(null).getTransferData(DataFlavor.stringFlavor);
