@@ -628,7 +628,7 @@ public class JTableUtil {
 
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // jmenu_item
-    
+
     public List<JMenuItem> getDefaultJMenuItems_NoAddRemoveColumn() {
         JMenuItem a3 = jMenuItem_addRow(true, "");
         JMenuItem a3_1 = jMenuItem_addRow(true, "input row count!");
@@ -640,7 +640,7 @@ public class JTableUtil {
         a3_1.setText("add multi row");
         return Arrays.asList(a3, a3_1, a4, a5, a6, a7, a8);
     }
-    
+
     public List<JMenuItem> getDefaultJMenuItems() {
         JMenuItem a1 = jMenuItem_addColumn("");
         JMenuItem a2 = jMenuItem_removeColumn("");
@@ -875,6 +875,30 @@ public class JTableUtil {
             }
         }
         throw new RuntimeException("error!!");
+    }
+
+    public static void setColumnWidths_Percent(JTable table, float[] widthPercentArry) {
+        int columnCount = table.getColumnCount();
+        if (columnCount != widthPercentArry.length) {
+            throw new RuntimeException("陣列長度必須為 : " + columnCount);
+        }
+        TableColumnModel tcm = table.getColumnModel();
+        double wholeSize = table.getBounds().getWidth();
+        for (int i = 0; i < columnCount; i++) {
+            int width = (int) (wholeSize * (widthPercentArry[i] / 100));
+            TableColumn column = tcm.getColumn(i);
+            column.setPreferredWidth(width);
+
+            boolean setMinimum = true;// 設最小
+            boolean setMaximum = false;// 設最大
+
+            if (setMinimum == true) {
+                column.setMinWidth(width);
+            }
+            if (setMaximum == true) {
+                column.setMaxWidth(width);
+            }
+        }
     }
 
     /**

@@ -64,6 +64,8 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
@@ -96,6 +98,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
      * Create the frame.
      */
     public BrowserHistoryHandlerUI() {
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                urlTableResize();
+            }
+        });
         try {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -240,16 +248,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
         remarkArea.setText("");
         modifyTimeLabel.setText("");
     }
+    
+    private void urlTableResize() {
+        JTableUtil.setColumnWidths_Percent(urlTable, new float[] {40, 10, 10, 10, 10, 7, 7, 7});
+    }
 
     private void initLoading() {
         List<String> tagLst = new ArrayList<String>();
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
         JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
-
         DefaultTableModel model = JTableUtil.createModel(//
                 true, new String[] { "title", "url", "tag", "timestamp", "remark", "選取", "刪除", "開啟" });
         urlTable.setModel(model);
+        urlTableResize();
+        
         for (String v : new String[] { "選取", "刪除", "開啟" }) {
             tableUtil.columnIsButton(v);
         }
