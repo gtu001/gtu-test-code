@@ -12,6 +12,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -19,7 +20,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import org.apache.commons.lang.StringUtils;
-
 
 /**
  * 最終成功版
@@ -30,7 +30,7 @@ public class AutoComboBox extends PlainDocument {
     JTextComponent editor;
     // flag to indicate if setSelectedItem has been called
     // subsequent calls to remove/insertString should be ignored
-    
+
     private RemoveLinisterController removeLinisterController = new RemoveLinisterController();
 
     // 輸入不符合項目時要做的處理
@@ -70,20 +70,20 @@ public class AutoComboBox extends PlainDocument {
 
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
         String currentText = getText(0, getLength());
-            
+
         // insert the string into the document
         super.insertString(offs, str, a);
 
         // lookup and select a matching item
         Object item = lookupItem(currentText);
         if (item != null) {
-            
+
             removeLinisterController.removeListener(comboBox);
-            
+
             model.setSelectedItem(item);
-            
+
             removeLinisterController.addBackListener(comboBox);
-            
+
         } else {
             // keep old item selected if there is no match
             item = comboBox.getSelectedItem();
@@ -101,7 +101,7 @@ public class AutoComboBox extends PlainDocument {
 
         if (item != null && item instanceof String && StringUtils.equals(currentText, (String) item)) {
             setText(item.toString());
-        } 
+        }
     }
 
     private void setText(String text) throws BadLocationException {
@@ -134,21 +134,21 @@ public class AutoComboBox extends PlainDocument {
     private boolean startsWithIgnoreCase(String str1, String str2) {
         return str1.toUpperCase().startsWith(str2.toUpperCase());
     }
-    
+
     private class RemoveLinisterController {
         ListDataListener[] tempListeners;
-        
+
         private void removeListener(JComboBox combox) {
-            DefaultComboBoxModel model  = (DefaultComboBoxModel)combox.getModel();
+            DefaultComboBoxModel model = (DefaultComboBoxModel) combox.getModel();
             tempListeners = model.getListDataListeners();
-            for( int ii = 0 ; ii < tempListeners.length ; ii ++) {
+            for (int ii = 0; ii < tempListeners.length; ii++) {
                 model.removeListDataListener(tempListeners[ii]);
             }
         }
-        
+
         private void addBackListener(JComboBox combox) {
-            DefaultComboBoxModel model  = (DefaultComboBoxModel)combox.getModel();
-            for( int ii = 0 ; ii < tempListeners.length ; ii ++) {
+            DefaultComboBoxModel model = (DefaultComboBoxModel) combox.getModel();
+            for (int ii = 0; ii < tempListeners.length; ii++) {
                 model.addListDataListener(tempListeners[ii]);
             }
         }
@@ -165,6 +165,13 @@ public class AutoComboBox extends PlainDocument {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
         editor.setDocument(autoComboBox);
         return autoComboBox;
+    }
+
+    /**
+     * 設定值給JComboBox
+     */
+    public static void setText(JComboBox comboBox, String text) {
+        ((JTextField) comboBox.getEditor().getEditorComponent()).setText(text);
     }
 
     public static void main(String[] args) {
