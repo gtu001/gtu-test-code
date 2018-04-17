@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -71,12 +72,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
-    private PropertiesUtilBean config = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
     private JTable urlTable;
-
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+    private JComboBox searchComboBox;
+    private JTextField bookmarkConfigText;
+    private AutoComboBox tagComboBoxUtil;
+    private AutoComboBox searchComboBoxUtil;
 
     /**
      * Launch the application.
@@ -90,7 +95,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    System.out.println("done..v8");
+                    System.out.println("done..v9");
                 }
             }
         });
@@ -100,12 +105,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
      * Create the frame.
      */
     public BrowserHistoryHandlerUI() {
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                urlTableResize();
-            }
-        });
         try {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -141,6 +140,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel.add(lblTag, "2, 6, right, default");
 
             tagComboBox = new JComboBox();
+            tagComboBoxUtil = AutoComboBox.applyAutoComboBox(tagComboBox);
             panel.add(tagComboBox, "4, 6, fill, default");
 
             JLabel lblRemark = new JLabel("remark");
@@ -186,8 +186,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tabbedPane.addTab("New tab", null, panel_1, null);
             panel_1.setLayout(new BorderLayout(0, 0));
 
-            JLabel lblNewLabel = new JLabel("           ");
-            panel_1.add(lblNewLabel, BorderLayout.NORTH);
+            JPanel panel_2x = new JPanel();
+            panel_1.add(panel_2x, BorderLayout.NORTH);
+
+            JLabel label = new JLabel("快速搜尋");
+            panel_2x.add(label);
+
+            searchComboBox = new JComboBox();
+            searchComboBoxUtil = AutoComboBox.applyAutoComboBox(searchComboBox);
+            panel_2x.add(searchComboBox);
+            searchComboBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initLoading();
+                }
+            });
 
             JLabel lblNewLabel_1 = new JLabel("           ");
             panel_1.add(lblNewLabel_1, BorderLayout.SOUTH);
@@ -201,11 +214,54 @@ public class BrowserHistoryHandlerUI extends JFrame {
             urlTable = new JTable();
             JTableUtil.defaultSetting_AutoResize(urlTable);
             panel_1.add(JCommonUtil.createScrollComponent(urlTable), BorderLayout.CENTER);
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    try {
+                        urlTableResize();
+                    } catch (Exception ex) {
+                    }
+                }
+            });
 
-            initLoading();
+            JPanel panel_3 = new JPanel();
+            tabbedPane.addTab("New tab", null, panel_3, null);
+            panel_3.setLayout(new FormLayout(
+                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+
+            JLabel lblNewLabel = new JLabel("bookmark config");
+            panel_3.add(lblNewLabel, "2, 2, right, default");
+
+            bookmarkConfigText = new JTextField();
+            JCommonUtil.jTextFieldSetFilePathMouseEvent(bookmarkConfigText, false);
+            panel_3.add(bookmarkConfigText, "4, 2, 24, 1, fill, default");
+            bookmarkConfigText.setColumns(10);
+
+            JButton configSaveBtn = new JButton("儲存設定");
+            configSaveBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    configSaveBtnAction();
+                }
+            });
+            panel_3.add(configSaveBtn, "28, 2");
 
             pack();
             this.setSize(800, 450);
+
+            configSelf.reflectInit(this);
+
+            if (configSelf.getConfigProp().containsKey("bookmarkConfigText")) {
+                bookmarkConfig = new PropertiesUtilBean(new File(configSelf.getConfigProp().getProperty("bookmarkConfigText")));
+            }
+
+            initLoading();
 
             JCommonUtil.setJFrameDefaultSetting(this);
         } catch (Exception ex) {
@@ -221,6 +277,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String remark = StringUtils.trimToEmpty(remarkArea.getText().toString());
             String timestamp = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
 
+            Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             Validate.notEmpty(url, "url 為空");
             Validate.notEmpty(title, "title 為空");
             Validate.notEmpty(tag, "tag 為空");
@@ -232,10 +289,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.remark = remark;
             d.timestamp = timestamp;
 
-            config.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
-            config.store();
+            bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
+            bookmarkConfig.store();
 
             this.initLoading();
+
+            // 因為initLoading會清空
+            tagComboBoxUtil.getTextComponent().setText(tag);
 
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {
@@ -246,17 +306,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void clearBtnAction() {
         urlText.setText("");
         titleText.setText("");
-        AutoComboBox.setText(tagComboBox, "");
+        tagComboBoxUtil.getTextComponent().setText("");
+        searchComboBoxUtil.getTextComponent().setText("");
         remarkArea.setText("");
         modifyTimeLabel.setText("");
     }
-    
+
     private void urlTableResize() {
-        JTableUtil.setColumnWidths_Percent(urlTable, new float[] {40, 10, 10, 10, 10, 7, 7, 7});
+        JTableUtil.setColumnWidths_Percent(urlTable, new float[] { 40, 10, 10, 10, 10, 7, 7, 7 });
     }
 
     private void initLoading() {
-        List<String> tagLst = new ArrayList<String>();
+        if (bookmarkConfig == null) {
+            return;
+        }
+
+        final List<String> tagLst = new ArrayList<String>();
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
         JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
@@ -264,23 +329,49 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 true, new String[] { "title", "url", "tag", "timestamp", "remark", "選取", "刪除", "開啟" });
         urlTable.setModel(model);
         urlTableResize();
-        
+
         for (String v : new String[] { "選取", "刪除", "開啟" }) {
             tableUtil.columnIsButton(v);
         }
 
-        for (Enumeration<?> enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
-            String url = (String) enu.nextElement();
-            String title_tag_remark_time = config.getConfigProp().getProperty(url);
+        String searchText = searchComboBoxUtil.getTextComponent().getText();
+        System.out.println("searchText " + searchText);
 
-            UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
-            lst.add(d);
-            tagLst.add(d.tag);
+        for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+            String url = (String) enu.nextElement();
+            String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
+
+            final UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
+
+            if (StringUtils.isBlank(searchText)) {
+                lst.add(d);
+            } else if (d.title.toLowerCase().contains(searchText) || //
+                    d.tag.toLowerCase().contains(searchText) || //
+                    d.remark.toLowerCase().contains(searchText) || //
+                    d.timestamp.toLowerCase().contains(searchText) || //
+                    d.url.toLowerCase().contains(searchText) //
+            ) {
+                lst.add(d);
+            }
+
+            // 過濾重複的
+            new Runnable() {
+                @Override
+                public void run() {
+                    for (String v : tagLst) {
+                        if (v.equalsIgnoreCase(d.tag)) {
+                            return;
+                        }
+                    }
+                    tagLst.add(d.tag);
+                }
+            }.run();
         }
 
         // 設定tag 夏拉
         Collections.sort(tagLst);
         AutoComboBox.applyAutoComboBox(tagComboBox, tagLst);
+        AutoComboBox.applyAutoComboBox(searchComboBox, tagLst);
 
         // 設定urlTable
         Collections.sort(lst, new Comparator<UrlConfig>() {
@@ -306,7 +397,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     if (!result) {
                         return;
                     }
-                    config.getConfigProp().remove(d.url);
+                    bookmarkConfig.getConfigProp().remove(d.url);
                     initLoading();
                     JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功!");
                 }
@@ -334,7 +425,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     titleText.setText(d.title);
                     remarkArea.setText(d.remark);
                     modifyTimeLabel.setText(d.timestamp);
-                    AutoComboBox.setText(tagComboBox, d.tag);
+                    tagComboBoxUtil.getTextComponent().setText(d.tag);
                 }
             });
             model.addRow(new Object[] { d.title, d.url, d.tag, d.timestamp, d.remark, choiceBtn, delBtn, goBtn });
@@ -343,6 +434,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void deleteBtnAction() {
         try {
+            Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑!");
+
             System.out.println("click 刪除");
             String message = "title : " + titleText.getText() + "\n" + //
                     "url : " + urlText.getText() + "\n" + //
@@ -355,8 +448,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return;
             }
 
-            if (config.getConfigProp().containsKey(urlText.getText())) {
-                config.getConfigProp().remove(urlText.getText());
+            if (bookmarkConfig.getConfigProp().containsKey(urlText.getText())) {
+                bookmarkConfig.getConfigProp().remove(urlText.getText());
                 initLoading();
                 JCommonUtil._jOptionPane_showMessageDialog_info("移除成功!");
                 return;
@@ -369,7 +462,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void urlTextOnblur() {
         try {
-            if (StringUtils.isBlank(urlText.getText())) {
+            if (StringUtils.isBlank(urlText.getText()) || //
+                    StringUtils.isNotBlank(titleText.getText()) //
+            ) {
                 return;
             }
             String title = getHtmlTitle(urlText.getText());
@@ -391,9 +486,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         private static UrlConfig parseTo(String key, String title_tag_remark_time) {
-            System.out.println("title_tag_remark_time = " + title_tag_remark_time);
             String[] args = StringUtils.trimToEmpty(title_tag_remark_time).split("\\^", -1);
-            System.out.println("length = " + args.length);
             if (args.length == 4) {
                 String title = args[0];
                 String tag = args[1];
@@ -434,10 +527,26 @@ public class BrowserHistoryHandlerUI extends JFrame {
         return title;
     }
 
-    //-----------------------------------------------------------------------------------------------------------------------
-    
+    private void configSaveBtnAction() {
+        try {
+            File file = JCommonUtil.filePathCheck(bookmarkConfigText.getText(), "bookmark設定黨", "properties");
+            bookmarkConfig = new PropertiesUtilBean(file);
+            configSelf.reflectSetConfig(BrowserHistoryHandlerUI.this);
+            configSelf.store();
+            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------------
+
     private static String __doGetRequest_UserAgent(String url, String encoding, String userAgent) {
         try {
+            if (!url.startsWith("http")) {
+                url = "http://" + url;
+            }
+
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
             URI uri = new URI(url);
 
@@ -476,7 +585,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             throw new RuntimeException("doGetRequest_UserAgent Err : " + ex.getMessage(), ex);
         }
     }
-    
+
     private static String __doGetRequest(String urlStr, String encode) throws IOException {
         StringBuilder response = new StringBuilder();
         URL url = null;

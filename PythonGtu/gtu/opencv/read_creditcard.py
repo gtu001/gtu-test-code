@@ -236,9 +236,8 @@ locs = []
 
 
 
-checkSelf.document(cv2.dilate)
-checkSelf.document(cv2.erode )
-checkSelf.document(cv2.getStructuringElement)
+checkSelf.checkLikeMembers(cv2, "BORDER_");
+# print("-------------", cv2.CV_RGB2GRAY )
 
 
 

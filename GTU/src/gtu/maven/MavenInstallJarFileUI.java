@@ -122,7 +122,7 @@ public class MavenInstallJarFileUI extends JFrame {
         JCommonUtil.jTextFieldSetFilePathMouseEvent(targetRespositoryDirText, true);
         JCommonUtil.jTextFieldSetFilePathMouseEvent(targetJarPathText, false);
         
-        config.init(this);
+        config.reflectInit(this);
 
         JButton btnNewButton = new JButton("執行");
         btnNewButton.addActionListener(new ActionListener() {
@@ -141,7 +141,7 @@ public class MavenInstallJarFileUI extends JFrame {
                     boolean result = ProcessRuntimeExec.runCommandForWin(command);
                     
                     if (result) {
-                        config.setConfig(MavenInstallJarFileUI.this);
+                        config.reflectSetConfig(MavenInstallJarFileUI.this);
                         config.store();
                     }
                     

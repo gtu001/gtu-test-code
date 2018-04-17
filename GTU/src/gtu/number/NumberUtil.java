@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public class NumberUtil {
 
     public static void main(String[] args) {
-//        System.out.println(numberFormat(123456789.123456789));
+        // System.out.println(numberFormat(123456789.123456789));
         testNumberFormatTest();
     }
 
@@ -105,18 +105,19 @@ public class NumberUtil {
         }
         return al;
     }
-    
+
     public void numberFormatTest() {
         String value = "10000000000000.12341234324324";
         NumberFormat nf = new DecimalFormat("####,###,###,###,###.###############");
-        nf.setMaximumFractionDigits(5);//設定最大小數位
-        nf.setMinimumFractionDigits(0);//設定最小小數位
-        String result =  nf.format(new BigDecimal(value));
+        nf.setMaximumFractionDigits(5);// 設定最大小數位
+        nf.setMinimumFractionDigits(0);// 設定最小小數位
+        String result = nf.format(new BigDecimal(value));
         System.out.println(result);
     }
-    
+
     /**
-     * 移動小數點 
+     * 移動小數點
+     * 
      * @param value
      * @moveDigit 負值往左移,正值往右移
      */
@@ -125,23 +126,55 @@ public class NumberUtil {
         orignVal = orignVal.movePointRight(moveDigit);
         return orignVal;
     }
-    
+
     /**
-     * -1 = 負值
-     * 0 = 0
-     * 1 = 正值
+     * -1 = 負值 0 = 0 1 = 正值
+     * 
      * @param value
      * @return
      */
     public static int numberType(String value) {
         return new BigDecimal(value).signum();
     }
-    
+
     public boolean isNumber(String val, boolean thousandComma) {
         String pattern = "\\-?[\\d]+\\.?\\d*";
-        if(thousandComma) {
+        if (thousandComma) {
             pattern = "\\-?[\\d,]+\\.?\\d*";
         }
         return StringUtils.trimToEmpty(val).matches(pattern);
+    }
+
+    // 他進位轉10進位
+    public void otherToDecimal() {
+        // option 1
+        System.out.println("2轉10進位" + Integer.valueOf("1010", 2).toString());
+        System.out.println("8轉10進位" + Integer.valueOf("10", 8).toString());
+        System.out.println("16轉10進位" + Integer.valueOf("10", 16).toString());
+        // option 2
+        System.out.println("2轉10進位" + Integer.parseInt("1010", 2));
+        System.out.println("8轉10進位" + Integer.parseInt("10", 8));
+        System.out.println("16轉10進位" + Integer.parseInt("10", 16));
+    }
+
+    public void decimalToOther() {
+        // 十進制轉成十六進制：
+        System.out.println(Integer.toHexString(10));
+        // 十進制轉成八進制
+        System.out.println(Integer.toOctalString(10));
+        // 十進制轉成二進制
+        System.out.println(Integer.toBinaryString(10));
+    }
+
+    public void important() {
+        System.out.println("轉二進\t" + Integer.toBinaryString(21));
+        System.out.println("拿掉最右位\t" + Integer.toBinaryString(21 >> 1));
+        System.out.println("最右位補0\t" + Integer.toBinaryString(21 << 1));
+        // System.out.println("or \t" + Integer.toBinaryString(21 |
+        // 0b11));//jdk7才支援
+        // System.out.println("and \t" + Integer.toBinaryString(21 & 0b11));
+        System.out.println("八進位表示\t" + 010);
+        // System.out.println("二進位表示\t" + 0b110);
+        System.out.println("十六進位表示\t" + 0x10);
     }
 }

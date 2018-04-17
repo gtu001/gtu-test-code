@@ -2,10 +2,12 @@ package gtu.swing.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
@@ -43,10 +45,11 @@ public class AutoComboBox extends PlainDocument {
             if (box.getSelectedIndex() == -1) {
                 model.insertElementAt(currentSelect, 0);
                 box.setSelectedItem(currentSelect);
+                System.out.println("force set currentSelect = " + currentSelect);
             }
         }
     };
-
+    
     public JTextComponent getTextComponent() {
         return (JTextComponent) comboBox.getEditor().getEditorComponent();
     }
@@ -62,10 +65,23 @@ public class AutoComboBox extends PlainDocument {
         });
         editor.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                if (comboBox.isDisplayable())
+                if (comboBox.isDisplayable()) {
                     comboBox.setPopupVisible(true);
+                }
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    addNewChoiceListener.actionPerformed(new ActionEvent(comboBox, -1, ""));
+                }
             }
         });
+    }
+    
+    private void triggerComboxBoxActionPerformed() {
+        System.out.println("#. triggerComboxBoxActionPerformed start");
+        for(ActionListener a: comboBox.getActionListeners()) {
+            a.actionPerformed(new ActionEvent(comboBox, ActionEvent.ACTION_PERFORMED, null) {
+                private static final long serialVersionUID = 1L;
+            });
+        }
     }
 
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
@@ -88,7 +104,7 @@ public class AutoComboBox extends PlainDocument {
             // keep old item selected if there is no match
             item = comboBox.getSelectedItem();
 
-            System.out.println("currentText -- " + currentText);
+            System.out.println("currentText -- " + currentText + ", item = " + item);
 
             // imitate no insert (later on offs will be incremented by
             // str.length(): selection won't move forward)
@@ -99,7 +115,9 @@ public class AutoComboBox extends PlainDocument {
                                           // UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
         }
 
-        if (item != null && item instanceof String && StringUtils.equals(currentText, (String) item)) {
+        if (item != null && item instanceof String && //
+                StringUtils.isNotBlank((String) item) && //
+                StringUtils.equals(currentText, (String) item)) {
             setText(item.toString());
         }
     }
@@ -153,31 +171,47 @@ public class AutoComboBox extends PlainDocument {
             }
         }
     }
-
-    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst) {
+    
+    public AutoComboBox applyComboxBoxList(List<String> lst) {
+        List<String> cloneLst = new ArrayList<String>(lst);
+        for (int ii = 0; ii < cloneLst.size(); ii++) {
+            if (StringUtils.isBlank(cloneLst.get(ii))) {
+                cloneLst.remove(ii);
+                ii--;
+            }
+        }
+        Collections.sort(cloneLst);
         DefaultComboBoxModel m1 = new DefaultComboBoxModel();
-        for (String s : lst) {
+        for (String s : cloneLst) {
             m1.addElement(s);
         }
         comboBox.setModel(m1);
         comboBox.setEditable(true);
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
-        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        editor.setDocument(autoComboBox);
-        return autoComboBox;
+        editor.setDocument(this);
+        return this;
     }
 
-    /**
-     * 設定值給JComboBox
-     */
-    public static void setText(JComboBox comboBox, String text) {
-        ((JTextField) comboBox.getEditor().getEditorComponent()).setText(text);
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst) {
+        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
+        autoComboBox.applyComboxBoxList(lst);
+        return autoComboBox;
+    }
+    
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox) {
+        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
+        autoComboBox.applyComboxBoxList(new ArrayList<String>());
+        return autoComboBox;
     }
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 List<String> searchList = new ArrayList<String>();
+
+                searchList.add("");
+                searchList.add("");
+
                 for (int ii = (int) 'a'; ii <= (int) 'z'; ii++) {
                     String v = String.valueOf((char) ii);
                     searchList.add(v + v + v + "1");

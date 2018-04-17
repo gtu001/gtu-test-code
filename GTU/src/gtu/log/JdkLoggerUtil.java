@@ -11,7 +11,23 @@ public class JdkLoggerUtil {
 
     private static final Logger log = Logger.getLogger(JdkLoggerUtil.class.getCanonicalName());
     private static final Logger rootlog = Logger.getLogger("");
-    
+
+    public static Logger getLogger(Class<?> clz, Level defaultLevel) {
+        Logger logger = Logger.getLogger(clz.getCanonicalName());
+        logger.setLevel(defaultLevel);
+        return logger;
+    }
+
+    public static Logger getLogger(Class<?> clz, boolean isDebug) {
+        Logger logger = Logger.getLogger(clz.getCanonicalName());
+        if (isDebug) {
+            logger.setLevel(Level.ALL);
+        } else {
+            logger.setLevel(Level.INFO);
+        }
+        return logger;
+    }
+
     public static void setupRootLogLevel(Level rootLevel) {
         rootlog.setLevel(rootLevel);
         for (Handler handler : rootlog.getHandlers()) {
@@ -31,7 +47,7 @@ public class JdkLoggerUtil {
 
         Handler[] handlers = rootlog.getHandlers();
         for (Handler handler : handlers) {
-             handler.setFormatter(new SimpleFormatter());
+            handler.setFormatter(new SimpleFormatter());
         }
 
         rootlog.setLevel(Level.ALL);
