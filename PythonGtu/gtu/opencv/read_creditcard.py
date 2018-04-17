@@ -19,7 +19,7 @@ from gtu.tesseract import tesseract_util
 
 
 def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
+    return np.dot(rgb[..., :3], [0.299, 0.587, 0.114])
 
 
 def contrastImg(img, contrast=1.5, brightness=0.7):
@@ -31,8 +31,8 @@ def contrastImg(img, contrast=1.5, brightness=0.7):
     return img
 
 
-def showImg(ref):
-    cv2.imshow("Image", ref)
+def showImg(winId, ref):
+    cv2.imshow(winId, ref)
     cv2.waitKey(0)
 
 
@@ -123,15 +123,15 @@ ap.add_argument("-i", "--image", required=True, help="path to input image")
 ap.add_argument("-r", "--reference", required=True, help="path to reference OCR-A image")
 # args = vars(ap.parse_args()) #使用console帶參數
 args = {
-        "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180301_170454_HDR.jpg", #正常(差一點)
-#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120247.jpg",  #正常
-#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120239.jpg", #沒抓到
-#         "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_120231.jpg",#正常(差一點)
+        "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180301_170454_HDR.jpg",  # 正常(差一點)
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_120247.jpg",  #正常
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_120239.jpg", #沒抓到
+#         "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_120231.jpg",#正常(差一點)
 
-#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131252.jpg", #一整塊
-#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131302.jpg", #前面被判定為一塊
-#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131310.jpg", #抓到三個
-#             "image":"C:/Users/gtu00/OneDrive/Desktop/creditcard/IMG_20180312_131319.jpg",
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_131252.jpg", #一整塊
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_131302.jpg", #前面被判定為一塊
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_131310.jpg", #抓到三個
+#             "image":"C:/Users/gtu00/OneDrive/Desktop/dataSience/creditcard/IMG_20180312_131319.jpg",
         "reference":"E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/opencv/ocr-b-font-254x300.png"
         }
 
@@ -181,6 +181,9 @@ rectKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 3))
 sqKernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
 
 
+
+
+
 # load the input image, resize it, and convert it to grayscale
 image = cv2.imread(args["image"])
 
@@ -216,7 +219,7 @@ gradX = gradX.astype("uint8")
 # Otsu's thresholding method to binarize the image
 gradX = cv2.morphologyEx(gradX, cv2.MORPH_CLOSE, rectKernel)
 thresh = cv2.threshold(gradX, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    
+
 
  
 # apply a second closing operation to the binary image, again
@@ -233,6 +236,11 @@ locs = []
 
 
 
+checkSelf.document(cv2.dilate)
+checkSelf.document(cv2.erode )
+checkSelf.document(cv2.getStructuringElement)
+
+
 
 # loop over the contours
 for (i, c) in enumerate(cnts):
@@ -240,7 +248,7 @@ for (i, c) in enumerate(cnts):
     def showInnerBlock(var):  #---------------------------------custom
         (x, y, w, h) = var
         group = gray[y - 5:y + h + 5, x - 5:x + w + 5]
-        showImg(group)
+        showImg("showInnerBlock", group)
         
         
     # compute the bounding box of the contour, then use the

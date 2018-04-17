@@ -8,10 +8,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import gtu.log.CurrentStackUtil.StackTraceWatcher;
+
 public class CurrentStackUtil {
 
     public static void main(String[] args) {
-        System.out.println(CurrentStackUtil.getInstance().currentStack());
+        StackTraceWatcher stack2 = CurrentStackUtil.StackTraceWatcher.getInstance();
+        CurrentStackUtil currentStackUtil = CurrentStackUtil.getInstance();
+        StackTraceElement stack = currentStackUtil.apply().currentStack();
+        System.out.println(stack);
     }
 
     public static boolean DEBUG = false;

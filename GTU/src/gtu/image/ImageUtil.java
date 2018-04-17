@@ -12,6 +12,9 @@ import java.net.URL;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import net.sf.image4j.codec.ico.ICODecoder;
 
@@ -111,5 +114,12 @@ public class ImageUtil {
 
     public javafx.scene.image.WritableImage getImageForJavaFx(BufferedImage capture) {
         return javafx.embed.swing.SwingFXUtils.toFXImage(capture, null);
+    }
+    
+    public void showImage(BufferedImage bufferedImage) {
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        frame.pack();
+        frame.setVisible(true);
     }
 }

@@ -3,16 +3,19 @@
 	<loadproperties srcFile="build_swing_jar.properties" />
 
 	<!--<property name="src_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\src" />
-	<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
+		<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
 	<property name="build_dir" location="build" />
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
 	<!--<property name="jar_repsitory" location="C:\Users\gtu001\.m2\repository" />-->
-	<property name="main_class_full" value="gtu._work.ui.EnglishSearchUI" />
-	<property name="main_class" value="EnglishSearchUI" />
+	<property name="main_class_full" value="gtu._work.ui.SingletonMakerUI" />
+	<property name="main_class" value="SingletonMakerUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="janna.ico" />
+	<property name="icon_name" value="tk_aiengine.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
 	<!--${main_class}-->
 
 
@@ -60,21 +63,15 @@
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
 
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
+
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
-
-			<packagename mode="small">com.google.common.collect.Multimap</packagename>
-			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
-			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
-
-			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
-			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			
-			<packagename mode="small">org.json.JSONObject</packagename>
-
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -115,7 +112,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="false" />
+			<param name="enable" value="true" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -123,7 +120,7 @@
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="false" />
+			<param name="enable" value="true" />
 		</antcall>
 
 		<antcall target="moveJarToDesktop">

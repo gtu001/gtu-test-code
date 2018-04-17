@@ -56,4 +56,8 @@ public class DataUriUtil {
             throw new RuntimeException(e);
         }
     }
+    
+    public String generateUri(String fileExtension, byte[] byteArry) {
+        return "data:image/" + fileExtension + ";base64," + DatatypeConverter.printBase64Binary(byteArry);
+    }
 }

@@ -1,10 +1,11 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.BufferedReader;
@@ -61,11 +62,10 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
@@ -89,6 +89,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    System.out.println("done..v8");
                 }
             }
         });
@@ -315,7 +317,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     System.out.println("click 開啟");
                     try {
-                        Desktop.getDesktop().browse(new URI(d.url));
+                        String url = d.url;
+                        DesktopUtil.browse(url);
                     } catch (Exception e1) {
                         JCommonUtil.handleException(e1);
                     }
@@ -431,7 +434,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
         return title;
     }
 
-    public static String __doGetRequest_UserAgent(String url, String encoding, String userAgent) {
+    //-----------------------------------------------------------------------------------------------------------------------
+    
+    private static String __doGetRequest_UserAgent(String url, String encoding, String userAgent) {
         try {
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
             URI uri = new URI(url);
@@ -471,7 +476,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             throw new RuntimeException("doGetRequest_UserAgent Err : " + ex.getMessage(), ex);
         }
     }
-
+    
     private static String __doGetRequest(String urlStr, String encode) throws IOException {
         StringBuilder response = new StringBuilder();
         URL url = null;

@@ -7,10 +7,17 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class JdkLoggerExample {
+public class JdkLoggerUtil {
 
-    private static final Logger log = Logger.getLogger(JdkLoggerExample.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger(JdkLoggerUtil.class.getCanonicalName());
     private static final Logger rootlog = Logger.getLogger("");
+    
+    public static void setupRootLogLevel(Level rootLevel) {
+        rootlog.setLevel(rootLevel);
+        for (Handler handler : rootlog.getHandlers()) {
+            handler.setLevel(rootLevel);
+        }
+    }
 
     public static void main(String[] args) {
 

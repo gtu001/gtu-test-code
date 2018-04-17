@@ -58,7 +58,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                         Transferable contents = getContentsTransferable();
                         if (contents == null) {
                             System.out.println(getTimestamp() + " " + " retry lostOwnership");
-                            sleepForce(5000);
+                            sleepForce(1000);
                             continue;
                         }
 
@@ -70,7 +70,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                             break;
                         } else {
                             System.out.println(getTimestamp() + " " + " retry lostOwnership");
-                            sleepForce(5000);
+                            sleepForce(1000);
                             continue;
                         }
                     } catch (Throwable e) {
@@ -89,6 +89,10 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
         DataFlavor[] flavors = null;
         try {
             flavors = sysClip.getAvailableDataFlavors();
+            
+            if(flavors == null) {
+                return null;
+            }
 
             // 跳過檔案不處理
             if (flavors.length == 1 && flavors[0].equals(DataFlavor.javaFileListFlavor)) {
@@ -105,9 +109,9 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                     Object val = sysClip.getData(d);
                     System.out.println(d + "\t" + val);
                 }
+                System.out.println("size = " + flavors.length);
             } catch (Throwable ex2) {
             }
-            System.out.println("size = " + flavors.length);
             System.out.println("-----------------------------------------------------");
 
             return null;
