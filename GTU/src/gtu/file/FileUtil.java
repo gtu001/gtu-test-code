@@ -1010,7 +1010,12 @@ public class FileUtil {
             mth.appendReplacement(sb, "-");
         }
         mth.appendTail(sb);
-        return sb.toString();
+        String fileName = sb.toString();
+        fileName = fileName.replaceAll("[\r\n]", "");
+        fileName = fileName.replaceAll("  ", " ");
+        fileName = fileName.replaceAll("　", "");
+        fileName = fileName.trim();
+        return fileName;
     }
 
     public static class FileZ {

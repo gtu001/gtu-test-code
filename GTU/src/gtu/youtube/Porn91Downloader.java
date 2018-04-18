@@ -4,10 +4,8 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -15,8 +13,10 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,20 +51,29 @@ public class Porn91Downloader {
     private static final DecimalFormat commaFormatNoPrecision = new DecimalFormat("###,###");
     private static final String DEFAULT_ENCODING = "UTF-8";
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+    private static final String FILE_EXTENSTION_PATTERN = "(mp4|avi|flv|rm|rmvb|mp3)";
+    private static final boolean DEBUT_MODE = false;
 
     public static void main(String[] args) throws Throwable {
         Porn91Downloader p = new Porn91Downloader();
         // List<VideoUrlConfig> videoLst =
         // p.processVideoLst("https://www.facebook.com/JKFR2.0/videos/434056733674860/");
-        List<VideoUrlConfig> videoLst = p.processVideoLst("https://www.facebook.com/JKFLADY/videos/844465589081974/");
+        // List<VideoUrlConfig> videoLst =
+        // p.processVideoLst("https://www.facebook.com/JKFLADY/videos/844465589081974/");
         // 每週一到每週六8:15-9:15有女郎直播
 
+        String url = JCommonUtil._jOptionPane_showInputDialog("請輸入facebook網址:");
+        List<VideoUrlConfig> videoLst = p.processVideoLst(url);
+
+        StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
             VideoUrlConfig v = videoLst.get(ii);
-            System.out.println(v + " index:" + ii);
+            System.out.println("[" + ii + "] " + v);
+            msg.append("[" + ii + "] " + v + "\n");
         }
 
-        int index = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入index : ", "-1"));
+        int index = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入index : \n" + msg, "-1"));
+
         VideoUrlConfig video = videoLst.get(index);
         p.processDownload(video);
         System.out.println("done...v3");
@@ -76,8 +85,8 @@ public class Porn91Downloader {
 
     public List<VideoUrlConfig> processVideoLst(String url) {
         String content = getVideoInfo(URI.create(url), "");
-        String title = getVideoNameFromTitle(content);
-        this.debugSaveHtml(title, content, false);
+        String title = getTitleForFileName(content);
+        this.debugSaveHtml(content, DEBUT_MODE);
         List<VideoUrlConfig> videoLst = this.getVideoList(title, content);
         return videoLst;
     }
@@ -89,17 +98,18 @@ public class Porn91Downloader {
         downloadWithHttpClient(DEFAULT_USER_AGENT, v.url, saveVideoFile);
     }
 
-    private void debugSaveHtml(String title, String content, boolean doSave) {
+    private void debugSaveHtml(String content, boolean doSave) {
         if (!doSave) {
             return;
         }
-        File saveFile = new File(FileUtil.DESKTOP_PATH, ".txt");
+        String tempFileName = this.getClass().getSimpleName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        File saveFile = new File(FileUtil.DESKTOP_PATH, tempFileName + ".txt");
         FileUtil.saveToFile(saveFile, content, "UTF-8");
     }
 
     private List<VideoUrlConfig> getVideoList(String title, String content) {
         List<VideoUrlConfig> videoLst = new ArrayList<VideoUrlConfig>();
-        Map<String, String> mp4Map = findVideoUrl("mp4", content);
+        Map<String, String> mp4Map = findVideoUrl(FILE_EXTENSTION_PATTERN, content);
         System.out.println("Mp4Map size = " + mp4Map.size());
         for (String v : mp4Map.keySet()) {
             System.out.println(v + "\t" + mp4Map.get(v));
@@ -291,13 +301,13 @@ public class Porn91Downloader {
             }
             BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(outputfile));
             System.out.println("outputfile " + outputfile);
-            
+
             new DownloadProgressHandler(length, instream2, outstream, null);
             System.out.println("Done");
         }
     }
 
-    private String getVideoNameFromTitle(String content) {
+    private String getTitleForFileName(String content) {
         String title = "";
         try {
             System.out.println("-----------------------------------------------------------------------");
@@ -308,7 +318,6 @@ public class Porn91Downloader {
                 title = mth.group(1);
                 title = StringEscapeUtils.unescapeHtml(title);
                 title = FileUtil.escapeFilename(title);
-                title = title;
                 System.out.println(title);
             }
             System.out.println("-----------------------------------------------------------------------");
