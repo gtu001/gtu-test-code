@@ -8,6 +8,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -318,6 +320,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void initLoading() {
         if (bookmarkConfig == null) {
+            System.out.println("bookmarkConfig null !!!");
             return;
         }
 
@@ -370,8 +373,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         // 設定tag 夏拉
         Collections.sort(tagLst);
-        AutoComboBox.applyAutoComboBox(tagComboBox, tagLst);
-        AutoComboBox.applyAutoComboBox(searchComboBox, tagLst);
+        tagComboBoxUtil.applyComboxBoxList(tagLst);
+        searchComboBoxUtil.applyComboxBoxList(tagLst, searchText);
 
         // 設定urlTable
         Collections.sort(lst, new Comparator<UrlConfig>() {

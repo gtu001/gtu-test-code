@@ -30,7 +30,7 @@ public class PropertiesUtilBean {
     private static final Logger logger = JdkLoggerUtil.getLogger(PropertiesUtilBean.class, true);
     
     static {
-        JdkLoggerUtil.setupRootLogLevel(Level.INFO);
+//        JdkLoggerUtil.setupRootLogLevel(Level.INFO);
     }
     
     public PropertiesUtilBean(File customFile) {

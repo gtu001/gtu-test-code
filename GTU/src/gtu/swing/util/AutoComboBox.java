@@ -24,7 +24,7 @@ import javax.swing.text.PlainDocument;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 最終成功版
+ * 最終成功版 (目前效果最穩)
  */
 public class AutoComboBox extends PlainDocument {
     JComboBox comboBox;
@@ -49,7 +49,7 @@ public class AutoComboBox extends PlainDocument {
             }
         }
     };
-    
+
     public JTextComponent getTextComponent() {
         return (JTextComponent) comboBox.getEditor().getEditorComponent();
     }
@@ -68,16 +68,22 @@ public class AutoComboBox extends PlainDocument {
                 if (comboBox.isDisplayable()) {
                     comboBox.setPopupVisible(true);
                 }
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    addNewChoiceListener.actionPerformed(new ActionEvent(comboBox, -1, ""));
+            }
+        });
+        editor.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                System.out.println("keyPressed ---- " + e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    triggerComboxBoxActionPerformed();
+                } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                 }
             }
         });
     }
-    
+
     private void triggerComboxBoxActionPerformed() {
         System.out.println("#. triggerComboxBoxActionPerformed start");
-        for(ActionListener a: comboBox.getActionListeners()) {
+        for (ActionListener a : comboBox.getActionListeners()) {
             a.actionPerformed(new ActionEvent(comboBox, ActionEvent.ACTION_PERFORMED, null) {
                 private static final long serialVersionUID = 1L;
             });
@@ -171,8 +177,12 @@ public class AutoComboBox extends PlainDocument {
             }
         }
     }
-    
+
     public AutoComboBox applyComboxBoxList(List<String> lst) {
+        return applyComboxBoxList(lst, "");
+    }
+
+    public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText) {
         List<String> cloneLst = new ArrayList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
             if (StringUtils.isBlank(cloneLst.get(ii))) {
@@ -188,19 +198,27 @@ public class AutoComboBox extends PlainDocument {
         comboBox.setModel(m1);
         comboBox.setEditable(true);
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
+        defaultText = StringUtils.trimToEmpty(defaultText);
+        editor.setText(defaultText);
         editor.setDocument(this);
         return this;
     }
 
-    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst) {
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst, String defaultText) {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        autoComboBox.applyComboxBoxList(lst);
+        autoComboBox.applyComboxBoxList(lst, defaultText);
         return autoComboBox;
     }
-    
+
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst) {
+        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
+        autoComboBox.applyComboxBoxList(lst, "");
+        return autoComboBox;
+    }
+
     public static AutoComboBox applyAutoComboBox(JComboBox comboBox) {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        autoComboBox.applyComboxBoxList(new ArrayList<String>());
+        autoComboBox.applyComboxBoxList(new ArrayList<String>(), "");
         return autoComboBox;
     }
 

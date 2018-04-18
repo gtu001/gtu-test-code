@@ -253,6 +253,7 @@ public class EnglishSearchUI extends JFrame {
             public void keyPressed(KeyEvent e) {
                 System.out.println("keyPressed ---- " + e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    System.out.println("key ENTER");
                     queryButtonAction(true);
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                     System.out.println("DEL00000000000000000000000000000000");
