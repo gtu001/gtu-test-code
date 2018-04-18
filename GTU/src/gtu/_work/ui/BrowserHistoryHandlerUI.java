@@ -163,7 +163,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JButton saveBtn = new JButton("儲存");
             saveBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    saveConfigBtnAction();
+                    saveCurrentBookmarkBtnAction();
                 }
             });
             panel_2.add(saveBtn);
@@ -271,7 +271,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
-    private void saveConfigBtnAction() {
+    private void saveCurrentBookmarkBtnAction() {
         try {
             String url = StringUtils.trimToEmpty(urlText.getText());
             String title = StringUtils.trimToEmpty(titleText.getText());
@@ -534,7 +534,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
         try {
             File file = JCommonUtil.filePathCheck(bookmarkConfigText.getText(), "bookmark設定黨", "properties");
             bookmarkConfig = new PropertiesUtilBean(file);
-            configSelf.reflectSetConfig(BrowserHistoryHandlerUI.this);
+            initLoading();
+            configSelf.reflectSetConfig(this);
             configSelf.store();
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {

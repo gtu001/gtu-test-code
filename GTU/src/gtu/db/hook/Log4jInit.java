@@ -12,11 +12,18 @@ import org.apache.log4j.PropertyConfigurator;
  * 
  */
 public class Log4jInit {
+    
+    public static void main(String[] args) {
+        Log4jInit t = new Log4jInit();
+        t.init(Log4jInit.class);
+        
+        logger.debug("TEST OK");
+        logger.debug("TEST DONE...");
+    }
 
     static Logger logger;
 
     public void init(Class cls) {
-
         Properties logp = new Properties();
         try {
             logp.load(Log4jInit.class.getResourceAsStream("log4j.properties"));
@@ -25,17 +32,9 @@ public class Log4jInit {
         }
 
         PropertyConfigurator.configure(logp);
-        logger = Logger.getLogger(cls.getName());
+        logger = Logger.getLogger(cls);
         logger.setLevel(Level.DEBUG);
         logger.debug("log4j_init_ok!!");
-    }
-
-    public Log4jInit(Class cls) {
-        init(cls);
-    }
-
-    public void debug(String xxx) {
-        logger.debug(xxx);
     }
 
 }

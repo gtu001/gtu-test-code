@@ -38,7 +38,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-public class YoutubeVideoUrlHandler {
+public class JavaYoutubeVideoUrlHandler {
     private static final String scheme = "http";
     private static final String host = "www.youtube.com";
     private static final String DEFAULT_ENCODING = "UTF-8";
@@ -47,7 +47,7 @@ public class YoutubeVideoUrlHandler {
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
 
     public static void main(String[] args) {
-        YoutubeVideoUrlHandler t = new YoutubeVideoUrlHandler("vBM2tg5FDH8", "", DEFAULT_USER_AGENT);
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("vBM2tg5FDH8", "", DEFAULT_USER_AGENT);
         System.out.println("done...");
     }
 
@@ -64,7 +64,7 @@ public class YoutubeVideoUrlHandler {
     List<DataFinal> typeLst = new ArrayList<DataFinal>();
 
 
-    public YoutubeVideoUrlHandler(String videoId, String format, String userAgent) {
+    public JavaYoutubeVideoUrlHandler(String videoId, String format, String userAgent) {
         try {
             List<NameValuePair> infoMap = this.getVideoInfo(videoId, format, userAgent);
             for (NameValuePair pair : infoMap) {

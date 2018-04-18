@@ -9,6 +9,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -203,9 +205,19 @@ public class FileUtil {
      */
     public static void saveToFile(File file, byte[] data) {
         try {
-            FileOutputStream out = new FileOutputStream(file);
-            out.write(data);
-            out.close();
+            // 廢棄
+            // FileOutputStream out = new FileOutputStream(file);
+            // out.write(data);
+            // out.close();
+            BufferedInputStream buffIn = new BufferedInputStream(new ByteArrayInputStream(data));
+            BufferedOutputStream buffOut = new BufferedOutputStream(new FileOutputStream(file));
+            byte[] arr = new byte[1024 * 1024];
+            int available = -1;
+            while ((available = buffIn.read(arr)) > 0) {
+                buffOut.write(arr, 0, available);
+            }
+            buffOut.flush();
+            buffOut.close();
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -367,21 +379,32 @@ public class FileUtil {
         }
         byte[] arrayOfByte = new byte[4096];
         FileOutputStream fileOutput = new FileOutputStream(copyTo, true);
-        FileChannel channel = fileOutput.getChannel();
-        FileLock fileLock = channel.tryLock();
-        if (fileLock != null) {
-            channel.truncate(0L);
-            BufferedInputStream input = new BufferedInputStream(new FileInputStream(copyFrom));
-            BufferedOutputStream output = new BufferedOutputStream(fileOutput);
-            int i;
-            while ((i = input.read(arrayOfByte, 0, arrayOfByte.length)) != -1) {
-                output.write(arrayOfByte, 0, i);
+        try {
+            FileChannel channel = fileOutput.getChannel();
+            FileLock fileLock = channel.tryLock();
+            if (fileLock != null) {
+                channel.truncate(0L);
+                BufferedInputStream input = new BufferedInputStream(new FileInputStream(copyFrom));
+                BufferedOutputStream output = new BufferedOutputStream(fileOutput);
+                try {
+                    int i;
+                    while ((i = input.read(arrayOfByte, 0, arrayOfByte.length)) != -1) {
+                        output.write(arrayOfByte, 0, i);
+                    }
+                    output.flush();
+                    fileLock.release();
+                } catch (Exception ex) {
+                    throw new RuntimeException("copyFileLocking ERR : " + ex.getMessage(), ex);
+                } finally {
+                    output.close();
+                    input.close();
+                }
+                return true;
             }
-            output.flush();
-            fileLock.release();
-            output.close();
-            input.close();
-            return true;
+        } catch (Exception ex) {
+            throw new RuntimeException("copyFileLocking ERR : " + ex.getMessage(), ex);
+        } finally {
+            fileOutput.close();
         }
         throw new IOException("Unable to acquire file lock for " + copyTo);
     }
@@ -965,14 +988,29 @@ public class FileUtil {
         } catch (IOException e) {
             System.out.println("Exception handled when trying to get file " + "attributes: " + e.getMessage());
         }
-        if(attr != null) {
-//            System.out.println("creationTime: " + attr.creationTime());
-//            System.out.println("lastAccessTime: " + attr.lastAccessTime());
-//            System.out.println("lastModifiedTime: " + attr.lastModifiedTime());
+        if (attr != null) {
+            // System.out.println("creationTime: " + attr.creationTime());
+            // System.out.println("lastAccessTime: " + attr.lastAccessTime());
+            // System.out.println("lastModifiedTime: " +
+            // attr.lastModifiedTime());
             return attr.creationTime().toMillis();
-        }else {
+        } else {
             return -1;
         }
+    }
+
+    /**
+     * 避掉黨名的特殊符號 \/:*?"<>|
+     */
+    public static String escapeFilename(String filename) {
+        Pattern ptn = Pattern.compile("\\\\\\/\\:\\*\\?\"\\<\\>\\|");
+        Matcher mth = ptn.matcher(filename);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+            mth.appendReplacement(sb, "-");
+        }
+        mth.appendTail(sb);
+        return sb.toString();
     }
 
     public static class FileZ {

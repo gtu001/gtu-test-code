@@ -1,5 +1,6 @@
 package gtu.youtube;
 
+import java.io.BufferedOutputStream;
 /**
  * This work is licensed under a Creative Commons Attribution 3.0 Unported
  * License (http://creativecommons.org/licenses/by/3.0/). This work is placed
@@ -208,7 +209,7 @@ public class JavaYoutubeDownloader extends Formatter {
 
     private void play(String videoId, int format, String encoding, String userAgent, File outputdir, String extension) throws Throwable {
         // 取得Youtube下載網址
-        YoutubeVideoUrlHandler urlHandler = new YoutubeVideoUrlHandler(videoId, String.valueOf(format), userAgent);
+        JavaYoutubeVideoUrlHandler urlHandler = new JavaYoutubeVideoUrlHandler(videoId, String.valueOf(format), userAgent);
 
         // 原來邏輯
         log.fine("Retrieving " + videoId);
@@ -288,7 +289,7 @@ public class JavaYoutubeDownloader extends Formatter {
                 
                 //自訂下載網址2
                 if (downloadUrl == null) {
-                    YoutubeVideoUrlHandler gtu001 = new YoutubeVideoUrlHandler(videoId, "", userAgent);
+                    JavaYoutubeVideoUrlHandler gtu001 = new JavaYoutubeVideoUrlHandler(videoId, "", userAgent);
                     downloadUrl = gtu001.getUrl(format);
                 }
 
@@ -326,7 +327,7 @@ public class JavaYoutubeDownloader extends Formatter {
             if (outputfile.exists()) {
                 outputfile.delete();
             }
-            FileOutputStream outstream = new FileOutputStream(outputfile);
+            BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(outputfile));
             System.out.println("outputfile " + outputfile);
             try {
                 byte[] buffer = new byte[BUFFER_SIZE];
