@@ -37,7 +37,10 @@ $ db2 get database manager configuration | findstr /i svce
  SSL service name                         (SSL_SVCENAME) =
  
  
-#建立scheam [必須先start]
+#顯示schema清單
+db2 list db directory
+ 
+#建立schema [必須先start]
 $db2 create database [name]
 
 #連線

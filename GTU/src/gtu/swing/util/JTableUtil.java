@@ -286,6 +286,11 @@ public class JTableUtil {
             }
         }
     }
+    
+    public void hiddenColumn(String columnTitle) {
+        TableColumnManager tcm = new TableColumnManager(table);
+        tcm.hideColumn(columnTitle);
+    }
 
     public void showColumnByHeaderValue(Object... title) {
         List<TableColumn> list = new ArrayList<TableColumn>();

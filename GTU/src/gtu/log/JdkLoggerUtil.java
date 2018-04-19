@@ -21,9 +21,9 @@ public class JdkLoggerUtil {
     public static Logger getLogger(Class<?> clz, boolean isDebug) {
         Logger logger = Logger.getLogger(clz.getCanonicalName());
         if (isDebug) {
-            logger.setLevel(Level.ALL);
-        } else {
             logger.setLevel(Level.INFO);
+        } else {
+            logger.setLevel(Level.WARNING);
         }
         return logger;
     }

@@ -1,5 +1,6 @@
 package gtu.youtube;
 
+import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,15 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -42,17 +40,26 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.log.LogbackUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
 
 public class Porn91Downloader {
 
     private static final DecimalFormat commaFormatNoPrecision = new DecimalFormat("###,###");
     private static final String DEFAULT_ENCODING = "UTF-8";
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
-    private static final String FILE_EXTENSTION_PATTERN = "(mp4|avi|flv|rm|rmvb|mp3)";
-    private static final boolean DEBUT_MODE = false;
+
+    /**
+     * 下載進度調處理
+     */
+    private ActionListener progressPerformd;
+
+    public void setProgressPerformd(ActionListener progressPerformd) {
+        this.progressPerformd = progressPerformd;
+    }
 
     public static void main(String[] args) throws Throwable {
         Porn91Downloader p = new Porn91Downloader();
@@ -63,7 +70,7 @@ public class Porn91Downloader {
         // 每週一到每週六8:15-9:15有女郎直播
 
         String url = JCommonUtil._jOptionPane_showInputDialog("請輸入facebook網址:");
-        List<VideoUrlConfig> videoLst = p.processVideoLst(url);
+        List<VideoUrlConfig> videoLst = p.processVideoLst(url, "");
 
         StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
@@ -75,7 +82,7 @@ public class Porn91Downloader {
         int index = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入index : \n" + msg, "-1"));
 
         VideoUrlConfig video = videoLst.get(index);
-        p.processDownload(video);
+        p.processDownload(video, null);
         System.out.println("done...v3");
     }
 
@@ -83,52 +90,76 @@ public class Porn91Downloader {
         LogbackUtil.setRootLevel(ch.qos.logback.classic.Level.INFO);
     }
 
-    public List<VideoUrlConfig> processVideoLst(String url) {
-        String content = getVideoInfo(URI.create(url), "");
+    public List<VideoUrlConfig> processVideoLst(String url, String cookieContent) {
+        String content = getVideoInfo(URI.create(url), "", cookieContent);
         String title = getTitleForFileName(content);
-        this.debugSaveHtml(content, DEBUT_MODE);
-        List<VideoUrlConfig> videoLst = this.getVideoList(title, content);
+
+        PornVideoUrlDetection p2 = new PornVideoUrlDetection(content);
+        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain();
+
+        List<VideoUrlConfig> videoLst = this.getVideoList(title, videoOrignLst);
+        this.debugSaveHtml(title, content, videoLst.isEmpty());
         return videoLst;
     }
 
-    public void processDownload(VideoUrlConfig v) throws Throwable {
+    public void processDownload(VideoUrlConfig v, Integer percentScale) throws Throwable {
         String prefix = StringUtils.isNotBlank(v.title) ? v.title + "_" : "";
         String filename = prefix + v.fileName;
         File saveVideoFile = new File(FileUtil.DESKTOP_PATH, filename);
-        downloadWithHttpClient(DEFAULT_USER_AGENT, v.url, saveVideoFile);
+        downloadWithHttpClient(DEFAULT_USER_AGENT, v.url, saveVideoFile, percentScale);
     }
 
-    private void debugSaveHtml(String content, boolean doSave) {
+    private void debugSaveHtml(String title, String content, boolean doSave) {
         if (!doSave) {
             return;
         }
-        String tempFileName = this.getClass().getSimpleName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        if (StringUtils.isBlank(title)) {
+            title = "FacebookVideoErrorHtml";
+        }
+        String tempFileName = title + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         File saveFile = new File(FileUtil.DESKTOP_PATH, tempFileName + ".txt");
         FileUtil.saveToFile(saveFile, content, "UTF-8");
     }
 
-    private List<VideoUrlConfig> getVideoList(String title, String content) {
+    private List<VideoUrlConfig> getVideoList(String title, List<PornVideoUrlDetection.SingleVideoUrlConfig> orignLst) {
         List<VideoUrlConfig> videoLst = new ArrayList<VideoUrlConfig>();
-        Map<String, String> mp4Map = findVideoUrl(FILE_EXTENSTION_PATTERN, content);
-        System.out.println("Mp4Map size = " + mp4Map.size());
-        for (String v : mp4Map.keySet()) {
-            System.out.println(v + "\t" + mp4Map.get(v));
 
-            VideoUrlConfig conf = new VideoUrlConfig();
-            conf.fileName = v;
-            conf.url = mp4Map.get(v);
+        for (SingleVideoUrlConfig from : orignLst) {
+            VideoUrlConfig conf = new VideoUrlConfig(from);
             conf.title = title;
             try {
-                conf.length = this.getContentLength(DEFAULT_USER_AGENT, mp4Map.get(v));
+                conf.length = this.getContentLength(DEFAULT_USER_AGENT, conf.url);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
+
+            if (!PornVideoUrlDetection.isVideo(conf.fileName)) {
+                System.out.println(conf.getFileName() + " is not video >> ignored!");
+                continue;
+            }
+
+            if (conf.length <= 0) {
+                System.out.println(conf.getFileName() + " size 0 >>  ignored!");
+                continue;
+            }
+
             videoLst.add(conf);
         }
+
+        System.out.println("video size = " + videoLst.size());
         return videoLst;
     }
 
-    private class VideoUrlConfig {
+    public static class VideoUrlConfig {
+
+        private PornVideoUrlDetection.SingleVideoUrlConfig orignConfig;
+
+        private VideoUrlConfig(PornVideoUrlDetection.SingleVideoUrlConfig orignConfig) {
+            this.orignConfig = orignConfig;
+            this.fileName = this.orignConfig.finalFileName;
+            this.url = this.orignConfig.orignUrl;
+        }
+
         String fileName;
         String title;
         String url;
@@ -147,6 +178,22 @@ public class Porn91Downloader {
         public String toString() {
             return getFileName() + " / " + getFizeSize();
         }
+
+        public PornVideoUrlDetection.SingleVideoUrlConfig getOrignConfig() {
+            return orignConfig;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public long getLength() {
+            return length;
+        }
     }
 
     private URI getURI() throws URISyntaxException {
@@ -161,29 +208,6 @@ public class Porn91Downloader {
         return uri;
     }
 
-    private Map<String, String> findVideoUrl(String fileExtenstion, String content) {
-        Pattern urlPtn = Pattern.compile("\"(https?\\:.*?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-        String urlDetailPtn = "https?\\:.*?\\." + fileExtenstion + "\\??.*?";
-        Pattern filenamePtn = Pattern.compile("\\w+\\." + fileExtenstion, Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-        Matcher mth = urlPtn.matcher(content);
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        while (mth.find()) {
-            String url = mth.group(1);
-            url = StringEscapeUtils.unescapeJava(url);
-            if (!Pattern.matches(urlDetailPtn, url)) {
-                // System.out.println("ignore -> " + url);
-                continue;
-            }
-            String filename = "Unknow." + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSSSS") + "." + fileExtenstion;
-            Matcher mth2 = filenamePtn.matcher(url);
-            if (mth2.find()) {
-                filename = mth2.group();
-            }
-            map.put(filename, url);
-        }
-        return map;
-    }
-
     /**
      * 多行Cookie key \t value
      */
@@ -195,6 +219,8 @@ public class Porn91Downloader {
             for (String line = null; (line = reader.readLine()) != null;) {
                 String[] arry = line.split("\t", -1);
                 if (arry != null && arry.length == 2) {
+                    arry[0] = StringUtils.trimToEmpty(arry[0]);
+                    arry[1] = StringUtils.trimToEmpty(arry[1]);
                     cookstore.addCookie(new BasicClientCookie(arry[0], arry[1]));
                     System.out.println("cookie : " + Arrays.toString(arry));
                 }
@@ -210,7 +236,7 @@ public class Porn91Downloader {
         }
     }
 
-    public String getVideoInfo(URI uri, String userAgent) {
+    public String getVideoInfo(URI uri, String userAgent, String cookieContent) {
         try {
             if (StringUtils.isBlank(userAgent)) {
                 userAgent = DEFAULT_USER_AGENT;
@@ -227,7 +253,9 @@ public class Porn91Downloader {
             cookstore.addCookie(new BasicClientCookie("ss", "150222930604599849"));
 
             CookieStore cookieStore = cookstore;
-            // CookieStore cookieStore = getCookieFromClipborad();
+            if (StringUtils.isNotBlank(cookieContent)) {
+                cookieStore = getCookieString(cookieContent);
+            }
 
             HttpContext localContext = new BasicHttpContext();
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
@@ -258,7 +286,7 @@ public class Porn91Downloader {
             }
             throw new RuntimeException("Error StatusCode : " + response.getStatusLine().getStatusCode());
         } catch (Exception ex) {
-            throw new RuntimeException("Error : " + ex.getMessage(), ex);
+            throw new RuntimeException("Error : " + uri + " , " + ex.getMessage(), ex);
         }
     }
 
@@ -278,7 +306,7 @@ public class Porn91Downloader {
         return -1;
     }
 
-    private void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile) throws Throwable {
+    private void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile, Integer percentScale) throws Throwable {
         System.out.println("Download URL : " + downloadUrl);
         HttpGet httpget2 = new HttpGet(downloadUrl);
         if (userAgent != null && userAgent.length() > 0) {
@@ -302,8 +330,13 @@ public class Porn91Downloader {
             BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(outputfile));
             System.out.println("outputfile " + outputfile);
 
-            new DownloadProgressHandler(length, instream2, outstream, null);
-            System.out.println("Done");
+            DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale);
+            if (progressPerformd != null) {
+                downloadHandler.setProgressPerformd(progressPerformd);
+            }
+            downloadHandler.start();
+
+            System.out.println("Done...");
         }
     }
 

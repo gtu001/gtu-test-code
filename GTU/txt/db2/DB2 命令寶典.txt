@@ -1,0 +1,102 @@
+-- 注：在【開始】->【運行】中輸入 db2cw 或 db2cmd 進入 DB2 CLP，db2ce 進入命令編輯器，db2cc進入控制中心
+---------------------------------------------------------------------------------------------------------------------------------------------
+1. 資料庫的啟動、停止
+db2start --啟動
+db2stop [force] --停止
+2.與資料庫的連接、斷開
+db2 CONNECT TO DBName [user UserID using PWD] --建立連接
+db2 CONNECT reset /db2 disconnect CURRENT --斷開連接
+
+3.實例的創建、刪除
+db2icrt < 實例名稱 > --創建 db2 實例
+db2idrop < 實例名稱 > --刪除 db2 實例
+SET db2intance=db2 --設置當前 db2 實例
+db2ilist -- 顯示 db2 擁有的實例
+
+4.節點、資料庫的編目
+db2 list node directory --查看本地節點目錄
+db2 catalog tcpip node <node_name> remote <hostname|ip_address> server <svcname|port_number> ostype <OS2|AIX|WIN95|NT|HPUX|SUN|MVS|OS400|VM|VSE|SCO|SGI|LINUX|DYNIX> --編目一個TCP/IP節點
+db2 uncatalog node <node_name> --取消節點編目
+db2 catalog DATABASE <db_name> AS <db_alias> AT node <node_name> --編目資料庫
+db2 uncatalog DATABASE <db_name> --取消資料庫編目
+
+5.表空間的創建、刪除
+db2 CREATE BUFFERPOOL STMABMP IMMEDIATE SIZE 25000 PAGESIZE 8K --創建緩衝集區STMABMP
+db2 DROP tablespace STMABMP --刪除表空間
+db2 CREATE REGULAR TABLESPACE STMA PAGESIZE 8 K MANAGED BY SYSTEM | DATABASE
+USING ('D:\DB2Container\Stma' ) EXTENTSIZE 8 OVERHEAD 10.5
+PREFETCHSIZE 8 TRANSFERRATE 0.14 BUFFERPOOL STMABMP DROPPED TABLE RECOVERY OFF
+--在D:\DB2Container\Stma下創建系統/資料庫管理表空間STMA
+db2 BACKUP DATABASE 資料庫別名 TABLESPACE 表空間名 [ONLINE} TO 介質名 --表空間的備 份
+db2 list tablespaces show detail --列出所 以表空間資訊
+db2 list tablespace containers for SpaceID --列出對應表空間的容器詳情
+
+--修改表空間
+
+ALTER TABLESPACE 表空間名 RESIZE(FILE '已滿的容器名' 更改後容器的大小)
+
+ALTER TABLESPACE 表空間名 EXTEND(FILE '已滿的容器名' 準備增加的大小) --可以是實際大小或者頁數
+
+eg：db2 "alter tablespace HTDC_INDEX EXTEND(file '/home/db2admin/dbback/db2containner/htdc/index/htdc_index' 1024M)" --（unix系統）將DMS HTDC_INDEX 在擴大1G
+
+6.資料庫的創建、刪除
+db2 CREATE db DBName [using codeset GBK territory CN] --創建資料庫
+db2 DROP db DBName --刪除資料庫
+db2 list db directory --列出所有資料庫目錄（包括遠端編目的資料庫）
+
+db2 list db directory ON location --如Windows下的 C: ,Unix下的/home/db2inst1(本機資料庫)
+
+db2 list active databases --列出活動的資料庫和連接數
+
+
+7.表的創建、刪除
+DROP TABLE TableName ; --刪除表
+CREATE TABLE TableName
+( 欄位名 資料類型 ,
+PRIMARY KEY (欄位名)
+)IN Space1 INDEX IN Space2 ; --創建表(表 空間Space1存放資料，Space2存放索引)
+
+ALTER TABLE TableName VOLATILE CARDINALITY; --將 表TableName設置為易失表
+
+db2 list tables ;
+db2 list tables FOR USER /ALL /system / SCHEMA SchemaName [show detail] ;
+--列出資料庫中的表如果沒有指定任何參 數，則缺省情況是列出當前使用者的表
+
+db2 describe TABLE TableName ;
+
+db2 describe SELECT * FROM tables ; --查看表結構
+
+
+8.索引的創建、刪除
+DROP INDEX Index_Name ; --刪除索引
+CREATE INDEX Index_Name ON TableName(F1) ; --對表TableName的F1欄位創建索引Index_Name
+db2 describe indexes FOR TABLE TableName ; --查看表 TableName的索引
+
+db2 describe indexes FOR TABLE TableName show detail;
+db2 SELECT INDNAME,COLNAMES FROM syscat.indexes WHERE tabname = 'TableName';
+
+9.視圖的創建、刪除
+DROP VIEW ViewName ; --刪除視圖
+CREATE VIEW ViewName(×,××) AS SELECT ×,×× FROM TableName WHERE ×××; --創建視圖
+
+10.資料庫的備份、恢復（詳見淺談IBM DB2的資料庫備份與恢復一文）
+
+--離線備份
+db2 force applications all --斷開所有連接
+
+db2 force application（h1,h2......） --殺死與欲備份資料庫相連接的進程
+db2 backup db DBName [to d:\db2_backup] [use TSM] --離 線備份
+--線上、增量備份
+--前提：更改資料庫參數 logretain, userexit, trackmod 為 on，之後資料庫處於backup pending狀態，要完全離線備份資料庫一次，之後就可以進行線上、線上增量備份了。
+db2 update db cfg using logretain on userexit on trackmod on --啟用相關參數
+
+--歸檔路徑
+DB2 UPDATE DATABASE CONFIGURATION USING LOGARCHMETH1 DISK:D:\DB2\ IMMEDIATE
+
+--LOGARCHMETH1參數改成TSM
+DB2 UPDATE DATABASE CONFIGURATION USING LOGARCHMETH1 TSM IMMEDIATE
+db2 backup db DBName [to d:\db2_backup] [use TSM] --離線備份
+db2 backup db DBName online [to d:\db2_backup] [use TSM] --線上線備份
+db2 backup db DBName online incremental [to d:\db2_backup] [use TSM] --線上增量備份
+
+--資料庫恢復

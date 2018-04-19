@@ -17,7 +17,11 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -42,6 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -921,16 +926,16 @@ public class JCommonUtil {
     public static boolean isUIMode() {
         return !GraphicsEnvironment.isHeadless();
     }
-    
+
     /**
      * 觸發actionPerformed事件
      */
     public static void triggerButtonActionPerformed(AbstractButton btn) {
-        for(ActionListener a: btn.getActionListeners()) {
+        for (ActionListener a : btn.getActionListeners()) {
             a.actionPerformed(new ActionEvent(btn, ActionEvent.ACTION_PERFORMED, null) {
                 private static final long serialVersionUID = 1L;
-                  //Nothing need go here, the actionPerformed method (with the
-                  //above arguments) will trigger the respective listener
+                // Nothing need go here, the actionPerformed method (with the
+                // above arguments) will trigger the respective listener
             });
         }
     }

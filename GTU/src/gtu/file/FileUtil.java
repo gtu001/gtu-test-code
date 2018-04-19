@@ -869,11 +869,31 @@ public class FileUtil {
         if (file.isFile() && pos != -1) {
             return name.substring(pos + 1);
         }
-        return name;
+        return "";
     }
 
     /**
-     * 取得檔名不含副檔名
+     * 取得副檔名 不含"."
+     * 
+     * @param file
+     * @return
+     */
+    public static String getSubName(String filepath) {
+        String name = filepath;
+        int pos = name.lastIndexOf(".");
+        if (pos != -1) {
+            name = name.substring(pos + 1);
+            Pattern ptn = Pattern.compile("\\w+");
+            Matcher mth = ptn.matcher(name);
+            if (mth.find()) {
+                return mth.group();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 取得檔名不含副檔名 速度慢(如果檔案不存在更慢)
      * 
      * @param file
      * @return
