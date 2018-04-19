@@ -282,7 +282,7 @@ public class FacebookVideoDownloader extends JFrame {
 
         downloadListTable = new JTable();
         JTableUtil.defaultSetting_AutoResize(downloadListTable);
-        panel_10.add(downloadListTable, BorderLayout.CENTER);
+        panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
 
         JCommonUtil.setJFrameDefaultSetting(this);
 
