@@ -1,0 +1,59 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: "war"
+
+sourceCompatibility = 1.8
+
+version = '1.0'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Quickstart',
+                   'Implementation-Version': version
+    }
+}
+
+repositories {
+	mavenLocal()
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+    }
+}
+
+war {
+    baseName = 'JoeGradleWeb'
+    version = '1.0.0-BUILD-SNAPSHOT'
+    from 'src/main/webapp' // adds a file-set to the root of the archive
+    webInf { from 'src/main/webapp/WEB-INF' } // adds a file-set to the WEB-INF dir.
+    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
+   // classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
+   //webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
+    
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+	compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    
+    
+	compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'
+	compile 'javax.servlet:jstl:1.2'
+    
+    testCompile("junit:junit")
+}
+
+dependencies {
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
