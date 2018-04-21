@@ -1,0 +1,139 @@
+create table Bill_User ( 
+id int not null,
+customer_id varchar(30) null,
+gender varchar(2) null,
+name varchar(20) null,
+PRIMARY KEY (id)
+);
+
+
+create table Operational_Data ( 
+id int not null,
+bill_name varchar(30) null,
+bill_user_id int null,
+customer_group varchar(50) null,
+cycle_start_date DATE null,
+cycle_end_date DATE null,
+device varchar(50) null,
+channel varchar(50) null,
+location_ip varchar(50) null,
+location_country varchar(50) null,
+location_region varchar(50) null,
+location_city varchar(50) null,
+location_tude varchar(50) null,
+location_zip varchar(50) null,
+active INT null,
+approval INT null,
+fail_reason varchar(50) null,
+datetime DATE null,
+PRIMARY KEY (id)
+);
+
+
+create table Ad_Click ( 
+id int not null,
+bill_user_id int null,
+customer_group varchar(50) null,
+device varchar(50) null,
+ad_id varchar(100) null,
+ad_name varchar(200) null,
+click_datetime DATE null,
+ip varchar(50) null,
+PRIMARY KEY (id)
+);
+
+
+create table Page_Click ( 
+id int not null,
+bill_user_id int null,
+customer_group varchar(50) null,
+device varchar(50) null,
+page_name varchar(50) null,
+click_datetime DATE null,
+ip varchar(50) null,
+PRIMARY KEY (id)
+);
+
+
+create table Feedback ( 
+id int not null,
+bill_user_id int null,
+customer_group varchar(50) null,
+comments varchar(800) null,
+comment_datetime DATE null,
+ip varchar(50) null,
+PRIMARY KEY (id)
+);
+
+
+
+
+
+create sequence seq__bill_user --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+
+create sequence seq__OPERATIONAL_DATA --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+
+create sequence seq__PAGE_CLICK --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+
+
+create sequence seq__Ad_Click --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+
+
+create sequence seq__Feedback  --replace 
+ as integer start with 1 
+ increment by 1 
+ no minvalue
+ no maxvalue no cycle
+ cache 20 order
+ ;
+
+
+
+
+
+CREATE TABLE
+    history_bill
+    (
+        name VARCHAR(30),
+        id VARCHAR(30) not null,
+        DATE VARCHAR(10) not null,
+        no VARCHAR(5) not null,
+        teleno VARCHAR(15),
+        billcode VARCHAR(10),
+        PRIMARY KEY (id, DATE, no)
+    );
+
+
+

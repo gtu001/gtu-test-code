@@ -1,0 +1,41 @@
+webFragment重點
+
+#jsp的部屬
+A.webFragment.xml若設定org.springframework.web.context.ContextLoaderListener會被忽略或錯誤, 只能定義在parent Web.xml
+
+I figured out how this is done. You have to follow one of the following approaches.
+
+1. If your web fragment will define it's own Spring Dispatch Servlet then the InternalResourceViewResolver should define the prefix relative to META-INF/resource. So, in the above example, the prefix should be /jsp/ and all your fragment's JSPs should go in there.
+2. If your web fragment will reuse the web application's Spring Dispatch Servlet, then the location of the JSPs in the fragment should mimic the structure defined by the InternalResourceViewResolver's prefix. For example, let's say the prefix is set to /WEB-INF/jsp/, then your META-INF structure should be META-INF/resources/WEB-INF/jsp and all your fragment's JSPs should go in there. 
+
+
+
+#xml的部屬
+Before we try our own web fragment example lets have quick overview of the rules/restrictions for it.
+
+1. We don't need to change/edit the original web.xml.
+2. Any number of web fragments can be created but the file name should be web-fragment.xml.
+3. The root element of web fragment should be <web-fragment>.
+4. Finally, the web fragment must be present in META-INF folder of a JAR or WEB-INF in case of a WAR.
+
+
+----------------------------------------------------------
+parent-web.xml 設定 web-context-fragment.xml是 children 
+	--> src/main/resources/META-INF/resources/WEB-INF/web-context-fragment.xml
+                                   /resources/views/test_gtu.jsp
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/root-context.xml,/WEB-INF/web-context-fragment.xml</param-value>
+	</context-param>
+	
+
+web-context-fragment.xml 的設定
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!--支持JSTL -->
+		<beans:property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<!--模板的路径 -->
+		<beans:property name="prefix" value="/views/" />
+		<!--模板文件后缀 -->
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>

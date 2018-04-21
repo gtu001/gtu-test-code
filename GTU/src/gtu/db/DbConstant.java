@@ -190,8 +190,8 @@ public class DbConstant {
     public static Connection getDB2Connection() {
         try {
             Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
-//            Connection conn = DriverManager.getConnection("jdbc:db2://10.1.249.35:50000/odstest1", "dpezbao", "dpezbao");
-            Connection conn = DriverManager.getConnection("jdbc:db2://10.0.75.1:50000/test", "db2inst1", "db2inst1-pwd");
+            Connection conn = DriverManager.getConnection("jdbc:db2://10.0.75.1:50000/test:retrieveMessagesFromServerOnGetMessage=true;currentSchema=test2", "db2inst1", "db2inst1-pwd");
+            
             return conn;
         } catch (Exception e) {
             throw new RuntimeException(e);

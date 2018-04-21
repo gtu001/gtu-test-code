@@ -94,6 +94,9 @@ public class MainActivity extends ActionBarActivity { //
         f_chicken(R.id.item_f_chicken, new int[]{R.drawable.f_chicken01, R.drawable.f_chicken02, R.drawable.f_chicken03, R.drawable.f_chicken04, R.drawable.f_chicken05}), //
         f_bigmacOneone(R.id.item_f_bigmacOneone, new int[]{R.drawable.f_bigmac_oneone_01, R.drawable.f_bigmac_oneone_02, R.drawable.f_bigmac_oneone_03, R.drawable.f_bigmac_oneone_04, R.drawable.f_bigmac_oneone_05}), //
         f_burgerFish40(R.id.item_f_burgerFish40, new int[]{R.drawable.f_burger_fish_40_01, R.drawable.f_burger_fish_40_02, R.drawable.f_burger_fish_40_03, R.drawable.f_burger_fish_40_04, R.drawable.f_burger_fish_40_05}), //
+        f_bbqChickenWing(R.id.item_f_bbqChickenWing, new int[]{R.drawable.f_bbq_chicken_wing_01, R.drawable.f_bbq_chicken_wing_02, R.drawable.f_bbq_chicken_wing_03, R.drawable.f_bbq_chicken_wing_04, R.drawable.f_bbq_chicken_wing_05}), //
+        f_bigMicTwo(R.id.item_f_bigMicTwo, new int[]{R.drawable.f_big_mic_two_01, R.drawable.f_big_mic_two_02, R.drawable.f_big_mic_two_03, R.drawable.f_big_mic_two_04, R.drawable.f_big_mic_two_05}), //
+        f_chickenFiredBurgerTwo(R.id.item_f_chickenFiredBurgerTwo, new int[]{R.drawable.f_chicken_fired_burger_two_01, R.drawable.f_chicken_fired_burger_two_02, R.drawable.f_chicken_fired_burger_two_03, R.drawable.f_chicken_fired_burger_two_04, R.drawable.f_chicken_fired_burger_two_05}), //
         ;
 
         final int menuId;

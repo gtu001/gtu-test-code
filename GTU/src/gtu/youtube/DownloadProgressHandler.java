@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +37,7 @@ public class DownloadProgressHandler {
         int kbpers;
         long remainSec;
         String remainDescrpition;
+        boolean isComplete = false;
 
         public long getCurrentLength() {
             return currentLength;
@@ -62,6 +65,10 @@ public class DownloadProgressHandler {
 
         public String getRemainDescrpition() {
             return remainDescrpition;
+        }
+
+        public boolean isComplete() {
+            return isComplete;
         }
 
         public String toString() {
@@ -109,7 +116,6 @@ public class DownloadProgressHandler {
             vo.remainDescrpition = remainDescrpition;
 
             progressPerformd.actionPerformed(new ActionEvent(vo, -1, percent + "%"));
-
             // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
             this.percent = percent;
@@ -139,7 +145,7 @@ public class DownloadProgressHandler {
     public DownloadProgressHandler(long totalLength, InputStream instream, OutputStream outstream, Integer percentScale) throws IOException {
         this.totalLength = totalLength;
         this.totalLengthDescription = FileUtil.getSizeDescription(totalLength);
-        
+
         this.instream = instream;
         this.outstream = outstream;
 
@@ -171,7 +177,23 @@ public class DownloadProgressHandler {
             outstream.flush();
         } finally {
             outstream.close();
-            System.out.println("下載進度100% !!");
+
+            long summeryTime = System.currentTimeMillis() - startTime;
+            System.out.println("下載進度100% !!" + (summeryTime / 1000) + "秒");
+
+            // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            DownloadProgress p = new DownloadProgress();
+            p.currentLength = this.totalLength;
+            p.totalLength = this.totalLength;
+            p.totalLengthDescription = this.totalLengthDescription;
+            p.percent = new BigDecimal(100);
+            p.kbpers = 0;
+            p.remainSec = 0;
+            p.remainDescrpition = DateUtil.wasteTotalTime(summeryTime);
+            p.isComplete = true;
+
+            progressPerformd.actionPerformed(new ActionEvent(p, -1, percent + "%"));
+            // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
         }
     }
 }

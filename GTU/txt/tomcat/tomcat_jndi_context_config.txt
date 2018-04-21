@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<WatchedResource>WEB-INF/web.xml</WatchedResource>
+	<Resource
+		url="jdbc:sqlserver://192.168.93.205\SQLEXPRESS;DatabaseName=ESUN_CCBILL"
+		type="javax.sql.DataSource" name="jdbc/sql" maxWaitMillis="10000"
+		maxIdle="30" maxActive="30"
+		driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+		auth="Container" />
+</Context>
+
+
+Context ic = new InitialContext();
+ic.lookup("java:comp/env/jdbc/sql")

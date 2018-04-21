@@ -70,8 +70,14 @@ public class Porn91Downloader {
         // 每週一到每週六8:15-9:15有女郎直播
 
         String url = JCommonUtil._jOptionPane_showInputDialog("請輸入facebook網址:");
-        List<VideoUrlConfig> videoLst = p.processVideoLst(url, "");
-
+        String content = "";
+        boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("使用記事本coockie", "");
+        if(result) {
+            content = ClipboardUtil.getInstance().getContents();
+        }
+        
+        List<VideoUrlConfig> videoLst = p.processVideoLst(url, content);
+        
         StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
             VideoUrlConfig v = videoLst.get(ii);
@@ -82,7 +88,7 @@ public class Porn91Downloader {
         int index = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入index : \n" + msg, "-1"));
 
         VideoUrlConfig video = videoLst.get(index);
-        p.processDownload(video, null);
+        p.processDownload(video, null, null);
         System.out.println("done...v3");
     }
 
@@ -102,10 +108,13 @@ public class Porn91Downloader {
         return videoLst;
     }
 
-    public void processDownload(VideoUrlConfig v, Integer percentScale) throws Throwable {
+    public void processDownload(VideoUrlConfig v, File destDir, Integer percentScale) throws Throwable {
         String prefix = StringUtils.isNotBlank(v.title) ? v.title + "_" : "";
         String filename = prefix + v.fileName;
-        File saveVideoFile = new File(FileUtil.DESKTOP_PATH, filename);
+        if(destDir == null) {
+            destDir = FileUtil.DESKTOP_DIR;
+        }
+        File saveVideoFile = new File(destDir, filename);
         downloadWithHttpClient(DEFAULT_USER_AGENT, v.url, saveVideoFile, percentScale);
     }
 

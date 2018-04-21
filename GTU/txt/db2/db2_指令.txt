@@ -36,12 +36,43 @@ $ db2 get database manager configuration | findstr /i svce
  TCP/IP Service name                          (SVCENAME) = db2c_DB2
  SSL service name                         (SSL_SVCENAME) =
  
- 
-#顯示schema清單
+
+
+
+#顯示database清單
 db2 list db directory
- 
-#建立schema [必須先start]
+
+#建立database [必須先start]
 $db2 create database [name]
+
+
+
+
+
+
+#建立schema [必須先start]
+$db2 create schema [name]
+
+#設定當前schema
+db2 set schema [SCHEMA_NAME]
+
+#查詢所有schema
+select schemaname from syscat.schemata
+
+#設定default schema <不work>
+set current schema = [name] --先設定當前schema
+set schema default --再設定為default
+
+#顯示當前schema
+values current schema
+
+#刪除schema
+DROP SCHEMA [SCHEMA_NAME] RESTRICT
+
+#顯示所有表
+list tables for schema [SCHEMA_NAME]
+ 
+
 
 #連線
 $ db2 CONNECT TO <databasename> user <Username> using <password>

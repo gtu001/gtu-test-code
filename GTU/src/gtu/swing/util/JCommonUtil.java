@@ -17,11 +17,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -46,7 +42,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -657,6 +652,10 @@ public class JCommonUtil {
      *            true可選檔案或目錄, false只可選檔案
      */
     public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir) {
+        jTextFieldSetFilePathMouseEvent(jTextField1, fileAndDir, null);
+    }
+    
+    public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir, final ActionListener fileChoiceDone) {
         jTextField1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
@@ -668,6 +667,9 @@ public class JCommonUtil {
                     }
                     if (file != null) {
                         jTextField1.setText(file.getAbsolutePath());
+                        if (fileChoiceDone != null) {
+                            fileChoiceDone.actionPerformed(new ActionEvent(file, -1, "ok"));
+                        }
                     } else {
                         JCommonUtil._jOptionPane_showMessageDialog_error("檔案選擇錯誤");
                     }

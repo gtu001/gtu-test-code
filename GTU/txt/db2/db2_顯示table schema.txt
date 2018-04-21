@@ -1,4 +1,4 @@
-#≈„•‹table schema
+#È°ØÁ§∫table schema
 
 db2 CONNECT TO test user db2inst1 using db2inst1-pwd
 
@@ -6,7 +6,7 @@ DESCRIBE TABLE test.bill_user
 
 
 
---≈„•‹™Ìµ≤∫c
+--È°ØÁ§∫Ë°®ÁµêÊßã
 SELECT DISTINCT
     (t.name),
     t.ColType,

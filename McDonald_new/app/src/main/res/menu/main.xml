@@ -168,4 +168,19 @@
         android:id="@+id/item_f_burgerFish40"
         android:orderInCategory="100"
         android:title="40元麥香魚(new)" />
+
+    <item
+        android:id="@+id/item_f_bbqChickenWing"
+        android:orderInCategory="100"
+        android:title="BBQ嫩雞翅買一送一(new)" />
+
+    <item
+        android:id="@+id/item_f_bigMicTwo"
+        android:orderInCategory="100"
+        android:title="大麥克買一送一(new)" />
+
+    <item
+        android:id="@+id/item_f_chickenFiredBurgerTwo"
+        android:orderInCategory="100"
+        android:title="嫩煎雞腿堡買一送一(new)" />
 </menu>

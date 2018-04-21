@@ -16,8 +16,8 @@ import gtu.log.JdkLoggerUtil;
 
 public class PornVideoUrlDetection {
 
-    private static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|mp3)";
-    private static final String FILE_EXTENSTION_POSSIBLE_PATTERN = "(mp4|avi|flv|rm|rmvb|mp3|jpg|jpeg|gif|tif|png|bmp)";
+    private static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
+    private static final String FILE_EXTENSTION_POSSIBLE_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3|jpg|jpeg|gif|tif|png|bmp)";
 
     private class PatternConfig {
         Pattern urlPtn;
@@ -169,7 +169,7 @@ public class PornVideoUrlDetection {
     public static void main(String[] args) {
         Porn91Downloader p = new Porn91Downloader();
         String url = "https://www.youjizz.com/videos/vixen-tasha-reign-has-intense-sex-with-a-college-friend-47628091.html";
-        String content = p.getVideoInfo(URI.create(url), "");
+        String content = p.getVideoInfo(URI.create(url), "", "");
 
         PornVideoUrlDetection p2 = new PornVideoUrlDetection(FILE_EXTENSTION_VIDEO_PATTERN, content);
         p2.processMain();

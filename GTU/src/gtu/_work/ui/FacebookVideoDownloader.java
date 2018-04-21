@@ -1,11 +1,16 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,9 +29,21 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import gtu.file.FileUtil;
+import gtu.javafx.traynotification.NotificationType;
+import gtu.javafx.traynotification.TrayNotificationHelper;
+import gtu.javafx.traynotification.animations.AnimationType;
 import gtu.properties.PropertiesUtilBean;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.SysTrayUtil;
 import gtu.youtube.DownloadProgressHandler;
 import gtu.youtube.Porn91Downloader;
 import gtu.youtube.Porn91Downloader.VideoUrlConfig;
@@ -45,9 +62,12 @@ public class FacebookVideoDownloader extends JFrame {
     private JTextField downloadThreadSizeText;
 
     private PropertiesUtilBean config = new PropertiesUtilBean(FacebookVideoDownloader.class);
+    private JTextField targetDirText;
+    private File targetDirectory = FileUtil.DESKTOP_DIR;
+    private HideInSystemTrayHelper sysutil;
 
     private class DownloadThreadPoolWatcher extends Thread {
-        LinkedList<VideoUrlConfig> downloadLst = new LinkedList<VideoUrlConfig>();
+        LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
         List<Thread> pool = new ArrayList<Thread>();
         int maxSize = 5;
 
@@ -72,7 +92,7 @@ public class FacebookVideoDownloader extends JFrame {
             int addSize = maxSize - pool.size();
             for (int ii = 0; ii < addSize; ii++) {
                 if (!downloadLst.isEmpty()) {
-                    VideoUrlConfig vo = downloadLst.pop();
+                    VideoUrlConfigZ vo = downloadLst.pop();
                     DownloadGOGO thread = new DownloadGOGO(vo, FacebookVideoDownloader.this);
                     thread.start();
                     pool.add(thread);
@@ -82,9 +102,9 @@ public class FacebookVideoDownloader extends JFrame {
 
         private class DownloadGOGO extends Thread {
             FacebookVideoDownloader ui;
-            VideoUrlConfig vo;
+            VideoUrlConfigZ vo;
 
-            private DownloadGOGO(VideoUrlConfig vo, FacebookVideoDownloader ui) {
+            private DownloadGOGO(VideoUrlConfigZ vo, FacebookVideoDownloader ui) {
                 this.ui = ui;
                 this.vo = vo;
             }
@@ -97,23 +117,49 @@ public class FacebookVideoDownloader extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             DownloadProgressHandler.DownloadProgress proc = (DownloadProgressHandler.DownloadProgress) e.getSource();
-                            String percent = proc.getPercent() + "%";
+                            String kbpers = proc.getKbpers() != 0 ? proc.getKbpers() + "KB/s " : "";
+                            String description = proc.getPercent() + "% " + kbpers + proc.getRemainDescrpition();
 
                             // 設定進度
                             // downloadListModel.addRow(new Object[] { serail,
                             // vo.getFileName(), vo.getUrl(), vo.getFizeSize(),
                             // "", vo });
-                            Vector vec = downloadListModel.getDataVector();// .set(4,
-                                                                           // percent);
+                            Vector vec = downloadListModel.getDataVector();
 
                             for (int row = 0; row < downloadListModel.getRowCount(); row++) {
                                 if (downloadListModel.getValueAt(row, 5) == DownloadGOGO.this.vo) {
-                                    downloadListModel.setValueAt(percent, row, 4);
+                                    downloadListModel.setValueAt(description, row, 4);
                                 }
+                            }
+
+                            if (proc.isComplete()) {
+                                showCompleteMessage();
+                            }
+                        }
+
+                        private void showCompleteMessage() {
+                            try {
+                                TrayNotificationHelper.newInstance()//
+                                        .title("下載完成!!")//
+                                        .message(DownloadGOGO.this.vo.getFileName())//
+                                        .notificationType(NotificationType.INFORMATION)//
+                                        .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
+                                        .animationType(AnimationType.FADE)//
+                                        .onPanelClickCallback(new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                try {
+                                                    Desktop.getDesktop().open(DownloadGOGO.this.vo.getDownloadToFile());
+                                                } catch (Exception ex) {
+                                                }
+                                            }
+                                        }).show(2000);
+                            } catch (Exception ex) {
+                                sysutil.displayMessage("下載完成!!", DownloadGOGO.this.vo.getFileName(), MessageType.INFO);
                             }
                         }
                     });
-                    downloader.processDownload(this.vo, 0);
+                    downloader.processDownload(this.vo.orign, this.vo.downloadToFile.getParentFile(), null);
                 } catch (Throwable e) {
                     JCommonUtil.handleException(this.vo.getFileName() + "失敗!", e);
                 }
@@ -144,7 +190,7 @@ public class FacebookVideoDownloader extends JFrame {
         this.setAutoRequestFocus(true);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 614, 512);
+        setBounds(100, 100, 680, 512);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -165,15 +211,31 @@ public class FacebookVideoDownloader extends JFrame {
 
         urlText = new JTextField();
         panel.add(urlText);
-        urlText.setColumns(40);
+        urlText.setColumns(35);
 
-        JButton clearUrlConfigBetn = new JButton("清除");
-        clearUrlConfigBetn.addActionListener(new ActionListener() {
+        JButton clearUrlConfigBtn = new JButton("清除");
+        clearUrlConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                clearUrlConfigBetnAction();
+                clearUrlConfigBtnAction();
             }
         });
-        panel.add(clearUrlConfigBetn);
+
+        JButton urlDetectBtn = new JButton("偵測");
+        urlDetectBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                urlTextOnBlur();
+            }
+        });
+        panel.add(urlDetectBtn);
+        panel.add(clearUrlConfigBtn);
+
+        JButton autoDownloadBtn = new JButton("自動");
+        autoDownloadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                autoDownload();
+            }
+        });
+        panel.add(autoDownloadBtn);
         urlText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -248,47 +310,106 @@ public class FacebookVideoDownloader extends JFrame {
                 cookieArea.setText("");
             }
         });
-
-        JButton saveConfigBtn = new JButton("儲存設定");
-        saveConfigBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                saveConfigBtnAction();
-            }
-        });
-        panel_9.add(saveConfigBtn);
         panel_9.add(clearCookieBtn);
 
         cookieArea = new JTextArea();
         panel_5.add(JCommonUtil.createScrollComponent(cookieArea), BorderLayout.CENTER);
 
-        JPanel panel_10 = new JPanel();
-        tabbedPane.addTab("下載清單", null, panel_10, null);
-        panel_10.setLayout(new BorderLayout(0, 0));
+        JPanel panel_15 = new JPanel();
+        tabbedPane.addTab("其他設定", null, panel_15, null);
+        panel_15.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
-        JPanel panel_11 = new JPanel();
-        panel_10.add(panel_11, BorderLayout.NORTH);
+        JLabel label_2 = new JLabel("下載位置");
+        panel_15.add(label_2, "2, 2, right, default");
 
-        JLabel lblNewLabel = new JLabel("下載清單");
-        panel_11.add(lblNewLabel);
+        targetDirText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(targetDirText, true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File file = (File) e.getSource();
+                if (file.isDirectory()) {
+                    targetDirectory = file;
+                }
+            }
+        });
+        panel_15.add(targetDirText, "4, 2, fill, default");
+        targetDirText.setColumns(10);
 
-        JPanel panel_12 = new JPanel();
-        panel_10.add(panel_12, BorderLayout.WEST);
+        JPanel panel_16 = new JPanel();
+        panel_15.add(panel_16, "4, 34, fill, fill");
 
-        JPanel panel_13 = new JPanel();
-        panel_10.add(panel_13, BorderLayout.EAST);
-
-        JPanel panel_14 = new JPanel();
-        panel_10.add(panel_14, BorderLayout.SOUTH);
-
-        downloadListTable = new JTable();
-        JTableUtil.defaultSetting_AutoResize(downloadListTable);
-        panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
+        JButton button = new JButton("儲存設定");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveConfigBtnAction();
+            }
+        });
+        panel_16.add(button);
+        
+                JPanel panel_10 = new JPanel();
+                tabbedPane.addTab("下載清單", null, panel_10, null);
+                panel_10.setLayout(new BorderLayout(0, 0));
+                
+                        JPanel panel_11 = new JPanel();
+                        panel_10.add(panel_11, BorderLayout.NORTH);
+                        
+                                JLabel lblNewLabel = new JLabel("下載清單");
+                                panel_11.add(lblNewLabel);
+                                
+                                        JPanel panel_12 = new JPanel();
+                                        panel_10.add(panel_12, BorderLayout.WEST);
+                                        
+                                                JPanel panel_13 = new JPanel();
+                                                panel_10.add(panel_13, BorderLayout.EAST);
+                                                
+                                                        JPanel panel_14 = new JPanel();
+                                                        panel_10.add(panel_14, BorderLayout.SOUTH);
+                                                        
+                                                                downloadListTable = new JTable();
+                                                                downloadListTable.addMouseListener(new MouseAdapter() {
+                                                                    @Override
+                                                                    public void mouseClicked(MouseEvent e) {
+                                                                        try {
+                                                                            JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
+                                                                            if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                                                                                int row = jTab.getRealRowPos(jTab.getSelectedRow());
+                                                                                VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, 5);
+                                                                                if (!vo.downloadToFile.exists()) {
+                                                                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在或被移除\n" + vo.downloadToFile);
+                                                                                    return;
+                                                                                }
+                                                                                Desktop.getDesktop().open(vo.downloadToFile);
+                                                                            }
+                                                                        } catch (Exception ex) {
+                                                                            JCommonUtil.handleException(ex);
+                                                                        }
+                                                                    }
+                                                                });
+                                                                JTableUtil.defaultSetting_AutoResize(downloadListTable);
+                                                                panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
 
         JCommonUtil.setJFrameDefaultSetting(this);
 
         initDownloadListTable();
 
         config.reflectInit(this);
+
+        // 設定下載目錄
+        File testTargetDir = new File(targetDirText.getText());
+        if (testTargetDir.exists() && testTargetDir.isDirectory()) {
+            targetDirectory = testTargetDir;
+        }
+        
+        sysutil = HideInSystemTrayHelper.newInstance();
+        sysutil.apply(this, "Facebook下載", "resource/images/ico/facebook.ico");
+        JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
     }
 
     private void initDownloadListTable() {
@@ -308,10 +429,16 @@ public class FacebookVideoDownloader extends JFrame {
             }
 
             List<VideoUrlConfig> list = downloader.processVideoLst(url, cookieContent);
-            DefaultTableModel model = JTableUtil.createModel(true, new String[] { "檔名", "URL", "大小", "下載" });
+            if (list.isEmpty()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
+                return;
+            }
+
+            DefaultTableModel model = JTableUtil.createModel(true, new String[] { "檔名", "URL", "大小", "下載", "VO" });
             videoTable.setModel(model);
             JTableUtil.newInstance(videoTable).columnIsButton("下載");
-            JTableUtil.setColumnWidths_Percent(videoTable, new float[] { 60f, 20f, 10f, 10f });
+            JTableUtil.setColumnWidths_Percent(videoTable, new float[] { 60f, 20f, 10f, 10f, 0f });
+            JTableUtil.newInstance(videoTable).hiddenColumn("VO");
 
             for (int ii = 0; ii < list.size(); ii++) {
                 final VideoUrlConfig vo = list.get(ii);
@@ -328,7 +455,8 @@ public class FacebookVideoDownloader extends JFrame {
                         vo.getFileName(), //
                         vo.getUrl(), //
                         vo.getFizeSize(), ////
-                        b1,//
+                        b1, //
+                        vo,//
                 });////
             }
         } catch (Exception ex) {
@@ -339,7 +467,7 @@ public class FacebookVideoDownloader extends JFrame {
     private void appendToDownloadBar(VideoUrlConfig vo) {
         boolean findOk1 = false;
         for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
-            VideoUrlConfig vo2 = downloadPool.downloadLst.get(ii);
+            VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);
             if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
                 findOk1 = true;
                 break;
@@ -348,15 +476,25 @@ public class FacebookVideoDownloader extends JFrame {
 
         boolean findOk2 = false;
         for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
-            VideoUrlConfig vo2 = (VideoUrlConfig) downloadListModel.getValueAt(ii, 5);
+            VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
             if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
                 findOk2 = true;
                 break;
             }
         }
 
+        File willingDownloadFile = new File(targetDirectory, vo.getFileName());
+        if (willingDownloadFile.exists()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+            return;
+        }
+
         if (!findOk1 && !findOk2) {
-            downloadPool.downloadLst.add(vo);
+            VideoUrlConfigZ vo2 = new VideoUrlConfigZ(vo);
+            vo2.downloadToFile = willingDownloadFile;
+
+            // add to pool
+            downloadPool.downloadLst.add(vo2);
 
             // append jtable
             {
@@ -367,15 +505,17 @@ public class FacebookVideoDownloader extends JFrame {
                 vec.add(vo.getUrl());
                 vec.add(vo.getFizeSize());
                 vec.add("");
-                vec.add(vo);
+                vec.add(vo2);
                 downloadListModel.addRow(vec);
             }
+
+            sysutil.displayMessage("開始下載", vo2.getFileName(), MessageType.INFO);
         } else {
-            JCommonUtil._jOptionPane_showMessageDialog_info("檔案已正在下載!");
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已正在下載!");
         }
     }
 
-    private void clearUrlConfigBetnAction() {
+    private void clearUrlConfigBtnAction() {
         urlText.setText("");
         videoTable.setModel(JTableUtil.createModel(true, new String[0]));
     }
@@ -387,6 +527,82 @@ public class FacebookVideoDownloader extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void autoDownload() {
+        try {
+            urlTextOnBlur();
+
+            JTableUtil jTab = JTableUtil.newInstance(videoTable);
+            DefaultTableModel model = jTab.getModel();
+
+            long maxSize = -1;
+            VideoUrlConfig tempVo = null;
+            JButton btn = new JButton();
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                final VideoUrlConfig vo = (VideoUrlConfig) model.getValueAt(ii, 4);
+                final JButton btn2 = (JButton) model.getValueAt(ii, 3);
+                if (tempVo != null) {
+                    maxSize = tempVo.getLength();
+                }
+                if (vo.getLength() > maxSize) {
+                    tempVo = vo;
+                    btn = btn2;
+                }
+            }
+
+            btn.doClick();
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private class VideoUrlConfigZ {
+
+        VideoUrlConfig orign;
+        File downloadToFile;
+        String fileName;
+        String fileSize;
+        String title;
+        String url;
+        long length = 0;
+
+        VideoUrlConfigZ(VideoUrlConfig orign) {
+            this.orign = orign;
+            this.fileName = orign.getFileName();
+            this.fileSize = orign.getFizeSize();
+            this.title = orign.getTitle();
+            this.url = orign.getUrl();
+            this.length = orign.getLength();
+        }
+
+        public VideoUrlConfig getOrign() {
+            return orign;
+        }
+
+        public File getDownloadToFile() {
+            return downloadToFile;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public String getFileSize() {
+            return fileSize;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public long getLength() {
+            return length;
         }
     }
 }
