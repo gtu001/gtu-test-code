@@ -72,12 +72,12 @@ public class Porn91Downloader {
         String url = JCommonUtil._jOptionPane_showInputDialog("請輸入facebook網址:");
         String content = "";
         boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("使用記事本coockie", "");
-        if(result) {
+        if (result) {
             content = ClipboardUtil.getInstance().getContents();
         }
-        
+
         List<VideoUrlConfig> videoLst = p.processVideoLst(url, content);
-        
+
         StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
             VideoUrlConfig v = videoLst.get(ii);
@@ -104,6 +104,7 @@ public class Porn91Downloader {
         List<SingleVideoUrlConfig> videoOrignLst = p2.processMain();
 
         List<VideoUrlConfig> videoLst = this.getVideoList(title, videoOrignLst);
+        content = String.format("<!-- Detect URL :%s -->\n\n", url) + content;
         this.debugSaveHtml(title, content, videoLst.isEmpty());
         return videoLst;
     }
@@ -111,7 +112,7 @@ public class Porn91Downloader {
     public void processDownload(VideoUrlConfig v, File destDir, Integer percentScale) throws Throwable {
         String prefix = StringUtils.isNotBlank(v.title) ? v.title + "_" : "";
         String filename = prefix + v.fileName;
-        if(destDir == null) {
+        if (destDir == null) {
             destDir = FileUtil.DESKTOP_DIR;
         }
         File saveVideoFile = new File(destDir, filename);

@@ -245,6 +245,22 @@ public class FileUtil {
             return null;
         }
     }
+    
+    public static List<String> loadFromFile_asList(File file, String encode) {
+        try {
+            List<String> lst = new ArrayList<String>();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encode));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                lst.add(line);
+            }
+            reader.close();
+            return lst;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * 讀取串流

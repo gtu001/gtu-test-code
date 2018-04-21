@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +29,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -43,7 +46,6 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.SysTrayUtil;
 import gtu.youtube.DownloadProgressHandler;
 import gtu.youtube.Porn91Downloader;
 import gtu.youtube.Porn91Downloader.VideoUrlConfig;
@@ -223,7 +225,7 @@ public class FacebookVideoDownloader extends JFrame {
         JButton urlDetectBtn = new JButton("偵測");
         urlDetectBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                urlTextOnBlur();
+                urlTextOnBlur(false);
             }
         });
         panel.add(urlDetectBtn);
@@ -232,7 +234,7 @@ public class FacebookVideoDownloader extends JFrame {
         JButton autoDownloadBtn = new JButton("自動");
         autoDownloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                autoDownload();
+                autoDownload(false);
             }
         });
         panel.add(autoDownloadBtn);
@@ -240,7 +242,7 @@ public class FacebookVideoDownloader extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    urlTextOnBlur();
+                    urlTextOnBlur(false);
                 }
             }
         });
@@ -318,7 +320,7 @@ public class FacebookVideoDownloader extends JFrame {
         JPanel panel_15 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_15, null);
         panel_15.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -342,6 +344,17 @@ public class FacebookVideoDownloader extends JFrame {
         panel_15.add(targetDirText, "4, 2, fill, default");
         targetDirText.setColumns(10);
 
+        JPanel panel_17 = new JPanel();
+        panel_15.add(panel_17, "4, 4, fill, fill");
+
+        JButton batchDownloadBtn = new JButton("批量下載");
+        batchDownloadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                batchAutoDownloadBtnAction();
+            }
+        });
+        panel_17.add(batchDownloadBtn);
+
         JPanel panel_16 = new JPanel();
         panel_15.add(panel_16, "4, 34, fill, fill");
 
@@ -352,48 +365,48 @@ public class FacebookVideoDownloader extends JFrame {
             }
         });
         panel_16.add(button);
-        
-                JPanel panel_10 = new JPanel();
-                tabbedPane.addTab("下載清單", null, panel_10, null);
-                panel_10.setLayout(new BorderLayout(0, 0));
-                
-                        JPanel panel_11 = new JPanel();
-                        panel_10.add(panel_11, BorderLayout.NORTH);
-                        
-                                JLabel lblNewLabel = new JLabel("下載清單");
-                                panel_11.add(lblNewLabel);
-                                
-                                        JPanel panel_12 = new JPanel();
-                                        panel_10.add(panel_12, BorderLayout.WEST);
-                                        
-                                                JPanel panel_13 = new JPanel();
-                                                panel_10.add(panel_13, BorderLayout.EAST);
-                                                
-                                                        JPanel panel_14 = new JPanel();
-                                                        panel_10.add(panel_14, BorderLayout.SOUTH);
-                                                        
-                                                                downloadListTable = new JTable();
-                                                                downloadListTable.addMouseListener(new MouseAdapter() {
-                                                                    @Override
-                                                                    public void mouseClicked(MouseEvent e) {
-                                                                        try {
-                                                                            JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
-                                                                            if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                                                                                int row = jTab.getRealRowPos(jTab.getSelectedRow());
-                                                                                VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, 5);
-                                                                                if (!vo.downloadToFile.exists()) {
-                                                                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在或被移除\n" + vo.downloadToFile);
-                                                                                    return;
-                                                                                }
-                                                                                Desktop.getDesktop().open(vo.downloadToFile);
-                                                                            }
-                                                                        } catch (Exception ex) {
-                                                                            JCommonUtil.handleException(ex);
-                                                                        }
-                                                                    }
-                                                                });
-                                                                JTableUtil.defaultSetting_AutoResize(downloadListTable);
-                                                                panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
+
+        JPanel panel_10 = new JPanel();
+        tabbedPane.addTab("下載清單", null, panel_10, null);
+        panel_10.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_11 = new JPanel();
+        panel_10.add(panel_11, BorderLayout.NORTH);
+
+        JLabel lblNewLabel = new JLabel("下載清單");
+        panel_11.add(lblNewLabel);
+
+        JPanel panel_12 = new JPanel();
+        panel_10.add(panel_12, BorderLayout.WEST);
+
+        JPanel panel_13 = new JPanel();
+        panel_10.add(panel_13, BorderLayout.EAST);
+
+        JPanel panel_14 = new JPanel();
+        panel_10.add(panel_14, BorderLayout.SOUTH);
+
+        downloadListTable = new JTable();
+        downloadListTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        int row = jTab.getRealRowPos(jTab.getSelectedRow());
+                        VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, 5);
+                        if (!vo.downloadToFile.exists()) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在或被移除\n" + vo.downloadToFile);
+                            return;
+                        }
+                        Desktop.getDesktop().open(vo.downloadToFile);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        JTableUtil.defaultSetting_AutoResize(downloadListTable);
+        panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
 
         JCommonUtil.setJFrameDefaultSetting(this);
 
@@ -406,7 +419,7 @@ public class FacebookVideoDownloader extends JFrame {
         if (testTargetDir.exists() && testTargetDir.isDirectory()) {
             targetDirectory = testTargetDir;
         }
-        
+
         sysutil = HideInSystemTrayHelper.newInstance();
         sysutil.apply(this, "Facebook下載", "resource/images/ico/facebook.ico");
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
@@ -420,7 +433,7 @@ public class FacebookVideoDownloader extends JFrame {
         JTableUtil.newInstance(downloadListTable).hiddenColumn("VO");
     }
 
-    private void urlTextOnBlur() {
+    private void urlTextOnBlur(final boolean throwEx) {
         try {
             String url = urlText.getText();
             String cookieContent = StringUtils.trimToEmpty(cookieArea.getText());
@@ -430,7 +443,11 @@ public class FacebookVideoDownloader extends JFrame {
 
             List<VideoUrlConfig> list = downloader.processVideoLst(url, cookieContent);
             if (list.isEmpty()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
+                if (throwEx) {
+                    throw new RuntimeException("找步道影片 : " + url);
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
+                }
                 return;
             }
 
@@ -447,7 +464,7 @@ public class FacebookVideoDownloader extends JFrame {
                 b1.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        appendToDownloadBar(vo);
+                        appendToDownloadBar(vo, throwEx);
                     }
                 });
 
@@ -460,11 +477,15 @@ public class FacebookVideoDownloader extends JFrame {
                 });////
             }
         } catch (Exception ex) {
-            JCommonUtil.handleException(ex);
+            if (throwEx) {
+                throw new RuntimeException("urlTextOnBlur ERR : " + ex.getMessage(), ex);
+            } else {
+                JCommonUtil.handleException(ex);
+            }
         }
     }
 
-    private void appendToDownloadBar(VideoUrlConfig vo) {
+    private void appendToDownloadBar(VideoUrlConfig vo, boolean throwEx) {
         boolean findOk1 = false;
         for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
             VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);
@@ -485,7 +506,11 @@ public class FacebookVideoDownloader extends JFrame {
 
         File willingDownloadFile = new File(targetDirectory, vo.getFileName());
         if (willingDownloadFile.exists()) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+            if (throwEx) {
+                throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+            }
             return;
         }
 
@@ -511,7 +536,11 @@ public class FacebookVideoDownloader extends JFrame {
 
             sysutil.displayMessage("開始下載", vo2.getFileName(), MessageType.INFO);
         } else {
-            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已正在下載!");
+            if (throwEx) {
+                // do nothing
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案已正在下載!");
+            }
         }
     }
 
@@ -530,9 +559,9 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
-    private void autoDownload() {
+    private void autoDownload(boolean throwEx) {
         try {
-            urlTextOnBlur();
+            urlTextOnBlur(throwEx);
 
             JTableUtil jTab = JTableUtil.newInstance(videoTable);
             DefaultTableModel model = jTab.getModel();
@@ -554,8 +583,55 @@ public class FacebookVideoDownloader extends JFrame {
 
             btn.doClick();
         } catch (Exception ex) {
+            if (throwEx) {
+                throw new RuntimeException(ex);
+            } else {
+                JCommonUtil.handleException(ex);
+            }
+        }
+    }
+
+    private void batchAutoDownloadBtnAction() {
+        StringBuffer sb = new StringBuffer();
+        try {
+            File saveFile = JCommonUtil._jFileChooser_selectFileOnly();
+            if (!saveFile.exists()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                return;
+            }
+
+            List<String> urLst = FileUtil.loadFromFile_asList(saveFile, "UTF-8");
+
+            for (int ii = 0; ii < urLst.size(); ii++) {
+                String url = StringUtils.trimToEmpty(urLst.get(ii));
+                sb.append(String.format("<<%d>> : %s", ii, url) + "\n");
+                if (StringUtils.isNotBlank(url)) {
+                    try {
+                        urlText.setText(url);
+                        autoDownload(true);
+                    } catch (Exception ex) {
+                        sb.append("Err : \n" + parseToString(ex));
+                    }
+                }
+            }
+
+            String logName = "facebook_log_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmm") + ".txt";
+            File logFile = new File(FileUtil.DESKTOP_PATH, logName);
+            FileUtil.saveToFile(logFile, sb.toString(), "UTF-8");
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+    
+    private String parseToString(Throwable ge) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ge.printStackTrace(pw);
+        Throwable parentThrowEx = ge;
+        while ((parentThrowEx = parentThrowEx.getCause()) != null) {
+            parentThrowEx.printStackTrace(pw);
+        }
+        return sw.toString();
     }
 
     private class VideoUrlConfigZ {
