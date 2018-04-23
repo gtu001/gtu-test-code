@@ -1,0 +1,59 @@
+create table ADCaseData ( 
+ADPrjId varchar2(50) not null,
+BlockCode varchar2(50) not null,
+STime timestamp null,
+Etime timestamp null,
+PhotoMax int null,
+Status int null,
+is_default char(1),
+ADPRJNAME varchar2(100),
+approver varchar2(20),
+creater varchar2(20),
+CTime timestamp,
+ATime timestamp,
+status2 number,
+approver2 varchar2(20),
+stopper varchar2(20)
+);
+
+create unique index pk_ADCaseData on ADCaseData(ADPrjId,BlockCode);
+
+-----------------------------------------------------------------------------
+
+create table ADCaseUserGroup ( 
+ADPrjId varchar2(50) not null,
+UGId varchar2(50) not null,
+Priority int null
+);
+
+create unique index pk_ADCaseUserGroup on ADCaseUserGroup(ADPrjId,UGId);
+-----------------------------------------------------------------------------
+create table BlockMap ( 
+BlockCode varchar2(50) not null,
+BlockName varchar2(500) null,
+BlockDesc varchar2(500) null,
+Status int null,
+Type int null,
+blockphoto clob
+);
+
+create unique index pk_BlockMap on BlockMap(BlockCode);
+-----------------------------------------------------------------------------
+create table ADPrjSay ( 
+ADPrjId varchar2(50) not null,
+UserId varchar2(50) not null,
+Content clob null
+);
+
+create unique index pk_ADPrjSay on ADPrjSay(ADPrjId,UserId);
+-----------------------------------------------------------------------------
+create table ADPhotoData ( 
+ADPrjId varchar2(50) not null,
+PhotoSN int not null,
+Photo clob null,
+LiinkTo clob null,
+Desc_ clob null
+);
+
+create unique index pk_ADPhotoData on ADPhotoData(ADPrjId,PhotoSN);
+

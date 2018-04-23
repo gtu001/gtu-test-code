@@ -48,9 +48,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
-        System.out.println(FileUtil.DESKTOP_DIR);
-        System.out.println(FileUtil.DESKTOP_PATH);
-        System.out.println(FileUtil.TEMP_DIR);
     }
 
     private FileUtil() {
@@ -245,7 +242,7 @@ public class FileUtil {
             return null;
         }
     }
-    
+
     public static List<String> loadFromFile_asList(File file, String encode) {
         try {
             List<String> lst = new ArrayList<String>();
@@ -1038,8 +1035,12 @@ public class FileUtil {
     /**
      * 避掉黨名的特殊符號 \/:*?"<>|
      */
-    public static String escapeFilename(String filename) {
-        Pattern ptn = Pattern.compile("\\\\\\/\\:\\*\\?\"\\<\\>\\|");
+    public static String escapeFilename(String filename, boolean doWithFileSeparator) {
+        String replaceSeparator = "\\\\\\/";
+        if (!doWithFileSeparator) {
+            replaceSeparator = "";
+        }
+        Pattern ptn = Pattern.compile("[" + doWithFileSeparator + "\\:\\*\\?\"\\<\\>\\|]");
         Matcher mth = ptn.matcher(filename);
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {

@@ -1,0 +1,17 @@
+﻿
+--原sql
+SELECT 
+  a.name, a.recovery_model_desc
+FROM sys.databases a
+WHERE a.database_id < 5
+ORDER BY a.name ASC;
+
+
+--若要加入rownum
+--需要將oerder by 改道 row_number()子句
+
+SELECT 
+  ROW_NUMBER() OVER(ORDER BY a.name ASC) 
+    AS Row#,
+  a.name, a.recovery_model_desc
+FROM sys.databases a WHERE a.database_id < 5;

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="no-js hasSidebar hasPageActions hasBreadcrumb " lang="en-us" dir="ltr" >
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:title" content="Data Type Mapping for Oracle Publishers" />
+	<meta property="og:image" content="https://docs.microsoft.com/_themes/docs.theme/master/en-us/_themes/images/microsoft-header.png" />
+
+
+		<meta name="breadcrumb_path" content="../../../breadcrumb/toc.json?view=sql-server-2017">
+<meta name="ms.suite" content="sql">
+<meta name="ms.custom" content="">
+<meta name="ms.tgt_pltfrm" content="">
+<meta name="ms.assetid" content="6da0e4f4-f252-4b7e-ba60-d2e912aa278e">
+<meta name="ms.prod_service" content="database-engine">
+<meta name="author" content="MashaMSFT">
+<meta name="ms.author" content="mathoma">
+<meta name="ms.component" content="replication">
+<meta name="manager" content="craigg">
+<meta name="caps.latest.revision" content="47">
+<meta name="ms.topic" content="article">
+<meta name="ms.service" content="">
+<meta name="ms.date" content="03/14/2017">
+<meta name="ms.technology" content="replication">
+<meta name="ms.workload" content="On Demand">
+<meta name="ms.prod" content="sql">
+<meta name="ms.reviewer" content="">
+<meta name="search.ms_sitename" content="Docs">
+<meta name="search.ms_docsetname" content="sql-content">
+<meta name="version" content="0">
+<meta name="locale" content="en-us">
+<meta name="site_name" content="Docs">
+<meta name="search.ms_product" content="SQL">
+<meta name="depot_name" content="SQL.sql-content">
+<meta name="updated_at" content="2018-04-13 10:33 PM">
+<meta name="gitcommit" content="https://github.com/MicrosoftDocs/sql-docs-pr/blob/60aa2f0cd8647583716c3157cbc3fd59b481b802/docs/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md">
+<meta name="original_content_git_url" content="https://github.com/MicrosoftDocs/sql-docs-pr/blob/live/docs/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md">
+<meta name="document_id" content="cbfd4430-d64e-2c4e-3ab4-5caea0b6a214">
+<meta name="document_version_independent_id" content="4ced7aeb-d900-2466-f3d7-a2e0a91c3fea">
+<meta name="monikers" content="sql-server-2016">
+<meta name="monikers" content="sql-server-2017">
+<meta name="monikers" content="sqlallproducts-allversions">
+<meta name="pagetype" content="Conceptual">
+<meta name="page_type" content="Conceptual">
+<meta name="toc_rel" content="TOC.json?view=sql-server-2017">
+<meta name="pdf_url_template" content="https://docs.microsoft.com/pdfstore/en-us/SQL.sql-content/{branchName}{pdfName}">
+<meta name="word_count" content="728">
+
+	<meta name="scope" content="sql" />
+<link href="https://docs.microsoft.com/en-us/sql/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers" rel="canonical">
+	<title>Data Type Mapping for Oracle Publishers | Microsoft Docs</title>
+
+	<link rel="stylesheet" href="/_themes/docs.theme/master/en-us/_themes/css/490bd545.site.css ">
+	<link rel="stylesheet" href="/_themes/docs.theme/master/en-us/_themes/css/d728b757.conceptual.css ">
+
+
+	<script>
+	var msDocs = {
+		data:{
+			contentLocale: 'en-us',
+			contentDir: 'ltr',
+			userLocale: 'en-us',
+			userDir: 'ltr',
+			pageTemplate: 'Conceptual',
+			brand: '',
+			context: {
+
+			},
+			hasComments: true,
+			feedbackSystem: 'LiveFyre',
+			feedbackGitHubRepo: '',
+			feedbackProductUrl: '',
+			contentGitUrl: 'https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md',
+			forceVersionPicker:false		},
+		functions:{},
+		settings:{
+			extendBreadcrumb: false
+		}
+	};
+	if (!('Promise' in window && 'resolve' in window.Promise && 'reject' in window.Promise && 'all' in window.Promise && 'race' in window.Promise)) {
+		document.write('<script src="/_themes/docs.theme/master/en-us/_themes/global/js/6ee34c01.bluebird.min.js"><\/script>');
+	}
+	if (typeof fetch !== 'function') {
+		document.write('<script src="/_themes/docs.theme/master/en-us/_themes/global/js/d9fc435c.fetch.min.js"><\/script>');
+	}
+	</script>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.2.4.min.js"></script>
+	<script src="/_themes/docs.theme/master/en-us/_themes/global/js/ccd188e3.global.min.js"></script>
+</head>
+
+<body lang="en-us" dir="ltr">
+<div class="header-holder">
+		<div id="headerAreaHolder" data-bi-name="header">
+			<div id="uhfPlaceHolder" class="c-me"></div>
+		</div>
+	<div id="disclaimer-holder" class="disclaimer-holder"></div>
+</div>
+
+	<div class="container mainContainer" data-bi-name="body">
+		<ul class="breadcrumbs" data-bi-name="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList" role="navigation" aria-label="Breadcrumb"><li></li></ul>
+
+		<div class="primary-holder">
+
+			<main id="main" role="main" class="content" data-bi-name="content" lang="en-us" dir="ltr">
+
+
+				<h1 id="data-type-mapping-for-oracle-publishers" sourcefile="relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md" sourcestartlinenumber="26" sourceendlinenumber="26">Data Type Mapping for Oracle Publishers</h1>
+
+					<ul class="metadata page-metadata" data-bi-name="page info" lang="en-us" dir="ltr">
+							<li class="displayDate docon-before docon-calendar inline loading">
+								<time datetime="03/14/2017">03/14/2017</time>
+							</li>
+							<li class="readingTime docon-before docon-clock inline">3 minutes to read</li>
+							<li class="contributors-holder inline">
+								<span class="contributors-text">Contributors</span>
+								<ul class="contributors" data-bi-name="contributors">
+											<li><a href="https://github.com/MashaMSFT" title="mashathomas" data-bi-name="contributorprofile"><img src="https://docs.microsoft.com/_themes/docs.theme/master/en-us/_themes/images/contributor.svg" data-src="https://github.com/MashaMSFT.png?size=32" alt="mashathomas"></a></li>
+											<li><a href="https://github.com/craigg-msft" title="Craig Guyer" data-bi-name="contributorprofile"><img src="https://docs.microsoft.com/_themes/docs.theme/master/en-us/_themes/images/contributor.svg" data-src="https://github.com/craigg-msft.png?size=32" alt="Craig Guyer"></a></li>
+											<li><a href="https://github.com/MikeRayMSFT" title="MikeRayMSFT" data-bi-name="contributorprofile"><img src="https://docs.microsoft.com/_themes/docs.theme/master/en-us/_themes/images/contributor.svg" data-src="https://github.com/MikeRayMSFT.png?size=32" alt="MikeRayMSFT"></a></li>
+								</ul>
+							</li>
+
+					</ul>
+						<nav id="center-doc-outline" class="doc-outline" data-bi-name="intopic toc" role="navigation" aria-label="On page navigation">
+							<h3>In this article</h3>
+						</nav>
+
+				<!-- <content> -->
+					
+<token><strong>THIS TOPIC APPLIES TO:</strong> <img src="../../../includes/media/yes.png?view=sql-server-2017" alt="yes" data-linktype="relative-path">SQL Server<img src="../../../includes/media/no.png?view=sql-server-2017" alt="no" data-linktype="relative-path">Azure SQL Database<img src="../../../includes/media/no.png?view=sql-server-2017" alt="no" data-linktype="relative-path">Azure SQL Data Warehouse <img src="../../../includes/media/no.png?view=sql-server-2017" alt="no" data-linktype="relative-path">Parallel Data Warehouse </token>
+
+<p>  Oracle data types and  Microsoft  SQL Server data types do not always match exactly. Where possible, the matching data type is selected automatically when publishing an Oracle table. In cases that a single data type mapping is not clear, alternative data type mappings are provided. For information about how to select alternative mappings, see the &quot;Specifying Alternative Data Type Mappings&quot; section later in this topic.  </p>
+<p> The following table shows how data types are mapped by default between Oracle and  SQL Server when data is moved from the Oracle Publisher to the  SQL Server Distributor. The Alternatives column indicates whether alternative mappings are available.  </p>
+<table>
+<thead>
+<tr>
+<th>Oracle data type</th>
+<th>SQL Server data type</th>
+<th>Alternatives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BFILE</td>
+<td>VARBINARY(MAX)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>BLOB</td>
+<td>VARBINARY(MAX)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>CHAR([1-2000])</td>
+<td>CHAR([1-2000])</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>CLOB</td>
+<td>VARCHAR(MAX)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>DATE</td>
+<td>DATETIME</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>FLOAT</td>
+<td>FLOAT</td>
+<td>No</td>
+</tr>
+<tr>
+<td>FLOAT([1-53])</td>
+<td>FLOAT([1-53])</td>
+<td>No</td>
+</tr>
+<tr>
+<td>FLOAT([54-126])</td>
+<td>FLOAT</td>
+<td>No</td>
+</tr>
+<tr>
+<td>INT</td>
+<td>NUMERIC(38)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>INTERVAL</td>
+<td>DATETIME</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>LONG</td>
+<td>VARCHAR(MAX)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>LONG RAW</td>
+<td>IMAGE</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>NCHAR([1-1000])</td>
+<td>NCHAR([1-1000])</td>
+<td>No</td>
+</tr>
+<tr>
+<td>NCLOB</td>
+<td>NVARCHAR(MAX)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>NUMBER</td>
+<td>FLOAT</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>NUMBER([1-38])</td>
+<td>NUMERIC([1-38])</td>
+<td>No</td>
+</tr>
+<tr>
+<td>NUMBER([0-38],[1-38])</td>
+<td>NUMERIC([0-38],[1-38])</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>NVARCHAR2([1-2000])</td>
+<td>NVARCHAR([1-2000])</td>
+<td>No</td>
+</tr>
+<tr>
+<td>RAW([1-2000])</td>
+<td>VARBINARY([1-2000])</td>
+<td>No</td>
+</tr>
+<tr>
+<td>REAL</td>
+<td>FLOAT</td>
+<td>No</td>
+</tr>
+<tr>
+<td>ROWID</td>
+<td>CHAR(18)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>DATETIME</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>TIMESTAMP(0-7)</td>
+<td>DATETIME</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>TIMESTAMP(8-9)</td>
+<td>DATETIME</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>TIMESTAMP(0-7) WITH TIME ZONE</td>
+<td>VARCHAR(37)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>TIMESTAMP(8-9) WITH TIME ZONE</td>
+<td>VARCHAR(37)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>TIMESTAMP(0-7) WITH LOCAL TIME ZONE</td>
+<td>VARCHAR(37)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>TIMESTAMP(8-9) WITH LOCAL TIME ZONE</td>
+<td>VARCHAR(37)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>UROWID</td>
+<td>CHAR(18)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>VARCHAR2([1-4000])</td>
+<td>VARCHAR([1-4000])</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="considerations-for-data-type-mapping">Considerations for Data Type Mapping</h2>
+<p> Keep the following data type issues in mind when replicating data from an Oracle database.  </p>
+<h3 id="unsupported-data-types">Unsupported Data Types</h3>
+<p> The following data types are not supported; columns that have these types cannot be replicated:  </p>
+<ul>
+<li><p>Object types  </p>
+</li>
+<li><p>XML types  </p>
+</li>
+<li><p>Varrays  </p>
+</li>
+<li><p>Nested tables  </p>
+</li>
+<li><p>Columns that use REF  </p>
+</li>
+</ul>
+<h3 id="the-date-data-type">The DATE Data Type</h3>
+<p> Dates in  SQL Server range from 1753 A.D. to 9999 A.D., whereas dates in Oracle range from 4712 B.C. to 4712 A.D. If a column of type DATE contains values that are out of range for SQL Server, select the alternative data type for the column, which is VARCHAR(19).  </p>
+<h3 id="float-and-number-types">FLOAT and NUMBER Types</h3>
+<p> The scale and precision specified during the mapping of FLOAT and NUMBER data types depends upon the scale and precision specified for the column using the data type in the Oracle database. Precision is the number of digits in a number. Scale is the number of digits to the right of the decimal point in a number. For example, the number 123.45 has a precision of 5 and a scale of 2.  </p>
+<p> Oracle allows numbers to be defined with a scale greater than the precision, such as NUMBER(4,5), but  SQL Server requires the precision to be equal to or greater than the scale. To ensure there is no data truncation, if the scale is greater than the precision at the Oracle Publisher, the precision is set equal to the scale when the data type is mapped: NUMBER(4,5) would be mapped as NUMERIC(5,5).  </p>
+<div class="NOTE"><p>Note</p><p> If you do not specify a scale and precision for NUMBER,  SQL Server defaults to using the maximum scale (8) and precision (38). We recommend that you set a specific scale and precision in Oracle for better storage and performance when the data is replicated.  </p>
+</div>
+<h3 id="large-object-types">Large Object Types</h3>
+<p> Oracle supports up to 4 gigabytes (GB), whereas SQL Server supports up to 2 GB. Data replicated above 2 GB is truncated.  </p>
+<p> If an Oracle table includes a BFILE column, the data for the column is stored in the file system. The replication administrative user account must be granted access to the directory in which the data is stored using the following syntax:  </p>
+<p> <code>GRANT READ ON DIRECTORY &lt;directory_name&gt; TO &lt;replication_administrative_user_schema&gt;</code>  </p>
+<p> For more information about large objects types, see the section &quot;Considerations for Large Objects&quot; in <a href="design-considerations-and-limitations-for-oracle-publishers?view=sql-server-2017" data-linktype="relative-path">Design Considerations and Limitations for Oracle Publishers</a>.  </p>
+<h2 id="specifying-alternative-data-type-mappings">Specifying Alternative Data Type Mappings</h2>
+<p> Typically, the default data type mapping is appropriate, but for many Oracle data types, you can select a data type mapping from a set of alternative mappings, rather than using the default. There are two ways to specify alternative mappings:  </p>
+<ul>
+<li><p>Override the default on a per-article basis using stored procedures or the New Publication Wizard.  </p>
+</li>
+<li><p>Globally change the default for all future articles using stored procedures (defaults are not changed for existing articles).  </p>
+<p>To specify alternative data type mappings, see <a href="../publish/specify-data-type-mappings-for-an-oracle-publisher?view=sql-server-2017" data-linktype="relative-path">Specify Data Type Mappings for an Oracle Publisher</a>.  </p>
+</li>
+</ul>
+<h2 id="see-also">See Also</h2>
+<p> <a href="configure-an-oracle-publisher?view=sql-server-2017" data-linktype="relative-path">Configure an Oracle Publisher</a><br> <a href="design-considerations-and-limitations-for-oracle-publishers?view=sql-server-2017" data-linktype="relative-path">Design Considerations and Limitations for Oracle Publishers</a><br> <a href="oracle-publishing-overview?view=sql-server-2017" data-linktype="relative-path">Oracle Publishing Overview</a>  </p>
+
+				<!-- </content> -->
+
+
+			</main>
+
+
+						<div class="note alert">
+							<p>Note</p>
+							<p>The feedback system for this content will be changing soon. Old comments will not be carried over. If content within a comment thread is important to you, please save a copy. For more information on the upcoming change, <a href="https://docs.microsoft.com/teamblog/a-new-feedback-system-is-coming-to-docs">we invite you to read our blog post</a>.</p>
+						</div>
+					<div id="comments-container" data-bi-name="comments" role="form"></div>
+		</div>
+
+		<div class="pageActions">
+			<div id="page-actions" data-bi-name="pageactions" role="complementary" aria-label="Page Actions">
+				<div id="page-actions-content">
+					<ul class="action-list">
+							<li>
+									<a href="#comments-container" id="comments-link" data-bi-name="comments">
+										<i class="docon docon-comment-lines" aria-hidden="true"></i>Feedback									</a>
+							</li>
+									<li id="contenteditbtn">
+											<a href="https://github.com/MicrosoftDocs/sql-docs/blob/live/docs/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md" title="Edit This Document" data-bi-name="edit" data-original_content_git_url="https://github.com/MicrosoftDocs/sql-docs-pr/blob/live/docs/relational-databases/replication/non-sql/data-type-mapping-for-oracle-publishers.md">
+											<i class="icon icon-editor"></i>Edit										</a>
+									</li>
+						<li>
+							<div class="sharing dropdown has-caret">
+								<a href="#" class="dropdown-trigger" aria-haspopup="true" aria-controls="sharing-menu" aria-expanded="false" title="Share This Document" data-bi-name="share">
+									<i class="icon icon-share"></i>Share								</a>
+								<div class="dropdown-menu" id="sharing-menu" role="menu">
+									<ul data-bi-name="share-links">
+										<li><a class="share-twitter" data-bi-name="twitter"><i class="icon icon-twitter"></i>Twitter</a></li>
+										<li><a class="share-linkedin" data-bi-name="linkedin"><i class="icon icon-linkedin"></i>LinkedIn</a></li>
+										<li><a class="share-facebook" data-bi-name="facebook"><i class="icon icon-facebook"></i>Facebook</a></li>
+										<li><a class="share-email" data-bi-name="email"><i class="icon icon-email"></i>Email</a></li>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li role="presentation" class="typeSep">|</li>
+						<li>
+							<label for="theme-selector">Theme</label>
+							<select id="theme-selector" data-bi-name="select-theme">
+								<option value="" class="removedOnload"></option>
+								<option value="">Light</option>
+								<option value="theme_night">Dark</option>
+							</select>
+						</li>
+					</ul>
+
+						<nav id="side-doc-outline" class="doc-outline" data-bi-name="intopic toc" role="navigation" aria-label="On page navigation">
+							<h3>In this article</h3>
+						</nav>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="sidebar" id="sidebar" data-bi-name="left toc" role="navigation" aria-label="Main Navigation">
+			<div id="sidebarContent">
+				<div class="filterHolder">
+				</div>
+				<nav class="toc"></nav>
+				<div class="pdfDownloadHolder"></div>
+			</div>
+			<div class="tocSpace"></div>
+		</div>
+
+		<nav id="menu-nav" class="dropdown-container" role="navigation" aria-label="Table of Contents">
+			<div class="dropdown dropdown-full mobilenavi">
+					<select>
+					</select>
+			</div>
+		</nav>
+
+	</div>
+
+	<div id="openFeedbackContainer" class="openfeedback-container"></div>
+
+	<div class="container footerContainer" >
+<footer id="footer" data-bi-name="footer" class="footer-layout" role="contentinfo">
+  <div class="container">
+
+    <a data-mscc-ic="false" id="locale-selector-link" href="#" data-bi-name="select-locale"></a>
+
+    <ul class="links" data-bi-name="footerlinks">
+		<li><a data-mscc-ic="false" href="https://docs.microsoft.com/previous-versions/" data-bi-name="archivelink">Previous Version Docs</a></li>
+		<li><a data-mscc-ic="false" href="https://docs.microsoft.com/teamblog" data-bi-name="bloglink">Blog</a></li>
+		<li><a data-mscc-ic="false" href="https://docs.microsoft.com/contribute" data-bi-name="contributorGuide">How to contribute</a></li>
+		<li><a data-mscc-ic="false" href="https://privacy.microsoft.com/en-us/" data-bi-name="privacy">Privacy &amp; Cookies</a></li>
+		<li><a data-mscc-ic="false" href="/en-us/legal/termsofuse" data-bi-name="termsofuse">Terms of Use</a></li>
+		<li><a data-mscc-ic="false" href="https://aka.ms/sitefeedback" data-bi-name="feedback">Feedback</a></li>
+		<li><a data-mscc-ic="false" href="https://www.microsoft.com/en-us/legal/intellectualproperty/Trademarks/EN-US.aspx" data-bi-name="trademarks">Trademarks</a></li>
+    </ul>
+  </div>
+</footer>	</div>
+
+</body>
+</html>

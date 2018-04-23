@@ -26,3 +26,10 @@ matplotlib
 
 #keyboard listener
 pynput
+
+#pdf
+pdftotext
+PyPDF2
+
+
+ipykernel>=4.5.1

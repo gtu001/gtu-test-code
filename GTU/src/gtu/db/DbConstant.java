@@ -12,10 +12,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class DbConstant {
     
     public static void main(String[] args) {
-//        DataSource ds = getTestDataSource_FucoOracle();
+        DataSource ds = getTestDataSource_Fuco_ESUN();
         Connection conn = null;
         try {
-            conn = getDB2Connection();
+            conn = ds.getConnection();
             System.out.println("test fine ...");
             
             int v = Integer.parseInt("01");
@@ -131,6 +131,16 @@ public class DbConstant {
     public static DataSource getTestDataSource_Fuco() {
         BasicDataSource ds2  = new BasicDataSource();
         ds2.setUrl("jdbc:sqlserver://192.168.93.205\\SQLEXPRESS;DatabaseName=SCSB_CCBILL");
+        ds2.setUsername("sa");
+        ds2.setPassword("12345678");
+        ds2.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        applyToConnectionPool(ds2);
+        return ds2;
+    }
+    
+    public static DataSource getTestDataSource_Fuco_ESUN() {
+        BasicDataSource ds2  = new BasicDataSource();
+        ds2.setUrl("jdbc:sqlserver://192.168.93.205\\SQLEXPRESS;DatabaseName=ESUN_CCBILL");
         ds2.setUsername("sa");
         ds2.setPassword("12345678");
         ds2.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

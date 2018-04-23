@@ -1,0 +1,19 @@
+--由於oracle有dual 但 sqlserver沒有類似的 , 此為最快解法
+
+CREATE TABLE
+    DUAL
+    (
+        DUMMY VARCHAR(1)
+    )
+    GO
+INSERT
+INTO
+    DUAL
+    (
+        DUMMY
+    )
+    VALUES
+    (
+        'X'
+    )
+    GO

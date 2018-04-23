@@ -1,0 +1,38 @@
+
+--### Oracle ª©¥» 
+with d1 as (                                                          
+  SELECT a.BLOCKCODE, c.photo, c.lIINKTO, b.type, a.etime              
+  FROM ADCASEDATA a join BLOCKMAP b on a.blockcode = b.blockcode       
+  join ADPHOTODATA c on a.ADPRJID = c.ADPRJID                          
+  where a.status2 = 4                                                  
+    and a.blockcode = ?                                                
+    and a.stime <= sysdate and a.etime + 1 >= sysdate                  
+    and a.is_default = 'N'                                             
+  order by a.etime desc, a.ctime desc                                  
+ ) ,                                                                   
+ d2 as (                                                               
+   select d.* from d1 d                                                
+   where rownum =1                                                     
+ )                                                                     
+  select a.photo, a.liinkto                                            
+  from d2 a                                                            
+
+
+--### SqlServer ª©¥»
+  with d1 as (                                                         
+   SELECT a.BLOCKCODE, c.photo, c.lIINKTO, b.type, a.etime,            
+          row_number() over(order by a.etime desc) as Row#             
+   FROM ADCASEDATA a join BLOCKMAP b on a.blockcode = b.blockcode      
+   join ADPHOTODATA c on a.ADPRJID = c.ADPRJID                         
+   where a.status2 = 4                                                 
+     and a.blockcode = ?                                               
+     and a.stime <= SYSDATETIME() and a.etime + 1 >= SYSDATETIME()     
+     and a.is_default = 'N'                                            
+  ) ,                                                                  
+  d2 as (                                                              
+    select d.*                                                         
+     from d1 d                                                         
+    where Row# =1                                                      
+  )                                                                    
+   select a.photo, a.liinkto                                           
+   from d2 a                                                           

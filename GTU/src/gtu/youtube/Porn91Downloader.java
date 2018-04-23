@@ -360,7 +360,7 @@ public class Porn91Downloader {
             if (mth.find()) {
                 title = mth.group(1);
                 title = StringEscapeUtils.unescapeHtml(title);
-                title = FileUtil.escapeFilename(title);
+                title = FileUtil.escapeFilename(title, true);
                 System.out.println(title);
             }
             System.out.println("-----------------------------------------------------------------------");

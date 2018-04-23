@@ -29,7 +29,7 @@ public class StringUtil_ {
      * @param isChineseBool
      * @return
      */
-    public String getChineseWord2(String str, boolean isChineseBool) {
+    public static String getChineseWord2(String str, boolean isChineseBool) {
         StringBuffer sb = new StringBuffer();
         char[] cs = str.toCharArray();
         for (char c : cs) {
@@ -50,7 +50,7 @@ public class StringUtil_ {
      * @param isChineseBool
      * @return
      */
-    public String getChineseWord(String str, boolean isChineseBool) {
+    public static String getChineseWord(String str, boolean isChineseBool) {
         String isChinese = isChineseBool ? "" : "^";
         Pattern chinesePattern = Pattern.compile("[" + isChinese + "\u4e00-\u9fa5]");
         StringBuilder sb = new StringBuilder();
@@ -68,7 +68,7 @@ public class StringUtil_ {
      * @param isChineseBool
      * @return
      */
-    public boolean hasChineseWord(String str) {
+    public static boolean hasChineseWord(String str) {
         Matcher mth = Pattern.compile("[\u4e00-\u9fa5]").matcher(str);
         if(mth.find()) {
             return true;

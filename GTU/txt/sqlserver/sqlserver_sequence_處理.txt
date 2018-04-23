@@ -1,0 +1,10 @@
+﻿--取得當前seq
+ DBCC checkident ('tablename') 
+--設定當前的seq --> reseed是保留字(直接打reseed), 7是值
+ DBCC checkident ('tablename', reseed, 7)
+
+
+--關閉auto increment
+SET IDENTITY_INSERT <TableName> ON
+-- Do the inserting in the table with name <TableName>
+SET IDENTITY_INSERT <TableName> OFF

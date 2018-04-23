@@ -21,9 +21,10 @@ from gtu.reflect import toStringUtil
 
 
 class CellDef(OrderedClass) :
+
     def __init__(self, row, sheetname):
         OrderedClass.__init__(self)
-        self.statistic_yyy = "105"  # 統計年月
+        self.statistic_yyy = "106"  # 統計年月
         
         mth = re.match("T\d\-(\d+)", sheetname)
         if mth:
@@ -165,7 +166,6 @@ def writeCSVandAppendEndComma(file, file2):
     f2.close()
 
 
-
 def main(fileArry):
     lst = list()
     
@@ -176,16 +176,17 @@ def main(fileArry):
     
     
 class RptDefName(Enum):
-    RCRP0S102 = (["T2-01","T2-02","T2-03"])
-    RCRP0S202 = (["T2-04","T2-05","T2-06"])
-    RCRP0S302 = (["T2-07","T2-08","T2-09"])
-    RCRP0S402 = (["T2-10","T2-11","T2-12"])
+    RCRP0S102 = (["T2-01", "T2-02", "T2-03"])
+    RCRP0S202 = (["T2-04", "T2-05", "T2-06"])
+    RCRP0S302 = (["T2-07", "T2-08", "T2-09"])
+    RCRP0S402 = (["T2-10", "T2-11", "T2-12"])
+
     def __init__(self, arry):
         self.arry = arry
         
         
 def mainDetail(filePath, lst):
-    rpt = RptDefName[Path(filePath).name.replace(".xlsx", "")]
+    rpt = RptDefName[Path(filePath).name.replace("_106.xlsx", "")]
     print(rpt)
     wb = openpyxl.load_workbook(filePath, 'r', data_only=True)
     for name in rpt.arry :
@@ -206,10 +207,14 @@ def rnd(strVal):
 
 if __name__ == '__main__':
     arry = [
-        "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S102.xlsx",
-        "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S202.xlsx",
-        "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S302.xlsx",
-        "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S402.xlsx",
+#         "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S102.xlsx",
+#         "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S202.xlsx",
+#         "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S302.xlsx",
+#         "C:/Users/gtu00/OneDrive/Desktop/20180116\u79C0\u5A1F_\u8F49\u6A94\u7A0B\u5F0F/RCRP0S402.xlsx",
+        "C:/Users/gtu00/OneDrive/Desktop/20180423秀娟_轉檔程式/RCRP0S102_106.xlsx",
+        "C:/Users/gtu00/OneDrive/Desktop/20180423秀娟_轉檔程式/RCRP0S202_106.xlsx",
+        "C:/Users/gtu00/OneDrive/Desktop/20180423秀娟_轉檔程式/RCRP0S302_106.xlsx",
+        "C:/Users/gtu00/OneDrive/Desktop/20180423秀娟_轉檔程式/RCRP0S402_106.xlsx",
         ]
     main(arry)
     print("done...")

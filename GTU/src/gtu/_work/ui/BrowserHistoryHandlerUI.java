@@ -8,8 +8,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +67,8 @@ import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
@@ -113,7 +113,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
             JPanel panel = new JPanel();
-            tabbedPane.addTab("New tab", null, panel, null);
+            tabbedPane.addTab("編輯書籤", null, panel, null);
             panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                     new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                             FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
@@ -166,6 +166,19 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     saveCurrentBookmarkBtnAction();
                 }
             });
+
+            JButton btnNewButton = new JButton("開啟");
+            btnNewButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        String url = StringUtils.trimToEmpty(urlText.getText());
+                        DesktopUtil.browse(url);
+                    } catch (Exception e1) {
+                        JCommonUtil.handleException(e1);
+                    }
+                }
+            });
+            panel_2.add(btnNewButton);
             panel_2.add(saveBtn);
 
             JButton deleteBtn = new JButton("刪除");
@@ -185,7 +198,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_2.add(clearBtn);
 
             JPanel panel_1 = new JPanel();
-            tabbedPane.addTab("New tab", null, panel_1, null);
+            tabbedPane.addTab("歷史書籤", null, panel_1, null);
             panel_1.setLayout(new BorderLayout(0, 0));
 
             JPanel panel_2x = new JPanel();
@@ -214,7 +227,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_1.add(lblNewLabel_3, BorderLayout.EAST);
 
             urlTable = new JTable();
-            JTableUtil.defaultSetting_AutoResize(urlTable);
+//            JTableUtil.defaultSetting_AutoResize(urlTable);
+            JTableUtil.defaultSetting(urlTable);
             panel_1.add(JCommonUtil.createScrollComponent(urlTable), BorderLayout.CENTER);
             addComponentListener(new ComponentAdapter() {
                 @Override
@@ -227,7 +241,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             });
 
             JPanel panel_3 = new JPanel();
-            tabbedPane.addTab("New tab", null, panel_3, null);
+            tabbedPane.addTab("設定", null, panel_3, null);
             panel_3.setLayout(new FormLayout(
                     new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
                             FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
@@ -401,6 +415,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         return;
                     }
                     bookmarkConfig.getConfigProp().remove(d.url);
+                    bookmarkConfig.store();
                     initLoading();
                     JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功!");
                 }
@@ -453,6 +468,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             if (bookmarkConfig.getConfigProp().containsKey(urlText.getText())) {
                 bookmarkConfig.getConfigProp().remove(urlText.getText());
+                bookmarkConfig.store();
                 initLoading();
                 JCommonUtil._jOptionPane_showMessageDialog_info("移除成功!");
                 return;

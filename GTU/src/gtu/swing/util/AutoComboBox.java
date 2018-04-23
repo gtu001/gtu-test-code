@@ -2,19 +2,17 @@ package gtu.swing.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -44,7 +42,7 @@ public class AutoComboBox extends PlainDocument {
             DefaultComboBoxModel model = (DefaultComboBoxModel) (box.getModel());
             if (box.getSelectedIndex() == -1) {
                 model.insertElementAt(currentSelect, 0);
-                box.setSelectedItem(currentSelect);
+                setSelectItem(currentSelect);
                 System.out.println("force set currentSelect = " + currentSelect);
             }
         }
@@ -72,11 +70,33 @@ public class AutoComboBox extends PlainDocument {
         });
         editor.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
-                System.out.println("keyPressed ---- " + e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    triggerComboxBoxActionPerformed();
+//                    runInIgnoreListener(new Runnable() {
+//                        @Override
+//                        public void run() {
+                            triggerComboxBoxActionPerformed();
+//                        }
+//                    });
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                 }
+            }
+        });
+    }
+
+    public void runInIgnoreListener(Runnable runner) {
+        if (comboBox == null || removeLinisterController == null) {
+            throw new RuntimeException("尚未初始化 comboBox, removeLinisterController");
+        }
+        removeLinisterController.removeListener(comboBox);
+        runner.run();
+        removeLinisterController.addBackListener(comboBox);
+    }
+
+    public void setSelectItem(final Object item) {
+        this.runInIgnoreListener(new Runnable() {
+            @Override
+            public void run() {
+                model.setSelectedItem(item);
             }
         });
     }
@@ -91,20 +111,17 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-        String currentText = getText(0, getLength());
-
         // insert the string into the document
         super.insertString(offs, str, a);
+
+        String currentText = getText(0, getLength());
 
         // lookup and select a matching item
         Object item = lookupItem(currentText);
         if (item != null) {
 
-            removeLinisterController.removeListener(comboBox);
-
-            model.setSelectedItem(item);
-
-            removeLinisterController.addBackListener(comboBox);
+            System.out.println("set selectItem = " + item);
+            setSelectItem(item);
 
         } else {
             // keep old item selected if there is no match
@@ -183,19 +200,23 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText) {
-        List<String> cloneLst = new ArrayList<String>(lst);
+        LinkedList<String> cloneLst = new LinkedList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
             if (StringUtils.isBlank(cloneLst.get(ii))) {
                 cloneLst.remove(ii);
                 ii--;
             }
         }
+        cloneLst.push("");//塞個空的放第一個
+
         Collections.sort(cloneLst);
-        DefaultComboBoxModel m1 = new DefaultComboBoxModel();
+        final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
         for (String s : cloneLst) {
             m1.addElement(s);
         }
-        comboBox.setModel(m1);
+        model = m1;
+        comboBox.setModel(model);
+
         comboBox.setEditable(true);
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
         defaultText = StringUtils.trimToEmpty(defaultText);
@@ -244,6 +265,7 @@ public class AutoComboBox extends PlainDocument {
                 JFrame frame = new JFrame();
                 frame.setDefaultCloseOperation(3);
                 frame.getContentPane().add(comboBox);
+                JCommonUtil.setJFrameCenter(frame);
                 frame.pack();
                 frame.setVisible(true);
             }

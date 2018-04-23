@@ -42,6 +42,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -101,6 +102,14 @@ public class JTableUtil {
     public static void defaultSetting_AutoResize(JTable table) {
         defaultSetting(table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    }
+
+    /**
+     * @param table
+     */
+    public static void defaultSetting_Indicate(JTable table, int autoResizeMode) {
+        defaultSetting(table);
+        table.setAutoResizeMode(autoResizeMode);
     }
 
     /**
@@ -286,7 +295,7 @@ public class JTableUtil {
             }
         }
     }
-    
+
     public void hiddenColumn(String columnTitle) {
         TableColumnManager tcm = new TableColumnManager(table);
         tcm.hideColumn(columnTitle);
@@ -888,7 +897,11 @@ public class JTableUtil {
             throw new RuntimeException("陣列長度必須為 : " + columnCount);
         }
         TableColumnModel tcm = table.getColumnModel();
-        double wholeSize = table.getBounds().getWidth();
+        double wholeSize = table.getSize().getWidth();
+        if (table.getParent() instanceof JViewport) {
+            wholeSize = ((JViewport) table.getParent()).getSize().getWidth() - 5;
+        }
+        System.out.println("table wholeSize : " + wholeSize);
         for (int i = 0; i < columnCount; i++) {
             int width = (int) (wholeSize * (widthPercentArry[i] / 100));
             TableColumn column = tcm.getColumn(i);
