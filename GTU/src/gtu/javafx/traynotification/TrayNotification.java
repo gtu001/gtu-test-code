@@ -216,6 +216,10 @@ public final class TrayNotification {
             dismiss();
         } else {
             stage.show();
+            
+            if(stage.isFocused()) {
+                stage.setFocused(false);
+            }
 
             onShown();
             animator.playSequential(dismissDelay);

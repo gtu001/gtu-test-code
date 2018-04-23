@@ -75,8 +75,14 @@ public class Porn91Downloader {
         if (result) {
             content = ClipboardUtil.getInstance().getContents();
         }
+        
+        String headerContent = "";
+        boolean result2 = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("使用記事本header", "");
+        if (result2) {
+            headerContent = ClipboardUtil.getInstance().getContents();
+        }
 
-        List<VideoUrlConfig> videoLst = p.processVideoLst(url, content);
+        List<VideoUrlConfig> videoLst = p.processVideoLst(url, content, headerContent);
 
         StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
@@ -96,8 +102,8 @@ public class Porn91Downloader {
         LogbackUtil.setRootLevel(ch.qos.logback.classic.Level.INFO);
     }
 
-    public List<VideoUrlConfig> processVideoLst(String url, String cookieContent) {
-        String content = getVideoInfo(URI.create(url), "", cookieContent);
+    public List<VideoUrlConfig> processVideoLst(String url, String cookieContent, String headerContent) {
+        String content = getVideoInfo(URI.create(url), "", cookieContent, headerContent);
         String title = getTitleForFileName(content);
 
         PornVideoUrlDetection p2 = new PornVideoUrlDetection(content);
@@ -246,23 +252,46 @@ public class Porn91Downloader {
         }
     }
 
-    public String getVideoInfo(URI uri, String userAgent, String cookieContent) {
+    //地一行先key在value
+    private void appendRequestHeader(HttpGet httpget, String headerContent) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new StringReader(headerContent));
+            String tempKey = null;
+            for (String line = null; (line = reader.readLine()) != null;) {
+                line = StringUtils.trimToEmpty(line);
+                if (StringUtils.isNotBlank(line)) {
+                    if (tempKey == null) {
+                        tempKey = line;
+                    }else {
+                        String key = StringUtils.trimToEmpty(tempKey);
+                        String value = StringUtils.trimToEmpty(line);
+                        System.out.format("appendHeader k:[%s] \t v:[%s]\n", key, value);
+                        httpget.setHeader(key, value);
+                        tempKey = null;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(" Err : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public String getVideoInfo(URI uri, String userAgent, String cookieContent, String headerContent) {
         try {
             if (StringUtils.isBlank(userAgent)) {
                 userAgent = DEFAULT_USER_AGENT;
             }
 
             BasicCookieStore cookstore = new BasicCookieStore();
-            cookstore.addCookie(new BasicClientCookie("_ga", "GA1.2.68028505.1524029678"));
-            cookstore.addCookie(new BasicClientCookie("_gat", "1"));
-            cookstore.addCookie(new BasicClientCookie("_gid", "GA1.2.1162949767.1524029678"));
-            cookstore.addCookie(new BasicClientCookie("bs", "8kef3mp24n8xlye1fo4g43jz0fcgzkmw"));
-            cookstore.addCookie(new BasicClientCookie("g36FastPopSessionRequestNumber", "2"));
-            cookstore.addCookie(new BasicClientCookie("platform", "pc"));
-            cookstore.addCookie(new BasicClientCookie("RNLBSERVERID", "ded6698"));
-            cookstore.addCookie(new BasicClientCookie("ss", "150222930604599849"));
-
             CookieStore cookieStore = cookstore;
+            
+            //加入cookie
             if (StringUtils.isNotBlank(cookieContent)) {
                 cookieStore = getCookieString(cookieContent);
             }
@@ -274,6 +303,11 @@ public class Porn91Downloader {
             HttpGet httpget = new HttpGet(uri);
             if (userAgent != null && userAgent.length() > 0) {
                 httpget.setHeader("User-Agent", userAgent);
+            }
+
+            //加入黨頭
+            if (StringUtils.isNotBlank(headerContent)) {
+                this.appendRequestHeader(httpget, headerContent);
             }
 
             HttpResponse response = httpclient.execute(httpget, localContext);

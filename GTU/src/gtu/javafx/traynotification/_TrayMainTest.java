@@ -23,7 +23,7 @@ public class _TrayMainTest {
                             .onPanelClickCallback(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    JCommonUtil._jOptionPane_showMessageDialog_info("TTTTTTTTTTT");
+                                    System.exit(1);
                                 }
                             }).show(1500);
                     try {

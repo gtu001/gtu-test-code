@@ -98,12 +98,12 @@ public class TrayNotificationHelper {
                             tray.setImage(image);
                         }
 
+                        TrayNotificationHelper.removeFocus();
                         if (dismissTime <= 0) {
                             tray.showAndWait();
                         } else {
                             tray.showAndDismiss(javafx.util.Duration.valueOf(dismissTime + "ms"));
                         }
-
                         result.set(true);
                     } catch (Throwable ex) {
                         result.set(false);
@@ -134,6 +134,19 @@ public class TrayNotificationHelper {
             }
         } catch (Throwable ex) {
             throw new RuntimeException("JavaFx not support!", ex);
+        }
+    }
+
+    private static void removeFocus() {
+        if (_INST4SHOW == null) {
+            System.out.println("無法removeFocus!");
+        } else {
+            javafx.application.Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    _INST4SHOW.requestFocus();
+                }
+            });
         }
     }
 

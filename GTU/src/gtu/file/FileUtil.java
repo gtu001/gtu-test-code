@@ -48,6 +48,10 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
+        String filename = 
+                "      Do you think people who are good in shape have more desires? (Apply for selfie, apply, gesture verification)\r\n" + 
+                "     -Chinese homemade video";
+        System.out.println(FileUtil.escapeFilename(filename, true));
     }
 
     private FileUtil() {
@@ -1035,12 +1039,12 @@ public class FileUtil {
     /**
      * 避掉黨名的特殊符號 \/:*?"<>|
      */
-    public static String escapeFilename(String filename, boolean doWithFileSeparator) {
+    public static String escapeFilename(String filename, boolean escapeFileSeparator) {
         String replaceSeparator = "\\\\\\/";
-        if (!doWithFileSeparator) {
+        if (!escapeFileSeparator) {
             replaceSeparator = "";
         }
-        Pattern ptn = Pattern.compile("[" + doWithFileSeparator + "\\:\\*\\?\"\\<\\>\\|]");
+        Pattern ptn = Pattern.compile("[" + replaceSeparator + "\\:\\*\\?\"\\<\\>\\|\r\n]", Pattern.DOTALL | Pattern.MULTILINE);
         Matcher mth = ptn.matcher(filename);
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {

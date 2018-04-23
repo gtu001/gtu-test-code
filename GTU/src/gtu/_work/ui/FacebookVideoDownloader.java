@@ -67,6 +67,7 @@ public class FacebookVideoDownloader extends JFrame {
     private JTextField targetDirText;
     private File targetDirectory = FileUtil.DESKTOP_DIR;
     private HideInSystemTrayHelper sysutil;
+    private JTextArea headerTextArea;
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
@@ -316,6 +317,25 @@ public class FacebookVideoDownloader extends JFrame {
 
         cookieArea = new JTextArea();
         panel_5.add(JCommonUtil.createScrollComponent(cookieArea), BorderLayout.CENTER);
+        
+        JPanel panel_18 = new JPanel();
+        tabbedPane.addTab("檔頭設定", null, panel_18, null);
+        panel_18.setLayout(new BorderLayout(0, 0));
+        
+        JPanel panel_19 = new JPanel();
+        panel_18.add(panel_19, BorderLayout.NORTH);
+        
+        JPanel panel_20 = new JPanel();
+        panel_18.add(panel_20, BorderLayout.WEST);
+        
+        JPanel panel_21 = new JPanel();
+        panel_18.add(panel_21, BorderLayout.EAST);
+        
+        JPanel panel_22 = new JPanel();
+        panel_18.add(panel_22, BorderLayout.SOUTH);
+        
+        headerTextArea = new JTextArea();
+        panel_18.add(JCommonUtil.createScrollComponent(headerTextArea), BorderLayout.CENTER);
 
         JPanel panel_15 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_15, null);
@@ -437,11 +457,12 @@ public class FacebookVideoDownloader extends JFrame {
         try {
             String url = urlText.getText();
             String cookieContent = StringUtils.trimToEmpty(cookieArea.getText());
+            String headerContent = StringUtils.trimToEmpty(headerTextArea.getText());
             if (StringUtils.isBlank(url)) {
                 return;
             }
 
-            List<VideoUrlConfig> list = downloader.processVideoLst(url, cookieContent);
+            List<VideoUrlConfig> list = downloader.processVideoLst(url, cookieContent, headerContent);
             if (list.isEmpty()) {
                 if (throwEx) {
                     throw new RuntimeException("找步道影片 : " + url);
