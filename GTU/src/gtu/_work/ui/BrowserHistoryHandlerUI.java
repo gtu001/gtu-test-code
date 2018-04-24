@@ -65,6 +65,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
 import java.awt.event.MouseAdapter;
@@ -84,6 +85,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField bookmarkConfigText;
     private AutoComboBox tagComboBoxUtil;
     private AutoComboBox searchComboBoxUtil;
+    private HideInSystemTrayHelper sysUtil = HideInSystemTrayHelper.newInstance();
 
     /**
      * Launch the application.
@@ -280,6 +282,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             initLoading();
 
             JCommonUtil.setJFrameDefaultSetting(this);
+            JCommonUtil.setLocationToRightBottomCorner(this);
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            sysUtil.apply(this);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }

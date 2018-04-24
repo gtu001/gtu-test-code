@@ -47,10 +47,17 @@ public class HideInSystemTrayHelper {
 
     public void apply(final JFrame jframe, String sysTrayTitle, String imagePath) {
         System.out.println("creating instance");
-        if (StringUtils.isBlank(imagePath)) {
-            imagePath = "resource/images/ico/janna.ico";
+        
+        //決定icon
+        Image image = null;
+        if(StringUtils.isNotBlank(imagePath)) {
+            image = getSysTrayIcon(imagePath);
+        }else if(jframe.getIconImage() != null) {
+            image = jframe.getIconImage();
+        }else {
+            image = getSysTrayIcon("resource/images/ico/janna.ico");
         }
-        Image image = getSysTrayIcon(imagePath);
+        
         try {
             System.out.println("setting look and feel");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

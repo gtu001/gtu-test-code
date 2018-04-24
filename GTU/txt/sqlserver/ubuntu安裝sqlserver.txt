@@ -1,0 +1,35 @@
+sudo apt-get update
+sudo apt-get upgrade
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
+curl https://packages.microsoft.com/config/ubuntu/16.04/mssql.server.list | sudo tee /etc/apt/sources.list/d/mssql-server.list 
+sudo apt-get update 
+sudo apt-get install -y mssql-server 
+sudo /opt/mssql/bin/sqlservr-setup
+systemctl status mssql-server 
+curl https://packages.microsoft.com/config/ubuntu/16.04/prod.ist | sudo tee /etc/apt/sources.list.d/msprod.list 
+sudo apt-get update
+sudo apt-get install mssql-tools
+
+--連線db
+sqlcmd -S localhost -U SA -P <PASSOWRD>
+--測試查詢
+SELECT Name from sys.Databases;
+GO
+--建立db
+CREATE DATABASE acmewidges;
+GO
+USE DATABASE acmewidgets;
+GO
+
+--建表
+CREATE TABLE customer (id INT, firstname NVARCHAR(50), lastname NVARCHAR(50));
+INSERT INTO customer VALUES(1, 'LIoyd', 'Christmas');
+INSERT INTO customer VALUES(2, 'Harry', 'Dunn');
+GO
+
+select * from customer;
+GO
+
+Quit
+
+

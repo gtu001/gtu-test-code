@@ -429,6 +429,7 @@ public class FacebookVideoDownloader extends JFrame {
         panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
 
         JCommonUtil.setJFrameDefaultSetting(this);
+        JCommonUtil.setLocationToRightBottomCorner(this);
 
         initDownloadListTable();
 

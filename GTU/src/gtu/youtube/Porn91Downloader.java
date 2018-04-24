@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,12 +30,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
@@ -75,7 +80,7 @@ public class Porn91Downloader {
         if (result) {
             content = ClipboardUtil.getInstance().getContents();
         }
-        
+
         String headerContent = "";
         boolean result2 = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("使用記事本header", "");
         if (result2) {
@@ -252,7 +257,7 @@ public class Porn91Downloader {
         }
     }
 
-    //地一行先key在value
+    // 地一行先key在value
     private void appendRequestHeader(HttpGet httpget, String headerContent) {
         BufferedReader reader = null;
         try {
@@ -263,7 +268,7 @@ public class Porn91Downloader {
                 if (StringUtils.isNotBlank(line)) {
                     if (tempKey == null) {
                         tempKey = line;
-                    }else {
+                    } else {
                         String key = StringUtils.trimToEmpty(tempKey);
                         String value = StringUtils.trimToEmpty(line);
                         System.out.format("appendHeader k:[%s] \t v:[%s]\n", key, value);
@@ -290,8 +295,8 @@ public class Porn91Downloader {
 
             BasicCookieStore cookstore = new BasicCookieStore();
             CookieStore cookieStore = cookstore;
-            
-            //加入cookie
+
+            // 加入cookie
             if (StringUtils.isNotBlank(cookieContent)) {
                 cookieStore = getCookieString(cookieContent);
             }
@@ -305,7 +310,7 @@ public class Porn91Downloader {
                 httpget.setHeader("User-Agent", userAgent);
             }
 
-            //加入黨頭
+            // 加入黨頭
             if (StringUtils.isNotBlank(headerContent)) {
                 this.appendRequestHeader(httpget, headerContent);
             }
@@ -350,6 +355,16 @@ public class Porn91Downloader {
         return -1;
     }
 
+    private HttpRequestRetryHandler customRetryHandler = new HttpRequestRetryHandler() {
+        @Override
+        public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+            if (executionCount >= 99) {
+                return false;
+            }
+            return true;
+        }
+    };
+
     private void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile, Integer percentScale) throws Throwable {
         System.out.println("Download URL : " + downloadUrl);
         HttpGet httpget2 = new HttpGet(downloadUrl);
@@ -357,7 +372,14 @@ public class Porn91Downloader {
             httpget2.setHeader("User-Agent", userAgent);
         }
 
-        HttpClient httpclient2 = new DefaultHttpClient();
+        // set timeout with 5 seconds.
+        RequestConfig config = RequestConfig.custom().setConnectTimeout(5 * 1000).build();
+
+        // use custom retry handler to make retry handler effect.
+        // HttpClient httpclient2 = new DefaultHttpClient(); //原始邏輯
+        CloseableHttpClient httpclient2 = HttpClients.custom().setRetryHandler(customRetryHandler).setDefaultRequestConfig(config).build();
+
+        // Execute request and get response.
         HttpResponse response2 = httpclient2.execute(httpget2);
         HttpEntity entity2 = response2.getEntity();
         if (entity2 != null && response2.getStatusLine().getStatusCode() == 200) {

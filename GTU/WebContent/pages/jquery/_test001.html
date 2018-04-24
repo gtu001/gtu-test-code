@@ -15,16 +15,19 @@ focused {
 <body>
 
 <p>xxxxxx</p>
-	<div style="background-color: red">
+	<div style="background-color: red"  >
 	</div>
-<input type="button" id="aaaa" value="aaaa" />
+<input type="button" id="aaaa" value="aaaa" data-validate-length="5"  />
 
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("#aaaa").click(function(){
+			/*
 				$("p").toggle("fast", function(){
 					alert($(this).is(":hidden"));
 				});
+				*/
+				alert($("input[id=aaaa]").attr("data-validate-length"));
 			});
 		});
 	</script>
