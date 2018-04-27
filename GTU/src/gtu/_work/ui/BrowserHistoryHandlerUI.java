@@ -121,25 +121,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel = new JPanel();
             tabbedPane.addTab("編輯書籤", null, panel, null);
-            panel.setLayout(new FormLayout(new ColumnSpec[] {
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    ColumnSpec.decode("default:grow"),},
-                new RowSpec[] {
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    RowSpec.decode("default:grow"),
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,}));
+            panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
             JLabel lblTitle = new JLabel("title");
             panel.add(lblTitle, "2, 2, right, default");
@@ -314,6 +299,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             initLoading();
 
+            JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
             JCommonUtil.setLocationToRightBottomCorner(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
@@ -615,13 +601,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void urlTextOnblur() {
         try {
-            if (StringUtils.isBlank(urlText.getText()) || //
-                    StringUtils.isNotBlank(titleText.getText()) //
-            ) {
+            if (StringUtils.isBlank(urlText.getText())) {
                 return;
             }
-            String title = getHtmlTitle(urlText.getText());
-            titleText.setText(title);
+
+            // 檔案
+            File file = new File(urlText.getText());
+            if (file.exists()) {
+                urlText.setText(file.toURL().toString());
+                if (StringUtils.isBlank(titleText.getText())) {
+                    titleText.setText(file.getName());
+                }
+                return;
+            }
+
+            // 超連結
+            if (StringUtils.isBlank(titleText.getText())) {
+                String title = getHtmlTitle(urlText.getText());
+                titleText.setText(title);
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -725,6 +723,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tagComboBoxUtil.getTextComponent().setText(d.tag);
             commandTypeSetting.setValue(d.commandType);
 
+            urlTable.setToolTipText(d.url);
+
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
                 commandTypeSetting.getValue().doOpen(d.url);
             }
@@ -738,11 +738,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
             CommandTypeEnum e = CommandTypeEnum.DEFAULT;
             try {
                 e = CommandTypeEnum.valueOf(commandType);
-            }catch(Exception ex) {
+            } catch (Exception ex) {
             }
             commandTypComboBox.setSelectedItem(e);
         }
-        
+
         private CommandTypeEnum getValue() {
             CommandTypeEnum commandType = (CommandTypeEnum) commandTypComboBox.getSelectedItem();
             if (commandType == null) {
@@ -751,7 +751,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             return commandType;
         }
     }
-    
 
     // -----------------------------------------------------------------------------------------------------------------------
 

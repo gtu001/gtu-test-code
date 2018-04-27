@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.collections.Transformer;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -89,9 +90,13 @@ public class DownloadProgressHandler {
     };
 
     private BigDecimal getPercent(long currentTotal) {
-        BigDecimal p = new BigDecimal(((double) currentTotal / (double) totalLength) * ONE_HUNDRED);
-        p = p.setScale(percentScale, BigDecimal.ROUND_DOWN);
-        return p;
+        try {
+            BigDecimal p = new BigDecimal(((double) currentTotal / (double) totalLength) * ONE_HUNDRED);
+            p = p.setScale(percentScale, BigDecimal.ROUND_DOWN);
+            return p;
+        } catch (Exception ex) {
+            return new BigDecimal(-1);
+        }
     }
 
     private void setCurrentTotal(long currentTotal) {
@@ -99,11 +104,16 @@ public class DownloadProgressHandler {
 
         if (!percent.equals(this.percent)) {
             // 計算KB/S
-            double s = (System.currentTimeMillis() - startTime) / 1000;
-            int kbpers = (int) ((currentTotal / KB) / s);
-
+            int kbpers = 0;
             // 剩餘時間
-            long remainSec = (this.totalLength - currentTotal) / kbpers;
+            long remainSec = 999999L;
+            try {
+                double s = (System.currentTimeMillis() - startTime) / 1000;
+                kbpers = (int) ((currentTotal / KB) / s);
+                remainSec = (this.totalLength - currentTotal) / kbpers;
+            } catch (Exception ex) {
+            }
+
             String remainDescrpition = DateUtil.wasteTotalTime(remainSec);
 
             // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓

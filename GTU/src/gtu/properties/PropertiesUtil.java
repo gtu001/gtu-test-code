@@ -101,7 +101,7 @@ public class PropertiesUtil {
             }
         }
     }
-    
+
     public static void saveByChineseUTF8(File file, Properties prop) {
         try {
             saveByChineseUTF8(new FileOutputStream(file), prop);
@@ -124,6 +124,10 @@ public class PropertiesUtil {
     }
 
     public static File getJarCurrentPath(Class<?> clz) {
+        Class<?> outterClz = clz.getEnclosingClass();
+        if (outterClz != null) {
+            clz = outterClz;
+        }
         URL url = clz.getResource(clz.getSimpleName() + ".class");
         String protocal = url.getProtocol();
         String filepath = url.getFile();

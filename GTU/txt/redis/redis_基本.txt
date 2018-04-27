@@ -1,0 +1,84 @@
+﻿## Base
+set server:name "fido"
+get server:name  ----> "fido"
+del server:name  ----> (integer) 1
+get server:name  ----> (nil)
+
+
+--若key不存在才新增
+setnx server:name aaaa  ---> (integer) 1 / 0 <-沒新增
+
+--遞增取直
+set sequenct 10
+incr sequence ---> (integer) 11
+incr sequence ---> (integer) 12
+
+--設定會過期的key
+expire expire_key 100 --設定100秒過期
+--檢查key多久過期
+ttl expire_key --> (integer) 96 <-剩下96秒 / (integer) -2 <-已過期
+
+
+## List
+--插入list
+lpush friends janna
+rpush friends joe
+rpush friends andy
+rpush friends kevin
+rpush friends victor
+--秀list
+lrange friends 0 -1 <--0到n (-1是最後一個)
+--刪除
+lrem friends 0 joe --> 0:表示從第n次出現開始刪, -1表示從尾開始算 ;  joe 要移除的元素
+--顯示list長度
+llen friends --> (integer) 5
+--取值
+lpop friends
+rpop friends
+
+
+## Set (沒有順序性有獨一性)
+--加入
+sadd superpowers flight
+sadd superpowers "x-ray vision
+--刪除
+srem superpowers flight
+--秀set
+smembers superpowers
+--合併
+sunion superpowers dc_heros
+--contains
+sismember superpowers flight --> (integer) 1 / 0 [true/false]
+
+
+## Sorted Set 帶分數的Set
+--加入 <set名> <score(以此排序)> <value>
+ZADD hackers 1940 "Alan Kay" 
+ZADD hackers 1906 "Grace Hopper"
+ZADD hackers 1953 "Richard Stallman"
+--秀 set
+zrange hackers 0 -1
+
+
+
+## Map
+--設值
+hset 9527 name "Troy Chang"
+hset 9527 email "gtu001@gmail.com"
+hset 9527 password "1234"
+--一次性設值
+hmset 9527 name "Troy Chang" email "gtu001@gmail.com" password "1234"
+--秀所有值
+hgetall 9527
+--取值
+hget 9527 name --> "Troy Chang"
+--刪除
+hdel 9527 password
+
+--Map設定sequence
+cmd : hset 9527 <key> <int>
+hset 9527 seq_id 10 --> seq_id 初始值為 10
+--遞+增(-減) 
+hincrby 9527 seq_id 1 --> (integer) 11 <-遞增1為11
+hincrby 9527 seq_id -2 --> (integer) 9 <-遞增-1為9
+

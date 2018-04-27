@@ -1,17 +1,12 @@
 package gtu.image;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
-
-import com.google.common.io.Files;
 
 import gtu.file.FileUtil;
 
@@ -23,17 +18,23 @@ public class DataUriUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        File dir = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\fwd");
-        File destFile = new File(FileUtil.DESKTOP_PATH, "test.html");
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), "utf8"));
-        for (File f : dir.listFiles()) {
-            String ext = Files.getFileExtension(f.getName()).toLowerCase();
-            String datauri = DataUriUtil.getInstance().generateUri(f.getAbsolutePath(), ext);
-            writer.write(String.format("%s<img src=\"%s\" />", f.getName(), datauri));
-            writer.newLine();
-        }
-        writer.flush();
-        writer.close();
+//        File dir = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\fwd");
+//        File destFile = new File(FileUtil.DESKTOP_PATH, "test.html");
+//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), "utf8"));
+//        for (File f : dir.listFiles()) {
+//            String ext = Files.getFileExtension(f.getName()).toLowerCase();
+//            String datauri = DataUriUtil.getInstance().generateUri(f.getAbsolutePath(), ext);
+//            writer.write(String.format("%s<img src=\"%s\" />", f.getName(), datauri));
+//            writer.newLine();
+//        }
+//        writer.flush();
+//        writer.close();
+        File file = new File(FileUtil.DESKTOP_DIR, "page1.jpg");
+        String datauri = DataUriUtil.getInstance().generateUri(file.getAbsolutePath(), "jpg");
+        File file2 = new File(FileUtil.DESKTOP_DIR, "page2.jpg");
+        String datauri2 = DataUriUtil.getInstance().generateUri(file2.getAbsolutePath(), "jpg");
+        System.out.println(datauri);
+        System.out.println(datauri2);
         System.out.println("done...");
     }
 

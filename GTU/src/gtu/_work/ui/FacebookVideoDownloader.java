@@ -11,19 +11,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,11 +30,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +44,7 @@ import gtu.file.FileUtil;
 import gtu.javafx.traynotification.NotificationType;
 import gtu.javafx.traynotification.TrayNotificationHelper;
 import gtu.javafx.traynotification.animations.AnimationType;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -79,6 +74,8 @@ public class FacebookVideoDownloader extends JFrame {
     private JTextArea headerTextArea;
 
     private boolean isCrashProcessDone = false;
+
+    private DownloadLogKeeper downloadLog = new DownloadLogKeeper();
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
@@ -140,6 +137,7 @@ public class FacebookVideoDownloader extends JFrame {
                             // "", vo });
                             Vector vec = downloadListModel.getDataVector();
 
+                            //更新下載狀態
                             for (int row = 0; row < downloadListModel.getRowCount(); row++) {
                                 if (downloadListModel.getValueAt(row, 5) == DownloadGOGO.this.vo) {
                                     downloadListModel.setValueAt(description, row, 4);
@@ -147,7 +145,11 @@ public class FacebookVideoDownloader extends JFrame {
                             }
 
                             if (proc.isComplete()) {
+                                //完成顯示訊息
                                 showCompleteMessage();
+                                
+                                //完成下載要清除
+                                downloadLog.processCompleteLog(DownloadGOGO.this.vo);
                             }
                         }
 
@@ -381,10 +383,18 @@ public class FacebookVideoDownloader extends JFrame {
         JButton batchDownloadBtn = new JButton("批量下載");
         batchDownloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                batchAutoDownloadBtnAction();
+                batchAutoDownloadBtnAction(null);
             }
         });
         panel_17.add(batchDownloadBtn);
+        
+        JButton continueLastestDownloadBtn = new JButton("繼續上次下載");
+        continueLastestDownloadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                continueLastestDownloadBtnAction();
+            }
+        });
+        panel_17.add(continueLastestDownloadBtn);
 
         JPanel panel_16 = new JPanel();
         panel_15.add(panel_16, "4, 34, fill, fill");
@@ -414,7 +424,7 @@ public class FacebookVideoDownloader extends JFrame {
             }
         });
         panel_11.add(saveDownloadListBtn);
-        
+
         JButton cleanDownloadListBtn = new JButton("清除已完成");
         cleanDownloadListBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -582,6 +592,9 @@ public class FacebookVideoDownloader extends JFrame {
                 vec.add(vo2);
                 downloadListModel.addRow(vec);
             }
+            
+            //每次下載紀錄
+            downloadLog.appendDownloadVO(vo2);
 
             sysutil.displayMessage("開始下載", vo2.getFileName(), MessageType.INFO);
         } else {
@@ -643,18 +656,22 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
-    private void batchAutoDownloadBtnAction() {
+    private void batchAutoDownloadBtnAction(List<String> configLst) {
         StringBuffer sb = new StringBuffer();
         try {
             isCrashProcessDone = false;
 
-            File saveFile = JCommonUtil._jFileChooser_selectFileOnly();
-            if (!saveFile.exists()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
-                return;
+            List<String> urLst = null;
+            if (configLst == null) {
+                File saveFile = JCommonUtil._jFileChooser_selectFileOnly();
+                if (!saveFile.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return;
+                }
+                urLst = FileUtil.loadFromFile_asList(saveFile, "UTF-8");
+            } else {
+                urLst = configLst;
             }
-
-            List<String> urLst = FileUtil.loadFromFile_asList(saveFile, "UTF-8");
 
             for (int ii = 0; ii < urLst.size(); ii++) {
                 String url = StringUtils.trimToEmpty(urLst.get(ii));
@@ -718,15 +735,15 @@ public class FacebookVideoDownloader extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
-    
+
     private void cleanDownloadListBtnAction() {
         try {
             Pattern ptn = Pattern.compile("100\\%.*");
             for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
                 String percent = (String) downloadListModel.getValueAt(ii, 4);
-                if(ptn.matcher(percent).find()) {
+                if (ptn.matcher(percent).find()) {
                     downloadListModel.removeRow(ii);
-                    ii --;
+                    ii--;
                 }
             }
             JCommonUtil._jOptionPane_showMessageDialog_info("完成!");
@@ -744,6 +761,53 @@ public class FacebookVideoDownloader extends JFrame {
             parentThrowEx.printStackTrace(pw);
         }
         return sw.toString();
+    }
+
+    private class DownloadLogKeeper {
+        private File logFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), FacebookVideoDownloader.class.getSimpleName() + "_downloadLog.cfg");
+        private PropertiesUtilBean config = new PropertiesUtilBean(logFile);
+
+        private void continueNotOk() {
+            config = new PropertiesUtilBean(logFile);
+            List<String> keyLst = new ArrayList<String>();
+            for (Object k : config.getConfigProp().keySet()) {
+                keyLst.add((String) k);
+            }
+            Collections.sort(keyLst);
+            List<String> continueLst = new ArrayList<String>();
+            for (String key : continueLst) {
+                String url = config.getConfigProp().getProperty(key);
+                continueLst.add(url);
+            }
+            batchAutoDownloadBtnAction(continueLst);
+        }
+
+        private void appendDownloadVO(VideoUrlConfigZ vo) {
+            String key = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + "_" + vo.getFileName();
+            String valueUrl = vo.getOrign().getOrignConfig().getOrignUrl();
+            config.getConfigProp().setProperty(key, valueUrl);
+            config.store();
+        }
+
+        private void processCompleteLog(VideoUrlConfigZ vo) {
+            config = new PropertiesUtilBean(logFile);
+            for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String url = config.getConfigProp().getProperty(key);
+                if (StringUtils.equals(vo.getOrign().getOrignConfig().getOrignUrl(), url)) {
+                    config.getConfigProp().remove(key);
+                    config.store();
+                }
+            }
+        }
+    }
+    
+    private void continueLastestDownloadBtnAction() {
+        try {
+            downloadLog.continueNotOk();
+        }catch(Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     private class VideoUrlConfigZ {
