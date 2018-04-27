@@ -20,8 +20,9 @@ public class GitLogToWorksheet {
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String startDateStr = "20180418";
-        int count_計算天數 = 1;
-//        String startDateStr = baseStartDateStr + StringUtils.leftPad(String.valueOf(jj), 2, "0");
+        int count_計算天數 = 30;
+        // String startDateStr = baseStartDateStr +
+        // StringUtils.leftPad(String.valueOf(jj), 2, "0");
 
         System.out.println("## " + startDateStr + " -> " + count_計算天數);
         Date d1 = sdf.parse(startDateStr);
@@ -41,59 +42,65 @@ public class GitLogToWorksheet {
                 .before(c2.getTime())//
                 .author("gtu001")//
                 .encode("big5")//
-                // .nameType(1)//
+                .hasDate(true) //
+                // .nameType(1)// 顯示完整路徑
                 .build();
         System.out.println(logCommand);
 
         StringBuilder sb = new StringBuilder();
 
-        File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_scsb");
-        String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
-        File[] files = fileDirs.listFiles();
-        for (int ii = 0; ii < files.length; ii++) {
-            File f = files[ii];
-            List<String> lst = new ArrayList<String>();
-            if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
-                lst.add(FileUtil.replaceSpecialChar("cd " + f));
-                lst.add("e:");
-                // if (ArrayUtils.contains(prodArry, f.getName())) {
-                // lst.add(FileUtil.replaceSpecialChar("git remote set-url
-                // origin http://gtu001@192.168.93.205:8448/r/ProdModule/" +
-                // f.getName() + ".git"));
-                // } else {
-                // lst.add(FileUtil.replaceSpecialChar("git remote set-url
-                // origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/"
-                // + f.getName() + ".git"));
-                // }
-                lst.add(logCommand);
-            }
+        File fileDirs1 = new File("E:\\workstuff\\workstuff\\workspace_scsb");
+        File fileDirs2 = new File("E:\\workstuff\\workstuff\\workspace_jtnsh");
+        File fileDirs3 = new File("E:\\workstuff\\workstuff\\workspace_esun_ccbill");
 
-            try {
-                System.out.println("index : " + ii + "# current : " + f.getName());
-                String commands = StringUtils.join(lst, " && ");
-                Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
-                ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-                newInstance.getStream(30000);
-                // System.out.println(newInstance.getErrorStreamToString());
-                // System.out.println(newInstance.getInputStreamToString());
-                String logContent = newInstance.getInputStreamToString();
-                System.out.println("processed " + (ii + 1) + " -> " + files.length);
-
-                if (StringUtils.isNotBlank(logContent)) {
-                    sb.append("--->/" + f.getName() + "\r\n");
-                    sb.append(logContent + "\r\n");
+        for (File workspaceDir : new File[] { fileDirs1, fileDirs2, fileDirs3 }) {
+            File[] files = workspaceDir.listFiles();
+            for (int ii = 0; ii < files.length; ii++) {
+                File f = files[ii];
+                List<String> lst = new ArrayList<String>();
+                if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
+                    lst.add(FileUtil.replaceSpecialChar("cd " + f));
+                    lst.add("e:");
+                    // if (ArrayUtils.contains(prodArry, f.getName())) {
+                    // lst.add(FileUtil.replaceSpecialChar("git remote set-url
+                    // origin http://gtu001@192.168.93.205:8448/r/ProdModule/" +
+                    // f.getName() + ".git"));
+                    // } else {
+                    // lst.add(FileUtil.replaceSpecialChar("git remote set-url
+                    // origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/"
+                    // + f.getName() + ".git"));
+                    // }
+                    lst.add(logCommand);
                 }
-            } catch (java.util.concurrent.TimeoutException ex) {
-                System.err.println("Timeout !!");
+
+                try {
+                    System.out.println("index : " + ii + "# current : " + f.getName());
+                    String commands = StringUtils.join(lst, " && ");
+                    Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
+                    ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
+                    newInstance.getStream(30000);
+                    // System.out.println(newInstance.getErrorStreamToString());
+                    // System.out.println(newInstance.getInputStreamToString());
+                    String logContent = newInstance.getInputStreamToString();
+                    System.out.println("processed " + (ii + 1) + " -> " + files.length);
+
+                    if (StringUtils.isNotBlank(logContent)) {
+                        sb.append("--->/" + f.getName() + "\r\n");
+                        sb.append(logContent + "\r\n");
+                    }
+                } catch (java.util.concurrent.TimeoutException ex) {
+                    System.err.println("Timeout !!");
+                }
             }
         }
 
         System.out.println("===============================================================");
         System.out.println(sb);
 
-//        if (sb.length() > 0) {
-//            FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH + "/xxxx/", startDateStr + ".txt"), sb.toString(), "utf8");
-//        }
+        // if (sb.length() > 0) {
+        // FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH + "/xxxx/",
+        // startDateStr + ".txt"), sb.toString(), "utf8");
+        // }
         System.out.println("done...");
     }
 

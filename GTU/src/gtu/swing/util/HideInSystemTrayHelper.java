@@ -35,7 +35,11 @@ public class HideInSystemTrayHelper {
     private TrayIconHandler trayIconHandler = new TrayIconHandler();
 
     public void apply(final JFrame jframe) {
-        apply(jframe, jframe.getClass().getSimpleName(), null);
+        String trayTitle = jframe.getClass().getSimpleName();
+        if (StringUtils.isNotBlank(jframe.getTitle())) {
+            trayTitle = jframe.getTitle();
+        }
+        apply(jframe, trayTitle, null);
     }
 
     private Image getSysTrayIcon(String imagePath) {
@@ -47,17 +51,17 @@ public class HideInSystemTrayHelper {
 
     public void apply(final JFrame jframe, String sysTrayTitle, String imagePath) {
         System.out.println("creating instance");
-        
-        //決定icon
+
+        // 決定icon
         Image image = null;
-        if(StringUtils.isNotBlank(imagePath)) {
+        if (StringUtils.isNotBlank(imagePath)) {
             image = getSysTrayIcon(imagePath);
-        }else if(jframe.getIconImage() != null) {
+        } else if (jframe.getIconImage() != null) {
             image = jframe.getIconImage();
-        }else {
+        } else {
             image = getSysTrayIcon("resource/images/ico/janna.ico");
         }
-        
+
         try {
             System.out.println("setting look and feel");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -184,7 +188,7 @@ public class HideInSystemTrayHelper {
         trayIconHandler.addIfNeed();
         System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
         trayIcon.displayMessage(caption, text, messageType);
-//        trayIconHandler.removeIfExists();
+        // trayIconHandler.removeIfExists();
     }
 
     public TrayIcon getTrayIcon() {

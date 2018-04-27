@@ -26,6 +26,7 @@ public class GitLogToWorksheet_GTU {
         String author;
         String encode = "utf-8";
         String nameType;
+        boolean hasDate;
 
         public static GitLog newInstance() {
             return new GitLog();
@@ -68,6 +69,11 @@ public class GitLogToWorksheet_GTU {
             }
             return this;
         }
+        
+        public GitLog hasDate(boolean hasDate) {
+            this.hasDate= hasDate;
+            return this;
+        }
 
         public String build() {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
@@ -92,8 +98,11 @@ public class GitLogToWorksheet_GTU {
             }
             sb.append(" --no-merges ");
             sb.append(" --all-match ");
-            sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
-//            sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
+            if (hasDate) {
+                sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
+            }else {
+                sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
+            }
             sb.append(" --date=iso  ");
             return sb.toString();
         }

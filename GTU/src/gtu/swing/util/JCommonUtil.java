@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,6 +59,7 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -654,7 +656,7 @@ public class JCommonUtil {
     public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir) {
         jTextFieldSetFilePathMouseEvent(jTextField1, fileAndDir, null);
     }
-    
+
     public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir, final ActionListener fileChoiceDone) {
         jTextField1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
@@ -932,13 +934,19 @@ public class JCommonUtil {
     /**
      * 觸發actionPerformed事件
      */
-    public static void triggerButtonActionPerformed(AbstractButton btn) {
-        for (ActionListener a : btn.getActionListeners()) {
-            a.actionPerformed(new ActionEvent(btn, ActionEvent.ACTION_PERFORMED, null) {
-                private static final long serialVersionUID = 1L;
-                // Nothing need go here, the actionPerformed method (with the
-                // above arguments) will trigger the respective listener
-            });
+    public static void triggerButtonActionPerformed(JComponent btn) {
+        try {
+            ActionListener[] listeners = (ActionListener[]) MethodUtils.invokeExactMethod(btn, "getActionListeners");
+            for (ActionListener a : listeners) {
+                a.actionPerformed(new ActionEvent(btn, ActionEvent.ACTION_PERFORMED, null) {
+                    private static final long serialVersionUID = 1L;
+                    // Nothing need go here, the actionPerformed method (with
+                    // the
+                    // above arguments) will trigger the respective listener
+                });
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("triggerButtonActionPerformed ERR :" + e.getMessage(), e);
         }
     }
 

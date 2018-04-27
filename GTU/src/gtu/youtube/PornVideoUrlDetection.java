@@ -62,6 +62,18 @@ public class PornVideoUrlDetection {
         String orignUrl;
         String finalFileName;
 
+        public List<String> getPossibleLst() {
+            return possibleLst;
+        }
+
+        public String getOrignUrl() {
+            return orignUrl;
+        }
+
+        public String getFinalFileName() {
+            return finalFileName;
+        }
+
         private SingleVideoUrlConfig() {
             finalFileName = "UnknownVideo_" + DateFormatUtil.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
         }
@@ -204,7 +216,7 @@ public class PornVideoUrlDetection {
         Matcher mth = ptn.urlPtn.matcher(content);
         while (mth.find()) {
             String url = mth.group(1);
-            url = StringEscapeUtils.unescapeJava(url);
+            url = unescapeJavaSilent(url);
             if (!Pattern.matches(ptn.urlDetailPtn, url)) {
                 // System.out.println("ignore -> " + url);
                 continue;
@@ -218,7 +230,7 @@ public class PornVideoUrlDetection {
         Matcher mth_ = ptn.urlPtn_NonHttp.matcher(content);
         while (mth_.find()) {
             String url = mth_.group(1);
-            url = StringEscapeUtils.unescapeJava(url);
+            url = unescapeJavaSilent(url);
             if (!Pattern.matches(ptn.urlDetailPtn_NonHttp, url)) {
                 // System.out.println("ignore[2] -> " + url);
                 continue;
@@ -229,6 +241,15 @@ public class PornVideoUrlDetection {
         }
 
         return urlLst;
+    }
+    
+    private String unescapeJavaSilent(String url) {
+        try {
+            return StringEscapeUtils.unescapeJava(url);
+        }catch(Exception ex) {
+            System.err.println("unescapeJavaSilent ERR : " + ex.getMessage() + " -> " + url);
+        }
+        return url;
     }
     
     public static boolean isVideo(String fileName) {

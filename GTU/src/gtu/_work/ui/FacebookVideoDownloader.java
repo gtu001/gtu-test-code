@@ -11,14 +11,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,7 +32,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +77,8 @@ public class FacebookVideoDownloader extends JFrame {
     private File targetDirectory = FileUtil.DESKTOP_DIR;
     private HideInSystemTrayHelper sysutil;
     private JTextArea headerTextArea;
+
+    private boolean isCrashProcessDone = false;
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
@@ -317,23 +328,23 @@ public class FacebookVideoDownloader extends JFrame {
 
         cookieArea = new JTextArea();
         panel_5.add(JCommonUtil.createScrollComponent(cookieArea), BorderLayout.CENTER);
-        
+
         JPanel panel_18 = new JPanel();
         tabbedPane.addTab("檔頭設定", null, panel_18, null);
         panel_18.setLayout(new BorderLayout(0, 0));
-        
+
         JPanel panel_19 = new JPanel();
         panel_18.add(panel_19, BorderLayout.NORTH);
-        
+
         JPanel panel_20 = new JPanel();
         panel_18.add(panel_20, BorderLayout.WEST);
-        
+
         JPanel panel_21 = new JPanel();
         panel_18.add(panel_21, BorderLayout.EAST);
-        
+
         JPanel panel_22 = new JPanel();
         panel_18.add(panel_22, BorderLayout.SOUTH);
-        
+
         headerTextArea = new JTextArea();
         panel_18.add(JCommonUtil.createScrollComponent(headerTextArea), BorderLayout.CENTER);
 
@@ -396,6 +407,22 @@ public class FacebookVideoDownloader extends JFrame {
         JLabel lblNewLabel = new JLabel("下載清單");
         panel_11.add(lblNewLabel);
 
+        JButton saveDownloadListBtn = new JButton("儲存清單");
+        saveDownloadListBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveDownloadListBtnAction();
+            }
+        });
+        panel_11.add(saveDownloadListBtn);
+        
+        JButton cleanDownloadListBtn = new JButton("清除已完成");
+        cleanDownloadListBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cleanDownloadListBtnAction();
+            }
+        });
+        panel_11.add(cleanDownloadListBtn);
+
         JPanel panel_12 = new JPanel();
         panel_10.add(panel_12, BorderLayout.WEST);
 
@@ -456,7 +483,7 @@ public class FacebookVideoDownloader extends JFrame {
 
     private void urlTextOnBlur(final boolean throwEx) {
         try {
-            String url = urlText.getText();
+            String url = StringUtils.trimToEmpty(urlText.getText()).replaceAll("\t", "");
             String cookieContent = StringUtils.trimToEmpty(cookieArea.getText());
             String headerContent = StringUtils.trimToEmpty(headerTextArea.getText());
             if (StringUtils.isBlank(url)) {
@@ -583,6 +610,8 @@ public class FacebookVideoDownloader extends JFrame {
 
     private void autoDownload(boolean throwEx) {
         try {
+            isCrashProcessDone = false;
+
             urlTextOnBlur(throwEx);
 
             JTableUtil jTab = JTableUtil.newInstance(videoTable);
@@ -605,6 +634,7 @@ public class FacebookVideoDownloader extends JFrame {
 
             btn.doClick();
         } catch (Exception ex) {
+            crashProcess(null, false);
             if (throwEx) {
                 throw new RuntimeException(ex);
             } else {
@@ -616,6 +646,8 @@ public class FacebookVideoDownloader extends JFrame {
     private void batchAutoDownloadBtnAction() {
         StringBuffer sb = new StringBuffer();
         try {
+            isCrashProcessDone = false;
+
             File saveFile = JCommonUtil._jFileChooser_selectFileOnly();
             if (!saveFile.exists()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
@@ -641,10 +673,68 @@ public class FacebookVideoDownloader extends JFrame {
             File logFile = new File(FileUtil.DESKTOP_PATH, logName);
             FileUtil.saveToFile(logFile, sb.toString(), "UTF-8");
         } catch (Exception ex) {
+            crashProcess(null, false);
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void crashProcess(String filename, boolean throwEx) {
+        try {
+            // downloadListModel = JTableUtil.createModel(true, new String[] {
+            // "順序", "檔名", "URL", "大小", "進度", "VO" });
+            StringBuffer sb = new StringBuffer();
+            for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
+                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
+                String percent = (String) downloadListModel.getValueAt(ii, 4);
+                sb.append( //
+                        vo2.getOrign().getOrignConfig().getOrignUrl() + "\t" + //
+                                vo2.getFileName() + "\t" + //
+                                vo2.getFileSize() + "\t" + //
+                                percent + "\n"//
+                );
+            }
+            String logFileName = this.getClass().getSimpleName() + "_crash_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".log";
+            FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH, logFileName), sb.toString(), "UTF-8");
+
+            isCrashProcessDone = true;
+        } catch (Exception ex) {
+            if (!throwEx) {
+                ex.printStackTrace();
+            } else {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private void saveDownloadListBtnAction() {
+        try {
+            String logFileName = this.getClass().getSimpleName() + "_crash_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".log";
+            logFileName = JCommonUtil._jOptionPane_showInputDialog("儲存清單! 檔名:", logFileName);
+            if (StringUtils.isBlank(logFileName)) {
+                logFileName = null;
+            }
+            crashProcess(logFileName, true);
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
     
+    private void cleanDownloadListBtnAction() {
+        try {
+            Pattern ptn = Pattern.compile("100\\%.*");
+            for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
+                String percent = (String) downloadListModel.getValueAt(ii, 4);
+                if(ptn.matcher(percent).find()) {
+                    downloadListModel.removeRow(ii);
+                    ii --;
+                }
+            }
+            JCommonUtil._jOptionPane_showMessageDialog_info("完成!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     private String parseToString(Throwable ge) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

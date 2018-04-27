@@ -14,13 +14,15 @@ import gtu.runtime.ProcessWatcher;
 public class GitAutoFetchNMerge_jtnsh {
 
     public static void main(String[] args) throws IOException {
-        File fileDirs = new File("E:/workstuff/workstuff/workspace_jtnsh");
+        File fileDirs = new File("E:/workstuff/workstuff/workspace_esun_ccbill");
         
         String account = "gtu001";
         if(args != null && args.length == 2) {
             fileDirs = new File(args[0]);
             account = args[1];
         }
+        
+        String[] commonModules = new String[] {"CMS", "CMSAD", "Config", "DBResource", "Static", "UserPermission"};
         
         File[] files = fileDirs.listFiles();
         for (int ii = 0 ; ii < files.length ; ii ++) {
@@ -30,7 +32,11 @@ public class GitAutoFetchNMerge_jtnsh {
                 lst.add("cd " + f);
                 lst.add("e:");
                 
-                lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/jtnsh/" + f.getName() + ".git"));
+                if(!ArrayUtils.contains(commonModules, f.getName())) {
+                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/ESUN_CCBill/" + f.getName() + ".git"));
+                }else {
+                    lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://"+account+"@192.168.93.205:8448/r/ProdModule2/" + f.getName() + ".git"));
+                }
                 
 //                lst.add("git fetch -v --progress \"origin\"");
                 lst.add("git fetch -v --all");

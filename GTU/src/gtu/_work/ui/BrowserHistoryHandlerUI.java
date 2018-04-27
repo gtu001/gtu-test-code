@@ -8,6 +8,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -45,6 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -67,9 +71,8 @@ import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
@@ -86,6 +89,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private AutoComboBox tagComboBoxUtil;
     private AutoComboBox searchComboBoxUtil;
     private HideInSystemTrayHelper sysUtil = HideInSystemTrayHelper.newInstance();
+    private JComboBox commandTypComboBox;
+    private CommandTypeSetting commandTypeSetting;
 
     /**
      * Launch the application.
@@ -116,9 +121,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel = new JPanel();
             tabbedPane.addTab("編輯書籤", null, panel, null);
-            panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+            panel.setLayout(new FormLayout(new ColumnSpec[] {
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    ColumnSpec.decode("default:grow"),},
+                new RowSpec[] {
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    RowSpec.decode("default:grow"),
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,}));
 
             JLabel lblTitle = new JLabel("title");
             panel.add(lblTitle, "2, 2, right, default");
@@ -156,9 +177,19 @@ public class BrowserHistoryHandlerUI extends JFrame {
             remarkArea = new JTextArea();
             scrollPane.setViewportView(remarkArea);
 
-            JPanel panel_2 = new JPanel();
-            panel.add(panel_2, "4, 10, fill, fill");
+            JLabel lblCommandType = new JLabel("command type");
+            panel.add(lblCommandType, "2, 10, right, default");
 
+            commandTypComboBox = new JComboBox();
+            DefaultComboBoxModel commandTypeComboModel = new DefaultComboBoxModel();//
+            for (CommandTypeEnum e : CommandTypeEnum.values()) {
+                commandTypeComboModel.addElement(e);
+            }
+            commandTypComboBox.setModel(commandTypeComboModel);
+            panel.add(commandTypComboBox, "4, 10, fill, default");
+
+            JPanel panel_2 = new JPanel();
+            panel.add(panel_2, "4, 11, fill, fill");
             modifyTimeLabel = new JLabel("修改時間");
             panel_2.add(modifyTimeLabel);
 
@@ -172,12 +203,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JButton btnNewButton = new JButton("開啟");
             btnNewButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        String url = StringUtils.trimToEmpty(urlText.getText());
-                        DesktopUtil.browse(url);
-                    } catch (Exception e1) {
-                        JCommonUtil.handleException(e1);
-                    }
+                    String url = StringUtils.trimToEmpty(urlText.getText());
+                    commandTypeSetting.getValue().doOpen(url);
                 }
             });
             panel_2.add(btnNewButton);
@@ -229,7 +256,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_1.add(lblNewLabel_3, BorderLayout.EAST);
 
             urlTable = new JTable();
-//            JTableUtil.defaultSetting_AutoResize(urlTable);
+            // JTableUtil.defaultSetting_AutoResize(urlTable);
             JTableUtil.defaultSetting(urlTable);
             panel_1.add(JCommonUtil.createScrollComponent(urlTable), BorderLayout.CENTER);
             addComponentListener(new ComponentAdapter() {
@@ -239,6 +266,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         urlTableResize();
                     } catch (Exception ex) {
                     }
+                }
+            });
+            urlTable.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    urlTableClickAction(e);
                 }
             });
 
@@ -284,10 +317,148 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JCommonUtil.setJFrameDefaultSetting(this);
             JCommonUtil.setLocationToRightBottomCorner(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            commandTypeSetting = new CommandTypeSetting();
             sysUtil.apply(this);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private enum CommandTypeEnum {
+        DEFAULT("預設") {
+            @Override
+            void doOpen(String url) {
+                try {
+                    url = StringUtils.trimToEmpty(url);
+                    DesktopUtil.browse(url);
+                } catch (Exception e1) {
+                    JCommonUtil.handleException(e1);
+                }
+            }
+        }, //
+        IE_EAGE("Microsoft Edge") {
+            @Override
+            void doOpen(String url) {
+                try {
+                    url = StringUtils.trimToEmpty(url);
+                    Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
+                } catch (Exception e1) {
+                    JCommonUtil.handleException(e1);
+                }
+            }
+        },//
+        ;
+
+        final String title;
+
+        private CommandTypeEnum(String title) {
+            this.title = title;
+        }
+
+        abstract void doOpen(String url);
+
+        public String toString() {
+            return this.title;
+        }
+    }
+
+    private enum UrlTableConfigEnum {
+        刪除(10) {
+            @Override
+            Object get(final UrlConfig d, final BrowserHistoryHandlerUI _this) {
+                JButton delBtn = new JButton("刪除");
+                delBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println("click 刪除");
+                        String message = "title : " + d.title + "\n" + //
+                        "url : " + d.url + "\n" + //
+                        "tag : " + d.tag + "\n" + //
+                        "remark : " + d.remark + "\n" + //
+                        "timestamp : " + d.timestamp + "\n" + //
+                        "";
+                        boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(message, "確定刪除");
+                        if (!result) {
+                            return;
+                        }
+                        _this.bookmarkConfig.getConfigProp().remove(d.url);
+                        _this.bookmarkConfig.store();
+                        _this.initLoading();
+                        JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功!");
+                    }
+                });
+                return delBtn;
+            }
+        }, //
+        title(40) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.title;
+            }
+        }, //
+        url(10) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.url;
+            }
+        }, //
+        tag(10) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.tag;
+            }
+        }, //
+        timestamp(10) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.timestamp;
+            }
+        }, //
+        remark(20) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.remark;
+            }
+        }, //
+        VO(0) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d;
+            }
+        },//
+        ;
+
+        final float width;
+
+        UrlTableConfigEnum(float width) {
+            this.width = width;
+        }
+
+        private static float[] getWidthConfig() {
+            List<Float> lst = new ArrayList<Float>();
+            for (UrlTableConfigEnum e : UrlTableConfigEnum.values()) {
+                lst.add(e.width);
+            }
+            return ArrayUtils.toPrimitive(lst.toArray(new Float[0]));
+        }
+
+        private static String[] getTitleConfig() {
+            List<String> lst = new ArrayList<String>();
+            for (UrlTableConfigEnum e : UrlTableConfigEnum.values()) {
+                lst.add(e.name());
+            }
+            return lst.toArray(new String[0]);
+        }
+
+        private static Object[] getRow(UrlConfig d, BrowserHistoryHandlerUI _this) {
+            List<Object> lst = new ArrayList<Object>();
+            for (UrlTableConfigEnum e : UrlTableConfigEnum.values()) {
+                lst.add(e.get(d, _this));
+            }
+            return lst.toArray();
+        }
+
+        abstract Object get(UrlConfig d, BrowserHistoryHandlerUI _this);
     }
 
     private void saveCurrentBookmarkBtnAction() {
@@ -297,6 +468,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String tag = StringUtils.trimToEmpty(tagComboBox.getSelectedItem().toString());
             String remark = StringUtils.trimToEmpty(remarkArea.getText().toString());
             String timestamp = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
+            String commandType = commandTypeSetting.getValue().name();
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             Validate.notEmpty(url, "url 為空");
@@ -309,6 +481,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.tag = tag;
             d.remark = remark;
             d.timestamp = timestamp;
+            d.commandType = commandType;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -334,7 +507,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private void urlTableResize() {
-        JTableUtil.setColumnWidths_Percent(urlTable, new float[] { 40, 10, 10, 10, 10, 7, 7, 7 });
+        JTableUtil.setColumnWidths_Percent(urlTable, UrlTableConfigEnum.getWidthConfig());
     }
 
     private void initLoading() {
@@ -347,22 +520,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
         JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
-        DefaultTableModel model = JTableUtil.createModel(//
-                true, new String[] { "title", "url", "tag", "timestamp", "remark", "選取", "刪除", "開啟" });
+        DefaultTableModel model = JTableUtil.createModel(true, UrlTableConfigEnum.getTitleConfig());
+        tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
         urlTable.setModel(model);
+
         urlTableResize();
 
-        for (String v : new String[] { "選取", "刪除", "開啟" }) {
+        for (String v : new String[] { UrlTableConfigEnum.刪除.name() }) {
+            System.out.println("columnIsButton = " + v);
             tableUtil.columnIsButton(v);
         }
 
-        String searchText = searchComboBoxUtil.getTextComponent().getText();
+        String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
         System.out.println("searchText " + searchText);
 
         for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
             String url = (String) enu.nextElement();
             String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
 
+            System.out.println("<<" + title_tag_remark_time);
             final UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
 
             if (StringUtils.isBlank(searchText)) {
@@ -404,54 +580,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         });
 
         for (final UrlConfig d : lst) {
-            JButton delBtn = new JButton("刪除");
-            delBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("click 刪除");
-                    String message = "title : " + d.title + "\n" + //
-                    "url : " + d.url + "\n" + //
-                    "tag : " + d.tag + "\n" + //
-                    "remark : " + d.remark + "\n" + //
-                    "timestamp : " + d.timestamp + "\n" + //
-                    "";
-                    boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(message, "確定刪除");
-                    if (!result) {
-                        return;
-                    }
-                    bookmarkConfig.getConfigProp().remove(d.url);
-                    bookmarkConfig.store();
-                    initLoading();
-                    JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功!");
-                }
-            });
-            JButton goBtn = new JButton("開啟");
-            goBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("click 開啟");
-                    try {
-                        String url = d.url;
-                        DesktopUtil.browse(url);
-                    } catch (Exception e1) {
-                        JCommonUtil.handleException(e1);
-                    }
-                }
-            });
-            JButton choiceBtn = new JButton("選取");
-            choiceBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    System.out.println("click 選取");
-                    System.out.println(ReflectionToStringBuilder.toString(d));
-                    urlText.setText(d.url);
-                    titleText.setText(d.title);
-                    remarkArea.setText(d.remark);
-                    modifyTimeLabel.setText(d.timestamp);
-                    tagComboBoxUtil.getTextComponent().setText(d.tag);
-                }
-            });
-            model.addRow(new Object[] { d.title, d.url, d.tag, d.timestamp, d.remark, choiceBtn, delBtn, goBtn });
+            model.addRow(UrlTableConfigEnum.getRow(d, this));
         }
     }
 
@@ -504,18 +633,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String tag;
         String remark;
         String timestamp;
+        String commandType;
 
         private static String getConfigValue(UrlConfig d) {
-            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp;
+            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType;
+        }
+
+        private static String getArryStr(String[] args, int index) {
+            if (args != null && args.length > index) {
+                return args[index];
+            }
+            return "";
         }
 
         private static UrlConfig parseTo(String key, String title_tag_remark_time) {
             String[] args = StringUtils.trimToEmpty(title_tag_remark_time).split("\\^", -1);
-            if (args.length == 4) {
-                String title = args[0];
-                String tag = args[1];
-                String remark = args[2];
-                String timestamp = args[3];
+            if (args.length >= 4) {
+                String title = getArryStr(args, 0);
+                String tag = getArryStr(args, 1);
+                String remark = getArryStr(args, 2);
+                String timestamp = getArryStr(args, 3);
+                String commandType = getArryStr(args, 4);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -523,6 +661,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.remark = remark;
                 d.timestamp = timestamp;
                 d.url = key;
+                d.commandType = commandType;
 
                 return d;
             }
@@ -563,6 +702,56 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
+
+    private void urlTableClickAction(MouseEvent e) {
+        try {
+            JTableUtil jtab = JTableUtil.newInstance(urlTable);
+            int rowPos = jtab.getRealRowPos(jtab.getSelectedRow());
+            int colPos = UrlTableConfigEnum.VO.ordinal();
+            Object config = jtab.getModel().getValueAt(rowPos, colPos);
+
+            if (config == null || !(config instanceof UrlConfig)) {
+                System.out.println("<<<選取有誤");
+                return;
+            }
+
+            UrlConfig d = (UrlConfig) config;
+            System.out.println("click 選取");
+            System.out.println(ReflectionToStringBuilder.toString(d));
+            urlText.setText(d.url);
+            titleText.setText(d.title);
+            remarkArea.setText(d.remark);
+            modifyTimeLabel.setText(d.timestamp);
+            tagComboBoxUtil.getTextComponent().setText(d.tag);
+            commandTypeSetting.setValue(d.commandType);
+
+            if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                commandTypeSetting.getValue().doOpen(d.url);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private class CommandTypeSetting {
+        private void setValue(String commandType) {
+            CommandTypeEnum e = CommandTypeEnum.DEFAULT;
+            try {
+                e = CommandTypeEnum.valueOf(commandType);
+            }catch(Exception ex) {
+            }
+            commandTypComboBox.setSelectedItem(e);
+        }
+        
+        private CommandTypeEnum getValue() {
+            CommandTypeEnum commandType = (CommandTypeEnum) commandTypComboBox.getSelectedItem();
+            if (commandType == null) {
+                return CommandTypeEnum.DEFAULT;
+            }
+            return commandType;
+        }
+    }
+    
 
     // -----------------------------------------------------------------------------------------------------------------------
 

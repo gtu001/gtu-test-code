@@ -1,0 +1,21 @@
+﻿--將 image 存至檔案
+docker save -o <save image to path> <image name>
+
+--載入image 檔案
+docker load -i <path to image tar file>
+
+
+
+------------------------------------------------------
+--存取image至ssh
+
+--Transferring a Docker image via SSH, bzipping the content on the fly:
+
+docker save <image> | bzip2 | \
+     ssh user@host 'bunzip2 | docker load'
+
+--It's also a good idea to put pv in the middle of the pipe to see how the transfer is going:
+
+docker save <image> | bzip2 | pv | \
+     ssh user@host 'bunzip2 | docker load'
+

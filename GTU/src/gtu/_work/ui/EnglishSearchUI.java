@@ -103,7 +103,6 @@ public class EnglishSearchUI extends JFrame {
     private Thread checkFocusOwnerThread;
     private SearchEnglishIdTextController searchEnglishIdTextController = new SearchEnglishIdTextController();
     private HideInSystemTrayHelper sysutil;
-    private CheckboxMode _CURRENT_MODE = CheckboxMode.NONE;
 
     private Properties offlineProp;
 
@@ -292,9 +291,9 @@ public class EnglishSearchUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 System.out.println("# meaningText click");
-                if(JMouseEventUtil.buttonLeftClick(1, e) && //
-                        StringUtils.isNotBlank(meaningText.getText()) //
-                        ) {
+                if (JMouseEventUtil.buttonLeftClick(1, e) && //
+                StringUtils.isNotBlank(meaningText.getText()) //
+                ) {
                     JCommonUtil._jOptionPane_showInputDialog("", meaningText.getText());
                 }
             }
@@ -349,6 +348,7 @@ public class EnglishSearchUI extends JFrame {
         listenClipboardChk = new JCheckBox("監聽剪貼簿");
         listenClipboardChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("< listenClipboardChk actionPerformed !!");
                 listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
                 mouseSelectionChk.setSelected(listenClipboardChk.isSelected());// XXX
             }
@@ -446,13 +446,12 @@ public class EnglishSearchUI extends JFrame {
                 System.exit(0);
             }
         });
-        
+
         // 確認是否Focus
         startCheckFocusOwnerThread();
 
         // 確認是否監聽記事本
         startListenClipboardThread();
-
 
         // 讀取離線檔
         loadOfflineConfig();
@@ -688,7 +687,10 @@ public class EnglishSearchUI extends JFrame {
             }
         }
         reader.close();
-        set.add(word);
+        //空白太多當成句子不處理
+        if (StringUtils.countMatches(StringUtils.trimToEmpty(word), " ") < 4) {
+            set.add(word);
+        }
         StringBuffer sb = new StringBuffer();
         for (String v : set) {
             sb.append(v + "\r\n");
@@ -733,62 +735,6 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
-    private enum CheckboxMode {
-        NONE() {
-            @Override
-            void apply(EnglishSearchUI this_) {
-                JCheckBox chk = this_.autoSearchChk;
-                chk.setSelected(false);
-                JCheckBox chk2 = this_.listenClipboardChk;
-                chk2.setSelected(false);
-                JCheckBox chk3 = this_.mouseSelectionChk;
-                chk3.setSelected(false);
-                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
-            }
-        },
-        CTRL_C() {
-            @Override
-            void apply(EnglishSearchUI this_) {
-                JCheckBox chk = this_.autoSearchChk;
-                chk.setSelected(true);
-                JCheckBox chk2 = this_.listenClipboardChk;
-                chk2.setSelected(true);
-                JCheckBox chk3 = this_.mouseSelectionChk;
-                chk3.setSelected(false);
-                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
-            }
-        },
-        MOUSE_MARK() {
-            @Override
-            void apply(EnglishSearchUI this_) {
-                JCheckBox chk = this_.autoSearchChk;
-                chk.setSelected(true);
-                JCheckBox chk2 = this_.listenClipboardChk;
-                chk2.setSelected(true);
-                JCheckBox chk3 = this_.mouseSelectionChk;
-                chk3.setSelected(true);
-                this_.sysutil.displayMessage("字典", this.name(), MessageType.INFO);
-            }
-        },;
-        CheckboxMode() {
-        }
-
-        abstract void apply(EnglishSearchUI this_);
-
-        private static CheckboxMode findNext(CheckboxMode current) {
-            for (int ii = 0; ii < CheckboxMode.values().length; ii++) {
-                if (CheckboxMode.values()[ii] == current) {
-                    if (ii + 1 >= CheckboxMode.values().length) {
-                        return CheckboxMode.values()[0];
-                    } else {
-                        return CheckboxMode.values()[ii + 1];
-                    }
-                }
-            }
-            throw new RuntimeException("error find : " + current);
-        }
-    }
-
     private class GlobalKeyListenerExampleForEnglishUI extends NativeKeyAdapter {
         public void close() {
             try {
@@ -801,13 +747,15 @@ public class EnglishSearchUI extends JFrame {
         public void nativeKeyReleased(NativeKeyEvent e) {
             System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
             // 模式check
-            if ((e.getModifiers() & NativeInputEvent.CTRL_MASK) != 0 && //
+            if ((e.getModifiers() & NativeInputEvent.ALT_L_MASK) != 0 && //
                     e.getKeyCode() == NativeKeyEvent.VC_F2) {
-                _CURRENT_MODE = CheckboxMode.findNext(_CURRENT_MODE);
-                _CURRENT_MODE.apply(EnglishSearchUI.this);
+                listenClipboardChk.setSelected(!listenClipboardChk.isSelected());
+                JCommonUtil.triggerButtonActionPerformed(listenClipboardChk);
+                sysutil.displayMessage("字典", "監聽" + (listenClipboardChk.isSelected() ? "啟用" : "停止"), MessageType.INFO);
                 // 監聽開啟UI
-            } else if ((e.getModifiers() & NativeInputEvent.SHIFT_MASK) != 0 && //
-                    (e.getModifiers() & NativeInputEvent.ALT_MASK) != 0 && //
+            } else if (// (e.getModifiers() & NativeInputEvent.SHIFT_MASK) != 0
+                       // && //
+            (e.getModifiers() & NativeInputEvent.ALT_MASK) != 0 && //
                     e.getKeyCode() == NativeKeyEvent.VC_X) {
                 startNewUI();
             }

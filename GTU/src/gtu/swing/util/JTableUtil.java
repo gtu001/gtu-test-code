@@ -57,6 +57,8 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import gtu.clipboard.ClipboardUtil;
 
 public class JTableUtil {
@@ -165,9 +167,14 @@ public class JTableUtil {
      * 設定某欄為button
      */
     public void columnIsButton(String columnName) {
-        table.getColumn(columnName).setCellRenderer(new TableCellRenderer() {
+        TableColumn columConfig = table.getColumn(columnName);
+        System.out.println("columnIsButton " + columConfig.getHeaderValue());
+        columConfig.setCellRenderer(new TableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (value == null || !(value instanceof JButton)) {
+                    throw new RuntimeException("無法被設定為Button : " + value);
+                }
                 JButton button = (JButton) value;
                 return button;
             }
