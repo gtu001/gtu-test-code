@@ -61,3 +61,7 @@ def rpad(strVal, length, padChar):
 
 def isNumber(s):
     return numberUtil.isNumber(s)
+
+
+def isNoneType(s):
+    return s is None

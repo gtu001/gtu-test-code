@@ -1,11 +1,11 @@
 
-¤Á´«¥Ø¿ı¨ì C:\Users\gtu00\Anaconda3\Scripts
+åˆ‡æ›ç›®éŒ„åˆ° C:\Users\gtu00\Anaconda3\Scripts
 
-·j´Mpackage©ÒÄİchannel
+æœå°‹packageæ‰€å±¬channel
 conda serach [package]
 
-¦w¸Ëpackage
+å®‰è£package
 conda install -c [channel] [package]
 
-¬İ¦w¸Ë²M³æ
+çœ‹å®‰è£æ¸…å–®
 conda list 

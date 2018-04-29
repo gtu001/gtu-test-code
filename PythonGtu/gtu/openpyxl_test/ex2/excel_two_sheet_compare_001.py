@@ -20,7 +20,7 @@ from gtu.reflect import checkSelf
 from gtu.reflect import toStringUtil
 from gtu.string import stringUtil
 from gtu.reflect import toStringUtil
-
+from gtu.number import numberUtil
 
 
 
@@ -36,6 +36,7 @@ class CellKeeper :
         self.value = cell.value
         self.rowIndex = rowIndex
         self.colIndex = colIndex
+        self.isNumber = numberUtil.isNumber(self.value)
 
     def apply(self, cell):
         cell.font = self.font
@@ -78,6 +79,15 @@ def getCellLst(excelPath, sheetTitle):
 
 
 
+def getFormulaStr(sheetNames, posStr):
+    #=工作表1!A1 = 工作表2!A1
+    #=IF(原來!J11=新的!J11,TRUE,FALSE)
+    formulaStr = "={0}!{2} = {1}!{2}".format(sheetNames[0], sheetNames[1], posStr)
+    formulaStr = "=IF({0}!{2} = {1}!{2}, TRUE, FALSE)".format(sheetNames[0], sheetNames[1], posStr)
+    return formulaStr
+
+
+
 def createCompareSheet(wb, sheetNames, maxPos):
     sheet3 = wb.create_sheet("比對")
     
@@ -87,8 +97,7 @@ def createCompareSheet(wb, sheetNames, maxPos):
     for row in range(0, rowMax + 1):
         for col in range(0, colMax + 1):
             posStr = excelUtil.cellEnglishToPos_toStr(col + 1) + str(row + 1)
-            #     =工作表1!A1 = 工作表2!A1
-            formula = "=" + sheetNames[0] + "!" + posStr + "=" + sheetNames[1] + "!" + posStr
+            formula = getFormulaStr(sheetNames, posStr)
             print(formula)
             sheet3[posStr] = formula
             

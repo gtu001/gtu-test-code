@@ -1,9 +1,15 @@
+'''
+from gtu.number import numberUtil
+'''
+
 from _decimal import Decimal
 import decimal
 import math
 import numbers
 import re
+
 from gtu.reflect import checkSelf
+
 
 def roundHalfUp2(value, scale):
     '''四捨五入,小數點後多的零會保留'''
@@ -40,6 +46,8 @@ def roundHalfUp(strVal, scale):
 
 
 def isNumber(s):
+    if s is None :
+        return False
     try:
         float(s)
         return True

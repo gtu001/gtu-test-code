@@ -2,8 +2,9 @@
 import os
 from os.path import expanduser
 from pathlib import Path
+from gtu.thread import threadUtil
 
-### from gtu.io import fileUtil
+# ## from gtu.io import fileUtil
 
 
 def mkdirs(path):
@@ -33,7 +34,7 @@ def get_line_number(phrase, file_name):
 
 def get_line_number2(phrase, file_name):
 	'''取得資料所在行數'''
-	f = open(file_name,'r')
+	f = open(file_name, 'r')
 	line_num = 0
 	for line in f.readlines():
 		line_num += 1
@@ -99,7 +100,7 @@ def copyDir(fromDir, toDir):
 
 
 def saveToFile(filePath, content):
-	f = open(filePath, "w", encoding = 'utf8')
+	f = open(filePath, "w", encoding='utf8')
 	f.write(content)
 	f.flush()
 	f.close()
@@ -113,7 +114,7 @@ def saveToFileBytes(filePath, byteArry):
 	
 
 def loadFile(filePath):
-	file = open(filePath, "r", encoding = 'utf8')
+	file = open(filePath, "r", encoding='utf8')
 	return file.read() 
 
 
@@ -122,9 +123,23 @@ def loadFileBytes(filePath):
 	return file.read() 
 
 
+def getCurrentDir():
+	''' print(os.getcwd()) '''
+	(threadId, filename, lineno, name, line) = threadUtil.getCurrentRunning(ignorePy=[__file__])
+	return (os.path.dirname(os.path.abspath(filename))) + os.sep
+
+
 if __name__ == '__main__':
-	print(copyFile("C:/Users/Administrator/Desktop/southpark.rar", "c:/southpark.rar"))
-	print("done..")
+# 	print(copyFile("C:/Users/Administrator/Desktop/southpark.rar", "c:/southpark.rar"))
+
+
 	
+	from gtu.thread import threadUtil
+	
+	threadUtil.printCurrentStacks()
+	
+	print()
+	
+	print("done..")
 	
 	

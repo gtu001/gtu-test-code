@@ -14,7 +14,7 @@ def cellEnglishToPos_toInt(column):
     _length = len(column)
     for i, c in enumerate(column, 0):
         total += (ord(c) - 64) * pow(26, _length - i - 1)
-    total -= 1
+#     total -= 1
     return total
 
 
@@ -27,17 +27,17 @@ def cellEnglishToPos_toStr(columnIndex):
     tmpColumn = columnIndex
     while True:
         exponent = 0
-        for i in range(0, 1000):
-            if math.pow(26, i) > tmpColumn:
+        for i in range(1, 1000):
+            if math.pow(26, i) >= tmpColumn:
                 exponent = i - 1
                 break
-        tmpColumn -= math.pow(26, exponent)
+        tmpColumn = tmpColumn - int(math.pow(26, exponent))
         value = 0
         if map.__contains__(exponent):
             value = map[exponent]
         value += 1
         map[exponent] = value
-        if exponent == 0:
+        if exponent <= 0:
             map[0] = tmpColumn + 1
             break
     rtnVal = ""
@@ -72,7 +72,5 @@ def getCellValue(column, row):
     
     
 if __name__ == '__main__' :
-    print(cellEnglishToPos_toStr(3058))
-    print(cellEnglishToPos_toStr(1031))
-    print(cellEnglishToPos_toStr(1032))
-    print(cellEnglishToPos_toStr(1033))
+    print(cellEnglishToPos_toStr(3333))
+    print("done...")

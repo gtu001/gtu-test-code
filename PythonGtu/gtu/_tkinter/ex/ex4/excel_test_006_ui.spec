@@ -9,7 +9,7 @@ srcBasePath = "e:\\workstuff\\workspace\\gtu-test-code\\PythonGtu"
 
 a = Analysis(['excel_test_006_ui.py'],
              pathex=[srcBasePath + '\\gtu\\_tkinter\\ex\\ex4', \
-             srcBasePath,
+             #srcBasePath,
              ],
              binaries=[],
              datas=[],
