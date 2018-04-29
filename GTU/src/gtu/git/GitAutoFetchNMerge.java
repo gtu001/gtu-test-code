@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +25,8 @@ public class GitAutoFetchNMerge {
         }
         
         String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
+        
+        List<String> needMergetLst = new ArrayList<String>();
         File[] files = fileDirs.listFiles();
         for (int ii = 0 ; ii < files.length ; ii ++) {
             File f = files[ii];
@@ -46,14 +50,33 @@ public class GitAutoFetchNMerge {
                 Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
                 ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
                 newInstance.getStream(60000);
-                System.out.println(newInstance.getErrorStreamToString());
-                System.out.println(newInstance.getInputStreamToString());
+               
+                String errorStr = newInstance.getErrorStreamToString();
+                String normalStr = newInstance.getInputStreamToString();
+                System.out.println(errorStr);
+                System.out.println(normalStr);
+
+                if (findIfMergeExists(errorStr) || findIfMergeExists(normalStr)) {
+                    needMergetLst.add(f.getName());
+                }
+                
                 System.out.println("processed " + (ii+1) + " -> " + files.length);
             } catch (java.util.concurrent.TimeoutException ex) {
                 System.err.println("Timeout !!");
             }
         }
+        
+        for (String merge : needMergetLst) {
+            System.out.println("Do Merge -----> " + merge);
+        }
         System.out.println("done...");
     }
-
+    
+    private static boolean findIfMergeExists(String content) {
+        // Please commit your changes or stash them before you merge.
+        // Aborting
+        Pattern ptn = Pattern.compile("Please\\scommit\\syour\\schanges\\sor\\sstash\\sthem\\sbefore\\syou\\smerge\\.", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = ptn.matcher(content);
+        return mth.find();
+    }
 }

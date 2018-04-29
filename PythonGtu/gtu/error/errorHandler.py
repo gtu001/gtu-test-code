@@ -3,12 +3,19 @@ import traceback
 
 from gtu.reflect import checkSelf
 
+'''
+from gtu.error import errorHandler
+'''
+
 
 def printStackTrace():
     traceback.print_exc(file=sys.stdout)
     
 def printStackTrace2(ex):
     traceback.print_tb(ex.__traceback__)
+    
+def getStackTraceToStr(ex):
+    return ''.join(traceback.format_exception(etype=type(ex), value=ex, tb=ex.__traceback__))
     
 def getException():
     exc_info = sys.exc_info()

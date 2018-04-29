@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -224,6 +225,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
             searchComboBox = new JComboBox();
             searchComboBoxUtil = AutoComboBox.applyAutoComboBox(searchComboBox);
             panel_2x.add(searchComboBox);
+
+            JButton allOpenBtn = new JButton("全開");
+            allOpenBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    allOpenBtnAction();
+                }
+            });
+            panel_2x.add(allOpenBtn);
             searchComboBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -346,6 +355,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
         public String toString() {
             return this.title;
         }
+        
+        private static CommandTypeEnum valueOfFrom(String commandType) {
+            CommandTypeEnum e = CommandTypeEnum.DEFAULT;
+            try {
+                e = CommandTypeEnum.valueOf(commandType);
+            } catch (Exception ex) {
+            }
+            return e;
+        }
     }
 
     private enum UrlTableConfigEnum {
@@ -376,7 +394,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return delBtn;
             }
         }, //
-        title(40) {
+        開啟(3) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return true;//預設勾選
+            }
+        }, //
+        title(37) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 return d.title;
@@ -506,7 +530,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
         JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
-        DefaultTableModel model = JTableUtil.createModel(true, UrlTableConfigEnum.getTitleConfig());
+        DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
         tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
         urlTable.setModel(model);
 
@@ -516,6 +540,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("columnIsButton = " + v);
             tableUtil.columnIsButton(v);
         }
+        tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());//設定為checkbox
 
         String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
         System.out.println("searchText " + searchText);
@@ -735,12 +760,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private class CommandTypeSetting {
         private void setValue(String commandType) {
-            CommandTypeEnum e = CommandTypeEnum.DEFAULT;
-            try {
-                e = CommandTypeEnum.valueOf(commandType);
-            } catch (Exception ex) {
-            }
-            commandTypComboBox.setSelectedItem(e);
+            commandTypComboBox.setSelectedItem(CommandTypeEnum.valueOfFrom(commandType));
         }
 
         private CommandTypeEnum getValue() {
@@ -749,6 +769,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return CommandTypeEnum.DEFAULT;
             }
             return commandType;
+        }
+    }
+
+    private void allOpenBtnAction() {
+        try {
+            JTableUtil jtab = JTableUtil.newInstance(urlTable);
+            for( int ii = 0; ii <jtab.getModel().getRowCount(); ii ++) {
+                boolean isChk = (Boolean)jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
+                UrlConfig vo = (UrlConfig)jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
+                if(isChk) {
+                    CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
+                    e.doOpen(vo.url);
+                }
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 

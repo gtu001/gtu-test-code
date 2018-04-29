@@ -3,6 +3,9 @@ import inspect
 import os
 import re
 
+'''
+from gtu.reflect import toStringUtil
+'''
 
 class _TestClass():
     intval = 0
@@ -40,8 +43,21 @@ class ToStringBuilder(metaclass=ABCMeta):
         
         self.multilineSep = "\n\t" if self.multiline else ""
         
+        if "limitSize" in arg2 :
+            self.limitSize = arg2['limitSize']
+        else :
+            self.limitSize = 20
+        
         if len(self.orderLst) != 0:
             self.props = self.orderLst
+            
+    def getPropertyToString(self, val):
+            strVal = str(val)
+            strVal = strVal.replace('\r', "")
+            strVal = strVal.replace('\n', "")
+            if len(strVal) > self.limitSize :
+                strVal = strVal[0:self.limitSize] + "...etc"
+            return strVal
             
     @abstractmethod
     def func(self, i, name, val):
@@ -62,8 +78,10 @@ def toStringSimple(instance, **arg2):
         def __init__(self, instance, arg2):
             ToStringBuilder.__init__(self, instance, arg2)
             self.lst = list()
+                
         def func(self, i, name, val):
-            self.lst.append(str(val))
+            self.lst.append(self.getPropertyToString(val))
+        
     
     t = MyToStringBuilder(instance, arg2)
     t.apply()
@@ -76,7 +94,7 @@ def toString(instance, **arg2):
             ToStringBuilder.__init__(self, instance, arg2)
             self.lst = list()
         def func(self, i, name, val):
-            self.lst.append(name + "=" + str(val))
+            self.lst.append(name + "=" + self.getPropertyToString(val))
     
     t = MyToStringBuilder(instance, arg2)
     t.apply()
