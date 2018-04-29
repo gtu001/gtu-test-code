@@ -105,7 +105,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    System.out.println("done..v9");
+                    System.out.println("done..v10");
                 }
             }
         });
@@ -729,9 +729,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void urlTableClickAction(MouseEvent e) {
         try {
             JTableUtil jtab = JTableUtil.newInstance(urlTable);
-            int rowPos = jtab.getRealRowPos(jtab.getSelectedRow());
+            int rowPos = jtab.getSelectedRow();
             int colPos = UrlTableConfigEnum.VO.ordinal();
-            Object config = jtab.getModel().getValueAt(rowPos, colPos);
+            Object config = jtab.getRealValueAt(rowPos, colPos);
 
             if (config == null || !(config instanceof UrlConfig)) {
                 System.out.println("<<<選取有誤");
