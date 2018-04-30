@@ -33,6 +33,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -73,6 +74,7 @@ import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 
 public class BrowserHistoryHandlerUI extends JFrame {
@@ -186,11 +188,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
 
-            JButton btnNewButton = new JButton("開啟");
+            final JButton btnNewButton = new JButton("開啟");
             btnNewButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String url = StringUtils.trimToEmpty(urlText.getText());
                     commandTypeSetting.getValue().doOpen(url);
+                }
+            });
+            btnNewButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    String url = StringUtils.trimToEmpty(urlText.getText());
+                    doRightClickShowMenuAction(btnNewButton, e, url);
                 }
             });
             panel_2.add(btnNewButton);
@@ -355,7 +364,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         public String toString() {
             return this.title;
         }
-        
+
         private static CommandTypeEnum valueOfFrom(String commandType) {
             CommandTypeEnum e = CommandTypeEnum.DEFAULT;
             try {
@@ -397,7 +406,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         開啟(3) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
-                return true;//預設勾選
+                return true;// 預設勾選
             }
         }, //
         title(37) {
@@ -540,7 +549,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("columnIsButton = " + v);
             tableUtil.columnIsButton(v);
         }
-        tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());//設定為checkbox
+        tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());// 設定為checkbox
 
         String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
         System.out.println("searchText " + searchText);
@@ -752,6 +761,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
                 commandTypeSetting.getValue().doOpen(d.url);
+            } else {
+                doRightClickShowMenuAction(urlTable, e, d.url);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -775,13 +786,35 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void allOpenBtnAction() {
         try {
             JTableUtil jtab = JTableUtil.newInstance(urlTable);
-            for( int ii = 0; ii <jtab.getModel().getRowCount(); ii ++) {
-                boolean isChk = (Boolean)jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
-                UrlConfig vo = (UrlConfig)jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
-                if(isChk) {
+            for (int ii = 0; ii < jtab.getModel().getRowCount(); ii++) {
+                boolean isChk = (Boolean) jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
+                UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
+                if (isChk) {
                     CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
                     e.doOpen(vo.url);
                 }
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void doRightClickShowMenuAction(JComponent parent, MouseEvent e, String url) {
+        try {
+            url = StringUtils.trimToEmpty(url);
+            if (DesktopUtil.getFile(url) == null) {
+                return;
+            }
+            if (JMouseEventUtil.buttonRightClick(1, e)) {
+                JPopupMenuUtil.newInstance(parent)//
+                        .addJMenuItem("開啟目錄", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String url = StringUtils.trimToEmpty(urlText.getText());
+                                DesktopUtil.openDir(url);
+                            }
+                        })//
+                        .applyEvent(e).show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

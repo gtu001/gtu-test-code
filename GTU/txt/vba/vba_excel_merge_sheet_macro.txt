@@ -1,0 +1,151 @@
+
+
+Sub main()
+    screenUpdate (False)
+
+    sheetDelete ("test")
+    Set newSht = createSheet("test")
+    Dim r As Integer
+    
+    Dim totalRowSize As Integer
+    
+    totalRowSize = 0
+    
+    For isht = 1 To Worksheets.Count - 1
+        If Sheets(isht).Name = "年中人口" Then
+            GoTo ContinueLoop
+        End If
+    
+        Sheets(isht).Select
+        r = getRowCount(Sheets(isht).Name)
+        
+        
+        selectCopy
+        
+        
+        Sheets("test").Select
+        Sheets("test").Paste
+        
+        totalRowSize = totalRowSize + r
+        
+        Call mavePosition("test", totalRowSize, 0)
+        
+        
+        debugMsg ("current sheet " & Sheets(isht).Name)
+        
+ContinueLoop:
+    Next isht
+    
+    debugMsg ("done")
+    
+    
+End Sub
+
+
+Private Sub screenUpdate(bool As Boolean)
+    Application.ScreenUpdating = bool
+End Sub
+
+
+Private Sub debugMsg(msg As String)
+    'Console.WriteLine (msg)
+    Debug.Print (msg)
+    'MsgBox (msg)
+End Sub
+
+Private Function getRowCount(sheetTitle As String) As Integer
+    Dim cnt As Integer
+    cnt = Sheets(sheetTitle).UsedRange.Rows.Count
+    cnt = Sheets(sheetTitle).UsedRange.Rows(cnt).row
+    getRowCount = cnt
+End Function
+
+Private Function getColCount(sheetTitle As String) As Integer
+    Dim cnt As Integer
+    cnt = Sheets(sheetTitle).UsedRange.Columns.Count
+    cnt = Sheets(sheetTitle).UsedRange.Columns(cnt).Column
+    getColCount = cnt
+End Function
+
+'Ex : cellEngStr = "A4"
+Private Sub cellSelect(cellEngStr As String)
+    Range(cellEngStr).Select
+End Sub
+
+'index start 1
+'呼叫方式為 (1) cellSelectPos x, y (2) Call cellSelectPos(x, y)
+Private Sub cellSelectPos(rowPos As Integer, colPos As Integer)
+    Cells(rowPos, colPos).Select
+End Sub
+
+Private Sub sheetSelect(sheetTitle As String)
+    Sheets(sheetTitle).Select
+End Sub
+
+Private Function isNumber(a As Variant)
+    If Not IsNumeric(a) Then
+        isNumber = False
+        Exit Function
+    Else
+        b = CInt(a)
+        isNumber = True
+        Exit Function
+    End If
+End Function
+
+Private Function prompt(title As String, message As String, defaultVal As String)
+    Dim a As Variant
+    Dim b As String
+    a = InputBox(message, title, defaultVal, 700, 600)
+    b = CStr(a)
+    prompt = b
+End Function
+
+Private Function createSheet(sheetTitle As String) As Worksheet
+    Dim allSht As Worksheet
+    Set allSht = Worksheets.Add(After:=Worksheets(Worksheets.Count))
+    allSht.Name = sheetTitle
+End Function
+
+Private Sub selectCopy()
+    Dim a As Range
+    Set a = Range("A1", Cells.Find(What:="*", _
+        After:=Range("A1"), _
+        LookAt:=xlPart, _
+        LookIn:=xlFormulas, _
+        searchorder:=xlByRows, _
+        searchdirection:=xlPrevious, _
+        MatchCase:=False) _
+    )
+    a.Copy
+    a.PasteSpecial xlPasteValues
+End Sub
+
+Private Sub showType(obj As Variant)
+    Debug.Print (TypeName(obj))
+End Sub
+
+
+Private Sub mavePosition(sheetTitle As String, row As Integer, col As Integer)
+    Worksheets(sheetTitle).Activate
+    Worksheets(sheetTitle).Range("A1").Select
+    ActiveCell.Offset(rowOffset:=row, columnOffset:=col).Activate
+    'ActiveCell.Offset(r, 0).Select
+End Sub
+
+
+Private Sub sheetDelete(sheetTitle As String)
+    Dim s As Worksheet, t As String
+    Dim i As Long, K As Long
+    K = Sheets.Count
+    For i = K To 1 Step -1
+        t = Sheets(i).Name
+        If t = sheetTitle Then
+            Application.DisplayAlerts = False
+                Sheets(i).Delete
+            Application.DisplayAlerts = True
+        End If
+    Next i
+End Sub
+
+
