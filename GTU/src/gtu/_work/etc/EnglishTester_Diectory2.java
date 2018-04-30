@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import gtu.net.https.SimpleHttpsUtil;
+
 public class EnglishTester_Diectory2 {
 
     public static void main(String[] args) throws Exception {
@@ -71,7 +73,7 @@ public class EnglishTester_Diectory2 {
         // String fullStr =
         // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
         // word));
-        String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p="+page+"&l=en#bilingual", word));
+        String fullStr = SimpleHttpsUtil.newInstance().queryPage(String.format("https://tw.ichacha.net/m.aspx?q=%s&p="+page+"&l=en#bilingual", word));
         if (StringUtils.isBlank(fullStr)) {
             return new WordInfo2();
         }
@@ -214,8 +216,9 @@ public class EnglishTester_Diectory2 {
         }
         return value;
     }
-
-    String searchWordOnline(String urls) {
+    
+    @Deprecated
+    private String searchWordOnline(String urls) {
         StringBuffer sb = new StringBuffer();
         try {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("11.22.33.44", 8080));

@@ -73,7 +73,7 @@ public class EnglishTester_Diectory2 {
         // String fullStr =
         // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
         // word));
-        String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p="+page+"&l=en#bilingual", word));
+        String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
         if (StringUtils.isBlank(fullStr)) {
             return new WordInfo2();
         }
@@ -125,7 +125,7 @@ public class EnglishTester_Diectory2 {
 
         LineNumberReader reader = new LineNumberReader(new StringReader(fullStr));
         try {
-            for (String line = null; (line = reader.readLine()) != null;) {
+            for (String line = null; (line = reader.readLine()) != null; ) {
                 if (line.contains(find2)) {
                     exampleSentanceOrign = line.substring(line.indexOf(find2) + find2.length());
                 }
@@ -201,7 +201,7 @@ public class EnglishTester_Diectory2 {
     }
 
     private String replaceNotAllow(String value) {
-        for (;;) {
+        for (; ; ) {
             int startPos = value.indexOf("<");
             int endPos = value.indexOf(">");
 
@@ -217,20 +217,22 @@ public class EnglishTester_Diectory2 {
         return value;
     }
 
-    String searchWordOnline(String urls) {
+    private String searchWordOnline(String urls) {
+        return SimpleHttpsUtil.newInstance().queryPage(urls);
+    }
+
+    @Deprecated
+    private String searchWordOnlineOld(String urls) {
         StringBuffer sb = new StringBuffer();
         try {
             URL u = new URL(urls);
             URLConnection url = u.openConnection();
             url.setReadTimeout(5000);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.getInputStream(), "utf8"));
-            for (String line = null; (line = reader.readLine()) != null;) {
+            for (String line = null; (line = reader.readLine()) != null; ) {
                 sb.append(line + "\n");
             }
             reader.close();
-        } catch (java.io.FileNotFoundException ex) {
-            ex.printStackTrace();
-            return "";
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);

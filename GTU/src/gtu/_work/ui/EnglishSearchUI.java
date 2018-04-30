@@ -598,7 +598,7 @@ public class EnglishSearchUI extends JFrame {
             }
             queryButton.setEnabled(false);
 
-            final String text = searchEnglishIdTextController.getText();
+            final String text = StringUtils.trimToEmpty(searchEnglishIdTextController.getText()).toLowerCase();
             if (StringUtils.isBlank(text)) {
                 return;
             }

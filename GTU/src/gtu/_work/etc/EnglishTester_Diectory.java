@@ -3,18 +3,33 @@ package gtu._work.etc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang.StringUtils;
 
 import gtu.binary.TransCodeUtil;
+import gtu.net.https.MyX509TrustManager;
+import gtu.net.https.SimpleHttpsUtil;
 
 public class EnglishTester_Diectory {
 
@@ -23,10 +38,10 @@ public class EnglishTester_Diectory {
 
         System.out.println(t.testPing());
 
-        WordInfo wordInfo = t.parseToWordInfo("decreed");
+        WordInfo wordInfo = t.parseToWordInfo("hurrah");
         System.out.println("pronounce=" + wordInfo.pronounce);
         System.out.println("meaning=" + wordInfo.meaning);
-        System.out.println("done...");
+        System.out.println("done...v6");
     }
 
     public boolean testPing() {
@@ -56,7 +71,8 @@ public class EnglishTester_Diectory {
     public WordInfo parseToWordInfo(String word) {
         word = word.trim().replaceAll(" ", "%20");
         System.out.println(word);
-        String fullStr = searchWordOnline("http://cdict.net/?q=" + word);
+        // String fullStr = searchWordOnline("http://cdict.net/?q=" + word);
+        String fullStr = SimpleHttpsUtil.newInstance().queryPage("https://cdict.net/?q=" + word);
         WordInfo wordInfo = parseToWordInfo(word, fullStr);
         return wordInfo;
     }
@@ -157,7 +173,8 @@ public class EnglishTester_Diectory {
         return value;
     }
 
-    String searchWordOnline(String urls) {
+    @Deprecated
+    private String searchWordOnline(String urls) {
         StringBuffer sb = new StringBuffer();
         try {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("11.22.33.44", 8080));
@@ -167,12 +184,15 @@ public class EnglishTester_Diectory {
             URL u = new URL(urls);
             URLConnection url = u.openConnection();
             url.setRequestProperty("User-agent", "IE/6.0");
-            // url.setReadTimeout(5000);
+            url.setReadTimeout(5000);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.getInputStream(), "utf8"));
             for (String line = null; (line = reader.readLine()) != null;) {
                 sb.append(line + "\n");
             }
             reader.close();
+        } catch (java.io.FileNotFoundException ex) {
+            ex.printStackTrace();
+            return "";
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);

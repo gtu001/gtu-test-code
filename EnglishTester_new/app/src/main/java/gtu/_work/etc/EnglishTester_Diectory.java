@@ -49,9 +49,9 @@ public class EnglishTester_Diectory {
         return true;
     }
 
-    private void toastMessage(final Context context,final String message, Handler handler){
-        if(handler != null){
-            handler.post(new Runnable(){
+    private void toastMessage(final Context context, final String message, Handler handler) {
+        if (handler != null) {
+            handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -67,13 +67,13 @@ public class EnglishTester_Diectory {
             return new WordInfo();
         }
 
-        if(!word.contains(" ")){
+        if (!word.contains(" ")) {
             WordInfo wordInfo = DropboxEnglishService.getRunOnUiThread(new Callable<WordInfo>() {
                 @Override
                 public WordInfo call() throws Exception {
                     System.out.println(word);
                     try {
-                        String fullStr = searchWordOnline("http://cdict.net/?q=" + word);
+                        String fullStr = searchWordOnline("https://cdict.net/?q=" + word);
                         WordInfo wordInfo = parseToWordInfo(word, fullStr);
                         return wordInfo;
                     } catch (Exception ex) {
@@ -82,7 +82,7 @@ public class EnglishTester_Diectory {
                 }
             }, -1L);
             return wordInfo;
-        }else{
+        } else {
             WordInfo wordInfo = DropboxEnglishService.getRunOnUiThread(new Callable<WordInfo>() {
                 @Override
                 public WordInfo call() throws Exception {
@@ -92,7 +92,7 @@ public class EnglishTester_Diectory {
                     try {
                         EnglishTester_Diectory2 dic = new EnglishTester_Diectory2();
                         EnglishTester_Diectory2.WordInfo2 info2 = dic.parseToWordInfo(word2);
-                        String meaning = StringUtils.join(info2.meaningList , ";");
+                        String meaning = StringUtils.join(info2.meaningList, ";");
                         wordInfo.setMeaning(meaning);
                         wordInfo.setEnglishId(word);
                         return wordInfo;
@@ -211,6 +211,11 @@ public class EnglishTester_Diectory {
     }
 
     private String searchWordOnline(String urls) {
+        return SimpleHttpsUtil.newInstance().queryPage(urls);
+    }
+
+    @Deprecated
+    private String searchWordOnlineOld(String urls) {
         StringBuffer sb = new StringBuffer();
         try {
             URL u = new URL(urls);
