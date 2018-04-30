@@ -394,18 +394,24 @@ public class JTableUtil {
         return (DefaultTableModel) table.getRowSorter().getModel();
     }
 
+    /**
+     * 已修正 pos
+     */
     public Object getSelectedValue() {
-        int row = getSelectedRow();
-        int col = getSelectedColumn();
+        int row = JTableUtil.getRealRowPos(getSelectedRow(), table);
+        int col = JTableUtil.getRealColumnPos(getSelectedColumn(), table);
         if (row == -1 || col == -1) {
             return null;
         }
         return getModel().getValueAt(row, col);
     }
 
+    /**
+     * 已修正 pos
+     */
     public JTableUtil setValueAtSelectedCell(Object value) {
-        int row = getSelectedRow();
-        int col = getSelectedColumn();
+        int row = JTableUtil.getRealRowPos(getSelectedRow(), table);
+        int col = JTableUtil.getRealColumnPos(getSelectedColumn(), table);
         System.out.format("setValueAtSelectedCell - row : %d, col : %d\n", row, col);
         if (row == -1 || col == -1) {
             return this;
@@ -414,55 +420,65 @@ public class JTableUtil {
         return this;
     }
 
+    /**
+     * 未變更原始col
+     */
     public int getSelectedColumn() {
-        int colPos = table.getSelectedColumn();
-        System.out.println("getSelectedColumn ==> colPos == " + colPos);
-        return table.convertColumnIndexToModel(colPos);
+        return table.getSelectedColumn();
     }
 
-    public int getSelectedRow() {
-        int rowPos = table.getSelectedRow();
-        System.out.println("getSelectedRow ==> rowPos == " + rowPos);
-        if (rowPos == -1) {
-            return rowPos;
-        }
-        if (table.getRowSorter() == null) {
-            return rowPos;
-        }
-        return table.getRowSorter().convertRowIndexToModel(rowPos);
-    }
-
-    public int getRealRowPos(int rowPos) {
-        System.out.println("getRealRowPos ==> rowPos == " + rowPos);
-        if (rowPos == -1) {
-            return rowPos;
-        }
-        if (table.getRowSorter() == null) {
-            return rowPos;
-        }
-        return table.getRowSorter().convertRowIndexToModel(rowPos);
-    }
-
-    public int getRealColumnPos(int colPos) {
+    /**
+     * 已修正col (記得傳入未修正 pos , 否則反而錯誤)
+     */
+    public static int getRealColumnPos(int colPos, JTable table) {
         System.out.println("getRealColumnPos ==> colPos == " + colPos);
         return table.convertColumnIndexToModel(colPos);
     }
 
-    public Object getRealValueAt(int rowPos, int colPos) {
-        rowPos = getRealRowPos(rowPos);
-        colPos = getRealColumnPos(colPos);
-        return table.getValueAt(rowPos, colPos);
+    /**
+     * 已修正 row (記得傳入未修正 pos , 否則反而錯誤)
+     */
+    public static int getRealRowPos(int rowPos, JTable table) {
+        if (rowPos == -1) {
+            System.out.println("getRealRowPos => " + rowPos);
+            return rowPos;
+        }
+        if (table.getRowSorter() == null) {
+            System.out.println("getRealRowPos[no sort] => " + rowPos);
+            return rowPos;
+        }
+        int fixRowPos = table.getRowSorter().convertRowIndexToModel(rowPos);
+        System.out.println(String.format("getRealRowPos[fix] => before[%d], after[%d]", rowPos, fixRowPos));
+        return fixRowPos;
     }
 
+    /**
+     * 未變更原始row
+     */
+    public int getSelectedRow() {
+        return table.getSelectedRow();
+    }
+
+    /**
+     * (記得傳入未修正 pos , 否則反而錯誤)
+     */
+    public Object getRealValueAt(int rowPos, int colPos) {
+        rowPos = getRealRowPos(rowPos, table);
+        colPos = getRealColumnPos(colPos, table);
+        return getModel().getValueAt(rowPos, colPos);
+    }
+
+    /**
+     * 取得已修正row arry
+     */
     public int[] getSelectedRows() {
         int[] rowPos = table.getSelectedRows();
-        System.out.println("getSelectedRow ==> rowPos == " + rowPos);
         if (table.getRowSorter() == null) {
             return rowPos;
         }
         int[] row2 = new int[rowPos.length];
         for (int ii = 0; ii < rowPos.length; ii++) {
-            row2[ii] = table.getRowSorter().convertRowIndexToModel(rowPos[ii]);
+            row2[ii] = JTableUtil.getRealRowPos(rowPos[ii], table);
         }
         return row2;
     }
@@ -472,6 +488,7 @@ public class JTableUtil {
         model.addRow(data);
     }
 
+    @Deprecated
     public Object[] getRealRowData(Object[] rowData) {
         TableColumnModel cmodel = table.getColumnModel();
         if (cmodel.getColumnCount() < rowData.length) {
@@ -1091,7 +1108,7 @@ public class JTableUtil {
         public void mouseClicked(MouseEvent e) {
             int column = table.getColumnModel().getColumnIndexAtX(e.getX());
             int row = e.getY() / table.getRowHeight();
-            System.out.println("column " + column + " , " + row);
+            System.out.println(String.format("tableClick row[%d],col[%d]", row, column));
             if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
                 Object value = table.getValueAt(row, column);
                 if (value instanceof JButton) {

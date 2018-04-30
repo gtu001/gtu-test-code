@@ -758,6 +758,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             commandTypeSetting.setValue(d.commandType);
 
             urlTable.setToolTipText(d.url);
+            System.out.println("[open]<<<" + d.title + " = " + d.url);
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
                 commandTypeSetting.getValue().doOpen(d.url);

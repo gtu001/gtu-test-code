@@ -137,7 +137,7 @@ public class FacebookVideoDownloader extends JFrame {
                             // "", vo });
                             Vector vec = downloadListModel.getDataVector();
 
-                            //更新下載狀態
+                            // 更新下載狀態
                             for (int row = 0; row < downloadListModel.getRowCount(); row++) {
                                 if (downloadListModel.getValueAt(row, 5) == DownloadGOGO.this.vo) {
                                     downloadListModel.setValueAt(description, row, 4);
@@ -145,10 +145,10 @@ public class FacebookVideoDownloader extends JFrame {
                             }
 
                             if (proc.isComplete()) {
-                                //完成顯示訊息
+                                // 完成顯示訊息
                                 showCompleteMessage();
-                                
-                                //完成下載要清除
+
+                                // 完成下載要清除
                                 downloadLog.processCompleteLog(DownloadGOGO.this.vo);
                             }
                         }
@@ -387,7 +387,7 @@ public class FacebookVideoDownloader extends JFrame {
             }
         });
         panel_17.add(batchDownloadBtn);
-        
+
         JButton continueLastestDownloadBtn = new JButton("繼續上次下載");
         continueLastestDownloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -449,8 +449,8 @@ public class FacebookVideoDownloader extends JFrame {
                 try {
                     JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
                     if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        int row = jTab.getRealRowPos(jTab.getSelectedRow());
-                        VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, 5);
+                        int row = jTab.getSelectedRow();
+                        VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getRealValueAt(row, 5);
                         if (!vo.downloadToFile.exists()) {
                             JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在或被移除\n" + vo.downloadToFile);
                             return;
@@ -592,8 +592,8 @@ public class FacebookVideoDownloader extends JFrame {
                 vec.add(vo2);
                 downloadListModel.addRow(vec);
             }
-            
-            //每次下載紀錄
+
+            // 每次下載紀錄
             downloadLog.appendDownloadVO(vo2);
 
             sysutil.displayMessage("開始下載", vo2.getFileName(), MessageType.INFO);
@@ -621,7 +621,7 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
-    private void autoDownload(boolean throwEx) {
+    private synchronized void autoDownload(boolean throwEx) {
         try {
             isCrashProcessDone = false;
 
@@ -801,11 +801,11 @@ public class FacebookVideoDownloader extends JFrame {
             }
         }
     }
-    
+
     private void continueLastestDownloadBtnAction() {
         try {
             downloadLog.continueNotOk();
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
