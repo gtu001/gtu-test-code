@@ -1,7 +1,6 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,6 +49,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
@@ -194,7 +194,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             btnNewButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String url = StringUtils.trimToEmpty(urlText.getText());
-                    commandTypeSetting.getValue().doOpen(url);
+                    commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
                 }
             });
             btnNewButton.addMouseListener(new MouseAdapter() {
@@ -334,9 +334,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private enum CommandTypeEnum {
         DEFAULT("預設") {
             @Override
-            void doOpen(String url) {
+            void _doOpen(String url) {
                 try {
-                    url = StringUtils.trimToEmpty(url);
                     DesktopUtil.browse(url);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -345,10 +344,33 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }, //
         IE_EAGE("Microsoft Edge") {
             @Override
-            void doOpen(String url) {
+            void _doOpen(String url) {
                 try {
-                    url = StringUtils.trimToEmpty(url);
                     Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
+                } catch (Exception e1) {
+                    JCommonUtil.handleException(e1);
+                }
+            }
+        }, //
+        FIREFOX("Mozilla Firefox") {
+            @Override
+            void _doOpen(String url) {
+                try {
+                    String exePath = "C:/Program Files/Mozilla Firefox/firefox.exe";
+                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    Runtime.getRuntime().exec(command);
+                } catch (Exception e1) {
+                    JCommonUtil.handleException(e1);
+                }
+            }
+        }, //
+        CHROME("Google Chrome") {
+            @Override
+            void _doOpen(String url) {
+                try {
+                    String exePath = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe";
+                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -362,7 +384,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
             this.title = title;
         }
 
-        abstract void doOpen(String url);
+        abstract void _doOpen(String url);
+
+        public void doOpen(String url, BrowserHistoryHandlerUI _this) {
+            url = StringUtils.trimToEmpty(url);
+            System.out.println("[doOpen]>>>" + this.name());
+            _doOpen(url);
+            UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
+            _this.clickUrlDoLogAction(d);
+        }
 
         public String toString() {
             return this.title;
@@ -379,7 +409,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private enum UrlTableConfigEnum {
-        刪除(10) {
+        刪除(5) {
             @Override
             Object get(final UrlConfig d, final BrowserHistoryHandlerUI _this) {
                 JButton delBtn = new JButton("刪除");
@@ -412,7 +442,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return true;// 預設勾選
             }
         }, //
-        title(37) {
+        title(35) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 return d.title;
@@ -430,13 +460,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return d.tag;
             }
         }, //
-        timestamp(10) {
+        timestamp(8) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 return d.timestamp;
             }
         }, //
-        remark(20) {
+        lastClick(9) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.timestampLastest;
+            }
+        }, //
+        clickTimes(5) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.clickTimes;
+            }
+        }, //
+        remark(19) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 return d.remark;
@@ -483,13 +525,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
         abstract Object get(UrlConfig d, BrowserHistoryHandlerUI _this);
     }
 
+    private void clickUrlDoLogAction(UrlConfig d) {
+        try {
+            int clickTime = NumberUtils.toInt(d.clickTimes, 0);
+            clickTime++;
+
+            d.clickTimes = String.valueOf(clickTime);
+            d.timestampLastest = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
+
+            bookmarkConfig.getConfigProp().setProperty(d.url, UrlConfig.getConfigValue(d));
+            bookmarkConfig.store();
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     private void saveCurrentBookmarkBtnAction() {
         try {
             String url = StringUtils.trimToEmpty(urlText.getText());
             String title = StringUtils.trimToEmpty(titleText.getText());
             String tag = StringUtils.trimToEmpty(tagComboBox.getSelectedItem().toString());
             String remark = StringUtils.trimToEmpty(remarkArea.getText().toString());
-            String timestamp = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
             String commandType = commandTypeSetting.getValue().name();
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
@@ -498,12 +554,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
             Validate.notEmpty(tag, "tag 為空");
 
             UrlConfig d = new UrlConfig();
+            if (bookmarkConfig.getConfigProp().containsKey(url)) {
+                String orignStr = bookmarkConfig.getConfigProp().getProperty(url);
+                d = UrlConfig.parseTo(url, orignStr);
+            } else {
+                d.timestamp = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
+                d.clickTimes = "";
+            }
+
             d.url = url;
             d.title = title;
             d.tag = tag;
             d.remark = remark;
-            d.timestamp = timestamp;
             d.commandType = commandType;
+            d.timestampLastest = "";
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -686,15 +750,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private static class UrlConfig {
+        String clickTimes;
         String title;
         String url;
         String tag;
         String remark;
-        String timestamp;
+        String timestamp;// 建立時間
+        String timestampLastest;// 最後一次點及時間
         String commandType;
 
         private static String getConfigValue(UrlConfig d) {
-            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType;
+            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType + "^" + d.timestampLastest + "^" + d.clickTimes;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -712,6 +778,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String remark = getArryStr(args, 2);
                 String timestamp = getArryStr(args, 3);
                 String commandType = getArryStr(args, 4);
+                String timestampLastest = getArryStr(args, 5);
+                String clickTimes = getArryStr(args, 6);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -720,6 +788,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.timestamp = timestamp;
                 d.url = key;
                 d.commandType = commandType;
+                d.timestampLastest = timestampLastest;
+                d.clickTimes = clickTimes;
 
                 return d;
             }
@@ -766,7 +836,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JTableUtil jtab = JTableUtil.newInstance(urlTable);
             int rowPos = jtab.getSelectedRow();
             int colPos = UrlTableConfigEnum.VO.ordinal();
-            Object config = jtab.getRealValueAt(rowPos, colPos);
+
+            Object config = null;
+            try {
+                config = jtab.getRealValueAt(rowPos, colPos);
+            } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+                return;
+            }
 
             if (config == null || !(config instanceof UrlConfig)) {
                 System.out.println("<<<選取有誤");
@@ -787,7 +863,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("[open]<<<" + d.title + " = " + d.url);
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                commandTypeSetting.getValue().doOpen(d.url);
+                commandTypeSetting.getValue().doOpen(d.url, BrowserHistoryHandlerUI.this);
             } else {
                 doRightClickShowMenuAction(urlTable, e, d.url);
             }
@@ -818,7 +894,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
                 if (isChk) {
                     CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
-                    e.doOpen(vo.url);
+                    e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
                 }
             }
         } catch (Exception ex) {
@@ -837,8 +913,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         .addJMenuItem("開啟目錄", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                String url = StringUtils.trimToEmpty(urlText.getText());
-                                DesktopUtil.openDir(url);
+                                try {
+                                    String url = StringUtils.trimToEmpty(urlText.getText());
+                                    DesktopUtil.openDir(url);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
+                            }
+                        })//
+                        .addJMenuItem("以參數開啟", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    String url = StringUtils.trimToEmpty(urlText.getText());
+                                    File file = DesktopUtil.getFile(url);
+                                    url = file.getAbsolutePath();
+                                    String options = JCommonUtil._jOptionPane_showInputDialog("請輸入執行參數", "");
+                                    String command = String.format("cmd /k /c call \"%s\"  %s ", url, options);
+                                    Runtime.getRuntime().exec(command);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
                             }
                         })//
                         .applyEvent(e).show();
