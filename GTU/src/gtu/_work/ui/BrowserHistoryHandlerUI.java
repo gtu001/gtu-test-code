@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -72,6 +73,7 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -232,6 +234,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_2x.add(label);
 
             searchComboBox = new JComboBox();
+            JComboBoxUtil.newInstance(searchComboBox).setWidth(300);
             searchComboBoxUtil = AutoComboBox.applyAutoComboBox(searchComboBox);
             panel_2x.add(searchComboBox);
 
@@ -536,7 +539,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         final List<String> tagLst = new ArrayList<String>();
-        List<UrlConfig> lst = new ArrayList<UrlConfig>();
+        final List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
         JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
         DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
@@ -551,7 +554,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
         tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());// 設定為checkbox
 
-        String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
+        final String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
         System.out.println("searchText " + searchText);
 
         for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
@@ -561,16 +564,39 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("<<" + title_tag_remark_time);
             final UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
 
-            if (StringUtils.isBlank(searchText)) {
-                lst.add(d);
-            } else if (d.title.toLowerCase().contains(searchText) || //
-                    d.tag.toLowerCase().contains(searchText) || //
-                    d.remark.toLowerCase().contains(searchText) || //
-                    d.timestamp.toLowerCase().contains(searchText) || //
-                    d.url.toLowerCase().contains(searchText) //
-            ) {
-                lst.add(d);
-            }
+            new Runnable() {
+                private boolean isMatch(String singleText) {
+                    if (StringUtils.isBlank(singleText)) {
+                        return true;
+                    } else if (d.title.toLowerCase().contains(singleText) || //
+                    d.tag.toLowerCase().contains(singleText) || //
+                    d.remark.toLowerCase().contains(singleText) || //
+                    d.timestamp.toLowerCase().contains(singleText) || //
+                    d.url.toLowerCase().contains(singleText) //
+                    ) {
+                        return true;
+                    }
+                    return false;
+                }
+
+                @Override
+                public void run() {
+                    String[] searchArry = searchText.split(",", -1);
+                    boolean isAllMatch = true;
+                    for (String singleText : searchArry) {
+                        singleText = StringUtils.trimToEmpty(singleText);
+                        if (StringUtils.isNotBlank(singleText)) {
+                            if (!isMatch(singleText)) {
+                                isAllMatch = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (isAllMatch) {
+                        lst.add(d);
+                    }
+                }
+            }.run();
 
             // 過濾重複的
             new Runnable() {
