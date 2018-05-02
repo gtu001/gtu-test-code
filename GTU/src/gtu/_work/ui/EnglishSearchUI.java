@@ -587,6 +587,11 @@ public class EnglishSearchUI extends JFrame {
                 }
                 searchResultArea.setText(sb.toString());
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
+
+                // set top the UI
+//                if (!EnglishSearchUI.this.isFocusOwner()) {
+//                    bringToTop();
+//                }
             }
         }).start();
     }
@@ -687,7 +692,7 @@ public class EnglishSearchUI extends JFrame {
             }
         }
         reader.close();
-        //空白太多當成句子不處理
+        // 空白太多當成句子不處理
         if (StringUtils.countMatches(StringUtils.trimToEmpty(word), " ") < 4) {
             set.add(word);
         }

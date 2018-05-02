@@ -72,6 +72,10 @@
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			
+			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
+			
+			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
+			
 			<!-- http client -->
 			<packagename mode="small">org.apache.http.client.HttpClient</packagename>
 			<packagename mode="small">org.apache.http.HttpEntity</packagename>

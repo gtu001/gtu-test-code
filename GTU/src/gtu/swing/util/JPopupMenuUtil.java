@@ -94,4 +94,8 @@ public class JPopupMenuUtil {
     public static JPopupMenuUtil newInstance(Component component) {
         return new JPopupMenuUtil(component);
     }
+    
+    public List<JMenuItem> getMenuList() {
+        return menuList;
+    }
 }

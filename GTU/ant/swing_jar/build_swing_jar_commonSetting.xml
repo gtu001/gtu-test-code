@@ -122,7 +122,6 @@
 			<packagename mode="small">com.dropbox.core.DbxClient</packagename>
 			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
 			  -->
-			<!-- 
 			<!-- http client 
 			<packagename mode="small">org.apache.http.client.HttpClient</packagename>
 			<packagename mode="small">org.apache.http.HttpEntity</packagename>
@@ -132,3 +131,9 @@
 			<packagename mode="pom">org.slf4j.spi.LocationAwareLogger</packagename>
 			<packagename mode="pom">ch.qos.logback.core.joran.spi.JoranException</packagename>
 			 -->
+			<!-- keyboard mouse
+			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
+			 -->
+		    <!-- 簡繁體
+		    <packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
+		     -->

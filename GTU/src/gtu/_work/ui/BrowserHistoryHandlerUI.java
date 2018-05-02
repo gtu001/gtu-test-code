@@ -21,11 +21,15 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,14 +67,22 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JComboBoxUtil;
@@ -78,6 +90,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
@@ -96,6 +109,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private HideInSystemTrayHelper sysUtil = HideInSystemTrayHelper.newInstance();
     private JComboBox commandTypComboBox;
     private CommandTypeSetting commandTypeSetting;
+    private BrowserHistoryHandlerUI_KeyboardListener keyboardListener = new BrowserHistoryHandlerUI_KeyboardListener();
 
     /**
      * Launch the application.
@@ -326,6 +340,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             commandTypeSetting = new CommandTypeSetting();
             sysUtil.apply(this);
+            keyboardListener.initialize();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -388,6 +403,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         public void doOpen(String url, BrowserHistoryHandlerUI _this) {
             url = StringUtils.trimToEmpty(url);
+
+            // 判斷是否為自動產生
+            if (StringUtil_.isUUID(url)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
+                return;
+            }
+
             System.out.println("[doOpen]>>>" + this.name());
             _doOpen(url);
             UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
@@ -549,9 +571,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String commandType = commandTypeSetting.getValue().name();
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
-            Validate.notEmpty(url, "url 為空");
+            // Validate.notEmpty(url, "url 為空");
             Validate.notEmpty(title, "title 為空");
             Validate.notEmpty(tag, "tag 為空");
+
+            if (StringUtils.isBlank(url)) {
+                url = UUID.randomUUID().toString();
+            }
 
             UrlConfig d = new UrlConfig();
             if (bookmarkConfig.getConfigProp().containsKey(url)) {
@@ -629,14 +655,34 @@ public class BrowserHistoryHandlerUI extends JFrame {
             final UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
 
             new Runnable() {
+                private String s2t(String oringStr) {
+                    try {
+                        return JChineseConvertor.getInstance().s2t(oringStr);
+                    } catch (Exception ex) {
+                        return oringStr;
+                    }
+                }
+
+                private String decode(String url) {
+                    try {
+                        return URLDecoder.decode(url, "UTF-8");
+                    } catch (Exception ex) {
+                        return url;
+                    }
+                }
+
                 private boolean isMatch(String singleText) {
+                    String tag = s2t(d.tag);
+                    String remark = s2t(d.remark);
+                    String url = decode(d.url);
+
                     if (StringUtils.isBlank(singleText)) {
                         return true;
                     } else if (d.title.toLowerCase().contains(singleText) || //
-                    d.tag.toLowerCase().contains(singleText) || //
-                    d.remark.toLowerCase().contains(singleText) || //
+                    tag.toLowerCase().contains(singleText) || //
+                    remark.toLowerCase().contains(singleText) || //
                     d.timestamp.toLowerCase().contains(singleText) || //
-                    d.url.toLowerCase().contains(singleText) //
+                    url.toLowerCase().contains(singleText) //
                     ) {
                         return true;
                     }
@@ -905,41 +951,215 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void doRightClickShowMenuAction(JComponent parent, MouseEvent e, String url) {
         try {
             url = StringUtils.trimToEmpty(url);
-            if (DesktopUtil.getFile(url) == null) {
-                return;
-            }
             if (JMouseEventUtil.buttonRightClick(1, e)) {
-                JPopupMenuUtil.newInstance(parent)//
-                        .addJMenuItem("開啟目錄", new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try {
-                                    String url = StringUtils.trimToEmpty(urlText.getText());
-                                    DesktopUtil.openDir(url);
-                                } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
+                JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(parent);//
+
+                // 檔案的處理
+                if (DesktopUtil.getFile(url) != null) {
+                    popupUtil//
+                            .addJMenuItem("開啟目錄", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String url = StringUtils.trimToEmpty(urlText.getText());
+                                        DesktopUtil.openDir(url);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
                                 }
-                            }
-                        })//
-                        .addJMenuItem("以參數開啟", new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try {
-                                    String url = StringUtils.trimToEmpty(urlText.getText());
-                                    File file = DesktopUtil.getFile(url);
-                                    url = file.getAbsolutePath();
-                                    String options = JCommonUtil._jOptionPane_showInputDialog("請輸入執行參數", "");
-                                    String command = String.format("cmd /k /c call \"%s\"  %s ", url, options);
-                                    Runtime.getRuntime().exec(command);
-                                } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
+                            })//
+                            .addJMenuItem("以參數開啟", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String url = StringUtils.trimToEmpty(urlText.getText());
+                                        File file = DesktopUtil.getFile(url);
+                                        url = file.getAbsolutePath();
+                                        String options = JCommonUtil._jOptionPane_showInputDialog("請輸入執行參數", "");
+                                        String command = String.format("cmd /k /c call \"%s\"  %s ", url, options);
+                                        Runtime.getRuntime().exec(command);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
                                 }
-                            }
-                        })//
-                        .applyEvent(e).show();
+                            })//
+                    ;
+                }
+
+                // 多項處理
+                if (true) {
+                    final JTableUtil jtab = JTableUtil.newInstance(urlTable);
+                    final int[] rowArry = jtab.getSelectedRows();
+
+                    popupUtil//
+                            .addJMenuItem("修改tag", new ActionListener() {
+
+                                private String getDefaultTag() {
+                                    Set<String> set = new LinkedHashSet<String>();
+                                    for (int row : rowArry) {
+                                        UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                        set.add(vo.tag);
+                                    }
+                                    return StringUtils.join(set, ",");
+                                }
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String newTag = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請賦予新的tag!", getDefaultTag()));
+                                        if (StringUtils.isBlank(newTag)) {
+                                            return;
+                                        }
+                                        StringBuilder sb = new StringBuilder();
+                                        int size = 0;
+                                        for (int row : rowArry) {
+                                            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                            vo.tag = newTag;
+                                            bookmarkConfig.getConfigProp().setProperty(vo.url, UrlConfig.getConfigValue(vo));
+                                            sb.append("" + vo.title + "\n");
+                                            size++;
+                                        }
+                                        boolean isSave = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString() + "確定修改Tag : " + newTag, "確認");
+                                        if (isSave) {
+                                            bookmarkConfig.store();
+                                            initLoading();
+                                            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功! size : " + size);
+                                        }
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("修改remark", new ActionListener() {
+
+                                private String getDefaultRemark() {
+                                    Set<String> set = new LinkedHashSet<String>();
+                                    for (int row : rowArry) {
+                                        UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                        set.add(vo.remark);
+                                    }
+                                    return StringUtils.join(set, ",");
+                                }
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String newRemark = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請賦予新的tag!", getDefaultRemark()));
+                                        StringBuilder sb = new StringBuilder();
+                                        int size = 0;
+                                        for (int row : rowArry) {
+                                            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                            vo.remark = newRemark;
+                                            bookmarkConfig.getConfigProp().setProperty(vo.url, UrlConfig.getConfigValue(vo));
+                                            sb.append("" + vo.title + "\n");
+                                            size++;
+                                        }
+                                        boolean isSave = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString() + "確定修改Remark : " + newRemark, "確認");
+                                        if (isSave) {
+                                            bookmarkConfig.store();
+                                            initLoading();
+                                            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功! size : " + size);
+                                        }
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("複製連結", new ActionListener() {
+
+                                private String getRealAbstractUrl(String url) {
+                                    File f = DesktopUtil.getFile(url);
+                                    if (f != null) {
+                                        return f.getAbsolutePath();
+                                    }
+                                    return url;
+                                }
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        StringBuilder sb = new StringBuilder();
+                                        for (int row : rowArry) {
+                                            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                            sb.append(getRealAbstractUrl(vo.url) + "\n");
+                                        }
+                                        ClipboardUtil.getInstance().setContents(sb.toString());
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
+                    ;
+                }
+
+                popupUtil.applyEvent(e).show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------------
+
+    private class BrowserHistoryHandlerUI_KeyboardListener implements NativeKeyListener {
+
+        BrowserHistoryHandlerUI_KeyboardListener() {
+            initialize();
+        }
+
+        private void initialize() {
+            try {
+                if (!GlobalScreen.isNativeHookRegistered()) {
+                    GlobalScreen.registerNativeHook();
+                }
+                JnativehookKeyboardMouseHelper.getInstance().disableLogger();
+            } catch (NativeHookException e) {
+                JCommonUtil.handleException(e);
+                throw new RuntimeException(e);
+            }
+            GlobalScreen.removeNativeKeyListener(this);// 記得她媽先移除否則會多掛listener
+                                                       // XXX
+            GlobalScreen.addNativeKeyListener(this);
+        }
+
+        public void close() {
+            if (!GlobalScreen.isNativeHookRegistered()) {
+                GlobalScreen.removeNativeKeyListener(this);
+            }
+        }
+
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent paramNativeKeyEvent) {
+        }
+
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent paramNativeKeyEvent) {
+        }
+
+        private void startNewUI() {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        if (BrowserHistoryHandlerUI.this.isShowing()) {
+                            BrowserHistoryHandlerUI.this.setVisible(false);
+                        } else {
+                            JCommonUtil.setFrameAtop(BrowserHistoryHandlerUI.this, false);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent e) {
+            synchronized (BrowserHistoryHandlerUI.class) {
+                if ((e.getModifiers() & NativeInputEvent.META_L_MASK) != 0 && //
+                        e.getKeyCode() == NativeKeyEvent.VC_Z) {
+                    startNewUI();
+                }
+            }
         }
     }
 

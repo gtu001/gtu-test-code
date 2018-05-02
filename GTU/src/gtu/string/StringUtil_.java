@@ -60,7 +60,7 @@ public class StringUtil_ {
         }
         return sb.toString();
     }
-    
+
     /**
      * 抓中文字(注音不抓)
      * 
@@ -70,7 +70,7 @@ public class StringUtil_ {
      */
     public static boolean hasChineseWord(String str) {
         Matcher mth = Pattern.compile("[\u4e00-\u9fa5]").matcher(str);
-        if(mth.find()) {
+        if (mth.find()) {
             return true;
         }
         return false;
@@ -587,7 +587,6 @@ public class StringUtil_ {
         strValue = new String(bs, 0, maxLen);
         return strValue;
     }
-    
 
     public static void halfCharToFullChar() {
         String outStr = "";
@@ -600,5 +599,10 @@ public class StringUtil_ {
             outStr += (char) tranTemp;
         }
         System.out.println("outStr : " + outStr);
+    }
+
+    public static boolean isUUID(String str) {
+        final Pattern UUID_PATTERN = Pattern.compile("^\\w{8}\\-\\w{4}\\-\\w{4}\\-\\w{4}\\-\\w{12}$");
+        return UUID_PATTERN.matcher(str).find();
     }
 }

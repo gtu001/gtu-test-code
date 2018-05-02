@@ -3,6 +3,9 @@ import re
 from gtu.number import numberUtil
 from gtu.regex import replaceContent
 
+'''
+from gtu.string import stringUtil
+'''
 
 def getChinese(strVal):
     matchList = re.finditer("[\u4e00-\u9fa5]", strVal)
@@ -22,7 +25,7 @@ def isChinese(strVal):
 
 def hasChinese(strVal):
     prog = re.compile("[\u4e00-\u9fa5]+", re.DOTALL | re.MULTILINE)
-    result = prog.match(strVal)
+    result = prog.search(strVal)
     if result == None:
         return False
     return True;

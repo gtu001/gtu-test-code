@@ -4,8 +4,9 @@ from os.path import expanduser
 from pathlib import Path
 from gtu.thread import threadUtil
 
-# ## from gtu.io import fileUtil
-
+'''
+from gtu.io import fileUtil
+'''
 
 def mkdirs(path):
 	'''建立多個目錄'''
@@ -127,6 +128,13 @@ def getCurrentDir():
 	''' print(os.getcwd()) '''
 	(threadId, filename, lineno, name, line) = threadUtil.getCurrentRunning(ignorePy=[__file__])
 	return (os.path.dirname(os.path.abspath(filename))) + os.sep
+
+'''
+讀取字串變數, by line
+'''
+def readStringVariableByLine(textData):
+	for line in textData.splitlines():
+	    print(line)
 
 
 if __name__ == '__main__':

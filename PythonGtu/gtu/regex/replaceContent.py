@@ -1,7 +1,11 @@
 import re
 
+'''
+from gtu.regex import replaceContent
+'''
 
-def replaceContent(pattern, text, rep):
+
+def replaceContent(pattern, text, repFunc):
 	'''替換match的內容, 可自訂替換的邏輯'''
 	matchList = re.finditer(pattern, text)
 	curPos = 0
@@ -9,16 +13,11 @@ def replaceContent(pattern, text, rep):
 	for mth in matchList:
 		matchStr = mth.group()
 		rtnStr += text[curPos : mth.start()]
-		rtnStr += rep.replaceTo(rep, matchStr)
+		rtnStr += repFunc(matchStr)
 		curPos = mth.end()
 	rtnStr += text[curPos :]
 	return rtnStr
 	
-	
-class DefaultReplace:
-	'''for replaceContent 參數rep, 可實作邏輯'''
-	def replaceTo(self, matchStr):
-		return matchStr
 
 
 def testFind001(restr, dataText):
@@ -35,7 +34,16 @@ def testFind001(restr, dataText):
 
 		
 if __name__ == '__main__' :
-# 	rtn = replaceContent("a", "111 fsadfsdf asdfasfdsff asfdfasdfsa asdfadsfsdf ", DefaultReplace)
+	'''
+		test replaceContent
+	'''
+# 	def replace(orign):
+# 		return "A"
+# 	rtn = replaceContent(r"a", "111 fsadfsdf asdfasfdsff asfdfasdfsa asdfadsfsdf ", replace)
 # 	print(rtn)
-	print(testFind001("([d])", "1234567890"))
+	
+	'''
+		test testFind001
+	'''
+# 	print(testFind001("([d])", "1234567890"))
 
