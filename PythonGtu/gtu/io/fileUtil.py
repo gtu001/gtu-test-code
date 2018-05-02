@@ -56,6 +56,7 @@ def getDesktopDir():
 	
 def getAbsPath(path):
 	'''取得絕對路徑'''
+	'''return os.path.abspath(path)'''
 	return Path(path).resolve()
 
 
@@ -128,6 +129,11 @@ def getCurrentDir():
 	''' print(os.getcwd()) '''
 	(threadId, filename, lineno, name, line) = threadUtil.getCurrentRunning(ignorePy=[__file__])
 	return (os.path.dirname(os.path.abspath(filename))) + os.sep
+
+
+def getDir(file):
+    return os.path.dirname(file)
+   
 
 '''
 讀取字串變數, by line

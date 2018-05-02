@@ -1,11 +1,11 @@
 from enum import Enum
 import re
 
+from gtu.enum import enumUtil
 from gtu.io import fileUtil
 from gtu.reflect import checkSelf
 from gtu.regex import regexUtil
 from gtu.string import stringUtil
-from sympy.utilities.benchmarking import BenchSession
 
 
 class __TableRegion(Enum):
@@ -105,6 +105,8 @@ def main(file):
                 
     for (i, row) in enumerate(lst):
         print(i, row)
+        
+        
 
 
 if __name__ == '__main__' :
