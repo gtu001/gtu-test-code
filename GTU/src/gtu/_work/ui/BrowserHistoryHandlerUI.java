@@ -82,6 +82,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
@@ -93,6 +94,7 @@ import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
+    private static final long serialVersionUID = 1L;
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
@@ -985,6 +987,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                     }
                                 }
                             })//
+                            .addJMenuItem("以remark開啟", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String url = StringUtils.trimToEmpty(urlText.getText());
+                                        File file = DesktopUtil.getFile(url);
+                                        if (file == null || !file.exists() || !file.isFile()) {
+                                            JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
+                                            return;
+                                        }
+                                        UrlConfig d = UrlConfig.parseTo(url, bookmarkConfig.getConfigProp().getProperty(url));
+                                        String command = d.remark;
+                                        if (command.contains("%s")) {
+                                            command = String.format(command, file);
+                                        }
+                                        RuntimeBatPromptModeUtil.newInstance().command(command).apply();
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
                     ;
                 }
 
@@ -1103,7 +1126,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void bringToTop() {
         JCommonUtil.setFrameAtop(this, false);
-        
+
         for (; true;) {
             this.tabbedPane.setSelectedIndex(1);
             if (this.tabbedPane.getSelectedIndex() == 1) {

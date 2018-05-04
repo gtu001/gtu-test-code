@@ -28,6 +28,7 @@ public class Pdfbox_forJannaEx1 {
 
     public static void main(String[] args) throws InvalidPasswordException, IOException {
         Pdfbox_forJannaEx1 p = new Pdfbox_forJannaEx1();
+        p.___saveTextToFile();
         System.out.println("done..");
     }
     

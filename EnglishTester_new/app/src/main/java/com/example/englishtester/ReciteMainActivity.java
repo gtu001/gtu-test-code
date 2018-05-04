@@ -30,7 +30,6 @@ import com.example.englishtester.MainActivityDTO.CurrentMode;
 import com.example.englishtester.common.ExampleSentenceDialogHelper;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.NetWorkUtil;
-import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
 
 import org.apache.commons.lang3.StringUtils;
@@ -263,6 +262,9 @@ public class ReciteMainActivity extends Activity {
                                     talkComponent.speak(englishBean.englishWord);
                                 }
                             }
+
+                            // 答對時重設答按鈕文字
+                            resetWrongButtonText(btn);
 
                             // 一秒鐘後自動再按一次
                             clickRightButtonAgain(btn);
@@ -921,6 +923,7 @@ public class ReciteMainActivity extends Activity {
         for (int ii = 0; ii < 4; ii++) {
             if (ii == dto.correctBtnNum) {
                 answerBtn[dto.correctBtnNum].setText(formatChangeLine(word, answer));
+                answerBtn[dto.correctBtnNum].setTag(dto.englishProp.get(word));
                 continue;
             }
 
@@ -955,6 +958,7 @@ public class ReciteMainActivity extends Activity {
         for (int ii = 0; ii < 4; ii++) {
             if (ii == dto.correctBtnNum) {
                 answerBtn[dto.correctBtnNum].setText(word);
+                answerBtn[dto.correctBtnNum].setTag(dto.englishProp.get(word));
                 continue;
             } else {
                 String engWord = iterator.next();
@@ -995,7 +999,6 @@ public class ReciteMainActivity extends Activity {
         answer = sb.toString();
 
         answer = answer.replaceAll("\n", "");
-
         return answer;
     }
 
@@ -1385,11 +1388,12 @@ public class ReciteMainActivity extends Activity {
     }
 
     /**
-     * 答錯時重設答錯按鈕文字
+     * 重設按下按鈕時顯示內容
      */
     private void resetWrongButtonText(Button btn) {
         EnglishWord eng = (EnglishWord) btn.getTag();
-        String engText = eng.englishId + "\n" + formatChangeLine(eng.englishId, eng.englishDesc);
+        String btnAppendix = StringUtils.trimToEmpty(eng.getBtnAppendix());
+        String engText = eng.englishId + "\n" + formatChangeLine(eng.englishId, eng.englishDesc) + btnAppendix;
         btn.setText(engText);
     }
 

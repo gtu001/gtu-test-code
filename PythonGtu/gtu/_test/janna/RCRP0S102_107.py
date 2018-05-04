@@ -110,7 +110,7 @@ def toRowDataLst(rowStr):
 
 
 def createExcel(lst):
-    tabRegion = EnumHelper("gtu._test.test002.__TableRegion")
+    tabRegion = EnumHelper("gtu._test.janna.RCRP0S102_107.__TableRegion")
     wb = openpyxl.Workbook()
     
     for (i, table) in enumerate(lst):
@@ -131,8 +131,10 @@ def createExcel(lst):
 
 def main(file):
     textContent = fileUtil.loadFile(file)
+    print("textContent size = ", len(textContent))
 
     lst = getPdfTable(textContent)
+    print("pdfTable size = ", len(lst))
     
     createExcel(lst)
          
@@ -140,7 +142,7 @@ def main(file):
 
 
 if __name__ == '__main__' :
-    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
+    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102_107.pdf.txt"
     main(file)
     print("done..")
 

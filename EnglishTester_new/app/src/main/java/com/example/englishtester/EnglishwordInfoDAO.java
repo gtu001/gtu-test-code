@@ -21,7 +21,7 @@ public class EnglishwordInfoDAO {
 
     private static final String TAG = EnglishwordInfoDAO.class.getSimpleName();
 
-//    final DBConnection helper;
+    //    final DBConnection helper;
     final Context context;
     private static QueryAllKeeper qryAllKeeper;
 
@@ -30,7 +30,7 @@ public class EnglishwordInfoDAO {
 //        helper = new DBConnection(context);
     }
 
-    public int sizeOfWords(){
+    public int sizeOfWords() {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.rawQuery("select count(*) as CNT from " + EnglishWordSchema.TABLE_NAME, new String[0]);
@@ -173,9 +173,9 @@ public class EnglishwordInfoDAO {
 
     public EnglishWord queryOneWord(String currentId) {
         List<EnglishWord> allLst = getQryAllKeeper().getAllList(false);
-        if(!allLst.isEmpty()){
-            for(EnglishWord e : allLst){
-                if(StringUtils.equalsIgnoreCase(e.englishId, currentId)){
+        if (!allLst.isEmpty()) {
+            for (EnglishWord e : allLst) {
+                if (StringUtils.equalsIgnoreCase(e.englishId, currentId)) {
                     return e;
                 }
             }
@@ -315,6 +315,7 @@ public class EnglishwordInfoDAO {
         long lastbrowerDate;
         long lastDuring;
         int lastResult;
+        String btnAppendix;//按鈕附加資訊
 
         public String getEnglishId() {
             return englishId;
@@ -402,6 +403,14 @@ public class EnglishwordInfoDAO {
 
         public void setLastResult(int lastResult) {
             this.lastResult = lastResult;
+        }
+
+        public String getBtnAppendix() {
+            return btnAppendix;
+        }
+
+        public void setBtnAppendix(String btnAppendix) {
+            this.btnAppendix = btnAppendix;
         }
 
         @Override

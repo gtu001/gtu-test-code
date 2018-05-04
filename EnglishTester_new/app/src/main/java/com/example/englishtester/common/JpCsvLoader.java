@@ -57,14 +57,33 @@ public class JpCsvLoader {
                 EnglishwordInfoDAO.EnglishWord word = new EnglishwordInfoDAO.EnglishWord();
                 word.setEnglishId(question);
                 word.setEnglishDesc(answer);
+                word.setBtnAppendix(getBtnAppendixStr(question));
                 rtnMap.put(question, word);
             }
         }
         return rtnMap;
     }
 
+    private String getBtnAppendixStr(String englishId) {
+        Jp50 tmp = null;
+        for (Jp50 jp : handler.getJpLst()) {
+            if (StringUtils.equals(jp.jp1, englishId) || StringUtils.equals(jp.jp2, englishId)) {
+                tmp = jp;
+                break;
+            }
+        }
+        return String.format("\n<平:%s, 片:%s>", tmp.jp1, tmp.jp2);
+    }
+
     private class Jp50Handler {
         List<Jp50> lst;
+
+        public List<Jp50> getJpLst() {
+            if (lst == null) {
+                throw new RuntimeException("未初始化!");
+            }
+            return lst;
+        }
 
         private Jp50Handler(CsvFile csv) {
             lst = getJpLst(csv);
@@ -108,8 +127,8 @@ public class JpCsvLoader {
     }
 
     private class Jp50 {
-        String jp1;
-        String jp2;
+        String jp1;//平假名
+        String jp2;//片假名
         String prounce;
         String chsProunce;
     }

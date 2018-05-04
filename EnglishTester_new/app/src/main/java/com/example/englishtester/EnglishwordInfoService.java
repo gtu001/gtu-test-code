@@ -561,7 +561,7 @@ public class EnglishwordInfoService {
     /**
      * 取得隨機三個答案
      */
-    Map<String, EnglishWord> queryForFourAnswers(String englishWord, String englishDesc, Map<String,EnglishWord> englishProp) {
+    Map<String, EnglishWord> queryForFourAnswers(String englishWord, String englishDesc, Map<String, EnglishWord> englishProp) {
         Log.v(TAG, "queryForFourAnswers --- " + englishWord);
         Map<String, EnglishWord> prop = new HashMap<String, EnglishWord>();
         List<EnglishWord> list = new ArrayList<EnglishWord>();
@@ -575,8 +575,15 @@ public class EnglishwordInfoService {
         }
 
         list = QuestionFilterService.similarityWordList(englishWord, list);
-        if (list.size() < 4){
+        if (list.size() < 4) {
             list = new ArrayList<>(englishProp.values());
+            //移除自己
+            for (int ii = 0; ii < list.size(); ii++) {
+                if (StringUtils.equals(englishWord, list.get(ii).getEnglishId())) {
+                    list.remove(ii);
+                    ii--;
+                }
+            }
             list = RandomUtil.randomList(list);
         }
         if (list.size() < 4) {// 情境 : 輸入亂碼
