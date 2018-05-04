@@ -99,7 +99,7 @@ public class JpCsvLoader {
         public Properties generateQuestionMap() {
             Properties prop = new Properties();
             for (Jp50 p : lst) {
-                String prounce = String.format("英[%s], 注:[%s]", p.prounce, p.chsProunce);
+                String prounce = String.format("英:%s, 注:%s", p.prounce, p.chsProunce);
                 prop.setProperty(p.jp1, prounce);
                 prop.setProperty(p.jp2, prounce);
             }

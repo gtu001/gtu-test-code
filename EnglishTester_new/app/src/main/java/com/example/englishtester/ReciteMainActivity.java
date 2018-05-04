@@ -671,8 +671,11 @@ public class ReciteMainActivity extends Activity {
             savePickProp();
         }
 
-        // 掃圖
-        switchPictureService.showPicture(englishBean.englishWord);
+        // 掃圖 (是英文才掃)
+        Pattern ptn = Pattern.compile("[a-zA-Z]+");
+        if (ptn.matcher(englishBean.englishWord).find()) {
+            switchPictureService.showPicture(englishBean.englishWord);
+        }
 
         // 發音
         // 考英文模式下才發音
@@ -869,6 +872,7 @@ public class ReciteMainActivity extends Activity {
      */
     private void clickRightButtonAgain(final Button button) {
         if (dto.isAutoChangeQuestion) {
+            final long WAIT_TIME = 500;
             final Handler handler = new Handler();
             Thread thread = new Thread(new Runnable() {
                 @Override
@@ -877,8 +881,8 @@ public class ReciteMainActivity extends Activity {
                         @Override
                         public void run() {
                             try {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {
+                                Thread.sleep(WAIT_TIME);
+                            } catch (Exception e) {
                             }
                             button.performClick();
                         }
