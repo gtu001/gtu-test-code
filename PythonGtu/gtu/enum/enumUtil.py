@@ -64,6 +64,19 @@ class EnumHelper():
             if result :
                 break;
         return rtnObj
+    
+    
+    def get(self, index):
+        exec(self.importScript)
+        
+        enumMembers = self.enumClass.__getattribute__(self.enumClass, "__members__")
+        clzName = self.enumClass.__name__
+        for i, name in enumerate(enumMembers, 0):
+            if i == index :
+                member = eval("{0}['{1}']".format(clzName, name))
+                return member
+        return ValueError(self.enumClass + " 長度為 " + len(enumMembers) + " 不在範圍內 : " + index)
+            
 
             
 if __name__ == '__main__' :

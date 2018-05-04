@@ -25,6 +25,7 @@ import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWordSchema;
 import com.example.englishtester.EnglishwordInfoDAO.LastResultEnum;
 import com.example.englishtester.common.FileConstantAccessUtil;
+import com.example.englishtester.common.JpCsvLoader;
 
 public class QuestionChoiceService {
 
@@ -175,6 +176,12 @@ public class QuestionChoiceService {
         }
         Log.v(TAG, "prop size = " + prop.size());
         return prop;
+    }
+
+    Map<String, EnglishWord> queryForExam_Jp50() {
+        Log.v(TAG, "queryForExam_Jp50");
+        Map<String, EnglishWord> map = JpCsvLoader.newInstance(context).getExamQuestion();
+        return map;
     }
 
     int getGeneralFilterListSize() {

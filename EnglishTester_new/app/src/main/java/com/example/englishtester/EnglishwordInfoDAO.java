@@ -316,6 +316,94 @@ public class EnglishwordInfoDAO {
         long lastDuring;
         int lastResult;
 
+        public String getEnglishId() {
+            return englishId;
+        }
+
+        public void setEnglishId(String englishId) {
+            this.englishId = englishId;
+        }
+
+        public String getEnglishDesc() {
+            return englishDesc;
+        }
+
+        public void setEnglishDesc(String englishDesc) {
+            this.englishDesc = englishDesc;
+        }
+
+        public String getPronounce() {
+            return pronounce;
+        }
+
+        public void setPronounce(String pronounce) {
+            this.pronounce = pronounce;
+        }
+
+        public int getBrowserTime() {
+            return browserTime;
+        }
+
+        public void setBrowserTime(int browserTime) {
+            this.browserTime = browserTime;
+        }
+
+        public int getExamTime() {
+            return examTime;
+        }
+
+        public void setExamTime(int examTime) {
+            this.examTime = examTime;
+        }
+
+        public int getFailTime() {
+            return failTime;
+        }
+
+        public void setFailTime(int failTime) {
+            this.failTime = failTime;
+        }
+
+        public long getInsertDate() {
+            return insertDate;
+        }
+
+        public void setInsertDate(long insertDate) {
+            this.insertDate = insertDate;
+        }
+
+        public long getExamDate() {
+            return examDate;
+        }
+
+        public void setExamDate(long examDate) {
+            this.examDate = examDate;
+        }
+
+        public long getLastbrowerDate() {
+            return lastbrowerDate;
+        }
+
+        public void setLastbrowerDate(long lastbrowerDate) {
+            this.lastbrowerDate = lastbrowerDate;
+        }
+
+        public long getLastDuring() {
+            return lastDuring;
+        }
+
+        public void setLastDuring(long lastDuring) {
+            this.lastDuring = lastDuring;
+        }
+
+        public int getLastResult() {
+            return lastResult;
+        }
+
+        public void setLastResult(int lastResult) {
+            this.lastResult = lastResult;
+        }
+
         @Override
         public String toString() {
             return "EnglishWord [englishId=" + englishId + ", englishDesc=" + englishDesc + ", pronounce=" + pronounce

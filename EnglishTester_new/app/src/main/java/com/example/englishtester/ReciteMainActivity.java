@@ -106,7 +106,7 @@ public class ReciteMainActivity extends Activity {
 
         setContentView(R.layout.activity_recite_main);
 
-        if(!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)){
+        if (!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)) {
             FullPageMentionDialog.builder(R.drawable.full_page_mention_001, this).showDialog();
         }
 
@@ -905,7 +905,7 @@ public class ReciteMainActivity extends Activity {
 
         String answer = getEnglishPropDesc(word);
 
-        Map<String, EnglishWord> answerMap = englishwordInfoService.queryForFourAnswers(word, answer);
+        Map<String, EnglishWord> answerMap = englishwordInfoService.queryForFourAnswers(word, answer, dto.englishProp);
 
         dto.correctBtnNum = RandomUtil.rangeInteger(0, 3);
         Log.v(TAG, "正確答案=====>" + dto.correctBtnNum);
@@ -942,7 +942,7 @@ public class ReciteMainActivity extends Activity {
 
         String answer = getEnglishPropDesc(word);
 
-        Map<String, EnglishWord> answerMap = englishwordInfoService.queryForFourAnswers(word, answer);
+        Map<String, EnglishWord> answerMap = englishwordInfoService.queryForFourAnswers(word, answer, dto.englishProp);
         Iterator<String> iterator = answerMap.keySet().iterator();
 
         dto.correctBtnNum = RandomUtil.rangeInteger(0, 3);
@@ -1151,6 +1151,17 @@ public class ReciteMainActivity extends Activity {
                     @Override
                     public void beforeProcess() {
                         activity.dto.englishProp = activity.questionChoiceService.queryForExam_LongtimeNoBrowser();
+                    }
+                });
+                activity.setDoRecordSuccessFailBoxStatus(false);
+            }
+        }, //
+        JP50_EXAM("日文50音", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final ReciteMainActivity activity, Intent intent, Bundle bundle) {
+                activity.initExam(null, true, new InitExamAction() {
+                    @Override
+                    public void beforeProcess() {
+                        activity.dto.englishProp = activity.questionChoiceService.queryForExam_Jp50();
                     }
                 });
                 activity.setDoRecordSuccessFailBoxStatus(false);

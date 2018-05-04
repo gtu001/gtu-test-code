@@ -449,8 +449,8 @@ public class FacebookVideoDownloader extends JFrame {
                 try {
                     JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
                     if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        int row = jTab.getSelectedRow();
-                        VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getRealValueAt(row, 5);
+                        int row = JTableUtil.getRealRowPos(jTab.getSelectedRow(), downloadListTable);
+                        VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, DownloadTableConfig.VO.ordinal());
                         if (!vo.downloadToFile.exists()) {
                             JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在或被移除\n" + vo.downloadToFile);
                             return;
@@ -483,12 +483,44 @@ public class FacebookVideoDownloader extends JFrame {
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
     }
 
+    private enum DownloadTableConfig {
+        順序(5f), //
+        檔名(60f), //
+        URL(20f), //
+        大小(8f), //
+        進度(7f), //
+        VO(0f),//
+        ;
+
+        final float width;
+
+        DownloadTableConfig(float width) {
+            this.width = width;
+        }
+
+        private static float[] getWidth() {
+            float[] arry = new float[DownloadTableConfig.values().length];
+            for (DownloadTableConfig e : DownloadTableConfig.values()) {
+                arry[e.ordinal()] = e.width;
+            }
+            return arry;
+        }
+        
+        private static String[] getTitle() {
+            String[] arry = new String[DownloadTableConfig.values().length];
+            for (DownloadTableConfig e : DownloadTableConfig.values()) {
+                arry[e.ordinal()] = e.name();
+            }
+            return arry;
+        }
+    }
+
     private void initDownloadListTable() {
-        downloadListModel = JTableUtil.createModel(true, new String[] { "順序", "檔名", "URL", "大小", "進度", "VO" });
+        downloadListModel = JTableUtil.createModel(true, DownloadTableConfig.getTitle());
         downloadListTable.setModel(downloadListModel);
-        JTableUtil.setColumnWidths_Percent(downloadListTable, new float[] { 5f, 60f, 20f, 8f, 7f, 0f });
+        JTableUtil.setColumnWidths_Percent(downloadListTable, DownloadTableConfig.getWidth());
         downloadPool.start();
-        JTableUtil.newInstance(downloadListTable).hiddenColumn("VO");
+        JTableUtil.newInstance(downloadListTable).hiddenColumn(DownloadTableConfig.VO.name());
     }
 
     private void urlTextOnBlur(final boolean throwEx) {

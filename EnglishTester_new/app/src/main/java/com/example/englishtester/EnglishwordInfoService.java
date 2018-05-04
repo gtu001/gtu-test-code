@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWordSchema;
 import com.example.englishtester.EnglishwordInfoDAO.LastResultEnum;
+import com.example.englishtester.common.InitExamInterface;
 import com.example.englishtester.common.NetWorkUtil;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -146,19 +147,15 @@ public class EnglishwordInfoService {
      * 初始化測驗
      */
     String initExam(final MainActivityDTO dto, final File file) {
-        String messageStr = null;
-
-        dto.wordsList = new ArrayList<String>();
-        dto.pickProp = new Properties();
-        dto.doAnswerList = new ArrayList<String>();
-
-        Properties prop = new Properties();
-        if (file != null) {
-            dto.englishFile = file;
-            try {
+        InitExamInterface initExamInst = new InitExamInterface() {
+            @Override
+            public void appendQuestionToEnglishProp(Map<String, EnglishWord> englishProp) throws Exception {
+                if (file == null) {
+                    return;
+                }
+                Properties prop = new Properties();
                 prop.load(new FileInputStream(file));
 
-                dto.englishProp = new HashMap<String, EnglishWord>();
                 for (Object key : prop.keySet()) {
                     String eng = (String) key;
                     String engQuery = StringUtils.trimToEmpty(eng).toLowerCase();
@@ -180,39 +177,10 @@ public class EnglishwordInfoService {
                         Log.v(TAG, "未建檔單字 : [" + eng + "]");
                     }
                 }
-            } catch (Exception ex) {
-                messageStr = "錯誤 :" + ex.getMessage();
-                ex.printStackTrace();
-                throw new RuntimeException("讀檔案失敗!:" + ex.getMessage());
             }
-        }
+        };
 
-        int noExamCount = 0;
-        for (String text : dto.englishProp.keySet()) {
-            dto.wordsList.add(text);
-            EnglishWord word = dto.englishProp.get(text);
-            if (word.examTime == 0) {
-                noExamCount++;
-            }
-        }
-        if (noExamCount != 0) {
-            messageStr = "未測單字數:" + noExamCount;
-        }
-
-        dto.wordsList = RandomUtil.randomList(dto.wordsList);
-        // 備份
-        dto.wordsListCopy = (List<String>) ((ArrayList<String>) dto.wordsList).clone();
-
-        // 建立中斷備份檔
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(Constant.INTERRUPT_INIT_FILE));
-            oos.writeObject(dto);
-            oos.flush();
-            oos.close();
-            Log.v(TAG, "write interrupt init backup!!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String messageStr = initExamInst.initExam(dto, file);
         return messageStr;
     }
 
@@ -593,10 +561,11 @@ public class EnglishwordInfoService {
     /**
      * 取得隨機三個答案
      */
-    Map<String, EnglishWord> queryForFourAnswers(String englishWord, String englishDesc) {
+    Map<String, EnglishWord> queryForFourAnswers(String englishWord, String englishDesc, Map<String,EnglishWord> englishProp) {
         Log.v(TAG, "queryForFourAnswers --- " + englishWord);
         Map<String, EnglishWord> prop = new HashMap<String, EnglishWord>();
         List<EnglishWord> list = new ArrayList<EnglishWord>();
+
         if (StringUtils.isBlank(englishWord)) {
             Log.v(TAG, "englishWord不應為空!");
             list = _getFillingErrorList(list);
@@ -604,10 +573,16 @@ public class EnglishwordInfoService {
             QuestionFilterService questionFilter = new QuestionFilterService(englishWord, englishDesc, context);
             list = questionFilter.getMatchList();
         }
+
         list = QuestionFilterService.similarityWordList(englishWord, list);
+        if (list.size() < 4){
+            list = new ArrayList<>(englishProp.values());
+            list = RandomUtil.randomList(list);
+        }
         if (list.size() < 4) {// 情境 : 輸入亂碼
             list = _getFillingErrorList(list);
         }
+
         for (int ii = 0; prop.size() < 3; ii++) {
             EnglishWord e = list.get(ii);
             prop.put(e.englishId, e);

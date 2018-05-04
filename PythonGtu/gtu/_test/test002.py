@@ -3,9 +3,11 @@ import re
 
 from gtu.enum import enumUtil
 from gtu.io import fileUtil
-from gtu.reflect import checkSelf
+from gtu.reflect import checkSelf, toStringUtil
 from gtu.regex import regexUtil
 from gtu.string import stringUtil
+from gtu.enum.enumUtil import EnumHelper
+import openpyxl
 
 
 class __TableRegion(Enum):
@@ -63,26 +65,24 @@ def isEndOfTable(line):
 
     
 class  PdfOnePage :
-
+    STATICID = 65
+    
     def __init__(self):
         self.lst = list()
+        self.identity = chr(PdfOnePage.STATICID)
+        PdfOnePage.STATICID += 1
         
     def __repr__(self):
-        strContent = ""
-        for (i, line) in enumerate(self.lst):
-            strContent += "{0} : {1}\n".format(i, line)
-        return strContent
+        return toStringUtil.toString(self)
              
 
 def getPdfTable(textContent):
     lst = list()
     tmpPage = PdfOnePage()
     startLineNumber = -1
+    
+    '''建立PdgOnePage'''
     for (i, line) in enumerate(textContent.splitlines()):
-        ''' for debug '''
-#         if (i + 1) == 234 :
-#             print("--------------", isEndOfTable(line))
-        
         if startLineNumber == -1 and isStartLine(line) :
             startLineNumber = i + 1
             print("find start : " , startLineNumber , "\t" , line)
@@ -95,24 +95,55 @@ def getPdfTable(textContent):
             else :
                 tmpPage.lst.append(line)
                 print("\t\t append : " + line)
+                
+    '''移除掉空物件'''                
+    def chk(row):
+        return len(row.lst) != 0
+    lst = list(filter(chk, lst))
     return lst
+
+
+
+def toRowDataLst(rowStr):
+    arry = rowStr.strip().split(" ")
+    return arry
+
+
+def createExcel(lst):
+    tabRegion = EnumHelper("gtu._test.test002.__TableRegion")
+    wb = openpyxl.Workbook()
+    
+    for (i, table) in enumerate(lst):
+        sheet = wb.create_sheet("工作表" + str(i + 1))
+        for (j, row) in enumerate(table.lst):
+            reg = tabRegion.get(j)
+            rowArry = toRowDataLst(row)
+#             print(">>> ", i, reg.chs, reg.eng, rowArry)
+            rowData = list()
+            rowData.append(reg.chs) 
+            rowData.append(reg.eng) 
+            rowData.extend(rowArry)
+            sheet.append(rowData)
+         
+    wb.save(fileUtil.getDesktopDir() + "janna_Rcrp0s102.xlsx")
+
 
 
 def main(file):
     textContent = fileUtil.loadFile(file)
-    
+
     lst = getPdfTable(textContent)
-                
-    for (i, row) in enumerate(lst):
-        print(i, row)
-        
+    
+    createExcel(lst)
+         
         
 
 
 if __name__ == '__main__' :
     file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
     main(file)
-
-#     checkSelf.checkMembers("")
-
     print("done..")
+
+
+
+

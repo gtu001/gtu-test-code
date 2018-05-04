@@ -132,4 +132,149 @@ public class MainActivityDTO implements Parcelable, Serializable {
         }
     }
     //↑↑↑↑↑↑  實作取得DTO的方式
+
+
+    public int getCorrectBtnNum() {
+        return correctBtnNum;
+    }
+
+    public void setCorrectBtnNum(int correctBtnNum) {
+        this.correctBtnNum = correctBtnNum;
+    }
+
+    public String getCurrentText() {
+        return currentText;
+    }
+
+    public void setCurrentText(String currentText) {
+        this.currentText = currentText;
+    }
+
+    public boolean isShowAnswerLabel() {
+        return showAnswerLabel;
+    }
+
+    public void setShowAnswerLabel(boolean showAnswerLabel) {
+        this.showAnswerLabel = showAnswerLabel;
+    }
+
+    public long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(long transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public long getDuringTime() {
+        return duringTime;
+    }
+
+    public void setDuringTime(long duringTime) {
+        this.duringTime = duringTime;
+    }
+
+    public List<String> getDoAnswerList() {
+        return doAnswerList;
+    }
+
+    public void setDoAnswerList(List<String> doAnswerList) {
+        this.doAnswerList = doAnswerList;
+    }
+
+    public List<String> getWordsList() {
+        return wordsList;
+    }
+
+    public void setWordsList(List<String> wordsList) {
+        this.wordsList = wordsList;
+    }
+
+    public List<String> getDoPronounceList() {
+        return doPronounceList;
+    }
+
+    public void setDoPronounceList(List<String> doPronounceList) {
+        this.doPronounceList = doPronounceList;
+    }
+
+    public Properties getPickProp() {
+        return pickProp;
+    }
+
+    public void setPickProp(Properties pickProp) {
+        this.pickProp = pickProp;
+    }
+
+    public List<String> getPickPropList() {
+        return pickPropList;
+    }
+
+    public void setPickPropList(List<String> pickPropList) {
+        this.pickPropList = pickPropList;
+    }
+
+    public Map<String, EnglishWord> getEnglishProp() {
+        return englishProp;
+    }
+
+    public void setEnglishProp(Map<String, EnglishWord> englishProp) {
+        this.englishProp = englishProp;
+    }
+
+    public File getEnglishFile() {
+        return englishFile;
+    }
+
+    public void setEnglishFile(File englishFile) {
+        this.englishFile = englishFile;
+    }
+
+    public CurrentMode getCurrentMode() {
+        return currentMode;
+    }
+
+    public void setCurrentMode(CurrentMode currentMode) {
+        this.currentMode = currentMode;
+    }
+
+    public List<String> getWordsListCopy() {
+        return wordsListCopy;
+    }
+
+    public void setWordsListCopy(List<String> wordsListCopy) {
+        this.wordsListCopy = wordsListCopy;
+    }
+
+    public boolean isWhiteBackground() {
+        return isWhiteBackground;
+    }
+
+    public void setWhiteBackground(boolean whiteBackground) {
+        isWhiteBackground = whiteBackground;
+    }
+
+    public boolean isListenTestMode() {
+        return isListenTestMode;
+    }
+
+    public void setListenTestMode(boolean listenTestMode) {
+        isListenTestMode = listenTestMode;
+    }
+
+    public boolean isAutoChangeQuestion() {
+        return isAutoChangeQuestion;
+    }
+
+    public void setAutoChangeQuestion(boolean autoChangeQuestion) {
+        isAutoChangeQuestion = autoChangeQuestion;
+    }
+
+    public boolean isAutoPronounce() {
+        return isAutoPronounce;
+    }
+
+    public void setAutoPronounce(boolean autoPronounce) {
+        isAutoPronounce = autoPronounce;
+    }
 }

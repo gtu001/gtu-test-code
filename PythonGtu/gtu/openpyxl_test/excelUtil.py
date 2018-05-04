@@ -48,7 +48,7 @@ def cellEnglishToPos_toStr(columnIndex):
     
 
 def debugShowData(sheetName, filePath):
-    wb = openpyxl.load_workbook(filePath, 'r', data_only=True)  # data_only=True會讀到真的值而不是func
+    wb = openpyxl.load_workbook(filePath, 'r', read_only=True, data_only=True)
     sheet = wb.get_sheet_by_name(sheetName)
     for rowNum, row in enumerate(sheet, 0):
         str2 = "row" + str(rowNum)
@@ -69,6 +69,13 @@ def getCellValue(column, row):
     if str(type(cell.value)) == "<class 'NoneType'>" :
         return ""
     return str(cell.value)
+
+
+
+def getSheetByIndex(wb1, index):
+    name = wb1.sheetnames[index]
+    return wb1[name]
+    
     
     
 if __name__ == '__main__' :

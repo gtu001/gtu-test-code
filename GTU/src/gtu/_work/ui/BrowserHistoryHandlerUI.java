@@ -110,6 +110,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JComboBox commandTypComboBox;
     private CommandTypeSetting commandTypeSetting;
     private BrowserHistoryHandlerUI_KeyboardListener keyboardListener = new BrowserHistoryHandlerUI_KeyboardListener();
+    private JTabbedPane tabbedPane;
 
     /**
      * Launch the application.
@@ -135,7 +136,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     public BrowserHistoryHandlerUI() {
         try {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+            tabbedPane = new JTabbedPane(JTabbedPane.TOP);
             getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
             JPanel panel = new JPanel();
@@ -341,6 +342,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             commandTypeSetting = new CommandTypeSetting();
             sysUtil.apply(this);
             keyboardListener.initialize();
+            bringToTop();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -1099,6 +1101,33 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private void bringToTop() {
+        JCommonUtil.setFrameAtop(this, false);
+        
+        for (; true;) {
+            this.tabbedPane.setSelectedIndex(1);
+            if (this.tabbedPane.getSelectedIndex() == 1) {
+                break;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        JCommonUtil.setLocationToRightBottomCorner(this);
+
+        boolean useRobotFocus = JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), true);
+        if (useRobotFocus) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        ((JTextField) searchComboBoxUtil.getTextComponent()).selectAll();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------------
 
     private class BrowserHistoryHandlerUI_KeyboardListener implements NativeKeyListener {
@@ -1143,7 +1172,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         if (BrowserHistoryHandlerUI.this.isShowing()) {
                             BrowserHistoryHandlerUI.this.setVisible(false);
                         } else {
-                            JCommonUtil.setFrameAtop(BrowserHistoryHandlerUI.this, false);
+                            bringToTop();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
