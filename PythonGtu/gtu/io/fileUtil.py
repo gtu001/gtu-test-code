@@ -3,10 +3,13 @@ import os
 from os.path import expanduser
 from pathlib import Path
 from gtu.thread import threadUtil
+from gtu.reflect import checkSelf
+import re
 
 '''
 from gtu.io import fileUtil
 '''
+
 
 def mkdirs(path):
 	'''建立多個目錄'''
@@ -62,14 +65,23 @@ def getAbsPath(path):
 
 def getName(path):
 	'''取得檔名'''
+	if type(path).__name__ == 'str' :
+		path = Path(path)
 	fullName = str(path.resolve())
 	name = fullName[fullName.rfind(os.sep) + 1:]
 	return name
 
 
+def getNoSubName(path):
+	'''取得無附檔名黨名'''
+	fullName = getName(path)
+	name = fullName[0 : fullName.rfind(".")]
+	return name
+
+
 def getSubName(path):
 	'''取得副檔名'''
-	fullName = str(path.resolve())
+	fullName = getName(path)
 	name = fullName[fullName.rfind(".") + 1:]
 	return name
 
@@ -132,28 +144,76 @@ def getCurrentDir():
 
 
 def getDir(file):
-    return os.path.dirname(file)
+	if Path(file).is_dir():
+		return file
+	return os.path.dirname(file)
    
 
 '''
 讀取字串變數, by line
 '''
+
+
 def readStringVariableByLine(textData):
 	for line in textData.splitlines():
 	    print(line)
+	    
+	    
+
+def searchFilefind(file, pattern, fileList):
+	if type(pattern).__name__ == 'str':
+		pattern = re.compile(pattern, re.IGNORECASE)
+	
+	file = Path(file)
+	currentDir = getDir(file)
+	
+	if file.is_dir() :
+		listFile = os.listdir(file)
+		for i, f in enumerate(listFile, 0):
+			f = Path(currentDir , f)
+			searchFilefind(f, pattern, fileList)
+	elif file.is_file() :
+		name = getName(file)
+		mth = pattern.search(name)
+		
+		if mth is not None :
+			fileList.append(file)
+			
+			
+
+
+def searchFileMatchs(file, pattern, fileList):
+	if type(pattern).__name__ == 'str':
+		pattern = re.compile(pattern, re.IGNORECASE)
+	
+	file = Path(file)
+	currentDir = getDir(file)
+	
+	if file.is_dir() :
+		listFile = os.listdir(file)
+		for i, f in enumerate(listFile, 0):
+			f = Path(currentDir , f)
+			searchFilefind(f, pattern, fileList)
+	elif file.is_file() :
+		name = getName(file)
+		mth = pattern.match(name)
+		
+		if mth is not None :
+			fileList.append(file)
+			
 
 
 if __name__ == '__main__':
-# 	print(copyFile("C:/Users/Administrator/Desktop/southpark.rar", "c:/southpark.rar"))
-
 
 	
-	from gtu.thread import threadUtil
+	file = "C:/Users/gtu00/OneDrive/Desktop/秀娟0501"
+# 	checkSelf.checkMembers(file)
 	
-	threadUtil.printCurrentStacks()
+	fileList = list()
+	searchFilefind(file, r".*\.pdf", fileList)
 	
-	print()
+	for i in fileList :
+		print("<<<<", i)
 	
 	print("done..")
-	
 	

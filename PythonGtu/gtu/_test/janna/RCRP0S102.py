@@ -97,11 +97,12 @@ def getPdfTable(textContent):
                 print("\t\t append : " + line)
                 
     '''移除掉空物件'''                
+
     def chk(row):
         return len(row.lst) != 0
+
     lst = list(filter(chk, lst))
     return lst
-
 
 
 def toRowDataLst(rowStr):
@@ -109,7 +110,7 @@ def toRowDataLst(rowStr):
     return arry
 
 
-def createExcel(lst):
+def createExcel(lst, targetXls):
     tabRegion = EnumHelper("gtu._test.janna.RCRP0S102.__TableRegion")
     wb = openpyxl.Workbook()
     
@@ -125,8 +126,14 @@ def createExcel(lst):
             rowData.extend(rowArry)
             sheet.append(rowData)
          
-    wb.save(fileUtil.getDesktopDir() + "janna_Rcrp0s102.xlsx")
+    wb.save(targetXls)
 
+
+def getTargetXls(file):
+    name = "janna_" + fileUtil.getNoSubName(file) + ".xlsx"
+    newFile = fileUtil.getDesktopDir() + name
+    print("create file = ", newFile)
+    return newFile
 
 
 def main(file):
@@ -136,16 +143,18 @@ def main(file):
     lst = getPdfTable(textContent)
     print("pdfTable size = ", len(lst))
     
-    createExcel(lst)
-         
-        
+    targetXls = getTargetXls(file)
+    createExcel(lst, targetXls)
 
 
 if __name__ == '__main__' :
-    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
-    main(file)
+#     file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
+#     file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102_107.pdf.txt"
+    file = 'c:/Users/gtu00/OneDrive/Desktop/秀娟0501/';
+    fileLst = list()
+    fileUtil.searchFilefind(file, r".*\.txt", fileLst)
+
+    for (i, f) in enumerate(fileLst) :
+        main(f)
     print("done..")
-
-
-
 
