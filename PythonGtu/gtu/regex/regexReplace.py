@@ -1,7 +1,7 @@
 import re
 
 '''
-from gtu.regex import replaceContent
+from gtu.regex import regexReplace
 '''
 
 

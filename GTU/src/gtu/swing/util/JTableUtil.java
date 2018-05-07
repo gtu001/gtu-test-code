@@ -488,25 +488,6 @@ public class JTableUtil {
         model.addRow(data);
     }
 
-    @Deprecated
-    public Object[] getRealRowData(Object[] rowData) {
-        TableColumnModel cmodel = table.getColumnModel();
-        if (cmodel.getColumnCount() < rowData.length) {
-            throw new ArrayIndexOutOfBoundsException(String.format("rowData columns[%d] > model columns[%d]", cmodel.getColumnCount()));
-        }
-        if (getModel().getDataVector().size() == 0) {
-            throw new RuntimeException("JTable must have one row!!");
-        }
-        int realColumnCount = ((Vector<?>) getModel().getDataVector().get(0)).size();
-        Object[] newRowData = (Object[]) Array.newInstance(Object.class, realColumnCount);
-        for (int ii = 0; ii < rowData.length; ii++) {
-            int modelIndex = cmodel.getColumn(ii).getModelIndex();
-            Array.set(newRowData, modelIndex, rowData[ii]);// TODO
-        }
-        System.out.println("realRowData = " + Arrays.toString(newRowData));
-        return newRowData;
-    }
-
     /**
      * 取得真實被選擇的欄
      */

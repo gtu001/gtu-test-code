@@ -2,6 +2,7 @@ from enum import Enum
 
 from gtu.reflect import checkSelf
 from gtu.reflect import classUtil
+from gtu.string import stringUtil
 
 '''
 from gtu.enum import enumUtil
@@ -75,7 +76,8 @@ class EnumHelper():
             if i == index :
                 member = eval("{0}['{1}']".format(clzName, name))
                 return member
-        return ValueError(self.enumClass + " 長度為 " + len(enumMembers) + " 不在範圍內 : " + index)
+            
+        raise ValueError(stringUtil.concat([self.enumClass, " 長度為 ", len(enumMembers), " 不在範圍內 : ", index]))
             
 
             

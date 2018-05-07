@@ -29,7 +29,19 @@ def match(pattern, multiLine, scanString):
         return True
     
     
-    
+
+def __test_pattern_match_group_key():
+    string = "The quick brown fox jumps over the lazy dog"
+    string_list = string.split()
+    print(string_list)
+    pattern = re.compile(r"(?P<match_word>the)", re.I)
+    print("Output #39:")
+    for word in string_list :
+        if pattern.search(word):
+            print("{:s}".format(pattern.search(word).group("match_word")))
+
+
+
 if __name__ == '__main__' :
-    print(find(r"加率‰", True, "str: (4)增加率‰"))
+    __test_pattern_match_group_key()
     print("done...")

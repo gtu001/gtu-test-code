@@ -1,7 +1,7 @@
 import re
 
 from gtu.number import numberUtil
-from gtu.regex import replaceContent
+from gtu.regex import regexReplace
 
 '''
 from gtu.string import stringUtil
@@ -64,6 +64,16 @@ def rpad(strVal, length, padChar):
 
 def isNumber(s):
     return numberUtil.isNumber(s)
+
+
+def concat(arry):
+    strValue = ""
+    for (i, obj) in enumerate(arry) :
+        if type(obj).__name__ == 'str':
+            strValue += obj
+        else:
+            strValue += str(obj)
+    return strValue
 
 
 def isNoneType(s):

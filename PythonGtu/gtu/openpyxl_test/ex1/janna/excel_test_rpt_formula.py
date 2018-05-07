@@ -17,7 +17,7 @@ from gtu.number import numberUtil
 from gtu.openpyxl_test import excelUtil
 from gtu.reflect import checkSelf
 from gtu.string import stringUtil
-from gtu.regex import replaceContent
+from gtu.regex import regexReplace
 
 
 

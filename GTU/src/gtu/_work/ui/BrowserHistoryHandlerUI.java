@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -86,6 +87,7 @@ import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -113,6 +115,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private CommandTypeSetting commandTypeSetting;
     private BrowserHistoryHandlerUI_KeyboardListener keyboardListener = new BrowserHistoryHandlerUI_KeyboardListener();
     private JTabbedPane tabbedPane;
+    private ColumnColorHandler columnColorHandler;
 
     /**
      * Launch the application.
@@ -335,8 +338,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 bookmarkConfig = new PropertiesUtilBean(new File(configSelf.getConfigProp().getProperty("bookmarkConfigText")));
             }
 
-            initLoading();
-
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
             JCommonUtil.setLocationToRightBottomCorner(this);
@@ -345,6 +346,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
             sysUtil.apply(this);
             keyboardListener.initialize();
             bringToTop();
+            columnColorHandler = new ColumnColorHandler(urlTable, bookmarkConfig);
+            
+            //final do
+            initLoading();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -635,10 +640,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
         final List<String> tagLst = new ArrayList<String>();
         final List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
-        JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
+        final JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
         DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
         tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
         urlTable.setModel(model);
+        columnColorHandler.apply();
 
         urlTableResize();
 
@@ -733,6 +739,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         // 設定urlTable
         Collections.sort(lst, new Comparator<UrlConfig>() {
+
             @Override
             public int compare(UrlConfig o1, UrlConfig o2) {
                 return o1.timestamp.compareTo(o2.timestamp);
@@ -741,6 +748,113 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         for (final UrlConfig d : lst) {
             model.addRow(UrlTableConfigEnum.getRow(d, this));
+        }
+    }
+
+    private static class ColumnColorHandler {
+        JTableUtil tableUtil;
+        int totalClickTimes = -1;
+        int hasClickSize = 0;
+        int maxClickTime = 0;
+        boolean initOk = false;
+
+        JTable urlTable;
+        PropertiesUtilBean bookmarkConfig;
+
+        private ColumnColorHandler(JTable urlTable, PropertiesUtilBean bookmarkConfig) {
+            this.urlTable = urlTable;
+            this.bookmarkConfig = bookmarkConfig;
+        }
+
+        private int getClickTime(int row) {
+            try {
+                return Integer.parseInt((String) tableUtil.getRealValueAt(row, UrlTableConfigEnum.clickTimes.ordinal()));
+            } catch (Exception ex) {
+                return 0;
+            }
+        }
+
+        private enum ColorDef {
+            DEF1("", 0, 3), //
+            DEF2("#ffff99", 3, 8), //
+            DEF3("#ff6666", 8, 13), //
+            DEF4("#ff0000", 13, Integer.MAX_VALUE),//
+            ;
+
+            final String colorStr;
+            final int min;
+            final int max;
+
+            ColorDef(String colorStr, int min, int max) {
+                this.colorStr = colorStr;
+                this.min = min;
+                this.max = max;
+            }
+        }
+
+        private Color getColorByClickTimes(int clickTimes) {
+            for (ColorDef e : ColorDef.values()) {
+                if (e.min <= clickTimes && e.max > clickTimes) {
+                    if (StringUtils.isBlank(e.colorStr)) {
+                        return null;
+                    } else {
+                        return JColorUtil.rgb(e.colorStr);
+                    }
+                }
+            }
+            throw new RuntimeException("getColorByClickTimes ERR : " + clickTimes);
+        }
+
+        private void initClickTimesConfig() {
+            if (initOk == true) {
+                return;
+            }
+            try {
+                tableUtil = JTableUtil.newInstance(urlTable);
+
+                for (Enumeration enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+                    String key = (String) enu.nextElement();
+                    UrlConfig d = UrlConfig.parseTo(key, bookmarkConfig.getConfigProp().getProperty(key));
+                    int currTime = 0;
+                    try {
+                        currTime = Integer.parseInt(d.clickTimes);
+                        maxClickTime = Math.max(maxClickTime, currTime);
+                    } catch (Exception ex) {
+                    }
+                    if (currTime > 0) {
+                        hasClickSize++;
+                    }
+                    totalClickTimes += currTime;
+                }
+                initOk = true;
+            } catch (Exception ex) {
+                System.out.println("initClickTimesConfig ERR : " + ex.getMessage());
+            }
+        }
+
+        private void apply() {
+            initClickTimesConfig();
+
+            // 設定欄位顏色
+            tableUtil.setColumnColor_byCondition(UrlTableConfigEnum.title.ordinal(), new JTableUtil.TableColorDef() {
+                public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    int clickTime = getClickTime(row);
+                    return getColorByClickTimes(clickTime);
+                }
+            });
+
+            tableUtil.setColumnColor_byCondition(UrlTableConfigEnum.url.ordinal(), new JTableUtil.TableColorDef() {
+                public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    String url = (String) tableUtil.getRealValueAt(row, UrlTableConfigEnum.url.ordinal());
+                    if (DesktopUtil.getFile(url) != null) {
+                        return JColorUtil.rgb("#b3f0ff");
+                    } else if (StringUtil_.isUUID(url)) {
+                        return JColorUtil.rgb("#ffeba5");
+                    } else {
+                        return JColorUtil.rgb("#c6ffb3");
+                    }
+                }
+            });
         }
     }
 
@@ -1119,7 +1233,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
                 popupUtil.applyEvent(e).show();
             }
-        } catch (Exception ex) {
+        } catch (
+
+        Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
