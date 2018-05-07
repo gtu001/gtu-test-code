@@ -175,7 +175,7 @@ public class Porn91Downloader {
 
         private PornVideoUrlDetection.SingleVideoUrlConfig orignConfig;
 
-        private VideoUrlConfig(PornVideoUrlDetection.SingleVideoUrlConfig orignConfig) {
+        public VideoUrlConfig(PornVideoUrlDetection.SingleVideoUrlConfig orignConfig) {
             this.orignConfig = orignConfig;
             this.fileName = this.orignConfig.finalFileName;
             this.url = this.orignConfig.orignUrl;
@@ -339,7 +339,7 @@ public class Porn91Downloader {
         }
     }
 
-    private long getContentLength(String userAgent, String downloadUrl) throws Throwable {
+    public static long getContentLength(String userAgent, String downloadUrl) throws Throwable {
         System.out.println("getContentLength URL : " + downloadUrl);
         HttpGet httpget2 = new HttpGet(downloadUrl);
         if (userAgent != null && userAgent.length() > 0) {

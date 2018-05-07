@@ -51,11 +51,13 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.youtube.DownloadProgressHandler;
+import gtu.youtube.JavaYoutubeVideoUrlHandler;
 import gtu.youtube.Porn91Downloader;
 import gtu.youtube.Porn91Downloader.VideoUrlConfig;
 
 public class FacebookVideoDownloader extends JFrame {
 
+    private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JTextField urlText;
     private JTable videoTable;
@@ -531,8 +533,19 @@ public class FacebookVideoDownloader extends JFrame {
             if (StringUtils.isBlank(url)) {
                 return;
             }
-
-            List<VideoUrlConfig> list = downloader.processVideoLst(url, cookieContent, headerContent);
+            
+            List<VideoUrlConfig> list = new ArrayList<VideoUrlConfig>();
+            
+            String youtubeId = JavaYoutubeVideoUrlHandler.getYoutubeID(url);
+            System.out.println("youtubeId == " + youtubeId);
+            if(StringUtils.isNotBlank(youtubeId)) {
+                JavaYoutubeVideoUrlHandler youtube = new JavaYoutubeVideoUrlHandler(youtubeId, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
+                youtube.execute();
+                list = youtube.getVideoFor91Lst();
+            }else {
+                list = downloader.processVideoLst(url, cookieContent, headerContent);
+            }
+            
             if (list.isEmpty()) {
                 if (throwEx) {
                     throw new RuntimeException("找步道影片 : " + url);

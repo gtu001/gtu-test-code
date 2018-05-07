@@ -7,23 +7,22 @@ import java.io.BufferedOutputStream;
  * into the public domain by the author.
  */
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Formatter;
@@ -31,7 +30,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,16 +44,23 @@ import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.poi.util.IOUtils;
 
 import gtu.file.FileUtil;
+import gtu.log.LogbackUtil;
 
 /**
  * Locally download a YouTube.com video.
  */
 public class JavaYoutubeDownloader extends Formatter {
+    
+    static {
+        LogbackUtil.setRootLevel(ch.qos.logback.classic.Level.OFF);
+    }
 
     private static final String scheme = "http";
     private static final String host = "www.youtube.com";
@@ -93,9 +98,10 @@ public class JavaYoutubeDownloader extends Formatter {
         System.err.println("\t[-verboseall] - Verbose logging for all components (e.g. HttpClient).");
         System.exit(-1);
     }
-    
+
     public static void main(String[] args) {
-        JavaYoutubeDownloader.mainRun("vBM2tg5FDH8", "", DEFAULT_ENCODING);
+        // https://www.youtube.com/watch?v=3KcN9wJHnU8&feature=youtu.be
+        JavaYoutubeDownloader.mainRun("3KcN9wJHnU8", "", DEFAULT_ENCODING);
     }
 
     public String[] makeFakeArgs(String videoId, String outputDir) {
@@ -103,7 +109,7 @@ public class JavaYoutubeDownloader extends Formatter {
             outputDir = FileUtil.DESKTOP_PATH;
         }
         String[] args = new String[] { //
-                videoId, // 
+                videoId, //
                 "-dir", outputDir, //
                 "-format", "18", //
                 "-ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0", //
@@ -120,6 +126,34 @@ public class JavaYoutubeDownloader extends Formatter {
             System.out.println("done...");
         } catch (Throwable t) {
             throw new RuntimeException(t);
+        }
+    }
+
+    /**
+     * 多行Cookie key \t value
+     */
+    private BasicCookieStore getCookieString(String cookieStr) {
+        BasicCookieStore cookstore = new BasicCookieStore();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new StringReader(cookieStr));
+            for (String line = null; (line = reader.readLine()) != null;) {
+                String[] arry = line.split("\t", -1);
+                if (arry != null && arry.length == 2) {
+                    arry[0] = StringUtils.trimToEmpty(arry[0]);
+                    arry[1] = StringUtils.trimToEmpty(arry[1]);
+                    cookstore.addCookie(new BasicClientCookie(arry[0], arry[1]));
+                    System.out.println("cookie : " + Arrays.toString(arry));
+                }
+            }
+            return cookstore;
+        } catch (Exception ex) {
+            throw new RuntimeException(" Err : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -219,6 +253,14 @@ public class JavaYoutubeDownloader extends Formatter {
         URI uri = getUri("get_video_info", qparams);
 
         CookieStore cookieStore = new BasicCookieStore();
+        if (true) {
+            InputStream is = this.getClass().getResource("JavaYoutubeDownloader_cookies.txt").openStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IOUtils.copy(is, baos);
+            String cookieContent = baos.toString("UTF-8");
+            cookieStore = this.getCookieString(cookieContent);
+        }
+
         HttpContext localContext = new BasicHttpContext();
         localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
@@ -282,12 +324,12 @@ public class JavaYoutubeDownloader extends Formatter {
                 filename += "." + extension;
                 File outputfile = new File(outputdir, filename);
 
-                //自訂下載網址1
+                // 自訂下載網址1
                 if (downloadUrl == null) {
                     downloadUrl = customDownloadUrl_by_gtu001;
                 }
-                
-                //自訂下載網址2
+
+                // 自訂下載網址2
                 if (downloadUrl == null) {
                     JavaYoutubeVideoUrlHandler gtu001 = new JavaYoutubeVideoUrlHandler(videoId, "", userAgent);
                     downloadUrl = gtu001.getUrl(format);

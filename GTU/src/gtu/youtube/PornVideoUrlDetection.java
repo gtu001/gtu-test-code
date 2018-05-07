@@ -74,7 +74,7 @@ public class PornVideoUrlDetection {
             return finalFileName;
         }
 
-        private SingleVideoUrlConfig() {
+        public SingleVideoUrlConfig() {
             finalFileName = "UnknownVideo_" + DateFormatUtil.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
         }
 
