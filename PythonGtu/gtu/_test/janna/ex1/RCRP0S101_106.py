@@ -9,18 +9,11 @@ from gtu.string import stringUtil
 from gtu.enum.enumUtil import EnumHelper
 import openpyxl
 
-import numpy as np 
-from gtu.numpy import numpyUtil
-
 ERROR_FILE = list()
 
 
 def isStartLine(line):
-    ptn = re.compile(r"[\d]+\~[\d]+\s")
-    mth = ptn.findall(line)
-    if len(mth) >= 3 :
-        return True
-    return False
+    return "holds" in line
 
 
 def isDataLine(line):
@@ -66,10 +59,11 @@ def getPdfTable(textContent):
                 tmpPage.lst.append(line)
                 print("\t\t append : " + line)
         
-    for (i, obj) in enumerate(lst) :
-        print(obj.lst)
-        exit(1)
-        
+    '''移除掉空物件'''                
+    def chk(row):
+        return len(row.lst) != 0
+
+    lst = list(filter(chk, lst))
     return lst
 
 
@@ -84,7 +78,7 @@ def createExcel(lst, targetXls):
         ERROR_FILE.append(targetXls)
         return
     
-    tabRegion = EnumHelper("gtu._test.janna.RCRP0S102.__TableRegion")
+    tabRegion = EnumHelper("gtu._test.janna.ex1.RCRP0S102.__TableRegion")
     wb = openpyxl.Workbook()
     
     for (i, table) in enumerate(lst):
@@ -96,8 +90,15 @@ def createExcel(lst, targetXls):
             rowArry, isNeedCountyName = toRowDataLst(row)
 #             print(">>> ", i, reg.chs, reg.eng, rowArry)
             rowData = list()
-            rowData.append(reg.chs) 
-            rowData.append(reg.eng) 
+            
+            if isNeedCountyName :
+                rowData.append(reg.chs) 
+                rowData.append(reg.eng) 
+                index += 1
+            else :
+                rowData.append("")
+                rowData.append("")
+            
             rowData.extend(rowArry)
             sheet.append(rowData)
          
@@ -123,7 +124,7 @@ def main(file):
 
 
 if __name__ == '__main__' :
-    file = 'c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S108_106.pdf.txt'
+    file = 'C:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S101_106.pdf.txt'
     main(file)
     print("done..")
 

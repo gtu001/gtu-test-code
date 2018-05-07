@@ -115,7 +115,7 @@ def createExcel(lst, targetXls):
         ERROR_FILE.append(targetXls)
         return
     
-    tabRegion = EnumHelper("gtu._test.janna.RCRP0S102.__TableRegion")
+    tabRegion = EnumHelper("gtu._test.janna.ex1.RCRP0S102.__TableRegion")
     wb = openpyxl.Workbook()
     
     for (i, table) in enumerate(lst):
@@ -152,17 +152,8 @@ def main(file):
 
 
 if __name__ == '__main__' :
-#     file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
-#     file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102_107.pdf.txt"
-    file = 'c:/Users/gtu00/OneDrive/Desktop/秀娟0501/';
-    fileLst = list()
-    fileUtil.searchFilefind(file, r".*\.txt", fileLst)
-
-    for (i, f) in enumerate(fileLst) :
-        main(f)
-        
-    print("Error ------------------------------")
-    for (i, f) in enumerate(ERROR_FILE) :
-        print("failed = ", i, f)
+    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
+    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102_107.pdf.txt"
+    main(file)
     print("done..")
 

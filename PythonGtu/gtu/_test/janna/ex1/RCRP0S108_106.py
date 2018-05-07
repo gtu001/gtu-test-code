@@ -8,12 +8,21 @@ from gtu.regex import regexUtil
 from gtu.string import stringUtil
 from gtu.enum.enumUtil import EnumHelper
 import openpyxl
+import pandas as pd
+from gtu.error import errorHandler
+
+import numpy as np 
+from gtu.data_science.numpy import numpyUtil
+from gtu.collection import listUtil
 
 ERROR_FILE = list()
 
-
 def isStartLine(line):
-    return "holds" in line
+    ptn = re.compile(r"[\d]+\~[\d]+\s")
+    mth = ptn.findall(line)
+    if len(mth) >= 3 :
+        return True
+    return False
 
 
 def isDataLine(line):
@@ -48,23 +57,70 @@ def getPdfTable(textContent):
     for (i, line) in enumerate(textContent.splitlines()):
         if startLineNumber == -1 and isStartLine(line) :
             startLineNumber = i + 1
-            print("find start : " , startLineNumber , "\t" , line)
+#             print("find start : " , startLineNumber , "\t" , line)
         elif startLineNumber != -1 :
             if isEndOfTable(line):
                 lst.append(tmpPage)
                 tmpPage = PdfOnePage()
-                print("find end : ", (i + 1)  , " \t" , line)
+#                 print("find end : ", (i + 1)  , " \t" , line)
                 startLineNumber = -1
             else :
                 tmpPage.lst.append(line)
-                print("\t\t append : " + line)
+#                 print("\t\t append : " + line)
+    
+    for (i, obj) in enumerate(lst) :
+        if (i % 2) == 0:
+            colSize = 11
+        else :
+            colSize = 16
+            
+        print(colSize, obj.lst)
         
-    '''移除掉空物件'''                
-    def chk(row):
-        return len(row.lst) != 0
-
-    lst = list(filter(chk, lst))
+        obj.lst = sliceToMartixArry(obj.lst, colSize=colSize)
     return lst
+
+
+
+
+# 11
+# 16
+def sliceToMartixArry(orginArry, rowSize=3, colSize=11):
+    npArry = numpyUtil.createEmptyMartix(100, 100)
+    
+    colIndex = 0
+    rowIndex = 0
+    for i in range(0, len(orginArry), rowSize) :
+        newArry = listUtil.fullLst(rowSize, "NA")
+        tmpArry = orginArry[i : i + rowSize]
+        listUtil.arraycopy(tmpArry, 0, newArry, 0, len(tmpArry))
+        
+        newArry = np.array(newArry)
+        newArry = np.reshape(newArry, (rowSize, 1), order='C')
+         
+        npArry[rowIndex : rowIndex + rowSize, colIndex:colIndex + 1] = newArry
+        colIndex += 1
+        
+        if colIndex >= colSize:
+            colIndex = 0
+            rowIndex += 3
+            
+    #取得邊界
+    maxRow, maxCol = numpyUtil.getMaxRowCol(npArry)
+    npArry = npArry[0:maxRow + 1, 0:maxCol + 1]
+    numpyUtil.transferNoneType(npArry, "NA")
+    
+    #轉回str lst
+    lst = list()
+    for i, row in enumerate(npArry):
+        try:
+            rowStr = " ".join(row.tolist())
+            lst.append(rowStr)
+        except Exception as ex :
+            errorHandler.printStackTrace2(ex)
+            raise Exception("Error Row " + str(row))
+    return lst
+    
+
 
 
 def toRowDataLst(rowStr):
@@ -73,12 +129,12 @@ def toRowDataLst(rowStr):
     return (arry, isCountyTitleNeed)
 
 
+
 def createExcel(lst, targetXls):
     if len(lst) == 0 :
         ERROR_FILE.append(targetXls)
         return
     
-    tabRegion = EnumHelper("gtu._test.janna.RCRP0S102.__TableRegion")
     wb = openpyxl.Workbook()
     
     for (i, table) in enumerate(lst):
@@ -86,23 +142,14 @@ def createExcel(lst, targetXls):
         
         index = 0
         for (j, row) in enumerate(table.lst):
-            reg = tabRegion.get(index)
             rowArry, isNeedCountyName = toRowDataLst(row)
 #             print(">>> ", i, reg.chs, reg.eng, rowArry)
             rowData = list()
-            
-            if isNeedCountyName :
-                rowData.append(reg.chs) 
-                rowData.append(reg.eng) 
-                index += 1
-            else :
-                rowData.append("")
-                rowData.append("")
-            
             rowData.extend(rowArry)
             sheet.append(rowData)
          
     wb.save(targetXls)
+
 
 
 def getTargetXls(file):
@@ -110,6 +157,7 @@ def getTargetXls(file):
     newFile = fileUtil.getDesktopDir() + name
     print("create file = ", newFile)
     return newFile
+
 
 
 def main(file):
@@ -123,8 +171,9 @@ def main(file):
     createExcel(lst, targetXls)
 
 
+
 if __name__ == '__main__' :
-    file = 'C:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S101_106.pdf.txt'
+    file = 'c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S108_106.pdf.txt'
     main(file)
     print("done..")
 

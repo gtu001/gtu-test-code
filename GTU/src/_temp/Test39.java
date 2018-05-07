@@ -34,6 +34,7 @@ public class Test39 {
             String comment = map.get(col);
             System.out.println("map.put(\"" + col + "\", " + col + ");//" + comment);
         }
+        
         System.out.println("done...");
     }
 
