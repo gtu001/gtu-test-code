@@ -67,10 +67,24 @@ def getPdfTable(textContent):
     return lst
 
 
+
 def toRowDataLst(rowStr):
     arry = rowStr.strip().split(" ")
     isCountyTitleNeed = len(arry) > 5
+    
+    for i in range(0, len(arry)):
+        arry[i] = fixNegativeNumber(arry[i])
+        
     return (arry, isCountyTitleNeed)
+
+
+#修正 負值
+def fixNegativeNumber(numberStr):
+    ptn = re.compile(r"^([0-9\,\.]+)[－-]$")
+    mth = ptn.match(numberStr)
+    if mth is not None :
+        return "-" + mth.group(1);
+    return numberStr
 
 
 def createExcel(lst, targetXls):

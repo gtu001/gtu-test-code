@@ -1,0 +1,251 @@
+ 
+總 　 計 Grand Total
+新 北 市 New Taipei City
+臺 北 市 Taipei City
+桃 園 市 Taoyuan City
+臺 中 市 Taichung City
+臺 南 市 Tainan City
+高 雄 市 Kaohsiung City
+臺 灣 省 Taiwan Province
+　宜蘭縣 Yilan County
+　新竹縣 Hsinchu County
+　苗栗縣 Miaoli County
+　彰化縣 Changhua County
+　南投縣 Nantou County
+　雲林縣 Yunlin County
+　嘉義縣 Chiayi County
+　屏東縣 Pingtung County
+　臺東縣 Taitung County
+　花蓮縣 Hualien County
+　澎湖縣 Penghu County
+　基隆市 Keelung City
+　新竹市 Hsinchu City
+　嘉義市 Chiayi City
+福 建 省 Fuchien Province
+　金門縣 Kinmen County
+　連江縣 Lienchiang County
+區 域 別
+District
+死 亡 數
+Death
+未 調 整 死 亡 率
+Unadjusted  Death  Rate
+千分率(1)
+‰
+增 減 數 *
+Increase
+季 節 調 整 死 亡 率
+Seasonally  Adjusted  Death
+Rate
+千分率(2)
+‰
+增 減 數 * *
+Increase
+1 月 至 1 月 累 積 死 亡 率
+Cumulative  Death  Rate
+from  Jan. to Jan..
+千分率(3)
+‰
+增減數***
+Increase
+16,761 8.37 1.95　 8.01 0.74　 8.37 1.95　
+2,364 6.98 1.90　 6.68 0.77　 6.98 1.90　
+1,770 7.77 1.96　 7.44 0.95　 7.77 1.96　
+1,248 6.71 1.70　 6.42 0.60　 6.71 1.70　
+1,600 6.76 1.45　 6.47 0.38　 6.76 1.45　
+1,454 9.08 2.06　 8.69 0.74　 9.08 2.06　
+2,074 8.79 2.07　 8.41 0.72　 8.79 2.07　
+6,177 10.23 2.23　 9.79 0.87　 10.23 2.23　
+405 10.45 1.42　 10.00 1.23　 10.45 1.42　
+369 7.87 2.19　 7.53 0.91　 7.87 2.19　
+509 10.83 3.31　 10.36 1.43　 10.83 3.31　
+998 9.16 1.59　 8.77 0.63　 9.16 1.59　
+479 11.26 3.24　 10.78 1.06　 11.26 3.24　
+731 12.47 2.64　 11.93 1.36　 12.47 2.64　
+515 11.87 1.38　 11.36 0.56　 11.87 1.38　
+812 11.52 2.84　 11.02 0.68　 11.52 2.84　
+209 11.21 1.45　 10.73 0.08－ 11.21 1.45　
+339 12.13 3.45　 11.61 1.64　 12.13 3.45　
+94 10.63 2.88　 10.17 2.00　 10.63 2.88　
+293 9.29 2.93　 8.89 1.05　 9.29 2.93　
+222 5.92 0.62　 5.67 0.39－ 5.92 0.62　
+202 8.83 1.89　 8.45 1.07　 8.83 1.89　
+74 5.79 0.69　 5.54 0.04－ 5.79 0.69　
+68 5.82 0.51　 5.57 0.07－ 5.82 0.51　
+6 5.48 2.68　 5.24 0.22　 5.48 2.68　
+註︰ 本表各項比率計算方法與表3同1.
+本月份粗死亡率調整係數△為1.0452.
+Note： The rates in this table are calculated by the same method as is table 31.
+The coefficient  for adjusting the CDR for this month is 1.0452.
+表4　107年1月死亡登記數、死亡率及其增減數按縣市分
+　 Table 4. Registered Deaths, and Unadjusted, Seasonally Adjusted and
+Cumulative Death Rates on Annual Basis for Counties and Cities,
+January 2018
+　
+— 1 —
+ 
+總 　 計 Grand Total
+新 北 市 New Taipei City
+臺 北 市 Taipei City
+桃 園 市 Taoyuan City
+臺 中 市 Taichung City
+臺 南 市 Tainan City
+高 雄 市 Kaohsiung City
+臺 灣 省 Taiwan Province
+　宜蘭縣 Yilan County
+　新竹縣 Hsinchu County
+　苗栗縣 Miaoli County
+　彰化縣 Changhua County
+　南投縣 Nantou County
+　雲林縣 Yunlin County
+　嘉義縣 Chiayi County
+　屏東縣 Pingtung County
+　臺東縣 Taitung County
+　花蓮縣 Hualien County
+　澎湖縣 Penghu County
+　基隆市 Keelung City
+　新竹市 Hsinchu City
+　嘉義市 Chiayi City
+福 建 省 Fuchien Province
+　金門縣 Kinmen County
+　連江縣 Lienchiang County
+區 域 別
+District
+死 亡 數
+Death
+未 調 整 死 亡 率
+Unadjusted  Death  Rate
+千分率(1)
+‰
+增 減 數 *
+Increase
+季 節 調 整 死 亡 率
+Seasonally  Adjusted  Death
+Rate
+千分率(2)
+‰
+增 減 數 * *
+Increase
+1 月 至 2 月 累 積 死 亡 率
+Cumulative  Death  Rate
+from  Jan. to Feb..
+千分率(3)
+‰
+增減數***
+Increase
+14,493 8.01 0.22－ 7.28 0.01　 8.20 0.92　
+2,021 6.61 0.06－ 6.00 0.09　 6.80 0.97　
+1,445 7.02 0.42－ 6.38 0.11－ 7.42 0.84　
+1,011 6.01 0.59－ 5.46 0.36－ 6.38 0.62　
+1,466 6.85 0.17　 6.22 0.13　 6.80 0.84　
+1,265 8.74 0.15－ 7.94 0.01－ 8.92 1.01　
+1,724 8.09 0.57－ 7.35 0.34－ 8.46 0.82　
+5,488 10.06 0.12－ 9.14 0.22　 10.15 1.11　
+328 9.37 0.52－ 8.51 0.26－ 9.93 0.49　
+320 7.55 0.37　 6.86 0.24　 7.72 1.33　
+435 10.25 0.33　 9.31 0.38　 10.55 1.89　
+943 9.59 0.02－ 8.71 0.57　 9.37 0.84　
+388 10.10 1.24－ 9.17 0.55－ 10.71 1.12　
+659 12.46 0.27　 11.32 0.75　 12.46 1.51　
+500 12.76 1.49　 11.59 0.79　 12.29 1.43　
+711 11.18 0.61－ 10.15 0.19－ 11.36 1.21　
+195 11.58 0.47－ 10.52 0.29－ 11.39 0.54　
+307 12.17 0.74　 11.05 1.08　 12.15 2.16　
+78 9.77 1.06　 8.87 0.70　 10.22 2.01　
+252 8.85 1.10－ 8.04 0.20　 9.08 1.02　
+216 6.37 0.51－ 5.79 0.27－ 6.14 0.09　
+156 7.55 1.39－ 6.86 0.52－ 8.22 0.33　
+73 6.32 0.64－ 5.74 0.16　 6.05 0.06　
+65 6.16 1.17－ 5.59 0.05－ 5.98 0.29－
+8 8.08 4.99　 7.34 2.32　 6.72 3.78　
+註︰ 本月份粗死亡率調整係數△為1.101　
+Note： The coefficient △ for adjusting the CDR for this month is 1.101　
+表4　107年2月死亡登記數、死亡率及其增減數按縣市分（續1）
+　 Table 4. Registered Deaths, and Unadjusted, Seasonally Adjusted and
+Cumulative Death Rates on Annual Basis for Counties and Cities,
+February 2018 (Cont. 1)
+　
+— 2 —
+ 
+總 　 計 Grand Total
+新 北 市 New Taipei City
+臺 北 市 Taipei City
+桃 園 市 Taoyuan City
+臺 中 市 Taichung City
+臺 南 市 Tainan City
+高 雄 市 Kaohsiung City
+臺 灣 省 Taiwan Province
+　宜蘭縣 Yilan County
+　新竹縣 Hsinchu County
+　苗栗縣 Miaoli County
+　彰化縣 Changhua County
+　南投縣 Nantou County
+　雲林縣 Yunlin County
+　嘉義縣 Chiayi County
+　屏東縣 Pingtung County
+　臺東縣 Taitung County
+　花蓮縣 Hualien County
+　澎湖縣 Penghu County
+　基隆市 Keelung City
+　新竹市 Hsinchu City
+　嘉義市 Chiayi City
+福 建 省 Fuchien Province
+　金門縣 Kinmen County
+　連江縣 Lienchiang County
+區 域 別
+District
+死 亡 數
+Death
+未 調 整 死 亡 率
+Unadjusted  Death  Rate
+千分率(1)
+‰
+增 減 數 *
+Increase
+季 節 調 整 死 亡 率
+Seasonally  Adjusted  Death
+Rate
+千分率(2)
+‰
+增 減 數 * *
+Increase
+1 月 至 3 月 累 積 死 亡 率
+Cumulative  Death  Rate
+from  Jan. to Mar..
+千分率(3)
+‰
+增減數***
+Increase
+17,200 8.59 0.11－ 7.77 0.50　 8.34 0.57　
+2,418 7.14 0.18　 6.46 0.55　 6.92 0.70　
+1,888 8.29 0.27　 7.50 1.01　 7.72 0.64　
+1,294 6.94 0.54－ 6.28 0.46　 6.57 0.21　
+1,670 7.04 — 6.37 0.28　 6.89 0.56　
+1,518 9.48 0.31　 8.58 0.63　 9.11 0.77　
+2,084 8.84 0.31－ 8.00 0.31　 8.59 0.43　
+6,238 10.34 0.33－ 9.36 0.44　 10.21 0.61　
+390 10.07 0.03　 9.11 0.34　 9.98 0.33　
+389 8.29 0.09－ 7.50 0.88　 7.91 0.83　
+483 10.29 1.38－ 9.31 0.38　 10.47 0.78　
+1,061 9.75 0.25－ 8.82 0.68　 9.50 0.46　
+475 11.18 0.52－ 10.12 0.40　 10.87 0.55　
+715 12.21 0.03－ 11.05 0.48　 12.38 0.99　
+543 12.53 0.36－ 11.34 0.54　 12.37 0.81　
+742 10.54 1.14－ 9.54 0.80－ 11.08 0.40　
+219 11.75 0.21－ 10.63 0.18－ 11.51 0.28　
+319 11.42 0.37－ 10.33 0.36　 11.90 1.29　
+79 8.94 0.52－ 8.09 0.08－ 9.78 1.14　
+314 9.96 0.24　 9.01 1.17　 9.38 0.75　
+296 7.88 0.22　 7.13 1.07　 6.74 0.14　
+213 9.31 0.93　 8.43 1.05　 8.60 0.55　
+90 7.04 0.12　 6.37 0.79　 6.39 0.08　
+84 7.19 0.03－ 6.51 0.87　 6.40 0.20－
+6 5.47 1.75　 4.95 0.07－ 6.29 3.08　
+註︰ 本月份粗死亡率調整係數△為1.105　
+Note： The coefficient △ for adjusting the CDR for this month is 1.105　
+表4　107年3月死亡登記數、死亡率及其增減數按縣市分（續2）
+　 Table 4. Registered Deaths, and Unadjusted, Seasonally Adjusted and
+Cumulative Death Rates on Annual Basis for Counties and Cities,
+March 2018 (Cont. 2)
+　
+— 3 —

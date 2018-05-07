@@ -105,8 +105,20 @@ def getPdfTable(textContent):
     return lst
 
 
+#修正 負值
+def fixNegativeNumber(numberStr):
+    ptn = re.compile(r"^([0-9\,\.]+)[－-]$")
+    mth = ptn.match(numberStr)
+    if mth is not None :
+        return "-" + mth.group(1);
+    return numberStr
+
+
 def toRowDataLst(rowStr):
     arry = rowStr.strip().split(" ")
+    
+    for i in range(0, len(arry)):
+        arry[i] = fixNegativeNumber(arry[i])
     return arry
 
 
@@ -152,8 +164,9 @@ def main(file):
 
 
 if __name__ == '__main__' :
-    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102.pdf.txt"
-    file = "c:/Users/gtu00/OneDrive/Desktop/秀娟0501/RCRP0S102_107.pdf.txt"
+    file = fileUtil.getCurrentDir() + "RCRP0S102.pdf.txt"
+    main(file)
+    file = fileUtil.getCurrentDir() + "RCRP0S102_107.pdf.txt"
     main(file)
     print("done..")
 
