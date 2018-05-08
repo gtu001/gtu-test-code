@@ -87,7 +87,7 @@ public class JavaYoutubeVideoUrlHandler {
                 Pattern.compile("www\\.youtube\\.com\\/watch\\?v\\=(\\w*)"), //
                 Pattern.compile("youtu\\.be\\/(\\w*?)\\&"), //
                 Pattern.compile("youtu\\.be\\/(\\w*)"), //
-                Pattern.compile("(\\w{11})"),//
+                Pattern.compile("^(\\w{11})$"),//
         };
 
         private String getMatchOne(String url, Pattern ptn) {
