@@ -507,6 +507,7 @@ public class JCommonUtil {
         String messageStr = "";
         File writeIfNeed = null;
         if (ex != null) {
+            System.err.println("<<Custom Error Message>> : " + message);
             ex.printStackTrace();
 
             StringWriter writer = new StringWriter();
@@ -574,6 +575,9 @@ public class JCommonUtil {
 
                     PrintWriter pw = new PrintWriter(writeIfNeed);
                     pw.write("案發時間:" + DateUtil.getCurrentDateTime(true) + "\n");
+                    if (message != null) {
+                        pw.write("自訂Message : " + message);
+                    }
                     ex.printStackTrace(pw);
                     pw.flush();
                     pw.close();

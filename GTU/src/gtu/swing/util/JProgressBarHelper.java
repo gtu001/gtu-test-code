@@ -22,6 +22,7 @@ public class JProgressBarHelper {
     private int width = 300;
     private int height = 100;
     private boolean indeterminate = false;
+    private int barValue = 0;
 
     public static JProgressBarHelper newInstance(JFrame parentFrame, String title) {
         return new JProgressBarHelper(parentFrame, title);
@@ -49,11 +50,18 @@ public class JProgressBarHelper {
     }
 
     public JProgressBarHelper setBarValue(int value) {
+        this.barValue = value;
         progressBar.setValue(value);
         counterLabel.setText(value + "/" + max + " (" + getDividePercentString(value, max) + ")");
         return this;
     }
-    
+
+    public JProgressBarHelper addOne() {
+        this.barValue++;
+        setBarValue(this.barValue);
+        return this;
+    }
+
     private String getDividePercentString(int from, int max) {
         try {
             BigDecimal v3 = new BigDecimal(from)//
@@ -83,7 +91,7 @@ public class JProgressBarHelper {
         dlg.setVisible(false);
         return this;
     }
-    
+
     public JProgressBarHelper dismissByMax() {
         setBarValue(max);
         try {
@@ -105,7 +113,7 @@ public class JProgressBarHelper {
 
     public JProgressBarHelper build() {
         dlg = new JDialog(parentFrame, title, true);
-        progressBar = new JProgressBar(0, max);
+        progressBar = new JProgressBar(barValue, max);
         progressBar.setIndeterminate(indeterminate);
         counterLabel = new JLabel();
         stateLabel = new JLabel("");
@@ -116,7 +124,7 @@ public class JProgressBarHelper {
         dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dlg.setSize(width, height);
         dlg.setLocationRelativeTo(parentFrame);
-        setBarValue(0);
+        setBarValue(barValue);
         return this;
     }
 }

@@ -87,6 +87,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.clipboard.ClipboardUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.net.https.SimpleHttpsUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
@@ -98,6 +99,7 @@ import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
@@ -122,6 +124,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private BrowserHistoryHandlerUI_KeyboardListener keyboardListener = new BrowserHistoryHandlerUI_KeyboardListener();
     private JTabbedPane tabbedPane;
     private ColumnColorHandler columnColorHandler;
+    private JLabel matchCountLabel;
+    private JCheckBox nonWorkChk;
 
     /**
      * Launch the application.
@@ -271,6 +275,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
             panel_2x.add(allOpenBtn);
+
+            nonWorkChk = new JCheckBox("列出無效連結");
+            nonWorkChk.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    nonWorkChkAction();
+                }
+            });
+            panel_2x.add(nonWorkChk);
+
+            matchCountLabel = new JLabel("");
+            panel_2x.add(matchCountLabel);
             searchComboBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -654,6 +669,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private void initLoading() {
+        nonWorkChk.setSelected(false);
+        initLoading(null);
+    }
+
+    private void initLoading(final JProgressBarHelper progressBarHelper) {
         if (bookmarkConfig == null) {
             System.out.println("bookmarkConfig null !!!");
             return;
@@ -703,7 +723,41 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     }
                 }
 
-                private boolean isMatch(String singleText) {
+                private boolean isUrlNotOk(UrlConfig d) {
+                    try {
+                        int stateCode = SimpleHttpsUtil.newInstance().getStatusCode(d.url, 5000);
+                        if (stateCode == 301) {
+                            String urlNew = d.url.replaceFirst("http:\\/", "https:\\/");
+                            stateCode = SimpleHttpsUtil.newInstance().getStatusCode(urlNew, 5000);
+                        }
+                        if (stateCode != 200) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error(stateCode + " " + d.title);
+                            return true;
+                        }
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException("Err Url : " + d.title + ", " + d.url, ex);
+                        return true;
+                    }
+                    return false;
+                }
+
+                private boolean isNonWrokUrl(UrlConfig d) {
+                    File file = DesktopUtil.getFile(d.url);
+                    if (StringUtil_.isUUID(d.url)) {
+                        return false;
+                    } else if (file != null) {
+                        if (!file.exists()) {
+                            return true;
+                        }
+                    } else {
+                        if (isUrlNotOk(d)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                private boolean isNormalMatch_detail(String singleText) {
                     String tag = s2t(d.tag);
                     String remark = s2t(d.remark);
                     String url = decode(d.url);
@@ -721,21 +775,34 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     return false;
                 }
 
-                @Override
-                public void run() {
+                private boolean isNormalMatch(String singleText) {
                     String[] searchArry = searchText.split(",", -1);
-                    boolean isAllMatch = true;
-                    for (String singleText : searchArry) {
-                        singleText = StringUtils.trimToEmpty(singleText);
-                        if (StringUtils.isNotBlank(singleText)) {
-                            if (!isMatch(singleText)) {
-                                isAllMatch = false;
-                                break;
+                    for (String _singleText : searchArry) {
+                        _singleText = StringUtils.trimToEmpty(_singleText);
+                        if (StringUtils.isNotBlank(_singleText)) {
+                            if (isNormalMatch_detail(_singleText)) {
+                                return true;
                             }
                         }
                     }
-                    if (isAllMatch) {
-                        lst.add(d);
+                    return false;
+                }
+
+                @Override
+                public void run() {
+                    if (nonWorkChk.isSelected()) {
+                        if (isNonWrokUrl(d)) {
+                            lst.add(d);
+                        }
+                        if (progressBarHelper != null) {
+                            progressBarHelper.addOne();
+                        }
+                    } else {
+                        if (StringUtils.isBlank(searchText)) {
+                            lst.add(d);
+                        } else if (isNormalMatch(searchText)) {
+                            lst.add(d);
+                        }
                     }
                 }
             }.run();
@@ -771,6 +838,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
         for (final UrlConfig d : lst) {
             model.addRow(UrlTableConfigEnum.getRow(d, this));
         }
+
+        matchCountLabel.setText((model.getRowCount() == 0) ? "查無!" : "數量:" + model.getRowCount());
     }
 
     private static class ColumnColorHandler {
@@ -1300,6 +1369,23 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
         }
+    }
+
+    private void nonWorkChkAction() {
+        if (!nonWorkChk.isSelected()) {
+            return;
+        }
+        final JProgressBarHelper helper = JProgressBarHelper.newInstance(BrowserHistoryHandlerUI.this, "檢測URL中");
+        helper.max(bookmarkConfig.getConfigProp().size());
+        helper.build();
+        helper.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                initLoading(helper);
+                helper.dismissByMax();
+            }
+        }).start();
     }
 
     private void bringToTop() {

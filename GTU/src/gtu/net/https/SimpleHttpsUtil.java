@@ -2,10 +2,12 @@ package gtu.net.https;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.LinkedHashMap;
@@ -19,16 +21,51 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import gtu.swing.util.JCommonUtil;
+
 public class SimpleHttpsUtil {
-    
+
     private SimpleHttpsUtil() {
     }
-    
+
     public static SimpleHttpsUtil newInstance() {
         return new SimpleHttpsUtil();
     }
-    
+
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        String url = "http://blog.xuite.net/laurated/game/356417230-%E5%8B%87%E8%80%85%E9%AC%A5%E6%83%A1%E9%BE%8D2%28%E6%94%BB%E7%95%A5%29";
+        int code = SimpleHttpsUtil.newInstance().getStatusCode(url, 5000);
+        System.out.println(code);
+        System.out.println("done...");
+    }
+
+    public int getStatusCode(String urls, int timeout) {
+        try {
+            URL u = new URL(urls);
+            HttpURLConnection url = (HttpURLConnection) u.openConnection();
+            if (url instanceof HttpsURLConnection) { // 是Https请求
+                System.out.println("Go Https..");
+                SSLContext sslContext = getSLLContextNoCertificate();
+                // 从上述SSLContext对象中得到SSLSocketFactory对象
+                SSLSocketFactory ssf = sslContext.getSocketFactory();
+                ((HttpsURLConnection) url).setSSLSocketFactory(ssf);
+                ((HttpsURLConnection) url).setHostnameVerifier(hostnameVerifier);
+            }
+            url.setRequestProperty("User-agent", DEFAULT_USER_AGENT);
+            url.setRequestMethod("GET");
+            url.setConnectTimeout(timeout);
+            // url.setReadTimeout(3 * 1000);
+
+            url.connect();
+            int code = url.getResponseCode();
+            return code;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+    }
 
     public String queryPage(String urls) {
         StringBuffer sb = new StringBuffer();
@@ -67,7 +104,7 @@ public class SimpleHttpsUtil {
 
             // 设置属性
             url.setConnectTimeout(8 * 1000);
-            url.setReadTimeout(8 * 1000);
+            url.setReadTimeout(1 * 60 * 1000);
 
             // url.setReadTimeout(5000);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.getInputStream(), "utf8"));
