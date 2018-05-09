@@ -20,12 +20,19 @@ def hist(npArry, title=None, xlabel=None, ylabel=None, seabornStyle=False):
     plt.show()
     
 
-def show_twoDim(npArry, seabornStyle=False):
+def image(npArry, seabornStyle=False):
     if seabornStyle:
         seaborn.set()  # set plot style
         
     plt.imshow(npArry, origin='lower', cmap='viridis')
     plt.colorbar()
+    plt.show()
+    
+
+def scatter(x, y, seabornStyle=False):
+    if seabornStyle:
+        seaborn.set()  # set plot style
+    plt.scatter(x, y);
     plt.show()
 
 

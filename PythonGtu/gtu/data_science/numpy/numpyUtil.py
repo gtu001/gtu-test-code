@@ -235,13 +235,6 @@ def inspectAggregation(npArry):
 if __name__ == '__main__':
 
     checkSelf.document(np.random.multivariate_normal)
-    
-    mean = [0, 0]
-    cov = [[1, 2],
-           [2, 5]]
-    X = np.random.multivariate_normal(mean, cov, 100)
-    X.shape
-
 
 
     print("done...")

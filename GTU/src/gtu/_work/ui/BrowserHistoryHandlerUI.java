@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -350,6 +353,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             keyboardListener.initialize();
             bringToTop();
             columnColorHandler = new ColumnColorHandler(urlTable, bookmarkConfig);
+            initAddSaveShortcutKeyEvent();
 
             // final do
             initLoading();
@@ -1272,6 +1276,29 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void initAddSaveShortcutKeyEvent() {
+        Component[] arry = new Component[] { titleText, //
+                urlText, //
+                remarkArea, //
+                searchComboBoxUtil.getTextComponent(),//
+        };
+        for (Component e : arry) {
+            e.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_S) {
+                        System.out.println("do save");
+                        saveCurrentBookmarkBtnAction();
+                    }
+                }
+            });
         }
     }
 
