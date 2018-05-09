@@ -191,6 +191,10 @@ public class JTableUtil {
         }
     }
 
+    public void setRowHeight(int rowPos, int height) {
+        table.setRowHeight(rowPos, height);
+    }
+
     public void columnIsComponent(int index, JComponent component) {
         TableColumn comboCol1 = table.getColumnModel().getColumn(index);
         if (component instanceof JComboBox) {

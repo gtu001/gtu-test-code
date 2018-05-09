@@ -1,6 +1,11 @@
 package gtu.image;
 
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -12,9 +17,11 @@ import java.net.URL;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.filechooser.FileSystemView;
 
 import net.sf.image4j.codec.ico.ICODecoder;
 
@@ -115,11 +122,73 @@ public class ImageUtil {
     public javafx.scene.image.WritableImage getImageForJavaFx(BufferedImage capture) {
         return javafx.embed.swing.SwingFXUtils.toFXImage(capture, null);
     }
-    
+
     public void showImage(BufferedImage bufferedImage) {
         JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void showImage(Icon icon) {
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(new JLabel(icon));
+        frame.setLocationRelativeTo(null);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public Icon imageToIcon(Image image) {
+        return new ImageIcon(image);
+    }
+
+    public Image iconToImage(Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return ((ImageIcon) icon).getImage();
+        } else {
+            int w = icon.getIconWidth();
+            int h = icon.getIconHeight();
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice gd = ge.getDefaultScreenDevice();
+            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+            BufferedImage image = gc.createCompatibleImage(w, h);
+            Graphics2D g = image.createGraphics();
+            icon.paintIcon(null, g, 0, 0);
+            g.dispose();
+            return image;
+        }
+    }
+
+    public Icon getIconFromExe(File file) {
+        try {
+            int opt = 1;
+            Icon icon = null;
+            switch (opt) {
+            case 1:
+                sun.awt.shell.ShellFolder sf = sun.awt.shell.ShellFolder.getShellFolder(file);
+                icon = new ImageIcon(sf.getIcon(true));
+                break;
+            case 2:
+                icon = FileSystemView.getFileSystemView().getSystemIcon(file);
+                break;
+            }
+            return icon;
+        } catch (Exception e) {
+            throw new RuntimeException("getIconFromExe ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public BufferedImage createTransparentImage(final int width, final int height) {
+        return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    }
+
+    public Icon createTransparentIcon(final int width, final int height) {
+        return new ImageIcon(createTransparentImage(width, height));
+    }
+
+    public static void main(String[] args) {
     }
 }

@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -35,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -80,6 +82,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
@@ -347,8 +350,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             keyboardListener.initialize();
             bringToTop();
             columnColorHandler = new ColumnColorHandler(urlTable, bookmarkConfig);
-            
-            //final do
+
+            // final do
             initLoading();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -473,6 +476,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return true;// 預設勾選
             }
         }, //
+        Icon(3) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                int width = _this.urlTable.getRowHeight();
+                try {
+                    File f = DesktopUtil.getFile(d.url);
+                    Icon icon = ImageUtil.getInstance().getIconFromExe(f);
+                    Image image = ImageUtil.getInstance().iconToImage(icon);
+                    Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
+                    return ImageUtil.getInstance().imageToIcon(image2);
+                } catch (Exception ex) {
+                    return ImageUtil.getInstance().createTransparentIcon(width, width);
+                }
+            }
+        }, //
         title(35) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
@@ -497,7 +515,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return d.timestamp;
             }
         }, //
-        lastClick(9) {
+        lastClick(6) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 return d.timestampLastest;
@@ -893,6 +911,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return;
             }
 
+            try {// 以現有就載入
+                String key = StringUtils.trimToEmpty(urlText.getText());
+                UrlConfig d = UrlConfig.parseTo(key, bookmarkConfig.getConfigProp().getProperty(key));
+                this.setUrlConfigToUI(d, false);
+            } catch (Exception ex) {
+            }
+
             // 檔案
             File file = new File(urlText.getText());
             if (file.exists()) {
@@ -1015,13 +1040,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             UrlConfig d = (UrlConfig) config;
             System.out.println("click 選取");
-            System.out.println(ReflectionToStringBuilder.toString(d));
-            urlText.setText(d.url);
-            titleText.setText(d.title);
-            remarkArea.setText(d.remark);
-            modifyTimeLabel.setText(d.timestamp);
-            tagComboBoxUtil.getTextComponent().setText(d.tag);
-            commandTypeSetting.setValue(d.commandType);
+            this.setUrlConfigToUI(d, true);
 
             urlTable.setToolTipText(d.url);
             System.out.println("[open]<<<" + d.title + " = " + d.url);
@@ -1033,6 +1052,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void setUrlConfigToUI(UrlConfig d, boolean throwEx) {
+        try {
+            System.out.println(ReflectionToStringBuilder.toString(d));
+            urlText.setText(d.url);
+            titleText.setText(d.title);
+            remarkArea.setText(d.remark);
+            modifyTimeLabel.setText(d.timestamp);
+            tagComboBoxUtil.getTextComponent().setText(d.tag);
+            commandTypeSetting.setValue(d.commandType);
+        } catch (Exception ex) {
+            if (throwEx) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -1256,7 +1291,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         JCommonUtil.setLocationToRightBottomCorner(this);
 
-        boolean useRobotFocus = JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), true);
+        boolean useRobotFocus = JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), false);// XXX
+                                                                                                         // 原本設true
         if (useRobotFocus) {
             try {
                 Thread.sleep(100);

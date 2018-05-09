@@ -2,7 +2,9 @@ import sys
 import pandas as pd
 from gtu.io import fileUtil
 from gtu.reflect import checkSelf
-
+import matplotlib.pyplot as plt
+import numpy as np
+from gtu.data_science.matplotlib import matplotlibUtil
 
 def main():
     input_file = fileUtil.getCurrentDir() + "pandas_ex2.csv"
@@ -23,6 +25,8 @@ def main():
     data_frame_value_in_set.to_csv(getOuput_file("data_frame_value_in_set"), index=False)
     print(data_frame_value_in_set)
     print("-----------------------------------------------------------")
+    
+    
 
 
 def getOuput_file(filename):
