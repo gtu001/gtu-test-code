@@ -133,7 +133,7 @@ public class DropboxEnglishService {
                 }
             }
 
-            prop.setProperty(word, desc);
+            prop.setProperty(word, StringUtils.trimToEmpty(desc));
             count++;
         }
         String comment = DateFormatUtils.format(System.currentTimeMillis(), "yyyy.MM.dd HH:mm:ss") + " add " + wordList.size() + ", actual : " + count;

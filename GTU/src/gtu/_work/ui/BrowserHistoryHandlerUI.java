@@ -742,11 +742,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
 
                 private boolean isNonWrokUrl(UrlConfig d) {
-                    File file = DesktopUtil.getFile(d.url);
                     if (StringUtil_.isUUID(d.url)) {
                         return false;
-                    } else if (file != null) {
-                        if (!file.exists()) {
+                    } else if (DesktopUtil.isFile(d.url)) {
+                        File file = DesktopUtil.getFile(d.url);
+                        if (file == null || !file.exists()) {
                             return true;
                         }
                     } else {
@@ -1376,6 +1376,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
             return;
         }
         final JProgressBarHelper helper = JProgressBarHelper.newInstance(BrowserHistoryHandlerUI.this, "檢測URL中");
+        helper.closeListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BrowserHistoryHandlerUI.this.nonWorkChk.setSelected(false);
+            }
+        });
         helper.max(bookmarkConfig.getConfigProp().size());
         helper.build();
         helper.show();

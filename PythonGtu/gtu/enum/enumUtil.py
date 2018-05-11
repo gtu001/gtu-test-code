@@ -61,9 +61,12 @@ class EnumHelper():
         clzName = self.enumClass.__name__
         for i, name in enumerate(enumMembers, 0):
             member = eval("{0}['{1}']".format(clzName, name))
-            (result, rtnObj) = callFunc(i, member)
-            if result :
-                break;
+            resultRough = callFunc(i, member)
+            if resultRough is not None :
+                (result, rtnObj) = resultRough
+                if result :
+                    break;
+            
         return rtnObj
     
     

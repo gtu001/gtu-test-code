@@ -507,7 +507,7 @@ public class FacebookVideoDownloader extends JFrame {
             }
             return arry;
         }
-        
+
         private static String[] getTitle() {
             String[] arry = new String[DownloadTableConfig.values().length];
             for (DownloadTableConfig e : DownloadTableConfig.values()) {
@@ -533,19 +533,20 @@ public class FacebookVideoDownloader extends JFrame {
             if (StringUtils.isBlank(url)) {
                 return;
             }
-            
+
             List<VideoUrlConfig> list = new ArrayList<VideoUrlConfig>();
-            
+
             String youtubeId = JavaYoutubeVideoUrlHandler.getYoutubeID(url);
             System.out.println("youtubeId == " + youtubeId);
-            if(StringUtils.isNotBlank(youtubeId)) {
+            if (StringUtils.isNotBlank(youtubeId)) {
                 JavaYoutubeVideoUrlHandler youtube = new JavaYoutubeVideoUrlHandler(youtubeId, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
                 youtube.execute();
                 list = youtube.getVideoFor91Lst();
-            }else {
+            } else {
                 list = downloader.processVideoLst(url, cookieContent, headerContent);
+                list.addAll(downloader.processVideoLst("\"" + url + "\""));
             }
-            
+
             if (list.isEmpty()) {
                 if (throwEx) {
                     throw new RuntimeException("找步道影片 : " + url);

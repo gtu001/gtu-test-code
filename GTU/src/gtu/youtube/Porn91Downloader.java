@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -107,7 +109,25 @@ public class Porn91Downloader {
         LogbackUtil.setRootLevel(ch.qos.logback.classic.Level.INFO);
     }
 
+    public List<VideoUrlConfig> processVideoLst(String videoUrl) {
+        PornVideoUrlDetection p2 = new PornVideoUrlDetection(videoUrl);
+        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain();
+        String title = this.getClass().getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
+        List<VideoUrlConfig> videoLst = this.getVideoList(title, videoOrignLst);
+        return videoLst;
+    }
+
     public List<VideoUrlConfig> processVideoLst(String url, String cookieContent, String headerContent) {
+        try {
+            long detectSize = getContentLength(DEFAULT_USER_AGENT, url);
+            final float MAX_SIZE = 1.5f * 1024 * 1024; // 超過1.5MB
+            if (MAX_SIZE < detectSize) {
+                System.out.println("偵測網頁大小太大 : Max : " + MAX_SIZE + " , current len : " + detectSize);
+                return new ArrayList<VideoUrlConfig>();
+            }
+        } catch (Throwable e) {
+        }
+
         String content = getVideoInfo(URI.create(url), "", cookieContent, headerContent);
         String title = getTitleForFileName(content);
 
