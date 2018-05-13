@@ -13,6 +13,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -126,6 +127,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private ColumnColorHandler columnColorHandler;
     private JLabel matchCountLabel;
     private JCheckBox nonWorkChk;
+    private JCheckBox directOpenFileChk;
 
     /**
      * Launch the application.
@@ -259,6 +261,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel_2x = new JPanel();
             panel_1.add(panel_2x, BorderLayout.NORTH);
+
+            directOpenFileChk = new JCheckBox("file直接打開");
+            panel_2x.add(directOpenFileChk);
 
             JLabel label = new JLabel("快速搜尋");
             panel_2x.add(label);
@@ -840,6 +845,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         matchCountLabel.setText((model.getRowCount() == 0) ? "查無!" : "數量:" + model.getRowCount());
+
+        // 如果只有一筆直接打開
+        if (model.getRowCount() == 1 && directOpenFileChk.isSelected()) {
+            JTableUtil jtab = JTableUtil.newInstance(urlTable);
+            int realRowPos = JTableUtil.getRealRowPos(0, urlTable);
+            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(realRowPos, UrlTableConfigEnum.VO.ordinal());
+            if (DesktopUtil.isFile(vo.url)) {
+                CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
+                e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
+            }
+        }
     }
 
     private static class ColumnColorHandler {

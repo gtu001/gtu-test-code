@@ -435,7 +435,7 @@ public class JTableUtil {
      * 已修正col (記得傳入未修正 pos , 否則反而錯誤)
      */
     public static int getRealColumnPos(int colPos, JTable table) {
-        System.out.println("getRealColumnPos ==> colPos == " + colPos);
+//        System.out.println("getRealColumnPos ==> colPos == " + colPos);
         return table.convertColumnIndexToModel(colPos);
     }
 
@@ -444,15 +444,15 @@ public class JTableUtil {
      */
     public static int getRealRowPos(int rowPos, JTable table) {
         if (rowPos == -1) {
-            System.out.println("getRealRowPos => " + rowPos);
+//            System.out.println("getRealRowPos => " + rowPos);
             return rowPos;
         }
         if (table.getRowSorter() == null) {
-            System.out.println("getRealRowPos[no sort] => " + rowPos);
+//            System.out.println("getRealRowPos[no sort] => " + rowPos);
             return rowPos;
         }
         int fixRowPos = table.getRowSorter().convertRowIndexToModel(rowPos);
-        System.out.println(String.format("getRealRowPos[fix] => before[%d], after[%d]", rowPos, fixRowPos));
+//        System.out.println(String.format("getRealRowPos[fix] => before[%d], after[%d]", rowPos, fixRowPos));
         return fixRowPos;
     }
 

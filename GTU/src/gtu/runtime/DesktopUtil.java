@@ -37,8 +37,11 @@ public class DesktopUtil {
             if (new File(url).exists()) {
                 return true;
             }
-            if (new URL(url).getProtocol().equals("file")) {
-                return true;
+            try {
+                if (new URL(url).getProtocol().equals("file")) {
+                    return true;
+                }
+            } catch (java.net.MalformedURLException ex) {
             }
             return false;
         } catch (Exception e) {

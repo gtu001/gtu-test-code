@@ -1,0 +1,2 @@
+#全域搜尋
+ctrl + shift + F

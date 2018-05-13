@@ -1,0 +1,104 @@
+[
+    {
+        "key": "ctrl+d",
+        "command": "editor.action.cutLines",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+o",
+        "command": "workbench.action.gotoSymbol"
+    },
+    {
+        "key": "ctrl+[",
+        "command": "workbench.action.navigateBack"
+    },
+    {
+        "key": "ctrl+]",
+        "command": "workbench.action.navigateForward"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.gotoLine"
+    },
+    {
+        "key": "F3",
+        "command": "editor.action.goToDeclaration"
+    },
+    {
+        "key": "ctrl+shift+g",
+        "command": "editor.action.referenceSearch.trigger"
+    },
+    {
+        "key": "ctrl+alt+r",
+        "command": "editor.action.rename",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+r",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+shift+t",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "actions.find"
+    },
+    {
+        "key": "alt+left",
+        "command": "subwordNavigation.cursorSubwordLeft"
+    },
+    {
+        "key": "alt+right",
+        "command": "subwordNavigation.cursorSubwordRight"
+    },
+    {
+        "key": "alt+left",
+        "command": "subwordNavigation.cursorSubwordLeft"
+    },
+    {
+        "key": "shift+alt+left",
+        "command": "subwordNavigation.cursorSubwordLeftSelect"
+    },
+    {
+        "key": "shift+alt+right",
+        "command": "subwordNavigation.cursorSubwordRightSelect"
+    },
+    {
+        "key": "ctrl+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+alt+up",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "editor.action.insertCursorBelow",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "shift+alt+up",
+        "command": "editor.action.insertCursorAbove",
+        "when": "editorTextFocus" },
+    {
+        "key": "alt+backspace",
+        "command": "subwordNavigation.deleteSubwordLeft"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "editor.action.deleteLines",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+]",
+        "command": "workbench.files.action.openNextWorkingFile"
+    },
+    {
+        "key": "ctrl+shift+[",
+        "command": "workbench.files.action.openPreviousWorkingFile"
+    }
+]

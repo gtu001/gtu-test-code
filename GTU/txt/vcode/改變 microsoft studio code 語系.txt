@@ -1,0 +1,12 @@
+﻿改變 microsoft studio code 語系
+
+win : C:\Users\gtu00\AppData\Roaming\Code\User
+Linux : $HOME/.config/Code/User
+Mac : $HOME/Library/Application Support/Code/User
+
+
+
+開啟VCode 
+按 F1 輸入 language
+選擇 "Configure language"
+改成 "locale":"en-US"
