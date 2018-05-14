@@ -12,10 +12,17 @@ import gtu.file.FileUtil;
 public class PdfboxUtil {
 
     public static void main(String[] args) {
-        File fromFile = new File("c:/Users/gtu00/OneDrive/Desktop/秀娟0501/PDF轉EXCEL/RCRP0S104.pdf");
-        File toFile = new File(FileUtil.DESKTOP_DIR, fromFile.getName() + ".txt");
-        String content = PdfboxUtil.loadText(fromFile);
-        FileUtil.saveToFile(toFile, content, "utf8");
+//        File fromFile = new File("c:/Users/gtu00/OneDrive/Desktop/秀娟0501/PDF轉EXCEL/RCRP0S104.pdf");
+//        File toFile = new File(FileUtil.DESKTOP_DIR, fromFile.getName() + ".txt");
+//        String content = PdfboxUtil.loadText(fromFile);
+//        FileUtil.saveToFile(toFile, content, "utf8");
+        
+        File fromDir = new File("C:/Users/gtu00/OneDrive/Desktop/秀娟0501/new_pdf");
+        for(File f : fromDir.listFiles()) {
+            File toFile = new File(FileUtil.DESKTOP_DIR, f.getName() + ".txt");
+            String content = PdfboxUtil.loadText(f);
+            FileUtil.saveToFile(toFile, content, "utf8");
+        }
         System.out.println("done...");
     }
 

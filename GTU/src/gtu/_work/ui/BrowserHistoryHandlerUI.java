@@ -95,6 +95,7 @@ import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
@@ -189,6 +190,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tagComboBox = new JComboBox();
             tagComboBoxUtil = AutoComboBox.applyAutoComboBox(tagComboBox);
             panel.add(tagComboBox, "4, 6, fill, default");
+            tagComboBoxUtil.getTextComponent().addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent event) {
+                    JChangeInputMethodUtil.toEnglish();
+                }
+            });
 
             JLabel lblRemark = new JLabel("remark");
             panel.add(lblRemark, "2, 8");
@@ -272,6 +279,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JComboBoxUtil.newInstance(searchComboBox).setWidth(300);
             searchComboBoxUtil = AutoComboBox.applyAutoComboBox(searchComboBox);
             panel_2x.add(searchComboBox);
+            searchComboBoxUtil.getTextComponent().addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent event) {
+                    JChangeInputMethodUtil.toEnglish();
+                }
+            });
 
             JButton allOpenBtn = new JButton("全開");
             allOpenBtn.addActionListener(new ActionListener() {

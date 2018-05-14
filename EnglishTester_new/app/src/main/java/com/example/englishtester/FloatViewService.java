@@ -50,6 +50,7 @@ import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
 import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
+import com.example.englishtester.common.InputMethodChangeUtil;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
 import com.example.englishtester.common.MagnifierPosEnum;
@@ -258,6 +259,7 @@ public class FloatViewService extends Service {
      * 開啟/關閉輸入框
      */
     private void doOpenCloseEditPanel(boolean isOpen) {
+
         // 檢查剪貼簿是否有內容
         if (isOpen) {
             //查詢記事本的單字
