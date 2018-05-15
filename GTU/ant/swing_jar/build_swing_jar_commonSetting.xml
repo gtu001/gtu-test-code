@@ -119,7 +119,7 @@
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			 -->
 			<!-- Dropbox
-			<packagename mode="small">com.dropbox.core.DbxClient</packagename>
+			<packagename mode="small">com.dropbox.core.v2.DbxClientV2</packagename>
 			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
 			  -->
 			<!-- http client 
@@ -137,3 +137,8 @@
 		    <!-- 簡繁體
 		    <packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
 		     -->
+		    <!-- log4j
+		    <packagename mode="small">org.apache.log4j.Logger</packagename>
+			<packagename mode="small">org/slf4j/MarkerFactory</packagename>
+			<packagename mode="small">org/slf4j/impl/StaticMarkerBinder</packagename>
+		    -->

@@ -48,15 +48,21 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="small">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="small">net.sf.image4j.codec.ico.ICODecoder</packagename>
+			<packagename mode="small">org.apache.commons.lang.reflect.FieldUtils</packagename>
 
 			<packagename mode="small">org.apache.log4j.Logger</packagename>
+			<packagename mode="small">org/slf4j/MarkerFactory</packagename>
+			<packagename mode="small">org/slf4j/impl/StaticMarkerBinder</packagename>
 
-			<packagename mode="small">com.dropbox.core.DbxClient</packagename>
+			<packagename mode="small">com.dropbox.core.v2.DbxClientV2</packagename>
 			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
 		</jarfinder>
 

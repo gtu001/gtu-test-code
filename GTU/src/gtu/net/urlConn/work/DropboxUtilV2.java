@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,19 +27,6 @@ public class DropboxUtilV2 {
 
     public static void main(String[] args) throws ListFolderErrorException, DbxException, FileNotFoundException, IOException {
         DropboxUtilV2 t = new DropboxUtilV2();
-
-        DbxClientV2 client = t.getClient("3y3nIS0p6KoAAAAAAAAsnT59ymBJxJMRFUjx2pIdE0UfaY4S5PSQJYgs5UsXOTbI");
-
-//        t.listFiles("/english_prop", client);
-//
-//        t.download("", new FileOutputStream(new File("C:\\Users\\gtu001\\Desktop\\x.txt")), client);/// english_prop/new_word_20170928175618.properties
-//
-//        t.upload("/x/x.txt", new FileInputStream(new File("C:\\Users\\gtu001\\Desktop\\x.txt")), client);
-//
-//        t.delete("/x/x.txt", client);
-        
-        isAccessTokenOk("3y3nIS0p6KoAAAAAAAAsnT59ymBJxJMRFUjx2pIdE0UfaY4S5PSQJYgs5UsXOTbI");
-
         System.out.println("done...");
     }
 
@@ -50,7 +38,7 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
         }
     }
 
@@ -65,7 +53,7 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
         }
     }
 
@@ -80,12 +68,12 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
         }
     }
 
-    public static Map<String,String> listFiles(String path, DbxClientV2 client) {
-        Map<String,String> fileMap = new LinkedHashMap<String,String>();
+    public static Map<String, String> listFiles(String path, DbxClientV2 client) {
+        Map<String, String> fileMap = new LinkedHashMap<String, String>();
         try {
             ListFolderResult result = client.files().listFolder(path);
             List<Metadata> entries = result.getEntries();
@@ -93,6 +81,22 @@ public class DropboxUtilV2 {
                 Metadata ent = entries.get(ii);
                 System.out.println(ent.getPathDisplay());
                 fileMap.put(ent.getName(), ent.getPathDisplay());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+        return fileMap;
+    }
+
+    public static List<DropboxUtilV2_DropboxFile> listFilesV2(String path, DbxClientV2 client) {
+        List<DropboxUtilV2_DropboxFile> fileMap = new ArrayList<DropboxUtilV2_DropboxFile>();
+        try {
+            ListFolderResult result = client.files().listFolder(path);
+            List<Metadata> entries = result.getEntries();
+            for (int ii = 0; ii < entries.size(); ii++) {
+                Metadata ent = entries.get(ii);
+                fileMap.add(new DropboxUtilV2_DropboxFile(ent));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -117,9 +121,35 @@ public class DropboxUtilV2 {
             System.out.println("accountId : " + account.getAccountId());
             System.out.println("email : " + account.getEmail());
             return true;
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    public static class DropboxUtilV2_DropboxFile {
+        private String name;
+        private String fullPath;
+        private boolean isFolder = false;
+
+        public DropboxUtilV2_DropboxFile(Metadata meta) {
+            this.name = meta.getName();
+            this.fullPath = meta.getPathDisplay();
+            if (meta instanceof com.dropbox.core.v2.files.FolderMetadata) {
+                this.isFolder = true;
+            }
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getFullPath() {
+            return fullPath;
+        }
+
+        public boolean isFolder() {
+            return isFolder;
         }
     }
 }

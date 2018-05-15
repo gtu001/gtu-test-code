@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,12 +12,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,32 +27,50 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxWriteMode;
+import com.dropbox.core.v2.DbxClientV2;
 
 import gtu.file.FileUtil;
 import gtu.log.Log;
 import gtu.log.PrintStreamAdapter;
+import gtu.net.urlConn.work.DropboxUtilV2;
+import gtu.net.urlConn.work.DropboxUtilV2.DropboxUtilV2_DropboxFile;
+import gtu.properties.PropertiesUtilBean;
 import gtu.string.SystemEncodeChange;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTreeUtil;
 
 public class DropboxTestUI extends JFrame {
-    
+
+    private static final long serialVersionUID = 1L;
+    private static PropertiesUtilBean config = new PropertiesUtilBean(DropboxTestUI.class);
+    private static final String TOKEN;
+    static {
+        TOKEN = StringUtils.trimToEmpty(config.getConfigProp().getProperty("token"));
+        if (StringUtils.isBlank(TOKEN)) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("無法取得token屬性");
+            try {
+                Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", config.getPropFile()));
+                Desktop.getDesktop().browse(new URI("https://www.dropbox.com/developers/apps"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.exit(1);
+        }
+    }
+
     private static final Logger logger = Logger.getLogger(DropboxTestUI.class);
     private final PrintStream out = new PrintStream(new PrintStreamAdapter("big5") {
         @Override
         public void println(String message) {
             Log.debug(message);
-//            if(StringUtils.length(logArea.getText()) > 500){
-//                logArea.setText("");
-//            }
-            logArea.append(message+"\n");
+            // if(StringUtils.length(logArea.getText()) > 500){
+            // logArea.setText("");
+            // }
+            logArea.append(message + "\n");
         }
     }, true);
 
@@ -62,7 +78,7 @@ public class DropboxTestUI extends JFrame {
     private JTree downloadTree;
     private JTreeUtil jTreeUtil;
     private JTextArea logArea;
-    
+
     private DropUtil util = new DropUtil();
 
     /**
@@ -92,37 +108,32 @@ public class DropboxTestUI extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(new BorderLayout(0, 0));
-        
+
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         contentPane.add(tabbedPane, BorderLayout.CENTER);
-        
+
         JPanel panel = new JPanel();
         tabbedPane.addTab("download", null, panel, null);
         panel.setLayout(new BorderLayout(0, 0));
-        
+
         JPanel panel_2 = new JPanel();
         panel.add(panel_2, BorderLayout.NORTH);
-        
+
         JButton reloadBtn = new JButton("reload");
         reloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    downloadTree.setModel(util.getRootFileModel());
-                } catch (DbxException e1) {
-                    logger.error(e1.getMessage(), e1);
-                    JCommonUtil.handleException(e1);
-                }
+                initReloadBtnAction();
             }
         });
         panel_2.add(reloadBtn);
-        
+
         JButton button = new JButton("download");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
-                    JFile jfile = (JFile)selectItem.getUserObject();
-                    util.download(util.getClient(), jfile.name, jfile.path);
+                    JFile jfile = (JFile) selectItem.getUserObject();
+                    util.download(jfile.name, jfile.path);
                     JCommonUtil._jOptionPane_showMessageDialog_info("檔案下載完成 : " + jfile.name);
                 } catch (Exception e1) {
                     logger.error(e1.getMessage(), e1);
@@ -131,24 +142,26 @@ public class DropboxTestUI extends JFrame {
             }
         });
         panel_2.add(button);
-        
+
         JButton button_1 = new JButton("upload");
         button_1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
-                    JFile jfile = (JFile)selectItem.getUserObject();
+                    JFile jfile = (JFile) selectItem.getUserObject();
                     File file = JCommonUtil._jFileChooser_selectFileOnly();
-                    if(file == null || !file.exists()){
+                    if (file == null || !file.exists()) {
                         JCommonUtil._jOptionPane_showMessageDialog_error("檔案為空或不存在!");
                         return;
                     }
-                    if(jfile == null || !jfile.isFolder){
+                    if (jfile == null || !jfile.isFolder) {
                         JCommonUtil._jOptionPane_showMessageDialog_error("請選擇上傳目錄");
                         return;
                     }
-                    util.upload(util.getClient(), file, jfile.path);
+                    util.upload(file, jfile.path);
                     JCommonUtil._jOptionPane_showMessageDialog_info("上傳 : " + jfile.path + " -> " + file.getName());
+                    
+                    initReloadBtnAction();
                 } catch (Exception e2) {
                     logger.error(e2.getMessage(), e2);
                     JCommonUtil.handleException(e2);
@@ -156,14 +169,47 @@ public class DropboxTestUI extends JFrame {
             }
         });
         panel_2.add(button_1);
-        
+
+        JButton btnNewButton = new JButton("delete");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                try {
+                    DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
+                    JFile jfile = (JFile) selectItem.getUserObject();
+
+                    if (jfile.isFolder) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("不提供目錄刪除!");
+                        return;
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("確定刪除!!!\n");
+                    sb.append("name : " + jfile.name + "\n");
+                    sb.append("path : " + jfile.path + "\n");
+                    boolean chkDelete = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString(), "確定刪除!!!");
+
+                    if (chkDelete) {
+                        util.delete(jfile.path);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("已刪除 : " + jfile.path);
+                        initReloadBtnAction();
+                    } else {
+                        JCommonUtil._jOptionPane_showMessageDialog_info("已取消刪除!");
+                    }
+                } catch (Exception e2) {
+                    logger.error(e2.getMessage(), e2);
+                    JCommonUtil.handleException(e2);
+                }
+            }
+        });
+        panel_2.add(btnNewButton);
+
         downloadTree = new JTree();
         downloadTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent paramMouseEvent) {
                 try {
                     DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
-                    JFile jfile = (JFile)selectItem.getUserObject();
+                    JFile jfile = (JFile) selectItem.getUserObject();
                     util.addFileSystemTreeNode(jfile, selectItem, util.getClient());
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
@@ -172,114 +218,107 @@ public class DropboxTestUI extends JFrame {
             }
         });
         JCommonUtil.createScrollComponent(panel, downloadTree);
-        //panel.add(downloadTree, BorderLayout.CENTER);
+        // panel.add(downloadTree, BorderLayout.CENTER);
         jTreeUtil = JTreeUtil.newInstance(downloadTree);
-        
-        
+
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("log", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
-        
+
         JLabel label = new JLabel("New label");
         panel_1.add(label, BorderLayout.NORTH);
-        
+
         logArea = new JTextArea();
         panel_1.add(logArea, BorderLayout.CENTER);
-        
+
         setTitle(SystemEncodeChange.getSystemEncode());
+
+        initReloadBtnAction();
+
+        JCommonUtil.setJFrameCenter(this);
     }
-    
-    private void debug(String message){
-//        logger.info(message);
+
+    private void debug(String message) {
+        // logger.info(message);
         Log.debug(message);
-//        out.println(message);
+        // out.println(message);
     }
-    
+
+    private void initReloadBtnAction() {
+        try {
+            downloadTree.setModel(util.getRootFileModel());
+        } catch (DbxException e1) {
+            logger.error(e1.getMessage(), e1);
+            JCommonUtil.handleException(e1);
+        }
+    }
+
     private class DropUtil {
-        private static final String TOKEN = "3y3nIS0p6KoAAAAAAAAzTZcBK7T3it-Yvf-AjbOy-czPn9KMTwYWj3psCcPdX37U";
-        
-        protected DbxClient getClient(){
-            DbxRequestConfig config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
-            DbxClient client = new DbxClient(config, TOKEN);
-            return client;
+
+        protected DbxClientV2 getClient() {
+            return DropboxUtilV2.getClient(TOKEN);
         }
-        
-        protected void upload(DbxClient client, File inputFile, String basePath) throws DbxException, IOException{
+
+        protected void upload(File inputFile, String basePath) throws DbxException, IOException {
             FileInputStream inputStream = new FileInputStream(inputFile);
-            try {
-                DbxEntry.File uploadedFile = client.uploadFile(basePath + "/" + inputFile.getName(),
-                    DbxWriteMode.add(), inputFile.length(), inputStream);
-                debug("Uploaded: " + uploadedFile.toString());
-            } finally {
-                inputStream.close();
-            }
+            String uploadPath = basePath + "/" + inputFile.getName();
+            System.out.println("upload >>" + uploadPath);
+            DropboxUtilV2.upload(uploadPath, inputStream, getClient());
         }
-        
-        protected void download(DbxClient client, String name, String path) throws DbxException, IOException{
+
+        protected void download(String name, String path) throws DbxException, IOException {
             FileOutputStream outputStream = new FileOutputStream(new File(FileUtil.DESKTOP_DIR, name));
-            try {
-                DbxEntry.File downloadedFile = client.getFile(path, null,
-                    outputStream);
-                debug("Metadata: " + downloadedFile.toString());
-            } finally {
-                outputStream.close();
-            }
+            DropboxUtilV2.download(path, outputStream, getClient());
         }
-        
-        protected DefaultTreeModel getRootFileModel() throws DbxException{
-            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new JFile(null));
+
+        protected void delete(String path) {
+            DropboxUtilV2.delete(path, getClient());
+        }
+
+        protected DefaultTreeModel getRootFileModel() throws DbxException {
+            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new JFile("", ""));
             DefaultTreeModel model = new DefaultTreeModel(rootNode);
-            addFileSystemTreeNode(new JFile(null), rootNode, getClient());
+            addFileSystemTreeNode(new JFile("", ""), rootNode, getClient());
             return model;
         }
-        
-        private void addFileSystemTreeNode(JFile jfile, DefaultMutableTreeNode loot, DbxClient client) throws DbxException {
+
+        private void addFileSystemTreeNode(JFile jfile, DefaultMutableTreeNode loot, DbxClientV2 client) throws DbxException {
             DefaultMutableTreeNode node = null;
             if (jfile.isFolder) {
-                List<DbxEntry> list = new ArrayList<DbxEntry>();
-                DbxEntry.WithChildren listing = client.getMetadataWithChildren(jfile.path);
-                if (listing != null) {
-                    for (DbxEntry ch : listing.children) {
-                        list.add(ch);
-                    }
-                }
-                Collections.sort(list, new Comparator<DbxEntry>() {
-                    @Override
-                    public int compare(DbxEntry o1, DbxEntry o2) {
-                        return o1.name.compareTo(o2.name);
-                    }
-                });
-                for (DbxEntry f : list) {
+                List<DropboxUtilV2_DropboxFile> list = DropboxUtilV2.listFilesV2(jfile.path, client);
+                for (DropboxUtilV2_DropboxFile f : list) {
                     JFile f2 = new JFile(f);
                     node = new DefaultMutableTreeNode(f2);
-                    //addFileSystemTreeNode(f2, node, client);
+                    // ////addFileSystemTreeNode(f2, node, client);//不要打開
                     loot.add(node);
                 }
             }
         }
     }
-    
+
     private class JFile {
         String path;
         String name;
         boolean isFolder;
-        DbxEntry child;
-        JFile(DbxEntry child){
-            if(child == null){
-                path = "/";
-                name = "/";
-                isFolder = true;
-                return;
-            }
-            path = child.path;
-            name = child.name;
-            isFolder = child.isFolder();
-            this.child = child;
+
+        JFile(String name, String path) {
+            this.name = name;
+            this.path = path;
+            isFolder = true;
             debug(toAllString());
         }
-        public String toAllString() {
-            return "JFile [path=" + path + ", name=" + name + ", isFolder=" + isFolder + ", child=" + child + "]";
+
+        JFile(DropboxUtilV2_DropboxFile val) {
+            this.name = val.getName();
+            this.path = val.getFullPath();
+            isFolder = val.isFolder();
+            debug(toAllString());
         }
+
+        public String toAllString() {
+            return "JFile [path=" + path + ", name=" + name + ", isFolder=" + isFolder + "]";
+        }
+
         @Override
         public String toString() {
             return "" + name + "";

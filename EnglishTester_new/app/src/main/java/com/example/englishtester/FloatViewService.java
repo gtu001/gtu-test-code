@@ -1006,6 +1006,9 @@ public class FloatViewService extends Service {
                 } else if (!StringUtil_.hasChinese(text)) {
                     doOpenCloseEditPanel(true);//查詢單字
                 }
+
+                //set back text to clipboard
+                pasteToClipboard("", text);
             }
         }
     }
