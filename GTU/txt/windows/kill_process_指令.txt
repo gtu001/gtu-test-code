@@ -1,0 +1,13 @@
+# Windows
+
+--詳情 https://tweaks.com/windows/39559/kill-processes-from-command-prompt/
+
+Taskkill /IM firefox.exe /F
+
+Taskkill /PID 26356 /F
+
+
+
+# Linux 
+
+kill -9 39393

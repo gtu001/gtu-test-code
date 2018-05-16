@@ -1,0 +1,20 @@
+詳見 https://docs.npmjs.com/cli/install
+
+
+1.先建立目錄
+2.切到該目錄執行
+npm init --yes
+
+3.修改底下 package.json 加入depedencies 
+  Ex :   
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "express": "^4.16.2"
+  }
+  
+4.安裝node_module
+npm install -d
+
+

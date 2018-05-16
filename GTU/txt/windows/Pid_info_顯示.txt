@@ -1,0 +1,2 @@
+# 顯示pid內容
+tasklist /fi "pid eq 1780"

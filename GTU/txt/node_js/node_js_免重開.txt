@@ -1,0 +1,6 @@
+#安裝這玩意
+npm i -g nodemon
+
+#用法
+	原本指令是 node app.js
+	改成 nodemon app.js
