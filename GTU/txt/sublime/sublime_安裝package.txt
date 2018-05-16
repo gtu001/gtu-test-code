@@ -1,0 +1,19 @@
+﻿安裝package方式
+第一個需要裝的通常是 https://packagecontrol.io/installation
+
+<Option 1>
+在 C:\Users\gtu00\AppData\Roaming\Sublime Text 3\Installed Packages
+放入 XXXXXXX.sublime-package
+
+或是選 Preferences > Browse Packages
+會開啟目錄 回上層就會看到 Installed Packages
+
+
+<Option 2>
+按ctrl+` 貼上 script即可
+
+
+
+需要安裝的package 如下 :::
+Go To Definition
+nodejs

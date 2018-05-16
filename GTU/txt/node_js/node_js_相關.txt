@@ -1,3 +1,29 @@
-#指定安裝 npm 版本為3.10.10
-
+﻿#指定安裝 npm 版本為3.10.10
 npm install -g npm@3.10.10
+
+
+#不指定版本
+npm install -g express
+
+
+#檢視安裝版本
+--angular
+ng -v
+
+
+#檢視所有已安裝版本
+npm list -g
+
+
+#檢視某個以安裝版本
+npm list -g | findstr express
+npm list -g | grep express
+
+
+#檢視最後可用版本 (遠端)
+npm info <pkg> version
+npm view <pkg> version
+
+
+#檢視安裝版本 Ps:不顯示dependency
+npm list -g --depth=0

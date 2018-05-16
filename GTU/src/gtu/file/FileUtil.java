@@ -48,10 +48,9 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
-        String filename = 
-                "      Do you think people who are good in shape have more desires? (Apply for selfie, apply, gesture verification)\r\n" + 
-                "     -Chinese homemade video";
-        System.out.println(FileUtil.escapeFilename(filename, true));
+        File f1 = new File("c:/Users/gtu00/OneDrive/Desktop/Culdcept Revolt (USA).cia");
+        File f2 = new File("k:/破解apk/模擬器/roms/3DS/Culdcept Revolt (USA).cia");
+        System.out.println(FileUtil.contentEquals(f1, f2));
     }
 
     private FileUtil() {
@@ -1057,6 +1056,14 @@ public class FileUtil {
         fileName = fileName.replaceAll("　", "");
         fileName = fileName.trim();
         return fileName;
+    }
+
+    public static boolean contentEquals(File file1, File file2) {
+        try {
+            return FileUtils.contentEquals(file1, file2);
+        } catch (Exception e) {
+            throw new RuntimeException("contentEquals ERR : " + e.getMessage(), e);
+        }
     }
 
     public static class FileZ {
