@@ -1,21 +1,21 @@
 
 
-class WebLogUtil {
+class ResponseAppender {
 
-	private fullMessage : string;
-
-	constructor(private res : any){
+	constructor(res){
+		this.res = res;
+		this.fullMessage = "";
 	}
 
-	log(message){
+	print(message){
 		console.log(message);
-		fullMessage += message + "<br/>";
+		this.fullMessage += message + "<br/>";
 	}
 
 	flush(){
-		res.send(fullMessage);
+		this.res.send(this.fullMessage);
 	}
 }
 
 
-module.exports.webLogUtil = WebLogUtil;
+module.exports.ResponseAppender = ResponseAppender;

@@ -1,9 +1,8 @@
-const sysinfoUtil = require("./sysinfoUtil");
-const express = require('express');
+const checkSelf = require("./checkSelf");
 
-sysinfoUtil.showMembers(express);
+checkSelf.showMembers(express);
 
-sysinfoUtil.nodeDocument("express");
+checkSelf.nodeDocument("express");
 
 
 

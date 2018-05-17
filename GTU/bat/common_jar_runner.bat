@@ -6,4 +6,7 @@ shift
 shift
 
 rem %* 表示所有參數
-java -jar %arg1%  %arg2%  %*
+start java -jar %arg1%  %arg2%  %*
+
+exit
+
