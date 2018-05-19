@@ -66,7 +66,7 @@ def isNumber(s):
     return numberUtil.isNumber(s)
 
 
-def concat(arry):
+def concat(*arry):
     strValue = ""
     for (i, obj) in enumerate(arry) :
         if type(obj).__name__ == 'str':

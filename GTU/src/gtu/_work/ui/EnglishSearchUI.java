@@ -18,7 +18,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -27,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,9 +62,9 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.mouse.NativeMouseAdapter;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.example.englishtester.EnglishwordInfoDAO;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -75,9 +75,9 @@ import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.clipboard.ClipboardListener;
-import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
@@ -395,6 +395,11 @@ public class EnglishSearchUI extends JFrame {
         String value = propertyBean.getConfigProp().getProperty(NEW_WORD_PATH);
         if (StringUtils.isNotBlank(value)) {
             newWordTxtPathText.setText(value);
+        } else {
+            File newWordFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "new_word.txt");
+            if (newWordFile.exists()) {
+                newWordTxtPathText.setText(newWordFile.getAbsolutePath());
+            }
         }
 
         this.addWindowListener(new WindowAdapter() {
@@ -509,25 +514,54 @@ public class EnglishSearchUI extends JFrame {
     private void loadOfflineConfig() {
         try {
             Properties prop = new Properties();
-            if (StringUtils.isNotBlank(offlineConfigText.getText())) {
-                File file = new File(offlineConfigText.getText());
-                if (!file.getName().equals("exportFileJson.bin")) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("檔名必須為exportFileJson.bin!");
-                    return;
+            if (StringUtils.isBlank(offlineConfigText.getText())) {
+                {
+                    File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJson.bin");
+                    if (exportFileJsonFile.exists()) {
+                        offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
+                    }
                 }
-                if (file.exists()) {
-                    String content = FileUtil.loadFromFile(file, "utf8");
-                    JSONArray arry = new JSONArray(content);
-                    for (int ii = 0; ii < arry.length(); ii++) {
-                        JSONObject obj = (JSONObject) arry.get(ii);
-                        String englishId = obj.getString("englishId");
-                        String englishDesc = obj.getString("englishDesc");
-                        prop.setProperty(englishId, englishDesc);
+                {
+                    File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJava.bin");
+                    if (exportFileJsonFile.exists()) {
+                        offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
                     }
                 }
             }
+
+            File file = new File(offlineConfigText.getText());
+            if (file.exists()) {
+                if (file.getName().equals("exportFileJson.bin")) {
+                    if (file.exists()) {
+                        String content = FileUtil.loadFromFile(file, "utf8");
+                        JSONArray arry = new JSONArray(content);
+                        for (int ii = 0; ii < arry.length(); ii++) {
+                            JSONObject obj = (JSONObject) arry.get(ii);
+                            String englishId = obj.getString("englishId");
+                            String englishDesc = obj.getString("englishDesc");
+                            prop.setProperty(englishId, englishDesc);
+                        }
+                    }
+                }
+                if (file.getName().equals("exportFileJava.bin")) {
+                    FileInputStream fis = new FileInputStream(file);
+                    ObjectInputStream input = new ObjectInputStream(fis);
+                    List<EnglishwordInfoDAO.EnglishWord> list = new ArrayList<EnglishwordInfoDAO.EnglishWord>();
+                    try {
+                        for (Object readObj = null; (readObj = input.readObject()) != null;) {
+                            EnglishwordInfoDAO.EnglishWord word = (EnglishwordInfoDAO.EnglishWord) readObj;
+                            String englishId = word.getEnglishId();
+                            String englishDesc = word.getEnglishDesc();
+                            prop.setProperty(englishId, englishDesc);
+                        }
+                        input.close();
+                    } catch (java.io.EOFException ex) {
+                    }
+                }
+            }
+
             offlineProp = prop;
-        } catch (JSONException e1) {
+        } catch (Exception e1) {
             JCommonUtil.handleException(e1);
         }
     }
@@ -589,9 +623,9 @@ public class EnglishSearchUI extends JFrame {
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
 
                 // set top the UI
-//                if (!EnglishSearchUI.this.isFocusOwner()) {
-//                    bringToTop();
-//                }
+                // if (!EnglishSearchUI.this.isFocusOwner()) {
+                // bringToTop();
+                // }
             }
         }).start();
     }

@@ -32,6 +32,21 @@ def testFind001(restr, dataText):
 		print(n, key)
 	return True
 
+
+def __test_replace():
+	'''
+	(?i) starts case-insensitive mode
+	(?-i) turns off case-insensitive mode
+	'''
+	line = "interfaceOpDataFile"
+	fileIn = "WTF"
+	line = re.sub(\
+           r"(?i)^.*interfaceOpDataFile.*$", \
+           "interfaceOpDataFile %s" % fileIn, \
+           line \
+           )
+	print(line)
+		
 		
 if __name__ == '__main__' :
 	'''

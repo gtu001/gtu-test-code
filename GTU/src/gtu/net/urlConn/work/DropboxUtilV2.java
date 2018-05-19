@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
@@ -39,6 +41,18 @@ public class DropboxUtilV2 {
             ex.printStackTrace();
             throw new RuntimeException(ex);
             // return false;
+        }
+    }
+
+    public static boolean exists(String path, DbxClientV2 client) {
+        try {
+            return true;
+        } catch (Exception ex) {
+            if (ex.getClass().getName().equals("com.dropbox.core.v2.files.GetMetadataErrorException") && //
+                    ex.getMessage().contains("\"path\":\"not_found\"")) {
+                return false;
+            }
+            throw new RuntimeException("exists ERR : " + ex.getMessage(), ex);
         }
     }
 

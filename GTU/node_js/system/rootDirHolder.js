@@ -1,12 +1,14 @@
-const process =  require("process"); 
 
+
+const DEFAULT_ROOT = "E:/workstuff/workspace/gtu-test-code/GTU/node_js";
 
 class RootDirHolder {
-	constructor(rootDirName, rootFileName){
+	
+	constructor(rootDirName = DEFAULT_ROOT, rootFileName = ""){
 		this.baseDir = rootDirName;
 		this.fileName = rootFileName;
 		global.rootDirHolder = this;
-		console.log(`system root dir : ${this.baseDir}`);
+		console.log(`project root dir : ${this.baseDir}`);
 	}
 
 	path(relactivePath){
@@ -21,7 +23,9 @@ function main(){
 	// __dirname
 	new RootDirHolder(__dirname, __filename);
 	console.log(rootDirHolder.path("xxxxxxx"));
-	console.log(">>>"+process.cwd());
+	
+	new RootDirHolder();
+	console.log(rootDirHolder.path("xxxxxxx"));
 }
 
 // main();

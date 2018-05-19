@@ -5,6 +5,7 @@ from pathlib import Path
 from gtu.thread import threadUtil
 from gtu.reflect import checkSelf
 import re
+from gtu.string import stringUtil
 
 '''
 from gtu.io import fileUtil
@@ -13,13 +14,8 @@ from gtu.io import fileUtil
 
 def mkdirs(path):
 	'''建立多個目錄'''
-	arry = path.split(os.sep)
-	url = ''
-	for i in range(0, len(arry)):
-		url += arry[i] + os.sep
-		if not os.path.exists(url):
-			os.mkdir(url)
-			print("mkdir ", url) 
+	os.makedirs(path, mode=0o777, exist_ok=True)
+	return os.path.exists(path) and os.path.isdir(path)
 
 
 def exeCommand(cmdStr):
@@ -177,7 +173,7 @@ def searchFilefind(file, pattern, fileList):
 		mth = pattern.search(name)
 		
 		if mth is not None :
-			fileList.append(file)
+			fileList.append(file.resolve())
 			
 			
 
@@ -199,21 +195,42 @@ def searchFileMatchs(file, pattern, fileList):
 		mth = pattern.match(name)
 		
 		if mth is not None :
-			fileList.append(file)
+			fileList.append(file.resolve())
 			
 
 
-if __name__ == '__main__':
+def sep():
+	'''取得檔案路徑分隔符號'''
+	req_sep = "/"
+	if os.sep == '\\' :
+		req_sep = '\\\\'
+	else:
+		req_sep = '\/'
+	return req_sep
 
+
+
+def replaceBasePath(orign, from_path, to_path):
+	'''換掉前置目錄'''
+	req_sep = sep()
+	
+	orign = re.sub(r"[\\/]", req_sep, orign)
+	from_path = re.sub(r"[\\/]", req_sep, from_path)
+	to_path = re.sub(r"[\\/]", req_sep, to_path)
+	
+	pos = orign.find(from_path)
+	
+	if pos == -1:
+		raise Exception(stringUtil.concat("無法取得前置目錄  : ", orign, " 找不到  ", from_path))
+	
+	return os.path.abspath(to_path  + os.sep + orign[orign.find(from_path) + len(from_path) : ])
+
+
+
+if __name__ == '__main__':
 	
 	file = "C:/Users/gtu00/OneDrive/Desktop/秀娟0501"
-# 	checkSelf.checkMembers(file)
-	
-	fileList = list()
-	searchFilefind(file, r".*\.pdf", fileList)
-	
-	for i in fileList :
-		print("<<<<", i)
+	print(replaceBasePath(file, "C:/Users/gtu00/OneDrive/DeskXXtop", "C:/Users/gtu00/OneDrive/Desktop/VVV"))
 	
 	print("done..")
 	

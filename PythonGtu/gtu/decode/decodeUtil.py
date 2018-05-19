@@ -1,3 +1,6 @@
+'''
+from gtu.decode import decodeUtil
+'''
 
 
 def decodeChs(byteArray, index):

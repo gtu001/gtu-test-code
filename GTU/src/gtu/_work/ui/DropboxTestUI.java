@@ -158,10 +158,14 @@ public class DropboxTestUI extends JFrame {
                         JCommonUtil._jOptionPane_showMessageDialog_error("請選擇上傳目錄");
                         return;
                     }
-                    util.upload(file, jfile.path);
-                    JCommonUtil._jOptionPane_showMessageDialog_info("上傳 : " + jfile.path + " -> " + file.getName());
-                    
-                    initReloadBtnAction();
+
+                    if (util.beforeUpload(file, jfile.path)) {
+                        util.upload(file, jfile.path);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("上傳 : " + jfile.path + " -> " + file.getName());
+                        initReloadBtnAction();
+                    } else {
+                        JCommonUtil._jOptionPane_showMessageDialog_info("取消上傳 : " + jfile.path + " -> " + file.getName());
+                    }
                 } catch (Exception e2) {
                     logger.error(e2.getMessage(), e2);
                     JCommonUtil.handleException(e2);
@@ -210,7 +214,9 @@ public class DropboxTestUI extends JFrame {
                 try {
                     DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
                     JFile jfile = (JFile) selectItem.getUserObject();
-                    util.addFileSystemTreeNode(jfile, selectItem, util.getClient());
+                    if (selectItem.getChildCount() == 0 && jfile.isFolder) {
+                        util.addFileSystemTreeNode(jfile, selectItem, util.getClient());
+                    }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     JCommonUtil.handleException(e);
@@ -259,9 +265,21 @@ public class DropboxTestUI extends JFrame {
             return DropboxUtilV2.getClient(TOKEN);
         }
 
-        protected void upload(File inputFile, String basePath) throws DbxException, IOException {
-            FileInputStream inputStream = new FileInputStream(inputFile);
+        protected boolean beforeUpload(File inputFile, String basePath) {
             String uploadPath = basePath + "/" + inputFile.getName();
+            if (DropboxUtilV2.exists(uploadPath, getClient())) {
+                if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否先刪除已存在檔案 : " + uploadPath, "檔案已存在")) {
+                    DropboxUtilV2.delete(uploadPath, getClient());
+                    return true;
+                } else {
+                }
+            }
+            return false;
+        }
+
+        protected void upload(File inputFile, String basePath) throws DbxException, IOException {
+            String uploadPath = basePath + "/" + inputFile.getName();
+            FileInputStream inputStream = new FileInputStream(inputFile);
             System.out.println("upload >>" + uploadPath);
             DropboxUtilV2.upload(uploadPath, inputStream, getClient());
         }

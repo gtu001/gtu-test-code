@@ -89,6 +89,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.net.https.SimpleHttpsUtil;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
@@ -375,6 +376,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             if (configSelf.getConfigProp().containsKey("bookmarkConfigText")) {
                 bookmarkConfig = new PropertiesUtilBean(new File(configSelf.getConfigProp().getProperty("bookmarkConfigText")));
+            } else {
+                //使用jar 所在路徑
+                File bookmarkConfigFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "BrowserHistoryHandlerUI_bookmark.properties");
+                if (bookmarkConfigFile.exists()) {
+                    bookmarkConfig = new PropertiesUtilBean(bookmarkConfigFile);
+                    bookmarkConfigText.setText(bookmarkConfigFile.getAbsolutePath());
+                }
             }
 
             JCommonUtil.defaultToolTipDelay();

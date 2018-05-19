@@ -713,7 +713,12 @@ public class FloatViewService extends Service {
                 @Override
                 public void run() {
                     final WordInfo newWord = diectory.parseToWordInfo(englishId, FloatViewService.this, handler);
-                    englishMap.put(englishId, transforToEnglishWord(newWord));
+
+                    //若有解釋內容才加進cache
+                    EnglishWord fixEng = transforToEnglishWord(newWord);
+                    if (StringUtils.isNotBlank(fixEng.englishDesc)) {
+                        englishMap.put(englishId, fixEng);
+                    }
 
                     handler.post(new Runnable() {
                         @Override
