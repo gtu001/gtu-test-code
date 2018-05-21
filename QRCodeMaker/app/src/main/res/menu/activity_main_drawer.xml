@@ -11,6 +11,12 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Processes讀取" />
         <item
+            android:id="@+id/nav_mp3_player"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Mp3撥放器" />
+
+        <!-- no use -->
+        <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Gallery" />

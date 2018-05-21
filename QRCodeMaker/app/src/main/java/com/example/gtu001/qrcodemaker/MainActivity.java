@@ -82,23 +82,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_qrcode_maker) {
-            // Handle the camera action
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            intent.putExtras(bundle);
-            intent.setClass(this, QRCodeMackerActivity.class);
-            startActivity(intent);
+            gotoActivity(QRCodeMackerActivity.class);
 
         } else if (id == R.id.nav_processes_loader) {
+            gotoActivity(ProcessesActivity.class);
 
-            // Handle the camera action
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            intent.putExtras(bundle);
-            intent.setClass(this, ProcessesActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_mp3_player) {
+            gotoActivity(Mp3PlayerActivity.class);
 
         } else if (id == R.id.nav_manage) {
 
@@ -111,5 +101,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void gotoActivity(Class clz){
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        intent.putExtras(bundle);
+        intent.setClass(this, clz);
+        startActivity(intent);
     }
 }

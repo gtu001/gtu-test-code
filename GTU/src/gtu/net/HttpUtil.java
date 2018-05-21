@@ -37,6 +37,9 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -63,7 +66,10 @@ public class HttpUtil {
             HttpContext localContext = new BasicHttpContext();
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
-            HttpClient httpclient = new DefaultHttpClient();
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
+            
+            HttpClient httpclient = new DefaultHttpClient(httpParams);
             HttpGet httpget = new HttpGet(uri);
             if (userAgent != null && userAgent.length() > 0) {
                 httpget.setHeader("User-Agent", userAgent);

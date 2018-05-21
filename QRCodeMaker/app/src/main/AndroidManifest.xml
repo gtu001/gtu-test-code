@@ -53,6 +53,9 @@
         <activity
             android:name=".ProcessesActivity"
             android:label="程序管理" />
+        <activity
+            android:name=".Mp3PlayerActivity"
+            android:label="Mp3播放" />
     </application>
 
 </manifest>

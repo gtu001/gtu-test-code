@@ -44,6 +44,7 @@ public class RuntimeBatPromptModeUtil {
             }
             File tmpBat = File.createTempFile("tmp_", ".bat");
             FileUtil.saveToFile(tmpBat, cmd.toString(), "UTF-8");
+            System.out.println("tempBat : " + tmpBat);
             Runtime.getRuntime().exec(String.format("cmd /c start cmd /k \"%s\" ", tmpBat));
         } catch (Exception ex) {
             throw new RuntimeException("batRun ERR : " + ex.getMessage(), ex);

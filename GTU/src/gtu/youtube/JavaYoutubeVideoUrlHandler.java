@@ -161,7 +161,9 @@ public class JavaYoutubeVideoUrlHandler {
                     String[] vals1 = val.split(",", -1);
                     for (String v2 : vals1) {
                         String[] kv2 = v2.split("\\/", -1);
-                        fmtMap.put(kv2[0], kv2[1]);
+                        if (kv2 != null && kv2.length >= 2) {
+                            fmtMap.put(kv2[0], kv2[1]);
+                        }
                     }
                 }
             }
