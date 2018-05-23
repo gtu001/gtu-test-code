@@ -135,6 +135,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JCheckBox directOpenFileChk;
     private static OtherOpenPath otherOpenPath;
     private JCheckBox useRemarkOpenChk;
+    private JCheckBox hiddenChk;
+    private JCheckBox showHiddenChk;
 
     /**
      * Launch the application.
@@ -229,6 +231,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             useRemarkOpenChk = new JCheckBox("使用remark開啟");
             panel_4.add(useRemarkOpenChk);
 
+            hiddenChk = new JCheckBox("隱藏");
+            panel_4.add(hiddenChk);
+
             JPanel panel_2 = new JPanel();
             panel.add(panel_2, "4, 13, fill, fill");
             modifyTimeLabel = new JLabel("修改時間");
@@ -280,6 +285,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel_2x = new JPanel();
             panel_1.add(panel_2x, BorderLayout.NORTH);
+
+            showHiddenChk = new JCheckBox("顯示隱藏");
+            showHiddenChk.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    initLoading();
+                }
+            });
+            panel_2x.add(showHiddenChk);
 
             directOpenFileChk = new JCheckBox("file直接打開");
             panel_2x.add(directOpenFileChk);
@@ -436,7 +449,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             @Override
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
-                    Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
+                    if (System.getProperty("os.name").equals("Windows 10")) {
+                        Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
+                        return;
+                    }
+                    String exePath = "C:/Program Files/Internet Explorer/iexplore.exe";
+                    if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_IE)) {
+                        exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_IE;
+                    }
+                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -666,6 +688,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String remark = StringUtils.trimToEmpty(remarkArea.getText().toString());
             String commandType = commandTypeSetting.getValue().name();
             String isUseRemarkOpen = useRemarkOpenChk.isSelected() ? "Y" : "N";
+            String isHidden = hiddenChk.isSelected() ? "Y" : "N";
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             // Validate.notEmpty(url, "url 為空");
@@ -692,6 +715,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.commandType = commandType;
             d.timestampLastest = "";
             d.isUseRemarkOpen = isUseRemarkOpen;
+            d.isHidden = isHidden;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -840,6 +864,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     return false;
                 }
 
+                private boolean isNotHiddenObj(UrlConfig d) {
+                    if (showHiddenChk.isSelected()) {
+                        return true;
+                    }
+                    return !"Y".equalsIgnoreCase(d.isHidden);
+                }
+
                 @Override
                 public void run() {
                     if (nonWorkChk.isSelected()) {
@@ -850,9 +881,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
                             progressBarHelper.addOne();
                         }
                     } else {
-                        if (StringUtils.isBlank(searchText)) {
+                        if (StringUtils.isBlank(searchText) && //
+                        isNotHiddenObj(d)) {
                             lst.add(d);
-                        } else if (isNormalMatch(searchText)) {
+                        } else if (isNormalMatch(searchText) && //
+                        isNotHiddenObj(d)) {
                             lst.add(d);
                         }
                     }
@@ -1084,9 +1117,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String timestampLastest;// 最後一次點及時間
         String commandType;
         String isUseRemarkOpen;// 是否使用remarkOpen
+        String isHidden;// 是否隱藏此項目
 
         private static String getConfigValue(UrlConfig d) {
-            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType + "^" + d.timestampLastest + "^" + d.clickTimes + "^" + d.isUseRemarkOpen;
+            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType + "^" + d.timestampLastest + "^" + d.clickTimes + "^" + d.isUseRemarkOpen + "^" + d.isHidden;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -1107,6 +1141,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String timestampLastest = getArryStr(args, 5);
                 String clickTimes = getArryStr(args, 6);
                 String isUseRemarkOpen = getArryStr(args, 7);
+                String isHidden = getArryStr(args, 8);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -1118,6 +1153,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.timestampLastest = timestampLastest;
                 d.clickTimes = clickTimes;
                 d.isUseRemarkOpen = isUseRemarkOpen;
+                d.isHidden = isHidden;
 
                 return d;
             }
@@ -1204,6 +1240,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tagComboBoxUtil.getTextComponent().setText(d.tag);
             commandTypeSetting.setValue(d.commandType);
             useRemarkOpenChk.setSelected("Y".equals(d.isUseRemarkOpen));
+            hiddenChk.setSelected("Y".equals(d.isHidden));
         } catch (Exception ex) {
             if (throwEx) {
                 throw new RuntimeException(ex);
@@ -1394,6 +1431,33 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                     }
                                 }
                             })//
+                            .addJMenuItem("顯示/隱藏", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String isHdden = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("是否隱藏 (Y/N)", "N"));
+                                        StringBuilder sb = new StringBuilder();
+                                        int size = 0;
+                                        Properties tempConf = new Properties();
+                                        for (int row : rowArry) {
+                                            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(row, UrlTableConfigEnum.VO.ordinal());
+                                            vo.isHidden = isHdden;
+                                            tempConf.setProperty(vo.url, UrlConfig.getConfigValue(vo));
+                                            sb.append("" + vo.title + "\n");
+                                            size++;
+                                        }
+                                        boolean isSave = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString() + "確定修改隱藏 : " + isHdden, "確認");
+                                        if (isSave) {
+                                            bookmarkConfig.getConfigProp().putAll(tempConf);
+                                            bookmarkConfig.store();
+                                            initLoading();
+                                            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功! size : " + size);
+                                        }
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
                     ;
                 }
 
@@ -1481,12 +1545,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private static class OtherOpenPath {
+        private static String PATH_IE;
         private static String PATH_CHROME;
         private static String PATH_FIREFOX;
 
         private OtherOpenPath(PropertiesUtilBean configSelf) {
             PATH_CHROME = StringUtils.trimToEmpty(configSelf.getConfigProp().getProperty("chrome"));
             PATH_FIREFOX = StringUtils.trimToEmpty(configSelf.getConfigProp().getProperty("firefox"));
+            PATH_IE = StringUtils.trimToEmpty(configSelf.getConfigProp().getProperty("ie"));
         }
     }
 
