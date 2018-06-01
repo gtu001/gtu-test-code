@@ -1,4 +1,4 @@
-﻿安裝package方式
+﻿##安裝package方式
 第一個需要裝的通常是 https://packagecontrol.io/installation
 
 <Option 1>
@@ -17,3 +17,9 @@
 需要安裝的package 如下 :::
 Go To Definition
 nodejs
+
+
+
+## 移除package
+Ctrl + Shift + P
+輸入 Remove Package

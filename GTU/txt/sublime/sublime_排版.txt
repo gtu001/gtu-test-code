@@ -1,0 +1,9 @@
+sublime
+
+¤â°Ê
+1) Ctrl + A
+2) Edit ¡÷ Line ¡÷ Reindent
+
+±Æª©
+{ "keys": ["alt+shift+f"], "command": "reindent" , "args": { "single_line": false } }
+

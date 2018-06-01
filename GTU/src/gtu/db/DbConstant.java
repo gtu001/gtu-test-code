@@ -176,6 +176,16 @@ public class DbConstant {
         bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
         return bds;
     }
+    
+    public static Connection getTestConnection_CTBC(){
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@172.24.36.77:1521:XE", "ebmwdev", "devebmw");
+            return conn;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static Connection getHsqlConn() {
         try {

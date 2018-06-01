@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu.db.DbConstant;
 //import gtu.db.DbConstant;
 import gtu.db.tradevan.DBCommon_tradevan;
 import gtu.db.tradevan.DBTypeMapping_tradevan;
@@ -20,28 +21,26 @@ public class GenDaoBean {
     public static void main(String[] args) {
         Connection conn = null;
         try {
-//            GenDaoBean t = new GenDaoBean();
-//            conn = DbConstant.getTestDataSource_FucoOracle().getConnection();
-//            
-//            StringBuilder sb = new StringBuilder();
-//            sb.append(" select a.adprjid,                                 ");
-//            sb.append(" a.adprjname,                                      ");
-//            sb.append(" b.BlockCode,                                      ");
-//            sb.append(" b.BlockName,                                      ");
-//            sb.append(" a.sTime,                                          ");
-//            sb.append(" a.eTime,                                          ");
-//            sb.append(" a.creater,                                        ");
-//            sb.append(" a.approver,                                       ");
-//            sb.append(" a.approver2,                                      ");
-//            sb.append(" a.status,                                         ");
-//            sb.append(" a.status2,                                        ");
-//            sb.append(" a.ctime                                           ");
-//            sb.append(" from adCaseData a                                 ");
-//            sb.append(" join BlockMap b on a.BlockCode = b.BlockCode      ");
-//            sb.append(" order by a.ctime desc                             ");
-//            
-//            String result = t.execute(sb.toString(), "AD_LIST_VO", conn);
-//            System.out.println(result);
+            GenDaoBean t = new GenDaoBean();
+            conn = DbConstant.getTestConnection_CTBC();
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append(" SELECT                                   ");
+            sb.append("     *                                    ");
+            sb.append(" FROM                                     ");
+            sb.append("     INEB_RATE_SUMMARY                    ");
+            sb.append(" WHERE                                    ");
+            sb.append("     PROD_KIND_1='外幣存款利率'           ");
+            sb.append(" AND ACCT_TYPE NOT LIKE '%48'             ");
+            sb.append(" ORDER BY                                 ");
+            sb.append("     ACCT_TYPE,                           ");
+            sb.append("     BASIS,                               ");
+            sb.append("     PERIOD,                              ");
+            sb.append("     INT_CAT,                             ");
+            sb.append("     MINIMUM_TYPE ASC                     ");
+            
+            String result = t.execute(sb.toString(), "FORIGN_INEB_RATE_SUMMARY", conn);
+            System.out.println(result);
         }catch(Exception ex) {
             ex.printStackTrace();
             try {
@@ -107,6 +106,9 @@ public class GenDaoBean {
 
     private String generateDoClass(String tableName, List<DBColumn> dbColmnList) {
         StringBuffer sb = new StringBuffer();
+        
+        //JAVA Mode
+        sb.append("\t//JAVA Mode\n");
         for (int ii = 0; ii < dbColmnList.size(); ii++) {
             DBColumn col = dbColmnList.get(ii);
             String dbField = col.fieldName.toUpperCase();
@@ -114,9 +116,22 @@ public class GenDaoBean {
             String information = col.fieldName + "/" + col.typeName + col.type + "/" + col.displaySize;
             String classPath = DBTypeMapping_tradevan.JdbcTypeMappingToJava.getMappingClass(col.type).getName();
             sb.append("\t//" + information + "\n");
-            sb.append("\t" + classPath + " " + parameter + ";\n");
+            sb.append("\t private " + classPath + " " + parameter + ";\n");
         }
         
+        //Orign Mode
+        sb.append("\t//Orign Mode\n");
+        for (int ii = 0; ii < dbColmnList.size(); ii++) {
+            DBColumn col = dbColmnList.get(ii);
+            String dbField = col.fieldName.toUpperCase();
+            String parameter = dbField.toLowerCase();
+            String information = col.fieldName + "/" + col.typeName + col.type + "/" + col.displaySize;
+            String classPath = DBTypeMapping_tradevan.JdbcTypeMappingToJava.getMappingClass(col.type).getName();
+            sb.append("\t//" + information + "\n");
+            sb.append("\t private " + classPath + " " + parameter + ";\n");
+        }
+        
+        //JAVA Mode
         //to map
         sb.append("public Map<String,Object> toMap(){\n");
         sb.append("\tMap<String,Object> map = new LinkedHashMap<String,Object>();\n");
@@ -139,6 +154,31 @@ public class GenDaoBean {
             sb.append(String.format("\tthis.%s = (%s)map.get(\"%s\");\n", parameter, classPath, columnName));
         }
         sb.append("}\n");
+        
+        //Orign Mode
+        //to map
+        sb.append("public Map<String,Object> toMap2(){\n");
+        sb.append("\tMap<String,Object> map = new LinkedHashMap<String,Object>();\n");
+        for (int ii = 0; ii < dbColmnList.size(); ii++) {
+            DBColumn col = dbColmnList.get(ii);
+            String parameter = col.fieldName.toLowerCase();
+            String columnName = col.fieldName.toUpperCase();
+            sb.append(String.format("\tmap.put(\"%s\", this.%s);\n", columnName, parameter));
+        }
+        sb.append("\treturn map;\n");
+        sb.append("}\n");
+        
+        //to bean
+        sb.append("public void toBean2(Map<String,Object> map){\n");
+        for (int ii = 0; ii < dbColmnList.size(); ii++) {
+            DBColumn col = dbColmnList.get(ii);
+            String parameter = col.fieldName.toLowerCase();
+            String columnName = col.fieldName.toUpperCase();
+            String classPath = DBTypeMapping_tradevan.JdbcTypeMappingToJava.getMappingClass(col.type).getName();
+            sb.append(String.format("\tthis.%s = (%s)map.get(\"%s\");\n", parameter, classPath, columnName));
+        }
+        sb.append("}\n");
+        
         return sb.toString();
     }
 

@@ -506,16 +506,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         public void doOpen(String url, BrowserHistoryHandlerUI _this) {
             url = StringUtils.trimToEmpty(url);
+            UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
+            System.out.println("[doOpen]>>>" + this.name());
 
             // 判斷是否為自動產生
-            if (StringUtil_.isUUID(url)) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
-                return;
+            if (StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
+            } else {
+                _doOpen(url, _this);
             }
 
-            System.out.println("[doOpen]>>>" + this.name());
-            _doOpen(url, _this);
-            UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
             _this.clickUrlDoLogAction(d);
         }
 
@@ -1558,14 +1558,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void doOpenWithRemark(UrlConfig d) {
         try {
-            File file = DesktopUtil.getFile(d.url);
-            if (file == null || !file.exists() || !file.isFile()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
-                return;
-            }
             String command = d.remark;
             if (command.contains("%s")) {
+                File file = DesktopUtil.getFile(d.url);
+                if (file == null || !file.exists() || !file.isFile()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
+                    return;
+                }
                 command = String.format(command, file);
+            } else {
+                // do nothing
             }
             RuntimeBatPromptModeUtil.newInstance().command(command).apply();
         } catch (Exception ex) {

@@ -14,21 +14,32 @@ const browserOpener = require(rootDirHolder.path("/web/browserOpener"));
 //常數
 const port = process.env.PORT || 3000;
 
+const courses = [
+	{id : 1, name : "angular"},
+	{id : 2, name : "nodeJs"},
+	{id : 3, name : "reactJs"},
+];
 
 app.get("/", (req, res) => {
 	appender = new webLogUtil.ResponseAppender(res);    
-    appender.print("Hello World!");
-    appender.print("測試");
-    appender.flush();
+	appender.print("Hello World!");
+	appender.print("測試");
+	appender.flush();
 });
 
 app.get("/api/courses", (req, res) => {
-    res.send("[1,2,3,4]");
+	res.send("[1,2,3,4]");
 });
 
 app.get("/api/courses/:id", (req,res) => {
 	var id = req.params.id;
 	res.send(`send id : ${id}`);
+	const course = courses.find(c => c.id === parseInt(req.params.id));
+	if (!course) {
+		res.status(404).send("The course with the given ID was not found :" + req.params.id);
+	}else{
+		res.send(course);
+	}
 });
 
 app.get("/api/posts/:year/:month", (req,res) => {
@@ -40,6 +51,15 @@ app.get("/api/posts/test1", (req,res) => {
 	res.send(req.query);
 });
 
+app.use(express.json());//middleware
+app.post("/api/courses", (req, res) => {
+  const course = {
+    id : courses.length + 1,
+    name : req.body.name
+  };
+  courses.push(course);
+  res.send(course);
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}...`));
 
