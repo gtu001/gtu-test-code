@@ -9,6 +9,8 @@ GTU/target/**
 **/bin/**
 **/target/**
 
+.sonarlint/**
+
 
 
 
