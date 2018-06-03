@@ -8,8 +8,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -41,6 +43,8 @@ import gtu.swing.util.JListUtil;
 
 public class AVChoicerUI extends JFrame {
     
+    private static final long serialVersionUID = 1L;
+
     public static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
 
     private JPanel contentPane;
@@ -53,6 +57,7 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_EXE_KEY = "avExeText";
 
     private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
+    private Set<File> clickAvSet = new HashSet<File>();
 
     /**
      * Launch the application.
@@ -338,7 +343,20 @@ public class AVChoicerUI extends JFrame {
         }
 
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
-        return cacheFileList.get(new Random().nextInt(cacheFileList.size()));
+        
+        File choiceFile = null;
+        List<File> cloneLst = new ArrayList<>(cacheFileList);
+        cloneLst.removeAll(clickAvSet);
+        
+        if(!cloneLst.isEmpty()) {
+            choiceFile = cloneLst.get(new Random().nextInt(cloneLst.size()));
+        }else {
+            JCommonUtil._jOptionPane_showMessageDialog_info("清單已跑完一輪");
+            choiceFile = cacheFileList.get(new Random().nextInt(cacheFileList.size()));
+        }
+        
+        clickAvSet.add(choiceFile);
+        return choiceFile;
     }
 
     private void choiceAVBtnAction() {
