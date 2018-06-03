@@ -92,8 +92,6 @@ public class ShowWordListActivity extends ListActivity {
             dto = (MainActivityDTO) extras.getParcelable(ShowWordListActivity_DTO);
         }
 
-        Log.v(TAG, "dto - " + ReflectionToStringBuilder.toString(dto));
-
         if (dto == null) {
             dto = new MainActivityDTO();
             this.recentSearchHistory();
@@ -562,9 +560,9 @@ public class ShowWordListActivity extends ListActivity {
                 return desc;
             }
             english = StringUtils.trimToEmpty(english).toLowerCase();
-            if(englishMap.containsKey(english)){
+            if (englishMap.containsKey(english)) {
                 return englishMap.get(english).getMeaning();
-            }else{
+            } else {
                 WordInfo word = diectory.parseToWordInfo(english, context, handler);
                 englishMap.put(english, word);
                 return word.getMeaning();

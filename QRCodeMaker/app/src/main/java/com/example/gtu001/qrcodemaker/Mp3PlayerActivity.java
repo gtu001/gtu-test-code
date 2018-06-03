@@ -80,15 +80,6 @@ public class Mp3PlayerActivity extends Activity {
 
     private OnClickListener pausePlay = new OnClickListener() {
         public void onClick(View v) {
-            // TODO Auto-generated method stub
-            // TODO Auto-generated method stub
-
-            Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-            Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
             if (!playPause) {
                 btnConfig.btn_setPause();
                 Toast.makeText(Mp3PlayerActivity.this, "START!!!", Toast.LENGTH_SHORT).show();

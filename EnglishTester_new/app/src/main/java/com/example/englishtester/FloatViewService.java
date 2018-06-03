@@ -19,6 +19,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Config;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -45,6 +46,7 @@ import android.widget.Toast;
 
 import com.ant.liao.GifView;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
+import com.example.englishtester.common.AppOpenHelper;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
@@ -1000,18 +1002,35 @@ public class FloatViewService extends Service {
             }
         }
 
+        private boolean isURL(String text) {
+            Pattern ptn = Pattern.compile("^http[s]?\\:[\\/]+.*$");
+            Matcher mth = ptn.matcher(StringUtils.trimToEmpty(text));
+            if (mth.find()) {
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public void onPrimaryClipChanged() {
             Log.v(TAG, "### onPrimaryClipChanged");
             String text = getClipboardText();
             Log.v(TAG, "### onPrimaryClipChanged text = " + text);
-            if (StringUtils.isNotBlank(text) && searchLayout.getVisibility() == View.GONE) {
-                if (isMoreThanSentance(text)) {
-                    openTxtReaderProgram();//翻譯本文
-                } else if (!StringUtil_.hasChinese(text)) {
-                    doOpenCloseEditPanel(true);//查詢單字
+            if (StringUtils.isNotBlank(text)) {
+                if (isURL(text)) {
+                    if (BuildConfig.DEBUG) {
+                        AppOpenHelper.openApp(getApplicationContext(), "jp.naver.line.android");
+                    }
+                    return;
                 }
 
+                if (searchLayout.getVisibility() == View.GONE) {
+                    if (isMoreThanSentance(text)) {
+                        openTxtReaderProgram();//翻譯本文
+                    } else if (!StringUtil_.hasChinese(text)) {
+                        doOpenCloseEditPanel(true);//查詢單字
+                    }
+                }
                 //set back text to clipboard
                 pasteToClipboard("", text);
             }
