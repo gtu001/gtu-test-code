@@ -620,7 +620,9 @@ public class FileUtil {
             }
         } else {
             if (file.getName().matches(pattern)) {
-                fileList.add(file);
+                if (!fileList.contains(file)) {
+                    fileList.add(file);
+                }
             }
         }
     }
@@ -645,7 +647,9 @@ public class FileUtil {
             }
         } else {
             if (Pattern.compile(pattern).matcher(file.getName()).find()) {
-                fileList.add(file);
+                if (!fileList.contains(file)) {
+                    fileList.add(file);
+                }
             }
         }
     }

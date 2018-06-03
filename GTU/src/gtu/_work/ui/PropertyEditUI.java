@@ -261,15 +261,15 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             private void setMeaning(String meaning, int rowPos) {
                                 propTable.getRowSorter().getModel().setValueAt(meaning, rowPos, 2);
                             }
-                            
+
                             private void setMeaningEn1(String english, int rowPos, List<String> errSb) {
                                 EnglishTester_Diectory eng = new EnglishTester_Diectory();
                                 try {
                                     WordInfo wordInfo = eng.parseToWordInfo(english);
                                     String meaning = getChs2Big5(wordInfo.getMeaning());
-                                    if(hasChinese(meaning)) {
+                                    if (hasChinese(meaning)) {
                                         setMeaning(meaning, rowPos);
-                                    }else {
+                                    } else {
                                         setMeaningEn2(english, rowPos, errSb);
                                     }
                                 } catch (Exception e) {
@@ -277,7 +277,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     e.printStackTrace();
                                 }
                             }
-                            
+
                             private void setMeaningEn2(String english, int rowPos, List<String> errSb) {
                                 EnglishTester_Diectory2 eng2 = new EnglishTester_Diectory2();
                                 try {
@@ -289,7 +289,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     e.printStackTrace();
                                 }
                             }
-                            
+
                             private boolean hasChinese(String val) {
                                 return new StringUtil_().getChineseWord(val, true).length() > 0;
                             }
@@ -303,7 +303,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     int rowPos = propTable.getRowSorter().convertRowIndexToModel(row);
                                     String english = (String) propTable.getRowSorter().getModel().getValueAt(rowPos, 1);
                                     String desc = (String) propTable.getRowSorter().getModel().getValueAt(rowPos, 2);
-                                    if (StringUtils.isBlank(desc)) {
+                                    if (StringUtils.isBlank(desc) || !hasChinese(desc)) {
                                         if (!english.contains(" ")) {
                                             setMeaningEn1(english, rowPos, errSb);
                                         } else {

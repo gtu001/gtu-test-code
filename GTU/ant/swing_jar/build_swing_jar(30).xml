@@ -8,11 +8,14 @@
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
 	<!--<property name="jar_repsitory" location="C:\Users\gtu001\.m2\repository" />-->
-	<property name="main_class_full" value="gtu._work.ui.PropertyEditUI" />
-	<property name="main_class" value="PropertyEditUI" />
+	<property name="main_class_full" value="gtu._work.ui.AVChoicerUI" />
+	<property name="main_class" value="AVChoicerUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="english.ico" />
+	<property name="icon_name" value="tk_aiengine.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
 	<!--${main_class}-->
 
 
@@ -60,13 +63,15 @@
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
 
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
+
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
-
-			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -107,7 +112,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -115,7 +120,7 @@
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="moveJarToDesktop">
@@ -142,7 +147,7 @@
 
 	<target name="compiler">
 		<echo># compiler ...</echo>
-		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+		<javac compiler="javac1.6" source="1.8" target="1.8" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
 			<classpath>
 				<path location="${build_dir}" />

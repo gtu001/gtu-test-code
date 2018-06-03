@@ -16,7 +16,7 @@ import gtu.log.JdkLoggerUtil;
 
 public class PornVideoUrlDetection {
 
-    private static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
+    public static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
     private static final String FILE_EXTENSTION_POSSIBLE_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3|jpg|jpeg|gif|tif|png|bmp)";
 
     private class PatternConfig {
