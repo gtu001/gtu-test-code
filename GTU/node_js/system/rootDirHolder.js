@@ -1,6 +1,6 @@
 
 
-const DEFAULT_ROOT = "E:/workstuff/workspace/gtu-test-code/GTU/node_js";
+const DEFAULT_ROOT = "D:/workstuff/gtu-test-code/GTU/node_js/";
 
 class RootDirHolder {
 	
