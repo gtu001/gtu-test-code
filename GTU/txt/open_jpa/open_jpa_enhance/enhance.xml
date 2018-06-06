@@ -1,0 +1,27 @@
+<project name="jpa_enhance_builder">
+	<path id="enhance.cp">
+	        <pathelement location="${basedir}${file.separator}${build.dir}"/>
+
+	        <fileset dir="${basedir}${file.separator}${openjpa.libs}">
+	            <include name="**/*.jar"/>
+	        </fileset>
+	</path>
+	<property name="cp" refid="enhance.cp"/>
+	
+	<target name="openjpa.libs.check" unless="openjpa.libs">
+		<fail message="Please set -Dopenjpa.libs in your builder configuration!" />
+	</target>
+	<target name="build.dir.check" unless="build.dir">
+		<fail message="Please set -Dbuild.dir in your builder configuration!" />
+	</target>
+		
+	<target name="enhance" depends="openjpa.libs.check, build.dir.check">
+		<echo message="${cp}"/>
+		<taskdef name="openjpac" classname="org.apache.openjpa.ant.PCEnhancerTask">
+			<classpath refid="enhance.cp"/>
+		</taskdef>
+		<openjpac>
+			<classpath refid="enhance.cp"/>
+		</openjpac>
+	</target>
+</project>

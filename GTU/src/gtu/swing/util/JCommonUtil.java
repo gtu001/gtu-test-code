@@ -661,7 +661,7 @@ public class JCommonUtil {
         jTextFieldSetFilePathMouseEvent(jTextField1, fileAndDir, null);
     }
 
-    public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir, final ActionListener fileChoiceDone) {
+    public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir, final ActionListener callBack) {
         jTextField1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
@@ -673,8 +673,8 @@ public class JCommonUtil {
                     }
                     if (file != null) {
                         jTextField1.setText(file.getAbsolutePath());
-                        if (fileChoiceDone != null) {
-                            fileChoiceDone.actionPerformed(new ActionEvent(file, -1, "ok"));
+                        if (callBack != null) {
+                            callBack.actionPerformed(new ActionEvent(file, -1, "ok"));
                         }
                     } else {
                         JCommonUtil._jOptionPane_showMessageDialog_error("檔案選擇錯誤");
