@@ -14,13 +14,9 @@ public class BuilderCreater {
 
     public static void main(String[] args) {
         Set<Pair<String, String>> paramLst = new LinkedHashSet<Pair<String, String>>();
-        paramLst.add(ImmutablePair.of("String", "targetJarPath"));
-        paramLst.add(ImmutablePair.of("String", "group"));
-        paramLst.add(ImmutablePair.of("String", "artifactId"));
-        paramLst.add(ImmutablePair.of("String", "version"));
-        paramLst.add(ImmutablePair.of("String", "targetRespositoryDir"));
+        paramLst.add(ImmutablePair.of("File", "targetDir"));
         
-        String className = "MavenInstallJarFile";
+        String className = "GitGetURL";
         String result = BuilderCreater.newInstance().className(className).paramLst(paramLst).build();
         System.out.println(result);
         System.out.println("done...");
