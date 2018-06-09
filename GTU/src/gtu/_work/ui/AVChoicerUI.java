@@ -46,6 +46,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 
@@ -368,7 +369,7 @@ public class AVChoicerUI extends JFrame {
                 resetCacheFileList();
                 JCommonUtil._jOptionPane_showMessageDialog_error("新增成功!");
             }
-            
+
             resetCacheFileList();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -451,12 +452,8 @@ public class AVChoicerUI extends JFrame {
             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除此檔 : " + file, "刪除檔案!");
             if (result) {
                 try {
-                    String command = FileUtil.OS_IS_WINDOWS ? " del /f " : " rm ";
-                    Process p = Runtime.getRuntime().exec(String.format("cmd /c %s \"%s\"", command, file));
-                    showInputString(p.getInputStream());
-                    showInputString(p.getErrorStream());
-                    int code = p.waitFor();
-                    JCommonUtil._jOptionPane_showMessageDialog_error(code == 0 ? "刪除成功!" : "刪除失敗, Code :" + code);
+                    boolean delResult = RecycleBinUtil_forWin.moveTo(file);
+                    JCommonUtil._jOptionPane_showMessageDialog_error(delResult ? "刪除成功!" : "刪除失敗");
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
                     resetCacheFileList();
@@ -483,7 +480,7 @@ public class AVChoicerUI extends JFrame {
     private void resetCacheFileList() {
         cacheFileList = null;
     }
-    
+
     private void choiceAVBtnAction() {
         try {
             File exe = config.getConfigProp().keySet().stream()//

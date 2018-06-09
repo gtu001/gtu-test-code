@@ -1013,7 +1013,7 @@ public class FileUtil {
         String tDir = System.getProperty("java.io.tmpdir");
         String path = tDir + File.separator + tempFileName;
         File file = new File(path);
-        file.deleteOnExit();
+//        file.deleteOnExit();
         FileUtils.copyURLToFile(url, file);
         return file;
     }
