@@ -965,8 +965,10 @@ public class FloatViewService extends Service {
         }
 
         private void pasteToClipboard(CharSequence label, CharSequence content) {
+            doStart(false);
             ClipData clip = ClipData.newPlainText(label, content);
             clipboard.setPrimaryClip(clip);
+            doStart(true);
         }
 
         private String getPrimaryClipAsString() {
@@ -1021,7 +1023,6 @@ public class FloatViewService extends Service {
                     if (BuildConfig.DEBUG) {
                         AppOpenHelper.openApp(getApplicationContext(), "jp.naver.line.android");
                     }
-                    return;
                 }
 
                 if (searchLayout.getVisibility() == View.GONE) {
@@ -1031,7 +1032,8 @@ public class FloatViewService extends Service {
                         doOpenCloseEditPanel(true);//查詢單字
                     }
                 }
-                //set back text to clipboard
+
+                //不使用剪貼簿設回原值
                 pasteToClipboard("", text);
             }
         }
