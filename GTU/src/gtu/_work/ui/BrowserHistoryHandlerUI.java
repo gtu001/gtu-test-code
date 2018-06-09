@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -894,14 +895,24 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             // 過濾重複的
             new Runnable() {
-                @Override
-                public void run() {
-                    for (String v : tagLst) {
-                        if (v.equalsIgnoreCase(d.tag)) {
-                            return;
+                private boolean isContains(String val) {
+                    for (String str : tagLst) {
+                        if (StringUtils.equalsIgnoreCase(str, val)) {
+                            return true;
                         }
                     }
-                    tagLst.add(d.tag);
+                    return false;
+                }
+
+                @Override
+                public void run() {
+                    String[] strs = StringUtils.split(d.tag, ",");
+                    for (String str : strs) {
+                        str = StringUtils.trimToEmpty(str);
+                        if (!isContains(str)) {
+                            tagLst.add(str);
+                        }
+                    }
                 }
             }.run();
         }
@@ -936,6 +947,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
             }
         }
+
+        // 重設bookmarkConfig 時間
+        this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
     }
 
     private static class ColumnColorHandler {

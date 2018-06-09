@@ -57,9 +57,11 @@ public class FileUtil {
     }
 
     static {
+        boolean isOsWindowsSystem = false;
         String destopPath = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
         if (System.getProperty("os.name").equals("Windows XP")) {
             destopPath = System.getProperty("user.home") + File.separator + "桌面" + File.separator;
+            isOsWindowsSystem = true;
         }
         if (System.getProperty("os.name").equals("Windows 10")) {
             String tmpDesktop = System.getProperty("user.home") + File.separator + "OneDrive" + File.separator + "Desktop" + File.separator;
@@ -67,9 +69,11 @@ public class FileUtil {
             if (tmpDesktopFile.exists() && tmpDesktopFile.isDirectory()) {
                 destopPath = tmpDesktop;
             }
+            isOsWindowsSystem = true;
         }
 
         DESKTOP_PATH = destopPath;
+        OS_IS_WINDOWS = isOsWindowsSystem;
 
         // GetPropertyAction localGetPropertyAction = new
         // GetPropertyAction("java.io.tmpdir");
@@ -82,6 +86,7 @@ public class FileUtil {
     public static final String DESKTOP_PATH;
     public static final File DESKTOP_DIR = new File(FileUtil.DESKTOP_PATH);
     public static final String TEMP_DIR;
+    public static final boolean OS_IS_WINDOWS;
 
     /** 專案路徑 */
     public static final String USER_DIR = System.getProperty("user.dir");

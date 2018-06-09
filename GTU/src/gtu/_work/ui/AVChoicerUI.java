@@ -1,12 +1,16 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +18,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,6 +34,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -36,13 +43,14 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 
 public class AVChoicerUI extends JFrame {
-    
+
     private static final long serialVersionUID = 1L;
 
     public static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
@@ -58,6 +66,10 @@ public class AVChoicerUI extends JFrame {
 
     private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
     private Set<File> clickAvSet = new HashSet<File>();
+    private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
+    private List<File> cacheFileList = new ArrayList<File>();
+    private JLabel deleteAVFileLabel;
+    private JLabel movCountLabel;
 
     /**
      * Launch the application.
@@ -95,6 +107,28 @@ public class AVChoicerUI extends JFrame {
 
         JPanel panel_7 = new JPanel();
         panel.add(panel_7, BorderLayout.NORTH);
+
+        deleteAVFileLabel = new JLabel("");
+        panel_7.add(deleteAVFileLabel);
+
+        JButton deleteAVFileBtn = new JButton("刪除VOD");
+        deleteAVFileBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                currentFileHandler.deleteFile();
+            }
+        });
+
+        JButton openContainDirBtn = new JButton("開啟目錄");
+        openContainDirBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                currentFileHandler.openContainDir();
+            }
+        });
+
+        movCountLabel = new JLabel("");
+        panel_7.add(movCountLabel);
+        panel_7.add(openContainDirBtn);
+        panel_7.add(deleteAVFileBtn);
 
         JPanel panel_8 = new JPanel();
         panel.add(panel_8, BorderLayout.WEST);
@@ -141,6 +175,15 @@ public class AVChoicerUI extends JFrame {
         });
         panel_3.add(saveConfigBtn);
 
+        JButton reloadListBtn = new JButton("reload");
+        reloadListBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                resetCacheFileList();
+                initAvDirList();
+            }
+        });
+        panel_3.add(reloadListBtn);
+
         JPanel panel_4 = new JPanel();
         panel_1.add(panel_4, BorderLayout.WEST);
 
@@ -155,7 +198,7 @@ public class AVChoicerUI extends JFrame {
         avDirList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent paramKeyEvent) {
-                cacheFileList = null;
+                resetCacheFileList();
                 JListUtil.newInstance(avDirList).defaultJListKeyPressed(paramKeyEvent);
             }
         });
@@ -188,6 +231,8 @@ public class AVChoicerUI extends JFrame {
         initAvDirList();
 
         JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
+        JCommonUtil.defaultToolTipDelay();
     }
 
     private void initAvDirList() {
@@ -320,15 +365,15 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在!");
             } else {
                 model.addElement(newFile);
-                cacheFileList = null;
+                resetCacheFileList();
                 JCommonUtil._jOptionPane_showMessageDialog_error("新增成功!");
             }
+            
+            resetCacheFileList();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
-
-    private List<File> cacheFileList = new ArrayList<File>();
 
     private File getRandomAvFile() {
         if (cacheFileList == null || cacheFileList.isEmpty()) {
@@ -343,22 +388,102 @@ public class AVChoicerUI extends JFrame {
         }
 
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
-        
+
         File choiceFile = null;
         List<File> cloneLst = new ArrayList<>(cacheFileList);
         cloneLst.removeAll(clickAvSet);
-        
-        if(!cloneLst.isEmpty()) {
+
+        if (!cloneLst.isEmpty()) {
             choiceFile = cloneLst.get(new Random().nextInt(cloneLst.size()));
-        }else {
+        } else {
             JCommonUtil._jOptionPane_showMessageDialog_info("清單已跑完一輪");
             choiceFile = cacheFileList.get(new Random().nextInt(cacheFileList.size()));
+            clickAvSet.clear();
         }
-        
+
         clickAvSet.add(choiceFile);
         return choiceFile;
     }
 
+    private class CurrentFileHandler {
+        private AtomicReference<File> tempFile = new AtomicReference<File>();
+        private AtomicReference<File> tempDir = new AtomicReference<File>();
+
+        private void setFile(File avFile) {
+            tempFile.set(avFile);
+            choiceAVBtn.setToolTipText(avFile.getName());
+            tempDir.set(avFile.getParentFile());
+            setTitle(avFile.getName());
+            String desc = DateFormatUtil.format(avFile.lastModified(), "yyyy/MM/dd") + " " + FileUtil.getSizeDescription(avFile.length());
+            deleteAVFileLabel.setText(desc);
+            setCountLabel();
+        }
+
+        private void setCountLabel() {
+            int totalSize = -1;
+            int alreadyLookSize = -1;
+            try {
+                totalSize = cacheFileList.size();
+            } catch (Exception ex) {
+            }
+            try {
+                alreadyLookSize = clickAvSet.size();
+            } catch (Exception ex) {
+            }
+            movCountLabel.setText(String.format("以看%d, 總數%d", alreadyLookSize, totalSize));
+        }
+
+        private void showInputString(InputStream is) throws IOException {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            IOUtils.copy(is, bos);
+            String string = bos.toString("BIG5");
+            if (StringUtils.isNotBlank(string)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error(string);
+            }
+        }
+
+        private void deleteFile() {
+            File file = tempFile.get();
+            if (!file.exists()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                return;
+            }
+            boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除此檔 : " + file, "刪除檔案!");
+            if (result) {
+                try {
+                    String command = FileUtil.OS_IS_WINDOWS ? " del /f " : " rm ";
+                    Process p = Runtime.getRuntime().exec(String.format("cmd /c %s \"%s\"", command, file));
+                    showInputString(p.getInputStream());
+                    showInputString(p.getErrorStream());
+                    int code = p.waitFor();
+                    JCommonUtil._jOptionPane_showMessageDialog_error(code == 0 ? "刪除成功!" : "刪除失敗, Code :" + code);
+                    deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
+                    setCountLabel();
+                    resetCacheFileList();
+                } catch (Exception e) {
+                    JCommonUtil.handleException(e);
+                }
+            }
+        }
+
+        private void openContainDir() {
+            try {
+                File dir = tempDir.get();
+                if (!dir.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
+                    return;
+                }
+                Desktop.getDesktop().open(dir);
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+    }
+
+    private void resetCacheFileList() {
+        cacheFileList = null;
+    }
+    
     private void choiceAVBtnAction() {
         try {
             File exe = config.getConfigProp().keySet().stream()//
@@ -370,6 +495,7 @@ public class AVChoicerUI extends JFrame {
                     });
 
             File avFile = getRandomAvFile();
+            currentFileHandler.setFile(avFile);
 
             Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile));
         } catch (Exception ex) {
