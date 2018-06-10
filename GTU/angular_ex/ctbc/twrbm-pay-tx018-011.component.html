@@ -1,0 +1,30 @@
+<div class="modal modal-select-account modal-for-select" role="dialog" style="z-index:99959;" #viewRootElement>
+    <div class="modal-vertical-middle">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body modal-scroll">
+                    <div class="btn-group btn-group-vertical btn-select-option">
+                        <label class="btn btn-default" *ngFor="let account of accountList;let index=index;" #itemRef (click)="clickItemEvent($event, index, itemRef)">
+                            <input type="radio" autocomplete="off">
+                            <span class="div-tb mb5">
+                                <span class="td">{{account.account}}</span>
+                                <span class="td rt">可用餘額</span>
+                            </span>
+                            <span class="div-tb">
+                                <span class="td">{{account.type}}</span>
+                                <span class="td rt">
+                                    <span class="money">{{account.money}}</span>
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

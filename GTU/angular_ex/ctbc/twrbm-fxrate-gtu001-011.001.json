@@ -1,0 +1,50 @@
+[
+	{
+		"key": "100",
+		"countyName": "中正區"
+	},
+	{
+		"key": "103",
+		"countyName": "大同區"
+	},
+	{
+		"key": "104",
+		"countyName": "中山區"
+	},
+	{
+		"key": "105",
+		"countyName": "松山區"
+	},
+	{
+		"key": "106",
+		"countyName": "大安區"
+	},
+	{
+		"key": "108",
+		"countyName": "萬華區"
+	},
+	{
+		"key": "110",
+		"countyName": "信義區"
+	},
+	{
+		"key": "111",
+		"countyName": "士林區"
+	},
+	{
+		"key": "112",
+		"countyName": "北投區"
+	},
+	{
+		"key": "114",
+		"countyName": "內湖區"
+	},
+	{
+		"key": "115",
+		"countyName": "南港區"
+	},
+	{
+		"key": "116",
+		"countyName": "文山區"
+	}
+]

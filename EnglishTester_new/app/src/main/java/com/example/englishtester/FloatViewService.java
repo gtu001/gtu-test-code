@@ -19,7 +19,6 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Config;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -44,7 +43,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ant.liao.GifView;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.AppOpenHelper;
 import com.example.englishtester.common.ClipboardHelper;
@@ -52,7 +50,6 @@ import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
 import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
-import com.example.englishtester.common.InputMethodChangeUtil;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
 import com.example.englishtester.common.MagnifierPosEnum;
@@ -66,8 +63,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,8 +72,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
+import gtu._work.etc.EnglishTester_Diectory_Factory;
 import gtu.util.StringUtil_;
 
 /**
@@ -112,7 +107,7 @@ public class FloatViewService extends Service {
     RecentSearchService recentSearchService = new RecentSearchService(this);
     AdCheckShow adCheckShow = new AdCheckShow();
     TextToSpeechComponent speechComponent;
-    EnglishTester_Diectory diectory = new EnglishTester_Diectory();
+    EnglishTester_Diectory_Factory diectory = new EnglishTester_Diectory_Factory();
     EnglishwordInfoService englishwordInfoService;
     ArrayAdapter<String> autoCompleteAdapter;
     Map<String, EnglishWord> englishMap = new LRUMap<String, EnglishWord>(50);

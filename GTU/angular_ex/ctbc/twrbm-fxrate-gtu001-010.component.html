@@ -1,0 +1,60 @@
+<div class="body-wrap  white">
+    <div class="main_container">
+        XXXXXXXXXXXXXXXXXXXXXXXXXXX
+    </div>
+
+    <div class="account-info-tab tab-line ct">
+        <div class="pad_15 pad_top0 pad_btm0">
+            <div class="div-tb">
+                <div class="td">
+                    <h4 class="title">
+                        <i18n translate="fx_qu004.00005733">近3個月新臺幣對外幣匯率走勢圖</i18n>
+                    </h4>
+                </div>
+                <div class="td">
+                    <a (click)="goToCustCurrency($event)" class="setting-btn-green">
+                        <i class="icon-setting_card"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <nav-tabs-fx [tabConfig]="tabConfig">
+        <div tabs-content>
+            <twrbm-fx-qu004-011 [currencyCode]="currency?.code" (prepare)="chartOnPrepare($event)" (ready)="chartOnReady($event)" (click)="chartOnClick($event)"
+                (onError)="chartOnError($event)"></twrbm-fx-qu004-011>
+            <div *ngIf="hasForeignAcct" class="chart-info rt">
+                <a (click)="goToFXQU003($event)" class="btn btn-round">
+                    <i18n translate="fx_qu004.00002977">換匯紀錄查詢</i18n>
+                </a>
+            </div>
+        </div>
+    </nav-tabs-fx>
+    -->
+
+    <nav-tabs-fx [tabConfig]="tabConfig">
+        <div tabs-content>
+            ssTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+        </div>
+        CCCCCCCCCCCCCCCCCCCCCCCCCCC
+    </nav-tabs-fx>
+
+    <nav-tabs [initTabIdx]="0" [removeContainerClass]="true" [tabsLabelTxt]="[getBundleString('TEST1', 'deposit_ag001.00006157'), getBundleString('TEST2', 'deposit_ag001.00005844')]"
+        [tabsId4DigitalTracking]="['tab0', 'tab1']" (tabSwitchEvent)="changeTabs($event)" (tabs0InitEvent)="initTab($event)"
+        (tabs1InitEvent)="initTab($event)"></nav-tabs>
+
+    <div [hidden]="false" class="container">
+        TestDivHidden1 {{isDivHidden}}
+    </div>
+
+    <div *ngIf="isDivHidden">
+        TestDivHidden2 {{isDivHidden}}
+    </div>
+
+    <gtu001-parent [title]="'test me'">
+    </gtu001-parent>
+
+    <p appHighlight>appHighlight test</p>
+</div>

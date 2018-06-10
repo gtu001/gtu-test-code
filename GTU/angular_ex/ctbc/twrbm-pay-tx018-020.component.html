@@ -1,0 +1,164 @@
+<!-- <body> -->
+<!-- <body class="green"> -->
+
+<body class="bg_white">
+    <div class="record_side close_frame">
+        <!-- load nav_area.html -->
+    </div>
+    <!-- header -->
+    <div class="container_header simple">
+        <!-- <a href="javascript:void(0)" class="mb_hamburg_menu open">
+            <i class="icon-hamburger"></i>
+        </a> -->
+        <a href="javascript: history.go(-1)" class="header-left-icon">
+            <i class="icon-expand_left"></i>
+        </a>
+        <h1 class="page_title">其他瓦斯費</h1>
+        <!-- <div class="logo"></div> -->
+        <a href="../TWRBM_General/TWRBM_General_OT001.html" class="header-right-icon">
+            <!-- <i class="icon-service"></i> -->
+            登出
+        </a>
+    </div>
+    <!-- END header -->
+    <div class="body-wrap scroll">
+        <div class="main_container">
+            <div class="content-step">
+                <ul>
+                    <li class="wid_25per"></li>
+                    <li class="active wid_50per"><span>2 確認及輸入密碼</span></li>
+                    <li class="wid_25per"></li>
+                </ul>
+            </div>
+            <!-- <div class="clearfix"></div> -->
+            <div class="container pad_top30">
+
+                <div class="div-tb">
+                    <div class="td hd vmid">繳費金額</div>
+                    <div class="td rt">
+                        <strong>
+                            <span class="txt_big">{{formUtil.get('payAmount')}}</span>
+                        </strong>
+                    </div>
+                </div>
+                <hr />
+                <div class="div-tb mb10">
+                    <div class="td hd">瓦斯公司</div>
+                    <div class="td rt">
+                        <strong>{{formUtil.get('gasCompany')}}</strong>
+                    </div>
+                </div>
+                <div class="div-tb mb10">
+                    <div class="td hd">銷帳編號</div>
+                    <div class="td rt">
+                        <strong>{{formUtil.get('balanceNumber')}}</strong>
+                    </div>
+                </div>
+                <div class="div-tb mb10">
+                    <div class="td hd">扣款帳號</div>
+                    <div class="td rt">
+                        <strong>{{formUtil.get('account')}}</strong>
+                    </div>
+                </div>
+                <div class="div-tb mb10">
+                    <div class="td hd">註記</div>
+                    <div class="td rt">
+                        <strong>{{formUtil.get('remark')}}</strong>
+                    </div>
+                </div>
+                
+                
+          
+                <div id="toggle-default">
+                    <hr class="gap mt30" />
+                    <!-- form_group -->
+                    <div class="form_group">
+                        <div class="input_group has-value">
+                            <span class="title">網銀密碼</span>
+                            <input placeholder="" maxlength="25" type="password" value="12345678">
+                        </div>
+                        <div class="form_error hide">錯誤訊息</div>
+                    </div>
+                    <!-- END form_group -->
+                    <div class="mb30"></div>
+                    <div class="btn_group">
+                        <a (click)="goNextPage($event)" class="btn btn-block btn-success">確定送出</a>
+                        <a href="javascript:;" class="btn btn-block btn-success-line">修改</a>
+                    </div>
+                </div>
+                <div id="toggle-otp">
+                    <div id="otp-content">
+                        <hr class="gap mt30" />
+                        <div class="mb10 pad_top10 ct">
+                            一次交易密碼有效時間 <span class="txt_green">1:22</span>
+                            <!-- 20170825 -->
+                            <br />
+                            <strong>網頁識別碼：ABCD</strong>
+                        </div>
+                        <!-- form_group -->
+                        <div class="form_group reduse">
+                            <div class="input_group has-value">
+                                <span class="title">一次交易<br />密碼</span>
+                                <input placeholder=" " maxlength="25" type="text">
+                            </div>
+                            <div class="form_error hide">錯誤訊息</div>
+                            <div class="rt">
+                                <a href=".modal-check-password" class="link" data-toggle="modal">查看一次交易密碼</a>
+                            </div>
+                        </div>
+                        <!-- END form_group -->
+                        <!-- form_group -->
+                        <div class="form_group">
+                            <div class="input_group has-value">
+                                <span class="title">網銀密碼</span>
+                                <input placeholder="" maxlength="25" type="password" value="12345678">
+                            </div>
+                            <div class="form_error hide">錯誤訊息</div>
+                        </div>
+                        <!-- END form_group -->
+                        <div class="mb30"></div>
+                        <div class="btn_group">
+                            <a (click)="goNextPage($event)" class="btn btn-block btn-success">確定送出</a>
+                            <a href="javascript:;" class="btn btn-block btn-success-line">修改</a>
+                        </div>
+                    </div>
+                    <div id="otp-btn">
+                        <div class="mb30"></div>
+                        <div class="btn_group">
+                            <a href="javascript:;" class="btn btn-block btn-success" id="otp-content-link">下一步</a>
+                            <p class="txt_gray rt b-info">點選後，系統將傳送一次交易密碼至您的手機</p>
+                            <a href="javascript:;" class="btn btn-block btn-success-line">修改</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / container -->
+            <div class="demo-link ct">
+                <a href="javascript:;" id="demo-toggle-link">網銀密碼/OTP切換</a>
+            </div>
+        </div>
+        <!-- main_container -->
+    </div>
+    <!-- body-wrap -->
+    <div class="gotop">回到頂端</div>
+    <div class="overlayer"></div>
+    <div class="overlayer_menu"></div>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $("#toggle-otp").hide();
+        $("#demo-toggle-link").click(function() {
+            $("#toggle-otp").toggle();
+            $("#toggle-default").toggle();
+            $("#otp-content").hide();
+            $("#otp-btn").show();
+        });
+        $("#otp-content-link").click(function() {
+            $("#otp-content").show();
+            $("#otp-btn").hide();
+        });
+         $("#demo-toggle2-link").click(function() {
+            $(".demo-toggle2").toggle();
+        });
+    });
+    </script>
+</body>

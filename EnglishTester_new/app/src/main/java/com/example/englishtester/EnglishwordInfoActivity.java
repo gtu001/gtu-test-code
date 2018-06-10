@@ -43,6 +43,7 @@ import java.util.Properties;
 
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
+import gtu._work.etc.EnglishTester_Diectory_Factory;
 
 @TargetApi(11)
 @SuppressLint("NewApi")
@@ -74,7 +75,7 @@ public class EnglishwordInfoActivity extends Activity {
     QuestionChoiceService questionChoiceService;
     EnglishwordInfoService englishwordInfoService;
     TextToSpeechComponent talkComponent;
-    EnglishTester_Diectory diectory = new EnglishTester_Diectory();
+    EnglishTester_Diectory_Factory diectory = new EnglishTester_Diectory_Factory();
     final Handler handler = new Handler();
 
     int allWordCount;

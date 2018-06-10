@@ -1,0 +1,183 @@
+<div class="body-wrap  white">
+    <div class="main_container">
+
+        <!--Non Use-->
+        <ng-container *ngIf="false">
+            <div class="account-info-tab tab-line ct">
+                <div class="pad_15 pad_top0 pad_btm0">
+                    <div class="div-tb">
+                        <div class="td">
+                            <h4 class="title">
+                                <i18n translate="fx_qu004.00005733">近3個月新臺幣對外幣匯率走勢圖</i18n>
+                            </h4>
+                        </div>
+                        <div class="td">
+                            <a (click)="goToCustCurrency($event)" class="setting-btn-green">
+                                <i class="icon-setting_card"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!--Non Use-->
+        <ng-container *ngIf="false">
+            <!--isLoading-->
+            <div class="pre-loading-card"></div>
+        </ng-container>
+
+        <!--Non Use-->
+        <ng-container *ngIf="false">
+            <!--hasError-->
+            <div class="account-info-tab tab-line ct">
+                <div class="pad_15 pad_top0 pad_btm0">
+                    <h4 class="title">
+                        <i18n translate="fx_qu004.00005733">近3個月新臺幣對外幣匯率走勢圖</i18n>
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-result fail">
+                <i18n translate="fx_qu004.00004175">系統回應代碼：</i18n>
+                {{errorStatus?.sys}}{{errorStatus?.code}}
+                <p class="lt">{{errorStatus?.desc}}</p>
+            </div>
+        </ng-container>
+
+        <!--Non Use-->
+        <div class="tab-line col-3 ct" *ngIf="false">
+            <ul class="nav mb0">
+                <li>
+                    <a (click)="goFxrateQU003($event)">
+                        <i18n translate="fxrate_qu004.00004559">臺幣存款利率</i18n>
+                    </a>
+                </li>
+                <li class="active">
+                    <a (click)="goFxrateQU004($event)">
+                        <i18n translate="fxrate_qu004.00000027"> 外幣存款利率 </i18n>
+                    </a>
+                </li>
+                <li>
+                    <a (click)="goFxrateQU005($event)">
+                        <i18n translate="fxrate_qu004.00003099">放款利率</i18n>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="tab-line col-3 ct">
+            <nav-tabs-fx [tabConfig]="tabConfig">
+                <div tabs-content>
+                </div>
+            </nav-tabs-fx>
+        </div>
+
+        <!-- END tab-line -->
+        <div class="pad_15">
+            <div class="txt_note pull-right">
+                <small>
+                    <i18n translate="fxrate_qu004.00001692">單位：年息%</i18n>
+                </small>
+            </div>
+            <div class="txt_note">
+                <small>
+                    <i18n translate="fxrate_qu004.00003221">更新時間：</i18n>{{updateDate}}</small>
+            </div>
+        </div>
+
+        <div class="container">
+            <ul class="card-list">
+                <li class="title line-top">
+                    <div class="div-tb">
+                        <div class="td wid_40per">
+                            <i18n translate="fxrate_qu004.00002224">幣別</i18n>
+                        </div>
+                        <div class="td rt">
+                            <i18n translate="fxrate_qu004.00003658">活期存款</i18n>
+                        </div>
+                        <div class="td rt wid_30per">
+                            <i18n translate="fxrate_qu004.00001947">定存1年期</i18n>
+                        </div>
+                        <div class="td wid_15px"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="panel-group toggle-panel" id="BB">
+            <ng-container *ngFor="let key of getBodyKey(); let i=index;" ngInit #ngInit="ngInit" [values]="rateSummary[key]">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#BB" href="#{{rateSummary[key].currency}}">
+                            <div class="div-tb">
+                                <div class="td wid_40per">
+                                    <i class="{{'flag '+ ngInit.values.currency | lowercase }}"></i>{{ngInit.values.currency_name}}
+                                </div>
+                                <div class="td rt">{{ngInit.values.livePayment}}</div>
+                                <div class="td rt wid_30per">{{ngInit.values.oneYearPayment}}</div>
+                                <div class="td wid_15px"></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="panel-collapse collapse" id="{{ngInit.values.currency}}" aria-expanded="true">
+                        <div class="panel-body pad_top0 bg_white">
+                            <ul class="card-list demo-toggle">
+                                <li class="title">
+                                    <div class="div-tb">
+                                        <div class="td wid_40per"></div>
+                                        <div class="td ct">
+                                            <i18n translate="fxrate_qu004.00003320">期別</i18n>
+                                        </div>
+                                        <div class="td rt wid_30per">
+                                            <i18n translate="fxrate_qu004.00001254">利率</i18n>
+                                        </div>
+                                        <div class="td wid_15px"></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <span *ngFor="let rate of ngInit.values.bodyLst;">
+                            <span>
+                                <!---->
+                                <div class="panel-body pad_top0 bg_white">
+                                    <ul class="card-list demo-toggle">
+                                        <li class="reduse">
+                                            <div class="div-tb">
+                                                <div class="td wid_40per"></div>
+                                                <div class="td ct">{{rate.periodUnit}}</div>
+                                                <div class="td rt wid_30per">{{rate.rateFix}}</div>
+                                                <div class="td wid_15px"></div>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </span>
+                        </span>
+                        <!-- panel-body -->
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+
+        <div class="container pad_top30">
+            <div class="remarks">
+                <!-- AEM panel start -->
+                <memo-remarks [format]="1" [key]="'TWRBMFXRATEQU004_010_remind_message'"></memo-remarks>
+                <!-- AEM panel end -->
+            </div>
+        </div>
+
+        <!-- body-wrap -->
+        <div class="gotop">
+            <i18n translate="fxrate_qu004.00001735">回到頂端</i18n>
+        </div>
+        <!-- 20170901 新增toast功能-->
+        <div class="overlayer"></div>
+        <div class="overlayer_menu"></div>
+    </div>
+</div>

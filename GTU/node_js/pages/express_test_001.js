@@ -2,7 +2,7 @@ const express     = require('express');
 const app = express();
 
 //設定專案跟目錄
-const {RootDirHolder} = require("E:/workstuff/workspace/gtu-test-code/GTU/node_js/system/rootDirHolder.js");
+const {RootDirHolder} = require("d:/workstuff/gtu-test-code/GTU/node_js/system/rootDirHolder.js");
 new RootDirHolder();
 
 //自訂package

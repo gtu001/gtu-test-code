@@ -1,0 +1,166 @@
+<body class="bg_white">
+    <div class="record_side close_frame">
+        <!-- load nav_area.html -->
+    </div>
+    <!-- header -->
+    <div class="container_header simple">
+        <!-- <a href="javascript:;" class="mb_hamburg_menu">
+            <i class="icon-hamburger"></i>
+        </a> -->
+        <a href="javascript: history.go(-1)" class="header-left-icon">
+            <i class="icon-expand_left"></i>
+        </a>
+        <h1 class="page_title">其他瓦斯費</h1>
+        <!-- <div class="logo"></div> -->
+        <a href="../TWRBM_General/TWRBM_General_OT001.html" class="header-right-icon">
+            <!-- <i class="icon-service"></i> -->
+            登出
+        </a>
+    </div>
+    <!-- END header -->
+    <div class="body-wrap  scroll">
+        <div class="main_container">
+            <form [formGroup]="formHolder.form" #formFromRef>
+                <div class="content-step">
+                    <ul>
+                        <li class="active">
+                            <span>1 填寫資料</span>
+                        </li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+                <!-- <div class="clearfix"></div> -->
+                <!-- tab-line -->
+                <!-- END tab-line -->
+                <div class="container">
+                    <!-- form-group -->
+                    <div formCssHandler [err]="formHolder.formErrors?.gasCompany" #gasCompany="formCssHandler">
+                        <div class="form_group" [ngClass]="gasCompany.css()">
+                            <a (click)="gasHolder.launchSelection($event)" class="form_group for-select" data-toggle="modal">
+                                <div class="input_group ">
+                                    <span class="title">瓦斯公司</span>
+                                    <input formControlName="gasCompany" placeholder="" value="" maxlength="25" type="text">
+                                </div>
+                            </a>
+                            <div class="form_error">{{gasCompany.msg()}}</div>
+                        </div>
+                    </div>
+
+                    <!-- END form-group -->
+                    <!-- form-group -->
+                    <div formCssHandler [err]="formHolder.formErrors?.balanceNumber" #balanceNumber="formCssHandler">
+                        <div class="form_group">
+                            <div class="form_group" [ngClass]="balanceNumber.css()">
+                                <div class="input_group has-value">
+                                    <span class="title">銷帳編號</span>
+                                    <input formcontrolname="balanceNumber" (blur)="onblurInput($event, 'balanceNumber')" placeholder="請輸入16碼英數字" value="" maxlength="16" type="text">
+                                </div>
+                                <div class="form_error">{{balanceNumber.msg()}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END form-group -->
+                    <!-- form-group -->
+                    <div formCssHandler [err]="formHolder.formErrors?.payAmount" #payAmount="formCssHandler">
+                        <div class="form_group">
+                            <div class="form_group" [ngClass]="payAmount.css()">
+                                <div class="input_group has-value">
+                                    <span class="title">繳費金額</span>
+                                    <input formcontrolname="payAmount" (blur)="onblurInput($event, 'payAmount')" placeholder="" value="" maxlength="25" type="text">
+                                </div>
+                                <div class="form_error">{{payAmount.msg()}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- END form-group -->
+                    <hr class="gap" />
+                    <!-- form-group -->
+                    <div formCssHandler [err]="formHolder.formErrors?.account" #account="formCssHandler">
+                        <div class="form_group">
+                            <div class="form_group" [ngClass]="account.css()">
+                                <a (click)="tx018011dropdownModal.showModal()" class="form_group for-select" data-toggle="modal">
+                                    <div class="input_group ">
+                                        <span class="title">扣款帳號</span>
+                                        <input formcontrolname="account" placeholder="" value="" maxlength="25" type="text">
+                                    </div>
+                                </a>
+                                <div class="form_error">{{account.msg()}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END form-group -->
+                    <!--  form-group -->
+                    <div formCssHandler [err]="formHolder.formErrors?.remark" #remark="formCssHandler">
+                        <div class="form_group">
+                            <div class="form_group" [ngClass]="remark.css()">
+                                <div class="input_group has-value">
+                                    <span class="title">註記</span>
+                                    <input formcontrolname="remark" (blur)="onblurInput($event, 'remark')" placeholder="可輸入7個字" value="" maxlength="7" type="text">
+                                </div>
+                                <div class="form_error">{{remark.msg()}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END form-group -->
+                    <hr class="gap" />
+                    <p class="note">中信銀茲依據【銀行法】及【個人資料保護法】等相關法令規定，說明中信銀蒐集、處理、利用及/或國際傳輸台端個人資料之管理方針，以及台端所享有之權利或服務如下：
+                        <br />
+                        <a href="javascript:;" class="link mb5">個人資料運用告知聲明</a>
+                        <br />
+                        <span class="txt_imp">台端如對前述告知內容確已知悉、瞭解與同意，再請繼續執行交易。</span>
+                    </p>
+                    <div class="checkbox">
+                        <label class="form_choose">
+                            <i class="txt">同意：台端如對於前述告知內容確已知悉、瞭解與同意，請勾選"同意"。</i>
+                            <input class="form_choose-input" type="checkbox" checked="">
+                            <span class="form_choose-img"></span>
+                        </label>
+                    </div>
+                    <div class="btn_group mt30">
+                        <a (click)="goNextPage($event)" class="btn btn-block btn-success">下一步</a>
+                    </div>
+                </div>
+                <!-- container -->
+                <!-- 20180110 移除class:mt30 <hr class="gap mt30" /> -->
+            </form>
+        </div>
+        <!-- / container -->
+        <!-- modal -->
+        <!-- /.modal -->
+        <!-- modal -->
+        <!-- /.modal -->
+        <!-- modal -->
+        <div class="modal fade modal-sample" tabindex="-1" role="dialog">
+            <div class="modal-vertical-middle">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title ct">輸入範例</h4>
+                        </div>
+                        <div class="modal-body">
+                            <!--20171101 新增帳單輸入範例圖檔，更換url替換圖檔，會自適應手機大小 -->
+                            <!--<img src="../../../../web/inc/img/temp/bill.png" class="bill" /> TODO -->
+                        </div>
+                    </div>
+                    <!-- /.modal-content-->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- /.modal -->
+    </div>
+    <!-- main_container -->
+    <!-- body-wrap -->
+    <div class="gotop">回到頂端</div>
+    <div class="toast">
+        <span>設定成功</span>
+    </div>
+
+    <modal-select #selectModal></modal-select>
+    <twrbm-pay-tx018-011-dropdownModel #tx018_011_dropdown (itemClickEvent)="click_twrbmPayTx018_011_dropdownModel($event, selectInput1Ref)"></twrbm-pay-tx018-011-dropdownModel>
+</body>
