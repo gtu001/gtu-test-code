@@ -463,6 +463,13 @@ public class JCommonUtil {
     public static boolean _JOptionPane_showConfirmDialog_yesNoOption(Object message, String title) {
         return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
     }
+    
+    /**
+     * 顯示輸入下拉項目
+     */
+    public static Object _JOptionPane_showInputDialog(Object message, String title, Object[] drowdown, Object defaultValue) {
+        return JOptionPaneUtil.newInstance().showInputDialog_drowdown(message, title, drowdown, defaultValue);
+    }
 
     /**
      * 錯誤處理

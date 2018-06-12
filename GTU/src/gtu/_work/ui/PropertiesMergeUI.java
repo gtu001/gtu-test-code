@@ -212,12 +212,9 @@ public class PropertiesMergeUI extends JFrame {
                     if (prop.containsKey(key)) {
                         String orignVal = prop.getProperty(key);
                         if (!StringUtils.equals(value, orignVal)) {
-                            boolean continueOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(//
-                                    "key 已存在 : " + key + //
-                                            "\n orignValue : " + orignVal + //
-                                            "\n newValue : " + value,
-                                    "是否繼續?");
-                            if (!continueOk) {
+                            String[] arry = new String[] { orignVal, value };
+                            value = (String) JCommonUtil._JOptionPane_showInputDialog("key 已存在 : " + key, "選擇適當的一個", arry, null);
+                            if (value == null) {
                                 Validate.isTrue(false, "中斷!!!");
                             }
                         }

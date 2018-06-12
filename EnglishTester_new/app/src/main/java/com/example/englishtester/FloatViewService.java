@@ -1008,6 +1008,19 @@ public class FloatViewService extends Service {
             return false;
         }
 
+        private boolean isNumbers(String text) {
+            Pattern ptn = Pattern.compile("^[\\d\\.\\-]+$");
+            Matcher mth = ptn.matcher(text);
+            return mth.find();
+        }
+
+        private boolean isEmail(String text) {
+            Pattern ptn = Pattern.compile("^[\\w\\-\\_]+\\@[\\w\\-\\_]+\\.[\\w\\-\\_]+");
+            Matcher mth = ptn.matcher(text);
+            return mth.find();
+        }
+
+
         @Override
         public void onPrimaryClipChanged() {
             Log.v(TAG, "### onPrimaryClipChanged");
@@ -1016,8 +1029,17 @@ public class FloatViewService extends Service {
             if (StringUtils.isNotBlank(text)) {
                 if (isURL(text)) {
                     if (BuildConfig.DEBUG) {
+                        //不使用剪貼簿設回原值
+                        pasteToClipboard("", text);
                         AppOpenHelper.openApp(getApplicationContext(), "jp.naver.line.android");
                     }
+                    return;
+                }
+
+                if (isNumbers(text) || isEmail(text)) {
+                    //不使用剪貼簿設回原值
+                    pasteToClipboard("", text);
+                    return;
                 }
 
                 if (searchLayout.getVisibility() == View.GONE) {
