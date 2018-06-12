@@ -29,9 +29,9 @@ class MainUI():
         l1 = Label(win, text="輸入port:")
         l1.grid(column=0, row=0)
         
-        self.text1 = _Text.create(win)
-        self.text1.grid(column=2, row=0)
-        self._text1 = _Text(self.text1)
+        self.dirText = _Text.create(win)
+        self.dirText.grid(column=2, row=0)
+        self._text1 = _Text(self.dirText)
         
         b1 = Button(win, text="執行", command=self.executeBtnAction)
         b1.grid(column=3, row=0)

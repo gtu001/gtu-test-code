@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -75,14 +76,21 @@ public class FacebookVideoDownloader extends JFrame {
     private HideInSystemTrayHelper sysutil;
     private JTextArea headerTextArea;
 
-    private boolean isCrashProcessDone = false;
-
     private DownloadLogKeeper downloadLog = new DownloadLogKeeper();
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
         List<Thread> pool = new ArrayList<Thread>();
-        int maxSize = 5;
+
+        private int getMaxSize() {
+            int maxSize = 5;
+            try {
+                maxSize = Integer.parseInt(downloadThreadSizeText.getText());
+            } catch (Exception ex) {
+            }
+            System.out.println("目前同時最大下載數 : " + maxSize);
+            return maxSize;
+        }
 
         @Override
         public void run() {
@@ -102,7 +110,7 @@ public class FacebookVideoDownloader extends JFrame {
                     ii--;
                 }
             }
-            int addSize = maxSize - pool.size();
+            int addSize = getMaxSize() - pool.size();
             for (int ii = 0; ii < addSize; ii++) {
                 if (!downloadLst.isEmpty()) {
                     VideoUrlConfigZ vo = downloadLst.pop();
@@ -122,6 +130,26 @@ public class FacebookVideoDownloader extends JFrame {
                 this.vo = vo;
             }
 
+            private String getAvgKbps(DownloadProgressHandler.DownloadProgress proc) {
+                if (proc.isComplete()) {
+                    long totalKbps = proc.getProcessLst().stream()//
+                            .map(vo -> vo.getKbpers())//
+                            .reduce(0, (a, b) -> {
+                                if (a > 0 && b > 0) {
+                                    a += b;
+                                    return a;
+                                }
+                                return a > 0 ? a : (b > 0) ? b : 0;
+                            });
+                    long motherCount = proc.getProcessLst().stream()//
+                            .filter(vo -> vo.getKbpers() > 0)//
+                            .collect(Collectors.counting());
+                    long avgKbps = (totalKbps / motherCount);
+                    return "(avg :" + avgKbps + "KB/s)";
+                }
+                return "";
+            }
+
             @Override
             public void run() {
                 try {
@@ -131,7 +159,7 @@ public class FacebookVideoDownloader extends JFrame {
                         public void actionPerformed(ActionEvent e) {
                             DownloadProgressHandler.DownloadProgress proc = (DownloadProgressHandler.DownloadProgress) e.getSource();
                             String kbpers = proc.getKbpers() != 0 ? proc.getKbpers() + "KB/s " : "";
-                            String description = proc.getPercent() + "% " + kbpers + proc.getRemainDescrpition();
+                            String description = proc.getPercent() + "% " + kbpers + proc.getRemainDescrpition() + getAvgKbps(proc);
 
                             // 設定進度
                             // downloadListModel.addRow(new Object[] { serail,
@@ -290,7 +318,7 @@ public class FacebookVideoDownloader extends JFrame {
         panel_6.add(label_1);
 
         downloadThreadSizeText = new JTextField();
-        downloadThreadSizeText.setText(String.valueOf(downloadPool.maxSize));
+        downloadThreadSizeText.setText(String.valueOf(downloadPool.getMaxSize()));
         panel_6.add(downloadThreadSizeText);
         downloadThreadSizeText.setColumns(10);
         downloadThreadSizeText.addKeyListener(new KeyAdapter() {
@@ -298,16 +326,7 @@ public class FacebookVideoDownloader extends JFrame {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     try {
-                        Integer val = Integer.parseInt(downloadThreadSizeText.getText());
-                        if (val <= 0) {
-                            return;
-                        }
-                        downloadPool.maxSize = val;
-                        // JCommonUtil._jOptionPane_showMessageDialog_info("同時下載數
-                        // :"
-                        // + val);
                     } catch (Exception ex) {
-                        downloadThreadSizeText.setText(String.valueOf(downloadPool.maxSize));
                     }
                 }
             }
@@ -669,8 +688,6 @@ public class FacebookVideoDownloader extends JFrame {
 
     private synchronized void autoDownload(boolean throwEx) {
         try {
-            isCrashProcessDone = false;
-
             urlTextOnBlur(throwEx);
 
             JTableUtil jTab = JTableUtil.newInstance(videoTable);
@@ -705,8 +722,6 @@ public class FacebookVideoDownloader extends JFrame {
     private void batchAutoDownloadBtnAction(List<String> configLst) {
         StringBuffer sb = new StringBuffer();
         try {
-            isCrashProcessDone = false;
-
             List<String> urLst = null;
             if (configLst == null) {
                 File saveFile = JCommonUtil._jFileChooser_selectFileOnly();
@@ -758,8 +773,6 @@ public class FacebookVideoDownloader extends JFrame {
             }
             String logFileName = this.getClass().getSimpleName() + "_crash_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".log";
             FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH, logFileName), sb.toString(), "UTF-8");
-
-            isCrashProcessDone = true;
         } catch (Exception ex) {
             if (!throwEx) {
                 ex.printStackTrace();

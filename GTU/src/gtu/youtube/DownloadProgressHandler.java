@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.concurrent.Callable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.collections.Transformer;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -29,6 +28,7 @@ public class DownloadProgressHandler {
     private String totalLengthDescription;
     private InputStream instream;
     private OutputStream outstream;
+    private List<DownloadProgress> processLst = new ArrayList<DownloadProgress>();
 
     public static class DownloadProgress {
         long currentLength;
@@ -39,6 +39,11 @@ public class DownloadProgressHandler {
         long remainSec;
         String remainDescrpition;
         boolean isComplete = false;
+
+        long startTime;
+        long endTime;
+        long during;
+        List<DownloadProgress> processLst;
 
         public long getCurrentLength() {
             return currentLength;
@@ -70,6 +75,22 @@ public class DownloadProgressHandler {
 
         public boolean isComplete() {
             return isComplete;
+        }
+
+        public long getStartTime() {
+            return startTime;
+        }
+
+        public long getEndTime() {
+            return endTime;
+        }
+
+        public long getDuring() {
+            return during;
+        }
+
+        public List<DownloadProgress> getProcessLst() {
+            return processLst;
         }
 
         public String toString() {
@@ -124,6 +145,8 @@ public class DownloadProgressHandler {
             vo.totalLength = this.totalLength;
             vo.totalLengthDescription = FileUtil.getSizeDescription(currentTotal);
             vo.remainDescrpition = remainDescrpition;
+            vo.startTime = this.startTime;
+            processLst.add(vo);
 
             progressPerformd.actionPerformed(new ActionEvent(vo, -1, percent + "%"));
             // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -159,6 +182,8 @@ public class DownloadProgressHandler {
         this.instream = instream;
         this.outstream = outstream;
 
+        this.processLst = new ArrayList<DownloadProgress>();
+
         // 計算percent敏銳度
         if (percentScale == null) {
             this.percentScale = caculatePercentScale(this.totalLength);
@@ -188,8 +213,9 @@ public class DownloadProgressHandler {
         } finally {
             outstream.close();
 
-            long summeryTime = System.currentTimeMillis() - startTime;
-            System.out.println("下載進度100% !!" + (summeryTime / 1000) + "秒");
+            long endtime = System.currentTimeMillis();
+            long during = System.currentTimeMillis() - startTime;
+            System.out.println("下載進度100% !!" + (during / 1000) + "秒");
 
             // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
             DownloadProgress p = new DownloadProgress();
@@ -199,8 +225,12 @@ public class DownloadProgressHandler {
             p.percent = new BigDecimal(100);
             p.kbpers = 0;
             p.remainSec = 0;
-            p.remainDescrpition = DateUtil.wasteTotalTime(summeryTime);
+            p.remainDescrpition = DateUtil.wasteTotalTime(during);
             p.isComplete = true;
+            p.startTime = this.startTime;
+            p.endTime = endtime;
+            p.during = during;
+            p.processLst = this.processLst;
 
             progressPerformd.actionPerformed(new ActionEvent(p, -1, percent + "%"));
             // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑

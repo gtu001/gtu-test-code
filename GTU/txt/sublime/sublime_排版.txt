@@ -1,9 +1,11 @@
 sublime
 
-���
+<手動>
 1) Ctrl + A
-2) Edit �� Line �� Reindent
+2) Edit → Line → Reindent
 
-�ƪ�
-{ "keys": ["alt+shift+f"], "command": "reindent" , "args": { "single_line": false } }
 
+<快捷>
+按ctrl + shift + p 輸入 key bindings
+右邊 user 視窗加入以下
+{ "keys": ["ctrl+shift+r"], "command": "reindent" , "args": { "single_line": false } },

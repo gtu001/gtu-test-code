@@ -1,7 +1,7 @@
 pypiwin32
 
 #https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyhook
-./gtu/keyboard_mouse/pyHook-1.5.1-cp34-cp34m-win32.whl
+#./gtu/keyboard_mouse/pyHook-1.5.1-cp34-cp34m-win32.whl <--use this
 #./gtu/keyboard_mouse/pyHook-1.5.1-cp34-cp34m-win_amd64.whl
 #./gtu/keyboard_mouse/pyHook-1.5.1-cp36-cp36m-win_amd64.whl
 #./gtu/keyboard_mouse/pyHook-1.5.1-cp36-cp36m-win32.whl
@@ -20,7 +20,7 @@ imutils
 numpy
 opencv-python
 
-#統計
+#data-science
 pandas
 matplotlib
 
@@ -28,7 +28,8 @@ matplotlib
 pynput
 
 #pdf
-pdftotext
+msgpack
+#pdftotext
 PyPDF2
 
 

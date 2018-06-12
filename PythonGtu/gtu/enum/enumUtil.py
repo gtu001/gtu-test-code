@@ -56,6 +56,8 @@ class EnumHelper():
         
         if callFunc is None :
             callFunc = self.__callFuncDefault
+            
+        rtnObj = None
         
         enumMembers = self.enumClass.__getattribute__(self.enumClass, "__members__")
         clzName = self.enumClass.__name__
@@ -63,10 +65,10 @@ class EnumHelper():
             member = eval("{0}['{1}']".format(clzName, name))
             resultRough = callFunc(i, member)
             if resultRough is not None :
-                (result, rtnObj) = resultRough
-                if result :
+                (isBreak, rtnObj) = resultRough
+                if isBreak :
                     break;
-            
+        
         return rtnObj
     
     

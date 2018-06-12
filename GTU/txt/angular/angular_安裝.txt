@@ -1,0 +1,10 @@
+
+#安裝angular
+npm install -g @angular/cli
+
+#安裝modules
+ng new <project_name>
+
+#啟動server
+ng serve --open 
+
