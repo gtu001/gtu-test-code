@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -54,6 +55,7 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -79,14 +81,17 @@ import gtu.file.FileUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 
 public class EnglishSearchUI extends JFrame {
 
+    private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JComboBox searchEnglishIdText;
     private JTextArea searchResultArea;
@@ -173,6 +178,7 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox offlineModeChk;
     private JLabel label;
     private JCheckBox offlineModeFirstChk;
+    private JCheckBox simpleSentanceChk;
 
     private void startCheckFocusOwnerThread() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
@@ -231,7 +237,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 527, 379);
+        setBounds(100, 100, 527, 400);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -262,6 +268,31 @@ public class EnglishSearchUI extends JFrame {
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                     System.out.println("DEL00000000000000000000000000000000");
                     clearAllInput();
+                }
+            }
+        });
+        searchEnglishIdTextController.get().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (JMouseEventUtil.buttonRightClick(1, arg0)) {
+                    JPopupMenuUtil.newInstance(searchEnglishIdTextController.get())//
+                            .addJMenuItem("google翻譯", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    try {
+                                        String text = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
+                                        if (StringUtils.isBlank(text)) {
+                                            return;
+                                        }
+                                        text = URLEncoder.encode(text, "UTF-8");
+                                        String url = String.format("https://translate.google.com.tw/?hl=zh-TW#en/zh-TW/%s", text);
+                                        DesktopUtil.browse(url);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            }).applyEvent(arg0)//
+                            .show();
                 }
             }
         });
@@ -386,6 +417,9 @@ public class EnglishSearchUI extends JFrame {
 
         offlineModeFirstChk = new JCheckBox("離線模式優先");
         panel.add(offlineModeFirstChk, "4, 18");
+
+        simpleSentanceChk = new JCheckBox("簡化例句");
+        panel.add(simpleSentanceChk, "4, 20");
         panel.add(configSettingBtn, "2, 22");
 
         sysutil = HideInSystemTrayHelper.newInstance();
@@ -435,6 +469,7 @@ public class EnglishSearchUI extends JFrame {
         mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
         offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
+        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -447,10 +482,14 @@ public class EnglishSearchUI extends JFrame {
                 propertyBean.getConfigProp().setProperty("mouseSelectionChk", String.valueOf(mouseSelectionChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("offlineModeChk", String.valueOf(offlineModeChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("offlineModeFirstChk", String.valueOf(offlineModeFirstChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("simpleSentanceChk", String.valueOf(simpleSentanceChk.isSelected()));
                 propertyBean.store();
                 System.exit(0);
             }
         });
+
+        // 設定離線檔參照路徑
+        this.initOfflineConfigText();
 
         // 確認是否Focus
         startCheckFocusOwnerThread();
@@ -511,23 +550,27 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
+    private void initOfflineConfigText() {
+        if (StringUtils.isBlank(offlineConfigText.getText())) {
+            {
+                File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJson.bin");
+                if (exportFileJsonFile.exists()) {
+                    offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
+                }
+            }
+            {
+                File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJava.bin");
+                if (exportFileJsonFile.exists()) {
+                    offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
+                }
+            }
+        }
+    }
+
     private void loadOfflineConfig() {
         try {
             Properties prop = new Properties();
-            if (StringUtils.isBlank(offlineConfigText.getText())) {
-                {
-                    File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJson.bin");
-                    if (exportFileJsonFile.exists()) {
-                        offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
-                    }
-                }
-                {
-                    File exportFileJsonFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "exportFileJava.bin");
-                    if (exportFileJsonFile.exists()) {
-                        offlineConfigText.setText(exportFileJsonFile.getAbsolutePath());
-                    }
-                }
-            }
+            this.initOfflineConfigText();
 
             File file = new File(offlineConfigText.getText());
             if (file.exists()) {
@@ -605,7 +648,9 @@ public class EnglishSearchUI extends JFrame {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int ii = 0; ii < 10; ii++) {
+                int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
+
+                for (int ii = 0; ii < maxLoop; ii++) {
                     WordInfo2 info2 = t2.parseToWordInfo(text, 1);
                     List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
                     if (exampleSentanceList.isEmpty()) {
