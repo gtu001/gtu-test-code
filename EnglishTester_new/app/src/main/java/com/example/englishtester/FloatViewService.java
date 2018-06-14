@@ -1049,9 +1049,6 @@ public class FloatViewService extends Service {
                         doOpenCloseEditPanel(true);//查詢單字
                     }
                 }
-
-                //不使用剪貼簿設回原值
-                pasteToClipboard("", text);
             }
         }
     }

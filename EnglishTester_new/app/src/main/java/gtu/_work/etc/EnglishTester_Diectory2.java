@@ -1,5 +1,7 @@
 package gtu._work.etc;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +25,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishTester_Diectory2 {
+
+    private static final String TAG = EnglishTester_Diectory2.class.getSimpleName();
 
     public static void main(String[] args) throws Exception {
         EnglishTester_Diectory2 t = new EnglishTester_Diectory2();
@@ -73,12 +77,17 @@ public class EnglishTester_Diectory2 {
         // String fullStr =
         // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
         // word));
-        String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
-        if (StringUtils.isBlank(fullStr)) {
+        try {
+            String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
+            if (StringUtils.isBlank(fullStr)) {
+                return new WordInfo2();
+            }
+            WordInfo2 wordInfo = parseToWordInfo(word, fullStr);
+            return wordInfo;
+        } catch (Exception ex) {
+            Log.e(TAG, "parseToWordInfo ERR : " + ex.getMessage(), ex);
             return new WordInfo2();
         }
-        WordInfo2 wordInfo = parseToWordInfo(word, fullStr);
-        return wordInfo;
     }
 
     public static class WordInfo2 {
