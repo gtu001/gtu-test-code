@@ -55,7 +55,6 @@ import javax.swing.text.JTextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.NativeInputEvent;
@@ -79,6 +78,8 @@ import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.clipboard.ClipboardListener;
 import gtu.file.FileUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.log.LogbackUtil_silent;
+import gtu.log.LogbackUtil_silent._LogbackUtil_silent_LEVEL;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
@@ -111,6 +112,10 @@ public class EnglishSearchUI extends JFrame {
 
     private Properties offlineProp;
 
+    static {
+        LogbackUtil_silent.setRootLevel(_LogbackUtil_silent_LEVEL.INFO);
+    }
+
     /**
      * Launch the application.
      */
@@ -130,6 +135,10 @@ public class EnglishSearchUI extends JFrame {
         FRAME = new EnglishSearchUI();
         FRAME.keyUtil = FRAME.new GlobalKeyListenerExampleForEnglishUI();
         FRAME.keyUtil.init();
+
+        // if(true){
+        // DesktopUtil.openDir(FRAME.propertyBean.getPropFile().getAbsolutePath());
+        // }
     }
 
     private static volatile EnglishSearchUI FRAME;
@@ -537,11 +546,7 @@ public class EnglishSearchUI extends JFrame {
             JCommonUtil.setLocationToRightBottomCorner(this);
         }
 
-        boolean useRobotFocus = focusSearchEnglishIdText();
-        if (useRobotFocus) {
-            sleep(100);
-        }
-        searchEnglishIdTextController.setSelectAll();
+        focusSearchEnglishIdText();
 
         // 開啟時自動查詢
         if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
@@ -713,7 +718,12 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private boolean focusSearchEnglishIdText() {
-        return JCommonUtil.focusComponent(searchEnglishIdTextController.get(), !mouseSelectionChk.isSelected());
+        return JCommonUtil.focusComponent(searchEnglishIdTextController.get(), true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                searchEnglishIdTextController.setSelectAll();
+            }
+        });
     }
 
     private class SearchEnglishIdTextController {
@@ -735,6 +745,7 @@ public class EnglishSearchUI extends JFrame {
             String text = get().getText();
             get().setSelectionStart(0);
             get().setSelectionEnd(text.length());
+            System.out.println(">> setSelectAll !!");
         }
 
         private String getText() {

@@ -28,7 +28,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -852,7 +851,54 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     return false;
                 }
 
+                private boolean isNormalMatch_logic(String compareTarget, String comparator, String compareText) {
+                    String comareThisStr = "";
+                    boolean isTag = false;
+                    if ("tag".equalsIgnoreCase(compareTarget)) {
+                        comareThisStr = d.tag;
+                        isTag = true;
+                    } else if ("remark".equalsIgnoreCase(compareTarget)) {
+                        comareThisStr = d.remark;
+                    }
+                    
+                    NormalLogicTagMatch tagChk = new NormalLogicTagMatch(d, comparator, compareText);
+                    if(isTag){
+                        return tagChk.isMatch();
+                    }
+                    
+                    if ("^=".equalsIgnoreCase(comparator)) {
+                        if (comareThisStr.toLowerCase().startsWith(compareText.toLowerCase())) {
+                            return true;
+                        }
+                    } else if ("$=".equalsIgnoreCase(comparator)) {
+                        if (comareThisStr.toLowerCase().endsWith(compareText.toLowerCase())) {
+                            return true;
+                        }
+                    } else if ("*=".equalsIgnoreCase(comparator)) {
+                        if (comareThisStr.toLowerCase().contains(compareText.toLowerCase())) {
+                            return true;
+                        }
+                    } else if ("=".equalsIgnoreCase(comparator)) {
+                        if (comareThisStr.equalsIgnoreCase(compareText)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                private Pattern logicPtn = Pattern.compile("^\\[(tag|remark)(\\=|\\^\\=|\\&\\=|\\*\\=)(.*)\\]", Pattern.CASE_INSENSITIVE);
+
                 private boolean isNormalMatch(String singleText) {
+                    // 條件查詢
+                    Matcher mth = logicPtn.matcher(singleText);
+                    if (mth.find()) {
+                        String compareTarget = mth.group(1);
+                        String comparator = mth.group(2);
+                        String compareText = mth.group(3);
+                        return this.isNormalMatch_logic(compareTarget, comparator, compareText);
+                    }
+
+                    // 一般查詢
                     String[] searchArry = searchText.split(",", -1);
                     for (String _singleText : searchArry) {
                         _singleText = StringUtils.trimToEmpty(_singleText);
@@ -1546,16 +1592,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         JCommonUtil.setLocationToRightBottomCorner(this);
 
-        boolean useRobotFocus = JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), false);// XXX
-                                                                                                         // 原本設true
-        if (useRobotFocus) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+        JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                ((JTextField) searchComboBoxUtil.getTextComponent()).selectAll();
             }
-        }
-
-        ((JTextField) searchComboBoxUtil.getTextComponent()).selectAll();
+        });
     }
 
     private static class OtherOpenPath {
@@ -1700,6 +1742,47 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
             throw new RuntimeException("doGetRequest_UserAgent Err : " + ex.getMessage(), ex);
+        }
+    }
+
+    private class NormalLogicTagMatch {
+        List<String> tagLst = new ArrayList<String>();
+        String comparator;
+        String compareText;
+
+        NormalLogicTagMatch(UrlConfig d, String comparator, String compareText) {
+            String[] arry = StringUtils.trimToEmpty(d.tag).split(",");
+            for (String v : arry) {
+                v = StringUtils.trimToEmpty(v);
+                if (StringUtils.isNotBlank(v)) {
+                    tagLst.add(v);
+                }
+            }
+            this.comparator = comparator;
+            this.compareText = compareText;
+        }
+
+        private boolean isMatch() {
+            for (String tag : tagLst) {
+                if ("^=".equalsIgnoreCase(comparator)) {
+                    if (tag.toLowerCase().startsWith(compareText.toLowerCase())) {
+                        return true;
+                    }
+                } else if ("$=".equalsIgnoreCase(comparator)) {
+                    if (tag.toLowerCase().endsWith(compareText.toLowerCase())) {
+                        return true;
+                    }
+                } else if ("*=".equalsIgnoreCase(comparator)) {
+                    if (tag.toLowerCase().contains(compareText.toLowerCase())) {
+                        return true;
+                    }
+                } else if ("=".equalsIgnoreCase(comparator)) {
+                    if (tag.equalsIgnoreCase(compareText)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 

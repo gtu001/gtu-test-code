@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -463,7 +462,7 @@ public class JCommonUtil {
     public static boolean _JOptionPane_showConfirmDialog_yesNoOption(Object message, String title) {
         return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
     }
-    
+
     /**
      * 顯示輸入下拉項目
      */
@@ -875,7 +874,7 @@ public class JCommonUtil {
         jframe.setAutoRequestFocus(true);
     }
 
-    public static boolean focusComponent(JComponent jcomponent, boolean robotFocus) {
+    public static boolean focusComponent(JComponent jcomponent, boolean robotFocus, ActionListener afterRobotFocus) {
         jcomponent.setRequestFocusEnabled(true);
         jcomponent.setFocusable(true);
         jcomponent.grabFocus();
@@ -898,6 +897,10 @@ public class JCommonUtil {
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
                 robot.mouseMove(p.x, p.y);
                 useRobotFocus = true;
+                System.out.println(">> useRobotFocus !!");
+                if (afterRobotFocus != null) {
+                    afterRobotFocus.actionPerformed(new ActionEvent(jcomponent, -1, "useRobotFocus"));
+                }
             } catch (AWTException e) {
                 e.printStackTrace();
             }

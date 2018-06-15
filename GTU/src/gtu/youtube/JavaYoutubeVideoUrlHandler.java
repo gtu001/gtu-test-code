@@ -51,7 +51,8 @@ public class JavaYoutubeVideoUrlHandler {
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
 
     public static void main(String[] args) {
-        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("vBM2tg5FDH8", "", DEFAULT_USER_AGENT);
+//        https://www.youtube.com/watch?v=UPXSB2gMsfI
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("UPXSB2gMsfI", "", DEFAULT_USER_AGENT);
         t.execute();
         System.out.println("done...");
     }
