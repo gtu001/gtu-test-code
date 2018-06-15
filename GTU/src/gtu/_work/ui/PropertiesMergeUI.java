@@ -219,6 +219,11 @@ public class PropertiesMergeUI extends JFrame {
                             }
                         }
                     }
+                } else {
+                    String orignVal = prop.getProperty(key);
+                    if (StringUtils.length(orignVal) > StringUtils.length(value)) {
+                        value = orignVal;
+                    }
                 }
                 prop.setProperty(key, value);
             } else {

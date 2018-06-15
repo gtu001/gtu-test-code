@@ -112,10 +112,6 @@ public class EnglishSearchUI extends JFrame {
 
     private Properties offlineProp;
 
-    static {
-        LogbackUtil_silent.setRootLevel(_LogbackUtil_silent_LEVEL.INFO);
-    }
-
     /**
      * Launch the application.
      */

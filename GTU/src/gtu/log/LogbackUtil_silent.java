@@ -3,6 +3,8 @@ package gtu.log;
 import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import gtu.exception.ExceptionStackUtil_Pure;
+
 public class LogbackUtil_silent {
     private LogbackUtil_silent() {
     }
@@ -18,7 +20,8 @@ public class LogbackUtil_silent {
 
             MethodUtils.invokeMethod(logger, "setLevel", new Object[] { levelObj }, new Class[] { clz2 });
         } catch (Exception e) {
-            throw new RuntimeException("setRootLevel ERR : " + e.getMessage(), e);
+            String otherMessage = ExceptionStackUtil_Pure.parseToString(e);
+            throw new RuntimeException("setRootLevel ERR : " + e.getMessage() + "\n\n" + otherMessage, e);
         }
     }
 
