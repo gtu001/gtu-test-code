@@ -130,26 +130,6 @@ public class FacebookVideoDownloader extends JFrame {
                 this.vo = vo;
             }
 
-            private String getAvgKbps(DownloadProgressHandler.DownloadProgress proc) {
-                if (proc.isComplete()) {
-                    long totalKbps = proc.getProcessLst().stream()//
-                            .map(vo -> vo.getKbpers())//
-                            .reduce(0, (a, b) -> {
-                                if (a > 0 && b > 0) {
-                                    a += b;
-                                    return a;
-                                }
-                                return a > 0 ? a : (b > 0) ? b : 0;
-                            });
-                    long motherCount = proc.getProcessLst().stream()//
-                            .filter(vo -> vo.getKbpers() > 0)//
-                            .collect(Collectors.counting());
-                    long avgKbps = (totalKbps / motherCount);
-                    return "(avg :" + avgKbps + "KB/s)";
-                }
-                return "";
-            }
-
             @Override
             public void run() {
                 try {
@@ -159,7 +139,7 @@ public class FacebookVideoDownloader extends JFrame {
                         public void actionPerformed(ActionEvent e) {
                             DownloadProgressHandler.DownloadProgress proc = (DownloadProgressHandler.DownloadProgress) e.getSource();
                             String kbpers = proc.getKbpers() != 0 ? proc.getKbpers() + "KB/s " : "";
-                            String description = proc.getPercent() + "% " + kbpers + proc.getRemainDescrpition() + getAvgKbps(proc);
+                            String description = proc.getPercent() + "% " + kbpers + proc.getRemainDescrpition() + DownloadProgressHandler.getSummaryAverageKbps(proc);
 
                             // 設定進度
                             // downloadListModel.addRow(new Object[] { serail,

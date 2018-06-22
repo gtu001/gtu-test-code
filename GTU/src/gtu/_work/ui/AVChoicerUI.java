@@ -71,6 +71,7 @@ public class AVChoicerUI extends JFrame {
     private List<File> cacheFileList = new ArrayList<File>();
     private JLabel deleteAVFileLabel;
     private JLabel movCountLabel;
+    private JButton replayBtn;
 
     /**
      * Launch the application.
@@ -130,6 +131,14 @@ public class AVChoicerUI extends JFrame {
         panel_7.add(movCountLabel);
         panel_7.add(openContainDirBtn);
         panel_7.add(deleteAVFileBtn);
+        
+        replayBtn = new JButton("重播");
+        replayBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                currentFileHandler.replay();
+            }
+        });
+        panel_7.add(replayBtn);
 
         JPanel panel_8 = new JPanel();
         panel.add(panel_8, BorderLayout.WEST);
@@ -475,21 +484,36 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil.handleException(e);
             }
         }
+                
+        private void replay() {
+            try {
+                File exe = getMediaPlayerExe();
+                File avFile = tempFile.get();
+                Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile));
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
     }
 
     private void resetCacheFileList() {
         cacheFileList = null;
     }
+    
+    private File getMediaPlayerExe() throws Exception {
+        File exe = config.getConfigProp().keySet().stream()//
+                .filter(key -> ((String) key).startsWith(AV_EXE_KEY))//
+                .map(key -> new File(config.getConfigProp().getProperty((String) key)))//
+                .filter(File::exists)//
+                .findFirst().orElseThrow(() -> {
+                    return new Exception("未設定Movie Exe!!");
+                });
+        return exe;
+    }
 
     private void choiceAVBtnAction() {
         try {
-            File exe = config.getConfigProp().keySet().stream()//
-                    .filter(key -> ((String) key).startsWith(AV_EXE_KEY))//
-                    .map(key -> new File(config.getConfigProp().getProperty((String) key)))//
-                    .filter(File::exists)//
-                    .findFirst().orElseThrow(() -> {
-                        return new Exception("未設定Movie Exe!!");
-                    });
+            File exe = getMediaPlayerExe();
 
             File avFile = getRandomAvFile();
             currentFileHandler.setFile(avFile);

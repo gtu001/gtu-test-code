@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -190,6 +191,27 @@ public class DownloadProgressHandler {
         } else {
             this.percentScale = percentScale;
         }
+    }
+    
+    public static String getSummaryAverageKbps(DownloadProgressHandler.DownloadProgress proc) {
+        if (proc.isComplete()) {
+            long totalKbps = proc.getProcessLst().stream()//
+                    .filter(vo -> vo.getKbpers() >= 0)//
+                    .map(vo -> vo.getKbpers())//
+                    .reduce(0, (a, b) -> {
+                        if (a > 0 && b > 0) {
+                            a += b;
+                            return a;
+                        }
+                        return a > 0 ? a : (b > 0) ? b : 0;
+                    });
+            long motherCount = proc.getProcessLst().stream()//
+                    .filter(vo -> vo.getKbpers() > 0)//
+                    .collect(Collectors.counting());
+            long avgKbps = (totalKbps / motherCount);
+            return "(avg :" + avgKbps + "KB/s)";
+        }
+        return "";
     }
 
     public void start() throws IOException {

@@ -184,6 +184,7 @@ public class EnglishSearchUI extends JFrame {
     private JLabel label;
     private JCheckBox offlineModeFirstChk;
     private JCheckBox simpleSentanceChk;
+    private JCheckBox robotFocusChk;
 
     private void startCheckFocusOwnerThread() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
@@ -242,7 +243,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 527, 400);
+        setBounds(100, 100, 540, 429);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -348,7 +349,7 @@ public class EnglishSearchUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -371,13 +372,6 @@ public class EnglishSearchUI extends JFrame {
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
-            }
-        });
-
-        JButton configSettingBtn = new JButton("儲存設定");
-        configSettingBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                configSettingBtnAction();
             }
         });
 
@@ -425,7 +419,17 @@ public class EnglishSearchUI extends JFrame {
 
         simpleSentanceChk = new JCheckBox("簡化例句");
         panel.add(simpleSentanceChk, "4, 20");
-        panel.add(configSettingBtn, "2, 22");
+        
+        JButton configSettingBtn = new JButton("儲存設定");
+        configSettingBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                configSettingBtnAction();
+            }
+        });
+        
+        robotFocusChk = new JCheckBox("使用機械Focus");
+        panel.add(robotFocusChk, "4, 22");
+        panel.add(configSettingBtn, "2, 24");
 
         sysutil = HideInSystemTrayHelper.newInstance();
         sysutil.apply(this, "英語字典", "resource/images/ico/janna.ico");
@@ -475,6 +479,7 @@ public class EnglishSearchUI extends JFrame {
         offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
         simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
+        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -488,6 +493,7 @@ public class EnglishSearchUI extends JFrame {
                 propertyBean.getConfigProp().setProperty("offlineModeChk", String.valueOf(offlineModeChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("offlineModeFirstChk", String.valueOf(offlineModeFirstChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("simpleSentanceChk", String.valueOf(simpleSentanceChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("robotFocusChk", String.valueOf(robotFocusChk.isSelected()));
                 propertyBean.store();
                 System.exit(0);
             }
@@ -714,12 +720,14 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private boolean focusSearchEnglishIdText() {
-        return JCommonUtil.focusComponent(searchEnglishIdTextController.get(), true, new ActionListener() {
+        boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent paramActionEvent) {
                 searchEnglishIdTextController.setSelectAll();
             }
         });
+        searchEnglishIdTextController.setSelectAll();
+        return isRobotFocus;
     }
 
     private class SearchEnglishIdTextController {
