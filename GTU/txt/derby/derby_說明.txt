@@ -1,0 +1,9 @@
+
+在 derby 的目錄裡放 derby_run.bat
+執行後
+
+開啟 dbvis 
+讀取 load derby jar
+url 設定 jdbc:derby://localhost:1527/seconddb;create=true
+帳號密碼隨意
+
