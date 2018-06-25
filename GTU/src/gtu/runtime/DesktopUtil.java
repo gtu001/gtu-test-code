@@ -106,13 +106,20 @@ public class DesktopUtil {
                     Desktop.getDesktop().browse(url2.toURI());// 嘗試正常流程
                 } catch (Exception ex) {
                     logger.log(Level.WARNING, "browse try 1 : " + ex.getMessage());
-                    Desktop.getDesktop().open(getFile(url));
+                    File file = getFile(url);
+                    logger.log(Level.WARNING, "file : " + file);
+                    try {
+                        Desktop.getDesktop().open(file);
+                    }catch(Exception ex1){
+                        logger.log(Level.WARNING, "browse try 2 : " + ex1.getMessage());
+                        Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", file));
+                    }
                 }
             } else {
                 Desktop.getDesktop().browse(url2.toURI());
             }
         } catch (Exception ex) {
-            throw new RuntimeException("browse ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("browse ERR : " + ex.getMessage() + " --> " + url, ex);
         }
     }
 }

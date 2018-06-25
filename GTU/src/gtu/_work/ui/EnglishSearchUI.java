@@ -30,11 +30,16 @@ import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,8 +57,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -66,11 +71,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.example.englishtester.EnglishwordInfoDAO;
+import com.ibm.db2.jcc.sqlj.e;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.HermannEbbinghaus_Memory;
+import gtu._work.HermannEbbinghaus_Memory.MemData;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory2;
@@ -78,8 +86,7 @@ import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.clipboard.ClipboardListener;
 import gtu.file.FileUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
-import gtu.log.LogbackUtil_silent;
-import gtu.log.LogbackUtil_silent._LogbackUtil_silent_LEVEL;
+import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
@@ -111,6 +118,9 @@ public class EnglishSearchUI extends JFrame {
     private HideInSystemTrayHelper sysutil;
 
     private Properties offlineProp;
+    private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory("EnglishSearchUI_MemoryBank.properties");
+
+    private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
 
     /**
      * Launch the application.
@@ -222,6 +232,78 @@ public class EnglishSearchUI extends JFrame {
             checkFocusOwnerThread.start();
         }
     }
+
+    private ActionListener MemDo = new ActionListener() {
+
+        private List<String> getAllList(String key) {
+            List<String> keys = new ArrayList<String>();
+            String ch = StringUtils.substring(StringUtils.trim(key), 0, 1).toLowerCase();
+            for (Enumeration<?> enu = __getOfflineProp().keys(); enu.hasMoreElements();) {
+                String v = (String) enu.nextElement();
+                if (v.toLowerCase().startsWith(ch)) {
+                    keys.add(v);
+                }
+            }
+            return keys;
+        }
+
+        private String getRandom(List<String> allLst) {
+            return allLst.get(new Random().nextInt(allLst.size()));
+        }
+
+        private Map<String, String> getRandomMap(int size, List<String> allLst) {
+            Map<String, String> map = new HashMap<String, String>();
+            if (allLst == null || allLst.isEmpty()) {
+                System.out.println("沒資料 getRandomMap");
+                return map;
+            }
+            while (map.size() <= size) {
+                String str = getRandom(allLst);
+                if (!map.containsKey(str)) {
+                    String meaning = __getOfflineProp().getProperty(str);
+                    map.put(meaning, str);
+                }
+            }
+            return map;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            if (__getOfflineProp() == null || __getOfflineProp().isEmpty()) {
+                loadOfflineConfig();
+            }
+            System.out.println("offlineProp size = " + offlineProp.size());
+
+            MemData d = (MemData) event.getSource();
+            long period = event.getWhen();
+            String reviewType = event.getActionCommand();
+
+            String meaning = "";
+            if (__getOfflineProp().containsKey(d.getKey())) {
+                meaning = __getOfflineProp().getProperty(d.getKey());
+            }
+
+            List<String> allLst = this.getAllList(d.getKey());
+            Map<String, String> questionMap = this.getRandomMap(3, allLst);
+            questionMap.put(meaning, d.getKey());
+            List<String> meaningLst = new ArrayList<String>(questionMap.keySet());
+            meaningLst = RandomUtil.randomList(meaningLst);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("複習 : " + d.getKey() + "\n");
+            sb.append("加入時間 : " + DateFormatUtils.format(d.getRegisterTime(), d.getDateFormat()) + "\n");
+            sb.append("進程 : " + d.getReviewTime() + "\n");
+
+            String choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
+
+            StringBuilder sb2 = new StringBuilder();
+            sb2.append("是否答對 : " + (StringUtils.equals(choiceMeaning, meaning) ? "對" : "錯") + "\n");
+            sb2.append("正確解答 : " + d.getKey() + " : " + meaning + "\n");
+            sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
+
+            JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
+        }
+    };
 
     /**
      * Create the frame.
@@ -510,6 +592,13 @@ public class EnglishSearchUI extends JFrame {
 
         // 讀取離線檔
         loadOfflineConfig();
+
+        // 設定記憶時鐘功能
+        memory.setMemDo(MemDo);
+        memory.start();
+        if (DEBUG) {
+            DesktopUtil.browse(memory.getFile().toURI().toString());
+        }
     }
 
     private void startListenClipboardThread() {
@@ -580,9 +669,28 @@ public class EnglishSearchUI extends JFrame {
             this.initOfflineConfigText();
 
             File file = new File(offlineConfigText.getText());
+
+            if (DEBUG) {
+                System.out.println("DEBUG MODE -----");
+                File dir = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
+                int max = -1;
+                Pattern ptn = Pattern.compile("bak(\\d+)");
+                for (File f : dir.listFiles()) {
+                    if (f.getName().startsWith("bak")) {
+                        Matcher mth = ptn.matcher(f.getName());
+                        if (mth.find()) {
+                            max = Math.max(max, Integer.parseInt(mth.group(1)));
+                        }
+                    }
+                }
+                file = new File(dir + File.separator + "bak" + max, "exportFileJava.bin");
+                System.out.println("offline file --- " + file);
+            }
+
             if (file.exists()) {
                 if (file.getName().equals("exportFileJson.bin")) {
                     if (file.exists()) {
+                        System.out.println("read --- " + "exportFileJson.bin");
                         String content = FileUtil.loadFromFile(file, "utf8");
                         JSONArray arry = new JSONArray(content);
                         for (int ii = 0; ii < arry.length(); ii++) {
@@ -591,9 +699,11 @@ public class EnglishSearchUI extends JFrame {
                             String englishDesc = obj.getString("englishDesc");
                             prop.setProperty(englishId, englishDesc);
                         }
+                        System.out.println("read --- " + prop.size());
                     }
                 }
                 if (file.getName().equals("exportFileJava.bin")) {
+                    System.out.println("read --- " + "exportFileJava.bin");
                     FileInputStream fis = new FileInputStream(file);
                     ObjectInputStream input = new ObjectInputStream(fis);
                     List<EnglishwordInfoDAO.EnglishWord> list = new ArrayList<EnglishwordInfoDAO.EnglishWord>();
@@ -607,6 +717,7 @@ public class EnglishSearchUI extends JFrame {
                         input.close();
                     } catch (java.io.EOFException ex) {
                     }
+                    System.out.println("read --- " + prop.size());
                 }
             }
 
@@ -614,6 +725,10 @@ public class EnglishSearchUI extends JFrame {
         } catch (Exception e1) {
             JCommonUtil.handleException(e1);
         }
+    }
+
+    private Properties __getOfflineProp() {
+        return offlineProp;
     }
 
     private boolean queryButtonAction_offline(String text) {
@@ -625,6 +740,7 @@ public class EnglishSearchUI extends JFrame {
         if (offlineProp.containsKey(text)) {
             String content = offlineProp.getProperty(text);
             meaningText.setText(content);
+            this.appendMemoryBank(content);
             return true;
         } else {
             meaningText.setText("查無此字!!");
@@ -649,7 +765,14 @@ public class EnglishSearchUI extends JFrame {
         sb.append(info.getMeaning() + "\n");
         sb.append("\n");
 
+        AtomicBoolean findOk = new AtomicBoolean(false);
+
         meaningText.setText(info.getMeaning());
+
+        if (StringUtils.isNotBlank(info.getMeaning())) {
+            findOk.set(true);
+            this.appendMemoryBank(text);
+        }
 
         final Set<String> meaningSet = new HashSet<String>();
         new Thread(new Runnable() {
@@ -670,6 +793,11 @@ public class EnglishSearchUI extends JFrame {
                     }
 
                     meaningSet.add(info2.getMeaning2());
+
+                    if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
+                        findOk.set(true);
+                        appendMemoryBank(text);
+                    }
                 }
                 searchResultArea.setText(sb.toString());
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
@@ -680,6 +808,10 @@ public class EnglishSearchUI extends JFrame {
                 // }
             }
         }).start();
+    }
+
+    private void appendMemoryBank(String word) {
+        memory.append(word);
     }
 
     private void queryButtonAction(boolean bringToFront) {
