@@ -26,14 +26,14 @@ public class PropertiesUtilBean {
     private Properties configProp;
     private File propFile;
     private _JFrameReflectionToConfig configReflect = new _JFrameReflectionToConfig();
-    
+
     private static final Logger logger = JdkLoggerUtil.getLogger(PropertiesUtilBean.class, true);
-    
+
     static {
-//        JdkLoggerUtil.setupRootLogLevel(Level.INFO);
+        // JdkLoggerUtil.setupRootLogLevel(Level.INFO);
     }
-    
-    public PropertiesUtilBean(File customFile) {
+
+    public void init(File customFile) {
         try {
             propFile = customFile;
             logger.info("configFile : " + propFile);
@@ -48,19 +48,12 @@ public class PropertiesUtilBean {
         }
     }
 
+    public PropertiesUtilBean(File customFile) {
+        this.init(customFile);
+    }
+
     public PropertiesUtilBean(Class<?> clz) {
-        try {
-            propFile = new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties");
-            logger.info("configFile : " + propFile);
-            if (!propFile.exists()) {
-                propFile.createNewFile();
-            }
-            configProp = new Properties();
-            configProp.load(new FileInputStream(propFile));
-            logger.info("configFile size : " + configProp.size());
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties"));
     }
 
     public void store() {

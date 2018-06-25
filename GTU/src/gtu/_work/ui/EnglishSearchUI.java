@@ -419,14 +419,14 @@ public class EnglishSearchUI extends JFrame {
 
         simpleSentanceChk = new JCheckBox("簡化例句");
         panel.add(simpleSentanceChk, "4, 20");
-        
+
         JButton configSettingBtn = new JButton("儲存設定");
         configSettingBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 configSettingBtnAction();
             }
         });
-        
+
         robotFocusChk = new JCheckBox("使用機械Focus");
         panel.add(robotFocusChk, "4, 22");
         panel.add(configSettingBtn, "2, 24");
@@ -769,6 +769,7 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void clearAllInput() {
+        searchEnglishIdTextController.setInputText("");
         searchEnglishIdTextController.setText("");
         searchResultArea.setText("");
         meaningText.setText("");
@@ -807,7 +808,16 @@ public class EnglishSearchUI extends JFrame {
     private File getAppendTextFile() {
         String val = propertyBean.getConfigProp().getProperty(NEW_WORD_PATH);
         if (StringUtils.isBlank(val)) {
-            Validate.isTrue(false, "未設定new_word.txt路徑!");
+            JCommonUtil._jOptionPane_showMessageDialog_error("未設定new_word.txt路徑, 建立一個在桌面!");
+            File newFile = new File(FileUtil.DESKTOP_PATH + File.separator + "new_word.txt");
+            try {
+                newFile.createNewFile();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            val = newFile.getAbsolutePath();
+            newWordTxtPathText.setText(val);
+            propertyBean.getConfigProp().setProperty(NEW_WORD_PATH, val);
         }
         return new File(val);
     }
