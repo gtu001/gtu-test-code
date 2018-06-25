@@ -118,16 +118,19 @@ public class EnglishSearchUI extends JFrame {
 
     private Properties offlineProp;
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
-    
+
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory(getDebugDir4Memory(), "EnglishSearchUI_MemoryBank.properties");
 
-    private static File getDebugDir4Memory(){
-        if(DEBUG){
-            return new File("D:/my_tool/EnglishSearchUI");
+    private static File getDebugDir4Memory() {
+        if (DEBUG) {
+            File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
+            if (f1.exists() && f1.isDirectory()) {
+                return f1;
+            }
         }
         return null;
     }
-    
+
     /**
      * Launch the application.
      */
@@ -550,7 +553,6 @@ public class EnglishSearchUI extends JFrame {
             public void focusGained(FocusEvent e) {
             }
         });
-        
 
         JButton configSettingBtn = new JButton("儲存設定");
         configSettingBtn.addActionListener(new ActionListener() {
@@ -569,7 +571,7 @@ public class EnglishSearchUI extends JFrame {
                 }
             }
         });
-        
+
         panel.add(reviewMemChk, "4, 24");
         panel.add(configSettingBtn, "2, 26");
 
