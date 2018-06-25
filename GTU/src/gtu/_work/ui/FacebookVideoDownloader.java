@@ -20,7 +20,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -88,7 +87,7 @@ public class FacebookVideoDownloader extends JFrame {
                 maxSize = Integer.parseInt(downloadThreadSizeText.getText());
             } catch (Exception ex) {
             }
-            System.out.println("目前同時最大下載數 : " + maxSize);
+//            System.out.println("目前同時最大下載數 : " + maxSize);
             return maxSize;
         }
 
@@ -804,6 +803,7 @@ public class FacebookVideoDownloader extends JFrame {
 
     private class DownloadLogKeeper {
         private File logFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), FacebookVideoDownloader.class.getSimpleName() + "_downloadLog.cfg");
+//        private File logFile = new File("E:/my_tool/FacebookVideoDownloader_downloadLog.cfg");
         private PropertiesUtilBean config = new PropertiesUtilBean(logFile);
 
         private void continueNotOk() {
@@ -814,14 +814,16 @@ public class FacebookVideoDownloader extends JFrame {
             }
             Collections.sort(keyLst);
             List<String> continueLst = new ArrayList<String>();
-            for (String key : continueLst) {
+            for (String key : keyLst) {
                 String url = config.getConfigProp().getProperty(key);
                 continueLst.add(url);
+                System.out.println("-> " + url);
             }
             batchAutoDownloadBtnAction(continueLst);
         }
 
         private void appendDownloadVO(VideoUrlConfigZ vo) {
+            config = new PropertiesUtilBean(logFile);
             String key = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + "_" + vo.getFileName();
             String valueUrl = vo.getOrign().getOrignConfig().getOrignUrl();
             config.getConfigProp().setProperty(key, valueUrl);

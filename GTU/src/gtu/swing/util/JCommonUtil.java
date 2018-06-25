@@ -469,6 +469,9 @@ public class JCommonUtil {
     public static Object _JOptionPane_showInputDialog(Object message, String title, Object[] drowdown, Object defaultValue) {
         return JOptionPaneUtil.newInstance().showInputDialog_drowdown(message, title, drowdown, defaultValue);
     }
+    public static Object _JOptionPane_showInputDialog_top(Object message, String title, Object[] drowdown, Object defaultValue) {
+        return JOptionPaneUtil.newInstance().showInputDialog_drowdown_top(message, title, drowdown, defaultValue);
+    }
 
     /**
      * 錯誤處理

@@ -19,8 +19,6 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 
 public class HermannEbbinghaus_Memory {
-    
-    private static final ReviewTime INITIAL = ReviewTime.M1;
 
     private enum ReviewTime {
         M1(5), // 1．第一個記憶週期：5分鐘
@@ -35,7 +33,7 @@ public class HermannEbbinghaus_Memory {
         ;
         final float min;
 
-        ReviewTime(int min) {
+        ReviewTime(float min) {
             this.min = min;
         }
 
@@ -111,13 +109,17 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    private ReviewTime getInitialReviewTime() {
+        return ReviewTime.values()[0];
+    }
+
     public void append(String key) {
         System.out.println("## 加入  " + key);
 
         MemData d = new MemData();
         d.key = key;
         d.registerTime = new Date();
-        d.reviewTime = INITIAL.name();
+        d.reviewTime = getInitialReviewTime().name();
         config.getConfigProp().setProperty(key, d.toValue());
         config.store();
 
@@ -135,7 +137,7 @@ public class HermannEbbinghaus_Memory {
 
         long nextRuntime = (long) (reviewTime.min * 60 * 1000);
         final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
-        
+
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid));
 
         Timer timer = newClock();
@@ -143,17 +145,17 @@ public class HermannEbbinghaus_Memory {
             @Override
             public void run() {
                 System.out.println(">> time up - " + d.getKey() + " , " + d.reviewTime + " , " + nextPeroid);
-                // target = d
-                // unknow = -1
-                // command = ENUM
-                // when = time
-                // unknow = -1
+                
+                // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid, -1);
                 memDo.actionPerformed(act);
 
                 // 紀錄下次執行
                 d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
                 storeMemData(d);
+
+                // 準備執行下次
+                schedule(d);
             }
         }, nextPeroid);
     }
@@ -165,7 +167,7 @@ public class HermannEbbinghaus_Memory {
 
     private long getExecuteTime(Date startTime, long period) {
         long val = startTime.getTime() + period - System.currentTimeMillis();
-        if (val < 0) { 
+        if (val < 0) {
             val = 0;
         }
         return val;

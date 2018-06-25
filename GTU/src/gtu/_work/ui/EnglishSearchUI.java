@@ -122,10 +122,11 @@ public class EnglishSearchUI extends JFrame {
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory(getDebugDir4Memory(), "EnglishSearchUI_MemoryBank.properties");
 
     private static File getDebugDir4Memory() {
-        if (DEBUG) {
-            File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
-            if (f1.exists() && f1.isDirectory()) {
-                return f1;
+        File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
+        File f2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
+        for (File f : new File[] { f1, f2 }) {
+            if (f.exists() && f.isDirectory()) {
+                return f;
             }
         }
         return null;
@@ -698,18 +699,23 @@ public class EnglishSearchUI extends JFrame {
 
             if (DEBUG) {
                 System.out.println("DEBUG MODE -----");
-                File dir = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
-                int max = -1;
-                Pattern ptn = Pattern.compile("bak(\\d+)");
-                for (File f : dir.listFiles()) {
-                    if (f.getName().startsWith("bak")) {
-                        Matcher mth = ptn.matcher(f.getName());
-                        if (mth.find()) {
-                            max = Math.max(max, Integer.parseInt(mth.group(1)));
+                File dir1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
+                File dir2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
+                for (File f1 : new File[] { dir1, dir2 }) {
+                    if (f1.exists() && f1.isDirectory()) {
+                        int max = -1;
+                        Pattern ptn = Pattern.compile("bak(\\d+)");
+                        for (File f : f1.listFiles()) {
+                            if (f.getName().startsWith("bak")) {
+                                Matcher mth = ptn.matcher(f.getName());
+                                if (mth.find()) {
+                                    max = Math.max(max, Integer.parseInt(mth.group(1)));
+                                }
+                            }
                         }
+                        file = new File(f1 + File.separator + "bak" + max, "exportFileJava.bin");
                     }
                 }
-                file = new File(dir + File.separator + "bak" + max, "exportFileJava.bin");
                 System.out.println("offline file --- " + file);
             }
 

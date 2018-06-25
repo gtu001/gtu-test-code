@@ -44,6 +44,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -69,6 +72,15 @@ public class Porn91Downloader {
     }
 
     public static void main(String[] args) throws Throwable {
+        Porn91Downloader p = new Porn91Downloader();
+        String url = "https://xvideos-im-24e6ee00-31316667-mp4.s.loris.llnwd.net/videos/mp4/4/2/d/xvideos.com_42d3bf243bc1136883a43d1ddcf19676.mp4?e=1524945829&ri=1024&rs=85&h=3258734aeecfc622cfa30c9c994aefb4";
+        File testMp4 = new File(FileUtil.DESKTOP_DIR, "xxxxxx.mp4");
+        long length = p.getContentLength(DEFAULT_USER_AGENT, url);
+        System.out.println("length = " + length);
+        System.out.println("done...");
+    }
+
+    public static void main_XXXXXX2(String[] args) throws Throwable {
         Porn91Downloader p = new Porn91Downloader();
         // List<VideoUrlConfig> videoLst =
         // p.processVideoLst("https://www.facebook.com/JKFR2.0/videos/434056733674860/");
@@ -365,13 +377,17 @@ public class Porn91Downloader {
         if (userAgent != null && userAgent.length() > 0) {
             httpget2.setHeader("User-Agent", userAgent);
         }
-        HttpClient httpclient2 = new DefaultHttpClient();
+        final HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
+        HttpClient httpclient2 = new DefaultHttpClient(httpParams);
         HttpResponse response2 = httpclient2.execute(httpget2);
         HttpEntity entity2 = response2.getEntity();
         if (entity2 != null && response2.getStatusLine().getStatusCode() == 200) {
             long length = entity2.getContentLength();
+            System.out.println("length : " + length);
             return length;
         }
+        System.out.println("length : Fail ");
         return -1;
     }
 
@@ -423,6 +439,8 @@ public class Porn91Downloader {
             downloadHandler.start();
 
             System.out.println("Done...");
+        } else {
+            System.out.println("Err : " + response2.getStatusLine().getStatusCode());
         }
     }
 

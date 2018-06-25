@@ -1,9 +1,19 @@
 package gtu.swing.util;
 
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+
+import sun.awt.AppContext;
 
 /**
  * 簡化JOptionPane
@@ -61,6 +71,10 @@ public class JOptionPaneUtil {
      */
     public Object showInputDialog_drowdown(Object message, String title, Object[] drowdown, Object defaultValue) {
         return JOptionPane.showInputDialog(null, message, title, messageType, null, drowdown, defaultValue);
+    }
+    
+    public Object showInputDialog_drowdown_top(Object message, String title, Object[] drowdown, Object defaultValue) {
+        return new __DropdownDialog().showInputDialog(null, message, title, messageType, null, drowdown, defaultValue);
     }
 
     /**
@@ -178,5 +192,114 @@ public class JOptionPaneUtil {
     public JOptionPaneUtil iconPlainMessage() {
         messageType = JOptionPane.PLAIN_MESSAGE;
         return this;
+    }
+    
+    private class __DropdownDialog {
+
+        private final Object sharedFrameKey = JOptionPane.class;
+        private final Object sharedOwnerFrameKey = new StringBuffer("SwingUtilities.sharedOwnerFrame");
+
+        public Frame getRootFrame() throws HeadlessException {
+            Frame localFrame = (Frame) AppContext.getAppContext().get(sharedFrameKey);
+            if (localFrame == null) {
+                localFrame = getSharedOwnerFrame();
+                AppContext.getAppContext().put(sharedFrameKey, localFrame);
+            }
+            return localFrame;
+        }
+
+        Frame getSharedOwnerFrame() throws HeadlessException {
+            Frame localObject = (Frame) AppContext.getAppContext().get(sharedOwnerFrameKey);
+            if (localObject == null) {
+                localObject = new SharedOwnerFrame();
+                AppContext.getAppContext().put(sharedOwnerFrameKey, localObject);
+            }
+            return localObject;
+        }
+
+        public final Object UNINITIALIZED_VALUE = "uninitializedValue";
+
+        public Object showInputDialog(Component paramComponent, Object paramObject1, String paramString, int paramInt, Icon paramIcon, Object[] paramArrayOfObject, Object paramObject2)
+                throws HeadlessException {
+            JOptionPane localJOptionPane = new JOptionPane(paramObject1, paramInt, 2, paramIcon, null, null);
+            localJOptionPane.setWantsInput(true);
+            localJOptionPane.setSelectionValues(paramArrayOfObject);
+            localJOptionPane.setInitialSelectionValue(paramObject2);
+            localJOptionPane.setComponentOrientation((paramComponent == null ? getRootFrame() : paramComponent).getComponentOrientation());
+            JDialog localJDialog = localJOptionPane.createDialog(paramComponent, paramString);
+            localJDialog.setAlwaysOnTop(true);
+            localJOptionPane.selectInitialValue();
+            localJDialog.show();
+            localJDialog.dispose();
+            Object localObject = localJOptionPane.getInputValue();
+            if (localObject == UNINITIALIZED_VALUE) {
+                return null;
+            }
+            return localObject;
+        }
+
+        private class SharedOwnerFrame extends Frame implements WindowListener {
+            SharedOwnerFrame() {
+            }
+
+            public void addNotify() {
+                super.addNotify();
+                installListeners();
+            }
+
+            void installListeners() {
+                Window[] arrayOfWindow1 = getOwnedWindows();
+                for (Window localWindow : arrayOfWindow1) {
+                    if (localWindow != null) {
+                        localWindow.removeWindowListener(this);
+                        localWindow.addWindowListener(this);
+                    }
+                }
+            }
+
+            public void windowClosed(WindowEvent paramWindowEvent) {
+                synchronized (getTreeLock()) {
+                    Window[] arrayOfWindow1 = getOwnedWindows();
+                    for (Window localWindow : arrayOfWindow1) {
+                        if (localWindow != null) {
+                            if (localWindow.isDisplayable()) {
+                                return;
+                            }
+                            localWindow.removeWindowListener(this);
+                        }
+                    }
+                    dispose();
+                }
+            }
+
+            public void windowOpened(WindowEvent paramWindowEvent) {
+            }
+
+            public void windowClosing(WindowEvent paramWindowEvent) {
+            }
+
+            public void windowIconified(WindowEvent paramWindowEvent) {
+            }
+
+            public void windowDeiconified(WindowEvent paramWindowEvent) {
+            }
+
+            public void windowActivated(WindowEvent paramWindowEvent) {
+            }
+
+            public void windowDeactivated(WindowEvent paramWindowEvent) {
+            }
+
+            public void show() {
+            }
+
+            public void dispose() {
+                try {
+                    getToolkit().getSystemEventQueue();
+                    super.dispose();
+                } catch (Exception localException) {
+                }
+            }
+        }
     }
 }

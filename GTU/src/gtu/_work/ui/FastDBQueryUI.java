@@ -51,13 +51,13 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.db.JdbcDBUtil;
+import gtu.properties.PropertiesGroupUtils;
+import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.PropertiesGroupUtils;
-import gtu.swing.util.PropertiesGroupUtils_ByKey;
 
 public class FastDBQueryUI extends JFrame {
 

@@ -1,8 +1,8 @@
 package gtu._work.ui;
 import gtu._work.BTMovieMove;
+import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.PropertiesGroupUtils;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

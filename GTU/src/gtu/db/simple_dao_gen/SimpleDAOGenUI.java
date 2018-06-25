@@ -33,9 +33,9 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.db.simple_dao_gen.forSpring.GenDaoAllMain_forSpring;
 import gtu.db.simple_dao_gen.forSpring_ex2.GenDaoAllMain_forSpring_Ex2;
+import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.PropertiesGroupUtils_ByKey;
 
 public class SimpleDAOGenUI extends JFrame {
 

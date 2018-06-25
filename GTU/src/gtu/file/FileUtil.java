@@ -48,9 +48,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
-        File f1 = new File("c:/Users/gtu00/OneDrive/Desktop/Culdcept Revolt (USA).cia");
-        File f2 = new File("k:/破解apk/模擬器/roms/3DS/Culdcept Revolt (USA).cia");
-        System.out.println(FileUtil.contentEquals(f1, f2));
+        File f1 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\XXXXXXXXXXXXXXXXXXXXXXXXXXXX - 複製");
+        System.out.println(FileUtil.moveToTrashCan(f1));
     }
 
     private FileUtil() {
@@ -1013,7 +1012,7 @@ public class FileUtil {
         String tDir = System.getProperty("java.io.tmpdir");
         String path = tDir + File.separator + tempFileName;
         File file = new File(path);
-//        file.deleteOnExit();
+        // file.deleteOnExit();
         FileUtils.copyURLToFile(url, file);
         return file;
     }
@@ -1072,6 +1071,24 @@ public class FileUtil {
             return FileUtils.contentEquals(file1, file2);
         } catch (Exception e) {
             throw new RuntimeException("contentEquals ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public static boolean moveToTrashCan(File... files) {
+        try {
+//            com.sun.jna.platform.FileUtils fileUtil = com.sun.jna.platform.FileUtils.getInstance();
+//            if (fileUtil.hasTrash()) {
+//                fileUtil.moveToTrash(files);
+//            }
+//            for (File f : files) {
+//                if (f.exists()) {
+//                    System.out.println("can't move to trash can : " + f);
+//                    return false;
+//                }
+//            }
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
     }
 

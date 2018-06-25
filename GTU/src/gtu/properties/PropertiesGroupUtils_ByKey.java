@@ -1,4 +1,4 @@
-package gtu.swing.util;
+package gtu.properties;
 
 import java.io.File;
 import java.io.FileInputStream;

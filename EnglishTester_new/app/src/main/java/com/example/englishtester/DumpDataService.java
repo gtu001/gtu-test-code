@@ -3,6 +3,7 @@ package com.example.englishtester;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Handler;
 import android.util.JsonReader;
 import android.util.JsonToken;
@@ -10,12 +11,15 @@ import android.util.JsonWriter;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dropbox.core.v2.DbxClientV2;
+import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FileUtilAndroid;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,12 +43,12 @@ public class DumpDataService {
 
     private static final String TAG = DumpDataService.class.getSimpleName();
 
-    Context context;
+    ContextWrapper context;
     final EnglishwordInfoDAO dao;
     XStream xstream = new XStream(new DomDriver());
     final Handler handler = new Handler();
 
-    public DumpDataService(Context context) {
+    public DumpDataService(ContextWrapper context) {
         this.context = context;
         this.dao = new EnglishwordInfoDAO(context);
     }
@@ -66,6 +70,11 @@ public class DumpDataService {
                         exportResult_JSON();
                         exportResult_XML();
                     }
+
+                    //上傳檔案到dropbox
+                    if (BuildConfig.DEBUG) {
+                        uploadExportDataToDropbox();
+                    }
                 } catch (Exception ex) {
                     resultOk = false;
                 }
@@ -86,6 +95,21 @@ public class DumpDataService {
                 });
             }
         }, "autoSysBackup").start();
+    }
+
+    private void uploadExportDataToDropbox() {
+        try {
+            String accessToken = DropboxApplicationActivity.getDropboxAccessToken(context);
+            DbxClientV2 client = DropboxUtilV2.getClient(accessToken);
+            String datestr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss");
+            String path = "/bak_" + datestr;
+            DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_JAVA.getName(), new FileInputStream(Constant.EXPORT_FILE_JAVA), client);
+            DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_JSON.getName(), new FileInputStream(Constant.EXPORT_FILE_JSON), client);
+            DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_XML.getName(), new FileInputStream(Constant.EXPORT_FILE_XML), client);
+        } catch (Exception ex) {
+            Log.e(TAG, "uploadExportDataToDropbox ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -142,14 +166,14 @@ public class DumpDataService {
                     try {
                         //判斷匯入來源
                         InputStream inputStream = null;
-                        if(FileConstantAccessUtil.getFile(context, Constant.EXPORT_FILE_JAVA).exists() &&
-                                FileConstantAccessUtil.getFile(context, Constant.EXPORT_FILE_JAVA).length() != 0){
+                        if (FileConstantAccessUtil.getFile(context, Constant.EXPORT_FILE_JAVA).exists() &&
+                                FileConstantAccessUtil.getFile(context, Constant.EXPORT_FILE_JAVA).length() != 0) {
                             inputStream = FileConstantAccessUtil.getInputStream(context, Constant.EXPORT_FILE_JAVA, false);
                             Log.v(TAG, "使用 custom 備份還原!");
 
                             //匯入資料
                             _importResult_JAVA(inputStream, false);
-                        }else{
+                        } else {
                             inputStream = context.getAssets().open("exportFileJava.bin");
                             Log.v(TAG, "使用 APK 備份還原!");
 

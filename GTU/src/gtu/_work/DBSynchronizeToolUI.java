@@ -1,8 +1,8 @@
 package gtu._work;
 
+import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.PropertiesGroupUtils;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
