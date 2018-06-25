@@ -66,8 +66,20 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    public void stop() {
+        startPause.set(false);
+        for (Timer t : timerLst) {
+            try{
+                t.cancel();
+            }catch(Exception ex){
+            }
+        }
+        timerLst.clear();
+    }
+
     private AtomicBoolean startPause = new AtomicBoolean(false);
     private List<MemData> memLst = new ArrayList<MemData>();
+    private List<Timer> timerLst = new ArrayList<Timer>();
     private ActionListener memDo = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent paramActionEvent) {
@@ -76,7 +88,9 @@ public class HermannEbbinghaus_Memory {
     };
 
     private Timer newClock() {
-        return new Timer();
+        Timer t = new Timer();
+        timerLst.add(t);
+        return t;
     }
 
     private void init() {

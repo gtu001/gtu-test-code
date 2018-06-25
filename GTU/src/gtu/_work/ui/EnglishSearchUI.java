@@ -304,6 +304,7 @@ public class EnglishSearchUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
         }
     };
+    private JCheckBox reviewMemChk;
 
     /**
      * Create the frame.
@@ -325,7 +326,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 429);
+        setBounds(100, 100, 540, 428);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -431,7 +432,8 @@ public class EnglishSearchUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -502,16 +504,8 @@ public class EnglishSearchUI extends JFrame {
         simpleSentanceChk = new JCheckBox("簡化例句");
         panel.add(simpleSentanceChk, "4, 20");
 
-        JButton configSettingBtn = new JButton("儲存設定");
-        configSettingBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                configSettingBtnAction();
-            }
-        });
-
-        robotFocusChk = new JCheckBox("使用機械Focus");
+        robotFocusChk = new JCheckBox("機械Focus");
         panel.add(robotFocusChk, "4, 22");
-        panel.add(configSettingBtn, "2, 24");
 
         sysutil = HideInSystemTrayHelper.newInstance();
         sysutil.apply(this, "英語字典", "resource/images/ico/janna.ico");
@@ -562,7 +556,29 @@ public class EnglishSearchUI extends JFrame {
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
         simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
+        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
+
+        JButton configSettingBtn = new JButton("儲存設定");
+        configSettingBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                configSettingBtnAction();
+            }
+        });
+
+        reviewMemChk = new JCheckBox("定時複習");
+        reviewMemChk.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (reviewMemChk.isSelected()) {
+                    memory.start();
+                } else {
+                    memory.stop();
+                }
+            }
+        });
+        reviewMemChk.setSelected(false);
+        panel.add(reviewMemChk, "4, 24");
+        panel.add(configSettingBtn, "2, 26");
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -576,6 +592,7 @@ public class EnglishSearchUI extends JFrame {
                 propertyBean.getConfigProp().setProperty("offlineModeFirstChk", String.valueOf(offlineModeFirstChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("simpleSentanceChk", String.valueOf(simpleSentanceChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("robotFocusChk", String.valueOf(robotFocusChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("reviewMemChk", String.valueOf(reviewMemChk.isSelected()));
                 propertyBean.store();
                 System.exit(0);
             }
