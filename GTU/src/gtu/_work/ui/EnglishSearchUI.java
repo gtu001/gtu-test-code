@@ -726,7 +726,6 @@ public class EnglishSearchUI extends JFrame {
                 searchEnglishIdTextController.setSelectAll();
             }
         });
-        searchEnglishIdTextController.setSelectAll();
         return isRobotFocus;
     }
 

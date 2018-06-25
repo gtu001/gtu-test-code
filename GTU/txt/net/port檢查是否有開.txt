@@ -12,7 +12,7 @@ netstat -ano | findstr 50000
 taskkill /PID typeYourPIDhere /F
 
 
-#linux
+#linux ------------------------------------------------------------------------
 
 netstat -nlp|grep 9000 
 #running as the superuser the -p option will say what the process is

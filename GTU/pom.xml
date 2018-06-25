@@ -660,6 +660,18 @@
 			<version>2.0.5.RELEASE</version>
 		</dependency>
 
+		<!-- for youtube liveStream -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-youtube</artifactId>
+			<version>v3-rev107-1.18.0-rc</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.23.0</version>
+		</dependency>
+
 	</dependencies>
 
 

@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_mp3_player) {
             gotoActivity(Mp3PlayerActivity.class);
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_hls_player) {
+            gotoActivity(HLSPlayerActivity.class);
 
         } else if (id == R.id.nav_share) {
 

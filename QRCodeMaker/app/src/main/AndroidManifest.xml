@@ -26,9 +26,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />
 
-
     <!-- 關掉其他程序 -->
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+
+    <!--網路-->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -56,6 +58,9 @@
         <activity
             android:name=".Mp3PlayerActivity"
             android:label="Mp3播放" />
+        <activity
+            android:name=".HLSPlayerActivity"
+            android:label="串流播放" />
     </application>
 
 </manifest>

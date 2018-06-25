@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "27.0.1"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.example.gtu001.qrcodemaker"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -33,7 +33,10 @@ dependencies {
     compile 'com.google.zxing:javase:2.0'//qrCode
     compile 'com.github.kenglxn.QRGen:android:2.4.0' //https://github.com/kenglxn/QRGen
 
-    compile 'com.jaredrummler:android-processes:1.1.1' //https://github.com/jaredrummler/AndroidProcesses
+    compile 'com.jaredrummler:android-processes:1.1.1'
+    //https://github.com/jaredrummler/AndroidProcesses
+
+    compile "com.brightcove.player:exoplayer:4.+" //for HLS 需要額外 repositories
 
     testCompile 'junit:junit:4.12'
 }
