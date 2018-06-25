@@ -119,7 +119,7 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
-    public void schedule(MemData d) {
+    public void schedule(final MemData d) {
         ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
 
         if (reviewTime == ReviewTime.NONE) {
@@ -127,7 +127,7 @@ public class HermannEbbinghaus_Memory {
         }
 
         long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-        long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+        final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid);
 
         Timer timer = newClock();

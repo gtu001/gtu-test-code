@@ -71,7 +71,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.example.englishtester.EnglishwordInfoDAO;
-import com.ibm.db2.jcc.sqlj.e;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -782,7 +781,7 @@ public class EnglishSearchUI extends JFrame {
         sb.append(info.getMeaning() + "\n");
         sb.append("\n");
 
-        AtomicBoolean findOk = new AtomicBoolean(false);
+        final AtomicBoolean findOk = new AtomicBoolean(false);
 
         meaningText.setText(info.getMeaning());
 
