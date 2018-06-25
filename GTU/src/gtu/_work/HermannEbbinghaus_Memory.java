@@ -14,11 +14,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import gtu.date.DateUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 
 public class HermannEbbinghaus_Memory {
-
+    
     private static final ReviewTime INITIAL = ReviewTime.M1;
 
     private enum ReviewTime {
@@ -49,10 +50,16 @@ public class HermannEbbinghaus_Memory {
 
     private PropertiesUtilBean config;
 
-    public HermannEbbinghaus_Memory(String configName) {
-        File dir = PropertiesUtil.getJarCurrentPath(HermannEbbinghaus_Memory.class);
+    public HermannEbbinghaus_Memory(File dir, String configName) {
+        if (dir == null) {
+            dir = PropertiesUtil.getJarCurrentPath(HermannEbbinghaus_Memory.class);
+        }
         config = new PropertiesUtilBean(new File(dir, configName));
         this.init();
+    }
+
+    public HermannEbbinghaus_Memory(String configName) {
+        this(null, configName);
     }
 
     public File getFile() {
@@ -69,9 +76,9 @@ public class HermannEbbinghaus_Memory {
     public void stop() {
         startPause.set(false);
         for (Timer t : timerLst) {
-            try{
+            try {
                 t.cancel();
-            }catch(Exception ex){
+            } catch (Exception ex) {
             }
         }
         timerLst.clear();
@@ -128,7 +135,8 @@ public class HermannEbbinghaus_Memory {
 
         long nextRuntime = (long) (reviewTime.min * 60 * 1000);
         final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
-        System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid);
+        
+        System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid));
 
         Timer timer = newClock();
         timer.schedule(new TimerTask() {
@@ -157,7 +165,7 @@ public class HermannEbbinghaus_Memory {
 
     private long getExecuteTime(Date startTime, long period) {
         long val = startTime.getTime() + period - System.currentTimeMillis();
-        if (val < 0) {
+        if (val < 0) { 
             val = 0;
         }
         return val;

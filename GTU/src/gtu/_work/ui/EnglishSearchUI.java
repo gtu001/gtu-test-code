@@ -117,10 +117,17 @@ public class EnglishSearchUI extends JFrame {
     private HideInSystemTrayHelper sysutil;
 
     private Properties offlineProp;
-    private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory("EnglishSearchUI_MemoryBank.properties");
-
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
+    
+    private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory(getDebugDir4Memory(), "EnglishSearchUI_MemoryBank.properties");
 
+    private static File getDebugDir4Memory(){
+        if(DEBUG){
+            return new File("D:/my_tool/EnglishSearchUI");
+        }
+        return null;
+    }
+    
     /**
      * Launch the application.
      */
@@ -543,20 +550,7 @@ public class EnglishSearchUI extends JFrame {
             public void focusGained(FocusEvent e) {
             }
         });
-
-        // 置中
-        JCommonUtil.setJFrameCenter(this);
-        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
-        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
-        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
-        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
-        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
-        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
-        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
-        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
-        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
-        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
-        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
+        
 
         JButton configSettingBtn = new JButton("儲存設定");
         configSettingBtn.addActionListener(new ActionListener() {
@@ -575,9 +569,23 @@ public class EnglishSearchUI extends JFrame {
                 }
             }
         });
-        reviewMemChk.setSelected(false);
+        
         panel.add(reviewMemChk, "4, 24");
         panel.add(configSettingBtn, "2, 26");
+
+        // 置中
+        JCommonUtil.setJFrameCenter(this);
+        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
+        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
+        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
+        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
+        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
+        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
+        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
+        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
+        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
+        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
+        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
