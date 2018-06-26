@@ -32,7 +32,7 @@ public class HermannEbbinghaus_Memory {
         System.out.println(Base64JdkUtil.decode(v));
         System.out.println("done...");
     }
-    
+
     private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
     private static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
 
@@ -67,6 +67,7 @@ public class HermannEbbinghaus_Memory {
     }
 
     private PropertiesUtilBean config;
+    private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
 
     public HermannEbbinghaus_Memory(File dir, String configName) {
         if (dir == null) {
@@ -157,9 +158,11 @@ public class HermannEbbinghaus_Memory {
     public void append(String key, String remark) {
         System.out.println("## 加入  " + key);
 
+        Date newDate = new Date();
         MemData d = new MemData();
         d.key = key;
-        d.registerTime = new Date();
+        d.registerTime = newDate;
+        d.fixedTime = newDate;
         d.setRemark(remark);
         d.resetReviewTime();
         this.memLst.add(d);
@@ -188,7 +191,7 @@ public class HermannEbbinghaus_Memory {
             d.setWaitingTriggerTime(-1);
         } else {
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            nextPeroid.set(this.getExecuteTime(d.registerTime, nextRuntime));
+            nextPeroid.set(this.getExecuteTime(d.fixedTime, nextRuntime));
         }
 
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
@@ -201,11 +204,20 @@ public class HermannEbbinghaus_Memory {
 
                 // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
-                memDo.actionPerformed(act);
+
+                synchronized (HermannEbbinghaus_Memory.this) {
+                    memDo.actionPerformed(act);
+                }
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
+                    // 計算下次執行起算點
+                    d.fixedTime = getCaculateFixedTime(d.reviewTime, d);
+
+                    // 計算下期
                     d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
+
+                    // 儲存
                     storeMemData(d);
                 }
 
@@ -213,6 +225,16 @@ public class HermannEbbinghaus_Memory {
                 schedule(d);
             }
         }, nextPeroid.get());
+    }
+
+    private Date getCaculateFixedTime(String thisReviewTime, MemData d) {
+        if (fixedTimeUsing) {
+            ReviewTime thisTime = ReviewTime.valueOf(thisReviewTime);
+            long fixedTime = System.currentTimeMillis() - (long) (thisTime.min * 60 * 1000);
+            return new Date(fixedTime);
+        } else {
+            return d.registerTime;
+        }
     }
 
     /**
@@ -291,31 +313,41 @@ public class HermannEbbinghaus_Memory {
         }
         return val;
     }
-    
+
     public static class MemData {
         String key;
         Date registerTime;
+        Date fixedTime;
         String reviewTime;
         String remark;
         long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
 
-        MemData() {
+        public MemData() {
         }
 
-        MemData(String key, String value) {
+        public MemData(String key, String value) {
             try {
                 String[] arry = StringUtils.trimToEmpty(value).split("\\^", -1);
                 this.key = key;
                 this.reviewTime = getArry(0, arry);
-                this.registerTime = SDF.parse(getArry(1, arry));
-                this.remark = getArry(2, arry);
+                this.registerTime = __getDateFromString(getArry(1, arry));
+                this.fixedTime = __getDateFromString(getArry(2, arry));
+                this.remark = getArry(3, arry);
             } catch (Exception e) {
                 throw new RuntimeException("MemData ERR : " + e.getMessage(), e);
             }
         }
 
+        private Date __getDateFromString(String dateStr) {
+            try {
+                return SDF.parse(dateStr);
+            } catch (Exception ex) {
+                return new Date();
+            }
+        }
+
         String toValue() {
-            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + this.remark;
+            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + DateFormatUtils.format(this.fixedTime, DATE_FORMAT) + "^" + this.remark;
         }
 
         private String getArry(int index, String[] arry) {
@@ -376,9 +408,25 @@ public class HermannEbbinghaus_Memory {
         public boolean isCustomWaitingTrigger() {
             return this.waitingTriggerTime >= 0;
         }
+
+        public Date getFixedTime() {
+            return fixedTime;
+        }
+
+        public void setFixedTime(Date fixedTime) {
+            this.fixedTime = fixedTime;
+        }
     }
 
     public void setMemDo(ActionListener memDo) {
         this.memDo = memDo;
+    }
+
+    public boolean isFixedTimeUsing() {
+        return fixedTimeUsing;
+    }
+
+    public void setFixedTimeUsing(boolean fixedTimeUsing) {
+        this.fixedTimeUsing = fixedTimeUsing;
     }
 }

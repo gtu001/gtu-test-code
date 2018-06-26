@@ -110,6 +110,24 @@ public class EnglishSearchUI extends JFrame {
     private JTabbedPane tabbedPane;
     private JPanel panel_4;
     private JCheckBox reviewMemChk;
+    private JButton reviewMemWaitingListBtn;
+    private JButton reviewMemResetBtn;
+    private JButton reviewMemConfigBtn;
+    private JLabel offlineReadyLabel;
+    private JButton reviewMemFromFileBtn;
+    private JCheckBox listenClipboardChk;
+    private JCheckBox rightBottomCornerChk;
+    private JCheckBox autoSearchChk;
+    private JCheckBox mouseSelectionChk;
+    private JButton showNewWordTxtBtn;
+    private JCheckBox focusTopChk;
+    private JPanel panel_3;
+    private JTextField offlineConfigText;
+    private JCheckBox offlineModeChk;
+    private JLabel label;
+    private JCheckBox offlineModeFirstChk;
+    private JCheckBox simpleSentanceChk;
+    private JCheckBox robotFocusChk;
 
     PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     private static final String NEW_WORD_PATH = "new_word_path";
@@ -140,25 +158,10 @@ public class EnglishSearchUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        // SocketUtilForSwing.startSwingUI("127.0.0.1", 65535,
-        // EnglishSearchUI.class, new Runnable() {
-        // @Override
-        // public void run() {
-        // try {
-        // startNewUI();
-        // } catch (Exception ex) {
-        // ex.printStackTrace();
-        // }
-        // }
-        // });
         JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         FRAME = new EnglishSearchUI();
         FRAME.keyUtil = FRAME.new GlobalKeyListenerExampleForEnglishUI();
         FRAME.keyUtil.init();
-
-        // if(true){
-        // DesktopUtil.openDir(FRAME.propertyBean.getPropFile().getAbsolutePath());
-        // }
     }
 
     private static volatile EnglishSearchUI FRAME;
@@ -196,19 +199,6 @@ public class EnglishSearchUI extends JFrame {
             focusSearchEnglishIdText();
         }
     };
-    private JCheckBox listenClipboardChk;
-    private JCheckBox rightBottomCornerChk;
-    private JCheckBox autoSearchChk;
-    private JCheckBox mouseSelectionChk;
-    private JButton showNewWordTxtBtn;
-    private JCheckBox focusTopChk;
-    private JPanel panel_3;
-    private JTextField offlineConfigText;
-    private JCheckBox offlineModeChk;
-    private JLabel label;
-    private JCheckBox offlineModeFirstChk;
-    private JCheckBox simpleSentanceChk;
-    private JCheckBox robotFocusChk;
 
     private void startCheckFocusOwnerThread() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
@@ -343,24 +333,17 @@ public class EnglishSearchUI extends JFrame {
             }
 
             String choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
-
             boolean choiceCorrect = StringUtils.equals(choiceMeaning, meaning);
-
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append("是否答對 : " + (choiceCorrect ? "對" : "錯") + "\n");
-            sb2.append("正確解答 : " + d.getKey() + " : " + meaning + "\n");
-            sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
-
             if (!choiceCorrect) {
+                StringBuilder sb2 = new StringBuilder();
+                sb2.append("是否答對 : " + (choiceCorrect ? "對" : "錯") + "\n");
+                sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
+                sb2.append("正確解答 : " + d.getKey() + " : " + meaning + "\n");
                 JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
                 d.setWaitingTriggerTime(30 * 1000);
             }
         }
     };
-    private JButton reviewMemWaitingListBtn;
-    private JButton reviewMemResetBtn;
-    private JButton reviewMemConfigBtn;
-    private JLabel offlineReadyLabel;
 
     /**
      * Create the frame.
@@ -382,7 +365,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 358);
+        setBounds(100, 100, 540, 338);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -647,6 +630,14 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         panel_3.add(offlineReadyLabel);
+
+        reviewMemFromFileBtn = new JButton("加入記憶清單");
+        reviewMemFromFileBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reviewMemFromFileBtn();
+            }
+        });
+        panel_4.add(reviewMemFromFileBtn);
 
         // ----------------------------------------------------------------------------------------------------------
 
@@ -1244,6 +1235,28 @@ public class EnglishSearchUI extends JFrame {
             DesktopUtil.browse(memory.getFile().toURL().toString());
         } catch (MalformedURLException e) {
             JCommonUtil.handleException(e);
+        }
+    }
+
+    private void reviewMemFromFileBtn() {
+        try {
+            File file = JCommonUtil._jFileChooser_selectFileOnly();
+            if (!file.exists()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案有誤!");
+                return;
+            }
+            Properties prop = new Properties();
+            prop.load(new FileInputStream(file));
+
+            for (Enumeration<?> enu = prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String meaning = this.getEnglishMeaning(key);
+                memory.append(key, meaning);
+            }
+
+            JCommonUtil._jOptionPane_showMessageDialog_info("重設完成!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
