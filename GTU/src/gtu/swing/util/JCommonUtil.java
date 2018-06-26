@@ -37,6 +37,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -469,6 +470,7 @@ public class JCommonUtil {
     public static Object _JOptionPane_showInputDialog(Object message, String title, Object[] drowdown, Object defaultValue) {
         return JOptionPaneUtil.newInstance().showInputDialog_drowdown(message, title, drowdown, defaultValue);
     }
+
     public static Object _JOptionPane_showInputDialog_top(Object message, String title, Object[] drowdown, Object defaultValue) {
         return JOptionPaneUtil.newInstance().showInputDialog_drowdown_top(message, title, drowdown, defaultValue);
     }
@@ -864,15 +866,27 @@ public class JCommonUtil {
     /**
      * 將視窗帶到最上層顯示
      */
-    public static void setFrameAtop(JFrame jframe, boolean alaysOnTop) {
+    public static void setFrameAtop(Window jframe, boolean alaysOnTop) {
         // 設定顯示
         jframe.setVisible(true);
         // 設定至最前
         jframe.toFront();
         jframe.repaint();
-        // 回復原狀
-        jframe.setState(java.awt.Frame.NORMAL);
+
+        if (jframe instanceof JFrame) {
+            JFrame f = (JFrame) jframe;
+            // f.setState(java.awt.Frame.NORMAL);// 回復原狀
+
+            int state = f.getExtendedState();
+            state &= ~JFrame.ICONIFIED;
+            f.setExtendedState(state);
+        } else if (jframe instanceof JDialog) {
+            JDialog d = (JDialog) jframe;
+            d.setModal(true);
+        }
+
         // 鎖定最上層
+        jframe.requestFocus();
         jframe.setAlwaysOnTop(alaysOnTop);
         jframe.setAutoRequestFocus(true);
     }

@@ -6,9 +6,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -55,6 +54,10 @@ public class HermannEbbinghaus_Memory {
                 return ReviewTime.NONE;
             }
             return ReviewTime.values()[v.ordinal() + 1];
+        }
+
+        private static ReviewTime getInitialReviewTime() {
+            return ReviewTime.values()[0];
         }
     }
 
@@ -127,10 +130,6 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
-    private ReviewTime getInitialReviewTime() {
-        return ReviewTime.values()[0];
-    }
-
     /**
      * 加入新項目
      * 
@@ -152,8 +151,8 @@ public class HermannEbbinghaus_Memory {
         MemData d = new MemData();
         d.key = key;
         d.registerTime = new Date();
-        d.reviewTime = getInitialReviewTime().name();
         d.setRemark(remark);
+        d.resetReviewTime();
         this.memLst.add(d);
 
         config.getConfigProp().setProperty(key, d.toValue());
@@ -211,9 +210,8 @@ public class HermannEbbinghaus_Memory {
      * 取得等待清單
      */
     public List<String> getWaitingList() {
-        TreeMap<Long, String> map = new TreeMap<Long, String>();
-        Map<String, Long> distinctMap = new HashMap<String, Long>();
-        for (MemData d : this.memLst) {
+        TreeMap<Long, List<MemData>> map = new TreeMap<Long,List<MemData>>();
+        for (MemData d : getAllMemData()) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
                 continue;
@@ -222,16 +220,54 @@ public class HermannEbbinghaus_Memory {
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
             long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
 
-            //只保留時間最近的 
-            if (distinctMap.containsKey(d.getKey())) {
-                nextPeroid = Math.min(distinctMap.get(d.getKey()), nextPeroid);
-            } 
-            distinctMap.put(d.getKey(), nextPeroid);
-
-            String detail = "" + d.getKey() + " , " + d.reviewTime + " - " + DateUtil.wasteTotalTime(nextPeroid);
-            map.put(nextPeroid, detail);
+            List<MemData> lst = new ArrayList<MemData>();
+            if(map.containsKey(nextPeroid)){
+                lst = map.get(nextPeroid);
+            }
+            lst.add(d);
+            map.put(nextPeroid, lst);
         }
-        return new ArrayList<String>(map.values());
+        
+        List<MemData> allLst = new ArrayList<MemData>();
+        for(Long key : map.keySet()){
+            List<MemData> lst2 = map.get(key);
+            allLst.addAll(lst2);
+        }
+        
+        List<String> rtnLst = new ArrayList<String>();
+        for(MemData d : allLst){
+            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
+            long nextRuntime = (long) (reviewTime.min * 60 * 1000);
+            long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+            String detail = String.format("[%s] %s : %s -> %s", d.reviewTime, d.getKey(), DateUtil.wasteTotalTime(nextPeroid), d.getRemark());
+            rtnLst.add(detail);
+        }
+        return rtnLst;
+    }
+
+    /**
+     * 取得所有設定
+     */
+    public List<MemData> getAllMemData() {
+        List<MemData> lst = new ArrayList<MemData>();
+        for (Enumeration<?> enu = this.config.getConfigProp().keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String value = this.config.getConfigProp().getProperty(key);
+            MemData d = new MemData(key, value);
+            lst.add(d);
+        }
+        return lst;
+    }
+
+    /**
+     * 複寫原來設定
+     */
+    public void overwrite(List<MemData> lst) {
+        for (MemData v : lst) {
+            System.out.println("overwrite : " + v.getKey() + "\t" + v.toValue());
+            config.getConfigProp().setProperty(v.getKey(), v.toValue());
+        }
+        config.store();
     }
 
     private void storeMemData(MemData d) {
@@ -301,6 +337,10 @@ public class HermannEbbinghaus_Memory {
 
         public String getReviewTime() {
             return reviewTime;
+        }
+
+        public void resetReviewTime() {
+            this.reviewTime = ReviewTime.getInitialReviewTime().name();
         }
 
         public void setReviewTime(String reviewTime) {

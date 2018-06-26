@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -308,6 +310,13 @@ public class EnglishSearchUI extends JFrame {
             sb.append("加入時間 : " + DateFormatUtils.format(d.getRegisterTime(), d.getDateFormat()) + "\n");
             sb.append("進程 : " + d.getReviewTime() + "\n");
 
+            // 若只有一個答案就把空白放第一個
+            if (meaningLst.size() == 1) {
+                String onlyOne = meaningLst.get(0);
+                meaningLst.set(0, "");
+                meaningLst.add(onlyOne);
+            }
+
             String choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
 
             boolean choiceCorrect = StringUtils.equals(choiceMeaning, meaning);
@@ -317,14 +326,16 @@ public class EnglishSearchUI extends JFrame {
             sb2.append("正確解答 : " + d.getKey() + " : " + meaning + "\n");
             sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
 
-            JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
-            
             if (!choiceCorrect) {
-                d.setWaitingTriggerTime(3 * 1000);
+                JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
+                d.setWaitingTriggerTime(30 * 1000);
             }
         }
     };
     private JButton reviewMemWaitingListBtn;
+    private JButton reviewMemResetBtn;
+    private JButton reviewMemConfigBtn;
+    private JLabel offlineReadyLabel;
 
     /**
      * Create the frame.
@@ -346,7 +357,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 377);
+        setBounds(100, 100, 540, 358);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -581,12 +592,36 @@ public class EnglishSearchUI extends JFrame {
         reviewMemWaitingListBtn = new JButton("等待清單");
         reviewMemWaitingListBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String waitingLstStr = StringUtils.join(memory.getWaitingList(), "\n");
-                JCommonUtil._jOptionPane_showMessageDialog_info(waitingLstStr);
+                reviewMemWaitingListBtnAction();
             }
         });
         panel_4.add(reviewMemWaitingListBtn);
         panel.add(configSettingBtn, "2, 26");
+
+        reviewMemResetBtn = new JButton("重設");
+        reviewMemResetBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reviewMemResetBtnAction();
+            }
+        });
+        panel_4.add(reviewMemResetBtn);
+
+        reviewMemConfigBtn = new JButton("開啟設定檔");
+        reviewMemConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reviewMemConfigBtnAction();
+            }
+        });
+        panel_4.add(reviewMemConfigBtn);
+
+        offlineReadyLabel = new JLabel("");
+        offlineReadyLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                offlineReadyLabelAction();
+            }
+        });
+        panel_3.add(offlineReadyLabel);
 
         // ----------------------------------------------------------------------------------------------------------
 
@@ -623,7 +658,7 @@ public class EnglishSearchUI extends JFrame {
         });
 
         // 設定離線檔參照路徑
-        this.initOfflineConfigText();
+        this.offlineReadyLabelAction();
 
         // 確認是否Focus
         startCheckFocusOwnerThread();
@@ -702,6 +737,28 @@ public class EnglishSearchUI extends JFrame {
                 }
             }
         }
+
+        if (StringUtils.isBlank(offlineConfigText.getText())) {
+            System.out.println("DEBUG MODE -----");
+            File dir1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
+            File dir2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
+            for (File f1 : new File[] { dir1, dir2 }) {
+                if (f1.exists() && f1.isDirectory()) {
+                    int max = -1;
+                    Pattern ptn = Pattern.compile("bak(\\d+)");
+                    for (File f : f1.listFiles()) {
+                        if (f.getName().startsWith("bak")) {
+                            Matcher mth = ptn.matcher(f.getName());
+                            if (mth.find()) {
+                                max = Math.max(max, Integer.parseInt(mth.group(1)));
+                            }
+                        }
+                    }
+                    File file = new File(f1 + File.separator + "bak" + max, "exportFileJava.bin");
+                    offlineConfigText.setText(file.getAbsolutePath());
+                }
+            }
+        }
     }
 
     private void loadOfflineConfig() {
@@ -710,28 +767,6 @@ public class EnglishSearchUI extends JFrame {
             this.initOfflineConfigText();
 
             File file = new File(offlineConfigText.getText());
-
-            if (DEBUG) {
-                System.out.println("DEBUG MODE -----");
-                File dir1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
-                File dir2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
-                for (File f1 : new File[] { dir1, dir2 }) {
-                    if (f1.exists() && f1.isDirectory()) {
-                        int max = -1;
-                        Pattern ptn = Pattern.compile("bak(\\d+)");
-                        for (File f : f1.listFiles()) {
-                            if (f.getName().startsWith("bak")) {
-                                Matcher mth = ptn.matcher(f.getName());
-                                if (mth.find()) {
-                                    max = Math.max(max, Integer.parseInt(mth.group(1)));
-                                }
-                            }
-                        }
-                        file = new File(f1 + File.separator + "bak" + max, "exportFileJava.bin");
-                    }
-                }
-                System.out.println("offline file --- " + file);
-            }
 
             if (file.exists()) {
                 if (file.getName().equals("exportFileJson.bin")) {
@@ -1117,8 +1152,78 @@ public class EnglishSearchUI extends JFrame {
             return StringUtils.join(lst, " ");
         }
     }
-    
-    private Properties getOfflineProp(){
+
+    private Properties getOfflineProp() {
         return offlineProp;
+    }
+
+    private void reviewMemResetBtnAction() {
+        boolean resetConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定要重設?", "確定要重設?");
+
+        if (!resetConfirm) {
+            JCommonUtil._jOptionPane_showMessageDialog_info("重設取消!");
+            return;
+        }
+
+        boolean resetTimeer = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否重設時間?", "是否重設時間?");
+        System.out.println("重設時間!! : " + resetTimeer);
+
+        Date newDate = new Date();
+        List<MemData> lst = memory.getAllMemData();
+        for (MemData d : lst) {
+            if (StringUtils.isBlank(d.getRemark())) {
+                String meaning = getEnglishMeaning(d.getKey());
+                d.setRemark(meaning);
+            }
+            if (resetTimeer) {
+                d.setRegisterTime(newDate);
+                d.resetReviewTime();
+            }
+        }
+
+        memory.overwrite(lst);
+        JCommonUtil._jOptionPane_showMessageDialog_info("重設完成!");
+    }
+
+    private String getEnglishMeaning(String text) {
+        if (offlineProp.isEmpty()) {
+            this.loadOfflineConfig();
+        }
+        text = StringUtils.trimToEmpty(text).toLowerCase();
+        if (offlineProp.containsKey(text)) {
+            return offlineProp.getProperty(text);
+        }
+        final EnglishTester_Diectory2 t2 = new EnglishTester_Diectory2();
+        WordInfo2 info2 = t2.parseToWordInfo(text, 1);
+        return info2.getMeaning2();
+    }
+
+    private void reviewMemWaitingListBtnAction() {
+        try {
+            File tmpFile = File.createTempFile(this.getClass().getSimpleName() + "_", "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss.SSSSS") + ".txt");
+            String waitingLstStr = StringUtils.join(memory.getWaitingList(), "\r\n");
+            FileUtil.saveToFile(tmpFile, waitingLstStr, "UTF8");
+            DesktopUtil.browse(tmpFile.toURL().toString());
+        } catch (Exception e) {
+            JCommonUtil.handleException(e);
+        }
+    }
+
+    private void reviewMemConfigBtnAction() {
+        try {
+            DesktopUtil.browse(memory.getFile().toURL().toString());
+        } catch (MalformedURLException e) {
+            JCommonUtil.handleException(e);
+        }
+    }
+
+    private void offlineReadyLabelAction() {
+        initOfflineConfigText();
+        loadOfflineConfig();
+        if (offlineProp.isEmpty()) {
+            offlineReadyLabel.setText("Not Yet!");
+        } else {
+            offlineReadyLabel.setText("done : " + offlineProp.size());
+        }
     }
 }

@@ -227,9 +227,9 @@ public class JOptionPaneUtil {
             localJOptionPane.setInitialSelectionValue(paramObject2);
             localJOptionPane.setComponentOrientation((paramComponent == null ? getRootFrame() : paramComponent).getComponentOrientation());
             JDialog localJDialog = localJOptionPane.createDialog(paramComponent, paramString);
-            localJDialog.setAlwaysOnTop(true);
             localJOptionPane.selectInitialValue();
             localJDialog.show();
+            JCommonUtil.setFrameAtop(localJDialog, true);
             localJDialog.dispose();
             Object localObject = localJOptionPane.getInputValue();
             if (localObject == UNINITIALIZED_VALUE) {
