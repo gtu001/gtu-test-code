@@ -3,8 +3,10 @@ package gtu._work;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -14,11 +16,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import gtu.binary.Base64JdkUtil;
 import gtu.date.DateUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 
 public class HermannEbbinghaus_Memory {
+
+    public static void main(String[] args) {
+        String v = Base64JdkUtil.encode("gogo測試");
+        System.out.println(v);
+        System.out.println(Base64JdkUtil.decode(v));
+        System.out.println("done...");
+    }
 
     private enum ReviewTime {
         M1(5), // 1．第一個記憶週期：5分鐘
@@ -112,14 +122,20 @@ public class HermannEbbinghaus_Memory {
     private ReviewTime getInitialReviewTime() {
         return ReviewTime.values()[0];
     }
-
+    
     public void append(String key) {
+        this.append(key, "");
+    }
+
+    public void append(String key, String remark) {
         System.out.println("## 加入  " + key);
 
         MemData d = new MemData();
         d.key = key;
         d.registerTime = new Date();
         d.reviewTime = getInitialReviewTime().name();
+        d.setRemark(remark);
+        
         config.getConfigProp().setProperty(key, d.toValue());
         config.store();
 
@@ -145,7 +161,7 @@ public class HermannEbbinghaus_Memory {
             @Override
             public void run() {
                 System.out.println(">> time up - " + d.getKey() + " , " + d.reviewTime + " , " + nextPeroid);
-                
+
                 // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid, -1);
                 memDo.actionPerformed(act);
@@ -177,6 +193,7 @@ public class HermannEbbinghaus_Memory {
         String key;
         Date registerTime;
         String reviewTime;
+        String remark;
 
         final String dateFormat = "yyyy-MM-dd_HH:mm:ss";
         final SimpleDateFormat SDF = new SimpleDateFormat(dateFormat);
@@ -190,13 +207,14 @@ public class HermannEbbinghaus_Memory {
                 this.key = key;
                 this.reviewTime = getArry(0, arry);
                 this.registerTime = SDF.parse(getArry(1, arry));
+                this.remark = getArry(2, arry);
             } catch (Exception e) {
                 throw new RuntimeException("MemData ERR : " + e.getMessage(), e);
             }
         }
 
         String toValue() {
-            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, dateFormat);
+            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, dateFormat) + "^" + this.remark;
         }
 
         private String getArry(int index, String[] arry) {
@@ -232,6 +250,14 @@ public class HermannEbbinghaus_Memory {
 
         public String getDateFormat() {
             return dateFormat;
+        }
+
+        public String getRemark() {
+            return Base64JdkUtil.decode(remark);
+        }
+
+        public void setRemark(String remark) {
+            this.remark = Base64JdkUtil.encode(remark);
         }
     }
 

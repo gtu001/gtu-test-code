@@ -772,7 +772,7 @@ public class EnglishSearchUI extends JFrame {
         if (offlineProp.containsKey(text)) {
             String content = offlineProp.getProperty(text);
             meaningText.setText(content);
-            this.appendMemoryBank(content);
+            this.appendMemoryBank(content, "");
             return true;
         } else {
             meaningText.setText("查無此字!!");
@@ -803,7 +803,7 @@ public class EnglishSearchUI extends JFrame {
 
         if (StringUtils.isNotBlank(info.getMeaning())) {
             findOk.set(true);
-            this.appendMemoryBank(text);
+            this.appendMemoryBank(text, info.getMeaning());
         }
 
         final Set<String> meaningSet = new HashSet<String>();
@@ -828,7 +828,7 @@ public class EnglishSearchUI extends JFrame {
 
                     if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
                         findOk.set(true);
-                        appendMemoryBank(text);
+                        appendMemoryBank(text, info2.getMeaning2());
                     }
                 }
                 searchResultArea.setText(sb.toString());
@@ -842,7 +842,7 @@ public class EnglishSearchUI extends JFrame {
         }).start();
     }
 
-    private void appendMemoryBank(String word) {
+    private void appendMemoryBank(String word, String desc) {
         memory.append(word);
     }
 
