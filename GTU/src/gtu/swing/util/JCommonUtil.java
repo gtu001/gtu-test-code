@@ -866,29 +866,25 @@ public class JCommonUtil {
     /**
      * 將視窗帶到最上層顯示
      */
-    public static void setFrameAtop(Window jframe, boolean alaysOnTop) {
+    public static void setFrameAtop(Window window, boolean alaysOnTop) {
         // 設定顯示
-        jframe.setVisible(true);
+        window.setVisible(true);
         // 設定至最前
-        jframe.toFront();
-        jframe.repaint();
+        window.toFront();
+        window.repaint();
 
-        if (jframe instanceof JFrame) {
-            JFrame f = (JFrame) jframe;
-            // f.setState(java.awt.Frame.NORMAL);// 回復原狀
-
-            int state = f.getExtendedState();
-            state &= ~JFrame.ICONIFIED;
-            f.setExtendedState(state);
-        } else if (jframe instanceof JDialog) {
-            JDialog d = (JDialog) jframe;
+        if (window instanceof JFrame) {
+            JFrame f = (JFrame) window;
+            f.setState(java.awt.Frame.NORMAL);// 回復原狀
+        } else if (window instanceof JDialog) {
+            JDialog d = (JDialog) window;
             d.setModal(true);
         }
 
         // 鎖定最上層
-        jframe.requestFocus();
-        jframe.setAlwaysOnTop(alaysOnTop);
-        jframe.setAutoRequestFocus(true);
+        window.requestFocus();
+        window.setAlwaysOnTop(alaysOnTop);
+        window.setAutoRequestFocus(true);
     }
 
     public static boolean focusComponent(JComponent jcomponent, boolean robotFocus, ActionListener afterRobotFocus) {

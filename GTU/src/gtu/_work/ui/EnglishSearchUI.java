@@ -281,6 +281,29 @@ public class EnglishSearchUI extends JFrame {
             return map;
         }
 
+        private Map<String, String> fixDescLength(Map<String, String> map) {
+            final int MAX_LENGTH_DESC = 40;
+            Map<String, String> rtnMap = new HashMap<String, String>();
+            for (String key : map.keySet()) {
+                String value = map.get(key);
+                if (StringUtils.length(key) > MAX_LENGTH_DESC) {
+                    key = StringUtils.substring(key, 0, MAX_LENGTH_DESC) + "...etc";
+                }
+                rtnMap.put(key, value);
+            }
+            return rtnMap;
+        }
+
+        private String getMeaningByValue(String key, Map<String, String> map) {
+            for (String meaning : map.keySet()) {
+                String key2 = map.get(meaning);
+                if (StringUtils.equals(key2, key)) {
+                    return meaning;
+                }
+            }
+            throw new RuntimeException("找不到 : " + key + ", " + map);
+        }
+
         @Override
         public void actionPerformed(ActionEvent event) {
             if (getOfflineProp() == null || getOfflineProp().isEmpty()) {
@@ -302,6 +325,8 @@ public class EnglishSearchUI extends JFrame {
             List<String> allLst = this.getAllList(d.getKey());
             Map<String, String> questionMap = this.getRandomMap(3, allLst);
             questionMap.put(meaning, d.getKey());
+            questionMap = fixDescLength(questionMap);
+            meaning = getMeaningByValue(d.getKey(), questionMap);
             List<String> meaningLst = new ArrayList<String>(questionMap.keySet());
             meaningLst = RandomUtil.randomList(meaningLst);
 
