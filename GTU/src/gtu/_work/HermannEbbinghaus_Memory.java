@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -30,6 +32,9 @@ public class HermannEbbinghaus_Memory {
         System.out.println(Base64JdkUtil.decode(v));
         System.out.println("done...");
     }
+    
+    private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
+    private static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_FORMAT);
 
     private enum ReviewTime {
         M1(5), // 1．第一個記憶週期：5分鐘
@@ -94,18 +99,19 @@ public class HermannEbbinghaus_Memory {
      */
     public void stop() {
         startPause.set(false);
-        for (Timer t : timerLst) {
+        for (Timer t : timerMap.values()) {
             try {
                 t.cancel();
             } catch (Exception ex) {
             }
         }
-        timerLst.clear();
+        timerMap.clear();
     }
 
     private AtomicBoolean startPause = new AtomicBoolean(false);
     private List<MemData> memLst = new ArrayList<MemData>();
-    private List<Timer> timerLst = new ArrayList<Timer>();
+    private Map<String, Timer> timerMap = new HashMap<String, Timer>();
+
     private ActionListener memDo = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent paramActionEvent) {
@@ -113,9 +119,12 @@ public class HermannEbbinghaus_Memory {
         }
     };
 
-    private Timer newClock() {
+    private Timer newClock(String key) {
         Timer t = new Timer();
-        timerLst.add(t);
+        if (timerMap.containsKey(key)) {
+            timerMap.get(key).cancel();
+        }
+        timerMap.put(key, t);
         return t;
     }
 
@@ -184,7 +193,7 @@ public class HermannEbbinghaus_Memory {
 
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
 
-        Timer timer = newClock();
+        Timer timer = newClock(d.getKey());
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -210,7 +219,7 @@ public class HermannEbbinghaus_Memory {
      * 取得等待清單
      */
     public List<String> getWaitingList() {
-        TreeMap<Long, List<MemData>> map = new TreeMap<Long,List<MemData>>();
+        TreeMap<Long, List<MemData>> map = new TreeMap<Long, List<MemData>>();
         for (MemData d : getAllMemData()) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
@@ -221,21 +230,21 @@ public class HermannEbbinghaus_Memory {
             long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
 
             List<MemData> lst = new ArrayList<MemData>();
-            if(map.containsKey(nextPeroid)){
+            if (map.containsKey(nextPeroid)) {
                 lst = map.get(nextPeroid);
             }
             lst.add(d);
             map.put(nextPeroid, lst);
         }
-        
+
         List<MemData> allLst = new ArrayList<MemData>();
-        for(Long key : map.keySet()){
+        for (Long key : map.keySet()) {
             List<MemData> lst2 = map.get(key);
             allLst.addAll(lst2);
         }
-        
+
         List<String> rtnLst = new ArrayList<String>();
-        for(MemData d : allLst){
+        for (MemData d : allLst) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
             long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
@@ -282,16 +291,13 @@ public class HermannEbbinghaus_Memory {
         }
         return val;
     }
-
+    
     public static class MemData {
         String key;
         Date registerTime;
         String reviewTime;
         String remark;
         long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
-
-        final String dateFormat = "yyyy-MM-dd_HH:mm:ss";
-        final SimpleDateFormat SDF = new SimpleDateFormat(dateFormat);
 
         MemData() {
         }
@@ -309,7 +315,7 @@ public class HermannEbbinghaus_Memory {
         }
 
         String toValue() {
-            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, dateFormat) + "^" + this.remark;
+            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + this.remark;
         }
 
         private String getArry(int index, String[] arry) {
@@ -348,7 +354,7 @@ public class HermannEbbinghaus_Memory {
         }
 
         public String getDateFormat() {
-            return dateFormat;
+            return DATE_FORMAT;
         }
 
         public String getRemark() {

@@ -913,7 +913,9 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void appendMemoryBank(String word, String desc) {
-        memory.append(word, desc);
+        if (StringUtils.isNotBlank(desc)) {
+            memory.append(word, desc);
+        }
     }
 
     private void queryButtonAction(boolean bringToFront) {
@@ -960,6 +962,9 @@ public class EnglishSearchUI extends JFrame {
                 searchEnglishIdTextController.setSelectAll();
             }
         });
+        if (!isRobotFocus) {
+            searchEnglishIdTextController.setSelectAll();
+        }
         return isRobotFocus;
     }
 
