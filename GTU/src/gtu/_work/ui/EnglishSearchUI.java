@@ -310,12 +310,18 @@ public class EnglishSearchUI extends JFrame {
 
             String choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
 
+            boolean choiceCorrect = StringUtils.equals(choiceMeaning, meaning);
+
             StringBuilder sb2 = new StringBuilder();
-            sb2.append("是否答對 : " + (StringUtils.equals(choiceMeaning, meaning) ? "對" : "錯") + "\n");
+            sb2.append("是否答對 : " + (choiceCorrect ? "對" : "錯") + "\n");
             sb2.append("正確解答 : " + d.getKey() + " : " + meaning + "\n");
             sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
 
             JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
+            
+            if (!choiceCorrect) {
+                d.setWaitingTriggerTime(3 * 1000);
+            }
         }
     };
     private JButton reviewMemWaitingListBtn;

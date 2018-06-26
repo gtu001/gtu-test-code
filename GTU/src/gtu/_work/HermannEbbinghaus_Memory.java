@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -127,9 +128,10 @@ public class HermannEbbinghaus_Memory {
     private ReviewTime getInitialReviewTime() {
         return ReviewTime.values()[0];
     }
-    
+
     /**
      * 加入新項目
+     * 
      * @param key
      */
     public void append(String key) {
@@ -138,6 +140,7 @@ public class HermannEbbinghaus_Memory {
 
     /**
      * 加入新項目
+     * 
      * @param key
      * @param remark
      */
@@ -149,7 +152,8 @@ public class HermannEbbinghaus_Memory {
         d.registerTime = new Date();
         d.reviewTime = getInitialReviewTime().name();
         d.setRemark(remark);
-        
+        this.memLst.add(d);
+
         config.getConfigProp().setProperty(key, d.toValue());
         config.store();
 
@@ -168,10 +172,16 @@ public class HermannEbbinghaus_Memory {
             return;
         }
 
-        long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-        final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+        final AtomicLong nextPeroid = new AtomicLong(-1);
+        if (d.isCustomWaitingTrigger()) {
+            nextPeroid.set(d.getWaitingTriggerTime());
+            d.setWaitingTriggerTime(-1);
+        } else {
+            long nextRuntime = (long) (reviewTime.min * 60 * 1000);
+            nextPeroid.set(this.getExecuteTime(d.registerTime, nextRuntime));
+        }
 
-        System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid));
+        System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
 
         Timer timer = newClock();
         timer.schedule(new TimerTask() {
@@ -180,25 +190,27 @@ public class HermannEbbinghaus_Memory {
                 System.out.println(">> time up - " + d.getKey() + " , " + d.reviewTime + " , " + nextPeroid);
 
                 // target = d , command = ENUM , when = time ,
-                ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid, -1);
+                ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
                 memDo.actionPerformed(act);
 
                 // 紀錄下次執行
-                d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
-                storeMemData(d);
+                if (!d.isCustomWaitingTrigger()) {
+                    d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
+                    storeMemData(d);
+                }
 
                 // 準備執行下次
                 schedule(d);
             }
-        }, nextPeroid);
+        }, nextPeroid.get());
     }
-    
+
     /**
      * 取得等待清單
      */
-    public List<String> getWaitingList(){
-        TreeMap<Long,String> map = new TreeMap<Long,String>();
-        for(MemData d : this.memLst){
+    public List<String> getWaitingList() {
+        TreeMap<Long, String> map = new TreeMap<Long, String>();
+        for (MemData d : this.memLst) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
                 continue;
@@ -231,6 +243,7 @@ public class HermannEbbinghaus_Memory {
         Date registerTime;
         String reviewTime;
         String remark;
+        long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
 
         final String dateFormat = "yyyy-MM-dd_HH:mm:ss";
         final SimpleDateFormat SDF = new SimpleDateFormat(dateFormat);
@@ -295,6 +308,18 @@ public class HermannEbbinghaus_Memory {
 
         public void setRemark(String remark) {
             this.remark = Base64JdkUtil.encode(remark);
+        }
+
+        public long getWaitingTriggerTime() {
+            return waitingTriggerTime;
+        }
+
+        public void setWaitingTriggerTime(long waitingTriggerTime) {
+            this.waitingTriggerTime = waitingTriggerTime;
+        }
+
+        public boolean isCustomWaitingTrigger() {
+            return this.waitingTriggerTime >= 0;
         }
     }
 
