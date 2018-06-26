@@ -6,7 +6,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -210,6 +212,7 @@ public class HermannEbbinghaus_Memory {
      */
     public List<String> getWaitingList() {
         TreeMap<Long, String> map = new TreeMap<Long, String>();
+        Map<String, Long> distinctMap = new HashMap<String, Long>();
         for (MemData d : this.memLst) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
@@ -217,7 +220,13 @@ public class HermannEbbinghaus_Memory {
             }
 
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+            long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+
+            //只保留時間最近的 
+            if (distinctMap.containsKey(d.getKey())) {
+                nextPeroid = Math.min(distinctMap.get(d.getKey()), nextPeroid);
+            } 
+            distinctMap.put(d.getKey(), nextPeroid);
 
             String detail = "" + d.getKey() + " , " + d.reviewTime + " - " + DateUtil.wasteTotalTime(nextPeroid);
             map.put(nextPeroid, detail);

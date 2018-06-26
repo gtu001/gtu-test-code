@@ -250,7 +250,7 @@ public class EnglishSearchUI extends JFrame {
         private List<String> getAllList(String key) {
             List<String> keys = new ArrayList<String>();
             String ch = StringUtils.substring(StringUtils.trim(key), 0, 1).toLowerCase();
-            for (Enumeration<?> enu = offlineProp.keys(); enu.hasMoreElements();) {
+            for (Enumeration<?> enu = getOfflineProp().keys(); enu.hasMoreElements();) {
                 String v = (String) enu.nextElement();
                 if (v.toLowerCase().startsWith(ch)) {
                     keys.add(v);
@@ -272,7 +272,7 @@ public class EnglishSearchUI extends JFrame {
             while (map.size() <= size) {
                 String str = getRandom(allLst);
                 if (!map.containsKey(str)) {
-                    String meaning = offlineProp.getProperty(str);
+                    String meaning = getOfflineProp().getProperty(str);
                     map.put(meaning, str);
                 }
             }
@@ -281,10 +281,10 @@ public class EnglishSearchUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (offlineProp == null || offlineProp.isEmpty()) {
+            if (getOfflineProp() == null || getOfflineProp().isEmpty()) {
                 loadOfflineConfig();
             }
-            System.out.println("offlineProp size = " + offlineProp.size());
+            System.out.println("offlineProp size = " + getOfflineProp().size());
 
             MemData d = (MemData) event.getSource();
             long period = event.getWhen();
@@ -293,8 +293,8 @@ public class EnglishSearchUI extends JFrame {
             String meaning = "";
             if (StringUtils.isNotBlank(d.getRemark())) {
                 meaning = d.getRemark();
-            } else if (offlineProp.containsKey(d.getKey())) {
-                meaning = offlineProp.getProperty(d.getKey());
+            } else if (getOfflineProp().containsKey(d.getKey())) {
+                meaning = getOfflineProp().getProperty(d.getKey());
             }
 
             List<String> allLst = this.getAllList(d.getKey());
@@ -576,7 +576,6 @@ public class EnglishSearchUI extends JFrame {
         panel.add(panel_4, "4, 24, fill, fill");
 
         reviewMemChk = new JCheckBox("定時複習");
-        reviewMemChk.setSelected(false);
         panel_4.add(reviewMemChk);
 
         reviewMemWaitingListBtn = new JButton("等待清單");
@@ -602,6 +601,7 @@ public class EnglishSearchUI extends JFrame {
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
         simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
+        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -782,7 +782,7 @@ public class EnglishSearchUI extends JFrame {
         if (offlineProp.containsKey(text)) {
             String content = offlineProp.getProperty(text);
             meaningText.setText(content);
-            this.appendMemoryBank(content, "");
+            this.appendMemoryBank(text, content);
             return true;
         } else {
             meaningText.setText("查無此字!!");
@@ -853,7 +853,7 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void appendMemoryBank(String word, String desc) {
-        memory.append(word);
+        memory.append(word, desc);
     }
 
     private void queryButtonAction(boolean bringToFront) {
@@ -1116,5 +1116,9 @@ public class EnglishSearchUI extends JFrame {
             }
             return StringUtils.join(lst, " ");
         }
+    }
+    
+    private Properties getOfflineProp(){
+        return offlineProp;
     }
 }
