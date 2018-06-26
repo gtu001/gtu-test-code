@@ -1,5 +1,5 @@
 
---### Oracle ª©¥» 
+--### Oracle ç‰ˆæœ¬ 
 with d1 as (                                                          
   SELECT a.BLOCKCODE, c.photo, c.lIINKTO, b.type, a.etime              
   FROM ADCASEDATA a join BLOCKMAP b on a.blockcode = b.blockcode       
@@ -18,7 +18,7 @@ with d1 as (
   from d2 a                                                            
 
 
---### SqlServer ª©¥»
+--### SqlServer ç‰ˆæœ¬
   with d1 as (                                                         
    SELECT a.BLOCKCODE, c.photo, c.lIINKTO, b.type, a.etime,            
           row_number() over(order by a.etime desc) as Row#             

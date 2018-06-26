@@ -10,20 +10,20 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 public class DbConstant {
-    
+
     public static void main(String[] args) {
-        DataSource ds = getTestDataSource_Fuco_ESUN();
+        DataSource ds = getDerbyDataSource();
         Connection conn = null;
         try {
             conn = ds.getConnection();
             System.out.println("test fine ...");
-            
+
             int v = Integer.parseInt("01");
             System.out.println(v);
             System.out.println("done...");
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }finally {
+        } finally {
             try {
                 conn.close();
             } catch (SQLException e) {
@@ -31,7 +31,7 @@ public class DbConstant {
             }
         }
     }
-    
+
     private static void applyToConnectionPool(BasicDataSource bds) {
         bds.setMaxActive(10);
         bds.setInitialSize(1);
@@ -127,9 +127,9 @@ public class DbConstant {
         applyToConnectionPool(bds);
         return bds;
     }
-    
+
     public static DataSource getTestDataSource_Fuco() {
-        BasicDataSource ds2  = new BasicDataSource();
+        BasicDataSource ds2 = new BasicDataSource();
         ds2.setUrl("jdbc:sqlserver://192.168.93.205\\SQLEXPRESS;DatabaseName=SCSB_CCBILL");
         ds2.setUsername("sa");
         ds2.setPassword("12345678");
@@ -137,9 +137,9 @@ public class DbConstant {
         applyToConnectionPool(ds2);
         return ds2;
     }
-    
+
     public static DataSource getTestDataSource_Fuco_ESUN() {
-        BasicDataSource ds2  = new BasicDataSource();
+        BasicDataSource ds2 = new BasicDataSource();
         ds2.setUrl("jdbc:sqlserver://192.168.93.205\\SQLEXPRESS;DatabaseName=ESUN_CCBILL");
         ds2.setUsername("sa");
         ds2.setPassword("12345678");
@@ -147,7 +147,7 @@ public class DbConstant {
         applyToConnectionPool(ds2);
         return ds2;
     }
-    
+
     public static DataSource getTestDataSource_FucoOracle() {
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:oracle:thin:@192.168.93.215:1521:SCSB");
@@ -157,7 +157,7 @@ public class DbConstant {
         applyToConnectionPool(bds);
         return bds;
     }
-    
+
     public static DataSource getTestDataSource_FucoOracle_SCSB() {
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:oracle:thin:@10.10.2.140:1521:rd11g");
@@ -167,7 +167,7 @@ public class DbConstant {
         applyToConnectionPool(bds);
         return bds;
     }
-    
+
     public static DataSource getSpringDataSource() {
         DriverManagerDataSource bds = new DriverManagerDataSource();
         bds.setUrl("jdbc:oracle:thin:@192.168.93.215:1521:SCSB");
@@ -176,8 +176,17 @@ public class DbConstant {
         bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
         return bds;
     }
-    
-    public static Connection getTestConnection_CTBC(){
+
+    public static DataSource getDerbyDataSource() {
+        DriverManagerDataSource bds = new DriverManagerDataSource();
+        bds.setUrl("jdbc:derby://localhost:1527/seconddb;create=true");
+        bds.setUsername("test");
+        bds.setPassword("1234");
+        bds.setDriverClassName("org.apache.derby.jdbc.ClientDriver");
+        return bds;
+    }
+
+    public static Connection getTestConnection_CTBC() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@172.24.36.77:1521:XE", "ebmwdev", "devebmw");
@@ -206,12 +215,12 @@ public class DbConstant {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static Connection getDB2Connection() {
         try {
             Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
             Connection conn = DriverManager.getConnection("jdbc:db2://10.0.75.1:50000/test:retrieveMessagesFromServerOnGetMessage=true;currentSchema=test2", "db2inst1", "db2inst1-pwd");
-            
+
             return conn;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -227,7 +236,7 @@ public class DbConstant {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static Connection getDB2Connection_FTP2() {
         try {
             Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
