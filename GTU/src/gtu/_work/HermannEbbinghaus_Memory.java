@@ -3,14 +3,13 @@ package gtu._work;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -74,6 +73,9 @@ public class HermannEbbinghaus_Memory {
         return config.getPropFile();
     }
 
+    /**
+     * 啟動
+     */
     public void start() {
         startPause.set(true);
         for (MemData v : memLst) {
@@ -81,6 +83,9 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    /**
+     * 關閉
+     */
     public void stop() {
         startPause.set(false);
         for (Timer t : timerLst) {
@@ -123,10 +128,19 @@ public class HermannEbbinghaus_Memory {
         return ReviewTime.values()[0];
     }
     
+    /**
+     * 加入新項目
+     * @param key
+     */
     public void append(String key) {
         this.append(key, "");
     }
 
+    /**
+     * 加入新項目
+     * @param key
+     * @param remark
+     */
     public void append(String key, String remark) {
         System.out.println("## 加入  " + key);
 
@@ -144,7 +158,10 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
-    public void schedule(final MemData d) {
+    /**
+     * 排成記憶內容
+     */
+    private void schedule(final MemData d) {
         ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
 
         if (reviewTime == ReviewTime.NONE) {
@@ -174,6 +191,26 @@ public class HermannEbbinghaus_Memory {
                 schedule(d);
             }
         }, nextPeroid);
+    }
+    
+    /**
+     * 取得等待清單
+     */
+    public List<String> getWaitingList(){
+        TreeMap<Long,String> map = new TreeMap<Long,String>();
+        for(MemData d : this.memLst){
+            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
+            if (reviewTime == ReviewTime.NONE) {
+                continue;
+            }
+
+            long nextRuntime = (long) (reviewTime.min * 60 * 1000);
+            final long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+
+            String detail = "" + d.getKey() + " , " + d.reviewTime + " - " + DateUtil.wasteTotalTime(nextPeroid);
+            map.put(nextPeroid, detail);
+        }
+        return new ArrayList<String>(map.values());
     }
 
     private void storeMemData(MemData d) {

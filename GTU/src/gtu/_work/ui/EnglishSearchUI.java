@@ -106,6 +106,8 @@ public class EnglishSearchUI extends JFrame {
     private JButton queryButton;
     private JTextField newWordTxtPathText;
     private JTabbedPane tabbedPane;
+    private JPanel panel_4;
+    private JCheckBox reviewMemChk;
 
     PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     private static final String NEW_WORD_PATH = "new_word_path";
@@ -248,7 +250,7 @@ public class EnglishSearchUI extends JFrame {
         private List<String> getAllList(String key) {
             List<String> keys = new ArrayList<String>();
             String ch = StringUtils.substring(StringUtils.trim(key), 0, 1).toLowerCase();
-            for (Enumeration<?> enu = __getOfflineProp().keys(); enu.hasMoreElements();) {
+            for (Enumeration<?> enu = offlineProp.keys(); enu.hasMoreElements();) {
                 String v = (String) enu.nextElement();
                 if (v.toLowerCase().startsWith(ch)) {
                     keys.add(v);
@@ -270,7 +272,7 @@ public class EnglishSearchUI extends JFrame {
             while (map.size() <= size) {
                 String str = getRandom(allLst);
                 if (!map.containsKey(str)) {
-                    String meaning = __getOfflineProp().getProperty(str);
+                    String meaning = offlineProp.getProperty(str);
                     map.put(meaning, str);
                 }
             }
@@ -279,7 +281,7 @@ public class EnglishSearchUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (__getOfflineProp() == null || __getOfflineProp().isEmpty()) {
+            if (offlineProp == null || offlineProp.isEmpty()) {
                 loadOfflineConfig();
             }
             System.out.println("offlineProp size = " + offlineProp.size());
@@ -289,8 +291,10 @@ public class EnglishSearchUI extends JFrame {
             String reviewType = event.getActionCommand();
 
             String meaning = "";
-            if (__getOfflineProp().containsKey(d.getKey())) {
-                meaning = __getOfflineProp().getProperty(d.getKey());
+            if (StringUtils.isNotBlank(d.getRemark())) {
+                meaning = d.getRemark();
+            } else if (offlineProp.containsKey(d.getKey())) {
+                meaning = offlineProp.getProperty(d.getKey());
             }
 
             List<String> allLst = this.getAllList(d.getKey());
@@ -314,7 +318,7 @@ public class EnglishSearchUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info(sb2);
         }
     };
-    private JCheckBox reviewMemChk;
+    private JButton reviewMemWaitingListBtn;
 
     /**
      * Create the frame.
@@ -336,7 +340,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 428);
+        setBounds(100, 100, 540, 449);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -442,7 +446,7 @@ public class EnglishSearchUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
@@ -562,19 +566,24 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
+        panel_4 = new JPanel();
+        panel.add(panel_4, "4, 24, fill, fill");
+
         reviewMemChk = new JCheckBox("定時複習");
-        reviewMemChk.addActionListener(new ActionListener() {
+        reviewMemChk.setSelected(false);
+        panel_4.add(reviewMemChk);
+
+        reviewMemWaitingListBtn = new JButton("等待清單");
+        reviewMemWaitingListBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (reviewMemChk.isSelected()) {
-                    memory.start();
-                } else {
-                    memory.stop();
-                }
+                String waitingLstStr = StringUtils.join(memory.getWaitingList(), "\n");
+                JCommonUtil._jOptionPane_showMessageDialog_info(waitingLstStr);
             }
         });
-
-        panel.add(reviewMemChk, "4, 24");
+        panel_4.add(reviewMemWaitingListBtn);
         panel.add(configSettingBtn, "2, 26");
+
+        // ----------------------------------------------------------------------------------------------------------
 
         // 置中
         JCommonUtil.setJFrameCenter(this);
@@ -587,7 +596,6 @@ public class EnglishSearchUI extends JFrame {
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
         simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
-        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -757,10 +765,6 @@ public class EnglishSearchUI extends JFrame {
         } catch (Exception e1) {
             JCommonUtil.handleException(e1);
         }
-    }
-
-    private Properties __getOfflineProp() {
-        return offlineProp;
     }
 
     private boolean queryButtonAction_offline(String text) {
