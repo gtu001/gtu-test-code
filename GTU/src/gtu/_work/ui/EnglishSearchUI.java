@@ -673,9 +673,6 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
-        // 設定離線檔參照路徑
-        this.offlineReadyLabelAction();
-
         // 確認是否Focus
         startCheckFocusOwnerThread();
 
@@ -683,7 +680,7 @@ public class EnglishSearchUI extends JFrame {
         startListenClipboardThread();
 
         // 讀取離線檔
-        loadOfflineConfig();
+        this.offlineReadyLabelAction();
 
         // 設定記憶時鐘功能
         memory.setMemDo(MemDo);

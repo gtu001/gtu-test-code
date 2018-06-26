@@ -74,7 +74,6 @@ public class HermannEbbinghaus_Memory {
             dir = PropertiesUtil.getJarCurrentPath(HermannEbbinghaus_Memory.class);
         }
         config = new PropertiesUtilBean(new File(dir, configName));
-        this.init();
     }
 
     public HermannEbbinghaus_Memory(String configName) {
@@ -89,6 +88,7 @@ public class HermannEbbinghaus_Memory {
      * 啟動
      */
     public void start() {
+        this.init();
         startPause.set(true);
         for (MemData v : memLst) {
             this.schedule(v);
@@ -130,6 +130,10 @@ public class HermannEbbinghaus_Memory {
     }
 
     private void init() {
+        memLst = new ArrayList<MemData>();
+        timerMap = new HashMap<String, Timer>();
+        startPause = new AtomicBoolean(false);
+        
         for (Object k : config.getConfigProp().keySet()) {
             String key = (String) k;
             String value = config.getConfigProp().getProperty(key);
