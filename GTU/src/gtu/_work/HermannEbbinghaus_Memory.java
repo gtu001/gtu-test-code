@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
@@ -76,6 +77,7 @@ public class HermannEbbinghaus_Memory {
     private PropertiesUtilBean config;
     private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
     private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
+    private AtomicReference<Range<Integer>> skipAll = new AtomicReference<Range<Integer>>();// 現在準備執行的全部取消
 
     public HermannEbbinghaus_Memory() {
     }
@@ -255,6 +257,10 @@ public class HermannEbbinghaus_Memory {
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
 
                 synchronized (HermannEbbinghaus_Memory.this) {
+                    if (skipAll.get() != null) {
+                        delayAll(d);
+                    }
+
                     memDo.actionPerformed(act);
                 }
 
@@ -461,7 +467,7 @@ public class HermannEbbinghaus_Memory {
         public void setWaitingTriggerTime(long waitingTriggerTime) {
             this.waitingTriggerTime = waitingTriggerTime;
         }
-        
+
         public void resetWaitingTriggerTime() {
             this.waitingTriggerTime = -1;
         }
@@ -504,39 +510,35 @@ public class HermannEbbinghaus_Memory {
         return config.getConfigProp().containsKey(key);
     }
 
+    private void delayAll(MemData d) {
+        Range<Integer> minRange = skipAll.get();
+        int min = RandomUtil.rangeInteger(minRange.getMinimum(), minRange.getMaximum());
+        long extendTime = min * 60 * 1000;
+        System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
+        try {
+            this.wait(extendTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 即將觸發的往後延
-     * @param recentTime 即將觸發的範圍
-     * @param minRange 往後延後的分鐘數範圍
+     * 
+     * @param minRange
+     *            往後延後的分鐘數範圍
      */
-    public void skipRecent(long recentTime, Range<Integer> minRange) {
-        for (int ii = 0; ii < this.memLst.size(); ii++) {
-            MemData d = this.memLst.get(ii);
-
-            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
-            if (reviewTime == ReviewTime.NONE) {
-                continue;
+    public void skipRecent(Range<Integer> minRange) {
+        skipAll.set(minRange);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1 * 60 * 1000);
+                } catch (InterruptedException e) {
+                }
+                skipAll.set(null);
             }
-
-            final AtomicLong nextPeroid = new AtomicLong(-1);
-            if (d.isCustomWaitingTrigger()) {
-                nextPeroid.set(d.getWaitingTriggerTime());
-                d.setWaitingTriggerTime(-1);
-            } else {
-                long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-                nextPeroid.set(this.getExecuteTime(d.fixedTime, nextRuntime));
-            }
-
-            if (nextPeroid.get() <= recentTime) {
-                int min = RandomUtil.rangeInteger(minRange.getMinimum(), minRange.getMaximum());
-                long extendTime = min * 60 * 1000;
-                nextPeroid.set(nextPeroid.get() + extendTime);
-
-                d.setWaitingTriggerTime(nextPeroid.get());
-
-                this.timerMap.get(d.getKey()).cancel();
-                this.schedule(d);
-            }
-        }
+        }).start();
     }
 }
