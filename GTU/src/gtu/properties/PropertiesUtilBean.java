@@ -25,6 +25,7 @@ public class PropertiesUtilBean {
 
     private Properties configProp;
     private File propFile;
+    private FileChangeHandler fileChangeHandler;
     private _JFrameReflectionToConfig configReflect = new _JFrameReflectionToConfig();
 
     private static final Logger logger = JdkLoggerUtil.getLogger(PropertiesUtilBean.class, true);
@@ -36,6 +37,7 @@ public class PropertiesUtilBean {
     public void init(File customFile) {
         try {
             propFile = customFile;
+            fileChangeHandler = new FileChangeHandler(propFile);
             logger.info("configFile : " + propFile);
             if (!propFile.exists()) {
                 logger.info("!!!!! 設定檔不存在建立新檔 : " + propFile);
@@ -47,6 +49,28 @@ public class PropertiesUtilBean {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    static class FileChangeHandler {
+        File file;
+        long lastModifyTime = -1;
+
+        FileChangeHandler(File file) {
+            this.file = file;
+            lastModifyTime = file.lastModified();
+        }
+
+        public void resetLastModifiedUnderControl() {
+            this.lastModifyTime = file.lastModified();
+        }
+
+        public boolean isChange() {
+            return file.lastModified() != lastModifyTime;
+        }
+    }
+
+    public boolean isFileChangeUncontrolled() {
+        return fileChangeHandler.isChange();
     }
 
     public PropertiesUtilBean(File customFile) {
@@ -61,6 +85,7 @@ public class PropertiesUtilBean {
         try {
             String remark = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS").format(new Date());
             configProp.store(new FileOutputStream(propFile), "SAVE_TIME : " + remark);
+            fileChangeHandler.resetLastModifiedUnderControl();
             logger.info("store success!");
         } catch (Exception ex) {
             throw new RuntimeException(ex);

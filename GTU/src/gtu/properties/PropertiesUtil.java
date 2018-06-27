@@ -1,7 +1,10 @@
 package gtu.properties;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -12,7 +15,6 @@ import gtu.swing.util.JCommonUtil;
 public class PropertiesUtil {
 
     public static void main(String[] args) throws IOException, Exception {
-        System.out.println(PropertiesUtil.isClassInJar(PropertiesUtil.class));
         System.out.println("done...");
     }
 
@@ -39,7 +41,7 @@ public class PropertiesUtil {
         }
         URL url = clz.getResource(clz.getSimpleName() + ".class");
         String protocal = url.getProtocol();
-        //String filepath = url.getFile();
+        // String filepath = url.getFile();
         return "jar".equals(protocal);
     }
 
@@ -89,5 +91,27 @@ public class PropertiesUtil {
             JCommonUtil.handleException(ex);
         }
         return defaultFile;
+    }
+
+    public static String getComments(File file) {
+        LineNumberReader reader = null;
+        try {
+            reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file)));
+            StringBuffer sb = new StringBuffer();
+            for (String line = null; (line = reader.readLine()) != null;) {
+                if (line.startsWith("#")) {
+                    sb.append(line + "\r\n");
+                }
+            }
+            String comment = UnicodeToUTF8Util.unicodeToUtf8(sb.toString());
+            return comment;
+        } catch (Exception e) {
+            throw new RuntimeException("getComment ERR : " + e.getMessage(), e);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
+        }
     }
 }

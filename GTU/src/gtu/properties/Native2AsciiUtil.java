@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang.Validate;
 
@@ -22,12 +23,12 @@ public class Native2AsciiUtil {
 
         File srcFile = new File("I:\\workstuff\\workspace_scsb\\SCSB_CCBill_AP\\src\\main\\java\\com\\fuco\\mb\\bill\\ASConstants.java");
         File destFile = new File(FileUtil.DESKTOP_PATH, "test.java");
-//        System.out.println(Mode.ENCODING.apply(srcFile, destFile));
-        
+        // System.out.println(Mode.ENCODING.apply(srcFile, destFile));
+
         String val = FileUtil.loadFromFile(srcFile, "utf8");
         val = val.replace("\ufeff", "");
         FileUtil.saveToFile(destFile, val, "utf8");
-        
+
         System.out.println("done...");
     }
 
@@ -44,7 +45,15 @@ public class Native2AsciiUtil {
     private File srcDir;
     private File destDir;
     private Mode mode;
-    private static final String JAVAHOME_BIN = "C:\\Program Files\\Java\\jdk1.8.0_73\\bin\\";
+    private static final String JAVAHOME_BIN;
+
+    static {
+        String javaHomeBin = null;
+        if (new File(System.getenv("JAVA_HOME")).exists()) {
+            javaHomeBin = System.getenv("JAVA_HOME") + File.separator + "bin";
+        }
+        JAVAHOME_BIN = javaHomeBin;
+    }
 
     public Native2AsciiUtil srcDir(File srcDir) {
         this.srcDir = srcDir;
@@ -56,7 +65,7 @@ public class Native2AsciiUtil {
         return this;
     }
 
-    public Native2AsciiUtil execute() throws IOException {
+    public Native2AsciiUtil execute() throws IOException, TimeoutException {
         Validate.notNull(srcDir);
         Validate.notNull(destDir);
         Validate.isTrue(srcDir.exists());

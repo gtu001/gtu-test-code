@@ -345,6 +345,13 @@ public class EnglishSearchUI extends JFrame {
         }
     };
 
+    private ActionListener onOffDo = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            sysutil.displayMessage("Memory Bank", event.getActionCommand(), MessageType.INFO);
+        }
+    };
+
     /**
      * Create the frame.
      */
@@ -693,6 +700,7 @@ public class EnglishSearchUI extends JFrame {
 
         // 設定記憶時鐘功能
         memory.setMemDo(MemDo);
+        memory.setOnOffDo(onOffDo);
         memory.start();
         if (DEBUG) {
             DesktopUtil.browse(memory.getFile().toURI().toString());

@@ -15,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.log.JdkLoggerUtil;
+import gtu.properties.PropertiesUtilBean.FileChangeHandler;
 
 public class PropertiesUtilChinese {
 
@@ -22,11 +23,13 @@ public class PropertiesUtilChinese {
 
     private Properties configProp;
     private File propFile;
+    private FileChangeHandler fileChangeHandler;
     private String encode;
 
     public PropertiesUtilChinese(File customFile, String encode) {
         try {
             propFile = customFile;
+            fileChangeHandler = new FileChangeHandler(propFile);
             this.encode = encode;
             logger.info("configFile : " + propFile);
             if (!propFile.exists()) {
@@ -96,9 +99,14 @@ public class PropertiesUtilChinese {
         } finally {
             try {
                 writer.close();
+                fileChangeHandler.resetLastModifiedUnderControl();
             } catch (Exception e) {
             }
         }
+    }
+
+    public boolean isFileChangeUncontrolled() {
+        return fileChangeHandler.isChange();
     }
 
     public Properties getConfigProp() {

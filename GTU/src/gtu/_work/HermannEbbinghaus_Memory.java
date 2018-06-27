@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -27,10 +28,6 @@ import gtu.properties.PropertiesUtilBean;
 public class HermannEbbinghaus_Memory {
 
     public static void main(String[] args) {
-        String v = Base64JdkUtil.encode("gogo測試");
-        System.out.println(v);
-        System.out.println(Base64JdkUtil.decode(v));
-        System.out.println("done...");
     }
 
     private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
@@ -68,6 +65,7 @@ public class HermannEbbinghaus_Memory {
 
     private PropertiesUtilBean config;
     private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
+    private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
 
     public HermannEbbinghaus_Memory(File dir, String configName) {
         if (dir == null) {
@@ -88,10 +86,41 @@ public class HermannEbbinghaus_Memory {
      * 啟動
      */
     public void start() {
+        this.start("start");
+    }
+
+    private void start(String label) {
         this.init();
         startPause.set(true);
         for (MemData v : memLst) {
             this.schedule(v);
+        }
+        initCheckConfigThread();
+
+        // 啟動事件
+        onOffDo.actionPerformed(new ActionEvent(this, -1, label));
+    }
+
+    private void initCheckConfigThread() {
+        if (checkConfigThread == null || checkConfigThread.getState() == Thread.State.TERMINATED) {
+            final long WAITTING_TIME = 30 * 1000;
+            checkConfigThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (HermannEbbinghaus_Memory.this.startPause.get()) {
+                        if (config.isFileChangeUncontrolled()) {
+                            HermannEbbinghaus_Memory.this.start("設定檔異動重新起動!");
+                        }
+
+                        try {
+                            Thread.sleep(WAITTING_TIME);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+            });
+            checkConfigThread.setDaemon(true);
+            checkConfigThread.start();
         }
     }
 
@@ -107,6 +136,9 @@ public class HermannEbbinghaus_Memory {
             }
         }
         timerMap.clear();
+
+        // 啟動事件
+        onOffDo.actionPerformed(new ActionEvent(this, -1, "stop"));
     }
 
     private AtomicBoolean startPause = new AtomicBoolean(false);
@@ -114,6 +146,12 @@ public class HermannEbbinghaus_Memory {
     private Map<String, Timer> timerMap = new HashMap<String, Timer>();
 
     private ActionListener memDo = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent paramActionEvent) {
+            System.out.println("TODO");
+        }
+    };
+    private ActionListener onOffDo = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent paramActionEvent) {
             System.out.println("TODO");
@@ -430,6 +468,10 @@ public class HermannEbbinghaus_Memory {
 
     public void setMemDo(ActionListener memDo) {
         this.memDo = memDo;
+    }
+
+    public void setOnOffDo(ActionListener onOffDo) {
+        this.onOffDo = onOffDo;
     }
 
     public boolean isFixedTimeUsing() {
