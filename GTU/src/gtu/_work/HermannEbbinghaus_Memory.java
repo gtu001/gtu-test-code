@@ -10,7 +10,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -28,6 +27,11 @@ import gtu.properties.PropertiesUtilBean;
 public class HermannEbbinghaus_Memory {
 
     public static void main(String[] args) {
+        HermannEbbinghaus_Memory config = new HermannEbbinghaus_Memory(new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
+        System.out.println(config.containsKey("hermannebbinghaus  memory  java"));
+        System.out.println(config.containsKey("static"));
+        config.deleteKey("hermannebbinghaus  memory  java");
+        config.deleteKey("static");
     }
 
     private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
@@ -76,6 +80,10 @@ public class HermannEbbinghaus_Memory {
 
     public HermannEbbinghaus_Memory(String configName) {
         this(null, configName);
+    }
+
+    public HermannEbbinghaus_Memory(File customFile) {
+        config = new PropertiesUtilBean(customFile);
     }
 
     public File getFile() {
@@ -260,7 +268,9 @@ public class HermannEbbinghaus_Memory {
                     d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
 
                     // 儲存
-                    storeMemData(d);
+                    if (containsKey(d.key)) {
+                        storeMemData(d);
+                    }
                 }
 
                 // 準備執行下次
@@ -480,5 +490,14 @@ public class HermannEbbinghaus_Memory {
 
     public void setFixedTimeUsing(boolean fixedTimeUsing) {
         this.fixedTimeUsing = fixedTimeUsing;
+    }
+
+    public void deleteKey(String key) {
+        config.getConfigProp().remove(key);
+        config.store();
+    }
+
+    public boolean containsKey(String key) {
+        return config.getConfigProp().containsKey(key);
     }
 }

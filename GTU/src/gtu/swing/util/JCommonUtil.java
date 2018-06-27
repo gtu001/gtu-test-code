@@ -867,6 +867,11 @@ public class JCommonUtil {
      * 將視窗帶到最上層顯示
      */
     public static void setFrameAtop(Window window, boolean alaysOnTop) {
+        if (window instanceof JDialog) {
+            JDialog d = (JDialog) window;
+            d.setModal(true);
+        }
+        
         // 設定顯示
         window.setVisible(true);
         // 設定至最前
@@ -876,9 +881,6 @@ public class JCommonUtil {
         if (window instanceof JFrame) {
             JFrame f = (JFrame) window;
             f.setState(java.awt.Frame.NORMAL);// 回復原狀
-        } else if (window instanceof JDialog) {
-            JDialog d = (JDialog) window;
-            d.setModal(true);
         }
 
         // 鎖定最上層

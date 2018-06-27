@@ -42,6 +42,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -301,22 +302,23 @@ public class EnglishSearchUI extends JFrame {
             }
             System.out.println("offlineProp size = " + getOfflineProp().size());
 
-            MemData d = (MemData) event.getSource();
+            final MemData d = (MemData) event.getSource();
             long period = event.getWhen();
             String reviewType = event.getActionCommand();
 
-            String meaning = "";
+            final AtomicBoolean checkChoiceEqual = new AtomicBoolean(true);
+            final AtomicReference<String> meaning = new AtomicReference<String>();
             if (StringUtils.isNotBlank(d.getRemark())) {
-                meaning = d.getRemark();
+                meaning.set(d.getRemark());
             } else if (getOfflineProp().containsKey(d.getKey())) {
-                meaning = getOfflineProp().getProperty(d.getKey());
+                meaning.set(getOfflineProp().getProperty(d.getKey()));
             }
 
             List<String> allLst = this.getAllList(d.getKey());
             Map<String, String> questionMap = this.getRandomMap(3, allLst);
-            questionMap.put(meaning, d.getKey());
+            questionMap.put(meaning.get(), d.getKey());
             questionMap = fixDescLength(questionMap);
-            meaning = getMeaningByValue(d.getKey(), questionMap);
+            meaning.set(getMeaningByValue(d.getKey(), questionMap));
             List<String> meaningLst = new ArrayList<String>(questionMap.keySet());
             meaningLst = RandomUtil.randomList(meaningLst);
 
@@ -332,9 +334,58 @@ public class EnglishSearchUI extends JFrame {
                 meaningLst.add(onlyOne);
             }
 
-            String choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
-            boolean choiceCorrect = StringUtils.equals(choiceMeaning, meaning);
-            if (!choiceCorrect) {
+            String choiceMeaning = "";
+
+            switch (2) {
+            case 1:
+                choiceMeaning = (String) JCommonUtil._JOptionPane_showInputDialog(sb, "複習" + reviewType + " " + period, meaningLst.toArray(new String[0]), "");
+                break;
+            case 2:
+                final EnglishSearchUI_MemoryBank_DialogUI choiceDialog = new EnglishSearchUI_MemoryBank_DialogUI();
+                choiceDialog.createDialog("複習" + reviewType + " " + period, d.getKey(), meaningLst.toArray(new String[0]), //
+                        new ActionListener() { // delete key
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                boolean confirmDel = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定刪除 : " + d.getKey(), "從設定檔中刪除");
+                                if (confirmDel) {
+                                    checkChoiceEqual.set(false);
+                                    memory.deleteKey(d.getKey());
+                                    choiceDialog.setVisible(false);
+                                }
+                            }
+                        }, new ActionListener() {// choice one
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                choiceDialog.setVisible(false);
+                            }
+                        }, new ActionListener() {// modify desc
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String newMeaning = JCommonUtil._jOptionPane_showInputDialog("請輸入新解釋  : " + d.getKey(), meaning.get());
+                                if (newMeaning != null && !StringUtils.equals(newMeaning, meaning.get())) {
+                                    choiceDialog.setNewMeaning(meaning.get(), newMeaning);
+                                    meaning.set(newMeaning);
+                                    d.setRemark(newMeaning);
+                                    checkChoiceEqual.set(false);
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("原為 : " + meaning.get() + "\n修正為 : " + newMeaning, "修正成功 " + d.getKey());
+                                }
+                            }
+                        }, new ActionListener() {// skip
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                long waitingTime = RandomUtil.rangeInteger(10, 30) * 60 * 1000;
+                                d.setWaitingTriggerTime(waitingTime);
+                                checkChoiceEqual.set(false);
+                                choiceDialog.setVisible(false);
+                            }
+                        });
+                choiceDialog.showDialog();
+                choiceMeaning = choiceDialog.getChoiceAnswer();
+                break;
+            }
+
+            boolean choiceCorrect = StringUtils.equals(choiceMeaning, meaning.get());
+            if (!choiceCorrect && checkChoiceEqual.get()) {
                 StringBuilder sb2 = new StringBuilder();
                 sb2.append("是否答對 : " + (choiceCorrect ? "對" : "錯") + "\n");
                 sb2.append("你選的 : " + questionMap.get(choiceMeaning) + " : " + choiceMeaning + "\n");
@@ -1282,5 +1333,17 @@ public class EnglishSearchUI extends JFrame {
         } else {
             offlineReadyLabel.setText("done : " + offlineProp.size());
         }
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        if (b == false) {
+            System.out.println("Hidden  ----------------------------------------");
+            for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
+                System.out.println("\t" + s);
+            }
+            System.out.println("Hidden  ----------------------------------------");
+        }
+        super.setVisible(b);
     }
 }
