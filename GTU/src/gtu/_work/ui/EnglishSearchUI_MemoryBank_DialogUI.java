@@ -3,6 +3,9 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -12,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -21,10 +24,6 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 
 public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
@@ -43,6 +42,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private ActionListener choiceRadioAction;
     private ActionListener customDescAction;
     private ActionListener skipBtnAction;
+    private ActionListener skipAllBtnAction;
 
     /**
      * Launch the application.
@@ -50,14 +50,17 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     public static void main(String[] args) {
         String[] arry = new String[] { "a1", "a2", "a3", "a4", "a5" };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
-        dialog.createDialog("title", "AAAA", arry, null, null, null, null);
+        dialog.createDialog("title", "AAAA", arry, null, null, null, null, null);
     }
 
     public void showDialog() {
         JCommonUtil.setFrameAtop(this, true);
     }
 
-    public void createDialog(String title, String englishWord, String[] meaningLst, ActionListener deleteConfigAction, ActionListener choiceRadioAction, ActionListener customDescAction, ActionListener skipBtnAction) {
+    public void createDialog(String title, String englishWord, String[] meaningLst, //
+            ActionListener deleteConfigAction, ActionListener choiceRadioAction, //
+            ActionListener customDescAction, ActionListener skipBtnAction, //
+            ActionListener skipAllBtnAction) {
         try {
             setTitle(title);
             this.meaningLst = meaningLst;
@@ -72,6 +75,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             this.choiceRadioAction = choiceRadioAction;
             this.customDescAction = customDescAction;
             this.skipBtnAction = skipBtnAction;
+            this.skipAllBtnAction = skipAllBtnAction;
         } catch (Exception e) {
             JCommonUtil.handleException(e);
         }
@@ -79,6 +83,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
     private JButton deleteFromMemoryBankBtn;
     private JButton customDescBtn;
+    private JButton skipAllBtn;
 
     private void questionRadioChoiceAction() {
         choiceIndex = Arrays.asList(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio).indexOf(JButtonGroupUtil.getSelectedButton(btnGroup));
@@ -186,7 +191,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 JButton skipBtn = new JButton("跳過skip");
                 skipBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if(skipBtnAction != null){
+                        if (skipBtnAction != null) {
                             skipBtnAction.actionPerformed(e);
                         }
                     }
@@ -194,6 +199,17 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 skipBtn.setActionCommand("OK");
                 buttonPane.add(skipBtn);
                 getRootPane().setDefaultButton(skipBtn);
+            }
+            {
+                skipAllBtn = new JButton("全部掠過skip");
+                skipAllBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        if (skipAllBtnAction != null) {
+                            skipAllBtnAction.actionPerformed(arg0);
+                        }
+                    }
+                });
+                buttonPane.add(skipAllBtn);
             }
         }
 

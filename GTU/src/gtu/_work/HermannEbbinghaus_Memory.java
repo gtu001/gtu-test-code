@@ -17,21 +17,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.binary.Base64JdkUtil;
 import gtu.date.DateUtil;
-import gtu.properties.PropertiesUtil;
+import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
 
 public class HermannEbbinghaus_Memory {
 
     public static void main(String[] args) {
-        HermannEbbinghaus_Memory config = new HermannEbbinghaus_Memory(new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
-        System.out.println(config.containsKey("hermannebbinghaus  memory  java"));
-        System.out.println(config.containsKey("static"));
-        config.deleteKey("hermannebbinghaus  memory  java");
-        config.deleteKey("static");
+        HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
+        memory.init(new File("‪e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
+        memory.setMemDo(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                MemData mem = (MemData) arg0.getSource();
+                mem.setWaitingTriggerTime(30 * 60 * 60);
+            }
+        });
+        memory.start();
     }
 
     private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
@@ -71,19 +77,7 @@ public class HermannEbbinghaus_Memory {
     private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
     private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
 
-    public HermannEbbinghaus_Memory(File dir, String configName) {
-        if (dir == null) {
-            dir = PropertiesUtil.getJarCurrentPath(HermannEbbinghaus_Memory.class);
-        }
-        config = new PropertiesUtilBean(new File(dir, configName));
-    }
-
-    public HermannEbbinghaus_Memory(String configName) {
-        this(null, configName);
-    }
-
-    public HermannEbbinghaus_Memory(File customFile) {
-        config = new PropertiesUtilBean(customFile);
+    public HermannEbbinghaus_Memory() {
     }
 
     public File getFile() {
@@ -98,7 +92,8 @@ public class HermannEbbinghaus_Memory {
     }
 
     private void start(String label) {
-        this.init();
+        this.init(null);
+
         startPause.set(true);
         for (MemData v : memLst) {
             this.schedule(v);
@@ -175,7 +170,11 @@ public class HermannEbbinghaus_Memory {
         return t;
     }
 
-    private void init() {
+    public void init(File customFile) {
+        if (customFile != null) {
+            config = new PropertiesUtilBean(customFile);
+        }
+
         memLst = new ArrayList<MemData>();
         timerMap = new HashMap<String, Timer>();
         startPause = new AtomicBoolean(false);
@@ -238,7 +237,7 @@ public class HermannEbbinghaus_Memory {
         final AtomicLong nextPeroid = new AtomicLong(-1);
         if (d.isCustomWaitingTrigger()) {
             nextPeroid.set(d.getWaitingTriggerTime());
-            d.setWaitingTriggerTime(-1);
+            d.resetWaitingTriggerTime();
         } else {
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
             nextPeroid.set(this.getExecuteTime(d.fixedTime, nextRuntime));
@@ -462,6 +461,10 @@ public class HermannEbbinghaus_Memory {
         public void setWaitingTriggerTime(long waitingTriggerTime) {
             this.waitingTriggerTime = waitingTriggerTime;
         }
+        
+        public void resetWaitingTriggerTime() {
+            this.waitingTriggerTime = -1;
+        }
 
         public boolean isCustomWaitingTrigger() {
             return this.waitingTriggerTime >= 0;
@@ -499,5 +502,41 @@ public class HermannEbbinghaus_Memory {
 
     public boolean containsKey(String key) {
         return config.getConfigProp().containsKey(key);
+    }
+
+    /**
+     * 即將觸發的往後延
+     * @param recentTime 即將觸發的範圍
+     * @param minRange 往後延後的分鐘數範圍
+     */
+    public void skipRecent(long recentTime, Range<Integer> minRange) {
+        for (int ii = 0; ii < this.memLst.size(); ii++) {
+            MemData d = this.memLst.get(ii);
+
+            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
+            if (reviewTime == ReviewTime.NONE) {
+                continue;
+            }
+
+            final AtomicLong nextPeroid = new AtomicLong(-1);
+            if (d.isCustomWaitingTrigger()) {
+                nextPeroid.set(d.getWaitingTriggerTime());
+                d.setWaitingTriggerTime(-1);
+            } else {
+                long nextRuntime = (long) (reviewTime.min * 60 * 1000);
+                nextPeroid.set(this.getExecuteTime(d.fixedTime, nextRuntime));
+            }
+
+            if (nextPeroid.get() <= recentTime) {
+                int min = RandomUtil.rangeInteger(minRange.getMinimum(), minRange.getMaximum());
+                long extendTime = min * 60 * 1000;
+                nextPeroid.set(nextPeroid.get() + extendTime);
+
+                d.setWaitingTriggerTime(nextPeroid.get());
+
+                this.timerMap.get(d.getKey()).cancel();
+                this.schedule(d);
+            }
+        }
     }
 }

@@ -61,7 +61,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -130,9 +132,10 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox simpleSentanceChk;
     private JCheckBox robotFocusChk;
 
-    PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
+    private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     private static final String NEW_WORD_PATH = "new_word_path";
     private static final String OFFLINE_WORD_PATH = "offline_word_path";
+    private static final String MEMORY_BANK_PATH = "memory_bank_path";
     private GlobalKeyListenerExampleForEnglishUI keyUtil;
     private __ClipboardListener listenClipboardThread = null;
     private Thread checkFocusOwnerThread;
@@ -141,19 +144,7 @@ public class EnglishSearchUI extends JFrame {
 
     private Properties offlineProp;
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
-
-    private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory(getDebugDir4Memory(), "EnglishSearchUI_MemoryBank.properties");
-
-    private static File getDebugDir4Memory() {
-        File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
-        File f2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/");
-        for (File f : new File[] { f1, f2 }) {
-            if (f.exists() && f.isDirectory()) {
-                return f;
-            }
-        }
-        return null;
-    }
+    private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
 
     /**
      * Launch the application.
@@ -377,6 +368,18 @@ public class EnglishSearchUI extends JFrame {
                                 d.setWaitingTriggerTime(waitingTime);
                                 checkChoiceEqual.set(false);
                                 choiceDialog.setVisible(false);
+                            }
+                        }, new ActionListener() {// skip all
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "20"));
+                                    memory.skipRecent(1 * 60 * 1000, Range.between(min, min + 40));
+                                    checkChoiceEqual.set(false);
+                                    choiceDialog.setVisible(false);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
                             }
                         });
                 choiceDialog.showDialog();
@@ -750,12 +753,7 @@ public class EnglishSearchUI extends JFrame {
         this.offlineReadyLabelAction();
 
         // 設定記憶時鐘功能
-        memory.setMemDo(MemDo);
-        memory.setOnOffDo(onOffDo);
-        memory.start();
-        if (DEBUG) {
-            DesktopUtil.browse(memory.getFile().toURI().toString());
-        }
+        this.init_HermannEbbinghaus_Memory();
     }
 
     private void startListenClipboardThread() {
@@ -1297,6 +1295,38 @@ public class EnglishSearchUI extends JFrame {
 
     private void reviewMemConfigBtnAction() {
         try {
+            boolean initOk = this.init_HermannEbbinghaus_Memory();
+
+            File memoryFile = null;
+            if (!initOk) {
+                final String FILE_NAME = "EnglishSearchUI_MemoryBank.properties";
+                File dirOrFile = JCommonUtil._jFileChooser_selectFileAndDirectory();
+                if (dirOrFile.exists()) {
+                    if (dirOrFile.isFile()) {
+                        if (dirOrFile.getName().equals(FILE_NAME)) {
+                            memoryFile = dirOrFile;
+                        } else {
+                            memoryFile = new File(dirOrFile.getParentFile(), FILE_NAME);
+                        }
+                    } else {
+                        memoryFile = new File(dirOrFile, FILE_NAME);
+                    }
+
+                    propertyBean.getConfigProp().setProperty(MEMORY_BANK_PATH, memoryFile.getAbsolutePath());
+                    propertyBean.store();
+
+                    boolean initOk2 = this.init_HermannEbbinghaus_Memory();
+                    if (!initOk2) {
+                        Validate.isTrue(false, "初始化失敗!! : " + memoryFile);
+                    }
+                }
+            } else {
+                memoryFile = new File(propertyBean.getConfigProp().getProperty(MEMORY_BANK_PATH));
+                if (!memoryFile.exists()) {
+                    Validate.isTrue(false, "檔案不存在!! : " + memoryFile);
+                }
+            }
+
             DesktopUtil.browse(memory.getFile().toURL().toString());
         } catch (MalformedURLException e) {
             JCommonUtil.handleException(e);
@@ -1345,5 +1375,26 @@ public class EnglishSearchUI extends JFrame {
             System.out.println("Hidden  ----------------------------------------");
         }
         super.setVisible(b);
+    }
+
+    private boolean init_HermannEbbinghaus_Memory() {
+        File file = null;
+        if (propertyBean.getConfigProp().containsKey(MEMORY_BANK_PATH)) {
+            file = new File(propertyBean.getConfigProp().getProperty(MEMORY_BANK_PATH));
+            if (file.isFile() && file.getName().equals("EnglishSearchUI_MemoryBank.properties")) {
+                // OK!!
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        memory.init(file);
+        memory.setMemDo(MemDo);
+        memory.setOnOffDo(onOffDo);
+
+        memory.start();
+        return true;
     }
 }
