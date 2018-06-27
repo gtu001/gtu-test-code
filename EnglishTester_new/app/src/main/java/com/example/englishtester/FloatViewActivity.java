@@ -22,6 +22,7 @@ import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.MainAdViewHelper;
+import com.example.englishtester.common.ServiceUtil;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class FloatViewActivity extends Activity {
      * 開啟/停止 服務
      */
     private void startStopService(boolean isStart) {
-        boolean isRunning = isServiceRunning(this, FloatViewService.class);
+        boolean isRunning = ServiceUtil.isServiceRunning(this, FloatViewService.class);
         if (!isRunning && isStart) {
             Intent intent = new Intent(FloatViewActivity.this, FloatViewService.class);
             // 启动FxService
@@ -153,21 +154,8 @@ public class FloatViewActivity extends Activity {
      * 修正按鈕文字
      */
     private void fixButtonText() {
-        boolean isRunning = isServiceRunning(this, FloatViewService.class);
+        boolean isRunning = ServiceUtil.isServiceRunning(this, FloatViewService.class);
         startBtn.setText((isRunning ? "關閉" : "開啟") + "即時字典");
-    }
-
-    /**
-     * 判斷service是否執行中
-     */
-    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private LinearLayout createContentView() {

@@ -11,7 +11,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "ExamBook";
-    static final int DATABASE_VERSION = 4;
+    static final int DATABASE_VERSION = 5;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,7 +55,8 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("  create table recent_search (                         ");
         sb.append("      english_id text primary key not null,      ");
         sb.append("      insert_date long not null,               ");
-        sb.append("      search_time integer not null               ");
+        sb.append("      search_time integer not null,               ");
+        sb.append("      upload_type text                          ");
         sb.append("  );                                           ");
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
@@ -77,16 +78,10 @@ public class DBConnection extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
 
-        if (newVersion == 4) {
+        if (newVersion == 5) {
             // txt查單字紀錄表
             sb = new StringBuilder();
-            sb.append("  create table recent_txt_mark (                         ");
-            sb.append("      list_id integer primary key autoincrement,      ");
-            sb.append("      file_name text not null,      ");
-            sb.append("      mark_index int not null,      ");
-            sb.append("      mark_english text not null,      ");
-            sb.append("      insert_date long not null               ");
-            sb.append("  );                                           ");
+            sb.append("  alter table recent_search add upload_type text ");
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());
         }

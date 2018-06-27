@@ -70,6 +70,12 @@
             android:exported="false"
             android:stopWithTask="false" />
 
+        <service
+            android:name="com.example.englishtester.common.HermannEbbinghaus_Memory_Service"
+            android:process=":hermannEbbinghaus_Memory_Service"
+            android:exported="false"
+            android:stopWithTask="false" />
+
         <!--<receiver android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

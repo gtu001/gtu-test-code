@@ -5,7 +5,7 @@ import java.util.Base64;
 import org.apache.commons.lang.StringUtils;
 
 public class Base64JdkUtil {
-    
+
     public static String encode(String str) {
         try {
             byte[] arry = StringUtils.trimToEmpty(str).getBytes("UTF8");
@@ -19,7 +19,11 @@ public class Base64JdkUtil {
         try {
             return new String(Base64.getDecoder().decode(str), "UTF8");
         } catch (Exception e) {
-            throw new RuntimeException("Base64Jdk.encode ERR : " + e.getMessage(), e);
+            try {
+                return CipherBase64.decode(str, "UTF8");
+            } catch (Exception ex) {
+                throw new RuntimeException("Base64Jdk.encode ERR : " + e.getMessage(), e);
+            }
         }
     }
 }

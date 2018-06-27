@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
+import com.example.englishtester.common.ServiceUtil;
 
 import java.util.Calendar;
 import java.util.List;
@@ -79,7 +80,7 @@ public class FloatViewAssistService extends Service {
         }
 
         private void keepAssistService(Context fromContext, Class<? extends Service> targetServiceClass) {
-            boolean isRun = FloatViewActivity.isServiceRunning(fromContext, targetServiceClass);
+            boolean isRun = ServiceUtil.isServiceRunning(fromContext, targetServiceClass);
             if (isRun == false) {
                 Log.i(TAG, "test001 - 守護線程重新啟動!~");
                 Intent intent = new Intent(fromContext, targetServiceClass);

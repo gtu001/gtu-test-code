@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.example.englishtester.RecentSearchDAO.RecentSearch;
 import com.example.englishtester.RecentSearchDAO.RecentSearchSchema;
+import com.example.englishtester.common.DBUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -88,8 +89,8 @@ public class RecentSearchService {
      */
     public List<String> recentSearchHistory(int rowmax) {
         List<String> list = new ArrayList<String>();
-        String sql = recentSearchDAO.getRownumRawSql(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.INSERT_DATE, "desc", " and rownum <= " + rowmax + " ");
-        List<Map<String, String>> queryList = recentSearchDAO.queryBySQL(sql, new String[]{});
+        String sql = DBUtil.getRownumRawSql(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.INSERT_DATE, false, " and rownum <= " + rowmax + " ");
+        List<Map<String, String>> queryList = DBUtil.queryBySQL(sql, new String[]{}, context);
         for (Map<String, String> m : queryList) {
             String englishId = m.get(RecentSearchSchema.ENGLISH_ID);
             list.add(englishId);

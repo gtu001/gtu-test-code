@@ -38,6 +38,7 @@ public class PropertiesUtilBean {
             propFile = customFile;
             logger.info("configFile : " + propFile);
             if (!propFile.exists()) {
+                logger.info("!!!!! 設定檔不存在建立新檔 : " + propFile);
                 propFile.createNewFile();
             }
             configProp = new Properties();

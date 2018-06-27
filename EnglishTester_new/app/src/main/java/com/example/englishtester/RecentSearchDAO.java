@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.englishtester.common.DBUtil;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -29,8 +31,8 @@ public class RecentSearchDAO {
     /**
      * 查詢總筆數
      */
-    long totalSize(){
-        List<Map<String,String>> lst = queryBySQL("select count(*) as CNT from " + RecentSearchSchema.TABLE_NAME, new String[0]);
+    long totalSize() {
+        List<Map<String, String>> lst = DBUtil.queryBySQL("select count(*) as CNT from " + RecentSearchSchema.TABLE_NAME, new String[0], context);
         long result = Long.parseLong(lst.get(0).get("CNT"));
         return result;
     }
@@ -49,7 +51,7 @@ public class RecentSearchDAO {
         return list;
     }
 
-    List<RecentSearch> query(String whereCondition, String[] whereArray, String orderBy){
+    List<RecentSearch> query(String whereCondition, String[] whereArray, String orderBy) {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.FROM, whereCondition, whereArray, null, null, orderBy);
         c.moveToFirst();
@@ -85,7 +87,7 @@ public class RecentSearchDAO {
         return list;
     }
 
-    List<RecentSearch> queryAll() {
+    public List<RecentSearch> queryAll() {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.FROM, null, null, null, null, null);
         c.moveToFirst();
@@ -96,49 +98,6 @@ public class RecentSearchDAO {
         }
         for (int ii = 0; ii < total; ii++) {
             list.add(transferWord(c));
-            c.moveToNext();
-        }
-        c.close();
-        db.close();
-        return list;
-    }
-
-    /**
-     * 取得帶有rownum 的查詢
-     */
-    public String getRownumRawSql(String tableName, String orderColumn, String orderType, String whereCondition) {
-        String compareType = "asc".equalsIgnoreCase(orderType) ? " <= " : " >= ";
-        StringBuilder sb = new StringBuilder();
-        sb.append(" select * from ( ");
-        sb.append(" select (select COUNT(0) ");
-        sb.append(" from " + tableName + " t1 ");
-        sb.append(" where t1." + orderColumn + " " + compareType + " t2." + orderColumn + " ");
-        sb.append(" ) as 'rownum', rowid, t2.* from " + tableName + " t2 ORDER BY " + RecentSearchSchema.INSERT_DATE + " desc ");
-        sb.append(" ) t where 1=1 " + whereCondition);
-        return sb.toString();
-    }
-
-    /**
-     * rawsql查詢
-     */
-    public List<Map<String, String>> queryBySQL(String rawSql, String[] whereArray) {
-        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
-        Cursor c = db.rawQuery(rawSql, whereArray);
-        c.moveToFirst();
-        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        int total = c.getCount();
-        if (total == 0) {
-            return new ArrayList<Map<String, String>>();
-        }
-        for (int ii = 0; ii < total; ii++) {
-            Map<String, String> map = new LinkedHashMap<String, String>();
-            for (int jj = 0; jj < c.getColumnCount(); jj++) {
-                String columnName = c.getColumnName(jj);
-                String val = c.getString(c.getColumnIndex(columnName));
-                map.put(columnName, val);
-            }
-            Log.v(TAG, "queryBySQL map - " + map);
-            list.add(map);
             c.moveToNext();
         }
         c.close();
@@ -174,7 +133,7 @@ public class RecentSearchDAO {
         return result;
     }
 
-    int updateWord(RecentSearch word) {
+    public int updateWord(RecentSearch word) {
         validationWord(word);
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         ContentValues values = this.transferWord(word);
@@ -207,6 +166,55 @@ public class RecentSearchDAO {
         // return result;
     }
 
+    private List<RecentSearch> transferToLst(Cursor c, SQLiteDatabase db) {
+        c.moveToFirst();
+        List<RecentSearch> list = new ArrayList<RecentSearch>();
+        int total = c.getCount();
+        if (total == 0) {
+            return list;
+        }
+        for (int ii = 0; ii < total; ii++) {
+            list.add(transferWord(c));
+            c.moveToNext();
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    //取得n比需上傳的單字
+    public int queryNeedUploadSize() {
+        String selection = String.format(" %1$s is null or %1$s = '' ", RecentSearchSchema.UPLOAD_TYPE);
+        String[] selectionArgs = new String[0];
+
+        String sql = "select count(*) as CNT from " + RecentSearchSchema.TABLE_NAME + //
+                " where " + selection;
+
+        List<Map<String, String>> lst = DBUtil.queryBySQL(sql, selectionArgs, context);
+        int result = Integer.parseInt(lst.get(0).get("CNT"));
+        return result;
+    }
+
+    //取得n比需上傳的單字
+    public List<RecentSearch> queryNeedUpload(int limitSize) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+
+        String table = RecentSearchSchema.TABLE_NAME;
+        String[] columns = null;
+        String selection = String.format(" %1$s is null or %1$s = '' ", RecentSearchSchema.UPLOAD_TYPE);
+        String[] selectionArgs = new String[0];
+        String groupBy = null;
+        String having = null;
+        String orderBy = RecentSearchSchema.INSERT_DATE + " DESC ";
+        String limit = limitSize <= 0 ? null : String.valueOf(limitSize);
+
+        Cursor c = db.query(table, columns, selection,
+                selectionArgs, groupBy, having,
+                orderBy, limit);
+
+        return this.transferToLst(c, db);
+    }
+
     /**
      * 關閉資料庫
      */
@@ -219,6 +227,7 @@ public class RecentSearchDAO {
         word.englishId = c.getString(c.getColumnIndex(RecentSearchSchema.ENGLISH_ID));
         word.insertDate = c.getLong(c.getColumnIndex(RecentSearchSchema.INSERT_DATE));
         word.searchTime = c.getInt(c.getColumnIndex(RecentSearchSchema.SEARCH_TIME));
+        word.uploadType = c.getString(c.getColumnIndex(RecentSearchSchema.UPLOAD_TYPE));
         return word;
     }
 
@@ -227,6 +236,7 @@ public class RecentSearchDAO {
         values.put(RecentSearchSchema.ENGLISH_ID, word.englishId);
         values.put(RecentSearchSchema.INSERT_DATE, word.insertDate);
         values.put(RecentSearchSchema.SEARCH_TIME, word.searchTime);
+        values.put(RecentSearchSchema.UPLOAD_TYPE, word.uploadType);
         return values;
     }
 
@@ -243,13 +253,47 @@ public class RecentSearchDAO {
         String englishId;
         long insertDate;
         int searchTime;
+        String uploadType;
+
+        public String getEnglishId() {
+            return englishId;
+        }
+
+        public void setEnglishId(String englishId) {
+            this.englishId = englishId;
+        }
+
+        public long getInsertDate() {
+            return insertDate;
+        }
+
+        public void setInsertDate(long insertDate) {
+            this.insertDate = insertDate;
+        }
+
+        public int getSearchTime() {
+            return searchTime;
+        }
+
+        public void setSearchTime(int searchTime) {
+            this.searchTime = searchTime;
+        }
+
+        public String getUploadType() {
+            return uploadType;
+        }
+
+        public void setUploadType(String uploadType) {
+            this.uploadType = uploadType;
+        }
     }
 
-    interface RecentSearchSchema {
+    public interface RecentSearchSchema {
         String TABLE_NAME = "recent_search";
         String ENGLISH_ID = "english_id";
         String INSERT_DATE = "insert_date";
         String SEARCH_TIME = "search_time";
-        final String[] FROM = {ENGLISH_ID, INSERT_DATE, SEARCH_TIME};
+        String UPLOAD_TYPE = "upload_type";
+        final String[] FROM = {ENGLISH_ID, INSERT_DATE, SEARCH_TIME, UPLOAD_TYPE};
     }
 }

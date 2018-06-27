@@ -365,7 +365,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 338);
+        setBounds(100, 100, 540, 347);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -595,6 +595,15 @@ public class EnglishSearchUI extends JFrame {
         panel.add(panel_4, "4, 24, fill, fill");
 
         reviewMemChk = new JCheckBox("定時複習");
+        reviewMemChk.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (reviewMemChk.isSelected()) {
+                    memory.start();
+                } else {
+                    memory.stop();
+                }
+            }
+        });
         panel_4.add(reviewMemChk);
 
         reviewMemWaitingListBtn = new JButton("等待清單");

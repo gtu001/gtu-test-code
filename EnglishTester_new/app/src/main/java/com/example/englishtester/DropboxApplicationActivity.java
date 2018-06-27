@@ -1,6 +1,7 @@
 package com.example.englishtester;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
@@ -155,7 +156,7 @@ public class DropboxApplicationActivity extends Activity {
     /**
      * 取得Dropbox AccessToken
      */
-    public static String getDropboxAccessToken(ContextWrapper context) {
+    public static String getDropboxAccessToken(Context context) {
         String token = SharedPreferencesUtil.getData(context, //
                 DROPBOX_REF_KEY, DROPBOX_BUNDLE_TOKEN_KEY);
         if (StringUtils.isBlank(token)) {

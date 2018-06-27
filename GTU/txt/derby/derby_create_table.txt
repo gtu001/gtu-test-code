@@ -1,0 +1,6 @@
+create table test_table (
+        pk1 integer not null,
+        col1 varchar(10)  default '',
+        col2 boolean default false,
+        primary key (pk1)
+);

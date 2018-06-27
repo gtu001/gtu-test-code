@@ -2,11 +2,9 @@ package com.example.englishtester;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -16,12 +14,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.englishtester.common.GodToast;
-import com.example.englishtester.common.InterstitialAdHelper;
+import com.example.englishtester.common.HermannEbbinghaus_Memory_Service;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.PermissionUtil;
+import com.example.englishtester.common.ServiceUtil;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.io.File;
@@ -130,6 +127,9 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
         contentView.addView(createButton("與我聯繫",//
                 createOnClickListener(DumpLogActivity.class, new Bundle(), null)));
 
+
+        //----------------------------------------------------------------
+
         //----------------------------------------------------------------
 
         //----------------------------------------------------------------
@@ -146,9 +146,11 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 //                }
 //        ));
 
-
         //初始化廣告框
         MainAdViewHelper.getInstance().initAdView(mAdView, this);
+
+        //啟動記憶追朔服務
+        ServiceUtil.startStopService(true, this, HermannEbbinghaus_Memory_Service.class);
 
         //確認讀取儲存空間權限
         boolean isFirstInstall = PermissionUtil.verifyStoragePermissions(this);
@@ -336,7 +338,7 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
     }
 

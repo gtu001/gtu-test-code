@@ -9,25 +9,21 @@ import sun.misc.BASE64Encoder;
  */
 public class CipherBase64 {
 
-    public String decode(String str) {
-        String sRtn = null;
+    public static String decode(String str, String encode) {
         try {
             BASE64Decoder b64d = new BASE64Decoder();
-            sRtn = new String(b64d.decodeBuffer(str));
-
+            return new String(b64d.decodeBuffer(str), encode);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("decode ERR : " + e.getMessage(), e);
         }
-        return sRtn;
-
     }
 
-    public String encode(String str) {
-        BASE64Encoder b64e = new BASE64Encoder();
-        return (b64e.encode(str.getBytes()));
-    }
-
-    public boolean verify(String originStr, String encryptionStr) {
-        return (originStr.compareTo(decode(encryptionStr)) == 0 ? true : false);
+    public static String encode(String str, String encode) {
+        try {
+            BASE64Encoder b64e = new BASE64Encoder();
+            return (b64e.encode(str.getBytes(encode)));
+        } catch (Exception e) {
+            throw new RuntimeException("encode ERR : " + e.getMessage(), e);
+        }
     }
 }

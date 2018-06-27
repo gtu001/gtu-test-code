@@ -133,7 +133,7 @@ public class HermannEbbinghaus_Memory {
         memLst = new ArrayList<MemData>();
         timerMap = new HashMap<String, Timer>();
         startPause = new AtomicBoolean(false);
-        
+
         for (Object k : config.getConfigProp().keySet()) {
             String key = (String) k;
             String value = config.getConfigProp().getProperty(key);
@@ -394,7 +394,13 @@ public class HermannEbbinghaus_Memory {
         }
 
         public String getRemark() {
-            return Base64JdkUtil.decode(remark);
+            try {
+                return Base64JdkUtil.decode(remark);
+            } catch (Exception ex) {
+                System.out.println("remark => " + remark);
+                ex.printStackTrace();
+                return "__ERROR__";
+            }
         }
 
         public void setRemark(String remark) {
