@@ -1,0 +1,8 @@
+CREATE SEQUENCE  row_id_sequence
+AS BIGINT
+START WITH  1 
+INCREMENT BY 1
+;
+
+--取得新的
+select ( NEXT VALUE FOR row_id_sequence ) as NEW_ID from AAAA;

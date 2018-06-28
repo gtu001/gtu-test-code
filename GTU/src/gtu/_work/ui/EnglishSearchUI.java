@@ -333,7 +333,9 @@ public class EnglishSearchUI extends JFrame {
                 break;
             case 2:
                 final EnglishSearchUI_MemoryBank_DialogUI choiceDialog = new EnglishSearchUI_MemoryBank_DialogUI();
-                choiceDialog.createDialog("複習" + reviewType + " " + period, d.getKey(), meaningLst.toArray(new String[0]), //
+                choiceDialog.createDialog("複習階段 :" + reviewType + " [組列 : " + memory.getQueue().size() + "]", //
+                        d.getKey(), //
+                        meaningLst.toArray(new String[0]), //
                         new ActionListener() { // delete key
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -1409,9 +1411,9 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void reviewMemResumeBtnAction() {
-        try{
+        try {
             memory.resume();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }

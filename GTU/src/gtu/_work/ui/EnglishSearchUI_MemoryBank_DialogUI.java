@@ -108,12 +108,12 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
         {
-            JLabel lblNewLabel = new JLabel("複習");
+            JLabel lblNewLabel = new JLabel("");
             contentPanel.add(lblNewLabel, "2, 2");
         }
         {
             englishWordLabel = new JLabel("");
-            englishWordLabel.setFont(new Font("新細明體", Font.PLAIN, 18));
+            englishWordLabel.setFont(new Font("Consolas", Font.PLAIN, 19));
             contentPanel.add(englishWordLabel, "4, 2");
         }
         {

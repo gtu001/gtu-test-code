@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -78,6 +80,7 @@ public class HermannEbbinghaus_Memory {
     private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
     private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
     private AtomicReference<Range<Integer>> skipAll = new AtomicReference<Range<Integer>>();// 現在準備執行的全部取消
+    private AtomicReference<Set<String>> queueSet = new AtomicReference<Set<String>>();// 顯示進入組列數
 
     public HermannEbbinghaus_Memory() {
     }
@@ -255,7 +258,10 @@ public class HermannEbbinghaus_Memory {
 
                 // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
-
+                
+                //放在 sync 裡沒鳥用
+                queueSetAddKey(d.getKey());
+                
                 synchronized (HermannEbbinghaus_Memory.this) {
                     do {
                         if (d instanceof NotifyAllClz) {
@@ -266,11 +272,13 @@ public class HermannEbbinghaus_Memory {
                         if (skipAll.get() != null) {
                             delayAll(d);
                         }
-                        
+
                     } while (skipAll.get() != null);
 
                     memDo.actionPerformed(act);
                 }
+
+                queueSetRemoveKey(d.getKey());
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
@@ -288,6 +296,19 @@ public class HermannEbbinghaus_Memory {
 
                 // 準備執行下次
                 schedule(d);
+            }
+
+            private void queueSetAddKey(String key) {
+                if (queueSet.get() == null) {
+                    queueSet.set(new LinkedHashSet<String>());
+                }
+                queueSet.get().add(key);
+            }
+
+            private void queueSetRemoveKey(String key) {
+                if (queueSet.get() != null && queueSet.get().contains(key)) {
+                    queueSet.get().remove(key);
+                }
             }
         }, nextPeroid.get());
     }
@@ -586,5 +607,15 @@ public class HermannEbbinghaus_Memory {
     public void resume() {
         skipAll.set(null);
         this.schedule(new NotifyAllClz());
+    }
+
+    /**
+     * 取得測驗中的阻列
+     */
+    public Set<String> getQueue() {
+        if (queueSet.get() == null) {
+            queueSet.set(new LinkedHashSet<String>());
+        }
+        return queueSet.get();
     }
 }
