@@ -1,0 +1,3 @@
+alter table rowdto alter column word_music SET DATA TYPE varchar(20);
+
+alter table Example_Clz add column word varchar(30);

@@ -42,7 +42,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +50,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -335,6 +335,8 @@ public class EnglishSearchUI extends JFrame {
                 break;
             case 2:
                 final EnglishSearchUI_MemoryBank_DialogUI choiceDialog = new EnglishSearchUI_MemoryBank_DialogUI();
+                final MouseMarkQueryHandler mouseMarkQueryHandler = new MouseMarkQueryHandler();
+                choiceDialog.initial();
                 choiceDialog.createDialog("複習階段 :" + reviewType + " [組列 : " + memory.getQueue().size() + "]", //
                         d.getKey(), //
                         meaningLst.toArray(new String[0]), //
@@ -356,10 +358,6 @@ public class EnglishSearchUI extends JFrame {
                         }, new ActionListener() {// modify desc
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                //取消圈選查詢
-                                listenClipboardThread.setMointerOn(false);
-                                mouseSelectionChk.setSelected(false);
-                                
                                 String newMeaning = JCommonUtil._jOptionPane_showInputDialog("請輸入新解釋  : " + d.getKey(), meaning.get());
                                 if (newMeaning != null) {
                                     newMeaning = getChs2Big5(newMeaning);
@@ -391,6 +389,16 @@ public class EnglishSearchUI extends JFrame {
                                 }
                                 checkChoiceEqual.set(false);
                                 choiceDialog.setVisible(false);
+                            }
+                        }, new ActionListener() { // onCreate
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                mouseMarkQueryHandler.before();
+                            }
+                        }, new ActionListener() { // onClose
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                mouseMarkQueryHandler.after();
                             }
                         });
                 choiceDialog.showDialog();
@@ -1450,5 +1458,33 @@ public class EnglishSearchUI extends JFrame {
             ex.printStackTrace();
         }
         return value;
+    }
+
+    private class MouseMarkQueryHandler {
+        boolean orignStatus;
+
+        private MouseMarkQueryHandler() {
+        }
+
+        public void before() {
+            orignStatus = isMouseQuery();
+            setMouseOuery(false);
+        }
+
+        public void after() {
+            if (orignStatus) {
+                setMouseOuery(true);
+            }
+        }
+
+        private boolean isMouseQuery() {
+            return mouseSelectionChk.isSelected() && listenClipboardChk.isSelected();
+        }
+
+        private void setMouseOuery(final boolean value) {
+            mouseSelectionChk.setSelected(value);
+            listenClipboardChk.setSelected(value);
+            listenClipboardThread.setMointerOn(value);
+        }
     }
 }

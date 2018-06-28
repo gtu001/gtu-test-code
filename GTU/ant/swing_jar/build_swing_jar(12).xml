@@ -59,6 +59,7 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
@@ -107,7 +108,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -115,7 +116,7 @@
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="moveJarToDesktop">

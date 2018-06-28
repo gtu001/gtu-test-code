@@ -43,6 +43,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private ActionListener customDescAction;
     private ActionListener skipBtnAction;
     private ActionListener skipAllBtnAction;
+    private ActionListener onDismissAction;
+    private ActionListener onCreateAction;
 
     /**
      * Launch the application.
@@ -50,17 +52,31 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     public static void main(String[] args) {
         String[] arry = new String[] { "a1", "a2", "a3", "a4", "a5" };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
-        dialog.createDialog("title", "AAAA", arry, null, null, null, null, null);
+        dialog.initial();
+        dialog.createDialog("title", "AAAA", arry, null, null, null, null, null, null, null);
     }
 
     public void showDialog() {
+        if (onCreateAction != null) {
+            onCreateAction.actionPerformed(new ActionEvent(this, -1, "create"));
+        }
         JCommonUtil.setFrameAtop(this, true);
+    }
+
+    public void closeDialog() {
+        this.setVisible(false);
+        this.dispose();
+        if (onDismissAction != null) {
+            onDismissAction.actionPerformed(new ActionEvent(this, -1, "onDismiss"));
+        }
     }
 
     public void createDialog(String title, String englishWord, String[] meaningLst, //
             ActionListener deleteConfigAction, ActionListener choiceRadioAction, //
             ActionListener customDescAction, ActionListener skipBtnAction, //
-            ActionListener skipAllBtnAction) {
+            ActionListener skipAllBtnAction, ActionListener onCreateAction, //
+            ActionListener onDismissAction //
+    ) {
         try {
             setTitle(title);
             this.meaningLst = meaningLst;
@@ -76,6 +92,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             this.customDescAction = customDescAction;
             this.skipBtnAction = skipBtnAction;
             this.skipAllBtnAction = skipAllBtnAction;
+            this.onCreateAction = onCreateAction;
+            this.onDismissAction = onDismissAction;
         } catch (Exception e) {
             JCommonUtil.handleException(e);
         }
@@ -99,6 +117,9 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
      * Create the dialog.
      */
     public EnglishSearchUI_MemoryBank_DialogUI() {
+    }
+
+    public void initial() {
         setBounds(100, 100, 450, 300);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

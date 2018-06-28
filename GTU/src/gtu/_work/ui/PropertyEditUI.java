@@ -40,6 +40,8 @@ import javax.swing.table.TableModel;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu._work.HermannEbbinghaus_Memory;
+import gtu._work.HermannEbbinghaus_Memory.MemData;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory2;
@@ -294,20 +296,50 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 return new StringUtil_().getChineseWord(val, true).length() > 0;
                             }
 
+                            private Properties loadFromMemoryBank() {
+                                try {
+                                    Properties prop = new Properties();
+                                    File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties");
+                                    File f2 = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties");
+                                    for (File f : new File[] { f1, f2 }) {
+                                        if (f.exists()) {
+                                            HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
+                                            memory.init(f);
+                                            List<MemData> memLst = memory.getAllMemData(true);
+                                            for (MemData d : memLst) {
+                                                prop.setProperty(d.getKey(), getChs2Big5(d.getRemark()));
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    return prop;
+                                } catch (Exception ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
+
                             public void actionPerformed(ActionEvent evt) {
                                 if (currentFile == null) {
                                     return;
                                 }
+
+                                Properties memoryProp = loadFromMemoryBank();
+
                                 List<String> errSb = new ArrayList<String>();
                                 for (int row = 0; row < propTable.getModel().getRowCount(); row++) {
                                     int rowPos = propTable.getRowSorter().convertRowIndexToModel(row);
-                                    String english = (String) propTable.getRowSorter().getModel().getValueAt(rowPos, 1);
+                                    String english = StringUtils.trimToEmpty((String) propTable.getRowSorter().getModel().getValueAt(rowPos, 1)).toLowerCase();
                                     String desc = (String) propTable.getRowSorter().getModel().getValueAt(rowPos, 2);
-                                    if (StringUtils.isBlank(desc) || !hasChinese(desc)) {
-                                        if (!english.contains(" ")) {
-                                            setMeaningEn1(english, rowPos, errSb);
-                                        } else {
-                                            setMeaningEn2(english, rowPos, errSb);
+
+                                    if (memoryProp.containsKey(english) && StringUtils.isNotBlank(memoryProp.getProperty(english))) {
+                                        setMeaning(memoryProp.getProperty(english), rowPos);
+                                    } else {
+                                        if (StringUtils.isBlank(desc) || !hasChinese(desc)) {
+                                            if (!english.contains(" ")) {
+                                                setMeaningEn1(english, rowPos, errSb);
+                                            } else {
+                                                setMeaningEn2(english, rowPos, errSb);
+                                            }
                                         }
                                     }
                                 }
