@@ -17,6 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,12 +29,16 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -137,6 +143,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JCheckBox useRemarkOpenChk;
     private JCheckBox hiddenChk;
     private JCheckBox showHiddenChk;
+    private JButton dropboxMergeBtn;
 
     /**
      * Launch the application.
@@ -369,13 +376,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tabbedPane.addTab("設定", null, panel_3, null);
             panel_3.setLayout(new FormLayout(
                     new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
-                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                             FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                             FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                             FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                             FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                             FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
-                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                            FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
             JLabel lblNewLabel = new JLabel("bookmark config");
             panel_3.add(lblNewLabel, "2, 2, right, default");
@@ -392,6 +401,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
             panel_3.add(configSaveBtn, "28, 2");
+
+            JPanel panel_5 = new JPanel();
+            panel_3.add(panel_5, "6, 4, fill, fill");
+
+            dropboxMergeBtn = new JButton("合併dropbox設定");
+            dropboxMergeBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    dropboxMergeBtnAction();
+                }
+            });
+            panel_5.add(dropboxMergeBtn);
 
             pack();
             this.setSize(900, 500);// XXX <---------- 設寬高度
@@ -713,7 +733,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.tag = tag;
             d.remark = remark;
             d.commandType = commandType;
-            d.timestampLastest = "";
+            d.timestampLastest = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
             d.isUseRemarkOpen = isUseRemarkOpen;
             d.isHidden = isHidden;
 
@@ -860,12 +880,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     } else if ("remark".equalsIgnoreCase(compareTarget)) {
                         comareThisStr = d.remark;
                     }
-                    
+
                     NormalLogicTagMatch tagChk = new NormalLogicTagMatch(d, comparator, compareText);
-                    if(isTag){
+                    if (isTag) {
                         return tagChk.isMatch();
                     }
-                    
+
                     if ("^=".equalsIgnoreCase(comparator)) {
                         if (comareThisStr.toLowerCase().startsWith(compareText.toLowerCase())) {
                             return true;
@@ -1190,8 +1210,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             return "";
         }
 
-        private static UrlConfig parseTo(String key, String title_tag_remark_time) {
-            String[] args = StringUtils.trimToEmpty(title_tag_remark_time).split("\\^", -1);
+        private static UrlConfig parseTo(String key, String propertiesValue) {
+            String[] args = StringUtils.trimToEmpty(propertiesValue).split("\\^", -1);
             if (args.length >= 4) {
                 String title = getArryStr(args, 0);
                 String tag = getArryStr(args, 1);
@@ -1217,7 +1237,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
                 return d;
             }
-            throw new RuntimeException("無法取得設定 : " + key + " -> " + title_tag_remark_time);
+            throw new RuntimeException("無法取得設定 : " + key + " -> " + propertiesValue);
         }
     }
 
@@ -1825,6 +1845,81 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 } catch (IOException e) {
                 }
             }
+        }
+    }
+
+    private class DropboxBookmarkConfigMergeHandler {
+        private List<String> mergeFileLst = new ArrayList<String>();
+
+        private UrlConfig __getNewConfig_for_Merge(UrlConfig d1, UrlConfig d2) throws ParseException {
+            if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
+                if (UrlConfig.getConfigValue(d1).length() > UrlConfig.getConfigValue(d2).length()) {
+                    return d1;
+                } else {
+                    return d2;
+                }
+            }
+
+            if (StringUtils.isNotBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
+                return d1;
+            } else if (StringUtils.isNotBlank(d2.timestampLastest) && StringUtils.isBlank(d1.timestampLastest)) {
+                return d2;
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            if (sdf.parse(d1.timestampLastest).after(sdf.parse(d2.timestampLastest))) {
+                return d1;
+            } else {
+                return d2;
+            }
+        }
+
+        private void __mergeToMap(Properties prop, Map<String, UrlConfig> mergeMap) throws ParseException {
+            for (Enumeration<?> enu = prop.keys(); enu.hasMoreElements();) {
+                String url = (String) enu.nextElement();
+                String propValue = prop.getProperty(url);
+                UrlConfig d = UrlConfig.parseTo(url, propValue);
+                if (mergeMap.containsKey(url)) {
+                    d = __getNewConfig_for_Merge(d, mergeMap.get(url));
+                }
+                mergeMap.put(url, d);
+            }
+        }
+
+        private Properties getMergeProperties(File dropboxDir) throws FileNotFoundException, IOException, ParseException {
+            Map<String, UrlConfig> map = new HashMap<String, UrlConfig>();
+            for (File f : dropboxDir.listFiles()) {
+                if (f.getName().matches("BrowserHistoryHandlerUI_bookmark.*\\.properties")) {
+                    Properties prop = new Properties();
+                    prop.load(new FileInputStream(f));
+                    __mergeToMap(prop, map);
+
+                    mergeFileLst.add(f.getName());
+                }
+            }
+            __mergeToMap(bookmarkConfig.getConfigProp(), map);
+
+            Properties prop = new Properties();
+            for (UrlConfig d : map.values()) {
+                prop.setProperty(d.url, UrlConfig.getConfigValue(d));
+            }
+            return prop;
+        }
+    }
+
+    private void dropboxMergeBtnAction() {
+        try {
+            File dir = JCommonUtil._jFileChooser_selectFileAndDirectory();
+            if (!dir.isDirectory()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("必須是dropbox目錄!");
+                return;
+            }
+            DropboxBookmarkConfigMergeHandler handler = new DropboxBookmarkConfigMergeHandler();
+            bookmarkConfig.getConfigProp().putAll(handler.getMergeProperties(dir));
+            bookmarkConfig.store();
+            JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(handler.mergeFileLst, "\r\n") + "\nMerge完成!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }
