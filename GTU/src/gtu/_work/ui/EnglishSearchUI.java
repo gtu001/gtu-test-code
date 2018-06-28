@@ -373,13 +373,13 @@ public class EnglishSearchUI extends JFrame {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "20"));
+                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", ""));
                                     memory.skipRecent(Range.between(min, min + 40));
-                                    checkChoiceEqual.set(false);
-                                    choiceDialog.setVisible(false);
                                 } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
+                                    memory.skipRecent();
                                 }
+                                checkChoiceEqual.set(false);
+                                choiceDialog.setVisible(false);
                             }
                         });
                 choiceDialog.showDialog();
@@ -405,6 +405,7 @@ public class EnglishSearchUI extends JFrame {
             sysutil.displayMessage("Memory Bank", event.getActionCommand(), MessageType.INFO);
         }
     };
+    private JButton reviewMemResumeBtn;
 
     /**
      * Create the frame.
@@ -426,7 +427,10 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 347);
+        // setBounds(100, 100, 540,
+        // 347);//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        setBounds(100, 100, 597, 470);
+
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -708,6 +712,14 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         panel_4.add(reviewMemFromFileBtn);
+
+        reviewMemResumeBtn = new JButton("中斷回復");
+        reviewMemResumeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                reviewMemResumeBtnAction();
+            }
+        });
+        panel_4.add(reviewMemResumeBtn);
 
         // ----------------------------------------------------------------------------------------------------------
 
@@ -1396,5 +1408,9 @@ public class EnglishSearchUI extends JFrame {
 
         memory.start();
         return true;
+    }
+
+    private void reviewMemResumeBtnAction() {
+        memory.notifyAll();
     }
 }

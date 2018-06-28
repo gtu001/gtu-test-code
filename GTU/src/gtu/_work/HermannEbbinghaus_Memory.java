@@ -512,14 +512,30 @@ public class HermannEbbinghaus_Memory {
 
     private void delayAll(MemData d) {
         Range<Integer> minRange = skipAll.get();
-        int min = RandomUtil.rangeInteger(minRange.getMinimum(), minRange.getMaximum());
-        long extendTime = min * 60 * 1000;
-        System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
-        try {
-            this.wait(extendTime);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (minRange.getMinimum() == -1 && minRange.getMaximum() == -1) {
+            System.out.println("@延遲 :" + d.getKey() + " ->  無限停止!!");
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            int min = RandomUtil.rangeInteger(minRange.getMinimum(), minRange.getMaximum());
+            long extendTime = min * 60 * 1000;
+            System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
+            try {
+                this.wait(extendTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    /**
+     * 即將觸發的往後延 (無限期)
+     */
+    public void skipRecent() {
+        this.skipRecent(null);
     }
 
     /**
@@ -529,6 +545,9 @@ public class HermannEbbinghaus_Memory {
      *            往後延後的分鐘數範圍
      */
     public void skipRecent(Range<Integer> minRange) {
+        if (minRange == null) {
+            minRange = Range.between(-1, -1);// 無限停止
+        }
         skipAll.set(minRange);
         new Thread(new Runnable() {
             @Override
