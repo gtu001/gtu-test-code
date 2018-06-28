@@ -427,9 +427,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // setBounds(100, 100, 540,
-        // 347);//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        setBounds(100, 100, 597, 470);
+        setBounds(100, 100, 540, 347);// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -1411,6 +1409,10 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void reviewMemResumeBtnAction() {
-        memory.notifyAll();
+        try{
+            memory.resume();
+        }catch(Exception ex){
+            JCommonUtil.handleException(ex);
+        }
     }
 }

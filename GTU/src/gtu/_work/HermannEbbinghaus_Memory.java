@@ -257,9 +257,17 @@ public class HermannEbbinghaus_Memory {
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
 
                 synchronized (HermannEbbinghaus_Memory.this) {
-                    if (skipAll.get() != null) {
-                        delayAll(d);
-                    }
+                    do {
+                        if (d instanceof NotifyAllClz) {
+                            HermannEbbinghaus_Memory.this.notifyAll();
+                            return;
+                        }
+
+                        if (skipAll.get() != null) {
+                            delayAll(d);
+                        }
+                        
+                    } while (skipAll.get() != null);
 
                     memDo.actionPerformed(act);
                 }
@@ -559,5 +567,24 @@ public class HermannEbbinghaus_Memory {
                 skipAll.set(null);
             }
         }).start();
+    }
+
+    // 純粹喚醒之用
+    private class NotifyAllClz extends MemData {
+        NotifyAllClz() {
+            this.key = "";
+            this.reviewTime = ReviewTime.getInitialReviewTime().name();
+            this.registerTime = new Date();
+            this.fixedTime = new Date();
+            this.setWaitingTriggerTime(0);
+        }
+    }
+
+    /**
+     * 中斷恢復
+     */
+    public void resume() {
+        skipAll.set(null);
+        this.schedule(new NotifyAllClz());
     }
 }
