@@ -34,6 +34,10 @@ public class PropertiesUtilBean {
         // JdkLoggerUtil.setupRootLogLevel(Level.INFO);
     }
 
+    public void reload() {
+        init(propFile);
+    }
+
     public void init(File customFile) {
         try {
             propFile = customFile;

@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +33,9 @@ public class HermannEbbinghaus_Memory {
 
     public static void main(String[] args) {
         HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
-        memory.init(new File("‪e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
+        // memory.init(new
+        // File("‪e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
+        memory.init(new File("d:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties"));
         memory.setMemDo(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -41,6 +44,9 @@ public class HermannEbbinghaus_Memory {
             }
         });
         memory.start();
+        for (String v : memory.getWaitingList()) {
+            System.out.println(v);
+        }
     }
 
     private static final String DATE_FORMAT = "yyyy-MM-dd_HH:mm:ss";
@@ -258,10 +264,13 @@ public class HermannEbbinghaus_Memory {
 
                 // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
-                
-                //放在 sync 裡沒鳥用
-                queueSetAddKey(d.getKey());
-                
+
+                // 放在 sync 裡沒鳥用
+                QueueHandler queueHandler = new QueueHandler();
+                if (queueHandler.contains_thanAdd(d.getKey())) {
+                    return;
+                }
+
                 synchronized (HermannEbbinghaus_Memory.this) {
                     do {
                         if (d instanceof NotifyAllClz) {
@@ -278,7 +287,7 @@ public class HermannEbbinghaus_Memory {
                     memDo.actionPerformed(act);
                 }
 
-                queueSetRemoveKey(d.getKey());
+                queueHandler.remove(d.getKey());
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
@@ -296,19 +305,6 @@ public class HermannEbbinghaus_Memory {
 
                 // 準備執行下次
                 schedule(d);
-            }
-
-            private void queueSetAddKey(String key) {
-                if (queueSet.get() == null) {
-                    queueSet.set(new LinkedHashSet<String>());
-                }
-                queueSet.get().add(key);
-            }
-
-            private void queueSetRemoveKey(String key) {
-                if (queueSet.get() != null && queueSet.get().contains(key)) {
-                    queueSet.get().remove(key);
-                }
             }
         }, nextPeroid.get());
     }
@@ -328,14 +324,14 @@ public class HermannEbbinghaus_Memory {
      */
     public List<String> getWaitingList() {
         TreeMap<Long, List<MemData>> map = new TreeMap<Long, List<MemData>>();
-        for (MemData d : getAllMemData()) {
+        for (MemData d : getAllMemData(true)) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
                 continue;
             }
 
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
+            long nextPeroid = this.getExecuteTime(d.fixedTime, nextRuntime);
 
             List<MemData> lst = new ArrayList<MemData>();
             if (map.containsKey(nextPeroid)) {
@@ -355,8 +351,9 @@ public class HermannEbbinghaus_Memory {
         for (MemData d : allLst) {
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            long nextPeroid = this.getExecuteTime(d.registerTime, nextRuntime);
-            String detail = String.format("[%s] %s : %s -> %s", d.reviewTime, d.getKey(), DateUtil.wasteTotalTime(nextPeroid), d.getRemark());
+            long nextPeroid = this.getExecuteTime(d.fixedTime, nextRuntime);
+            String nextPeriodDesc = nextPeroid == 0 ? "馬上" : DateUtil.wasteTotalTime(nextPeroid);
+            String detail = String.format("[%s] %s : %s -> %s", d.reviewTime, d.getKey(), nextPeriodDesc, d.getRemark());
             rtnLst.add(detail);
         }
         return rtnLst;
@@ -365,7 +362,10 @@ public class HermannEbbinghaus_Memory {
     /**
      * 取得所有設定
      */
-    public List<MemData> getAllMemData() {
+    public List<MemData> getAllMemData(boolean reload) {
+        if (reload) {
+            config.reload();
+        }
         List<MemData> lst = new ArrayList<MemData>();
         for (Enumeration<?> enu = this.config.getConfigProp().keys(); enu.hasMoreElements();) {
             String key = (String) enu.nextElement();
@@ -617,5 +617,33 @@ public class HermannEbbinghaus_Memory {
             queueSet.set(new LinkedHashSet<String>());
         }
         return queueSet.get();
+    }
+
+    private class QueueHandler {
+        QueueHandler() {
+            chkQueue();
+        }
+
+        public boolean contains_thanAdd(String key) {
+            chkQueue();
+            boolean contain = queueSet.get().contains(DATE_FORMAT);
+            if (!contain) {
+                queueSet.get().add(key);
+            }
+            return contain;
+        }
+
+        private void chkQueue() {
+            if (queueSet.get() == null) {
+                queueSet.set(new LinkedHashSet<String>());
+            }
+        }
+
+        private void remove(String key) {
+            chkQueue();
+            if (queueSet.get().contains(key)) {
+                queueSet.get().remove(key);
+            }
+        }
     }
 }

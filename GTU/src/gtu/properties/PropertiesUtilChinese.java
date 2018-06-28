@@ -26,7 +26,7 @@ public class PropertiesUtilChinese {
     private FileChangeHandler fileChangeHandler;
     private String encode;
 
-    public PropertiesUtilChinese(File customFile, String encode) {
+    public void init(File customFile, String encode) {
         try {
             propFile = customFile;
             fileChangeHandler = new FileChangeHandler(propFile);
@@ -42,19 +42,16 @@ public class PropertiesUtilChinese {
         }
     }
 
+    public void reload() {
+        init(propFile, encode);
+    }
+
+    public PropertiesUtilChinese(File customFile, String encode) {
+        init(customFile, encode);
+    }
+
     public PropertiesUtilChinese(Class<?> clz, String encode) {
-        try {
-            propFile = new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties");
-            this.encode = encode;
-            logger.info("configFile : " + propFile);
-            if (!propFile.exists()) {
-                propFile.createNewFile();
-            }
-            configProp = loadFileByCoding(propFile, encode);
-            logger.info("configFile size : " + configProp.size());
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        this(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties"), encode);
     }
 
     private Properties loadFileByCoding(File file, String encode) throws IOException {

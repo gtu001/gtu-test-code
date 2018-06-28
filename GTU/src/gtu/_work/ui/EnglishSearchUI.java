@@ -42,6 +42,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,6 +101,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
+import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishSearchUI extends JFrame {
 
@@ -354,7 +356,14 @@ public class EnglishSearchUI extends JFrame {
                         }, new ActionListener() {// modify desc
                             @Override
                             public void actionPerformed(ActionEvent e) {
+                                //取消圈選查詢
+                                listenClipboardThread.setMointerOn(false);
+                                mouseSelectionChk.setSelected(false);
+                                
                                 String newMeaning = JCommonUtil._jOptionPane_showInputDialog("請輸入新解釋  : " + d.getKey(), meaning.get());
+                                if (newMeaning != null) {
+                                    newMeaning = getChs2Big5(newMeaning);
+                                }
                                 if (newMeaning != null && !StringUtils.equals(newMeaning, meaning.get())) {
                                     choiceDialog.setNewMeaning(meaning.get(), newMeaning);
                                     meaning.set(newMeaning);
@@ -408,6 +417,7 @@ public class EnglishSearchUI extends JFrame {
         }
     };
     private JButton reviewMemResumeBtn;
+    private JCheckBox lostFocusHiddenChk;
 
     /**
      * Create the frame.
@@ -429,7 +439,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 540, 347);// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        setBounds(100, 100, 540, 347);// xxxxxxxx setBounds(100, 100, 540, 347);
 
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -536,8 +546,8 @@ public class EnglishSearchUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -635,11 +645,7 @@ public class EnglishSearchUI extends JFrame {
 
             @Override
             public void focusLost(FocusEvent e) {
-                // 使用word模式時需要自動隱藏
-                if (EnglishSearchUI.this.autoSearchChk.isSelected() && //
-                EnglishSearchUI.this.listenClipboardChk.isSelected() && //
-                EnglishSearchUI.this.mouseSelectionChk.isSelected()//
-                ) {
+                if (lostFocusHiddenChk.isSelected()) {
                     EnglishSearchUI.this.setVisible(false);
                 }
             }
@@ -649,6 +655,15 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
+        offlineReadyLabel = new JLabel("");
+        offlineReadyLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                offlineReadyLabelAction();
+            }
+        });
+        panel_3.add(offlineReadyLabel);
+
         JButton configSettingBtn = new JButton("儲存設定");
         configSettingBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -656,8 +671,12 @@ public class EnglishSearchUI extends JFrame {
             }
         });
 
+        lostFocusHiddenChk = new JCheckBox("失焦隱藏");
+        panel.add(lostFocusHiddenChk, "4, 24");
+        panel.add(configSettingBtn, "2, 30");
+
         panel_4 = new JPanel();
-        panel.add(panel_4, "4, 24, fill, fill");
+        panel.add(panel_4, "4, 30, fill, fill");
 
         reviewMemChk = new JCheckBox("定時複習");
         reviewMemChk.addActionListener(new ActionListener() {
@@ -678,7 +697,6 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         panel_4.add(reviewMemWaitingListBtn);
-        panel.add(configSettingBtn, "2, 26");
 
         reviewMemResetBtn = new JButton("重設");
         reviewMemResetBtn.addActionListener(new ActionListener() {
@@ -696,15 +714,6 @@ public class EnglishSearchUI extends JFrame {
         });
         panel_4.add(reviewMemConfigBtn);
 
-        offlineReadyLabel = new JLabel("");
-        offlineReadyLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                offlineReadyLabelAction();
-            }
-        });
-        panel_3.add(offlineReadyLabel);
-
         reviewMemFromFileBtn = new JButton("加入記憶清單");
         reviewMemFromFileBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -720,6 +729,7 @@ public class EnglishSearchUI extends JFrame {
             }
         });
         panel_4.add(reviewMemResumeBtn);
+        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
 
         // ----------------------------------------------------------------------------------------------------------
 
@@ -734,7 +744,7 @@ public class EnglishSearchUI extends JFrame {
         offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
         simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
-        reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
+        lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -750,6 +760,7 @@ public class EnglishSearchUI extends JFrame {
                 propertyBean.getConfigProp().setProperty("simpleSentanceChk", String.valueOf(simpleSentanceChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("robotFocusChk", String.valueOf(robotFocusChk.isSelected()));
                 propertyBean.getConfigProp().setProperty("reviewMemChk", String.valueOf(reviewMemChk.isSelected()));
+                propertyBean.getConfigProp().setProperty("lostFocusHiddenChk", String.valueOf(lostFocusHiddenChk.isSelected()));
                 propertyBean.store();
                 System.exit(0);
             }
@@ -1265,7 +1276,7 @@ public class EnglishSearchUI extends JFrame {
         System.out.println("重設時間!! : " + resetTimeer);
 
         Date newDate = new Date();
-        List<MemData> lst = memory.getAllMemData();
+        List<MemData> lst = memory.getAllMemData(true);
         for (MemData d : lst) {
             if (StringUtils.isBlank(d.getRemark())) {
                 String meaning = getEnglishMeaning(d.getKey());
@@ -1416,5 +1427,28 @@ public class EnglishSearchUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private String getChs2Big5(String value) {
+        try {
+            value = StringUtils.defaultString(value);
+            value = value.replace((char) 65292, ',');
+            value = value.replace((char) 65288, '(');
+            value = value.replace((char) 65289, ')');
+            value = value.replace((char) 65307, ';');
+            value = value.replace((char) 65306, ':');
+            value = value.replace((char) 8220, '"');
+            value = value.replace((char) 8221, '"');
+            value = value.replace((char) 12289, ',');
+            value = value.replaceAll("…", "...");
+            try {
+                value = JChineseConvertor.getInstance().s2t(value);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return value;
     }
 }

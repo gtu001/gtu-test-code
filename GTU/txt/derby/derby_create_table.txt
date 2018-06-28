@@ -4,3 +4,29 @@ create table test_table (
         col2 boolean default false,
         primary key (pk1)
 );
+
+create table RowDTO (
+    id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	letter varchar(5),
+	word varchar(30),
+	page int,
+	word_music varchar(10),
+    vocabulary varchar(5),
+	chinese varchar(10),
+	chinese_music varchar(10),
+    phonetics_dj varchar(10),
+	phonetics_kk varchar(10),
+    present_tense varchar(30),
+	past_tense varchar(30),
+	before_participle varchar(30),
+	plural varchar(30),
+	remark varchar(30),
+	image varchar(50),
+	synonym varchar(30),
+	chinese_synonym varchar(30),
+	music_synonym varchar(10),
+	antonym varchar(30),
+    chinese_antonym varchar(30),
+	music_antonym varchar(10),
+	CONSTRAINT primary_key PRIMARY KEY (id)
+);
