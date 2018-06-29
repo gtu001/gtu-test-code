@@ -945,32 +945,34 @@ public class EnglishSearchUI extends JFrame {
         final EnglishTester_Diectory t = new EnglishTester_Diectory();
         final EnglishTester_Diectory2 t2 = new EnglishTester_Diectory2();
 
-        WordInfo info = new WordInfo();
-        try {
-            info = t.parseToWordInfo(text);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        final StringBuffer sb = new StringBuffer();
-        sb.append(text + "\n");
-        sb.append(info.getPronounce() + "\n");
-        sb.append(info.getMeaning() + "\n");
-        sb.append("\n");
-
         final AtomicBoolean findOk = new AtomicBoolean(false);
-
-        meaningText.setText(info.getMeaning());
-
-        if (StringUtils.isNotBlank(info.getMeaning())) {
-            findOk.set(true);
-            this.appendMemoryBank(text, info.getMeaning());
-        }
 
         final Set<String> meaningSet = new HashSet<String>();
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // ---------------------------------------------------------
+                WordInfo info = new WordInfo();
+                try {
+                    info = t.parseToWordInfo(text);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                final StringBuffer sb = new StringBuffer();
+                sb.append(text + "\n");
+                sb.append(info.getPronounce() + "\n");
+                sb.append(info.getMeaning() + "\n");
+                sb.append("\n");
+
+                meaningText.setText(info.getMeaning());
+
+                if (StringUtils.isNotBlank(info.getMeaning())) {
+                    findOk.set(true);
+                    appendMemoryBank(text, info.getMeaning());
+                }
+
+                // ---------------------------------------------------------
                 int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
 
                 for (int ii = 0; ii < maxLoop; ii++) {
@@ -994,11 +996,6 @@ public class EnglishSearchUI extends JFrame {
                 }
                 searchResultArea.setText(sb.toString());
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
-
-                // set top the UI
-                // if (!EnglishSearchUI.this.isFocusOwner()) {
-                // bringToTop();
-                // }
             }
         }).start();
     }
