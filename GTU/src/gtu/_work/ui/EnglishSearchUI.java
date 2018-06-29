@@ -347,13 +347,13 @@ public class EnglishSearchUI extends JFrame {
                                 if (confirmDel) {
                                     checkChoiceEqual.set(false);
                                     memory.deleteKey(d.getKey());
-                                    choiceDialog.setVisible(false);
+                                    choiceDialog.closeDialog();
                                 }
                             }
                         }, new ActionListener() {// choice one
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                choiceDialog.setVisible(false);
+                                choiceDialog.closeDialog();
                             }
                         }, new ActionListener() {// modify desc
                             @Override
@@ -368,6 +368,7 @@ public class EnglishSearchUI extends JFrame {
                                     d.setRemark(newMeaning);
                                     checkChoiceEqual.set(false);
                                     JCommonUtil._jOptionPane_showMessageDialog_info("原為 : " + meaning.get() + "\n修正為 : " + newMeaning, "修正成功 " + d.getKey());
+                                    choiceDialog.closeDialog();
                                 }
                             }
                         }, new ActionListener() {// skip
@@ -376,19 +377,19 @@ public class EnglishSearchUI extends JFrame {
                                 long waitingTime = RandomUtil.rangeInteger(10, 30) * 60 * 1000;
                                 d.setWaitingTriggerTime(waitingTime);
                                 checkChoiceEqual.set(false);
-                                choiceDialog.setVisible(false);
+                                choiceDialog.closeDialog();
                             }
                         }, new ActionListener() {// skip all
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", ""));
+                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "5"));
                                     memory.skipRecent(Range.between(min, min + 40));
                                 } catch (Exception ex) {
                                     memory.skipRecent();
                                 }
                                 checkChoiceEqual.set(false);
-                                choiceDialog.setVisible(false);
+                                choiceDialog.closeDialog();
                             }
                         }, new ActionListener() { // onCreate
                             @Override

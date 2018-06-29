@@ -87,6 +87,7 @@ public class HermannEbbinghaus_Memory {
     private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
     private AtomicReference<Range<Integer>> skipAll = new AtomicReference<Range<Integer>>();// 現在準備執行的全部取消
     private AtomicReference<Set<String>> queueSet = new AtomicReference<Set<String>>();// 顯示進入組列數
+    private QueueHandler queueHandler = new QueueHandler();
 
     public HermannEbbinghaus_Memory() {
     }
@@ -266,7 +267,6 @@ public class HermannEbbinghaus_Memory {
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
 
                 // 放在 sync 裡沒鳥用
-                QueueHandler queueHandler = new QueueHandler();
                 if (queueHandler.contains_thanAdd(d.getKey())) {
                     return;
                 }
@@ -544,7 +544,9 @@ public class HermannEbbinghaus_Memory {
         if (minRange.getMinimum() == -1 && minRange.getMaximum() == -1) {
             System.out.println("@延遲 :" + d.getKey() + " ->  無限停止!!");
             try {
+                queueHandler.remove(d.getKey());
                 this.wait();
+                queueHandler.contains_thanAdd(d.getKey());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -553,7 +555,9 @@ public class HermannEbbinghaus_Memory {
             long extendTime = min * 60 * 1000;
             System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
             try {
+                queueHandler.remove(d.getKey());
                 this.wait(extendTime);
+                queueHandler.contains_thanAdd(d.getKey());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -613,15 +617,17 @@ public class HermannEbbinghaus_Memory {
      * 取得測驗中的阻列
      */
     public Set<String> getQueue() {
-        if (queueSet.get() == null) {
-            queueSet.set(new LinkedHashSet<String>());
-        }
-        return queueSet.get();
+        return queueHandler.getLst();
     }
 
     private class QueueHandler {
         QueueHandler() {
             chkQueue();
+        }
+
+        private Set<String> getLst() {
+            chkQueue();
+            return queueSet.get();
         }
 
         public boolean contains_thanAdd(String key) {

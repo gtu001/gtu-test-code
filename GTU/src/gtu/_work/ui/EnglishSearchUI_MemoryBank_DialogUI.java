@@ -5,12 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
@@ -81,11 +84,11 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             setTitle(title);
             this.meaningLst = meaningLst;
             englishWordLabel.setText(englishWord);
-            q1Radio.setText(meaningLst[0]);
-            q2Radio.setText(meaningLst[1]);
-            q3Radio.setText(meaningLst[2]);
-            q4Radio.setText(meaningLst[3]);
-            q5Radio.setText(meaningLst[4]);
+            q1Radio.setText(__getArryByIndex(meaningLst, 0));
+            q2Radio.setText(__getArryByIndex(meaningLst, 1));
+            q3Radio.setText(__getArryByIndex(meaningLst, 2));
+            q4Radio.setText(__getArryByIndex(meaningLst, 3));
+            q5Radio.setText(__getArryByIndex(meaningLst, 4));
             setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             this.deleteConfigAction = deleteConfigAction;
             this.choiceRadioAction = choiceRadioAction;
@@ -234,6 +237,15 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             }
         }
 
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if (skipBtnAction != null) {
+                    ActionEvent e2 = new ActionEvent(EnglishSearchUI_MemoryBank_DialogUI.this, -1, "winClose");
+                    skipBtnAction.actionPerformed(e2);
+                }
+            }
+        });
+
         JCommonUtil.setJFrameCenter(this);
         this.setModal(false);
         btnGroup = JButtonGroupUtil.createRadioButtonGroup(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio);
@@ -247,6 +259,13 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 radioArry[ii].setText(newMeaning);
             }
         }
+    }
+
+    private String __getArryByIndex(String[] meaningLst, int index) {
+        if (meaningLst != null && meaningLst.length > index) {
+            return meaningLst[index];
+        }
+        return "_Oops!!_IndexOfOfBound__";
     }
 
     public int getChoiceIndex() {
