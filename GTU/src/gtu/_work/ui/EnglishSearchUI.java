@@ -1004,6 +1004,7 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void appendMemoryBank(String word, String desc) {
+        desc = getChs2Big5(desc);
         if (StringUtils.isNotBlank(desc)) {
             memory.append(word, desc);
         }

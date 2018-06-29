@@ -659,7 +659,7 @@ public class HermannEbbinghaus_Memory {
 
         public boolean contains_thanAdd(String key) {
             chkQueue();
-            boolean contain = queueSet.get().contains(DATE_FORMAT);
+            boolean contain = queueSet.get().contains(key);
             if (!contain) {
                 queueSet.get().add(key);
             }

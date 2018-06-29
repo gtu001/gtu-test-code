@@ -1,19 +1,24 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
@@ -57,6 +62,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
         dialog.createDialog("title", "AAAA", arry, null, null, null, null, null, null, null);
+        dialog.showDialog();
     }
 
     public void showDialog() {
@@ -105,11 +111,21 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private JButton deleteFromMemoryBankBtn;
     private JButton customDescBtn;
     private JButton skipAllBtn;
+    private JLabel lblNewLabel_1;
+    private JLabel lblb;
+    private JLabel lblc;
+    private JLabel lbld;
+    private JLabel lblNewLabel_2;
 
-    private void questionRadioChoiceAction() {
-        choiceIndex = Arrays.asList(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio).indexOf(JButtonGroupUtil.getSelectedButton(btnGroup));
-        choiceAnswer = meaningLst[choiceIndex];
+    private void questionRadioChoiceAction(int index) {
+        AbstractButton choiceBtn = JButtonGroupUtil.getSelectedButton(btnGroup);
+        if (choiceBtn != null) {
+            choiceIndex = Arrays.asList(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio).indexOf(choiceBtn);
+        } else {
+            choiceIndex = index;
+        }
         System.out.println("choiceIndex = " + choiceIndex);
+        choiceAnswer = meaningLst[choiceIndex];
         System.out.println("choiceAnswer = " + choiceAnswer);
         if (choiceRadioAction != null) {
             choiceRadioAction.actionPerformed(new ActionEvent(this, choiceIndex, choiceAnswer));
@@ -144,45 +160,65 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             q1Radio = new JRadioButton("");
             q1Radio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    questionRadioChoiceAction();
+                    questionRadioChoiceAction(0);
                 }
             });
+            {
+                lblNewLabel_1 = new JLabel("1A");
+                contentPanel.add(lblNewLabel_1, "2, 4");
+            }
             contentPanel.add(q1Radio, "4, 4");
         }
         {
             q2Radio = new JRadioButton("");
             q2Radio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    questionRadioChoiceAction();
+                    questionRadioChoiceAction(1);
                 }
             });
+            {
+                lblb = new JLabel("2B");
+                contentPanel.add(lblb, "2, 6");
+            }
             contentPanel.add(q2Radio, "4, 6");
         }
         {
             q3Radio = new JRadioButton("");
             q3Radio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    questionRadioChoiceAction();
+                    questionRadioChoiceAction(2);
                 }
             });
+            {
+                lblc = new JLabel("3C");
+                contentPanel.add(lblc, "2, 8");
+            }
             contentPanel.add(q3Radio, "4, 8");
         }
         {
             q4Radio = new JRadioButton("");
             q4Radio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    questionRadioChoiceAction();
+                    questionRadioChoiceAction(3);
                 }
             });
+            {
+                lbld = new JLabel("4D");
+                contentPanel.add(lbld, "2, 10");
+            }
             contentPanel.add(q4Radio, "4, 10");
         }
         {
             q5Radio = new JRadioButton("");
             q5Radio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    questionRadioChoiceAction();
+                    questionRadioChoiceAction(4);
                 }
             });
+            {
+                lblNewLabel_2 = new JLabel("5E");
+                contentPanel.add(lblNewLabel_2, "2, 12");
+            }
             contentPanel.add(q5Radio, "4, 12");
         }
         {
@@ -246,7 +282,42 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             }
         });
 
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println("Dialog Key Event - " + e.getKeyChar());
+                switch (e.getKeyChar()) {
+                case '1':
+                case 'a':
+                case 'A':
+                    JCommonUtil.triggerButtonActionPerformed(q1Radio);
+                    break;
+                case '2':
+                case 'b':
+                case 'B':
+                    JCommonUtil.triggerButtonActionPerformed(q2Radio);
+                    break;
+                case '3':
+                case 'c':
+                case 'C':
+                    JCommonUtil.triggerButtonActionPerformed(q3Radio);
+                    break;
+                case '4':
+                case 'd':
+                case 'D':
+                    JCommonUtil.triggerButtonActionPerformed(q4Radio);
+                    break;
+                case '5':
+                case 'e':
+                case 'E':
+                    JCommonUtil.triggerButtonActionPerformed(q5Radio);
+                    break;
+                }
+            }
+        });
+
         JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.setFoucsToChildren(this, this);
         this.setModal(false);
         btnGroup = JButtonGroupUtil.createRadioButtonGroup(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio);
     }

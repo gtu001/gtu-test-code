@@ -17,6 +17,8 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -871,7 +873,7 @@ public class JCommonUtil {
             JDialog d = (JDialog) window;
             d.setModal(true);
         }
-        
+
         // 設定顯示
         window.setVisible(true);
         // 設定至最前
@@ -977,6 +979,18 @@ public class JCommonUtil {
         } catch (Exception e) {
             throw new RuntimeException("triggerButtonActionPerformed ERR :" + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * 取得底下的 component focus
+     */
+    public static void setFoucsToChildren(final Component root, final Component target) {
+        root.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent ce) {
+                target.requestFocusInWindow();
+            }
+        });
     }
 
     public static void main(String[] args) {
