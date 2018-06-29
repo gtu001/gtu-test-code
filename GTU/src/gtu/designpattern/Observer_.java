@@ -3,6 +3,9 @@ package gtu.designpattern;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * 使用Jdk版本
+ */
 public class Observer_ extends Observable {
 
     public static void main(String[] args) {

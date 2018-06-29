@@ -57,7 +57,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
 
                         Transferable contents = getContentsTransferable();
                         if (contents == null) {
-                            System.out.println(getTimestamp() + " " + " retry lostOwnership");
+//                            System.out.println(getTimestamp() + " " + " retry lostOwnership");
                             sleepForce(1000);
                             continue;
                         }
@@ -69,7 +69,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                             regainOwnership(contents);
                             break;
                         } else {
-                            System.out.println(getTimestamp() + " " + " retry lostOwnership");
+//                            System.out.println(getTimestamp() + " " + " retry lostOwnership");
                             sleepForce(1000);
                             continue;
                         }

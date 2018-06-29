@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -89,6 +90,20 @@ public class HermannEbbinghaus_Memory {
     private AtomicReference<Set<String>> queueSet = new AtomicReference<Set<String>>();// 顯示進入組列數
     private QueueHandler queueHandler = new QueueHandler();
 
+    private AtomicBoolean startPause = new AtomicBoolean(false);
+    private List<MemData> memLst = new ArrayList<MemData>();
+    private Map<String, Timer> timerMap = new HashMap<String, Timer>();
+    private ActionListener memDo = DEFAULT_ACTION;
+    private ActionListener onOffDo = DEFAULT_ACTION;
+    private ActionListener updateQueueDo = DEFAULT_ACTION;
+
+    private static final ActionListener DEFAULT_ACTION = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent paramActionEvent) {
+            System.out.println("TODO");
+        }
+    };
+
     public HermannEbbinghaus_Memory() {
     }
 
@@ -100,10 +115,15 @@ public class HermannEbbinghaus_Memory {
      * 啟動
      */
     public void start() {
-        this.start("start");
+        this.start("start", true);
     }
 
-    private void start(String label) {
+    private void start(String label, boolean triggerOnOffDo) {
+        try {
+            stop(false);
+        } catch (Exception e) {
+        }
+
         this.init(null);
 
         startPause.set(true);
@@ -113,7 +133,9 @@ public class HermannEbbinghaus_Memory {
         initCheckConfigThread();
 
         // 啟動事件
-        onOffDo.actionPerformed(new ActionEvent(this, -1, label));
+        if (triggerOnOffDo) {
+            onOffDo.actionPerformed(new ActionEvent(this, -1, label));
+        }
     }
 
     private void initCheckConfigThread() {
@@ -124,7 +146,7 @@ public class HermannEbbinghaus_Memory {
                 public void run() {
                     if (HermannEbbinghaus_Memory.this.startPause.get()) {
                         if (config.isFileChangeUncontrolled()) {
-                            HermannEbbinghaus_Memory.this.start("設定檔異動重新起動!");
+                            HermannEbbinghaus_Memory.this.start("設定檔異動重新起動!", true);
                         }
 
                         try {
@@ -139,10 +161,14 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    public void stop() {
+        stop(true);
+    }
+
     /**
      * 關閉
      */
-    public void stop() {
+    public void stop(boolean triggerOnOffDo) {
         startPause.set(false);
         for (Timer t : timerMap.values()) {
             try {
@@ -153,25 +179,10 @@ public class HermannEbbinghaus_Memory {
         timerMap.clear();
 
         // 啟動事件
-        onOffDo.actionPerformed(new ActionEvent(this, -1, "stop"));
+        if (triggerOnOffDo) {
+            onOffDo.actionPerformed(new ActionEvent(this, -1, "stop"));
+        }
     }
-
-    private AtomicBoolean startPause = new AtomicBoolean(false);
-    private List<MemData> memLst = new ArrayList<MemData>();
-    private Map<String, Timer> timerMap = new HashMap<String, Timer>();
-
-    private ActionListener memDo = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent paramActionEvent) {
-            System.out.println("TODO");
-        }
-    };
-    private ActionListener onOffDo = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent paramActionEvent) {
-            System.out.println("TODO");
-        }
-    };
 
     private Timer newClock(String key) {
         Timer t = new Timer();
@@ -544,9 +555,7 @@ public class HermannEbbinghaus_Memory {
         if (minRange.getMinimum() == -1 && minRange.getMaximum() == -1) {
             System.out.println("@延遲 :" + d.getKey() + " ->  無限停止!!");
             try {
-                queueHandler.remove(d.getKey());
                 this.wait();
-                queueHandler.contains_thanAdd(d.getKey());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -555,9 +564,8 @@ public class HermannEbbinghaus_Memory {
             long extendTime = min * 60 * 1000;
             System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
             try {
-                queueHandler.remove(d.getKey());
+                queueHandler.doWait(d.getKey(), extendTime);
                 this.wait(extendTime);
-                queueHandler.contains_thanAdd(d.getKey());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -625,9 +633,28 @@ public class HermannEbbinghaus_Memory {
             chkQueue();
         }
 
+        public void doWait(final String key, long extendTime) {
+            chkQueue();
+            this.remove(key);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    contains_thanAdd(key);
+                    __updateQueueTrigger();
+                }
+            }, extendTime - 10);
+        }
+
+        private void __updateQueueTrigger() {
+            if (updateQueueDo != null) {
+                ActionEvent act = new ActionEvent(getLst(), -1, "updateQueue");
+                updateQueueDo.actionPerformed(act);
+            }
+        }
+
         private Set<String> getLst() {
             chkQueue();
-            return queueSet.get();
+            return Collections.unmodifiableSet(queueSet.get());
         }
 
         public boolean contains_thanAdd(String key) {
@@ -651,5 +678,9 @@ public class HermannEbbinghaus_Memory {
                 queueSet.get().remove(key);
             }
         }
+    }
+
+    public void setUpdateQueueDo(ActionListener updateQueueDo) {
+        this.updateQueueDo = updateQueueDo;
     }
 }

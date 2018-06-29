@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -147,6 +149,7 @@ public class EnglishSearchUI extends JFrame {
     private Properties offlineProp;
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
+    private DialogTitleUpdaterObervable dialogObervable = new DialogTitleUpdaterObervable();
 
     /**
      * Launch the application.
@@ -335,6 +338,7 @@ public class EnglishSearchUI extends JFrame {
                 break;
             case 2:
                 final EnglishSearchUI_MemoryBank_DialogUI choiceDialog = new EnglishSearchUI_MemoryBank_DialogUI();
+                dialogObervable.add(choiceDialog);
                 final MouseMarkQueryHandler mouseMarkQueryHandler = new MouseMarkQueryHandler();
                 choiceDialog.initial();
                 choiceDialog.createDialog("複習階段 :" + reviewType + " [組列 : " + memory.getQueue().size() + "]", //
@@ -400,6 +404,7 @@ public class EnglishSearchUI extends JFrame {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 mouseMarkQueryHandler.after();
+                                dialogObervable.remove(choiceDialog);
                             }
                         });
                 choiceDialog.showDialog();
@@ -1401,9 +1406,7 @@ public class EnglishSearchUI extends JFrame {
     public void setVisible(boolean b) {
         if (b == false) {
             System.out.println("Hidden  ----------------------------------------");
-            for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
-                System.out.println("\t" + s);
-            }
+            Thread.dumpStack();
             System.out.println("Hidden  ----------------------------------------");
         }
         super.setVisible(b);
@@ -1425,6 +1428,13 @@ public class EnglishSearchUI extends JFrame {
         memory.init(file);
         memory.setMemDo(MemDo);
         memory.setOnOffDo(onOffDo);
+        memory.setUpdateQueueDo(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Set<String> lst = (Set<String>) e.getSource();
+                dialogObervable.update(lst);
+            }
+        });
 
         memory.start();
         return true;
@@ -1486,6 +1496,59 @@ public class EnglishSearchUI extends JFrame {
             mouseSelectionChk.setSelected(value);
             listenClipboardChk.setSelected(value);
             listenClipboardThread.setMointerOn(value);
+        }
+    }
+
+    private class DialogTitleUpdaterObervable extends Observable {
+        private class DialogHolder implements Observer {
+            JDialog dialog;
+
+            DialogHolder(JDialog dialog) {
+                this.dialog = dialog;
+            }
+
+            @Override
+            public void update(Observable o, Object arg) {
+                Set<String> lst = (Set<String>) arg;
+
+                Pattern ptn = Pattern.compile("\\[組列\\s*\\:\\s*(\\d+)\\s*\\]");
+                Matcher mth = ptn.matcher(this.dialog.getTitle());
+
+                StringBuffer sb = new StringBuffer();
+                String newReplaceStr = String.format("[組列 : %d]", lst.size());
+                while (mth.find()) {
+                    mth.appendReplacement(sb, newReplaceStr);
+                }
+                mth.appendTail(sb);
+
+                System.out.println("update >>" + sb);
+
+                this.dialog.setTitle(sb.toString());
+            }
+        }
+
+        List<DialogHolder> holderLst = new ArrayList<DialogHolder>();
+
+        public void add(JDialog o1) {
+            DialogHolder holder = new DialogHolder(o1);
+            holderLst.add(holder);
+            this.addObserver(holder);
+        }
+
+        public void update(Set<String> queue) {
+            this.setChanged();
+            this.notifyObservers(queue);
+        }
+
+        public void remove(JDialog dialog) {
+            for (int ii = 0; ii < holderLst.size(); ii++) {
+                DialogHolder holder = holderLst.get(ii);
+                if (holder.dialog == dialog) {
+                    this.deleteObserver(holder);
+                    holderLst.remove(ii);
+                    ii--;
+                }
+            }
         }
     }
 }
