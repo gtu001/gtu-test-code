@@ -5,22 +5,22 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +29,7 @@ import gtu.binary.Base64JdkUtil;
 import gtu.date.DateUtil;
 import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.timer.TimerUtil;
 
 public class HermannEbbinghaus_Memory {
 
@@ -87,7 +88,6 @@ public class HermannEbbinghaus_Memory {
     private boolean fixedTimeUsing = true;// 判斷推算下次時間用登入起算[false],還是每次複習時修正下次時間[true]
     private Thread checkConfigThread; // 檢查 config 是否有變更來自外力
     private AtomicReference<Range<Integer>> skipAll = new AtomicReference<Range<Integer>>();// 現在準備執行的全部取消
-    private AtomicReference<Set<String>> queueSet = new AtomicReference<Set<String>>();// 顯示進入組列數
     private QueueHandler queueHandler = new QueueHandler();
 
     private AtomicBoolean startPause = new AtomicBoolean(false);
@@ -247,6 +247,14 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    private abstract class MemoryTimerTask extends TimerTask {
+        String key;
+
+        MemoryTimerTask(String key) {
+            this.key = key;
+        }
+    }
+
     /**
      * 排成記憶內容
      */
@@ -269,7 +277,7 @@ public class HermannEbbinghaus_Memory {
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
 
         Timer timer = newClock(d.getKey());
-        timer.schedule(new TimerTask() {
+        timer.schedule(new MemoryTimerTask(d.getKey()) {
             @Override
             public void run() {
                 System.out.println(">> time up - " + d.getKey() + " , " + d.reviewTime + " , " + nextPeroid);
@@ -277,28 +285,27 @@ public class HermannEbbinghaus_Memory {
                 // target = d , command = ENUM , when = time ,
                 ActionEvent act = new ActionEvent(d, -1, d.reviewTime, nextPeroid.get(), -1);
 
-                // 放在 sync 裡沒鳥用
-                if (queueHandler.contains_thanAdd(d.getKey())) {
-                    return;
-                }
-
                 synchronized (HermannEbbinghaus_Memory.this) {
                     do {
+                        if (!queueHandler.append(this)) {
+                            return;
+                        }
+
+                        queueHandler.updateQueue();
+
                         if (d instanceof NotifyAllClz) {
                             HermannEbbinghaus_Memory.this.notifyAll();
                             return;
                         }
 
-                        if (skipAll.get() != null) {
+                        if (isSuspended()) {
                             delayAll(d);
                         }
 
-                    } while (skipAll.get() != null);
+                    } while (isSuspended());
 
                     memDo.actionPerformed(act);
                 }
-
-                queueHandler.remove(d.getKey());
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
@@ -564,7 +571,6 @@ public class HermannEbbinghaus_Memory {
             long extendTime = min * 60 * 1000;
             System.out.println("@延遲 :" + d.getKey() + " -> " + min + "分鐘!!");
             try {
-                queueHandler.doWait(d.getKey(), extendTime);
                 this.wait(extendTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -572,11 +578,20 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    public boolean isSuspended() {
+        // (skipAll.get().getMinimum() == -1 && skipAll.get().getMaximum() ==
+        // -1)
+        if (skipAll.get() != null) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 即將觸發的往後延 (無限期)
      */
-    public void skipRecent() {
-        this.skipRecent(null);
+    public void suspend() {
+        skipAll.set(Range.between(-1, -1));
     }
 
     /**
@@ -585,10 +600,7 @@ public class HermannEbbinghaus_Memory {
      * @param minRange
      *            往後延後的分鐘數範圍
      */
-    public void skipRecent(Range<Integer> minRange) {
-        if (minRange == null) {
-            minRange = Range.between(-1, -1);// 無限停止
-        }
+    public void suspend(Range<Integer> minRange) {
         skipAll.set(minRange);
         new Thread(new Runnable() {
             @Override
@@ -618,6 +630,7 @@ public class HermannEbbinghaus_Memory {
      */
     public void resume() {
         skipAll.set(null);
+        queueHandler.updateQueue();
         this.schedule(new NotifyAllClz());
     }
 
@@ -629,54 +642,50 @@ public class HermannEbbinghaus_Memory {
     }
 
     private class QueueHandler {
+
+        AtomicReference<Set<MemoryTimerTask>> keeper = new AtomicReference<Set<MemoryTimerTask>>(new HashSet<MemoryTimerTask>());
+
         QueueHandler() {
-            chkQueue();
         }
 
-        public void doWait(final String key, long extendTime) {
-            chkQueue();
-            this.remove(key);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    contains_thanAdd(key);
-                    __updateQueueTrigger();
+        private boolean append(MemoryTimerTask t) {
+            for (MemoryTimerTask m : keeper.get()) {
+                if (StringUtils.equals(m.key, t.key)) {
+                    try {
+                        Integer state = (Integer) FieldUtils.readDeclaredField(m, "state", true);
+                        if (state == 1) {
+                            System.out.println("timerTask SCHEDULED ---> " + m.key);
+                            return false;
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    m.cancel();
                 }
-            }, extendTime - 10);
+            }
+            keeper.get().add(t);
+            return true;
         }
 
-        private void __updateQueueTrigger() {
+        private void updateQueue() {
             if (updateQueueDo != null) {
                 ActionEvent act = new ActionEvent(getLst(), -1, "updateQueue");
                 updateQueueDo.actionPerformed(act);
+            } else {
+                getLst();
             }
         }
 
         private Set<String> getLst() {
-            chkQueue();
-            return Collections.unmodifiableSet(queueSet.get());
-        }
-
-        public boolean contains_thanAdd(String key) {
-            chkQueue();
-            boolean contain = queueSet.get().contains(key);
-            if (!contain) {
-                queueSet.get().add(key);
+            Integer v = TimerUtil.getInstance().getTimerThreadStatus().get(Thread.State.BLOCKED);
+            if (v == null) {
+                v = 0;
             }
-            return contain;
-        }
-
-        private void chkQueue() {
-            if (queueSet.get() == null) {
-                queueSet.set(new LinkedHashSet<String>());
+            Set<String> set = new HashSet<String>();
+            for (int ii = 0; ii < v; ii++) {
+                set.add(UUID.randomUUID().toString());
             }
-        }
-
-        private void remove(String key) {
-            chkQueue();
-            if (queueSet.get().contains(key)) {
-                queueSet.get().remove(key);
-            }
+            return set;
         }
     }
 

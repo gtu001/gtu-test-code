@@ -388,9 +388,9 @@ public class EnglishSearchUI extends JFrame {
                             public void actionPerformed(ActionEvent e) {
                                 try {
                                     int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "5"));
-                                    memory.skipRecent(Range.between(min, min + 40));
+                                    memory.suspend(Range.between(min, min + 40));
                                 } catch (Exception ex) {
-                                    memory.skipRecent();
+                                    memory.suspend();
                                 }
                                 checkChoiceEqual.set(false);
                                 choiceDialog.closeDialog();
