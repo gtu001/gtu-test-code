@@ -1,22 +1,27 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +36,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.swing.util.JButtonGroupUtil;
+import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 
 public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
@@ -53,15 +59,28 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private ActionListener skipAllBtnAction;
     private ActionListener onDismissAction;
     private ActionListener onCreateAction;
+    private JButton deleteFromMemoryBankBtn;
+    private JButton customDescBtn;
+    private JButton skipAllBtn;
+    private JLabel q1Label;
+    private JLabel q2Label;
+    private JLabel q3Label;
+    private JLabel q4Label;
+    private JLabel q5Label;
+    private JComboBox hotKeyComboBox;
+    private JComboBox windowSizeComboBox;
+    private static AtomicInteger KEY_MAPPING_INDEX = new AtomicInteger(-1);
+    private static AtomicInteger WINDOW_SIZE_INDEX = new AtomicInteger(-1);
+    private static final int MAX_LENGTH_DESC = 40;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        String[] arry = new String[] { "a1", "a2", "a3", "a4", "a5" };
+        String[] arry = new String[] { "測試aA1", "測試bB2", "測試cC3", "測試dD4", "測試eE5" };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
-        dialog.createDialog("title", "AAAA", arry, null, null, null, null, null, null, null);
+        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null);
         dialog.showDialog();
     }
 
@@ -108,15 +127,6 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         }
     }
 
-    private JButton deleteFromMemoryBankBtn;
-    private JButton customDescBtn;
-    private JButton skipAllBtn;
-    private JLabel lblNewLabel_1;
-    private JLabel lblb;
-    private JLabel lblc;
-    private JLabel lbld;
-    private JLabel lblNewLabel_2;
-
     private void questionRadioChoiceAction(int index) {
         AbstractButton choiceBtn = JButtonGroupUtil.getSelectedButton(btnGroup);
         if (choiceBtn != null) {
@@ -136,10 +146,11 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
      * Create the dialog.
      */
     public EnglishSearchUI_MemoryBank_DialogUI() {
+        this.initial();
     }
 
     public void initial() {
-        setBounds(100, 100, 450, 300);
+        setBounds(100, 100, 650, 285);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -164,21 +175,22 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 }
             });
             {
-                lblNewLabel_1 = new JLabel("1A");
-                contentPanel.add(lblNewLabel_1, "2, 4");
+                q1Label = new JLabel("");
+                contentPanel.add(q1Label, "2, 4");
             }
             contentPanel.add(q1Radio, "4, 4");
         }
         {
             q2Radio = new JRadioButton("");
             q2Radio.addActionListener(new ActionListener() {
+
                 public void actionPerformed(ActionEvent e) {
                     questionRadioChoiceAction(1);
                 }
             });
             {
-                lblb = new JLabel("2B");
-                contentPanel.add(lblb, "2, 6");
+                q2Label = new JLabel("");
+                contentPanel.add(q2Label, "2, 6");
             }
             contentPanel.add(q2Radio, "4, 6");
         }
@@ -190,8 +202,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 }
             });
             {
-                lblc = new JLabel("3C");
-                contentPanel.add(lblc, "2, 8");
+                q3Label = new JLabel("");
+                contentPanel.add(q3Label, "2, 8");
             }
             contentPanel.add(q3Radio, "4, 8");
         }
@@ -203,8 +215,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 }
             });
             {
-                lbld = new JLabel("4D");
-                contentPanel.add(lbld, "2, 10");
+                q4Label = new JLabel("");
+                contentPanel.add(q4Label, "2, 10");
             }
             contentPanel.add(q4Radio, "4, 10");
         }
@@ -216,8 +228,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 }
             });
             {
-                lblNewLabel_2 = new JLabel("5E");
-                contentPanel.add(lblNewLabel_2, "2, 12");
+                q5Label = new JLabel("");
+                contentPanel.add(q5Label, "2, 12");
             }
             contentPanel.add(q5Radio, "4, 12");
         }
@@ -243,6 +255,38 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                             }
                         }
                     });
+                    {
+                        hotKeyComboBox = new JComboBox();
+                        hotKeyComboBox.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent arg0) {
+                                ((KeyMapping) hotKeyComboBox.getSelectedItem()).applyLabel(EnglishSearchUI_MemoryBank_DialogUI.this);
+                                JCommonUtil.setFoucsToChildren(EnglishSearchUI_MemoryBank_DialogUI.this, EnglishSearchUI_MemoryBank_DialogUI.this);
+                                EnglishSearchUI_MemoryBank_DialogUI.this.requestFocusInWindow();
+                                KEY_MAPPING_INDEX.set(hotKeyComboBox.getSelectedIndex());
+                            }
+                        });
+                        windowSizeComboBox = new JComboBox();
+                        windowSizeComboBox.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent arg0) {
+                                ((WindowSizeHandler) windowSizeComboBox.getSelectedItem()).apply(EnglishSearchUI_MemoryBank_DialogUI.this);
+                                JCommonUtil.setFoucsToChildren(EnglishSearchUI_MemoryBank_DialogUI.this, EnglishSearchUI_MemoryBank_DialogUI.this);
+                                EnglishSearchUI_MemoryBank_DialogUI.this.requestFocusInWindow();
+                                WINDOW_SIZE_INDEX.set(windowSizeComboBox.getSelectedIndex());
+                            }
+                        });
+                        windowSizeComboBox.setModel(JComboBoxUtil.createModel(WindowSizeHandler.values()));
+                        buttonPane.add(windowSizeComboBox);
+                        buttonPane.add(hotKeyComboBox);
+                        hotKeyComboBox.setModel(JComboBoxUtil.createModel(KeyMapping.values()));
+                        if (KEY_MAPPING_INDEX.get() != -1) {
+                            hotKeyComboBox.setSelectedIndex(KEY_MAPPING_INDEX.get());
+                        }
+                    }
+                    {
+                        if (WINDOW_SIZE_INDEX.get() != -1) {
+                            windowSizeComboBox.setSelectedIndex(WINDOW_SIZE_INDEX.get());
+                        }
+                    }
                     buttonPane.add(customDescBtn);
                 }
                 buttonPane.add(deleteFromMemoryBankBtn);
@@ -274,6 +318,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         }
 
         this.addWindowListener(new WindowAdapter() {
+
             public void windowClosing(WindowEvent e) {
                 if (skipBtnAction != null) {
                     ActionEvent e2 = new ActionEvent(EnglishSearchUI_MemoryBank_DialogUI.this, -1, "winClose");
@@ -285,34 +330,16 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                System.out.println("Dialog Key Event - " + e.getKeyChar());
-                switch (e.getKeyChar()) {
-                case '1':
-                case 'a':
-                case 'A':
-                    JCommonUtil.triggerButtonActionPerformed(q1Radio);
-                    break;
-                case '2':
-                case 'b':
-                case 'B':
-                    JCommonUtil.triggerButtonActionPerformed(q2Radio);
-                    break;
-                case '3':
-                case 'c':
-                case 'C':
-                    JCommonUtil.triggerButtonActionPerformed(q3Radio);
-                    break;
-                case '4':
-                case 'd':
-                case 'D':
-                    JCommonUtil.triggerButtonActionPerformed(q4Radio);
-                    break;
-                case '5':
-                case 'e':
-                case 'E':
-                    JCommonUtil.triggerButtonActionPerformed(q5Radio);
-                    break;
-                }
+                System.out.println("Dialog Key Event - " + e.getKeyChar() + ", " + e.getKeyCode());
+                KeyMapping emun = (KeyMapping) hotKeyComboBox.getSelectedItem();
+                emun.applyEvent(e, EnglishSearchUI_MemoryBank_DialogUI.this);
+            }
+        });
+
+        addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                JCommonUtil.setFoucsToChildren(EnglishSearchUI_MemoryBank_DialogUI.this, EnglishSearchUI_MemoryBank_DialogUI.this);
             }
         });
 
@@ -353,5 +380,122 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
     public void setChoiceRadioAction(ActionListener choiceRadioAction) {
         this.choiceRadioAction = choiceRadioAction;
+    }
+
+    private enum WindowSizeHandler {
+        NORMAL("一般", 19, 12, 12), //
+        FULLSCREEN("全螢幕", 52, 42, 24),//
+        ;
+
+        final String chsName;
+        final int questionLabelSize;
+        final int answerLabelSize;
+        final int kotKeyLabelSize;
+
+        WindowSizeHandler(String chsName, int questionLabelSize, int answerLabelSize, int kotKeyLabelSize) {
+            this.chsName = chsName;
+            this.questionLabelSize = questionLabelSize;
+            this.answerLabelSize = answerLabelSize;
+            this.kotKeyLabelSize = kotKeyLabelSize;
+        }
+
+        public String toString() {
+            return chsName;
+        }
+
+        private void apply(EnglishSearchUI_MemoryBank_DialogUI _this) {
+            _this.englishWordLabel.setFont(new Font("Consolas", Font.PLAIN, questionLabelSize));
+            JComponent[] radios = new JComponent[] { _this.q1Radio, _this.q2Radio, _this.q3Radio, _this.q4Radio, _this.q5Radio, };
+            JComponent[] hotkeys = new JComponent[] { _this.q1Label, _this.q2Label, _this.q3Label, _this.q4Label, _this.q5Label };
+            for (JComponent c : radios) {
+                c.setFont(new Font("新細明體", Font.PLAIN, answerLabelSize));
+            }
+            for (JComponent c : hotkeys) {
+                c.setFont(new Font("新細明體", Font.PLAIN, kotKeyLabelSize));
+            }
+            if (this == NORMAL) {
+                _this.setBounds(100, 100, 650, 285);
+            } else {
+                _this.setBounds(100, 100, 1280, 520);
+            }
+            JCommonUtil.setJFrameCenter(_this);
+        }
+    }
+
+    private enum KeyMapping {
+        WSADZ(new char[] { 'W', 'S', 'A', 'D', 'Z' }), //
+        wsadz(new char[] { 'w', 's', 'a', 'd', 'z' }), //
+        ABCDE(new char[] { 'A', 'B', 'C', 'D', 'E' }), //
+        abcde(new char[] { 'a', 'b', 'c', 'd', 'e' }), //
+        _12345(new char[] { '1', '2', '3', '4', '5' }), //
+        _上下左右空白(new int[] { 38, 40, 37, 39, 32 }),//
+        ;
+
+        Object arry;
+
+        KeyMapping(Object arry) {
+            this.arry = arry;
+        }
+
+        public String toString() {
+            return this.name().replaceFirst("_", "");
+        }
+
+        private void applyLabel(EnglishSearchUI_MemoryBank_DialogUI _this) {
+            JLabel[] labelArry = new JLabel[] { _this.q1Label, _this.q2Label, _this.q3Label, _this.q4Label, _this.q5Label };
+            if (this == KeyMapping._上下左右空白) {
+                Object customArry = new String[] { "上", "下", "左", "右", "空白" };
+                for (int ii = 0; ii < Array.getLength(customArry); ii++) {
+                    labelArry[ii].setText(String.valueOf(Array.get(customArry, ii)));
+                }
+            } else {
+                for (int ii = 0; ii < Array.getLength(arry); ii++) {
+                    labelArry[ii].setText(String.valueOf(Array.get(arry, ii)));
+                }
+            }
+        }
+
+        private void applyEvent(KeyEvent event, EnglishSearchUI_MemoryBank_DialogUI _this) {
+            int triggerIndex = getMatchIndex(this, event);
+            triggerRadio(triggerIndex, _this);
+        }
+
+        private int getMatchIndex(KeyMapping e, KeyEvent event) {
+            Object val = null;
+            if (e.arry.getClass() == char[].class) {
+                val = event.getKeyChar();
+                System.out.println("use keyChar : " + val);
+            } else {
+                val = event.getKeyCode();
+                System.out.println("use keyCode : " + val);
+            }
+            for (int ii = 0; ii < Array.getLength(arry); ii++) {
+                System.out.println(Array.get(arry, ii) + " - " + val);
+                if (Array.get(arry, ii).equals(val)) {
+                    return ii;
+                }
+            }
+            throw new RuntimeException("找步道對應 index : " + e);
+        }
+
+        private void triggerRadio(int index, EnglishSearchUI_MemoryBank_DialogUI _this) {
+            switch (index) {
+            case 0:
+                JCommonUtil.triggerButtonActionPerformed(_this.q1Radio);
+                break;
+            case 1:
+                JCommonUtil.triggerButtonActionPerformed(_this.q2Radio);
+                break;
+            case 2:
+                JCommonUtil.triggerButtonActionPerformed(_this.q3Radio);
+                break;
+            case 3:
+                JCommonUtil.triggerButtonActionPerformed(_this.q4Radio);
+                break;
+            case 4:
+                JCommonUtil.triggerButtonActionPerformed(_this.q5Radio);
+                break;
+            }
+        }
     }
 }

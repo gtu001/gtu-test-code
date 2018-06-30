@@ -63,8 +63,12 @@ public class EnglishTester_Diectory2 {
     public WordInfo2 parseToWordInfo(String word) {
         return parseToWordInfo(word, 1);
     }
-    
+
     public WordInfo2 parseToWordInfo(String word, int page) {
+        if (page <= 0) {
+            throw new RuntimeException("頁碼不可<=0");
+        }
+
         word = word.trim().replaceAll(" ", "%20");
         System.out.println(word);
         // String fullStr =
@@ -73,7 +77,7 @@ public class EnglishTester_Diectory2 {
         // String fullStr =
         // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
         // word));
-        String fullStr = SimpleHttpsUtil.newInstance().queryPage(String.format("https://tw.ichacha.net/m.aspx?q=%s&p="+page+"&l=en#bilingual", word));
+        String fullStr = SimpleHttpsUtil.newInstance().queryPage(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
         if (StringUtils.isBlank(fullStr)) {
             return new WordInfo2();
         }
@@ -216,15 +220,15 @@ public class EnglishTester_Diectory2 {
         }
         return value;
     }
-    
+
     @Deprecated
     private String searchWordOnline(String urls) {
         StringBuffer sb = new StringBuffer();
         try {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("11.22.33.44", 8080));
-//          URLConnection uc = url.openConnection(proxy);
-//          uc.setRequestProperty("User-agent", "IE/6.0");
-            
+            // URLConnection uc = url.openConnection(proxy);
+            // uc.setRequestProperty("User-agent", "IE/6.0");
+
             URL u = new URL(urls);
             URLConnection url = u.openConnection();
             url.setRequestProperty("User-agent", "IE/6.0");

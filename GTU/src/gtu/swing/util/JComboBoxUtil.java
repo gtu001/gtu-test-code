@@ -1,7 +1,9 @@
 package gtu.swing.util;
 
 import java.awt.Dimension;
+import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
 public class JComboBoxUtil {
@@ -10,6 +12,26 @@ public class JComboBoxUtil {
 
     private JComboBoxUtil(JComboBox comboBox) {
         this.comboBox = comboBox;
+    }
+
+    public static <T> DefaultComboBoxModel<T> createModel() {
+        return new DefaultComboBoxModel<T>();
+    }
+
+    public static <T> DefaultComboBoxModel<T> createModel(T[] arry) {
+        DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
+        for (int ii = 0; ii < arry.length; ii++) {
+            model.addElement(arry[ii]);
+        }
+        return model;
+    }
+
+    public static <T> DefaultComboBoxModel<T> createModel(List<T> arry) {
+        DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
+        for (int ii = 0; ii < arry.size(); ii++) {
+            model.addElement(arry.get(ii));
+        }
+        return model;
     }
 
     public static JComboBoxUtil newInstance(JComboBox comboBox) {

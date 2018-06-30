@@ -69,15 +69,13 @@ public class EnglishTester_Diectory2 {
     }
 
     public WordInfo2 parseToWordInfo(String word, int page) {
-        word = word.trim().replaceAll(" ", "%20");
-        System.out.println(word);
-        // String fullStr =
-        // searchWordOnline(String.format("http://www.ichacha.net/m/%s.html",
-        // word));
-        // String fullStr =
-        // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
-        // word));
         try {
+            if(page <= 0){
+                throw new Exception("頁碼不可小於等於0");
+            }
+            word = word.trim().replaceAll(" ", "%20");
+            System.out.println(word);
+
             String fullStr = searchWordOnline(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
             if (StringUtils.isBlank(fullStr)) {
                 return new WordInfo2();

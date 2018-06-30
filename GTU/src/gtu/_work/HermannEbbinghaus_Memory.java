@@ -1,5 +1,6 @@
 package gtu._work;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -96,6 +97,7 @@ public class HermannEbbinghaus_Memory {
     private ActionListener memDo = DEFAULT_ACTION;
     private ActionListener onOffDo = DEFAULT_ACTION;
     private ActionListener updateQueueDo = DEFAULT_ACTION;
+    private BeepHandler beepHandler = new BeepHandler();
 
     private static final ActionListener DEFAULT_ACTION = new ActionListener() {
         @Override
@@ -304,7 +306,11 @@ public class HermannEbbinghaus_Memory {
 
                     } while (isSuspended());
 
+                    beepHandler.beep();
+
                     memDo.actionPerformed(act);
+
+                    beepHandler.afterCheck();
                 }
 
                 // 紀錄下次執行
@@ -686,6 +692,34 @@ public class HermannEbbinghaus_Memory {
                 set.add(UUID.randomUUID().toString());
             }
             return set;
+        }
+    }
+
+    private class BeepHandler {
+        private AtomicBoolean continueBeep = new AtomicBoolean(true);
+        private AtomicLong lastestChk = new AtomicLong(-1);
+        private final long LONE_TIME_AGE = (long) 1.5 * 60 * 1000;
+
+        private void beep() {
+            if (continueBeep.get()) {
+                Toolkit.getDefaultToolkit().beep();
+                lastestChk.set(System.currentTimeMillis());
+            }
+        }
+
+        private boolean isLongTimeAgo() {
+            return Math.abs(System.currentTimeMillis() - lastestChk.get()) > LONE_TIME_AGE;
+        }
+
+        private void afterCheck() {
+            if (queueHandler.getLst().isEmpty() || isLongTimeAgo()) {
+                System.out.println("continueBeep cond 1 - " + (queueHandler.getLst().isEmpty()));
+                System.out.println("continueBeep cond 2 - " + (isLongTimeAgo()));
+                continueBeep.set(true);
+            } else {
+                continueBeep.set(false);
+            }
+            lastestChk.set(System.currentTimeMillis());
         }
     }
 

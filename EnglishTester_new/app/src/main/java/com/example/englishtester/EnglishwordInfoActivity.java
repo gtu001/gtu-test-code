@@ -40,9 +40,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
+import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
 
 @TargetApi(11)
@@ -68,6 +70,7 @@ public class EnglishwordInfoActivity extends Activity {
     Button deleteBtn;
     Button englishDetailBtn;
     Button resetBtn;
+    Button researchDescBtn;
 
     EnglishwordInfoDAO englishwordInfoDAO;
     RecentSearchService recentSearchService;
@@ -102,7 +105,7 @@ public class EnglishwordInfoActivity extends Activity {
 
         autoCompleteTextView1 = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView1);
         englishPronounceLabel = (TextView) findViewById(R.id.englishPronounceLabel);
-        searchBtn = (Button)findViewById(R.id.searchBtn);
+        searchBtn = (Button) findViewById(R.id.searchBtn);
         englishDescText = (EditText) findViewById(R.id.englishDescText);
         viewInfoText = (TextView) findViewById(R.id.viewInfoText);
 
@@ -110,6 +113,7 @@ public class EnglishwordInfoActivity extends Activity {
         deleteBtn = (Button) findViewById(R.id.deleteBtn);
         englishDetailBtn = (Button) findViewById(R.id.englishDetailBtn);
         resetBtn = (Button) findViewById(R.id.resetBtn);
+        researchDescBtn = (Button) findViewById(R.id.researchDescBtn);
 
         previousPicBtn = (Button) findViewById(R.id.previousPicBtn);
         nextPicBtn = (Button) findViewById(R.id.nextPicBtn);
@@ -141,15 +145,15 @@ public class EnglishwordInfoActivity extends Activity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 Log.v(TAG, "keyCode = " + keyCode);
                 switch (event.getAction()) {
-                case KeyEvent.ACTION_DOWN:
-                    break;
-                case KeyEvent.ACTION_MULTIPLE:
-                    break;
-                case KeyEvent.ACTION_UP:
-                    if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                        onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(), true);
-                    }
-                    return true;
+                    case KeyEvent.ACTION_DOWN:
+                        break;
+                    case KeyEvent.ACTION_MULTIPLE:
+                        break;
+                    case KeyEvent.ACTION_UP:
+                        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                            onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(), true);
+                        }
+                        return true;
                 }
                 return false;
             }
@@ -211,10 +215,10 @@ public class EnglishwordInfoActivity extends Activity {
                                 }
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                            }
-                        }).show();
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                }).show();
             }
         });
 
@@ -244,10 +248,10 @@ public class EnglishwordInfoActivity extends Activity {
                                 initial();
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                            }
-                        }).show();
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                }).show();
             }
         });
 
@@ -289,6 +293,51 @@ public class EnglishwordInfoActivity extends Activity {
             }
         });
 
+        //重新查詢
+        researchDescBtn.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                final String englishId = getAutoCompleteTextViewEnglishId();
+                if (StringUtils.isBlank(englishId)) {
+                    Toast.makeText(getApplicationContext(), "請輸入單字,不可為空白!", Toast.LENGTH_SHORT).show();
+                    Log.v(TAG, "englishId is empty");
+                    return;
+                }
+
+                new AlertDialog.Builder(EnglishwordInfoActivity.this).setItems(new String[]{"簡易", "完整"}, //
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, final int which) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        final AtomicReference<String> desc = new AtomicReference<String>();
+                                        switch (which) {
+                                            case 0:
+                                                WordInfo newWord = new EnglishTester_Diectory().parseToWordInfo(englishId, EnglishwordInfoActivity.this, handler);
+                                                desc.set(newWord.getMeaning());
+                                                break;
+                                            case 1:
+                                                EnglishTester_Diectory2.WordInfo2 newWord2 = new EnglishTester_Diectory2().parseToWordInfo(englishId);
+                                                desc.set(newWord2.getMeaning2());
+                                                break;
+                                        }
+
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                englishDescText.setText(desc.get());
+                                            }
+                                        });
+                                    }
+                                }).start();
+                            }
+                        }).show();
+            }
+        });
+
+
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final EnglishwordInfoActivity data = (EnglishwordInfoActivity) getLastNonConfigurationInstance();
         if (data != null) {// 表示不是由於Configuration改變觸發的onCreate()
@@ -328,7 +377,7 @@ public class EnglishwordInfoActivity extends Activity {
     private void onAutoCompleteTextView1Click(String currentId, boolean isMakeRecord) {
         Log.v(TAG, "onItemSelected == " + currentId);
 
-        if(StringUtils.isBlank(currentId)){
+        if (StringUtils.isBlank(currentId)) {
             Toast.makeText(this, "請輸入查詢單字!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -361,7 +410,7 @@ public class EnglishwordInfoActivity extends Activity {
                 recentSearchService.recordRecentSearch(englishId_);
                 writeSearchWordToProperties(englishId_, null);
             }
-            
+
             //設定查詢紀錄
             viewHistorySetup(word);
             Log.v(TAG, word.toString());
@@ -396,9 +445,9 @@ public class EnglishwordInfoActivity extends Activity {
         }
     }
 
-    private void toastMessage(final Context context, final String message, Handler handler){
-        if(handler != null){
-            handler.post(new Runnable(){
+    private void toastMessage(final Context context, final String message, Handler handler) {
+        if (handler != null) {
+            handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -406,11 +455,11 @@ public class EnglishwordInfoActivity extends Activity {
             });
         }
     }
-    
+
     /**
      * 設定查詢紀錄
      */
-    private void viewHistorySetup(EnglishWord word){
+    private void viewHistorySetup(EnglishWord word) {
         StringBuilder sb = new StringBuilder();
         sb.append("瀏覽次數 : " + word.browserTime + "\n");
         sb.append("測驗次數 : " + word.examTime + "\n");
@@ -625,9 +674,9 @@ public class EnglishwordInfoActivity extends Activity {
         for (TaskInfo t : TaskInfo.values()) {
             if (requestCode == t.requestCode) {
                 switch (resultCode) {
-                case RESULT_OK:
-                    t.onActivityResult(this, data, bundle);
-                    break;
+                    case RESULT_OK:
+                        t.onActivityResult(this, data, bundle);
+                        break;
                 }
                 break;
             }
