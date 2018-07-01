@@ -2,12 +2,14 @@ package gtu.properties;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
@@ -71,6 +73,18 @@ public class PropertiesUtilBean {
         public boolean isChange() {
             return file.lastModified() != lastModifyTime;
         }
+
+        public void merge(Properties currentProp) throws FileNotFoundException, IOException {
+            Properties changeProp = new Properties();
+            if (isChange()) {
+                changeProp.load(new FileInputStream(file));
+                for (Enumeration<?> enu = currentProp.keys(); enu.hasMoreElements();) {
+                    String key = (String) enu.nextElement();
+                    changeProp.remove(key);
+                }
+                currentProp.putAll(changeProp);
+            }
+        }
     }
 
     public boolean isFileChangeUncontrolled() {
@@ -87,6 +101,7 @@ public class PropertiesUtilBean {
 
     public void store() {
         try {
+            fileChangeHandler.merge(configProp);
             String remark = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS").format(new Date());
             configProp.store(new FileOutputStream(propFile), "SAVE_TIME : " + remark);
             fileChangeHandler.resetLastModifiedUnderControl();

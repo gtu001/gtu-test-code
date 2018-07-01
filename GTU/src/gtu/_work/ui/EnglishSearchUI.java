@@ -407,6 +407,7 @@ public class EnglishSearchUI extends JFrame {
     };
     private JButton reviewMemResumeBtn;
     private JCheckBox lostFocusHiddenChk;
+    private JButton reviewMemoryMergeBtn;
 
     /**
      * Create the frame.
@@ -719,6 +720,14 @@ public class EnglishSearchUI extends JFrame {
         });
         panel_4.add(reviewMemResumeBtn);
         reviewMemChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("reviewMemChk")));
+
+        reviewMemoryMergeBtn = new JButton("合併");
+        reviewMemoryMergeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent paramActionEvent) {
+                reviewMemoryMergeBtnAction();
+            }
+        });
+        panel_4.add(reviewMemoryMergeBtn);
 
         // ----------------------------------------------------------------------------------------------------------
 
@@ -1522,6 +1531,42 @@ public class EnglishSearchUI extends JFrame {
                     ii--;
                 }
             }
+        }
+    }
+
+    private void reviewMemoryMergeBtnAction() {
+        try {
+            File dir = JCommonUtil._jFileChooser_selectFileAndDirectory();
+            if (!dir.isDirectory()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("必須是dropbox目錄!");
+                return;
+            }
+
+            List<String> mergeFileLst = new ArrayList<String>();
+            int addCount = 0;
+
+            for (File f : dir.listFiles()) {
+                if (f.getName().matches("EnglishSearchUI_MemoryBank.*\\.properties")) {
+                    HermannEbbinghaus_Memory m1 = new HermannEbbinghaus_Memory();
+                    m1.init(f);
+                    List<MemData> lst = m1.getAllMemData(false);
+
+                    mergeFileLst.add(f.getName());
+
+                    for (MemData d : lst) {
+                        if (!memory.containsKey(d.getKey())) {
+                            memory.append(d);
+                            addCount++;
+                        }
+                    }
+                }
+            }
+
+            memory.store();
+
+            JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(mergeFileLst, "\r\n") + "\n加入數 : " + addCount + "\nMerge完成!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }

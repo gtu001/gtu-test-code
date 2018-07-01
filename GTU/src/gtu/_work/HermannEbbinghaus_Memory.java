@@ -239,14 +239,28 @@ public class HermannEbbinghaus_Memory {
         d.fixedTime = newDate;
         d.setRemark(remark);
         d.resetReviewTime();
+
+        this.append(d);
+    }
+
+    public void append(MemData d) {
         this.memLst.add(d);
 
-        config.getConfigProp().setProperty(key, d.toValue());
+        config.getConfigProp().setProperty(d.getKey(), d.toValue());
         config.store();
 
         if (startPause.get()) {
             this.schedule(d);
         }
+    }
+
+    private void storeMemData(MemData d) {
+        config.getConfigProp().setProperty(d.key, d.toValue());
+        config.store();
+    }
+
+    public void store() {
+        config.store();
     }
 
     private abstract class MemoryTimerTask extends TimerTask {
@@ -408,11 +422,6 @@ public class HermannEbbinghaus_Memory {
             System.out.println("overwrite : " + v.getKey() + "\t" + v.toValue());
             config.getConfigProp().setProperty(v.getKey(), v.toValue());
         }
-        config.store();
-    }
-
-    private void storeMemData(MemData d) {
-        config.getConfigProp().setProperty(d.key, d.toValue());
         config.store();
     }
 
