@@ -98,7 +98,9 @@ public class StatusInfoService {
         String hermannEbbinghausStartTime; //
         @StatusInfoService_DataAnn(name = "艾賓浩斯記憶最後執行時間", index = 22)
         String hermannEbbinghausLastestTime; //
-        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶更新次數", index = 23)
+        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶最近一次更新筆數", index = 23)
+        String hermannEbbinghausLastestUpdateCount; //
+        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶更新次數", index = 24)
         String hermannEbbinghausRuntime; //
     }
 
@@ -249,11 +251,13 @@ public class StatusInfoService {
             val.hermannEbbinghausStartTime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.START_TIME);
             val.hermannEbbinghausLastestTime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.LASTEST_TIME);
             val.hermannEbbinghausRuntime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.RUNTIME);
+            val.hermannEbbinghausLastestUpdateCount = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.UPDATE_COUNT);
         } catch (Exception ex) {
             Log.e(TAG, "getMemoryStateInfo ERR : " + ex.getMessage(), ex);
             val.hermannEbbinghausStartTime = "NA";
             val.hermannEbbinghausLastestTime = "NA";
             val.hermannEbbinghausRuntime = "NA";
+            val.hermannEbbinghausLastestUpdateCount = "NA";
         }
         return val;
     }

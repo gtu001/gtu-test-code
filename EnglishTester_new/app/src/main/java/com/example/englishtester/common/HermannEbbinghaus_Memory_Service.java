@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.DropboxApplicationActivity;
@@ -24,11 +24,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import gtu._work.etc.EnglishTester_Diectory;
@@ -53,6 +60,8 @@ public class HermannEbbinghaus_Memory_Service extends Service {
     private final static int UPLOAD_SIZE = 20;
     private Thread singleThread;
     private AtomicReference<MemoryStateInfo> state = new AtomicReference<MemoryStateInfo>();
+    private static final long SERVICE_PERIOD = 1 * 60 * 60 * 1000;
+    ;
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -89,25 +98,18 @@ public class HermannEbbinghaus_Memory_Service extends Service {
     //↓↓↓↓↓↓↓↓ business logical ------------------------------------------------------------------------------------------------------------------------------------
 
     private void initRunningThread() {
-        if (singleThread == null || singleThread.getState() == Thread.State.TERMINATED) {
-            singleThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        uploadMemeryBank(UPLOAD_SIZE);
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                uploadMemeryBank(UPLOAD_SIZE);
 
-                        addRuntimeRecord();
+                addRuntimeRecord();
 
-                        try {
-                            Thread.sleep(1 * 60 * 60 * 1000);
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }
-            });
+                handler.postDelayed(this, SERVICE_PERIOD);
+            }
+        };
 
-            singleThread.start();
-        }
+        handler.postDelayed(runnable, 1);
     }
 
     public void uploadMemeryBank(int size) {
@@ -120,7 +122,9 @@ public class HermannEbbinghaus_Memory_Service extends Service {
             MemoryBankDropboxProcess dropboxHandler = new MemoryBankDropboxProcess();
             dropboxHandler.downloadProperties();//先下載 config
 
-            List<RecentSearchDAO.RecentSearch> lst = recentSearchDAO.queryNeedUpload(size);
+            List<RecentSearchDAO.RecentSearch> lst = recentSearchDAO.queryNeedUpload_byRegisterTime(getInsertTimeBegin());
+
+            getMemoryStateInfo().updateCount = lst.size();
 
             Properties prop = this.getPropertiesFromRecentSearchLst(lst);
 
@@ -130,6 +134,17 @@ public class HermannEbbinghaus_Memory_Service extends Service {
 
             Log.v(TAG, "uploadMemeryBank : end ");
         }
+    }
+
+    @Override
+    public void onStart(Intent intent, int startid) {
+        Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
+    }
+
+    private long getInsertTimeBegin() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        return cal.getTimeInMillis();
     }
 
     private void updateRecentSearchLst(List<RecentSearchDAO.RecentSearch> lst) {
@@ -168,6 +183,9 @@ public class HermannEbbinghaus_Memory_Service extends Service {
         DbxClientV2 client;
         String dropboxPath;
 
+        AtomicBoolean idDownloadPropertiesOk = new AtomicBoolean(false);
+        AtomicBoolean idUploadPropertiesOk = new AtomicBoolean(false);
+
         private MemoryBankDropboxProcess() {
             fileName = "EnglishSearchUI_MemoryBank.properties";
             file = new File(context.getCacheDir(), fileName);
@@ -176,33 +194,61 @@ public class HermannEbbinghaus_Memory_Service extends Service {
         }
 
         private void downloadProperties() {
-            try {
-                boolean result = DropboxUtilV2.download(dropboxPath, new FileOutputStream(file), client);
-                if (result && file.exists()) {
-                    Log.v(TAG, "uploadProperties : 佔存檔儲存ok : " + file.length());
-                } else {
-                    throw new Exception("downloadProperties : 檔案下載失敗!");
+            getFutureResult(new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    try {
+                        boolean result = DropboxUtilV2.download(dropboxPath, new FileOutputStream(file), client);
+                        if (result && file.exists()) {
+                            Log.v(TAG, "downloadProperties : 佔存檔儲存ok : " + file.length());
+                            idDownloadPropertiesOk.set(true);
+                        } else {
+                            throw new Exception("downloadProperties : 檔案下載失敗!");
+                        }
+                    } catch (Exception ex) {
+                        throw new RuntimeException("downloadProperties ERR : " + ex.getMessage(), ex);
+                    }
+                    return null;
                 }
-            } catch (Exception ex) {
-                throw new RuntimeException("downloadProperties ERR : " + ex.getMessage(), ex);
-            }
+            });
         }
 
-        private boolean uploadProperties(Properties prop) {
+        private void uploadProperties(final Properties prop) {
+            getFutureResult(new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    try {
+                        Properties newProp = new Properties();
+                        newProp.load(new FileInputStream(file));
+                        newProp.putAll(prop);
+                        newProp.store(new FileOutputStream(file), "Phone Add " + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+
+                        boolean result1 = DropboxUtilV2.delete(dropboxPath, client);
+                        Log.v(TAG, "uploadProperties DELETE : " + result1);
+
+                        boolean result2 = DropboxUtilV2.upload(dropboxPath, new FileInputStream(file), client);
+                        Log.v(TAG, "uploadProperties UPLOAD : " + result2);
+
+                        idUploadPropertiesOk.set(result2);
+                    } catch (Exception ex) {
+                        throw new RuntimeException("uploadProperties ERR : " + ex.getMessage(), ex);
+                    }
+                    return null;
+                }
+            });
+        }
+
+        private <T> T getFutureResult(Callable<T> callable) {
+            final int TIMEOUT = 30000;
+            ExecutorService service = Executors.newCachedThreadPool();
+            Future<T> future = service.submit(callable);
             try {
-                Properties newProp = new Properties();
-                newProp.load(new FileInputStream(file));
-                newProp.putAll(prop);
-                newProp.store(new FileOutputStream(file), "Phone Add " + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
-
-                boolean result1 = DropboxUtilV2.delete(dropboxPath, client);
-                Log.v(TAG, "uploadProperties DELETE : " + result1);
-
-                boolean result2 = DropboxUtilV2.upload(dropboxPath, new FileInputStream(file), client);
-                Log.v(TAG, "uploadProperties UPLOAD : " + result2);
-                return result2;
-            } catch (Exception ex) {
-                throw new RuntimeException("uploadProperties ERR : " + ex.getMessage(), ex);
+//                return future.get(TIMEOUT, TimeUnit.MILLISECONDS);
+                return future.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+                future.cancel(true);
+                return null;
             }
         }
     }
@@ -355,12 +401,16 @@ public class HermannEbbinghaus_Memory_Service extends Service {
         }
     }
 
-    private void addRuntimeRecord() {
+    private MemoryStateInfo getMemoryStateInfo() {
         if (state.get() == null) {
             state.set(new MemoryStateInfo());
         }
-        state.get().runtime++;
-        state.get().lastestTime = new Date();
+        return state.get();
+    }
+
+    private void addRuntimeRecord() {
+        getMemoryStateInfo().runtime++;
+        getMemoryStateInfo().lastestTime = new Date();
     }
 
     // 與activity連線 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ (新的寫法)
@@ -369,6 +419,7 @@ public class HermannEbbinghaus_Memory_Service extends Service {
         String START_TIME = "startTime";
         String LASTEST_TIME = "lastestTime";
         String RUNTIME = "runtime";
+        String UPDATE_COUNT = "updateCount";
     }
 
     private final IHermannEbbinghausMemoryAidlInterface.Stub mBinderNew = new IHermannEbbinghausMemoryAidlInterface.Stub() {
@@ -378,14 +429,17 @@ public class HermannEbbinghaus_Memory_Service extends Service {
             String startTime = "NA";
             String lastestTime = "NA";
             String runtime = "NA";
+            String updateCount = "NA";
             if (state.get() != null) {
                 startTime = DateFormatUtils.format(state.get().startTime, "yyyy/MM/dd HH:mm:ss");
                 lastestTime = DateFormatUtils.format(state.get().lastestTime, "yyyy/MM/dd HH:mm:ss");
                 runtime = String.valueOf(state.get().runtime);
+                updateCount = String.valueOf(state.get().updateCount);
             }
             infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.START_TIME, startTime);
             infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.LASTEST_TIME, lastestTime);
             infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.RUNTIME, runtime);
+            infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.UPDATE_COUNT, updateCount);
             return infoMap;
         }
     };
@@ -395,6 +449,7 @@ public class HermannEbbinghaus_Memory_Service extends Service {
         Date startTime;
         Date lastestTime;
         int runtime = 0;
+        int updateCount = 0;
 
         MemoryStateInfo() {
             startTime = new Date();

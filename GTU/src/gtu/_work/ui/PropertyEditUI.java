@@ -342,6 +342,10 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                             }
                                         }
                                     }
+
+                                    if (StringUtils.trimToEmpty(desc).contains("未收錄此詞條")) {
+                                        setMeaning("", rowPos);
+                                    }
                                 }
                                 if (!errSb.isEmpty()) {
                                     JCommonUtil._jOptionPane_showMessageDialog_error("有錯誤單字:\n" + errSb);

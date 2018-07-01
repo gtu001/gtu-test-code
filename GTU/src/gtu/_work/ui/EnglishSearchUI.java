@@ -1424,6 +1424,8 @@ public class EnglishSearchUI extends JFrame {
 
     private void reviewMemResumeBtnAction() {
         try {
+            setBounds(100, 100, 540, 347);
+            JCommonUtil.setLocationToRightBottomCorner(this);
             memory.resume();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

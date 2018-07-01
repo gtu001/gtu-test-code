@@ -9,7 +9,7 @@ import java.util.concurrent.TimeoutException;
 
 public class ThreadUtil {
 
-    public static <T> T getResultTimeout(Callable<T> task, long timeout) throws TimeoutException {
+    public static <T> T getFutureResult(Callable<T> task, long timeout) throws TimeoutException {
         try {
             ExecutorService executor = Executors.newFixedThreadPool(1);
             Future<T> future = executor.submit(task);

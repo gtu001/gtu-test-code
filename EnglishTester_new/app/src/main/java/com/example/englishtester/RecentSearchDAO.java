@@ -215,6 +215,26 @@ public class RecentSearchDAO {
         return this.transferToLst(c, db);
     }
 
+    //取得n比需上傳的單字
+    public List<RecentSearch> queryNeedUpload_byRegisterTime(long registerTime) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+
+        String table = RecentSearchSchema.TABLE_NAME;
+        String[] columns = null;
+        String selection = String.format(" (%1$s is null or %1$s = '') and %2$s >= ? ", RecentSearchSchema.UPLOAD_TYPE, RecentSearchSchema.INSERT_DATE);
+        String[] selectionArgs = new String[]{String.valueOf(registerTime)};
+        String groupBy = null;
+        String having = null;
+        String orderBy = RecentSearchSchema.INSERT_DATE + " DESC ";
+        String limit = null;
+
+        Cursor c = db.query(table, columns, selection,
+                selectionArgs, groupBy, having,
+                orderBy, limit);
+
+        return this.transferToLst(c, db);
+    }
+
     /**
      * 關閉資料庫
      */
