@@ -59,6 +59,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private ActionListener skipAllBtnAction;
     private ActionListener onDismissAction;
     private ActionListener onCreateAction;
+    private ActionListener appendBtnAction;
     private JButton deleteFromMemoryBankBtn;
     private JButton customDescBtn;
     private JButton skipAllBtn;
@@ -72,6 +73,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private static AtomicInteger KEY_MAPPING_INDEX = new AtomicInteger(-1);
     private static AtomicInteger WINDOW_SIZE_INDEX = new AtomicInteger(-1);
     private static final int MAX_LENGTH_DESC = 40;
+    private JButton appendBtn;
 
     /**
      * Launch the application.
@@ -80,7 +82,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         String[] arry = new String[] { "測試aA1", "測試bB2", "測試cC3", "測試dD4", "測試eE5" };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
-        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null);
+        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null, null);
         dialog.showDialog();
     }
 
@@ -103,7 +105,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             ActionListener deleteConfigAction, ActionListener choiceRadioAction, //
             ActionListener customDescAction, ActionListener skipBtnAction, //
             ActionListener skipAllBtnAction, ActionListener onCreateAction, //
-            ActionListener onDismissAction //
+            ActionListener onDismissAction, ActionListener appendBtnAction //
     ) {
         try {
             setTitle(title);
@@ -122,6 +124,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             this.skipAllBtnAction = skipAllBtnAction;
             this.onCreateAction = onCreateAction;
             this.onDismissAction = onDismissAction;
+            this.appendBtnAction = appendBtnAction;
         } catch (Exception e) {
             JCommonUtil.handleException(e);
         }
@@ -287,12 +290,23 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                             windowSizeComboBox.setSelectedIndex(WINDOW_SIZE_INDEX.get());
                         }
                     }
+                    {
+                        appendBtn = new JButton("加字");
+                        appendBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent paramActionEvent) {
+                                if (appendBtnAction != null) {
+                                    appendBtnAction.actionPerformed(paramActionEvent);
+                                }
+                            }
+                        });
+                        buttonPane.add(appendBtn);
+                    }
                     buttonPane.add(customDescBtn);
                 }
                 buttonPane.add(deleteFromMemoryBankBtn);
             }
             {
-                JButton skipBtn = new JButton("跳過skip");
+                JButton skipBtn = new JButton("跳過");
                 skipBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         if (skipBtnAction != null) {
@@ -305,7 +319,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 getRootPane().setDefaultButton(skipBtn);
             }
             {
-                skipAllBtn = new JButton("全部掠過skip");
+                skipAllBtn = new JButton("暫停");
                 skipAllBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
                         if (skipAllBtnAction != null) {
@@ -384,7 +398,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
     private enum WindowSizeHandler {
         NORMAL("一般", 19, 12, 12), //
-        FULLSCREEN("全螢幕", 52, 42, 24),//
+        FULLSCREEN("放大", 52, 42, 24),//
         ;
 
         final String chsName;

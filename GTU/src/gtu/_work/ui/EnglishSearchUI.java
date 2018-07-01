@@ -381,6 +381,23 @@ public class EnglishSearchUI extends JFrame {
                                 mouseMarkQueryHandler.after();
                                 dialogObervable.remove(choiceDialog);
                             }
+                        }, new ActionListener() { // append new word
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    String key = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入單字:"));
+                                    if (StringUtils.isBlank(key)) {
+                                        JCommonUtil._jOptionPane_showMessageDialog_error("未輸入單字!");
+                                        return;
+                                    }
+                                    String desc = getChs2Big5(getEnglishMeaning(key));
+                                    memory.append(key, desc);
+                                    memory.store();
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("加入成功!!\n" + key + "\n" + desc);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
+                            }
                         });
                 choiceDialog.showDialog();
                 choiceMeaning = choiceDialog.getChoiceAnswer();
