@@ -4,15 +4,20 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import com.example.englishtester.memory.IHermannEbbinghausMemoryAidlInterface;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -114,9 +119,9 @@ public class StatusInfoActivity extends Activity {
         Class<StatusInfoService.StatusInfoService_Data> clz = StatusInfoService.StatusInfoService_Data.class;
         StatusInfoService.StatusInfoService_Data data = statusInfoService.getStatusInfo();
 
-        Map<Integer,Pair<String,String>> tableData = new TreeMap<>();
+        Map<Integer, Pair<String, String>> tableData = new TreeMap<>();
 //        for (Field f2 : FieldUtils.getAllFields(clz)) {
-        for(Field f2 : clz.getDeclaredFields()){
+        for (Field f2 : clz.getDeclaredFields()) {
             try {
                 String name = "";
                 Integer index = -1;
@@ -137,8 +142,8 @@ public class StatusInfoActivity extends Activity {
             }
         }
 
-        for(int index : tableData.keySet()){
-            Pair<String,String> pair = tableData.get(index);
+        for (int index : tableData.keySet()) {
+            Pair<String, String> pair = tableData.get(index);
             String name = pair.getKey();
             String val = pair.getValue();
             sb.append(String.format("<tr><td>%s</td><td>%s</td></tr>", name, val));
@@ -149,7 +154,6 @@ public class StatusInfoActivity extends Activity {
         sb.append("</html>");
         return sb.toString();
     }
-
 
     // 測試螢幕翻轉 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     @Override

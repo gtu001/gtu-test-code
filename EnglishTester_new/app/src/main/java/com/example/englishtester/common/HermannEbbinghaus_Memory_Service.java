@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -13,6 +15,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.DropboxApplicationActivity;
 import com.example.englishtester.EnglishwordInfoDAO;
 import com.example.englishtester.RecentSearchDAO;
+import com.example.englishtester.memory.IHermannEbbinghausMemoryAidlInterface;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -22,8 +25,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
@@ -45,8 +51,8 @@ public class HermannEbbinghaus_Memory_Service extends Service {
     private EnglishTester_Diectory_Factory engFactory = new EnglishTester_Diectory_Factory();
     private String dropboxAccessToken;
     private final static int UPLOAD_SIZE = 20;
-
     private Thread singleThread;
+    private AtomicReference<MemoryStateInfo> state = new AtomicReference<MemoryStateInfo>();
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +71,7 @@ public class HermannEbbinghaus_Memory_Service extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinderNew;
     }
 
     @Override
@@ -89,6 +95,8 @@ public class HermannEbbinghaus_Memory_Service extends Service {
                 public void run() {
                     while (true) {
                         uploadMemeryBank(UPLOAD_SIZE);
+
+                        addRuntimeRecord();
 
                         try {
                             Thread.sleep(1 * 60 * 60 * 1000);
@@ -344,6 +352,52 @@ public class HermannEbbinghaus_Memory_Service extends Service {
 
         public void setFixedTime(Date fixedTime) {
             this.fixedTime = fixedTime;
+        }
+    }
+
+    private void addRuntimeRecord() {
+        if (state.get() == null) {
+            state.set(new MemoryStateInfo());
+        }
+        state.get().runtime++;
+        state.get().lastestTime = new Date();
+    }
+
+    // 與activity連線 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ (新的寫法)
+
+    public interface IHermannEbbinghausMemoryAidlInterface_KEY {
+        String START_TIME = "startTime";
+        String LASTEST_TIME = "lastestTime";
+        String RUNTIME = "runtime";
+    }
+
+    private final IHermannEbbinghausMemoryAidlInterface.Stub mBinderNew = new IHermannEbbinghausMemoryAidlInterface.Stub() {
+        @Override
+        public Map getMemoryStateInfo() throws RemoteException {
+            Map<String, String> infoMap = new HashMap<>();
+            String startTime = "NA";
+            String lastestTime = "NA";
+            String runtime = "NA";
+            if (state.get() != null) {
+                startTime = DateFormatUtils.format(state.get().startTime, "yyyy/MM/dd HH:mm:ss");
+                lastestTime = DateFormatUtils.format(state.get().lastestTime, "yyyy/MM/dd HH:mm:ss");
+                runtime = String.valueOf(state.get().runtime);
+            }
+            infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.START_TIME, startTime);
+            infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.LASTEST_TIME, lastestTime);
+            infoMap.put(IHermannEbbinghausMemoryAidlInterface_KEY.RUNTIME, runtime);
+            return infoMap;
+        }
+    };
+    // 與activity連線↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ (新的寫法)
+
+    private class MemoryStateInfo {
+        Date startTime;
+        Date lastestTime;
+        int runtime = 0;
+
+        MemoryStateInfo() {
+            startTime = new Date();
         }
     }
 }

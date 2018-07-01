@@ -1,9 +1,16 @@
 package com.example.englishtester;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.util.Log;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
+import com.example.englishtester.common.HermannEbbinghaus_Memory_Service;
+import com.example.englishtester.common.ServiceUtil;
+import com.example.englishtester.memory.IHermannEbbinghausMemoryAidlInterface;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
@@ -16,6 +23,7 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 public class StatusInfoService {
 
@@ -23,10 +31,15 @@ public class StatusInfoService {
 
     EnglishwordInfoDAO dao;
     QuestionChoiceService questionChoiceService;
+    private IHermannEbbinghausMemoryAidlInterface mService;
+    Context context;
+
 
     StatusInfoService(Context context) {
+        this.context = context;
         dao = new EnglishwordInfoDAO(context);
         questionChoiceService = new QuestionChoiceService(context);
+        this.bindServiceMethod(true);
     }
 
     @Target(value = {ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.CONSTRUCTOR, ElementType.LOCAL_VARIABLE, ElementType.ANNOTATION_TYPE,
@@ -34,52 +47,59 @@ public class StatusInfoService {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface StatusInfoService_DataAnn {
         String name();
+
         int index();
     }
 
     public static class StatusInfoService_Data {
-        @StatusInfoService_DataAnn(name = "最早匯入時間", index=0)
+        @StatusInfoService_DataAnn(name = "最早匯入時間", index = 0)
         String minInputDate; //
-        @StatusInfoService_DataAnn(name = "最晚匯入時間", index=1)
+        @StatusInfoService_DataAnn(name = "最晚匯入時間", index = 1)
         String maxInputDate; //
-        @StatusInfoService_DataAnn(name = "最早測驗時間", index=2)
+        @StatusInfoService_DataAnn(name = "最早測驗時間", index = 2)
         String minExamDate; //
-        @StatusInfoService_DataAnn(name = "最晚測驗時間", index=3)
+        @StatusInfoService_DataAnn(name = "最晚測驗時間", index = 3)
         String maxExamDate; //
-        @StatusInfoService_DataAnn(name = "平均瀏覽次數", index=4)
+        @StatusInfoService_DataAnn(name = "平均瀏覽次數", index = 4)
         String avgBrowserTime; //
-        @StatusInfoService_DataAnn(name = "平均測驗次數", index=5)
+        @StatusInfoService_DataAnn(name = "平均測驗次數", index = 5)
         String avgExamTime; //
-        @StatusInfoService_DataAnn(name = "總瀏覽次數", index=6)
+        @StatusInfoService_DataAnn(name = "總瀏覽次數", index = 6)
         String totalBrowserTime; //
-        @StatusInfoService_DataAnn(name = "總測驗次數", index=7)
+        @StatusInfoService_DataAnn(name = "總測驗次數", index = 7)
         String totalExamTime; //
-        @StatusInfoService_DataAnn(name = "平均回答時間", index=8)
+        @StatusInfoService_DataAnn(name = "平均回答時間", index = 8)
         String avgExamOkDuring; //
-        @StatusInfoService_DataAnn(name = "總測驗時間(估計)", index=9)
+        @StatusInfoService_DataAnn(name = "總測驗時間(估計)", index = 9)
         String totalExamOkDuring; //
-        @StatusInfoService_DataAnn(name = "總瀏覽時間(估計)", index=10)
+        @StatusInfoService_DataAnn(name = "總瀏覽時間(估計)", index = 10)
         String totalBrowserDuring; //
-        @StatusInfoService_DataAnn(name = "平均正確率", index=11)
+        @StatusInfoService_DataAnn(name = "平均正確率", index = 11)
         String avgCorrectRate; //
-        @StatusInfoService_DataAnn(name = "錯誤次數分布", index=12)
+        @StatusInfoService_DataAnn(name = "錯誤次數分布", index = 12)
         String wrongMapping; //
-        @StatusInfoService_DataAnn(name = "總共單字數", index=13)
+        @StatusInfoService_DataAnn(name = "總共單字數", index = 13)
         String totalWordCount; //
-        @StatusInfoService_DataAnn(name = "尚須測驗單字數", index=14)
+        @StatusInfoService_DataAnn(name = "尚須測驗單字數", index = 14)
         String examNotOkCount; //
-        @StatusInfoService_DataAnn(name = "本日瀏覽字數", index=15)
+        @StatusInfoService_DataAnn(name = "本日瀏覽字數", index = 15)
         String todayBrowserTime; //
-        @StatusInfoService_DataAnn(name = "本日測驗字數", index=16)
+        @StatusInfoService_DataAnn(name = "本日測驗字數", index = 16)
         String todayExamTime; //
-        @StatusInfoService_DataAnn(name = "10日瀏覽字數", index=17)
+        @StatusInfoService_DataAnn(name = "10日瀏覽字數", index = 17)
         String tenDayBrowserTime; //
-        @StatusInfoService_DataAnn(name = "10日測驗字數", index=18)
+        @StatusInfoService_DataAnn(name = "10日測驗字數", index = 18)
         String tenDayExamTime; //
-        @StatusInfoService_DataAnn(name = "本月瀏覽字數", index=19)
+        @StatusInfoService_DataAnn(name = "本月瀏覽字數", index = 19)
         String thisMonthBrowserTime; //
-        @StatusInfoService_DataAnn(name = "本月測驗字數", index=20)
+        @StatusInfoService_DataAnn(name = "本月測驗字數", index = 20)
         String thisMonthExamTime; //
+        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶起始時間", index = 21)
+        String hermannEbbinghausStartTime; //
+        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶最後執行時間", index = 22)
+        String hermannEbbinghausLastestTime; //
+        @StatusInfoService_DataAnn(name = "艾賓浩斯記憶更新次數", index = 23)
+        String hermannEbbinghausRuntime; //
     }
 
     StatusInfoService_Data getStatusInfo() {
@@ -223,6 +243,18 @@ public class StatusInfoService {
         val.tenDayExamTime = String.valueOf(tendayBeginCount1);//10日測驗字數
         val.thisMonthBrowserTime = String.valueOf(monthdayBeginCount);//本月瀏覽字數
         val.thisMonthExamTime = String.valueOf(monthdayBeginCount1);//本月測驗字數
+
+        try {
+            Map memoryStateInfo = mService.getMemoryStateInfo();
+            val.hermannEbbinghausStartTime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.START_TIME);
+            val.hermannEbbinghausLastestTime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.LASTEST_TIME);
+            val.hermannEbbinghausRuntime = (String) memoryStateInfo.get(HermannEbbinghaus_Memory_Service.IHermannEbbinghausMemoryAidlInterface_KEY.RUNTIME);
+        } catch (Exception ex) {
+            Log.e(TAG, "getMemoryStateInfo ERR : " + ex.getMessage(), ex);
+            val.hermannEbbinghausStartTime = "NA";
+            val.hermannEbbinghausLastestTime = "NA";
+            val.hermannEbbinghausRuntime = "NA";
+        }
         return val;
     }
 
@@ -264,4 +296,37 @@ public class StatusInfoService {
         wasteTotal = wasteTotal / 24;
         return wasteTotal + "天" + hours + "時" + min + "分" + sec_ + "秒";
     }
+
+    @Override
+    public void finalize() {
+        this.bindServiceMethod(false);
+    }
+
+    private void bindServiceMethod(boolean isOn) {
+        if (ServiceUtil.isServiceRunning(context, HermannEbbinghaus_Memory_Service.class)) {
+            Intent intent = new Intent(context, HermannEbbinghaus_Memory_Service.class);
+            if (isOn) {
+                context.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            } else {
+                context.unbindService(mConnection);
+            }
+        }
+    }
+
+    /**
+     * 設定綁定服務器連線
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.v(TAG, "onServiceConnected called");
+            mService = IHermannEbbinghausMemoryAidlInterface.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.v(TAG, "onServiceDisconnected called");
+            mService = null;
+        }
+    };
 }

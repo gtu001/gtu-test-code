@@ -108,11 +108,15 @@ public class DesktopUtil {
                     logger.log(Level.WARNING, "browse try 1 : " + ex.getMessage());
                     File file = getFile(url);
                     logger.log(Level.WARNING, "file : " + file);
-                    try {
-                        Desktop.getDesktop().open(file);
-                    }catch(Exception ex1){
-                        logger.log(Level.WARNING, "browse try 2 : " + ex1.getMessage());
-                        Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", file));
+                    if (file == null || !file.exists()) {
+                        throw new Exception("file : " + file + " not exists !!");
+                    } else {
+                        try {
+                            Desktop.getDesktop().open(file);
+                        } catch (Exception ex1) {
+                            logger.log(Level.WARNING, "browse try 2 : " + ex1.getMessage());
+                            Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", file));
+                        }
                     }
                 }
             } else {
