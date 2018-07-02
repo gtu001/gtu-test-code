@@ -478,9 +478,14 @@ public class EnglishSearchUI extends JFrame {
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                     System.out.println("DEL00000000000000000000000000000000");
                     clearAllInput();
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    if (EnglishSearchUI.this.isVisible()) {
+                        EnglishSearchUI.this.setVisible(false);
+                    }
                 }
             }
         });
+
         searchEnglishIdTextController.get().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -1195,6 +1200,10 @@ public class EnglishSearchUI extends JFrame {
             (e.getModifiers() & NativeInputEvent.ALT_MASK) != 0 && //
                     e.getKeyCode() == NativeKeyEvent.VC_X) {
                 startNewUI();
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                // if(EnglishSearchUI.this.isVisible()) {
+                // EnglishSearchUI.this.setVisible(false);
+                // }
             }
         }
 

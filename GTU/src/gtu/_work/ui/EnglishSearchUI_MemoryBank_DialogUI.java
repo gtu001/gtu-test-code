@@ -13,9 +13,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -26,9 +25,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.reflect.MethodUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -38,6 +39,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JTextWidthFitter;
 
 public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
@@ -50,7 +52,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private JRadioButton q5Radio;
     private ButtonGroup btnGroup;
     private int choiceIndex = -1;
-    private String[] meaningLst;
+    private AtomicReference<String[]> meaningLst = new AtomicReference<String[]>();
     private String choiceAnswer;
     private ActionListener deleteConfigAction;
     private ActionListener choiceRadioAction;
@@ -72,14 +74,19 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private JComboBox windowSizeComboBox;
     private static AtomicInteger KEY_MAPPING_INDEX = new AtomicInteger(-1);
     private static AtomicInteger WINDOW_SIZE_INDEX = new AtomicInteger(-1);
+    private static AtomicInteger ALIGENT_TYPE_INDEX = new AtomicInteger(-1);
     private static final int MAX_LENGTH_DESC = 40;
     private JButton appendBtn;
+    private JComboBox alignTypeComboBox;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        String[] arry = new String[] { "測試aA1", "測試bB2", "測試cC3", "測試dD4", "測試eE5" };
+        String testStr = "讓各位久等 Vue 課程的重頭戲了！" + //
+                "近三小時的前後端分離電商 API 教學已上架，" + //
+                "請各位盡情享用~";//
+        String[] arry = new String[] { testStr, testStr, testStr, testStr, testStr };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
         dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null, null);
@@ -109,7 +116,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     ) {
         try {
             setTitle(title);
-            this.meaningLst = meaningLst;
+            this.meaningLst.set(meaningLst);
             englishWordLabel.setText(englishWord);
             q1Radio.setText(__getArryByIndex(meaningLst, 0));
             q2Radio.setText(__getArryByIndex(meaningLst, 1));
@@ -125,8 +132,21 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             this.onCreateAction = onCreateAction;
             this.onDismissAction = onDismissAction;
             this.appendBtnAction = appendBtnAction;
+            this.initialAfter();
         } catch (Exception e) {
             JCommonUtil.handleException(e);
+        }
+    }
+
+    private void initialAfter() {
+        if (KEY_MAPPING_INDEX.get() != -1) {
+            hotKeyComboBox.setSelectedIndex(KEY_MAPPING_INDEX.get());
+        }
+        if (WINDOW_SIZE_INDEX.get() != -1) {
+            windowSizeComboBox.setSelectedIndex(WINDOW_SIZE_INDEX.get());
+        }
+        if (ALIGENT_TYPE_INDEX.get() != -1) {
+            alignTypeComboBox.setSelectedIndex(ALIGENT_TYPE_INDEX.get());
         }
     }
 
@@ -138,7 +158,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             choiceIndex = index;
         }
         System.out.println("choiceIndex = " + choiceIndex);
-        choiceAnswer = meaningLst[choiceIndex];
+        choiceAnswer = this.meaningLst.get()[choiceIndex];
         System.out.println("choiceAnswer = " + choiceAnswer);
         if (choiceRadioAction != null) {
             choiceRadioAction.actionPerformed(new ActionEvent(this, choiceIndex, choiceAnswer));
@@ -241,7 +261,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
-                deleteFromMemoryBankBtn = new JButton("從設定檔中刪除");
+                deleteFromMemoryBankBtn = new JButton("刪除");
                 deleteFromMemoryBankBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         if (deleteConfigAction != null) {
@@ -250,7 +270,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                     }
                 });
                 {
-                    customDescBtn = new JButton("修正解釋");
+                    customDescBtn = new JButton("修正");
                     customDescBtn.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             if (customDescAction != null) {
@@ -258,7 +278,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                             }
                         }
                     });
-                    {
+                    // -------------------------------------------
+                    if (true) {
                         hotKeyComboBox = new JComboBox();
                         hotKeyComboBox.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent arg0) {
@@ -268,6 +289,11 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                                 KEY_MAPPING_INDEX.set(hotKeyComboBox.getSelectedIndex());
                             }
                         });
+                        hotKeyComboBox.setModel(JComboBoxUtil.createModel(KeyMapping.values()));
+                        buttonPane.add(hotKeyComboBox);
+                    }
+                    // -------------------------------------------
+                    if (true) {
                         windowSizeComboBox = new JComboBox();
                         windowSizeComboBox.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent arg0) {
@@ -279,17 +305,22 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                         });
                         windowSizeComboBox.setModel(JComboBoxUtil.createModel(WindowSizeHandler.values()));
                         buttonPane.add(windowSizeComboBox);
-                        buttonPane.add(hotKeyComboBox);
-                        hotKeyComboBox.setModel(JComboBoxUtil.createModel(KeyMapping.values()));
-                        if (KEY_MAPPING_INDEX.get() != -1) {
-                            hotKeyComboBox.setSelectedIndex(KEY_MAPPING_INDEX.get());
-                        }
                     }
-                    {
-                        if (WINDOW_SIZE_INDEX.get() != -1) {
-                            windowSizeComboBox.setSelectedIndex(WINDOW_SIZE_INDEX.get());
-                        }
+                    // -------------------------------------------
+                    if (true) {
+                        alignTypeComboBox = new JComboBox();
+                        alignTypeComboBox.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent arg0) {
+                                ((AlignType) alignTypeComboBox.getSelectedItem()).apply(EnglishSearchUI_MemoryBank_DialogUI.this);
+                                JCommonUtil.setFoucsToChildren(EnglishSearchUI_MemoryBank_DialogUI.this, EnglishSearchUI_MemoryBank_DialogUI.this);
+                                EnglishSearchUI_MemoryBank_DialogUI.this.requestFocusInWindow();
+                                ALIGENT_TYPE_INDEX.set(alignTypeComboBox.getSelectedIndex());
+                            }
+                        });
+                        alignTypeComboBox.setModel(JComboBoxUtil.createModel(AlignType.values()));
+                        buttonPane.add(alignTypeComboBox);
                     }
+                    // -------------------------------------------
                     {
                         appendBtn = new JButton("加字");
                         appendBtn.addActionListener(new ActionListener() {
@@ -345,6 +376,13 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             @Override
             public void keyPressed(KeyEvent e) {
                 System.out.println("Dialog Key Event - " + e.getKeyChar() + ", " + e.getKeyCode());
+
+                // Key ESC
+                if (e.getKeyCode() == 27 && skipBtnAction != null) {
+                    skipBtnAction.actionPerformed(null);
+                    return;
+                }
+
                 KeyMapping emun = (KeyMapping) hotKeyComboBox.getSelectedItem();
                 emun.applyEvent(e, EnglishSearchUI_MemoryBank_DialogUI.this);
             }
@@ -365,9 +403,9 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
     public void setNewMeaning(String oldMeaning, String newMeaning) {
         JRadioButton[] radioArry = new JRadioButton[] { q1Radio, q2Radio, q3Radio, q4Radio, q5Radio };
-        for (int ii = 0; ii < meaningLst.length; ii++) {
-            if (StringUtils.equals(oldMeaning, meaningLst[ii])) {
-                meaningLst[ii] = newMeaning;
+        for (int ii = 0; ii < meaningLst.get().length; ii++) {
+            if (StringUtils.equals(oldMeaning, meaningLst.get()[ii])) {
+                meaningLst.get()[ii] = newMeaning;
                 radioArry[ii].setText(newMeaning);
             }
         }
@@ -418,29 +456,37 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         }
 
         private void apply(EnglishSearchUI_MemoryBank_DialogUI _this) {
-            _this.englishWordLabel.setFont(new Font("Consolas", Font.PLAIN, questionLabelSize));
-            JComponent[] radios = new JComponent[] { _this.q1Radio, _this.q2Radio, _this.q3Radio, _this.q4Radio, _this.q5Radio, };
-            JComponent[] hotkeys = new JComponent[] { _this.q1Label, _this.q2Label, _this.q3Label, _this.q4Label, _this.q5Label };
-            for (JComponent c : radios) {
-                c.setFont(new Font("新細明體", Font.PLAIN, answerLabelSize));
-            }
-            for (JComponent c : hotkeys) {
-                c.setFont(new Font("新細明體", Font.PLAIN, kotKeyLabelSize));
-            }
             if (this == NORMAL) {
                 _this.setBounds(100, 100, 650, 285);
             } else {
                 _this.setBounds(100, 100, 1280, 520);
             }
+
+            _this.englishWordLabel.setFont(new Font("Consolas", Font.PLAIN, questionLabelSize));
+
+            JComponent[] radios = new JComponent[] { _this.q1Radio, _this.q2Radio, _this.q3Radio, _this.q4Radio, _this.q5Radio, };
+            JComponent[] hotkeys = new JComponent[] { _this.q1Label, _this.q2Label, _this.q3Label, _this.q4Label, _this.q5Label };
+            for (int index = 0; index < radios.length; index++) {
+                JComponent c = radios[index];
+                c.setFont(new Font("新細明體", Font.PLAIN, answerLabelSize));
+
+                if (_this.meaningLst.get() != null) {
+                    _this.fixContentLength(c, _this.meaningLst.get()[index], answerLabelSize, (int) (_this.getWidth() * 0.95));
+                }
+            }
+            for (JComponent c : hotkeys) {
+                c.setFont(new Font("新細明體", Font.PLAIN, kotKeyLabelSize));
+            }
+
             JCommonUtil.setJFrameCenter(_this);
         }
     }
 
     private enum KeyMapping {
-        WSADZ(new char[] { 'W', 'S', 'A', 'D', 'Z' }), //
-        wsadz(new char[] { 'w', 's', 'a', 'd', 'z' }), //
-        ABCDE(new char[] { 'A', 'B', 'C', 'D', 'E' }), //
         abcde(new char[] { 'a', 'b', 'c', 'd', 'e' }), //
+        ABCDE(new char[] { 'A', 'B', 'C', 'D', 'E' }), //
+        wsadz(new char[] { 'w', 's', 'a', 'd', 'z' }), //
+        WSADZ(new char[] { 'W', 'S', 'A', 'D', 'Z' }), //
         _12345(new char[] { '1', '2', '3', '4', '5' }), //
         _上下左右空白(new int[] { 38, 40, 37, 39, 32 }),//
         ;
@@ -511,5 +557,38 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                 break;
             }
         }
+    }
+
+    private enum AlignType {
+        左(SwingConstants.LEADING, true), //
+        右(SwingConstants.RIGHT, false),//
+        ;
+
+        final int type;
+        final boolean visible;
+
+        AlignType(int type, boolean visible) {
+            this.type = type;
+            this.visible = visible;
+        }
+
+        private void apply(EnglishSearchUI_MemoryBank_DialogUI _this) {
+            try {
+                JComponent[] ary = new JComponent[] { _this.englishWordLabel, _this.q1Radio, _this.q2Radio, _this.q3Radio, _this.q4Radio, _this.q5Radio };
+                for (JComponent v : ary) {
+                    MethodUtils.invokeMethod(v, "setHorizontalAlignment", type);
+                }
+                JComponent[] ary1 = new JComponent[] { _this.q1Label, _this.q2Label, _this.q3Label, _this.q4Label, _this.q5Label, };
+                for (JComponent v : ary1) {
+                    v.setVisible(visible);
+                }
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+    }
+
+    private void fixContentLength(JComponent component, String content, int fontSize, int boundryWidth) {
+        JTextWidthFitter.getInstance().setFitTextWidth(component, content, fontSize, boundryWidth);
     }
 }
