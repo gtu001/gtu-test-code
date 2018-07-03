@@ -27,8 +27,6 @@ $ docker logs --follow [container name]
 $ docker exec -it [container name] cli
 $ docker exec -it [container name] bash
 
-#安裝image
-$ docker build [放Dockerfile的目錄路徑]
 
 
 #下載image or container 去 docker store 或 docker hub
@@ -41,3 +39,17 @@ $ docker pull [image name]
 
 #查詢container ip組態
 docker inspect keen_swanson | findstr IPAddress
+
+
+--------------------------------------------------------------------------
+#安裝image
+$ docker build [放Dockerfile的目錄路徑]
+
+#image build
+
+# 若Dockerfile 在當前目錄, 且相關檔案也再一起
+sudo docker build -t <tag>  .
+
+# 若Dockerfile 在其他目錄
+sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
+--------------------------------------------------------------------------

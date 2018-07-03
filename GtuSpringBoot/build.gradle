@@ -4,31 +4,93 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+    	jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
+	dependencies {
+        classpath('se.transmode.gradle:gradle-docker:1.2')//for docker image
+    }
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'docker'//for docker image
+
 
 group = 'com.gtu.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-repositories {
-	mavenCentral()
+bootJar {
+    baseName = 'GtuSpringBoot'
+    version =  '0.1.0'
+    classifier = 'boot'
+    excludeDevtools = false
+    mainClassName = 'com.gtu.example.Application'
 }
 
+springBoot {
+	mainClassName = 'com.gtu.example.Application'
+}
+
+jar {
+	baseName = "GtuSpringBoot"
+	enabled = true
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest { attributes 'Main-Class': 'com.gtu.example.Application' }
+}
+
+task copyJar(type: Copy) {
+    dependsOn   'jar'
+    from        "build/libs/GtuSpringBoot-${project.version}.jar"
+    into        'build/docker'
+    rename { String fileName ->
+        fileName.replace("-${project.version}", "")
+    }
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.gtu.example.Application'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task buildDocker(type: Docker) {
+	baseImage = 'develar/java:latest'
+	push = project.hasProperty('push')
+	tag = 'gtu001/gtu001_spring_boot_image'
+	addFile {
+	    from jar
+	    rename {'app_1.jar'}
+	}
+	entryPoint(['java', '-Djava.security.egd=file:/dev/./urandom', '-jar', '/app_1.jar'])
+	// exposePort(8080)
+}
+
+buildDocker.dependsOn(build)
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
-	compile('org.springframework.boot:spring-boot-maven-plugin')	
+	//compile('org.springframework.boot:spring-boot-maven-plugin')//加了會錯啊災
 	
-	compile("org.springframework.boot:spring-boot-dependencies")
+	//compile("org.springframework.boot:spring-boot-dependencies")//加了會錯啊災
 	compile("org.springframework.boot:spring-boot-starter-web")
 	
 	compile("org.springframework.boot:spring-boot-devtools")
@@ -37,6 +99,9 @@ dependencies {
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	
+	compile("se.transmode.gradle:gradle-docker:1.2") //for docker image
+	
 	//compileOnly('javax.servlet:servlet-api:2.5')
 	//provided group: 'javax.servlet', name: 'servlet-api', version: '2.5'
 }
+

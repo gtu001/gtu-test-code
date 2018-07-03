@@ -1,0 +1,3 @@
+
+# 跳過測試
+gradle build -x test 

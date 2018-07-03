@@ -1,0 +1,12 @@
+# 一般複製
+cp -r -f  <src>  <dest>
+
+
+# 複製目的地若已有檔案 舊的會被改成 xx.bak
+cp -r -f --backup=existing --suffix=.bak  <src>  <dest>
+
+# 複製目的地若已有檔案 舊的會被改成 xx.~d~ 依序產生
+cp -r -f --backup=numbered  <src>  <dest>
+
+
+

@@ -52,7 +52,7 @@ public class ProcessWatcher {
     }
 
     private byte[] getInputStream(final InputStream is) throws IOException, TimeoutException {
-        return ThreadUtil.getResultTimeout(new Callable<byte[]>() {
+        return ThreadUtil.getFutureResult(new Callable<byte[]>() {
             @Override
             public byte[] call() throws Exception {
                 BufferedInputStream bis = new BufferedInputStream(is);
