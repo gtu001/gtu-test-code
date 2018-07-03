@@ -1,0 +1,23 @@
+
+# Get the IP of the local kubernetes cluster
+minikube ip
+
+
+# SSH into the minikube VM
+minikube ssh
+
+
+# Open the kubernetes dashboard for your local cluster
+minikube dashboard
+
+
+# List the services exposed via a node port
+minikube service list
+
+
+# 安裝 Google Cloud SDK
+curl https://sdk.cloud.google.com | bash
+
+
+# 透過 Google Cloud SDK 安裝 Kubernetes
+gcloud components install kubectl

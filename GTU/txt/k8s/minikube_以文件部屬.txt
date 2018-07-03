@@ -1,0 +1,76 @@
+後臺部屬文件 
+-----------------------------------------------------------------
+kind: Service
+apiVersion: v1
+metadata:
+  name: demo-backend
+spec:
+  selector:
+    app: demo-backend
+  ports:
+  - protocol: TCP
+    port: 8080
+  type: ClusterIP
+  
+-----------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+spec:
+  selector:
+      matchLabels:
+        app: demo-backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: demo-backend
+    spec:
+      containers:
+        - name: demo-backend
+          image: demo-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+
+-----------------------------------------------------------------
+前台部屬文件 
+-----------------------------------------------------------------
+kind: Service
+apiVersion: v1
+metadata:
+  name: demo-frontend
+spec:
+  selector:
+    app: demo-frontend
+  ports:
+  - protocol: TCP
+    port: 8081
+    nodePort: 30001
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-frontend
+spec:
+  selector:
+      matchLabels:
+        app: demo-frontend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: demo-frontend
+    spec:
+      containers:
+        - name: demo-frontend
+          image: demo-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+
+-----------------------------------------------------------------
+部屬指令
+kubectl create -f frontend-deployment.yaml

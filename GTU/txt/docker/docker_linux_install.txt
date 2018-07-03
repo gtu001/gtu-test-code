@@ -69,3 +69,19 @@ sudo apt-get purge docker
 --Images, containers, volumes, or customized configuration files on your host are not automatically removed. To delete all images, containers, and volumes
 sudo rm -rf /var/lib/docker
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

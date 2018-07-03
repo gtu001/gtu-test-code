@@ -256,8 +256,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
             final JButton btnNewButton = new JButton("開啟");
             btnNewButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    String url = StringUtils.trimToEmpty(urlText.getText());
-                    commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
+                    try {
+                        String url = StringUtils.trimToEmpty(urlText.getText());
+                        commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
                 }
             });
             btnNewButton.addMouseListener(new MouseAdapter() {
@@ -268,6 +272,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
             panel_2.add(btnNewButton);
+
+            JButton showInDirectoryBtn = new JButton("目錄");
+            showInDirectoryBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        String url = StringUtils.trimToEmpty(urlText.getText());
+                        File file = DesktopUtil.getFile(url);
+                        if (file.exists()) {
+                            DesktopUtil.openDir(url);
+                        }
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
+                }
+            });
+            panel_2.add(showInDirectoryBtn);
             panel_2.add(saveBtn);
 
             JButton deleteBtn = new JButton("刪除");
@@ -526,7 +546,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         public void doOpen(String url, BrowserHistoryHandlerUI _this) {
             url = StringUtils.trimToEmpty(url);
-            UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
+
+            if (StringUtils.isBlank(url)) {
+                return;
+            }
+
+            UrlConfig d = null;
+
+            try {
+                d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
+            } catch (Exception ex) {
+                DesktopUtil.browse(url);
+                return;
+            }
+
             System.out.println("[doOpen]>>>" + this.name());
 
             // 判斷是否為自動產生
@@ -1242,6 +1275,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private String getHtmlTitle(String url) throws IOException {
+        url = StringUtils.trimToEmpty(url);
+        try {
+            File file = DesktopUtil.getFile(url);
+            if (file.exists()) {
+                return file.getName();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         String title = "";
         try {
             String content = __doGetRequest_UserAgent(url, "UTF-8", DEFAULT_USER_AGENT);
@@ -1635,7 +1678,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void doOpenWithRemark(UrlConfig d) {
         try {
             String command = d.remark;
-            if (command.contains("%s")) {
+            command = StringUtils.trimToEmpty(command);
+
+            Pattern ptn = Pattern.compile("\\%(?:1\\$|)s");
+            Matcher mth = ptn.matcher(command);
+            if (mth.find()) {
                 File file = DesktopUtil.getFile(d.url);
                 if (file == null || !file.exists() || !file.isFile()) {
                     JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
@@ -1645,6 +1692,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             } else {
                 // do nothing
             }
+
             RuntimeBatPromptModeUtil.newInstance().command(command).apply();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

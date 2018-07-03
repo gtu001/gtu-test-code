@@ -1,0 +1,18 @@
+<<ubuntu>>
+
+
+重開機按 shift 進入 回復模式 recovery mode
+
+選擇登入帳號
+
+
+$> mount -o rw,remount /
+
+
+$> passwd <account>
+
+
+輸入密碼
+
+
+done...
