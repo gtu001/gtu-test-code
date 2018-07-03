@@ -1,0 +1,3 @@
+$ mkdir /opt/gradle
+$ unzip -d /opt/gradle gradle-4.8.1-bin.zip
+$ ls /opt/gradle/gradle-4.8.1

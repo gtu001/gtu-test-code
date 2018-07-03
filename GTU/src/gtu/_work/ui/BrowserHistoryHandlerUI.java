@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -475,6 +477,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
                     UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
+                    ;
                     if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                         DesktopUtil.browse(url);
                     } else {
@@ -552,24 +555,23 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
 
             UrlConfig d = null;
-
             try {
                 d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
             } catch (Exception ex) {
-                DesktopUtil.browse(url);
-                return;
             }
 
             System.out.println("[doOpen]>>>" + this.name());
 
             // 判斷是否為自動產生
-            if (StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+            if (d != null && StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                 // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
             } else {
                 _doOpen(url, _this);
             }
 
-            _this.clickUrlDoLogAction(d);
+            if (d != null) {
+                _this.clickUrlDoLogAction(d);
+            }
         }
 
         public String toString() {
@@ -1146,7 +1148,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tableUtil.setColumnColor_byCondition(UrlTableConfigEnum.url.ordinal(), new JTableUtil.TableColorDef() {
                 public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     String url = (String) tableUtil.getRealValueAt(row, UrlTableConfigEnum.url.ordinal());
-                    if (DesktopUtil.getFile(url) != null) {
+                    if (DesktopUtil.getFile_ignoreFailed(url) != null) {
                         return JColorUtil.rgb("#b3f0ff");
                     } else if (StringUtil_.isUUID(url)) {
                         return JColorUtil.rgb("#ffeba5");
@@ -1408,7 +1410,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(parent);//
 
                 // 檔案的處理
-                if (DesktopUtil.getFile(url) != null) {
+                if (DesktopUtil.getFile_ignoreFailed(url) != null) {
                     popupUtil//
                             .addJMenuItem("開啟目錄", new ActionListener() {
                                 @Override
@@ -1421,7 +1423,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                     }
                                 }
                             })//
-                            .addJMenuItem("以參數開啟", new ActionListener() {
+                            .addJMenuItem("檔案以參數開啟", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     try {
@@ -1453,6 +1455,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     final int[] rowArry = jtab.getSelectedRows();
 
                     popupUtil//
+                            .addJMenuItem("URL以參數開啟", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        String url = StringUtils.trimToEmpty(urlText.getText());
+                                        UrlConfig d = UrlConfig.parseTo(url, bookmarkConfig.getConfigProp().getProperty(url));
+
+                                        String options = JCommonUtil._jOptionPane_showInputDialog("請輸入執行參數", "");
+
+                                        if (StringUtils.isNotBlank(options)) {
+                                            options = URLEncoder.encode(options, "UTF-8");
+                                        }
+                                        String newURL = String.format(url, options);
+
+                                        CommandTypeEnum e1 = CommandTypeEnum.valueOfFrom(d.commandType);
+                                        e1.doOpen(newURL, BrowserHistoryHandlerUI.this);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
                             .addJMenuItem("修改tag", new ActionListener() {
 
                                 private String getDefaultTag() {

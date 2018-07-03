@@ -49,6 +49,15 @@ public class DesktopUtil {
         }
     }
 
+    public static File getFile_ignoreFailed(String url) {
+        try {
+            return getFile(url);
+        } catch (Throwable ex) {
+            System.err.println("<getFile_ignoreFailed> WARNING : " + ex.getMessage());
+            return null;
+        }
+    }
+
     public static File getFile(String url) {
         try {
             if (!isFile(url)) {
