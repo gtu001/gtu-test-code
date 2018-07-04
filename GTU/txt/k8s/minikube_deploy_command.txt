@@ -19,9 +19,17 @@ kubectl cluster-info
 # Create a deployment
 kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
 
+<<<暫時放>>>
+kubectl run gtu001-boot --image=gtu001/gtu001_boot:v1 --port=8080 //(後面別用)--image-pull-policy Never
+kubectl expose deployment gtu001-boot --type=NodePort
+
 
 # 取得部屬項目
 kubectl get deployments
+
+
+# 刪除部屬項目
+kubectl delete deployment <name>
 
 
 # Expose it
@@ -37,7 +45,7 @@ kubectl get pods
 kubectl logs <pod id>
 
 
-# 看啟動的服務
+# 看啟動的服務 (看ip)
 kubectl get services
 
 
@@ -59,6 +67,18 @@ curl $(minikube service hello-minikube --url)
 
 
 
+#---------------------------------------------------------
+看image部屬流程
+$ kubectl get pod
+$ kubectl describe pod <pod name>
+or
+$ kubectl logs <pod name>
 
 
+#---------------------------------------------------------
+# 更新版本 
+$ kubectl set image deployments/<deployment-name> <deployment-name>=<repo-name>/<image-name>:v2
 
+#---------------------------------------------------------
+# port forward
+$ kubectl port-forward <pod name> <external port>:<pod port> 

@@ -1,11 +1,11 @@
-﻿#running containers
+﻿# checkout image 
+$ docker pull ubuntu:14.04
+
+
+#running containers
 $ docker ps
 #all containers
 $ docker ps -a
-
-#列出images
-$ docker images
-
 
 #停止container 
 $ docker stop [container name or id]
@@ -13,9 +13,17 @@ $ docker stop [container name or id]
 $ docker rm [container name or id]
 
 
+#列出images
+$ docker images
+
+
 #掛載images
 $ docker run -dit --net=host -v [本地位置]  --name=[container name]  [image id]
 Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
+
+#執行images 指定 一個container 名子
+docker run --name <image> -t <container name>
+
 
 #刪除image
 $ docker rmi [image id]
@@ -52,4 +60,13 @@ sudo docker build -t <tag>  .
 
 # 若Dockerfile 在其他目錄
 sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
+--------------------------------------------------------------------------
+
+
+#上傳 image 到 docker repo
+1.先到網站註冊 image --> https://hub.docker.com/
+2.記住image命名 : account/imageName -> imageName
+
+$ docker push imageName[:tag] 
+
 --------------------------------------------------------------------------
