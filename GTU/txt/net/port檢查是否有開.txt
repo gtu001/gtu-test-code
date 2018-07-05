@@ -7,11 +7,22 @@ netstat -an | findstr 50000
 netstat -a -b 
 --看port被哪個PID占用(工作管理員->詳細資料[可看PID])
 netstat -ano | findstr 50000
+--看有在監聽的port 
+netstat -an |find /i "listening"
 
 --刪除程序
 taskkill /PID typeYourPIDhere /F
 
 
+-------------------------------------------------------------------------------
+# Port 有通大概長這樣
+C:\Windows\system32>netstat -ano | findstr 8099
+  TCP    127.0.0.1:8099         0.0.0.0:0              LISTENING       12920
+  TCP    127.0.0.1:8099         127.0.0.1:54163        ESTABLISHED     12920
+  TCP    127.0.0.1:54163        127.0.0.1:8099         ESTABLISHED     10556
+
+
+-------------------------------------------------------------------------------
 #linux ------------------------------------------------------------------------
 
 netstat -nlp|grep 9000 
@@ -27,3 +38,23 @@ netstat -ap | grep 34465
 會顯示
 tcp        0      0 machine.name:34465  oracle.db.com:ncube-lm ESTABLISHED 4030/java
 程序為 PID : 4030, kill即可
+
+
+-------------------------------------------------------------------------------
+linux 要安裝此套件  (netstat)
+
+apt-get update
+apt-get install net-tools
+
+-------------------------------------------------------------------------------
+linux 測ip:port連線 (nc)
+
+apt-get update
+apt-get install netcat
+
+
+-------------------------------------------------------------------------------
+用網址確認 port 是否有開
+https://www.yougetsignal.com/tools/open-ports/
+
+-------------------------------------------------------------------------------
