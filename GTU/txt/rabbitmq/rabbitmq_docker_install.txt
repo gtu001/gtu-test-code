@@ -14,7 +14,7 @@ docker run -it --link some-rabbit:my-rabbit  -e RABBITMQ_ERLANG_COOKIE='secret c
 
 
 
-<<暫放>>
+## 最後用這版建立 container 較完整
 docker run -d -p 5672:5672 -p 15672:15672   --hostname  my-rabbit --name  some-rabbit   pause_rabbit  
 
 
@@ -35,6 +35,15 @@ docker inspect some-rabbit | findstr IPAddress
 docker exec  <container>  rabbitmqctl  <command>
 Ex: docker exec some-rabbit  rabbitmqctl start_app <--啟動 
 
+
+-------------------------------------------------------------------------------
+
+啟用 managerment-plugin 可用 localhost:15672 進度管理畫面
+
+指令如下
+$ rabbitmq-plugins enable rabbitmq_management
+
+管理介面帳號密碼  guest / guest 
 
 -------------------------------------------------------------------------------
 
