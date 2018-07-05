@@ -1,0 +1,53 @@
+
+# 網址
+https://hub.docker.com/_/rabbitmq/
+
+
+docker pull rabbitmq
+
+
+# 啟動   [預設  port 5672]
+$ docker run -d --hostname  my-rabbit --name <container name> rabbitmq:<Tag>
+
+# 啟動 management  <把 -e RABBITMQ_ERLANG_COOKIE='secret cookie here' 拿掉>
+docker run -it --link some-rabbit:my-rabbit  -e RABBITMQ_ERLANG_COOKIE='secret cookie here' -e RABBITMQ_NODENAME=rabbit@my-rabbit rabbitmq:3 bash 
+
+
+
+<<暫放>>
+docker run -d -p 5672:5672 -p 15672:15672   --hostname  my-rabbit --name  some-rabbit   pause_rabbit  
+
+
+
+# 啟動 management (-p 把port 8080導向container的15672)
+$ docker run -d --hostname my-rabbit --name some-rabbit -p 8080:15672 rabbitmq:3-management
+
+
+# 看log
+docker logs some-rabbit
+
+
+# 看 ip
+docker inspect some-rabbit | findstr IPAddress
+
+
+# 執行 rabbitmq 使用  rabbitmqctl
+docker exec  <container>  rabbitmqctl  <command>
+Ex: docker exec some-rabbit  rabbitmqctl start_app <--啟動 
+
+
+-------------------------------------------------------------------------------
+
+設定黨位置
+
+/etc/rabbitmq/
+
+參考網址 https://www.rabbitmq.com/configure.html#config-location
+-------------------------------------------------------------------------------
+
+rabbitmqctl 指令
+
+start_app 啟動
+list_queues 看queue
+status
+environment

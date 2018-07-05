@@ -13,6 +13,7 @@ minikube dashboard
 
 # List the services exposed via a node port
 minikube service list
+kubectl get services --all-namespaces
 
 
 # 安裝 Google Cloud SDK

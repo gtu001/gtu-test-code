@@ -1,55 +1,115 @@
-﻿#running containers
+﻿# checkout image 
+$ docker pull ubuntu:14.04
+
+
+# running containers
 $ docker ps
-#all containers
+# all containers
 $ docker ps -a
 
-#列出images
+# 停止container 
+$ docker stop [container name or id]
+# 移除container 
+$ docker rm [container name or id] -f (強制)
+
+
+# 列出images
 $ docker images
 
 
-#停止container 
-$ docker stop [container name or id]
-#移除container 
-$ docker rm [container name or id]
-
-
-#掛載images
+# 掛載images
 $ docker run -dit --net=host -v [本地位置]  --name=[container name]  [image id]
 Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
 
-#刪除image
-$ docker rmi [image id]
+#執行images 指定 一個container 名子
+docker run --name <image> -t <container name>
 
-#顯示container log
+
+
+# 刪除image
+$ docker rmi [image id] -f (強制)
+
+# 顯示container log
 $ docker logs --follow [container name]
 
-#連線使用container console
+# 連線使用container console
 $ docker exec -it [container name] cli
 $ docker exec -it [container name] bash
+$ docker exec -it $CONTAINER_ID /bin/bash
 
 
 
-#下載image or container 去 docker store 或 docker hub
+# 下載image or container 去 docker store 或 docker hub
 $ docker pull [image name]
 
 
-#無法pull任何image時
+# 無法pull任何image時
 --> 右鍵Settings -> Network -> DNS Server -> 選 Fixed : 8.8.8.8
 
 
-#查詢container ip組態
+# 查詢container ip組態
 docker inspect keen_swanson | findstr IPAddress
 
 
 --------------------------------------------------------------------------
-#安裝image
+# 安裝image
 $ docker build [放Dockerfile的目錄路徑]
 
-#image build
+# image build
 
 # 若Dockerfile 在當前目錄, 且相關檔案也再一起
 sudo docker build -t <tag>  .
 
 # 若Dockerfile 在其他目錄
 sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
+--------------------------------------------------------------------------
+
+
+# 上傳 image 到 docker repo
+1.先到網站註冊 image --> https://hub.docker.com/
+2.記住image命名 : account/imageName -> imageName
+
+$ docker push imageName[:tag] 
+
+--------------------------------------------------------------------------
+
+# 改變 docker 執行指令 
+
+$ docker commit $CONTAINER_ID user/test_image
+$ docker run -it --entrypoint=sh user/test_image
+$ docker run -it --entrypoint " xxx xxx " user/test_image
+$ docker run -ti --entrypoint=/bin/bash  user/test_image  -s
+
+--------------------------------------------------------------------------
+# run images
+
+docker run -it -d --rm -h 
+	i 可互動 
+	t 假的tty
+	d 背景執行 
+	rm  離開時自動移除container
+	p 本機port : container port , Ex: -p 80:80
+	h 給主機名 Ex: -h www.myhost.net
+	v 給實體空間位置  Ex: -v /var/www/html 
+	
+	
+--------------------------------------------------------------------------
+# 在container 灌 vi
+
+apt-get update
+apt-get install vim
+--------------------------------------------------------------------------
+# port forward 
+
+docker run -d -p 5801:5801 -p 5802:5802 .....
+	-p (本基  port) : (container port)
+--------------------------------------------------------------------------
+# 測連線通
+    curl ip:port
+    curl container-name:port
+
+--------------------------------------------------------------------------
+# 取得 container 的 pid
+
+docker inspect --format='{{.State.Pid}}' <container>
 --------------------------------------------------------------------------

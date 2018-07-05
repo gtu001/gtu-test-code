@@ -6,6 +6,17 @@ docker load -i <path to image tar file>
 
 
 
+
+
+------------------------------------------------------
+
+
+--從已存在的影像檔build
+docker  load  --input  C:/Users/wistronits/Desktop/VM/test.img
+
+
+
+
 ------------------------------------------------------
 --存取image至ssh
 
