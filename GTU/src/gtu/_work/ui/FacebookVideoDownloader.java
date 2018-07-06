@@ -19,6 +19,9 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -40,6 +43,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.javafx.traynotification.NotificationType;
 import gtu.javafx.traynotification.TrayNotificationHelper;
@@ -49,6 +53,7 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.youtube.DownloadProgressHandler;
 import gtu.youtube.JavaYoutubeVideoUrlHandler;
@@ -87,7 +92,7 @@ public class FacebookVideoDownloader extends JFrame {
                 maxSize = Integer.parseInt(downloadThreadSizeText.getText());
             } catch (Exception ex) {
             }
-//            System.out.println("目前同時最大下載數 : " + maxSize);
+            // System.out.println("目前同時最大下載數 : " + maxSize);
             return maxSize;
         }
 
@@ -235,6 +240,12 @@ public class FacebookVideoDownloader extends JFrame {
         panel.add(label);
 
         urlText = new JTextField();
+        urlText.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                urlTextMouseAction(arg0);
+            }
+        });
         panel.add(urlText);
         urlText.setColumns(35);
 
@@ -524,66 +535,86 @@ public class FacebookVideoDownloader extends JFrame {
     }
 
     private void urlTextOnBlur(final boolean throwEx) {
-        try {
-            String url = StringUtils.trimToEmpty(urlText.getText()).replaceAll("\t", "");
-            String cookieContent = StringUtils.trimToEmpty(cookieArea.getText());
-            String headerContent = StringUtils.trimToEmpty(headerTextArea.getText());
-            if (StringUtils.isBlank(url)) {
-                return;
-            }
-
-            List<VideoUrlConfig> list = new ArrayList<VideoUrlConfig>();
-
-            String youtubeId = JavaYoutubeVideoUrlHandler.getYoutubeID(url);
-            System.out.println("youtubeId == " + youtubeId);
-            if (StringUtils.isNotBlank(youtubeId)) {
-                JavaYoutubeVideoUrlHandler youtube = new JavaYoutubeVideoUrlHandler(youtubeId, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
-                youtube.execute();
-                list = youtube.getVideoFor91Lst();
-            } else {
-                list = downloader.processVideoLst(url, cookieContent, headerContent);
-                list.addAll(downloader.processVideoLst("\"" + url + "\""));
-            }
-
-            if (list.isEmpty()) {
-                if (throwEx) {
-                    throw new RuntimeException("找步道影片 : " + url);
-                } else {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
-                }
-                return;
-            }
-
-            DefaultTableModel model = JTableUtil.createModel(true, new String[] { "檔名", "URL", "大小", "下載", "VO" });
-            videoTable.setModel(model);
-            JTableUtil.newInstance(videoTable).columnIsButton("下載");
-            JTableUtil.setColumnWidths_Percent(videoTable, new float[] { 60f, 20f, 10f, 10f, 0f });
-            JTableUtil.newInstance(videoTable).hiddenColumn("VO");
-
-            for (int ii = 0; ii < list.size(); ii++) {
-                final VideoUrlConfig vo = list.get(ii);
-
-                JButton b1 = new JButton("download");
-                b1.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        appendToDownloadBar(vo, throwEx);
+        BlockingQueue<String> queue = new ArrayBlockingQueue<String>(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String url = StringUtils.trimToEmpty(urlText.getText()).replaceAll("\t", "");
+                    String cookieContent = StringUtils.trimToEmpty(cookieArea.getText());
+                    String headerContent = StringUtils.trimToEmpty(headerTextArea.getText());
+                    if (StringUtils.isBlank(url)) {
+                        return;
                     }
-                });
 
-                model.addRow(new Object[] { //
-                        vo.getFileName(), //
-                        vo.getUrl(), //
-                        vo.getFizeSize(), ////
-                        b1, //
-                        vo,//
-                });////
+                    List<VideoUrlConfig> list = new ArrayList<VideoUrlConfig>();
+
+                    String youtubeId = JavaYoutubeVideoUrlHandler.getYoutubeID(url);
+                    System.out.println("youtubeId == " + youtubeId);
+                    if (StringUtils.isNotBlank(youtubeId)) {
+                        JavaYoutubeVideoUrlHandler youtube = new JavaYoutubeVideoUrlHandler(youtubeId, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
+                        youtube.execute();
+                        list = youtube.getVideoFor91Lst();
+                    } else {
+                        list = downloader.processVideoLst(url, cookieContent, headerContent);
+                        list.addAll(downloader.processVideoLst("\"" + url + "\""));
+                    }
+
+                    if (list.isEmpty()) {
+                        if (throwEx) {
+                            throw new RuntimeException("找步道影片 : " + url);
+                        } else {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
+                        }
+                        return;
+                    }
+
+                    DefaultTableModel model = JTableUtil.createModel(true, new String[] { "檔名", "URL", "大小", "下載", "VO" });
+                    videoTable.setModel(model);
+                    JTableUtil.newInstance(videoTable).columnIsButton("下載");
+                    JTableUtil.setColumnWidths_Percent(videoTable, new float[] { 60f, 20f, 10f, 10f, 0f });
+                    JTableUtil.newInstance(videoTable).hiddenColumn("VO");
+
+                    for (int ii = 0; ii < list.size(); ii++) {
+                        final VideoUrlConfig vo = list.get(ii);
+
+                        JButton b1 = new JButton("download");
+                        b1.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                appendToDownloadBar(vo, throwEx);
+                            }
+                        });
+
+                        model.addRow(new Object[] { //
+                                vo.getFileName(), //
+                                vo.getUrl(), //
+                                vo.getFizeSize(), ////
+                                b1, //
+                                vo,//
+                        });////
+                    }
+                } catch (Exception ex) {
+                    if (throwEx) {
+                        throw new RuntimeException("urlTextOnBlur ERR : " + ex.getMessage(), ex);
+                    } else {
+                        JCommonUtil.handleException(ex);
+                    }
+                } finally {
+                    queue.offer("done..");
+                }
             }
-        } catch (Exception ex) {
+        }).start();
+
+        final int SEC = 60;
+        try {
+            queue.poll(SEC * 1000L, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            String message = "時間超出範圍 " + SEC + "秒!!";
             if (throwEx) {
-                throw new RuntimeException("urlTextOnBlur ERR : " + ex.getMessage(), ex);
+                throw new RuntimeException(message, ex);
             } else {
-                JCommonUtil.handleException(ex);
+                JCommonUtil.handleException(message, ex);
             }
         }
     }
@@ -665,7 +696,7 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
-    private synchronized void autoDownload(boolean throwEx) {
+    private void autoDownload(boolean throwEx) {
         try {
             urlTextOnBlur(throwEx);
 
@@ -803,7 +834,8 @@ public class FacebookVideoDownloader extends JFrame {
 
     private class DownloadLogKeeper {
         private File logFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), FacebookVideoDownloader.class.getSimpleName() + "_downloadLog.cfg");
-//        private File logFile = new File("E:/my_tool/FacebookVideoDownloader_downloadLog.cfg");
+        // private File logFile = new
+        // File("E:/my_tool/FacebookVideoDownloader_downloadLog.cfg");
         private PropertiesUtilBean config = new PropertiesUtilBean(logFile);
 
         private void continueNotOk() {
@@ -846,6 +878,28 @@ public class FacebookVideoDownloader extends JFrame {
     private void continueLastestDownloadBtnAction() {
         try {
             downloadLog.continueNotOk();
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void urlTextMouseAction(MouseEvent arg0) {
+        try {
+            if (JMouseEventUtil.buttonRightClick(1, arg0)) {
+                JPopupMenuUtil.newInstance(urlText)//
+                        .addJMenuItem("從記事本貼上", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String content = ClipboardUtil.getInstance().getContents();
+                                if (StringUtils.isBlank(content)) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("記事本為空!!");
+                                    return;
+                                }
+                                urlText.setText(content);
+                            }
+                        }).applyEvent(arg0)//
+                        .show();
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
