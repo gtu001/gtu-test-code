@@ -38,12 +38,12 @@ Ex: docker exec some-rabbit  rabbitmqctl start_app <--啟動
 
 -------------------------------------------------------------------------------
 
-啟用 managerment-plugin 可用 localhost:15672 進度管理畫面
+啟用 managerment-plugin 可用 http://localhost:15672 進度管理畫面
 
 指令如下
 $ rabbitmq-plugins enable rabbitmq_management
 
-管理介面帳號密碼  guest / guest 
+管理介面帳號密碼  guest / guest
 
 -------------------------------------------------------------------------------
 
@@ -56,7 +56,9 @@ $ rabbitmq-plugins enable rabbitmq_management
 
 rabbitmqctl 指令
 
-start_app 啟動
+start_app 啟動 rabiitmq
 list_queues 看queue
+list_exchanges
+list_bindings
 status
 environment

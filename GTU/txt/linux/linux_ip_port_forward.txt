@@ -1,0 +1,67 @@
+﻿    ※操作系統為Ubuntu-14.04.4-server-amd64
+    ※使用者為root，如果不是用root操作，請記得加sudo
+
+本機端上：
+
+# 轉送外來tcp port 20022封包到本機的port 22
+root@localhost:~$ iptables -t nat -A PREROUTING -p tcp --dport 20022 -j REDIRECT --to-port 22
+ 
+# 也可以使用-i參數指定網路卡(Interface)，指定網路卡eth0
+root@localhost:~$ iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 20022 -j REDIRECT --to-port 22
+
+
+----------------------------------------------------------
+涉及轉送到其他機器的話，必須先開啟ip forward，有三種方法，但生效時間不一樣
+
+# 注意: 這邊必須以root權限操作，請切換成root或是sudo vim用編輯器編輯
+# 方法一：直接echo 1到檔案，這個方式是暫時開啟，重開機後會消失，如果你只是想要暫時當一下Router可以用這種方式 (1為開啟，0為關閉)
+root@localhost:~$ echo 1 > /proc/sys/net/ipv4/ip_forward
+ 
+# 方法二：使用sysctl進行設定，效果等同第一種方法 (1為開啟，0為關閉)
+root@localhost:~$ sysctl net.ipv4.ip_forward=1
+ 
+# 方法三：將上述兩種方法其中一種指令加到/etc/network/interfaces，這樣子每次網路卡重啟時皆會自動開啟轉送，但如果要當下生效的話還是要先利用上面提到的方法
+root@localhost:~$ echo 'pre-up sysctl net.ipv4.ip_forward=1' >> /etc/network/interfaces
+
+----------------------------------------------------------
+
+進入主題，將封包轉送到其他機器上的指令
+
+# 轉送外來tcp port 20022封包到內網機器192.168.0.1的port 22
+root@localhost:~$ iptables -t nat -A PREROUTING -p tcp --dport 20022 -j DNAT --to 192.168.0.1:22
+root@localhost:~$ iptables -t nat -A POSTROUTING -p tcp --dport 22 --dst 192.168.0.1 -j MASQUERADE
+
+
+----------------------------------------------------------
+測試規則是否生效 (192.168.0.253是Server IP)
+
+root@localhost:~$ nc -zv 192.168.0.253 20022
+Connection to 192.168.0.253 20022 port [tcp/*] succeeded!
+
+若成功了就會出現successed字樣
+實際上server沒有服務在使用port 20022
+但是因為我們設定了iptables做forward
+所以這個封包並沒有進到server，而是直接被轉到內網的192.168.0.1
+而192.168.0.1收到了封包，回傳會先經過server
+server收到了回傳封包，透過POSTROUTING的規則，把封包傳回外網的機器
+
+----------------------------------------------------------
+
+因為自定義的iptables rules在重開機之後就會消失
+所以我們要在重開機後能自動復原rules
+
+#先保存現在已經設定好的rules
+root@localhost:~$ iptables-save > /etc/network/iptables.rules
+
+----------------------------------------------------------
+
+編輯/etc/network/interfaces，在檔案末端加入這行
+
+pre-up iptables-restore < /etc/network/iptables.rules
+
+這樣當網路卡啟用的同時，也會一併載入自訂的rules
+
+----------------------------------------------------------
+
+Updates:
+2017-01-18: 修正錯誤，sysctl重啟網卡後forward一樣會自動關閉，新增自動開啟的方法(第三種)。

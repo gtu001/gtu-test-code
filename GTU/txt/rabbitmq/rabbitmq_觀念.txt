@@ -1,0 +1,12 @@
+教學網址
+https://www.rabbitmq.com/getstarted.html
+
+--------------------------------------------------------------
+
+exchange : 最高層的分類 
+
+queue name : 相當於訂閱者名子
+
+routing key : 相當於訂閱者本身的層級定義 (Ex : [免費, 低額付費, 高額付費 ...] or [debug, info, warn, error, ...])  <--必須使用 direct , 若訊息不分層級要用 fanout
+
+
