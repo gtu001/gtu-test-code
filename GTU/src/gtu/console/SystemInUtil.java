@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Troy 2012/1/2
  * 
@@ -60,6 +62,18 @@ public class SystemInUtil {
      * 
      * @return
      */
+    public static String readLine(String questionLine) {
+        if (StringUtils.isNotBlank(questionLine)) {
+            System.out.print(questionLine);
+        }
+        return readLine();
+    }
+
+    /**
+     * 只讀一行
+     * 
+     * @return
+     */
     public static String readLine() {
         InputStreamReader reader = new InputStreamReader(System.in);
         BufferedReader bufreader = new BufferedReader(reader);
@@ -69,8 +83,8 @@ public class SystemInUtil {
                 line = bufreader.readLine();
                 Thread.sleep(100);
             }
-            //            bufreader.close();
-            //            reader.close();
+            // bufreader.close();
+            // reader.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
