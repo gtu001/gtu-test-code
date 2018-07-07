@@ -107,5 +107,4 @@ public class FileUtilAndroid {
         writer.flush();
         writer.close();
     }
-
 }

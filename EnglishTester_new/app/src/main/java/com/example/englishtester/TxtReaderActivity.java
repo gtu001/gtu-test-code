@@ -49,6 +49,7 @@ import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FileUtilAndroid;
+import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
@@ -830,16 +831,20 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         });
 
         final List<String> fileList = new ArrayList<String>();
+        final List<String> fileInfoList = new ArrayList<String>();
         final Map<String, File> fileMap = new LinkedHashMap<String, File>();
         for (File f : lists) {
             fileList.add(f.getName());
+            fileInfoList.add(String.format("%s %s (%s)", f.getName(),//
+                    DateFormatUtils.format(f.lastModified(), "yyyy/MM/dd HH:mm:ss"), //
+                    FileUtilGtu.getSizeDescription(f.length())));
             fileMap.put(f.getName(), f);
         }
 
         fileList.addAll(fileMap.keySet());
         new AlertDialog.Builder(TxtReaderActivity.this)//
                 .setTitle("選擇dropbox檔案")//
-                .setItems(fileList.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                .setItems(fileInfoList.toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         String filename = fileList.get(paramInt);
