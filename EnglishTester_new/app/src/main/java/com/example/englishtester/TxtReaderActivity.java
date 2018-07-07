@@ -27,6 +27,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -51,8 +53,9 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
+import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.SharedPreferencesUtil;
-import com.example.englishtester.common.SimplePopupDialog;
+import com.example.englishtester.common.TitleTextSetter;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -94,6 +97,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 最近查詢單字
      */
     RecentTxtMarkService recentTxtMarkService;
+    /**
+     * 蘋果字型
+     */
+    AppleFontApplyer appleFontApplyer;
+    /**
+     * 邊界調整
+     */
+    PaddingAdjuster paddingAdjuster;
 
     EditText editText1;
     Button clearBtn;
@@ -114,7 +125,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         System.out.println("# onCreate");
         super.onCreate(savedInstanceState);
 
-        if(!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)){
+        if (!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)) {
             FullPageMentionDialog.builder(R.drawable.full_page_mention_001, this).showDialog();
         }
 
@@ -137,6 +148,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         confirmBtn = (Button) this.findViewById(R.id.confirmBtn);
         linearLayout2 = (LinearLayout) this.findViewById(R.id.linearLayout2);
 
+        //初始化服務
+        initService();
+
         //群組一
         initTextView();
         initTranslateBtn();
@@ -147,10 +161,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         //顯示第二群組
         showGroup(2);
-
-        // 刪除舊資料
-        initService();
-        recentTxtMarkService.deleteOldData();
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final TxtReaderActivity data = (TxtReaderActivity) getLastNonConfigurationInstance();
@@ -221,10 +231,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
         txtView.setMovementMethod(createMovementMethod(this));
-        txtView.setPadding(10, 10, 10, 10);
+        txtView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         txtView.setLineSpacing(10, 1.4f);
+        appleFontApplyer.apply(txtView);
     }
 
     /**
@@ -235,10 +246,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
         translateView.setMovementMethod(createMovementMethod(this));
-        translateView.setPadding(10, 10, 10, 10);
+        translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         translateView.setLineSpacing(10, 1.4f);
+        appleFontApplyer.apply(translateView);
     }
 
     /**
@@ -308,6 +320,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     private void initService() {
         dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
+
+        appleFontApplyer = new AppleFontApplyer();
+        paddingAdjuster = new PaddingAdjuster();
+
+        // 刪除舊資料
+        recentTxtMarkService.deleteOldData();
         doOnoffService(true);
     }
 
@@ -331,12 +349,21 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             final String txtNow = txtContent_.substring(start, end);
 
             WordSpan clickableSpan = new WordSpan(index) {
+
+                private void checkFloatServiceOn() {
+                    if (!ServiceUtil.isServiceRunning(TxtReaderActivity.this, FloatViewService.class)) {
+                        doOnoffService(true);
+                    }
+                }
+
                 @Override
                 public void onClick(View view) {
                     Log.v(TAG, "click " + this.id + " - " + txtNow);
 
                     //myService.searchWordForActivity(txtNow);
                     try {
+                        checkFloatServiceOn();
+
                         mService.searchWord(txtNow);
                     } catch (RemoteException e) {
                         Log.e(TAG, e.getMessage(), e);
@@ -498,7 +525,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 }
                                 final String reulstStr = getResultStr(dto.content);
                                 Log.v(TAG, "reulstStr - " + reulstStr);
-                                if(StringUtils.isBlank(reulstStr)){
+                                if (StringUtils.isBlank(reulstStr)) {
                                     throw new Exception("翻譯結果為空,無法翻譯!");
                                 }
                                 handler.post(new Runnable() {
@@ -817,33 +844,66 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         String filename = fileList.get(paramInt);
                         File txtFile = fileMap.get(filename);
-                        try {
-                            setFileName(txtFile.getName());
-                            String content = FileUtilAndroid.loadFileToString(txtFile);
-
-                            StringBuilder engSb = new StringBuilder();
-                            StringBuilder chsSb = new StringBuilder();
-
-                            for (char c : content.toCharArray()) {
-                                if (new String(new char[]{c}).getBytes().length >= 3) {
-                                    chsSb.append(c);
-                                    if (c == '。') {
-                                        chsSb.append("\n");
-                                    }
-                                } else {
-                                    engSb.append(c);
-                                }
-                            }
-
-                            setContentText(engSb.toString());
-                            translateView.setText(chsSb.toString());
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getMessage(), e);
-                            throw new RuntimeException(e);
-                        }
+                        setTxtContentFromFile(txtFile);
                     }
                 })//
                 .show();
+    }
+
+    /**
+     * 從檔案設定內容
+     */
+    private void setTxtContentFromFile(File txtFile) {
+        try {
+            TitleTextSetter.setText(this, txtFile.getName());
+
+            setFileName(txtFile.getName());
+            String content = FileUtilAndroid.loadFileToString(txtFile);
+
+            StringBuilder engSb = new StringBuilder();
+            StringBuilder chsSb = new StringBuilder();
+
+            for (char c : content.toCharArray()) {
+                if (new String(new char[]{c}).getBytes().length >= 3) {
+                    chsSb.append(c);
+                    if (c == '。') {
+                        chsSb.append("\n");
+                    }
+                } else {
+                    engSb.append(c);
+                }
+            }
+
+            setContentText(engSb.toString());
+            translateView.setText(chsSb.toString());
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private class PaddingAdjuster {
+        Display d;
+        int width;
+        int height;
+
+        PaddingAdjuster() {
+            d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            width = (int) ((double) d.getWidth() * 0.1 / 2);
+            height = (int) ((double) d.getHeight() * 0.1 / 2);
+        }
+    }
+
+    private class AppleFontApplyer {
+        Typeface myriadProRegular;
+
+        AppleFontApplyer() {
+            myriadProRegular = Typeface.createFromAsset(getAssets(), "fonts/Myriad Pro Regular.ttf");
+        }
+
+        void apply(TextView view) {
+            view.setTypeface(myriadProRegular);
+        }
     }
 
     // --------------------------------------------------------------------
@@ -875,6 +935,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         LOAD_CONTENT_FROM_FILE("讀取文件", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 activity.loadContentFromFile();
+            }
+        }, //
+        LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(其他txt檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
+            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
+                activity.setTxtContentFromFile(file);
             }
         }, //
         ;

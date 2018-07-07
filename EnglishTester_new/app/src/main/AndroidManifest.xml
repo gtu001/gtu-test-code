@@ -142,7 +142,9 @@
             android:name=".InterstitialAdActivity"
             android:label="全版廣告"
             android:theme="@style/Transparent2" />
-
+        <activity
+            android:name=".FileFindActivity"
+            android:label="開啟檔案" />
         <!-- for AdMob ↓↓↓↓↓↓ -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
