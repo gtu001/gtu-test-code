@@ -93,64 +93,27 @@ public class TxtReaderAppender {
             ss.setSpan(new ImageSpan(activity, smiley, ImageSpan.ALIGN_BASELINE), show_start, show_end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
-        //一般查詢
-        Pattern ptn = Pattern.compile("[a-zA-Z\\-]+");
-        mth = ptn.matcher(txtContent);
-        int index = 0;
-        while (mth.find()) {
-            final int start = mth.start();
-            final int end = mth.end();
-
-            final String txtNow = txtContent.substring(start, end);
-
-            WordSpan clickableSpan = new WordSpan(index) {
-
-                private void checkFloatServiceOn() {
-                    if (!ServiceUtil.isServiceRunning(activity, FloatViewService.class)) {
-                        activity.doOnoffService(true);
-                    }
-                }
-
-                @Override
-                public void onClick(View view) {
-                    Log.v(TAG, "click " + this.id + " - " + txtNow);
-
-                    try {
-                        checkFloatServiceOn();
-
-                        mService.searchWord(txtNow);
-                    } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                        Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    setMarking(true);
-                    view.invalidate();
-                    txtView.invalidate();
-
-                    // 新增單字
-                    recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id);
-                }
-            };
-
-            Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + txtNow);
-            index++;
-            ss.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);// SPAN_EXCLUSIVE_EXCLUSIVE
-        }
+        // 一般流程
+        ss = getAppendTxt(txtContent, ss);
         return ss;
     }
-
 
     /**
      * 建立可點擊文件
      */
     public SpannableString getAppendTxt(String txtContent) {
         SpannableString ss = new SpannableString(txtContent);
+        return getAppendTxt(txtContent, ss);
+    }
+
+
+    private SpannableString getAppendTxt(String txtContent, SpannableString ss) {
         Pattern ptn = Pattern.compile("[a-zA-Z\\-]+");
         Matcher mth = ptn.matcher(txtContent);
         final String txtContent_ = txtContent;
 
         List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+        Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
         Log.v(TAG, "recentTxtMark list size = " + qList.size());
 
         int index = 0;

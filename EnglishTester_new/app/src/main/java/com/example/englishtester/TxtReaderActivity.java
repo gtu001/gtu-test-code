@@ -780,7 +780,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
             TitleTextSetter.setText(this, title);
 
-            setFileName(txtFile.getName());
+            setFileName(title);
 
             if (txtFile.getName().endsWith(".htm") || txtFile.getName().endsWith(".html")) {
                 String content = WordHtmlParser.getInstance().getFromFile(txtFile);
