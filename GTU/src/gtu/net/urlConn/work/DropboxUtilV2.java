@@ -9,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-
 import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
@@ -145,12 +143,19 @@ public class DropboxUtilV2 {
         private String name;
         private String fullPath;
         private boolean isFolder = false;
+        private long size = -1;
+        private long serverModify = -1;
 
         public DropboxUtilV2_DropboxFile(Metadata meta) {
             this.name = meta.getName();
             this.fullPath = meta.getPathDisplay();
             if (meta instanceof com.dropbox.core.v2.files.FolderMetadata) {
                 this.isFolder = true;
+            }
+            if (meta instanceof com.dropbox.core.v2.files.FileMetadata) {
+                com.dropbox.core.v2.files.FileMetadata m2 = (com.dropbox.core.v2.files.FileMetadata)meta;
+                size = m2.getSize();
+                serverModify = m2.getServerModified().getTime();
             }
         }
 
@@ -164,6 +169,14 @@ public class DropboxUtilV2 {
 
         public boolean isFolder() {
             return isFolder;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public long getServerModify() {
+            return serverModify;
         }
     }
 }

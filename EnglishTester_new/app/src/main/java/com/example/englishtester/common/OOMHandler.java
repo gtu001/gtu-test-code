@@ -3,12 +3,19 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by gtu001 on 2017/10/21.
@@ -91,21 +98,21 @@ public class OOMHandler {
     }
 
     public static Bitmap new_decode(File f) {
-        try{
+        try {
             InputStream inputStream = new FileInputStream(f);
             Bitmap bitmap = null;
-            for(int ii = 0 ; ; ii ++){
-                try{
+            for (int ii = 0; ; ii++) {
+                try {
                     bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                     Log.v(TAG, "Bitmap scale = " + ii);
                     return bitmap;
-                }catch(OutOfMemoryError ex){
+                } catch (OutOfMemoryError ex) {
                     Log.v(TAG, "Bitmap scale = " + ii);
                     bitmap.recycle();
                     System.gc();
                 }
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
@@ -113,12 +120,12 @@ public class OOMHandler {
     public static Bitmap new_decode(Context context, int resourceId) {
         InputStream inputStream = context.getResources().openRawResource(resourceId);
         Bitmap bitmap = null;
-        for(int ii = 0 ; ; ii ++){
-            try{
+        for (int ii = 0; ; ii++) {
+            try {
                 bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                 Log.v(TAG, "Bitmap scale = " + ii);
                 return bitmap;
-            }catch(OutOfMemoryError ex){
+            } catch (OutOfMemoryError ex) {
                 Log.v(TAG, "Bitmap scale = " + ii);
                 bitmap.recycle();
                 System.gc();
@@ -126,7 +133,62 @@ public class OOMHandler {
         }
     }
 
-    private static BitmapFactory.Options getBitmapOptions(int scale){
+    public static Bitmap getEmptyBitmap(int w, int h) {
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+        Canvas canvas = new Canvas(bmp);
+        return bmp;
+    }
+
+    public static Bitmap getBitmapFromURL_waiting(final String src, long wattingTime) {
+        final BlockingQueue<Bitmap> queue = new ArrayBlockingQueue<Bitmap>(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = getBitmapFromURL(src);
+                if (bitmap != null) {
+                    queue.offer(bitmap);
+                } else {
+                    queue.offer(getEmptyBitmap(1, 1));
+                }
+            }
+        }).start();
+        try {
+            return queue.poll(wattingTime, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            return getEmptyBitmap(1, 1);
+        }
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+//            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+//            return myBitmap;
+
+            Bitmap bitmap = null;
+            for (int ii = 0; ; ii++) {
+                try {
+                    bitmap = BitmapFactory.decodeStream(input, null, getBitmapOptions(ii));
+                    Log.v(TAG, "Bitmap scale = " + ii);
+                    return bitmap;
+                } catch (OutOfMemoryError ex) {
+                    Log.v(TAG, "Bitmap scale = " + ii);
+                    bitmap.recycle();
+                    System.gc();
+                }
+            }
+        } catch (Exception e) {
+            Log.v(TAG, "getBitmapFromURL ERR : " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private static BitmapFactory.Options getBitmapOptions(int scale) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPurgeable = true;//這樣可以讓java系統記憶體不足時先行回收部分的記憶體
         options.inInputShareable = true;

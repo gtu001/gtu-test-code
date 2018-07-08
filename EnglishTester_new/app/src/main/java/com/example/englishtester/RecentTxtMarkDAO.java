@@ -182,6 +182,46 @@ public class RecentTxtMarkDAO {
         int markIndex = -1;
         String markEnglish;
         long insertDate = -1L;
+
+        public Long getListId() {
+            return listId;
+        }
+
+        public void setListId(Long listId) {
+            this.listId = listId;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public int getMarkIndex() {
+            return markIndex;
+        }
+
+        public void setMarkIndex(int markIndex) {
+            this.markIndex = markIndex;
+        }
+
+        public String getMarkEnglish() {
+            return markEnglish;
+        }
+
+        public void setMarkEnglish(String markEnglish) {
+            this.markEnglish = markEnglish;
+        }
+
+        public long getInsertDate() {
+            return insertDate;
+        }
+
+        public void setInsertDate(long insertDate) {
+            this.insertDate = insertDate;
+        }
     }
 
     interface RecentTxtMarkSchmea {

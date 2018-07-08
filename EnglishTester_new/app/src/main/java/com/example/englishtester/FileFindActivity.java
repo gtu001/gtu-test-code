@@ -48,7 +48,7 @@ public class FileFindActivity extends ListActivity {
         setContentView(R.layout.activity_file_directory);
 
         //init service
-        extensionChecker = new ExtensionChecker("(txt)");
+        extensionChecker = new ExtensionChecker("(txt|htm|html)");
         rootDirHolder = new RootDirHolder();
 
         mPath = (TextView) findViewById(R.id.filePathLabel);

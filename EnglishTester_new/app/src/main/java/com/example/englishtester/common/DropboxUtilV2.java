@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,19 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
+        }
+    }
+
+    public static boolean exists(String path, DbxClientV2 client) {
+        try {
+            return true;
+        } catch (Exception ex) {
+            if (ex.getClass().getName().equals("com.dropbox.core.v2.files.GetMetadataErrorException") && //
+                    ex.getMessage().contains("\"path\":\"not_found\"")) {
+                return false;
+            }
+            throw new RuntimeException("exists ERR : " + ex.getMessage(), ex);
         }
     }
 
@@ -56,7 +69,7 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
         }
     }
 
@@ -71,12 +84,12 @@ public class DropboxUtilV2 {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
-//            return false;
+            // return false;
         }
     }
 
-    public static Map<String,String> listFiles(String path, DbxClientV2 client) {
-        Map<String,String> fileMap = new LinkedHashMap<String,String>();
+    public static Map<String, String> listFiles(String path, DbxClientV2 client) {
+        Map<String, String> fileMap = new LinkedHashMap<String, String>();
         try {
             ListFolderResult result = client.files().listFolder(path);
             List<Metadata> entries = result.getEntries();
@@ -84,6 +97,22 @@ public class DropboxUtilV2 {
                 Metadata ent = entries.get(ii);
                 System.out.println(ent.getPathDisplay());
                 fileMap.put(ent.getName(), ent.getPathDisplay());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+        return fileMap;
+    }
+
+    public static List<DropboxUtilV2_DropboxFile> listFilesV2(String path, DbxClientV2 client) {
+        List<DropboxUtilV2_DropboxFile> fileMap = new ArrayList<DropboxUtilV2_DropboxFile>();
+        try {
+            ListFolderResult result = client.files().listFolder(path);
+            List<Metadata> entries = result.getEntries();
+            for (int ii = 0; ii < entries.size(); ii++) {
+                Metadata ent = entries.get(ii);
+                fileMap.add(new DropboxUtilV2_DropboxFile(ent));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -108,9 +137,50 @@ public class DropboxUtilV2 {
             System.out.println("accountId : " + account.getAccountId());
             System.out.println("email : " + account.getEmail());
             return true;
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    public static class DropboxUtilV2_DropboxFile {
+        private String name;
+        private String fullPath;
+        private boolean isFolder = false;
+        private long size = -1;
+        private long serverModify = -1;
+
+        public DropboxUtilV2_DropboxFile(Metadata meta) {
+            this.name = meta.getName();
+            this.fullPath = meta.getPathDisplay();
+            if (meta instanceof com.dropbox.core.v2.files.FolderMetadata) {
+                this.isFolder = true;
+            }
+            if (meta instanceof com.dropbox.core.v2.files.FileMetadata) {
+                com.dropbox.core.v2.files.FileMetadata m2 = (com.dropbox.core.v2.files.FileMetadata) meta;
+                size = m2.getSize();
+                serverModify = m2.getServerModified().getTime();
+            }
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getFullPath() {
+            return fullPath;
+        }
+
+        public boolean isFolder() {
+            return isFolder;
+        }
+
+        public long getSize() {
+            return size;
+        }
+
+        public long getServerModify() {
+            return serverModify;
         }
     }
 }

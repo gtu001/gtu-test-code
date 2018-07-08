@@ -15,7 +15,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
@@ -24,7 +23,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -44,9 +42,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApi;
-import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMark;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DialogFontSizeChange;
+import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
@@ -54,9 +52,10 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
-import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
+import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.WordHtmlParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,8 +74,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks {
 
@@ -216,7 +213,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     Toast.makeText(TxtReaderActivity.this, "請輸入英文句子!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                setContentText(text);
+                setContentText(text, false);
                 setFileName("selfTyping");
             }
         });
@@ -278,23 +275,27 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 讀取dropbox文件
      */
     private void loadDropboxList() {
-        final List<String> fileList = new ArrayList<String>();
-        final Map<String, String> fileMap = dropboxFileLoadService.listFile();
-        fileList.addAll(fileMap.keySet());
+        final List<String> fileInfoList = new ArrayList<String>();
+        final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
+        for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
+            fileInfoList.add(String.format("%s (%s)", f.getName(),//
+                    FileUtilGtu.getSizeDescription(f.getSize())));
+        }
         new AlertDialog.Builder(TxtReaderActivity.this)//
                 .setTitle("選擇dropbox檔案")//
-                .setItems(fileList.toArray(new String[0]), new DialogInterface.OnClickListener() {
+                .setItems(fileInfoList.toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        String filename = fileList.get(paramInt);
-                        String fileDropboxPath = fileMap.get(filename);
+                        String filename = fileLst.get(paramInt).getName();
+                        String fileDropboxPath = fileLst.get(paramInt).getFullPath();
                         try {
-                            File loadFile = dropboxFileLoadService.downloadFile(fileDropboxPath);
+                            String fileExtension = FileUtilGtu.getSubName(filename);
+
+                            File loadFile = dropboxFileLoadService.downloadFile(fileDropboxPath, fileExtension);
 
                             setFileName(filename);
 
-                            String content = FileUtilAndroid.loadFileToString(loadFile);
-                            setContentText(content);
+                            setTxtContentFromFile(loadFile, filename);
                         } catch (Exception e) {
                             Log.e(TAG, e.getMessage(), e);
                             throw new RuntimeException(e);
@@ -330,70 +331,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         doOnoffService(true);
     }
 
-    /**
-     * 建立可點擊文件
-     */
-    private SpannableString getAppendTxt(String txtContent) {
-        SpannableString ss = new SpannableString(txtContent);
-        Pattern ptn = Pattern.compile("[a-zA-Z\\-]+");
-        Matcher mth = ptn.matcher(txtContent);
-        final String txtContent_ = txtContent;
-
-        List<RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.fileName.toString());
-        Log.v(TAG, "recentTxtMark list size = " + qList.size());
-
-        int index = 0;
-        while (mth.find()) {
-            final int start = mth.start();
-            final int end = mth.end();
-
-            final String txtNow = txtContent_.substring(start, end);
-
-            WordSpan clickableSpan = new WordSpan(index) {
-
-                private void checkFloatServiceOn() {
-                    if (!ServiceUtil.isServiceRunning(TxtReaderActivity.this, FloatViewService.class)) {
-                        doOnoffService(true);
-                    }
-                }
-
-                @Override
-                public void onClick(View view) {
-                    Log.v(TAG, "click " + this.id + " - " + txtNow);
-
-                    //myService.searchWordForActivity(txtNow);
-                    try {
-                        checkFloatServiceOn();
-
-                        mService.searchWord(txtNow);
-                    } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                        Toast.makeText(TxtReaderActivity.this, "查詢失敗!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    setMarking(true);
-                    view.invalidate();
-                    txtView.invalidate();
-
-                    // 新增單字
-                    recentTxtMarkService.addMarkWord(dto.fileName.toString(), txtNow, this.id);
-                }
-            };
-
-            // 設定單字為以查詢狀態
-            for (RecentTxtMark bo : qList) {
-                if (bo.markIndex == clickableSpan.id && StringUtils.equals(bo.markEnglish, txtNow)) {
-                    Log.v(TAG, "remark : " + txtNow + " - " + clickableSpan.id);
-                    clickableSpan.setMarking(true);
-                }
-            }
-
-            Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + txtNow);
-            index++;
-            ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
-        }
-        return ss;
-    }
 
     /**
      * 建立可點擊文件
@@ -408,7 +345,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 continue;
             }
             int end = start + chinesePara.length();
-            WordSpan clickableSpan = new WordSpan(0) {
+            TxtReaderAppender.WordSpan clickableSpan = new TxtReaderAppender.WordSpan(0) {
                 @Override
                 public void updateDrawState(TextPaint ds) {
                     // ds.bgColor = Color.WHITE;
@@ -561,7 +498,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 啟動關閉服務
      */
-    private void doOnoffService(boolean isOn) {
+    public void doOnoffService(boolean isOn) {
         if (!FloatViewChecker.isPermissionOk(this)) {
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
@@ -612,33 +549,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     @Override
     public void updateClient(long data) {
         // TODO
-    }
-
-    class WordSpan extends ClickableSpan {
-        int id;
-        private boolean marking = false;
-
-        public WordSpan(int id) {
-            this.id = id;
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            // ds.bgColor = Color.WHITE;
-            ds.setColor(Color.BLACK);
-            ds.setUnderlineText(false);
-            if (marking) {
-                ds.setTypeface(Typeface.create("新細明體", Typeface.BOLD));
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-        }
-
-        public void setMarking(boolean m) {
-            marking = m;
-        }
     }
 
     private MovementMethod createMovementMethod(Context context) {
@@ -699,7 +609,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     int line = layout.getLineForVertical(y);
                     int off = layout.getOffsetForHorizontal(line, x);
 
-                    WordSpan[] link = buffer.getSpans(off, off, WordSpan.class);
+                    TxtReaderAppender.WordSpan[] link = buffer.getSpans(off, off, TxtReaderAppender.WordSpan.class);
 
                     if (link.length != 0) {
                         // execute click only for first clickable span
@@ -730,7 +640,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             return;
         }
         setFileName("clipboard");
-        setContentText(text);
+        setContentText(text, false);
     }
 
     /**
@@ -742,15 +652,22 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             return;
         }
         setFileName("clipboard");
-        setContentText(content);
+        setContentText(content, false);
     }
 
     /**
      * 設定英文內容
      */
-    private void setContentText(String content) {
+    private void setContentText(String content, boolean isHtmlFromWord) {
         this.dto.content = content;
-        txtView.setText(getAppendTxt(content));
+        TxtReaderAppender appender = new TxtReaderAppender(
+                this, recentTxtMarkService, mService, dto, txtView //
+        );
+        if (!isHtmlFromWord) {
+            txtView.setText(appender.getAppendTxt(content));
+        } else {
+            txtView.setText(appender.getAppendTxt_HtmlFromWord(content));
+        }
         translateView.setText("");
         if (StringUtils.isNotBlank(content)) {
             translateBtn.setVisibility(View.VISIBLE);
@@ -835,13 +752,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         final Map<String, File> fileMap = new LinkedHashMap<String, File>();
         for (File f : lists) {
             fileList.add(f.getName());
-            fileInfoList.add(String.format("%s %s (%s)", f.getName(),//
-                    DateFormatUtils.format(f.lastModified(), "yyyy/MM/dd HH:mm:ss"), //
+            fileInfoList.add(String.format("%s (%s)", f.getName(),//
                     FileUtilGtu.getSizeDescription(f.length())));
             fileMap.put(f.getName(), f);
         }
 
-        fileList.addAll(fileMap.keySet());
         new AlertDialog.Builder(TxtReaderActivity.this)//
                 .setTitle("選擇dropbox檔案")//
                 .setItems(fileInfoList.toArray(new String[0]), new DialogInterface.OnClickListener() {
@@ -849,7 +764,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         String filename = fileList.get(paramInt);
                         File txtFile = fileMap.get(filename);
-                        setTxtContentFromFile(txtFile);
+                        setTxtContentFromFile(txtFile, null);
                     }
                 })//
                 .show();
@@ -858,29 +773,40 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 從檔案設定內容
      */
-    private void setTxtContentFromFile(File txtFile) {
+    private void setTxtContentFromFile(File txtFile, String title) {
         try {
-            TitleTextSetter.setText(this, txtFile.getName());
+            if (title == null) {
+                title = txtFile.getName();
+            }
+            TitleTextSetter.setText(this, title);
 
             setFileName(txtFile.getName());
-            String content = FileUtilAndroid.loadFileToString(txtFile);
 
-            StringBuilder engSb = new StringBuilder();
-            StringBuilder chsSb = new StringBuilder();
+            if (txtFile.getName().endsWith(".htm") || txtFile.getName().endsWith(".html")) {
+                String content = WordHtmlParser.getInstance().getFromFile(txtFile);
 
-            for (char c : content.toCharArray()) {
-                if (new String(new char[]{c}).getBytes().length >= 3) {
-                    chsSb.append(c);
-                    if (c == '。') {
-                        chsSb.append("\n");
+                setContentText(content, true);
+                translateView.setText("");
+
+            } else {
+                String content = FileUtilAndroid.loadFileToString(txtFile);
+
+                StringBuilder engSb = new StringBuilder();
+                StringBuilder chsSb = new StringBuilder();
+
+                for (char c : content.toCharArray()) {
+                    if (new String(new char[]{c}).getBytes().length >= 3) {
+                        chsSb.append(c);
+                        if (c == '。') {
+                            chsSb.append("\n");
+                        }
+                    } else {
+                        engSb.append(c);
                     }
-                } else {
-                    engSb.append(c);
                 }
+                setContentText(engSb.toString(), false);
+                translateView.setText(chsSb.toString());
             }
-
-            setContentText(engSb.toString());
-            translateView.setText(chsSb.toString());
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             throw new RuntimeException(e);
@@ -945,7 +871,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(其他txt檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
-                activity.setTxtContentFromFile(file);
+                activity.setTxtContentFromFile(file, null);
             }
         }, //
         ;
@@ -1023,11 +949,31 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         return true;
     }
 
-    private class TxtReaderActivityDTO implements Serializable {
+    public static class TxtReaderActivityDTO implements Serializable {
         private final StringBuilder fileName = new StringBuilder();
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)
         private Thread translateThread; //翻譯thread
+
+        public StringBuilder getFileName() {
+            return fileName;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public String getContentCopy() {
+            return contentCopy;
+        }
+
+        public void setContentCopy(String contentCopy) {
+            this.contentCopy = contentCopy;
+        }
     }
 
     // 測試螢幕翻轉 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -63,6 +64,19 @@ public class DropboxFileLoadService {
     }
 
     /**
+     * 列出檔案清單
+     */
+    public List<DropboxUtilV2.DropboxUtilV2_DropboxFile> listFileV2() {
+        return DropboxEnglishService.getRunOnUiThread(new Callable<List<DropboxUtilV2.DropboxUtilV2_DropboxFile>>() {
+            @Override
+            public List<DropboxUtilV2.DropboxUtilV2_DropboxFile> call() throws Exception {
+                DbxClientV2 client = getClient();
+                return DropboxUtilV2.listFilesV2(ENGLISH_TXT_FOLDER, client);
+            }
+        }, -1L);
+    }
+
+    /**
      * 下載dropbox檔案
      */
     public File downloadFile(final String path) {
@@ -77,6 +91,27 @@ public class DropboxFileLoadService {
 //                    if (downloadedFile != null) {
 //                        Log.v(TAG, "Metadata: " + downloadedFile.toString());
 //                    }
+                    DropboxUtilV2.download(path, outputStream, client);
+                } finally {
+                    outputStream.close();
+                }
+                return tmpFile;
+            }
+        }, -1L);
+    }
+
+    /**
+     * 下載dropbox檔案
+     */
+    public File downloadFile(final String path, final String fileExtension) {
+        final String newExtension = fileExtension.startsWith(".") ? fileExtension : "." + fileExtension;
+        return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                File tmpFile = File.createTempFile("temp_txt_", newExtension);
+                final FileOutputStream outputStream = new FileOutputStream(tmpFile);
+                try {
+                    DbxClientV2 client = getClient();
                     DropboxUtilV2.download(path, outputStream, client);
                 } finally {
                     outputStream.close();
