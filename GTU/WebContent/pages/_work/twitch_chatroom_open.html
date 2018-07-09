@@ -1,0 +1,91 @@
+<%@ page language="java" contentType="text/html; charset=UTF8" pageEncoding="UTF8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<script type="text/javascript">
+	function openChat() {
+		var id = prompt("請輸入twitch id:");
+
+		//var winId1 = window.open("http://www.multitwitch.tv/" + id, "_blank",
+		//		getTwitchWindowConfig());
+		var winId2 = window.open("https://www.twitch.tv/embed/" + id + "/chat",
+				"_blank", getTwitchWindowChatroomConfig());
+				
+		window.location = "http://www.multitwitch.tv/" + id;
+	}
+	
+	function getTwitchWindowConfig(){
+		var winSize = getMointerSize();
+		var customHeight = winSize['height'] / 3;
+		var configParam = //
+			"location=no, " + //網址列
+			"menubar=no, " + //zz
+			"status=no, " + //顯示狀態列
+			"width="+ winSize['width'] +" , " + //
+			"height="+customHeight+" , " + //
+			"left=0, " + //
+			"top=" + (winSize['height'] - customHeight) + ", " +   //
+			"";
+		return configParam;
+	}
+	
+	function getTwitchWindowChatroomConfig(){
+		var winSize = getMointerSize();
+		var customWidth = 350;
+		var customHeight = parseFloat(winSize['height']) * 0.8;
+		var customTop = (parseFloat(winSize['height']) - customHeight) / 2
+		var customLeft = winSize['width'] - customWidth;
+		var configParam = //
+			"location=no, " + //網址列
+			"menubar=no, " + //
+			"status=no, " + //顯示狀態列
+			"width="+ customWidth +" , " + //
+			"height="+customHeight+" , " + //
+			"left="+ customLeft +", " + //
+			"top=" + customTop + ", " +   //
+			"";
+		return configParam;
+	}
+
+	function getWidowSize() {
+		var w = window, //
+		d = document, //
+		e = d.documentElement, //
+		g = d.getElementsByTagName('body')[0], //
+		x = w.innerWidth || e.clientWidth || g.clientWidth, //
+		y = w.innerHeight || e.clientHeight || g.clientHeight;//
+		//alert(x + ' × ' + y);
+		return {
+			"width" : x,
+			"height" : y
+		};
+	}
+
+	function getMointerSize() {
+		var txt = "";
+		txt += "<p>Total width/height: " + screen.width + "*" + screen.height
+				+ "</p>";
+		txt += "<p>Available width/height: " + screen.availWidth + "*"
+				+ screen.availHeight + "</p>";
+		txt += "<p>Color depth: " + screen.colorDepth + "</p>";
+		txt += "<p>Color resolution: " + screen.pixelDepth + "</p>";
+		//alert(txt) ;
+		return {
+			"width" : screen.width,
+			"height" : screen.height
+		};
+	}
+</script>
+
+
+
+<html>
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF8">
+<!-- meta http-equiv="refresh" content="1; url=/JoeGradleWeb/loginTest_test" / -->
+<title></title>
+</head>
+
+<body onload="javascript:openChat();"></body>
+</html>

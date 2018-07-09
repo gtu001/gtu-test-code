@@ -62,3 +62,6 @@ list_exchanges
 list_bindings
 status
 environment
+
+看未ack的queue
+list_queues name messages_ready messages_unacknowledged

@@ -1,5 +1,6 @@
 package com.example.englishtester.common;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -25,7 +27,13 @@ import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.TxtReaderActivity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,17 +64,6 @@ public class TxtReaderAppender {
         ss.setSpan(new RelativeSizeSpan(0f), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    public SpannableString getAppendTxt_HtmlFromWord(String txtContent) {
-        SpannableString ss = new SpannableString(txtContent);
-
-        // Word 產生 HTML 處理
-        ss = getAppendTxt_HtmpFromWord_RuleAppender(txtContent, ss);
-
-        // 一般流程
-        ss = getAppendTxt(txtContent, ss);
-        return ss;
-    }
-
     private class __SpecialTagHolder_Pos {
         int show_start = -1;
         int show_end = -1;
@@ -76,11 +73,10 @@ public class TxtReaderAppender {
             int start = mth.start();
             int end = mth.end();
 
-            String txtNow = txtContent.substring(start, end);
             content = mth.group(groupIndex);
 
-            show_start = start + txtNow.indexOf(content);
-            show_end = show_start + content.length();
+            show_start = mth.start(groupIndex);
+            show_end = mth.end(groupIndex);
         }
 
         public int getStart() {
@@ -94,138 +90,252 @@ public class TxtReaderAppender {
         public String getContent() {
             return content;
         }
+
+        @Override
+        public String toString() {
+            return "__SpecialTagHolder_Pos{" +
+                    "show_start=" + show_start +
+                    ", show_end=" + show_end +
+                    ", content='" + content + '\'' +
+                    '}';
+        }
     }
 
-    private SpannableString getAppendTxt_HtmpFromWord_RuleAppender(String txtContent, SpannableString ss) {
-        // 設定標題
-        Pattern ptnTitle = Pattern.compile("\\{\\{title\\:(.*?)\\}\\}");
-        Matcher mth = ptnTitle.matcher(txtContent);
-        while (mth.find()) {
-            int start = mth.start();
-            int end = mth.end();
+    private class TxtAppenderProcess {
+        final int HYPER_LINK_LABEL_MAX_LENGTH = 80;
 
-            __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(mth, txtContent, 1);
+        String txtContent;
+        boolean isWordHtml;
+        SpannableString ss;
+        int maxPicWidth;
+        List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
 
-            hiddenSpan(ss, start, proc.getStart());
-            hiddenSpan(ss, proc.getEnd(), end);
-
-            ss.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            ss.setSpan(new RelativeSizeSpan(1.2f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth) {
+            this.txtContent = txtContent;
+            this.isWordHtml = isWordHtml;
+            this.ss = new SpannableString(txtContent);
+            this.maxPicWidth = maxPicWidth;
         }
 
-        // 設定圖片
-        Pattern ptnImg = Pattern.compile("\\{\\{img\\:(.*?)\\}\\}");
-        Matcher mth2 = ptnImg.matcher(txtContent);
-        while (mth2.find()) {
-            int start = mth.start();
-            int end = mth.end();
+        public SpannableString getResult() {
+            if (isWordHtml) {
+                wordHtmlProcess();
+            }
 
-            __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(mth, txtContent, 1);
+            normalTxtProcess();
 
-            hiddenSpan(ss, start, proc.getStart());
-            hiddenSpan(ss, proc.getEnd(), end);
-
-            Bitmap smiley = OOMHandler.getBitmapFromURL_waiting(proc.getContent(), 10 * 1000);
-            ss.setSpan(new ImageSpan(activity, smiley, ImageSpan.ALIGN_BASELINE), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return ss;
         }
 
-        // 設定Url
-        Pattern ptnHref = Pattern.compile("\\{\\{link\\:(.*?),value\\:(.*?)\\}\\}");
-        Matcher mth3 = ptnHref.matcher(txtContent);
-        while (mth3.find()) {
+        private void appendNormalIgnoreLst(Matcher mth) {
+            normalIgnoreLst.add(Pair.of(mth.start(), mth.end()));
+        }
+
+        private boolean isNormalIgnore(Matcher mth) {
+            if (normalIgnoreLst.isEmpty()) {
+                return false;
+            }
             int start = mth.start();
             int end = mth.end();
-
-            final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(mth, txtContent, 1);
-            final __SpecialTagHolder_Pos linkLabel = new __SpecialTagHolder_Pos(mth, txtContent, 2);
-
-            WordSpan hrefLinkSpan = new WordSpan() {
-                @Override
-                public void onClick(View view) {
-                    Log.v(TAG, "click " + " - " + linkUrl.getContent());
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(linkUrl.getContent()));
-                    activity.startActivity(browserIntent);
+            for (Pair<Integer, Integer> p : normalIgnoreLst) {
+                if (p.getLeft() <= start && p.getRight() >= end) {
+                    return true;
                 }
-            };
-
-            hiddenSpan(ss, start, linkUrl.getStart());
-            hiddenSpan(ss, linkUrl.getEnd(), linkLabel.getStart());
-            hiddenSpan(ss, linkLabel.getStart(), end);
-
-            ss.setSpan(hrefLinkSpan, linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return false;
         }
-        return ss;
+
+        private boolean isLegelHyperLink(String urlContent) {
+            return StringUtils.trimToEmpty(urlContent).length() <= HYPER_LINK_LABEL_MAX_LENGTH;
+        }
+
+        private void wordHtmlProcess() {
+            // 設定標題
+            Pattern ptnTitle = Pattern.compile("\\{\\{title\\:(.*?)\\}{2,4}", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptnTitle.matcher(txtContent);
+            while (mth.find()) {
+                int start = mth.start();
+                int end = mth.end();
+//                this.appendNormalIgnoreLst(mth);
+
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(mth, txtContent, 1);
+
+                hiddenSpan(ss, start, proc.getStart());
+                hiddenSpan(ss, proc.getEnd(), end);
+
+                ss.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss.setSpan(new RelativeSizeSpan(1.2f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            // 設定圖片
+            Pattern ptnImg = Pattern.compile("\\{\\{img\\:(.*?)\\}\\}", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth2 = ptnImg.matcher(txtContent);
+            while (mth2.find()) {
+                int start = mth2.start();
+                int end = mth2.end();
+//                this.appendNormalIgnoreLst(mth2);
+
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(mth2, txtContent, 1);
+
+                hiddenSpan(ss, start, proc.getStart());
+                hiddenSpan(ss, proc.getEnd(), end);
+
+                Bitmap smiley = null;
+
+                if (dto.getDropboxDir() != null) {
+                    smiley = getPicFromDropbox(proc.getContent());
+                } else {
+                    smiley = OOMHandler.getBitmapFromURL_waiting(proc.getContent(), 10 * 1000);
+                }
+
+                smiley = OOMHandler.fixPicScaleFixScreenWidth(smiley, maxPicWidth);
+
+                ss.setSpan(new ImageSpan(activity, smiley, ImageSpan.ALIGN_BASELINE), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            // 設定Url
+            Pattern ptnHref = Pattern.compile("\\{\\{link\\:(.*?),value\\:(.*?)\\}\\}", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth3 = ptnHref.matcher(txtContent);
+            while (mth3.find()) {
+                int start = mth3.start();
+                int end = mth3.end();
+
+                final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(mth3, txtContent, 1);
+                final __SpecialTagHolder_Pos linkLabel = new __SpecialTagHolder_Pos(mth3, txtContent, 2);
+
+                //長度太長的link忽略
+                if (!isLegelHyperLink(linkLabel.getContent())) {
+                    continue;
+                }
+
+                this.appendNormalIgnoreLst(mth3);
+
+                SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
+
+                hiddenSpan(ss, start, linkLabel.getStart());
+                hiddenSpan(ss, linkLabel.getEnd(), end);
+
+                Log.v(TAG, "Lbl : " + linkLabel);
+
+                ss.setSpan(hrefLinkSpan, linkLabel.getStart(), linkLabel.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+
+        private void normalTxtProcess() {
+            Pattern ptn = Pattern.compile("[a-zA-Z\\-]+", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptn.matcher(txtContent);
+            final String txtContent_ = txtContent;
+
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+            Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
+            Log.v(TAG, "recentTxtMark list size = " + qList.size());
+
+            int index = 0;
+            while (mth.find()) {
+                final int start = mth.start();
+                final int end = mth.end();
+
+                if (isNormalIgnore(mth)) {
+                    continue;
+                }
+
+                final String txtNow = txtContent_.substring(start, end);
+
+                WordSpan clickableSpan = new WordSpan(index) {
+
+                    private void checkFloatServiceOn() {
+                        if (!ServiceUtil.isServiceRunning(activity, FloatViewService.class)) {
+                            activity.doOnoffService(true);
+                        }
+                    }
+
+                    @Override
+                    public void onClick(View view) {
+                        Log.v(TAG, "click " + this.id + " - " + txtNow);
+
+                        //myService.searchWordForActivity(txtNow);
+                        try {
+                            checkFloatServiceOn();
+
+                            mService.searchWord(txtNow);
+                        } catch (RemoteException e) {
+                            Log.e(TAG, e.getMessage(), e);
+                            Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
+                        }
+
+                        setMarking(true);
+                        view.invalidate();
+                        txtView.invalidate();
+
+                        // 新增單字
+                        recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id);
+                    }
+                };
+
+                // 設定單字為以查詢狀態
+                for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
+                    if (bo.getMarkIndex() == clickableSpan.id && StringUtils.equals(bo.getMarkEnglish(), txtNow)) {
+                        Log.v(TAG, "remark : " + txtNow + " - " + clickableSpan.id);
+                        clickableSpan.setMarking(true);
+                    }
+                }
+
+                Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + txtNow);
+                index++;
+                ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
+            }
+        }
+
+        private Bitmap getPicFromDropbox(String filename) {
+            try {
+                String realName = URLDecoder.decode(filename, "BIG5");
+                if (realName.contains("/")) {
+                    realName = realName.substring(realName.lastIndexOf("/"));
+                }
+                File dropboxPic = new File(dto.getDropboxDir(), realName);
+                return OOMHandler.new_decode(dropboxPic);
+            } catch (Exception e) {
+                Log.e(TAG, "getPicFromDropbox ERR : " + e.getMessage(), e);
+                return OOMHandler.DEFAULT_EMPTY_BMP;
+            }
+        }
     }
 
     /**
      * 建立可點擊文件
      */
     public SpannableString getAppendTxt(String txtContent) {
-        SpannableString ss = new SpannableString(txtContent);
-        return getAppendTxt(txtContent, ss);
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, false, -1);
+        return appender.getResult();
     }
 
+    /**
+     * 建立可點擊文件
+     */
+    public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth) {
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth);
+        return appender.getResult();
+    }
 
-    private SpannableString getAppendTxt(String txtContent, SpannableString ss) {
-        Pattern ptn = Pattern.compile("[a-zA-Z\\-]+");
-        Matcher mth = ptn.matcher(txtContent);
-        final String txtContent_ = txtContent;
+    private class SimpleUrlLinkSpan extends ClickableSpan {
+        String url;
 
-        List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
-        Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
-        Log.v(TAG, "recentTxtMark list size = " + qList.size());
-
-        int index = 0;
-        while (mth.find()) {
-            final int start = mth.start();
-            final int end = mth.end();
-
-            final String txtNow = txtContent_.substring(start, end);
-
-            WordSpan clickableSpan = new WordSpan(index) {
-
-                private void checkFloatServiceOn() {
-                    if (!ServiceUtil.isServiceRunning(activity, FloatViewService.class)) {
-                        activity.doOnoffService(true);
-                    }
-                }
-
-                @Override
-                public void onClick(View view) {
-                    Log.v(TAG, "click " + this.id + " - " + txtNow);
-
-                    //myService.searchWordForActivity(txtNow);
-                    try {
-                        checkFloatServiceOn();
-
-                        mService.searchWord(txtNow);
-                    } catch (RemoteException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                        Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
-                    }
-
-                    setMarking(true);
-                    view.invalidate();
-                    txtView.invalidate();
-
-                    // 新增單字
-                    recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id);
-                }
-            };
-
-            // 設定單字為以查詢狀態
-            for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
-                if (bo.getMarkIndex() == clickableSpan.id && StringUtils.equals(bo.getMarkEnglish(), txtNow)) {
-                    Log.v(TAG, "remark : " + txtNow + " - " + clickableSpan.id);
-                    clickableSpan.setMarking(true);
-                }
-            }
-
-            Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + txtNow);
-            index++;
-            ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
+        public SimpleUrlLinkSpan(String url) {
+            this.url = url;
         }
-        return ss;
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            ds.setColor(Color.BLUE);
+            ds.setUnderlineText(true);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.v(TAG, "click " + " - " + url);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            activity.startActivity(browserIntent);
+        }
     }
 
     public static class WordSpan extends ClickableSpan {

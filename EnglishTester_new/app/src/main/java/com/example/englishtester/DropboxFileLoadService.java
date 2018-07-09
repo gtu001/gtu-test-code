@@ -143,6 +143,47 @@ public class DropboxFileLoadService {
         }, -1L);
     }
 
+    public File downloadHtmlReferencePicDir(final String dropboxDirName) {
+        return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                String tmpPath = "";
+                try {
+                    File dirFile = new File(context.getCacheDir(), dropboxDirName);
+                    if (!dirFile.exists()) {
+                        dirFile.mkdirs();
+                    }
+
+                    DbxClientV2 client = getClient();
+                    List<DropboxUtilV2.DropboxUtilV2_DropboxFile> picLst = DropboxUtilV2.listFilesV2(ENGLISH_TXT_FOLDER + File.separator + dropboxDirName, client);
+
+                    for (DropboxUtilV2.DropboxUtilV2_DropboxFile pic : picLst) {
+                        if (!pic.getName().matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")) {
+                            continue;
+                        }
+
+                        tmpPath = pic.getFullPath();
+
+                        File targetPicFile = new File(dirFile, pic.getName());
+
+                        if (targetPicFile.exists() && targetPicFile.canRead()) {
+                            continue;
+                        }
+
+                        FileOutputStream outputStream = new FileOutputStream(targetPicFile);
+                        DropboxUtilV2.download(pic.getFullPath(), outputStream, client);
+                        Log.v(TAG, "下載ref pic : " + targetPicFile);
+                    }
+                    return dirFile;
+                } catch (Exception ex) {
+                    Log.e(TAG, "downloadHtmlReferencePicDir ERR : " + ex.getMessage() + " --> " + tmpPath);
+                    throw new RuntimeException("downloadHtmlReferencePicDir ERR : " + ex.getMessage() + " --> " + tmpPath, ex);
+                } finally {
+                }
+            }
+        }, -1L);
+    }
+
     private DbxClientV2 getClient() {
         return DropboxUtilV2.getClient(accessToken);
     }

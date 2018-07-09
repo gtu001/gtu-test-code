@@ -1,8 +1,4 @@
-package com.example.englishtester.common;
-
-import android.util.Log;
-
-import org.apache.commons.lang3.StringUtils;
+package gtu._work.forDebug;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -11,6 +7,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
+import gtu.file.FileUtil;
+import gtu.log.fakeAndroid.Log;
 
 public class WordHtmlParser {
 
@@ -36,7 +36,7 @@ public class WordHtmlParser {
     }
 
     public String getFromFile(File file) {
-        String content = FileUtilGtu.loadFromFile(file, "BIG5");
+        String content = FileUtil.loadFromFile(file, "BIG5");
 
         content = _step0_headEmpty(content);
         content = _step1_replaceTo_title(content);
@@ -127,7 +127,7 @@ public class WordHtmlParser {
         if (url.matches("https?\\:.*") || //
                 url.matches("www\\..*") || //
                 url.matches("\\w+\\.\\w+.*") //
-                ) {
+        ) {
             return url;
         }
 

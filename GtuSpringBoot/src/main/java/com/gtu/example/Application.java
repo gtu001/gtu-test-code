@@ -4,10 +4,12 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.gtu.example.rabbitmq.sender.RabbitMqSender;
@@ -18,6 +20,9 @@ import com.gtu.example.rabbitmq.sender.RabbitMqSender;
 @SpringBootApplication // = @Configuration + @EnableAutoConfiguration +
                        // @ComponentScan
 public class Application {
+    
+    @Autowired
+    private ConfigurableApplicationContext ctx;
 
     private static final Logger logger = LoggerFactory.getLogger(RabbitMqSender.class);
 

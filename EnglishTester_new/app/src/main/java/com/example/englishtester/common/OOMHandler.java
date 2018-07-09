@@ -1,10 +1,14 @@
 package com.example.englishtester.common;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 public class OOMHandler {
 
     private static final String TAG = OOMHandler.class.getSimpleName();
+
+    public static final Bitmap DEFAULT_EMPTY_BMP = getEmptyBitmap(300, 300);
 
     @Deprecated
     public static Bitmap new_decode_OLD(File f) {
@@ -97,6 +103,30 @@ public class OOMHandler {
         }
     }
 
+    public static Bitmap fixPicScaleFixScreenWidth(Bitmap bm, Context context) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+
+        int newWidth1 = dm.widthPixels;
+        float scaleWidth = ((float) newWidth1) / width;
+        int newHeight = (int) (scaleWidth * height);
+
+        return Bitmap.createScaledBitmap(bm, newWidth1, newHeight, false);
+    }
+
+    public static Bitmap fixPicScaleFixScreenWidth(Bitmap bm, int customWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        int newWidth1 = customWidth;
+        float scaleWidth = ((float) newWidth1) / width;
+        int newHeight = (int) (scaleWidth * height);
+
+        return Bitmap.createScaledBitmap(bm, newWidth1, newHeight, false);
+    }
+
     public static Bitmap new_decode(File f) {
         try {
             InputStream inputStream = new FileInputStream(f);
@@ -149,14 +179,14 @@ public class OOMHandler {
                 if (bitmap != null) {
                     queue.offer(bitmap);
                 } else {
-                    queue.offer(getEmptyBitmap(1, 1));
+                    queue.offer(DEFAULT_EMPTY_BMP);
                 }
             }
         }).start();
         try {
             return queue.poll(wattingTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
-            return getEmptyBitmap(1, 1);
+            return DEFAULT_EMPTY_BMP;
         }
     }
 

@@ -74,6 +74,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks {
 
@@ -291,11 +292,15 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         try {
                             String fileExtension = FileUtilGtu.getSubName(filename);
 
+                            ProgressDialog processDialog = new ProgressDialog(TxtReaderActivity.this);
+                            processDialog.setMessage("讀取中...");
+                            processDialog.show();
+
                             File loadFile = dropboxFileLoadService.downloadFile(fileDropboxPath, fileExtension);
 
                             setFileName(filename);
 
-                            setTxtContentFromFile(loadFile, filename);
+                            setTxtContentFromFile(loadFile, filename, processDialog);
                         } catch (Exception e) {
                             Log.e(TAG, e.getMessage(), e);
                             throw new RuntimeException(e);
@@ -666,7 +671,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         if (!isHtmlFromWord) {
             txtView.setText(appender.getAppendTxt(content));
         } else {
-            txtView.setText(appender.getAppendTxt_HtmlFromWord(content));
+            txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.maxWidth - 10));
         }
         translateView.setText("");
         if (StringUtils.isNotBlank(content)) {
@@ -764,7 +769,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                         String filename = fileList.get(paramInt);
                         File txtFile = fileMap.get(filename);
-                        setTxtContentFromFile(txtFile, null);
+                        setTxtContentFromFile(txtFile, null, null);
                     }
                 })//
                 .show();
@@ -773,7 +778,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 從檔案設定內容
      */
-    private void setTxtContentFromFile(File txtFile, String title) {
+    private void setTxtContentFromFile(final File txtFile, String title, final ProgressDialog progressDialog1) {
         try {
             if (title == null) {
                 title = txtFile.getName();
@@ -782,31 +787,83 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
             setFileName(title);
 
-            if (txtFile.getName().endsWith(".htm") || txtFile.getName().endsWith(".html")) {
-                String content = WordHtmlParser.getInstance().getFromFile(txtFile);
+            final Handler handler = new Handler();
 
-                setContentText(content, true);
-                translateView.setText("");
-
+            final AtomicReference<ProgressDialog> dialog = new AtomicReference<ProgressDialog>();
+            if (progressDialog1 == null) {
+                dialog.set(new ProgressDialog(TxtReaderActivity.this));
+                dialog.get().setMessage("讀取中...");
             } else {
-                String content = FileUtilAndroid.loadFileToString(txtFile);
+                dialog.set(progressDialog1);
+            }
 
-                StringBuilder engSb = new StringBuilder();
-                StringBuilder chsSb = new StringBuilder();
+            if (!dialog.get().isShowing()) {
+                dialog.get().show();
+            }
 
-                for (char c : content.toCharArray()) {
-                    if (new String(new char[]{c}).getBytes().length >= 3) {
-                        chsSb.append(c);
-                        if (c == '。') {
-                            chsSb.append("\n");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (txtFile.getName().endsWith(".htm") || txtFile.getName().endsWith(".html")) {
+                            WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                            final String content = wordParser.getFromFile(txtFile);
+                            String dropboxDir = wordParser.getPicDirForDropbox();
+
+                            if (StringUtils.isNotBlank(dropboxDir)) {
+                                File dropboxPicDir = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxDir);
+                                dto.dropboxDir = dropboxPicDir;
+                            } else {
+                                dto.dropboxDir = null;
+                            }
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setContentText(content, true);
+                                    translateView.setText("");
+                                }
+                            });
+
+                        } else {
+                            String content = FileUtilAndroid.loadFileToString(txtFile);
+
+                            final StringBuilder engSb = new StringBuilder();
+                            final StringBuilder chsSb = new StringBuilder();
+
+                            for (char c : content.toCharArray()) {
+                                if (new String(new char[]{c}).getBytes().length >= 3) {
+                                    chsSb.append(c);
+                                    if (c == '。') {
+                                        chsSb.append("\n");
+                                    }
+                                } else {
+                                    engSb.append(c);
+                                }
+                            }
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setContentText(engSb.toString(), false);
+                                    translateView.setText(chsSb.toString());
+                                }
+                            });
+
                         }
-                    } else {
-                        engSb.append(c);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    } finally {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.get().dismiss();
+                            }
+                        });
                     }
                 }
-                setContentText(engSb.toString(), false);
-                translateView.setText(chsSb.toString());
-            }
+            }).start();
+
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             throw new RuntimeException(e);
@@ -817,11 +874,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         Display d;
         int width;
         int height;
+        int maxWidth;
+        int maxHeight;
 
         PaddingAdjuster() {
             d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
             width = (int) ((double) d.getWidth() * 0.1 / 2);
             height = (int) ((double) d.getHeight() * 0.1 / 2);
+
+            maxWidth = d.getWidth() - (2 * width);
+            maxHeight = d.getHeight() - (2 * height);
         }
     }
 
@@ -871,7 +933,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(其他txt檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
-                activity.setTxtContentFromFile(file, null);
+                activity.setTxtContentFromFile(file, null, null);
             }
         }, //
         ;
@@ -954,6 +1016,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)
         private Thread translateThread; //翻譯thread
+        private File dropboxDir;
 
         public StringBuilder getFileName() {
             return fileName;
@@ -973,6 +1036,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public void setContentCopy(String contentCopy) {
             this.contentCopy = contentCopy;
+        }
+
+        public File getDropboxDir() {
+            return dropboxDir;
         }
     }
 
