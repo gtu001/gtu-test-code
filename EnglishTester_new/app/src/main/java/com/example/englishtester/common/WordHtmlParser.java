@@ -2,13 +2,21 @@ package com.example.englishtester.common;
 
 import android.util.Log;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class WordHtmlParser {
+
+    public static void main(String[] args) {
+        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The Most Important Skill Nobody Taught You.htm");
+        String result = WordHtmlParser.getInstance().getFromFile(file);
+        System.out.println(result);
+        System.out.println("done...");
+    }
 
     private static final String TAG = WordHtmlParser.class.getSimpleName();
 
@@ -28,9 +36,12 @@ public class WordHtmlParser {
         content = _step2_nomalContent(content);
         content = _step2_hrefTag(content);
         content = _step3_imageProc(content);
+        content = _step3_imageProc2(content);
         content = _step4_wordBlockCheck(content);
         content = _step5_li_check(content);
 
+        content = _stepFinal_hidden_tag(content, "\\<body.*?\\>");
+        content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<body.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<div.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<ul.*?\\>");
@@ -39,7 +50,11 @@ public class WordHtmlParser {
         content = _stepFinal_hidden_tag(content, "\\<u.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<b.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<html.*?\\>");
+        content = _stepFinal_hidden_tag(content, "\\<span.*?\\>");
         content = _stepFinal_hidden_tag(content, "\\<\\/.*?\\>");
+        content = _stepFinal_hidden_tag(content, "\\<o\\:p>");
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\[.*?\\]\\>");
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\-\\-\\[.*?\\]\\>");
 
         return content;
     }
@@ -49,8 +64,11 @@ public class WordHtmlParser {
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
-            String title = "{{title:" + mth.group(1) + "}}";
-            title = contentFix(title);
+            String titleStr = mth.group(1);
+            String title = "";
+            if (StringUtils.isNotBlank(titleStr)) {
+                title = "{{title:" + contentFix(titleStr) + "}}";
+            }
             mth.appendReplacement(sb, title);
         }
         mth.appendTail(sb);
@@ -62,7 +80,7 @@ public class WordHtmlParser {
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
-            AtomicReference<String> errMsg = new AtomicReference<>();
+            AtomicReference<String> errMsg = new AtomicReference<String>();
             try {
                 String normalContent = mth.group(1);
                 String normalContentNew = contentFix(normalContent);
@@ -79,20 +97,38 @@ public class WordHtmlParser {
     }
 
     private String _step2_hrefTag(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<a.*?href\\=\"(.*?)\">(.*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<a\\s*?href\\=\"(.*?)\".*?>(.*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String link = mth.group(1);
             String linkLabel = mth.group(2);
-            mth.appendReplacement(sb, "");
+//            linkLabel = appendReplacementEscape(linkLabel);
+            linkLabel = _stepFinal_hidden_tag(linkLabel, "\\<.*?\\>");
+            String replaeStr = "";
+            if (StringUtils.isNotBlank(link) && StringUtils.isNotBlank(linkLabel)) {
+                replaeStr = "{{link:" + link + ",value:" + linkLabel + "}}";
+            }
+            mth.appendReplacement(sb, replaeStr);
         }
         mth.appendTail(sb);
         return sb.toString();
     }
 
     private String _step3_imageProc(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<img.*?alt\\=\"描述\\:\\s(.*?)\">", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<img.*?alt\\=\"描述\\:\\s(.*?)\".*?>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String picLink = mth.group(1);
+            mth.appendReplacement(sb, "{{img:" + picLink + "}}");
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String _step3_imageProc2(String content) {
+        Pattern titleStylePtn = Pattern.compile("\\<v\\:shape.*?alt\\=\"描述\\:\\s(.*?)\".*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -104,11 +140,12 @@ public class WordHtmlParser {
     }
 
     private String _step4_wordBlockCheck(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<p.*?class\\=MsoNormal\\>(.*?)\\<\\/p\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=MsoNormal.*?\\>(.*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String tempContent = mth.group(1);
+            tempContent = contentFix(tempContent);
             mth.appendReplacement(sb, tempContent);
         }
         mth.appendTail(sb);
@@ -150,7 +187,7 @@ public class WordHtmlParser {
     }
 
     private String contentFix(String content) {
-        //escape &nbsp;
+        // escape &nbsp;
         Pattern ptn = Pattern.compile("\\&.{1,5}\\;");
         StringBuffer sb = new StringBuffer();
         Matcher mth = ptn.matcher(content);
@@ -159,12 +196,12 @@ public class WordHtmlParser {
         }
         mth.appendTail(sb);
 
-        //escape for
+        // escape for
         String rtnStr = appendReplacementEscape(sb.toString());
         return rtnStr;
     }
 
-    private String appendReplacementEscape(String content){
+    private String appendReplacementEscape(String content) {
         content = content.replaceAll("\\$", "\\\\$");
         content = content.replaceAll("\\/", "\\\\/");
         return content;

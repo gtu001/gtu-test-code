@@ -514,7 +514,7 @@
 			<artifactId>DebugMointerUI</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>E:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
+			<systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
 		</dependency><!-- ${project.basedir}/src/main/webapp/WEB-INF/lib/DebugMointerUI.jar -->
 
 		<!-- dropbox -->
@@ -616,7 +616,8 @@
 			<artifactId>javafx</artifactId>
 			<version>2.2.3</version>
 			<scope>system</scope>
-			<systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath>
+			<!-- <systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath> -->
+			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -670,6 +671,13 @@
 			<groupId>com.google.api-client</groupId>
 			<artifactId>google-api-client</artifactId>
 			<version>1.23.0</version>
+		</dependency>
+
+		<!-- rabbitmq amqp-client -->
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>5.0.0</version>
 		</dependency>
 
 	</dependencies>

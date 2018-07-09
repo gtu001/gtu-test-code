@@ -107,5 +107,14 @@ dependencies {
 	
 	//compileOnly('javax.servlet:servlet-api:2.5')
 	//provided group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+	
+	// rabbitMq ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	
+	compile("ch.qos.logback:logback-classic")
+	compile group: 'org.slf4j', name: 'slf4j-api'
+	
+	compile("org.springframework.amqp:spring-rabbit")
+	
+	// rabbitMq ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 }
 
