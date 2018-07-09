@@ -9,6 +9,7 @@ public class Log {
     private static CurrentStackUtil currentStackUtil;
     static {
         stack2 = CurrentStackUtil.StackTraceWatcher.getInstance();
+        stack2.addClass(Log.class);
         currentStackUtil = CurrentStackUtil.getInstance();
     }
 

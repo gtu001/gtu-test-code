@@ -15,12 +15,15 @@ import java.util.regex.Pattern;
 public class WordHtmlParser {
 
     public static void main(String[] args) {
-        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/-a rom hack of Teenage Mutant Ninja Turtles 2 for the NES-.htm");
         WordHtmlParser parser = WordHtmlParser.newInstance();
-        String result = parser.getFromFile(file);
+
+        File file = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/-a rom hack of Teenage Mutant Ninja Turtles 2 for the NES-.htm");
+
+        String result = parser.getFromFile(file, "image036.gif");
         String dropboxDir = parser.picDirForDropbox;
         System.out.println(result);
         System.out.println(dropboxDir);
+
         System.out.println("done...");
     }
 
@@ -35,39 +38,95 @@ public class WordHtmlParser {
         return new WordHtmlParser();
     }
 
+    private void validateContent(String stepLabel, String content, String checkStr) {
+        if (StringUtils.isBlank(checkStr)) {
+            return;
+        }
+        if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
+            throw new RuntimeException(stepLabel + " -> 查無 : " + checkStr);
+        } else {
+            Log.v(TAG, "CHECK : " + stepLabel + " OK!!!");
+        }
+    }
+
     public String getFromFile(File file) {
+        return getFromFile(file, null);
+    }
+
+    public String getFromFile(File file, String checkStr) {
         String content = FileUtilGtu.loadFromFile(file, "BIG5");
+        Log.v(TAG, "ORIGN : =======================================================================");
+        Log.v(TAG, content);
+        Log.v(TAG, "ORIGN : =======================================================================");
 
         content = _step0_headEmpty(content);
+        validateContent("_step0_headEmpty", content, checkStr);
         content = _step1_replaceTo_title(content);
+        validateContent("_step1_replaceTo_title", content, checkStr);
         content = _step2_nomalContent(content);
+        validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content);
-        content = _step3_imageProc(content);
-        content = _step3_imageProc2(content);
+        validateContent("_step2_hrefTag", content, checkStr);
+        content = _step3_imageProc(content, checkStr);
+        validateContent("_step3_imageProc", content, checkStr);
         content = _step4_wordBlockCheck(content);
+        validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step5_li_check(content);
+        validateContent("_step5_li_check", content, checkStr);
 
-        content = _stepFinal_hidden_tag(content, "\\<body.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<body.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<div.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<ul.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<li.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<hr.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<u.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<b.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<html.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<span.*?\\>");
-        content = _stepFinal_hidden_tag(content, "\\<\\/.*?\\>");
+        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 1", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 2", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 3", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<div(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 4", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<ul(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 5", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<li(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 6", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<hr(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 7", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<u(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 8", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<b(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 9", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<html(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 10", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<span(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 11", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\/(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 12", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<o\\:p>");
-        content = _stepFinal_hidden_tag(content, "\\<\\!\\[.*?\\]\\>");
-        content = _stepFinal_hidden_tag(content, "\\<\\!\\-\\-\\[.*?\\]\\>");
+        validateContent("_stepFinal_hidden_tag 13", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\[(?:.|\n)*?\\]\\>");
+        validateContent("_stepFinal_hidden_tag 14", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\-\\-\\[(?:.|\n)*?\\]\\>");
+        validateContent("_stepFinal_hidden_tag 15", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:shape.*?\\>");
+        validateContent("_stepFinal_hidden_tag 16", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<table(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 17", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<td(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 18", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<tr(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 19", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<o\\:(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 20", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 21", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
+        content = _stepFinal_removeMultiChangeLine(content);
+        validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
 
         return content;
     }
 
+
     private String _step1_replaceTo_title(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span.*?\\>(.*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -83,7 +142,7 @@ public class WordHtmlParser {
     }
 
     private String _step2_nomalContent(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<span.*?\\>(.*?)\\<\\/span\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -104,14 +163,19 @@ public class WordHtmlParser {
     }
 
     private String _step2_hrefTag(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<a\\s*?href\\=\"(.*?)\".*?>(.*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<a\\s*?href\\=\"((?:.|\n)*?)\"(?:.|\n)*?>((?:.|\n)*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String link = mth.group(1);
-            String linkLabel = mth.group(2);
+            String linkLabel = StringUtils.trimToEmpty(mth.group(2));
+
+            if (linkLabel.contains("<img")) {
+                continue;
+            }
+
             // linkLabel = appendReplacementEscape(linkLabel);
-            linkLabel = _stepFinal_hidden_tag(linkLabel, "\\<.*?\\>");
+            linkLabel = _stepFinal_hidden_tag(linkLabel, "\\<(?:.|\n)*?\\>");
             String replaeStr = "";
             if (StringUtils.isNotBlank(link) && StringUtils.isNotBlank(linkLabel)) {
                 replaeStr = "{{link:" + link + ",value:" + linkLabel + "}}";
@@ -147,36 +211,28 @@ public class WordHtmlParser {
         return StringUtils.trimToEmpty(srcDesc);
     }
 
-    private String _step3_imageProc(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<img.*?src\\=\"(.*?)\".*?alt\\=\"描述\\:\\s(.*?)\".*?>", Pattern.DOTALL | Pattern.MULTILINE);
+    private String _step3_imageProc(String content, String checkPic) {
+        Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"描述\\:\\s((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String srcDesc = mth.group(1);
             String picLink = mth.group(2);
             picLink = _fixPicUrl(picLink, srcDesc);
-            mth.appendReplacement(sb, "{{img:" + picLink + "}}");
-        }
-        mth.appendTail(sb);
-        return sb.toString();
-    }
 
-    private String _step3_imageProc2(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<v\\:shape.*?src\\=\"(.*?)\".*?alt\\=\"描述\\:\\s(.*?)\".*?>", Pattern.DOTALL | Pattern.MULTILINE);
-        StringBuffer sb = new StringBuffer();
-        Matcher mth = titleStylePtn.matcher(content);
-        while (mth.find()) {
-            String srcDesc = mth.group(1);
-            String picLink = mth.group(2);
-            picLink = _fixPicUrl(picLink, srcDesc);
-            mth.appendReplacement(sb, "{{img:" + picLink + "}}");
+            if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
+            }
+
+            String repStr = "{{img:" + picLink + "}}";
+            mth.appendReplacement(sb, repStr);
         }
         mth.appendTail(sb);
         return sb.toString();
     }
 
     private String _step4_wordBlockCheck(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=MsoNormal.*?\\>(.*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=MsoNormal(?:.|\n)*?\\>((?:.|\n)*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -200,7 +256,7 @@ public class WordHtmlParser {
     }
 
     private String _step5_li_check(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<i\\>(.*?)\\<\\/i\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<i\\>((?:.|\n)*?)\\<\\/i\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -212,7 +268,7 @@ public class WordHtmlParser {
     }
 
     private String _stepFinal_hidden_tag(String content, String patternStr) {
-        Pattern titleStylePtn = Pattern.compile(patternStr, Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile(patternStr, Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -220,6 +276,26 @@ public class WordHtmlParser {
         }
         mth.appendTail(sb);
         return sb.toString();
+    }
+
+    private String _stepFinal_removeMultiChangeLine(String content) {
+        Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
+        for (; ; ) {
+            boolean findOk = false;
+            StringBuffer sb = new StringBuffer();
+            Matcher mth = ptn.matcher(content);
+            while (mth.find()) {
+                findOk = true;
+                mth.appendReplacement(sb, "\n\n");
+            }
+            mth.appendTail(sb);
+            if (findOk) {
+                content = sb.toString();
+            } else {
+                break;
+            }
+        }
+        return content;
     }
 
     private String contentFix(String content) {

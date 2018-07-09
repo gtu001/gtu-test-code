@@ -279,6 +279,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     private void loadDropboxList() {
         final List<String> fileInfoList = new ArrayList<String>();
         final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
+        for (int ii = 0; ii < fileLst.size(); ii++) {
+            if (fileLst.get(ii).isFolder()) {
+                fileLst.remove(ii);
+                ii--;
+            }
+        }
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
             fileInfoList.add(String.format("%s (%s)", f.getName(),//
                     FileUtilGtu.getSizeDescription(f.getSize())));
@@ -797,7 +803,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             txtFileZ.set(txtFileGetterCall.call());
                         }
 
-                        handler.post(new Runnable(){
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (title == null) {
