@@ -1,6 +1,5 @@
 package com.example.englishtester.common;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,23 +14,21 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.FloatViewService;
+import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.TxtReaderActivity;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,13 +99,13 @@ public class TxtReaderAppender {
     }
 
     private class TxtAppenderProcess {
-        final int HYPER_LINK_LABEL_MAX_LENGTH = 80;
 
         String txtContent;
         boolean isWordHtml;
         SpannableString ss;
         int maxPicWidth;
         List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
+        Bitmap hyperlink;
 
         TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth) {
             this.txtContent = txtContent;
@@ -131,6 +128,10 @@ public class TxtReaderAppender {
             normalIgnoreLst.add(Pair.of(mth.start(), mth.end()));
         }
 
+        private void appendNormalIgnoreLst(int start, int end) {
+            normalIgnoreLst.add(Pair.of(start, end));
+        }
+
         private boolean isNormalIgnore(Matcher mth) {
             if (normalIgnoreLst.isEmpty()) {
                 return false;
@@ -145,8 +146,16 @@ public class TxtReaderAppender {
             return false;
         }
 
-        private boolean isLegelHyperLink(String urlContent) {
-            return StringUtils.trimToEmpty(urlContent).length() <= HYPER_LINK_LABEL_MAX_LENGTH;
+        private ImageSpan createHyperlinkImageSpan() {
+            if (hyperlink == null) {
+                Bitmap b1 = OOMHandler.new_decode(activity, R.drawable.hyperlink);
+                hyperlink = OOMHandler.fixPicScale(b1, 100, 100);
+            }
+            return new ImageSpan(activity, hyperlink, ImageSpan.ALIGN_BASELINE);
+        }
+
+        private boolean isHyperLinkToLong(String urlContent) {
+            return StringUtils.trimToEmpty(urlContent).length() > WordHtmlParser.HYPER_LINK_LABEL_MAX_LENGTH;
         }
 
         private void wordHtmlProcess() {
@@ -203,21 +212,34 @@ public class TxtReaderAppender {
                 final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(mth3, txtContent, 1);
                 final __SpecialTagHolder_Pos linkLabel = new __SpecialTagHolder_Pos(mth3, txtContent, 2);
 
-                //長度太長的link忽略
-                if (!isLegelHyperLink(linkLabel.getContent())) {
-                    continue;
+                //長度太長的link
+                if (!isHyperLinkToLong(linkLabel.getContent())) {
+
+                    this.appendNormalIgnoreLst(mth3);
+
+                    SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
+
+                    hiddenSpan(ss, start, linkLabel.getStart());
+                    hiddenSpan(ss, linkLabel.getEnd(), end);
+
+                    Log.v(TAG, "Lbl : " + linkLabel);
+
+                    ss.setSpan(hrefLinkSpan, linkLabel.getStart(), linkLabel.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } else {
+
+                    this.appendNormalIgnoreLst(linkUrl.getStart(), linkUrl.getEnd());
+
+                    SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
+
+                    hiddenSpan(ss, start, linkUrl.getStart());
+                    hiddenSpan(ss, linkUrl.getEnd(), linkLabel.getStart());
+                    hiddenSpan(ss, linkLabel.getEnd(), end);
+
+                    Log.v(TAG, "Lbl : " + linkLabel);
+
+//                    ss.setSpan(createHyperlinkImageSpan(), linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    ss.setSpan(hrefLinkSpan, linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
-
-                this.appendNormalIgnoreLst(mth3);
-
-                SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
-
-                hiddenSpan(ss, start, linkLabel.getStart());
-                hiddenSpan(ss, linkLabel.getEnd(), end);
-
-                Log.v(TAG, "Lbl : " + linkLabel);
-
-                ss.setSpan(hrefLinkSpan, linkLabel.getStart(), linkLabel.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
 
@@ -288,7 +310,7 @@ public class TxtReaderAppender {
 
         private Bitmap getPicFromDropbox(String filename) {
             try {
-                String realName = URLDecoder.decode(filename, "BIG5");
+                String realName = URLDecoder.decode(filename, WordHtmlParser.WORD_HTML_ENCODE);
                 if (realName.contains("/")) {
                     realName = realName.substring(realName.lastIndexOf("/"));
                 }

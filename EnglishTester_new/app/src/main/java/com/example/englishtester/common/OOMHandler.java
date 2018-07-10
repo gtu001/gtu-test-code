@@ -127,6 +127,10 @@ public class OOMHandler {
         return Bitmap.createScaledBitmap(bm, newWidth1, newHeight, false);
     }
 
+    public static Bitmap fixPicScale(Bitmap bm, int customWidth, int customHeight) {
+        return Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
+    }
+
     public static Bitmap new_decode(File f) {
         try {
             InputStream inputStream = new FileInputStream(f);

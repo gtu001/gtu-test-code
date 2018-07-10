@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 
 public class WordHtmlParser {
 
+    public static final String WORD_HTML_ENCODE = "BIG5";
+    public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
+
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
 
@@ -54,7 +57,7 @@ public class WordHtmlParser {
     }
 
     public String getFromFile(File file, String checkStr) {
-        String content = FileUtilGtu.loadFromFile(file, "BIG5");
+        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
         Log.v(TAG, "ORIGN : =======================================================================");
         Log.v(TAG, content);
         Log.v(TAG, "ORIGN : =======================================================================");
@@ -198,7 +201,7 @@ public class WordHtmlParser {
         // 取得dropbox 目錄名稱
         if (StringUtils.isBlank(picDirForDropbox)) {
             try {
-                String tmpDir = URLDecoder.decode(srcDesc, "BIG5");
+                String tmpDir = URLDecoder.decode(srcDesc, WORD_HTML_ENCODE);
                 if (tmpDir.contains("/")) {
                     tmpDir = tmpDir.substring(0, tmpDir.indexOf("/"));
                 }

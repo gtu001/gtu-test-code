@@ -76,6 +76,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks {
 
@@ -804,15 +806,27 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
 
                         handler.post(new Runnable() {
+                            private String fixName(String title) {
+                                title = StringUtils.trimToEmpty(title);
+                                Pattern ptn = Pattern.compile("(.*?)\\.(?:htm|html|txt|properties)", Pattern.CASE_INSENSITIVE);
+                                Matcher mth = ptn.matcher(title);
+                                if (mth.find()) {
+                                    return mth.group(1);
+                                }
+                                return title;
+                            }
+
                             @Override
                             public void run() {
+                                String titleVal = "";
                                 if (title == null) {
-                                    TitleTextSetter.setText(TxtReaderActivity.this, txtFileZ.get().getName());
-                                    setFileName(txtFileZ.get().getName());
+                                    titleVal = txtFileZ.get().getName();
                                 } else {
-                                    TitleTextSetter.setText(TxtReaderActivity.this, title);
-                                    setFileName(title);
+                                    titleVal = title;
                                 }
+                                titleVal = fixName(titleVal);
+                                setFileName(titleVal);
+                                TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
                             }
                         });
 
@@ -846,7 +860,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 if (new String(new char[]{c}).getBytes().length >= 3) {
                                     chsSb.append(c);
                                     if (c == '。') {
-                                        chsSb.append("\n");
+                                        chsSb.append("。\n");
                                     }
                                 } else {
                                     engSb.append(c);

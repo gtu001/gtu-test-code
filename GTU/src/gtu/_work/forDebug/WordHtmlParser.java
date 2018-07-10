@@ -12,8 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import gtu.file.FileUtil;
 import gtu.log.fakeAndroid.Log;
 
-
 public class WordHtmlParser {
+
+    public static final String WORD_HTML_ENCODE = "BIG5";
+    public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
 
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
@@ -55,7 +57,7 @@ public class WordHtmlParser {
     }
 
     public String getFromFile(File file, String checkStr) {
-        String content = FileUtil.loadFromFile(file, "BIG5");
+        String content = FileUtil.loadFromFile(file, WORD_HTML_ENCODE);
         Log.v(TAG, "ORIGN : =======================================================================");
         Log.v(TAG, content);
         Log.v(TAG, "ORIGN : =======================================================================");
@@ -125,7 +127,6 @@ public class WordHtmlParser {
         return content;
     }
 
-
     private String _step1_replaceTo_title(String content) {
         Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
@@ -192,14 +193,14 @@ public class WordHtmlParser {
         if (url.matches("https?\\:.*") || //
                 url.matches("www\\..*") || //
                 url.matches("\\w+\\.\\w+.*") //
-                ) {
+        ) {
             return url;
         }
 
         // 取得dropbox 目錄名稱
         if (StringUtils.isBlank(picDirForDropbox)) {
             try {
-                String tmpDir = URLDecoder.decode(srcDesc, "BIG5");
+                String tmpDir = URLDecoder.decode(srcDesc, WORD_HTML_ENCODE);
                 if (tmpDir.contains("/")) {
                     tmpDir = tmpDir.substring(0, tmpDir.indexOf("/"));
                 }
@@ -281,7 +282,7 @@ public class WordHtmlParser {
 
     private String _stepFinal_removeMultiChangeLine(String content) {
         Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
-        for (; ; ) {
+        for (;;) {
             boolean findOk = false;
             StringBuffer sb = new StringBuffer();
             Matcher mth = ptn.matcher(content);
