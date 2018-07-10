@@ -32,9 +32,9 @@ public class OnlinePicLoader {
 
     public Bitmap getBitmapFromURL_waiting(final String url, long wattingTime) {
         Bitmap bitmap = OOMHandler.getBitmapFromURL_waiting(url, wattingTime);
-        if (OOMHandler.DEFAULT_EMPTY_BMP == bitmap) {
-            return getNotfound404();
+        if (OOMHandler.DEFAULT_EMPTY_BMP != bitmap) {
+            return bitmap;
         }
-        return bitmap;
+        return null;
     }
 }

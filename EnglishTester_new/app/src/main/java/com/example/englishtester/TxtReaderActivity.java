@@ -15,23 +15,15 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.Layout;
-import android.text.Selection;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.method.MovementMethod;
-import android.text.method.ScrollingMovementMethod;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -727,6 +719,84 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             txtFileZ.set(txtFile);
 
             new Thread(new Runnable() {
+
+                private String fixName(String title) {
+                    title = StringUtils.trimToEmpty(title);
+                    Pattern ptn = Pattern.compile("(.*?)\\.(?:htm|html|txt|properties)", Pattern.CASE_INSENSITIVE);
+                    Matcher mth = ptn.matcher(title);
+                    if (mth.find()) {
+                        return mth.group(1);
+                    }
+                    return title;
+                }
+
+                private void setTitleNameProcess() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            String titleVal = "";
+                            if (title == null) {
+                                titleVal = txtFileZ.get().getName();
+                            } else {
+                                titleVal = title;
+                            }
+                            titleVal = fixName(titleVal);
+                            setFileName(titleVal);
+                            TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
+                        }
+                    });
+                }
+
+                private void htmlProcess() {
+                    //給html抓圖用
+                    dto.currentHtmlFile = txtFileZ.get();
+
+                    WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                    final String content = wordParser.getFromFile(txtFileZ.get());
+                    String dropboxDir = wordParser.getPicDirForDropbox();
+
+                    if (StringUtils.isNotBlank(dropboxDir)) {
+                        File dropboxPicDir = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxDir);
+                        dto.dropboxDir = dropboxPicDir;
+                    } else {
+                        dto.dropboxDir = null;
+                    }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setContentText(content, true);
+                            translateView.setText("");
+                        }
+                    });
+                }
+
+                private void txtProcess() throws IOException {
+                    String content = FileUtilAndroid.loadFileToString(txtFileZ.get());
+
+                    final StringBuilder engSb = new StringBuilder();
+                    final StringBuilder chsSb = new StringBuilder();
+
+                    for (char c : content.toCharArray()) {
+                        if (new String(new char[]{c}).getBytes().length >= 3) {
+                            chsSb.append(c);
+                            if (c == '。') {
+                                chsSb.append("。\n");
+                            }
+                        } else {
+                            engSb.append(c);
+                        }
+                    }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setContentText(engSb.toString(), false);
+                            translateView.setText(chsSb.toString());
+                        }
+                    });
+                }
+
                 @Override
                 public void run() {
                     try {
@@ -734,76 +804,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             txtFileZ.set(txtFileGetterCall.call());
                         }
 
-                        handler.post(new Runnable() {
-                            private String fixName(String title) {
-                                title = StringUtils.trimToEmpty(title);
-                                Pattern ptn = Pattern.compile("(.*?)\\.(?:htm|html|txt|properties)", Pattern.CASE_INSENSITIVE);
-                                Matcher mth = ptn.matcher(title);
-                                if (mth.find()) {
-                                    return mth.group(1);
-                                }
-                                return title;
-                            }
-
-                            @Override
-                            public void run() {
-                                String titleVal = "";
-                                if (title == null) {
-                                    titleVal = txtFileZ.get().getName();
-                                } else {
-                                    titleVal = title;
-                                }
-                                titleVal = fixName(titleVal);
-                                setFileName(titleVal);
-                                TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
-                            }
-                        });
+                        setTitleNameProcess();
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
-                            WordHtmlParser wordParser = WordHtmlParser.newInstance();
-                            final String content = wordParser.getFromFile(txtFileZ.get());
-                            String dropboxDir = wordParser.getPicDirForDropbox();
-
-                            if (StringUtils.isNotBlank(dropboxDir)) {
-                                File dropboxPicDir = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxDir);
-                                dto.dropboxDir = dropboxPicDir;
-                            } else {
-                                dto.dropboxDir = null;
-                            }
-
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setContentText(content, true);
-                                    translateView.setText("");
-                                }
-                            });
-
+                            htmlProcess();
                         } else {
-                            String content = FileUtilAndroid.loadFileToString(txtFileZ.get());
-
-                            final StringBuilder engSb = new StringBuilder();
-                            final StringBuilder chsSb = new StringBuilder();
-
-                            for (char c : content.toCharArray()) {
-                                if (new String(new char[]{c}).getBytes().length >= 3) {
-                                    chsSb.append(c);
-                                    if (c == '。') {
-                                        chsSb.append("。\n");
-                                    }
-                                } else {
-                                    engSb.append(c);
-                                }
-                            }
-
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setContentText(engSb.toString(), false);
-                                    translateView.setText(chsSb.toString());
-                                }
-                            });
-
+                            txtProcess();
                         }
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
@@ -971,6 +977,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)
         private Thread translateThread; //翻譯thread
         private File dropboxDir;
+        private File currentHtmlFile;//給html抓圖用
 
         public StringBuilder getFileName() {
             return fileName;
@@ -994,6 +1001,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public File getDropboxDir() {
             return dropboxDir;
+        }
+
+        public File getCurrentHtmlFile() {
+            return currentHtmlFile;
         }
     }
 

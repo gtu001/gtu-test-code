@@ -162,16 +162,6 @@ public class TxtReaderAppender {
             return StringUtils.trimToEmpty(urlContent).length() > WordHtmlParser.HYPER_LINK_LABEL_MAX_LENGTH;
         }
 
-        private boolean isOnlineImageFromURL(String url) {
-            if (url.matches("https?\\:.*") || //
-                    url.matches("www\\..*") || //
-                    url.matches("\\w+\\.\\w+.*") //
-                    ) {
-                return true;
-            }
-            return false;
-        }
-
         private void wordHtmlProcess() {
             // 設定標題
             Pattern ptnTitle = Pattern.compile("\\{\\{title\\:(.*?)\\}{2,4}", Pattern.DOTALL | Pattern.MULTILINE);
@@ -191,29 +181,25 @@ public class TxtReaderAppender {
             }
 
             // 設定圖片
-            Pattern ptnImg = Pattern.compile("\\{\\{img\\:(.*?)\\}\\}", Pattern.DOTALL | Pattern.MULTILINE);
+            Pattern ptnImg = Pattern.compile("\\{\\{img\\ssrc\\:(.*?)\\,alt\\:(.*?)\\}\\}", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth2 = ptnImg.matcher(txtContent);
             while (mth2.find()) {
                 int start = mth2.start();
                 int end = mth2.end();
 //                this.appendNormalIgnoreLst(mth2);
 
-                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(mth2, txtContent, 1);
+                __SpecialTagHolder_Pos srcData = new __SpecialTagHolder_Pos(mth2, txtContent, 1);
+                __SpecialTagHolder_Pos altData = new __SpecialTagHolder_Pos(mth2, txtContent, 2);
 
-                hiddenSpan(ss, start, proc.getStart());
-                hiddenSpan(ss, proc.getEnd(), end);
+                ImageLoaderCandidate picProcess = new ImageLoaderCandidate(srcData.getContent(), altData.getContent());
 
-                Bitmap smiley = null;
+//                hiddenSpan(ss, start, srcData.getStart());
+//                hiddenSpan(ss, srcData.getEnd(), altData.getStart());
+//                hiddenSpan(ss, altData.getEnd(), end);
 
-                if (isOnlineImageFromURL(proc.getContent())) {
-                    smiley = onlinePicLoader.getBitmapFromURL_waiting(proc.getContent(), 10 * 1000);
-                } else {
-                    smiley = getPicFromDropbox(proc.getContent());
-                }
+                Bitmap smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), maxPicWidth);
 
-                smiley = OOMHandler.fixPicScaleFixScreenWidth(smiley, maxPicWidth);
-
-                ss.setSpan(new ImageSpan(activity, smiley, ImageSpan.ALIGN_BASELINE), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss.setSpan(new ImageSpan(activity, smiley, ImageSpan.ALIGN_BASELINE), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 
             // 設定Url
@@ -319,20 +305,6 @@ public class TxtReaderAppender {
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
             }
         }
-
-        private Bitmap getPicFromDropbox(String filename) {
-            try {
-                String realName = URLDecoder.decode(filename, WordHtmlParser.WORD_HTML_ENCODE);
-                if (realName.contains("/")) {
-                    realName = realName.substring(realName.lastIndexOf("/"));
-                }
-                File dropboxPic = new File(dto.getDropboxDir(), realName);
-                return OOMHandler.new_decode(dropboxPic);
-            } catch (Exception e) {
-                Log.e(TAG, "getPicFromDropbox ERR : " + e.getMessage(), e);
-                return onlinePicLoader.getNotfound404();
-            }
-        }
     }
 
     /**
@@ -349,6 +321,71 @@ public class TxtReaderAppender {
     public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth) {
         TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth);
         return appender.getResult();
+    }
+
+    private class ImageLoaderCandidate {
+        String srcData;
+        String altData;
+
+        ImageLoaderCandidate(String srcData, String altData) {
+            this.srcData = srcData;
+            this.altData = altData;
+        }
+
+        private Bitmap getResult() {
+            Bitmap tmp = null;
+            if ((tmp = getPicFromLocalSD(srcData)) != null) {
+                return tmp;
+            } else {
+                if (isOnlineImageFromURL(altData) && //
+                        (tmp = getPicFromURL(altData)) != null) {
+                    return tmp;
+                } else if ((tmp = getPicFromDropbox(srcData)) != null) {
+                    return tmp;
+                } else {
+                    return onlinePicLoader.getNotfound404();
+                }
+            }
+        }
+
+        private boolean isOnlineImageFromURL(String url) {
+            if (url.matches("https?\\:.*") || //
+                    url.matches("www\\..*") || //
+                    url.matches("\\w+\\.\\w+.*") //
+                    ) {
+                return true;
+            }
+            return false;
+        }
+
+        private Bitmap getPicFromLocalSD(String filename) {
+            try {
+                String realName = URLDecoder.decode(filename, WordHtmlParser.WORD_HTML_ENCODE);
+                File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
+                return OOMHandler.new_decode(localPicFile);
+            } catch (Exception e) {
+                Log.e(TAG, "getPicFromLocalSD ERR : " + e.getMessage(), e);
+                return null;
+            }
+        }
+
+        private Bitmap getPicFromDropbox(String filename) {
+            try {
+                String realName = URLDecoder.decode(filename, WordHtmlParser.WORD_HTML_ENCODE);
+                if (realName.contains("/")) {
+                    realName = realName.substring(realName.lastIndexOf("/"));
+                }
+                File dropboxPic = new File(dto.getDropboxDir(), realName);
+                return OOMHandler.new_decode(dropboxPic);
+            } catch (Exception e) {
+                Log.e(TAG, "getPicFromDropbox ERR : " + e.getMessage(), e);
+                return null;
+            }
+        }
+
+        private Bitmap getPicFromURL(String url) {
+            return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000);
+        }
     }
 
     public static class SimpleUrlLinkSpan extends ClickableSpan {

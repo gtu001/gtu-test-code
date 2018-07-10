@@ -127,7 +127,6 @@ public class WordHtmlParser {
         return content;
     }
 
-
     private String _step1_replaceTo_title(String content) {
         Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
@@ -194,7 +193,7 @@ public class WordHtmlParser {
         if (url.matches("https?\\:.*") || //
                 url.matches("www\\..*") || //
                 url.matches("\\w+\\.\\w+.*") //
-                ) {
+        ) {
             return url;
         }
 
@@ -221,13 +220,12 @@ public class WordHtmlParser {
         while (mth.find()) {
             String srcDesc = mth.group(1);
             String picLink = mth.group(2);
-            picLink = _fixPicUrl(picLink, srcDesc);
 
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
                 Log.v(TAG, "!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
             }
 
-            String repStr = "{{img:" + picLink + "}}";
+            String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
             mth.appendReplacement(sb, repStr);
         }
         mth.appendTail(sb);
@@ -283,7 +281,7 @@ public class WordHtmlParser {
 
     private String _stepFinal_removeMultiChangeLine(String content) {
         Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
-        for (; ; ) {
+        for (;;) {
             boolean findOk = false;
             StringBuffer sb = new StringBuffer();
             Matcher mth = ptn.matcher(content);
