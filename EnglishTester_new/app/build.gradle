@@ -35,10 +35,15 @@ android {
     }
     productFlavors {
     }
+    packagingOptions {
+        exclude 'META-INF/spring.tooling'
+        exclude 'META-INF/spring.handlers'
+        exclude 'META-INF/spring.schemas'
+    }
 }
 
 configurations {
-    all*.exclude group: 'xmlpull' , module: 'xmlpull'  //for com.thoughtworks.xstream:xstream
+    all*.exclude group: 'xmlpull', module: 'xmlpull'  //for com.thoughtworks.xstream:xstream
 }
 
 dependencies {
@@ -67,6 +72,7 @@ dependencies {
     compile 'com.android.support:percent:26.0.1'
     //compile 'com.google.firebase:firebase-ads:10.2.0'
     compile 'com.google.firebase:firebase-ads:11.4.0'
+    compile 'org.springframework:spring-web:4.3.18.RELEASE'
 }
 
 apply plugin: 'com.google.gms.google-services'

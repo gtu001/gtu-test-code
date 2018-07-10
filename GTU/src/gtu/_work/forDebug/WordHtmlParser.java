@@ -302,16 +302,10 @@ public class WordHtmlParser {
 
     private String contentFix(String content) {
         // escape &nbsp;
-        Pattern ptn = Pattern.compile("\\&.{1,5}\\;");
-        StringBuffer sb = new StringBuffer();
-        Matcher mth = ptn.matcher(content);
-        while (mth.find()) {
-            mth.appendReplacement(sb, "");
-        }
-        mth.appendTail(sb);
+        content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
         // escape for
-        String rtnStr = appendReplacementEscape(sb.toString());
+        String rtnStr = appendReplacementEscape(content);
         return rtnStr;
     }
 

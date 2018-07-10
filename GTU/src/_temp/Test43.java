@@ -7,9 +7,12 @@ import gtu.binary.Base64JdkUtil;
 public class Test43 {
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        String from = "bi4g6L6p6K665pyv77yb6K666K+B5rOV77yIcG9sZW1pY+eahOWkjeaVsO+8iQ";
-        String v = Base64JdkUtil.decode(from);
-        System.out.println("--" + v);
+        
+        String val1 = org.springframework.web.util.HtmlUtils.htmlUnescape("&lt;&gt;");
+        String val2 = org.springframework.web.util.JavaScriptUtils.javaScriptEscape("&lt;&gt;");
+        
+        System.out.println("--" + val1);
+        System.out.println("--" + val2);
         System.out.println("done...");
     }
 }

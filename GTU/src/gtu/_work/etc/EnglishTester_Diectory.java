@@ -132,7 +132,7 @@ public class EnglishTester_Diectory {
     }
 
     private String meaningUnescape(String meaning) {
-        meaning = meaning.replaceAll("\\&\\w{3,5}\\;", "");
+        meaning = org.springframework.web.util.HtmlUtils.htmlUnescape(meaning);
         meaning = meaning.replaceAll(Pattern.quote("\\"), "");
         return meaning;
     }

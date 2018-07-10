@@ -193,7 +193,7 @@ public class EnglishTester_Diectory2 {
         }
         mth.appendTail(sb);
         String rtnVal = sb.toString();
-        rtnVal = rtnVal.replaceAll("&nbsp;", "");
+        rtnVal = org.springframework.web.util.HtmlUtils.htmlUnescape(rtnVal);
         rtnVal = rtnVal.replaceAll("；", ";");
         rtnVal = rtnVal.replaceAll("。", ".");
         return rtnVal;
@@ -221,6 +221,7 @@ public class EnglishTester_Diectory2 {
             sb.delete(startPos, endPos + 1);
             value = sb.toString();
         }
+        value = org.springframework.web.util.HtmlUtils.htmlUnescape(value);
         return value;
     }
 

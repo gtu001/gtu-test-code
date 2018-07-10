@@ -1,5 +1,6 @@
 package com.example.englishtester.common;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -151,7 +152,7 @@ public class TxtReaderAppender {
                 Bitmap b1 = OOMHandler.new_decode(activity, R.drawable.hyperlink);
                 hyperlink = OOMHandler.fixPicScale(b1, 100, 100);
             }
-            return new ImageSpan(activity, hyperlink, ImageSpan.ALIGN_BASELINE);
+            return new ImageSpan(activity, hyperlink, ImageSpan.ALIGN_BASELINE);//
         }
 
         private boolean isHyperLinkToLong(String urlContent) {
@@ -212,12 +213,12 @@ public class TxtReaderAppender {
                 final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(mth3, txtContent, 1);
                 final __SpecialTagHolder_Pos linkLabel = new __SpecialTagHolder_Pos(mth3, txtContent, 2);
 
+                SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(activity, linkUrl.getContent());
+
                 //長度太長的link
                 if (!isHyperLinkToLong(linkLabel.getContent())) {
 
                     this.appendNormalIgnoreLst(mth3);
-
-                    SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
 
                     hiddenSpan(ss, start, linkLabel.getStart());
                     hiddenSpan(ss, linkLabel.getEnd(), end);
@@ -229,15 +230,13 @@ public class TxtReaderAppender {
 
                     this.appendNormalIgnoreLst(linkUrl.getStart(), linkUrl.getEnd());
 
-                    SimpleUrlLinkSpan hrefLinkSpan = new SimpleUrlLinkSpan(linkUrl.getContent());
-
                     hiddenSpan(ss, start, linkUrl.getStart());
                     hiddenSpan(ss, linkUrl.getEnd(), linkLabel.getStart());
                     hiddenSpan(ss, linkLabel.getEnd(), end);
 
                     Log.v(TAG, "Lbl : " + linkLabel);
 
-//                    ss.setSpan(createHyperlinkImageSpan(), linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    ss.setSpan(createHyperlinkImageSpan(), linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_POINT_POINT);
                     ss.setSpan(hrefLinkSpan, linkUrl.getStart(), linkUrl.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
@@ -339,10 +338,12 @@ public class TxtReaderAppender {
         return appender.getResult();
     }
 
-    private class SimpleUrlLinkSpan extends ClickableSpan {
+    public static class SimpleUrlLinkSpan extends ClickableSpan {
+        Context context;
         String url;
 
-        public SimpleUrlLinkSpan(String url) {
+        public SimpleUrlLinkSpan(Context context, String url) {
+            this.context = context;
             this.url = url;
         }
 
@@ -356,7 +357,7 @@ public class TxtReaderAppender {
         public void onClick(View view) {
             Log.v(TAG, "click " + " - " + url);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            activity.startActivity(browserIntent);
+            context.startActivity(browserIntent);
         }
     }
 

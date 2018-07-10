@@ -23,6 +23,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -42,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApi;
+import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.DropboxUtilV2;
@@ -84,6 +86,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     private static final String TAG = TxtReaderActivity.class.getSimpleName();
 
     public static final String KEY_CONTENT = "TxtReaderActivity_content";
+
+    private static final Class[] CLICKABLE_SPAN_IMPL_CLZ = new Class[]{//
+            TxtReaderAppender.WordSpan.class, //
+            TxtReaderAppender.SimpleUrlLinkSpan.class//
+    };//
 
     /**
      * 綁定服務器
@@ -232,7 +239,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         float fontsize = new FontSizeApplyer().getFontSize(this);
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
-        txtView.setMovementMethod(createMovementMethod(this));
+        txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
         txtView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
@@ -247,7 +254,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         float fontsize = new FontSizeApplyer().getFontSize(this);
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
-        translateView.setMovementMethod(createMovementMethod(this));
+        translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
         translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
@@ -345,7 +352,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
 
     /**
-     * 建立可點擊文件
+     * 建立可點擊文件(中文翻譯部分)
      */
     private SpannableString getAppendTxtForTranslateView(final String chineseContent, Map<String, String> traMap) {
         SpannableString ss = new SpannableString(chineseContent);
@@ -561,84 +568,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     @Override
     public void updateClient(long data) {
         // TODO
-    }
-
-    private MovementMethod createMovementMethod(Context context) {
-        final GestureDetector detector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return true;
-            }
-
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                return true;
-            }
-        });
-
-        return new ScrollingMovementMethod() {
-
-            @Override
-            public boolean canSelectArbitrarily() {
-                return true;
-            }
-
-            @Override
-            public void initialize(TextView widget, Spannable text) {
-                Selection.setSelection(text, text.length());
-            }
-
-            @Override
-            public void onTakeFocus(TextView view, Spannable text, int dir) {
-                if ((dir & (View.FOCUS_FORWARD | View.FOCUS_DOWN)) != 0) {
-                    if (view.getLayout() == null) {
-                        // This shouldn't be null, but do something sensible if
-                        // it is.
-                        Selection.setSelection(text, text.length());
-                    }
-                } else {
-                    Selection.setSelection(text, text.length());
-                }
-            }
-
-            @Override
-            public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
-                // check if event is a single tab
-                boolean isClickEvent = detector.onTouchEvent(event);
-
-                // detect span that was clicked
-                if (isClickEvent) {
-                    int x = (int) event.getX();
-                    int y = (int) event.getY();
-
-                    x -= widget.getTotalPaddingLeft();
-                    y -= widget.getTotalPaddingTop();
-
-                    x += widget.getScrollX();
-                    y += widget.getScrollY();
-
-                    Layout layout = widget.getLayout();
-                    int line = layout.getLineForVertical(y);
-                    int off = layout.getOffsetForHorizontal(line, x);
-
-                    TxtReaderAppender.WordSpan[] link = buffer.getSpans(off, off, TxtReaderAppender.WordSpan.class);
-
-                    if (link.length != 0) {
-                        // execute click only for first clickable span
-                        // can be a for each loop to execute every one
-                        if (event.getAction() == MotionEvent.ACTION_UP) {
-                            link[0].onClick(widget);
-                        } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                            Selection.setSelection(buffer, buffer.getSpanStart(link[0]), buffer.getSpanEnd(link[0]));
-                        }
-                        return true;
-                    }
-                }
-
-                // let scroll movement handle the touch
-                return super.onTouchEvent(widget, buffer, event);
-            }
-        };
     }
 
     /**
