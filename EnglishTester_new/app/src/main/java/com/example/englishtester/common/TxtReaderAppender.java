@@ -50,12 +50,15 @@ public class TxtReaderAppender {
     TxtReaderActivity.TxtReaderActivityDTO dto;
     TextView txtView;
 
+    OnlinePicLoader onlinePicLoader;
+
     public TxtReaderAppender(TxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderActivity.TxtReaderActivityDTO dto, TextView txtView) {
         this.recentTxtMarkService = recentTxtMarkService;
         this.activity = activity;
         this.mService = mService;
         this.dto = dto;
         this.txtView = txtView;
+        this.onlinePicLoader = new OnlinePicLoader(activity);
     }
 
     private void hiddenSpan(SpannableString ss, int start, int end) {
@@ -159,6 +162,16 @@ public class TxtReaderAppender {
             return StringUtils.trimToEmpty(urlContent).length() > WordHtmlParser.HYPER_LINK_LABEL_MAX_LENGTH;
         }
 
+        private boolean isOnlineImageFromURL(String url) {
+            if (url.matches("https?\\:.*") || //
+                    url.matches("www\\..*") || //
+                    url.matches("\\w+\\.\\w+.*") //
+                    ) {
+                return true;
+            }
+            return false;
+        }
+
         private void wordHtmlProcess() {
             // 設定標題
             Pattern ptnTitle = Pattern.compile("\\{\\{title\\:(.*?)\\}{2,4}", Pattern.DOTALL | Pattern.MULTILINE);
@@ -192,10 +205,10 @@ public class TxtReaderAppender {
 
                 Bitmap smiley = null;
 
-                if (dto.getDropboxDir() != null) {
-                    smiley = getPicFromDropbox(proc.getContent());
+                if (isOnlineImageFromURL(proc.getContent())) {
+                    smiley = onlinePicLoader.getBitmapFromURL_waiting(proc.getContent(), 10 * 1000);
                 } else {
-                    smiley = OOMHandler.getBitmapFromURL_waiting(proc.getContent(), 10 * 1000);
+                    smiley = getPicFromDropbox(proc.getContent());
                 }
 
                 smiley = OOMHandler.fixPicScaleFixScreenWidth(smiley, maxPicWidth);
@@ -317,7 +330,7 @@ public class TxtReaderAppender {
                 return OOMHandler.new_decode(dropboxPic);
             } catch (Exception e) {
                 Log.e(TAG, "getPicFromDropbox ERR : " + e.getMessage(), e);
-                return OOMHandler.DEFAULT_EMPTY_BMP;
+                return onlinePicLoader.getNotfound404();
             }
         }
     }

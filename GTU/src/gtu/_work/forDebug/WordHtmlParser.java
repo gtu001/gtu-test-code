@@ -20,9 +20,9 @@ public class WordHtmlParser {
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
 
-        File file = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/-a rom hack of Teenage Mutant Ninja Turtles 2 for the NES-.htm");
+        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/Frankenstein’s Incel Demands a Girlfriend.htm");
 
-        String result = parser.getFromFile(file, "image036.gif");
+        String result = parser.getFromFile(file, "1");
         String dropboxDir = parser.picDirForDropbox;
         System.out.println(result);
         System.out.println(dropboxDir);
@@ -127,6 +127,7 @@ public class WordHtmlParser {
         return content;
     }
 
+
     private String _step1_replaceTo_title(String content) {
         Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
@@ -193,7 +194,7 @@ public class WordHtmlParser {
         if (url.matches("https?\\:.*") || //
                 url.matches("www\\..*") || //
                 url.matches("\\w+\\.\\w+.*") //
-        ) {
+                ) {
             return url;
         }
 
@@ -282,7 +283,7 @@ public class WordHtmlParser {
 
     private String _stepFinal_removeMultiChangeLine(String content) {
         Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
-        for (;;) {
+        for (; ; ) {
             boolean findOk = false;
             StringBuffer sb = new StringBuffer();
             Matcher mth = ptn.matcher(content);

@@ -8,11 +8,13 @@ import android.widget.Toast;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.common.DropboxUtilV2;
+import com.example.englishtester.common.FileUtilGtu;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,6 +159,9 @@ public class DropboxFileLoadService {
                     DbxClientV2 client = getClient();
                     List<DropboxUtilV2.DropboxUtilV2_DropboxFile> picLst = DropboxUtilV2.listFilesV2(ENGLISH_TXT_FOLDER + File.separator + dropboxDirName, client);
 
+                    //for check
+                    List<File> downloadLst = new ArrayList<File>();
+
                     for (DropboxUtilV2.DropboxUtilV2_DropboxFile pic : picLst) {
                         if (!pic.getName().matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")) {
                             continue;
@@ -165,14 +170,19 @@ public class DropboxFileLoadService {
                         tmpPath = pic.getFullPath();
 
                         File targetPicFile = new File(dirFile, pic.getName());
+                        downloadLst.add(targetPicFile);
 
-                        if (targetPicFile.exists() && targetPicFile.canRead()) {
+                        if (targetPicFile.exists() && targetPicFile.canRead() && targetPicFile.length() > 0) {
                             continue;
                         }
 
                         FileOutputStream outputStream = new FileOutputStream(targetPicFile);
                         DropboxUtilV2.download(pic.getFullPath(), outputStream, client);
                         Log.v(TAG, "下載ref pic : " + targetPicFile);
+                    }
+
+                    for (File f : downloadLst) {
+                        Log.v(TAG, "####### 圖片 : " + (f.exists() && f.canRead()) + " -> " + f + " -> " + FileUtilGtu.getSizeDescription(f.length()));
                     }
                     return dirFile;
                 } catch (Exception ex) {

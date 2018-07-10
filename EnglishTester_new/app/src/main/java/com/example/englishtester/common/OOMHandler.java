@@ -10,12 +10,15 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.example.englishtester.R;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -174,12 +177,12 @@ public class OOMHandler {
         return bmp;
     }
 
-    public static Bitmap getBitmapFromURL_waiting(final String src, long wattingTime) {
+    public static Bitmap getBitmapFromURL_waiting(final String url, long wattingTime) {
         final BlockingQueue<Bitmap> queue = new ArrayBlockingQueue<Bitmap>(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Bitmap bitmap = getBitmapFromURL(src);
+                Bitmap bitmap = getBitmapFromURL(url);
                 if (bitmap != null) {
                     queue.offer(bitmap);
                 } else {
