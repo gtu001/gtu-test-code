@@ -1,0 +1,2 @@
+要加決定run哪一塊
+--spring.profiles.active=rpc,server 

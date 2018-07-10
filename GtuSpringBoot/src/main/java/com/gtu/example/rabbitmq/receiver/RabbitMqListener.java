@@ -6,38 +6,60 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.gtu.example.entity.RabbitMqCustomMessage;
-import com.gtu.example.rabbitmq.RabbitMqApplication;
-import com.gtu.example.rabbitmq.RabbitMqBeanDefiner;
 
+@Profile(value = { "rabbitmq" })
 @Service
 public class RabbitMqListener {
+
+    private static final Logger log = LoggerFactory.getLogger(RabbitMqListener.class);
 
     @PostConstruct
     public void initOk() {
     }
 
-    private static final Logger log = LoggerFactory.getLogger(RabbitMqListener.class);
-
-    @RabbitListener(queues = RabbitMqBeanDefiner.POJO_QUEUE_001)
-    public void receiveMessage(final Message message) {
-        log.info("Received POJO_QUEUE_001 as generic: {}", message.toString());
+    @RabbitListener(queues = "#{topicQueue01.name}")
+    public void topicQueue01Listener(final Message message) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, message);
     }
 
-    @RabbitListener(queues = RabbitMqBeanDefiner.POJO_QUEUE_001)
-    public void receiveMessage(final RabbitMqCustomMessage customMessage) {
-        log.info("Received POJO_QUEUE_001 as specific class: {}", customMessage.toString());
+    @RabbitListener(queues = "#{topicQueue01.name}")
+    public void topicQueue01Listener(final RabbitMqCustomMessage customMessage) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, customMessage);
     }
 
-    @RabbitListener(queues = RabbitMqBeanDefiner.SPRING_QUEUE_001)
-    public void receiveMessage2(final Message message) {
-        log.info("Received SPRING_QUEUE_001 as generic: {}", message.toString());
+    @RabbitListener(queues = "#{topicQueue02.name}")
+    public void topicQueue02Listener(final Message message) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, message);
     }
 
-    @RabbitListener(queues = RabbitMqBeanDefiner.SPRING_QUEUE_001)
-    public void receiveMessage2(final RabbitMqCustomMessage customMessage) {
-        log.info("Received SPRING_QUEUE_001 as specific class: {}", customMessage.toString());
+    @RabbitListener(queues = "#{topicQueue02.name}")
+    public void topicQueue02Listener(final RabbitMqCustomMessage customMessage) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, customMessage);
+    }
+
+    @RabbitListener(queues = "#{directQueue01.name}")
+    public void directQueue01Listener(final String message) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, message);
+    }
+
+    @RabbitListener(queues = "#{directQueue02.name}")
+    public void directQueue02Listener(final String message) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, message);
+    }
+    
+    @RabbitListener(queues = "#{fandoutQueue.name}")
+    public void fandoutQueueListener(final String message) {
+        String method = new Object(){}.getClass().getEnclosingMethod().getName();
+        log.info("[receive] {} : {}", method, message);
     }
 }

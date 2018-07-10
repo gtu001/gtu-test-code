@@ -20,27 +20,31 @@ import com.gtu.example.rabbitmq.sender.RabbitMqSender;
 @SpringBootApplication // = @Configuration + @EnableAutoConfiguration +
                        // @ComponentScan
 public class Application {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
+
     @Autowired
     private ConfigurableApplicationContext ctx;
 
-    private static final Logger logger = LoggerFactory.getLogger(RabbitMqSender.class);
-
     public static void main(String[] args) throws Exception {
-        System.setProperty("spring.devtools.restart.enabled", "true"); // 自動重啟開關
-                                                                       // (false關閉)
+        System.setProperty("spring.profiles.active", "rabbitmq");
         SpringApplication.run(Application.class, args);
     }
 
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
-            System.out.println("Let's inspect the beans provided by Spring Boot:");
+            log.info("Let's inspect the beans provided by Spring Boot:");
 
             String[] beanNames = ctx.getBeanDefinitionNames();
             Arrays.sort(beanNames);
             for (String beanName : beanNames) {
-                logger.info("\t bean : " + beanName);
+                String beanPrefix = "";
+                if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {
+                    beanPrefix = "<GTU>";
+                }
+
+                log.info("\t {} bean : {}", beanPrefix, beanName);
             }
         };
     }

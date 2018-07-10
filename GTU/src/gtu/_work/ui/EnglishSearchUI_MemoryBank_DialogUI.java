@@ -62,6 +62,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private ActionListener onDismissAction;
     private ActionListener onCreateAction;
     private ActionListener appendBtnAction;
+    private ActionListener suspendTerminatedBtnAction;
     private JButton deleteFromMemoryBankBtn;
     private JButton customDescBtn;
     private JButton skipAllBtn;
@@ -78,6 +79,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private static final int MAX_LENGTH_DESC = 40;
     private JButton appendBtn;
     private JComboBox alignTypeComboBox;
+    private JButton suspendTerminatedBtn;
 
     /**
      * Launch the application.
@@ -89,7 +91,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         String[] arry = new String[] { testStr, testStr, testStr, testStr, testStr };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
-        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null, null);
+        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null, null, null);
         dialog.showDialog();
     }
 
@@ -112,8 +114,8 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             ActionListener deleteConfigAction, ActionListener choiceRadioAction, //
             ActionListener customDescAction, ActionListener skipBtnAction, //
             ActionListener skipAllBtnAction, ActionListener onCreateAction, //
-            ActionListener onDismissAction, ActionListener appendBtnAction //
-    ) {
+            ActionListener onDismissAction, ActionListener appendBtnAction, //
+            ActionListener suspendTerminatedBtnAction) {
         try {
             setTitle(title);
             this.meaningLst.set(meaningLst);
@@ -132,6 +134,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             this.onCreateAction = onCreateAction;
             this.onDismissAction = onDismissAction;
             this.appendBtnAction = appendBtnAction;
+            this.suspendTerminatedBtnAction = suspendTerminatedBtnAction;
             this.initialAfter();
         } catch (Exception e) {
             JCommonUtil.handleException(e);
@@ -345,6 +348,17 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                         }
                     }
                 });
+                {
+                    suspendTerminatedBtn = new JButton("停止");
+                    suspendTerminatedBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            if (suspendTerminatedBtnAction != null) {
+                                suspendTerminatedBtnAction.actionPerformed(e);
+                            }
+                        }
+                    });
+                    buttonPane.add(suspendTerminatedBtn);
+                }
                 skipBtn.setActionCommand("OK");
                 buttonPane.add(skipBtn);
                 getRootPane().setDefaultButton(skipBtn);

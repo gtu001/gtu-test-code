@@ -3,10 +3,6 @@ package com.gtu.example.rabbitmq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -19,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -26,6 +23,7 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
+@Profile(value = { "rabbitmq" })
 //-------------------------------
 @SpringBootApplication
 @EnableRabbit
@@ -51,6 +49,7 @@ public class RabbitMqApplication implements RabbitListenerConfigurer {
     @Value("${spring.rabbitmq.password}")
     private String password;
 
+    @Profile("suspicious_conflict")
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
@@ -60,9 +59,7 @@ public class RabbitMqApplication implements RabbitListenerConfigurer {
         return connectionFactory;
     }
 
-    /**
-     * Required for executing adminstration functions against an AMQP Broker
-     */
+    @Profile("suspicious_conflict")
     @Bean
     public AmqpAdmin amqpAdmin() {
         return new RabbitAdmin(connectionFactory());

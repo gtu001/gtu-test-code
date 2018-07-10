@@ -64,7 +64,8 @@ public class HermannEbbinghaus_Memory {
         M6(4 * 24 * 60), // 6．第六個記憶週期：4天
         M7(7 * 24 * 60), // 7．第七個記憶週期：7天
         M8(15 * 24 * 60), // 8．第八個記憶週期：15天
-        NONE(-1),//
+        NONE(-1), //
+        SUSPEND(-1),//
         ;
         final float min;
 
@@ -243,7 +244,34 @@ public class HermannEbbinghaus_Memory {
         this.append(d);
     }
 
+    public boolean suspendKey(String key) {
+        if (!config.getConfigProp().containsKey(key)) {
+            return false;
+        }
+        String strValue = config.getConfigProp().getProperty(key);
+        MemData d = new MemData(key, strValue);
+        d.suspendThis();
+        config.getConfigProp().setProperty(key, d.toValue());
+        config.store();
+        return true;
+    }
+
+    private MemData getExistsMemData(String key) {
+        if (config.getConfigProp().containsKey(key)) {
+            String strVal = config.getConfigProp().getProperty(key);
+            MemData d2 = new MemData(key, strVal);
+            return d2;
+        }
+        return null;
+    }
+
     public void append(MemData d) {
+        // 如果幾經終止就跳過
+        MemData test = getExistsMemData(d.getKey());
+        if (test != null && test.isSuspend()) {
+            return;
+        }
+
         this.memLst.add(d);
 
         config.getConfigProp().setProperty(d.getKey(), d.toValue());
@@ -498,6 +526,14 @@ public class HermannEbbinghaus_Memory {
 
         public void resetReviewTime() {
             this.reviewTime = ReviewTime.getInitialReviewTime().name();
+        }
+
+        public void suspendThis() {
+            this.reviewTime = ReviewTime.SUSPEND.name();
+        }
+
+        public boolean isSuspend() {
+            return ReviewTime.SUSPEND.name().equalsIgnoreCase(this.reviewTime);
         }
 
         public void setReviewTime(String reviewTime) {

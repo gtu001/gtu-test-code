@@ -398,6 +398,17 @@ public class EnglishSearchUI extends JFrame {
                                     JCommonUtil.handleException(ex);
                                 }
                             }
+                        }, new ActionListener() { // suspend key
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                boolean confirmDel = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定終止 : " + d.getKey(), "從設定檔中停止");
+                                if (confirmDel) {
+                                    checkChoiceEqual.set(false);
+                                    memory.suspendKey(d.getKey());
+                                    d.setWaitingTriggerTime(9999 * 60 * 1000);
+                                    choiceDialog.closeDialog();
+                                }
+                            }
                         });
                 choiceDialog.showDialog();
                 choiceMeaning = choiceDialog.getChoiceAnswer();
@@ -1424,6 +1435,7 @@ public class EnglishSearchUI extends JFrame {
         File file = null;
         if (propertyBean.getConfigProp().containsKey(MEMORY_BANK_PATH)) {
             file = new File(propertyBean.getConfigProp().getProperty(MEMORY_BANK_PATH));
+            FileUtil.createNewFile(file);
             if (file.isFile() && file.getName().equals("EnglishSearchUI_MemoryBank.properties")) {
                 // OK!!
             } else {

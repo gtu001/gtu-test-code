@@ -53,15 +53,3 @@ $ rabbitmq-plugins enable rabbitmq_management
 
 參考網址 https://www.rabbitmq.com/configure.html#config-location
 -------------------------------------------------------------------------------
-
-rabbitmqctl 指令
-
-start_app 啟動 rabiitmq
-list_queues 看queue
-list_exchanges
-list_bindings
-status
-environment
-
-看未ack的queue
-list_queues name messages_ready messages_unacknowledged

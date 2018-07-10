@@ -1,5 +1,7 @@
 package com.gtu.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -9,6 +11,8 @@ import com.kenai.jffi.Main;
 
 public class Application2 {
 
+    private static final Logger log = LoggerFactory.getLogger(Application2.class);
+
     public static void main(String[] args) {
         SpringApplication sa = new SpringApplication(Main.class);
         sa.setBannerMode(Banner.Mode.OFF);
@@ -16,16 +20,16 @@ public class Application2 {
 
         ApplicationContext c = sa.run(args);
         MyObject bean = c.getBean(MyObject.class);
-        bean.doSomething(); // TODO Auto-generated method stub
+        bean.doSomething();
     }
 
     @Component
     private static class MyObject {
 
         public void doSomething() {
-            System.out.println("-------------");
-            System.out.println("working ...");
-            System.out.println("-------------");
+            log.info("-------------");
+            log.info("working ...");
+            log.info("-------------");
         }
     }
 }

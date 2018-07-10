@@ -17,7 +17,7 @@ import gtu.rabbitmq.ex.common.RabbitMqConst;
 
 public class RabbitMqClient_Rpc {
     
-    public static void main(String[] args) throws IOException, TimeoutException{
+    public static void main(String[] args) throws IOException, TimeoutException, InterruptedException{
         RabbitMqClient_Rpc fibonacciRpc = new RabbitMqClient_Rpc();
 
         System.out.println(" [x] Requesting fib(30)");

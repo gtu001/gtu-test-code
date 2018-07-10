@@ -49,7 +49,6 @@ public class FileUtil {
 
     public static void main(String[] args) {
         File f1 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\XXXXXXXXXXXXXXXXXXXXXXXXXXXX - 複製");
-        System.out.println(FileUtil.moveToTrashCan(f1));
     }
 
     private FileUtil() {
@@ -1074,20 +1073,25 @@ public class FileUtil {
         }
     }
 
-    public static boolean moveToTrashCan(File... files) {
-        try {
-//            com.sun.jna.platform.FileUtils fileUtil = com.sun.jna.platform.FileUtils.getInstance();
-//            if (fileUtil.hasTrash()) {
-//                fileUtil.moveToTrash(files);
-//            }
-//            for (File f : files) {
-//                if (f.exists()) {
-//                    System.out.println("can't move to trash can : " + f);
-//                    return false;
-//                }
-//            }
-            return true;
-        } catch (Exception ex) {
+    public static boolean createNewFile(File file) {
+        if (!file.exists()) {
+            try {
+                return file.createNewFile();
+            } catch (IOException e1) {
+                System.out.println("createNewFile ERR : " + e1.getMessage());
+                return false;
+            }
+        } else {
+            System.out.println("取消建立新檔, 檔案已存在 : " + file);
+            return false;
+        }
+    }
+
+    public static boolean mkdirs(File file) {
+        if (!file.exists()) {
+            return file.mkdirs();
+        } else {
+            System.out.println("取消建立目錄, 路徑已存在 : " + file);
             return false;
         }
     }
