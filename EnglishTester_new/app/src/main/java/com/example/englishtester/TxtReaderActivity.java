@@ -890,7 +890,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.loadContentFromFile();
             }
         }, //
-        LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(其他txt檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
+        LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(其他txt,htm檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
                 activity.setTxtContentFromFile(file, null, null);
