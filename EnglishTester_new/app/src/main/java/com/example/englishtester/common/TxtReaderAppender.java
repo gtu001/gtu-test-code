@@ -375,7 +375,7 @@ public class TxtReaderAppender {
                 if (realName.contains("/")) {
                     realName = realName.substring(realName.lastIndexOf("/"));
                 }
-                File dropboxPic = new File(dto.getDropboxDir(), realName);
+                File dropboxPic = new File(dto.getDropboxPicDir(), realName);
                 return OOMHandler.new_decode(dropboxPic);
             } catch (Exception e) {
                 Log.e(TAG, "getPicFromDropbox ERR : " + e.getMessage(), e);

@@ -363,6 +363,12 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
         super.onDestroy();
     }
 
+    //用在將此app設定為背景
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     //設定權限callback行為
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {

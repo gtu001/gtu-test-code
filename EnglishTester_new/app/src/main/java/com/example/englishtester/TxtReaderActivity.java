@@ -106,6 +106,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 邊界調整
      */
     PaddingAdjuster paddingAdjuster;
+    /**
+     * 紀錄scroll位置
+     */
+    ScrollViewYHolder scrollViewYHolder;
 
     EditText editText1;
     Button clearBtn;
@@ -116,6 +120,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     TextView translateView;
     Button translateBtn;
     LinearLayout linearLayout1;
+
+    ScrollView scrollView1;
 
     private NativeExpressAdView mAdView;
 
@@ -149,16 +155,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         confirmBtn = (Button) this.findViewById(R.id.confirmBtn);
         linearLayout2 = (LinearLayout) this.findViewById(R.id.linearLayout2);
 
+        //卷軸
+        scrollView1 = (ScrollView) this.findViewById(R.id.scrollView1);
+
         //初始化服務
         initService();
 
-        //群組一
-        initTextView();
-        initTranslateBtn();
-        initTranslateView();
-
-        //群組2
-        initGroup2View();
+        initView();
 
         //顯示第二群組
         showGroup(2);
@@ -180,6 +183,38 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 Log.e(TAG, ex.getMessage(), ex);
             }
         }
+    }
+
+    /**
+     * 初始化view
+     */
+    private void initView() {
+        //群組一
+        initTextView();
+        initTranslateBtn();
+        initTranslateView();
+
+        //群組2
+        initGroup2View();
+
+        //卷軸
+        initScrollView();
+    }
+
+    /**
+     * 紀錄卷軸位置
+     */
+    private void initScrollView() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            return;
+        }
+        scrollView1.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                String fileName = dto != null ? StringUtils.isNotBlank(dto.getFileName()) ? dto.getFileName().toString() : "" : "";
+                Log.v(TAG, "[ScrollView Y] " + fileName + " -> " + scrollY);
+            }
+        });
     }
 
     /**
@@ -319,12 +354,27 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 設定現在檔案名稱
      */
-    private void setFileName(String newName) {
+    private void setFileName(final String newName) {
+        final String oldFileName = dto.fileName.toString();
+
         if (dto.fileName.length() > 0) {
             dto.fileName.delete(0, dto.fileName.length() - 1);
         }
         dto.fileName.append(newName);
         Log.v(TAG, "current fileName : " + dto.fileName);
+
+        dto.scrollRecordApplyer = new Runnable() {
+            @Override
+            public void run() {
+                if (!StringUtils.isBlank(oldFileName)) {
+                    //記錄舊的 scrollView Y
+                    scrollViewYHolder.recordY(oldFileName, scrollView1);
+                }
+
+                //回復新的 scrollView Y
+                scrollViewYHolder.restoreY(newName, scrollView1);
+            }
+        };
     }
 
     /**
@@ -339,6 +389,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         // 刪除舊資料
         recentTxtMarkService.deleteOldData();
+        scrollViewYHolder = new ScrollViewYHolder(recentTxtMarkService);
         doOnoffService(true);
     }
 
@@ -606,6 +657,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             translateBtn.setVisibility(View.VISIBLE);
         }
         showGroup(1);
+
+        //更新卷軸
+        if (dto.scrollRecordApplyer != null) {
+            txtView.invalidate();
+            scrollView1.invalidate();
+            dto.scrollRecordApplyer.run();
+        }
     }
 
     /**
@@ -757,9 +815,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
                     if (StringUtils.isNotBlank(dropboxDir)) {
                         File dropboxPicDir = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxDir);
-                        dto.dropboxDir = dropboxPicDir;
+                        dto.dropboxPicDir = dropboxPicDir;
                     } else {
-                        dto.dropboxDir = null;
+                        dto.dropboxPicDir = null;
                     }
 
                     handler.post(new Runnable() {
@@ -856,6 +914,32 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         void apply(TextView view) {
             view.setTypeface(myriadProRegular);
+        }
+    }
+
+    /**
+     * 紀錄 scrollView位置
+     */
+    private class ScrollViewYHolder {
+
+        RecentTxtMarkService recentTxtMarkService;
+
+        ScrollViewYHolder(RecentTxtMarkService recentTxtMarkService) {
+            this.recentTxtMarkService = recentTxtMarkService;
+        }
+
+        private void recordY(String fileName, ScrollView scrollView1) {
+            recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
+        }
+
+        private void restoreY(String fileName, final ScrollView scrollView1) {
+            final int posY = recentTxtMarkService.getScrollViewYPos(fileName);
+            scrollView1.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView1.scrollTo(0, posY);
+                }
+            });
         }
     }
 
@@ -976,8 +1060,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)
         private Thread translateThread; //翻譯thread
-        private File dropboxDir;//設定dropbox下載圖片的目錄
+        private File dropboxPicDir;//設定dropbox下載圖片的目錄
         private File currentHtmlFile;//給html抓圖用
+        private Runnable scrollRecordApplyer;
 
         public StringBuilder getFileName() {
             return fileName;
@@ -999,12 +1084,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.contentCopy = contentCopy;
         }
 
-        public File getDropboxDir() {
-            return dropboxDir;
+        public File getDropboxPicDir() {
+            return dropboxPicDir;
         }
 
         public File getCurrentHtmlFile() {
             return currentHtmlFile;
+        }
+
+        public void setDropboxPicDir(File dropboxPicDir) {
+            this.dropboxPicDir = dropboxPicDir;
         }
     }
 
@@ -1058,5 +1147,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         // Destroy the AdView.
         mAdView.destroy();
         super.onDestroy();
+    }
+
+    public void finish() {
+        super.finish();
+        scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
     }
 }

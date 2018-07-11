@@ -54,6 +54,7 @@ import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.RepeatMoveListener;
+import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
@@ -112,6 +113,7 @@ public class FloatViewService extends Service {
     ArrayAdapter<String> autoCompleteAdapter;
     Map<String, EnglishWord> englishMap = new LRUMap<String, EnglishWord>(50);
     ClipboardListenerHandler clipboardListenerHandler;//剪貼簿監聽器
+    MagnifierPosHolder magnifierPosHolder = new MagnifierPosHolder(this);
     Handler handler = new Handler();
 
     // ----------------------------------------------------------------
@@ -176,6 +178,9 @@ public class FloatViewService extends Service {
 
         mWindowManager.addView(contentView, wmParams);
 
+        //回復 放大鏡位置
+        magnifierPosHolder.retoreXY(mWindowManager, wmParams, contentView);
+
         contentView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         Log.i(TAG, "Width/2--->" + imageView1.getMeasuredWidth() / 2);
         Log.i(TAG, "Height/2--->" + imageView1.getMeasuredHeight() / 2);
@@ -194,6 +199,9 @@ public class FloatViewService extends Service {
                 Log.i(TAG, "Y" + event.getY());
 
                 mWindowManager.updateViewLayout(contentView, wmParams);
+
+                //紀錄最後位置
+                magnifierPosHolder.recordXY(wmParams);
                 return false;
             }
         }));
@@ -244,6 +252,7 @@ public class FloatViewService extends Service {
 
         // 调整悬浮窗显示的停靠位置为左侧置顶 (x,y左標起點位置)
         wmParams.gravity = Gravity.LEFT | Gravity.TOP;
+
         // 以屏幕左上角为原点，设置x、y初始值，相对于gravity
         MagnifierPosEnum.RIGHT_TOP.apply(mWindowManager, wmParams);
 
@@ -1245,6 +1254,42 @@ public class FloatViewService extends Service {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * 紀錄放大鏡最後位置
+     */
+    private class MagnifierPosHolder {
+
+        final String REF_KEY = MagnifierPosHolder.class.getName();
+        final String X_KEY = "X";
+        final String Y_KEY = "Y";
+
+        private Context context;
+
+        MagnifierPosHolder(Context context) {
+            this.context = context;
+        }
+
+        private void recordXY(WindowManager.LayoutParams wmParams) {
+            int x = wmParams.x;
+            int y = wmParams.y;
+            SharedPreferencesUtil.putData(context, REF_KEY, X_KEY, String.valueOf(x));
+            SharedPreferencesUtil.putData(context, REF_KEY, Y_KEY, String.valueOf(y));
+        }
+
+        private boolean retoreXY(WindowManager mWindowManager, WindowManager.LayoutParams wmParams, RelativeLayout contentView) {
+            if (SharedPreferencesUtil.hasData(context, REF_KEY, X_KEY) &&  //
+                    SharedPreferencesUtil.hasData(context, REF_KEY, Y_KEY)) {
+                int x = Integer.parseInt(SharedPreferencesUtil.getData(context, REF_KEY, X_KEY));
+                int y = Integer.parseInt(SharedPreferencesUtil.getData(context, REF_KEY, Y_KEY));
+                wmParams.x = x;
+                wmParams.y = y;
+                mWindowManager.updateViewLayout(contentView, wmParams);
+                return true;
+            }
+            return false;
         }
     }
 

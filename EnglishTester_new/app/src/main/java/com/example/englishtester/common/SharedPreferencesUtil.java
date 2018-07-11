@@ -26,4 +26,6 @@ public class SharedPreferencesUtil {
         String text = settings.getString(bundleKey, "");
         return text;
     }
+
+
 }

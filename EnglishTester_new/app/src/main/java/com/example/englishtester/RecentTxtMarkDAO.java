@@ -16,7 +16,7 @@ public class RecentTxtMarkDAO {
 
     private static final String TAG = RecentTxtMarkDAO.class.getSimpleName();
 
-//    final DBConnection helper;
+    //    final DBConnection helper;
     final Context context;
 
     public RecentTxtMarkDAO(Context context) {
@@ -73,7 +73,7 @@ public class RecentTxtMarkDAO {
 
     RecentTxtMark queryByListId(Long listId) {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
-        Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, RecentTxtMarkSchmea.LIST_ID + "=?", new String[] { String.valueOf(listId) }, null, null, null);
+        Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, RecentTxtMarkSchmea.LIST_ID + "=?", new String[]{String.valueOf(listId)}, null, null, null);
         if (c.getCount() == 0) {
             return null;
         }
@@ -107,12 +107,12 @@ public class RecentTxtMarkDAO {
         return result;
     }
 
-    int updateByListId(RecentTxtMark word) {
+    int updateByVO(RecentTxtMark word) {
         validationWord(word);
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         ContentValues values = this.transferWord(word);
         String where = RecentTxtMarkSchmea.LIST_ID + "=?";
-        int result = db.update(RecentTxtMarkSchmea.TABLE_NAME, values, where, new String[] { String.valueOf(word.listId) });
+        int result = db.update(RecentTxtMarkSchmea.TABLE_NAME, values, where, new String[]{String.valueOf(word.listId)});
         db.close();
         return result;
     }
@@ -120,11 +120,11 @@ public class RecentTxtMarkDAO {
     int deleteByListId(String currentId) {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         String where = RecentTxtMarkSchmea.LIST_ID + "=?";
-        int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, where, new String[] { currentId });
+        int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, where, new String[]{currentId});
         db.close();
         return result;
     }
-    
+
     int deleteByCondition(String whereCondition, String[] properties) {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, whereCondition, properties);
@@ -154,6 +154,7 @@ public class RecentTxtMarkDAO {
         word.markIndex = c.getInt(c.getColumnIndex(RecentTxtMarkSchmea.MARK_INDEX));
         word.markEnglish = c.getString(c.getColumnIndex(RecentTxtMarkSchmea.MARK_ENGLISH));
         word.insertDate = c.getLong(c.getColumnIndex(RecentTxtMarkSchmea.INSERT_DATE));
+        word.scrollYPos = c.getInt(c.getColumnIndex(RecentTxtMarkSchmea.SCROLL_Y_POS));
         return word;
     }
 
@@ -164,6 +165,7 @@ public class RecentTxtMarkDAO {
         values.put(RecentTxtMarkSchmea.MARK_INDEX, word.markIndex);
         values.put(RecentTxtMarkSchmea.MARK_ENGLISH, word.markEnglish);
         values.put(RecentTxtMarkSchmea.INSERT_DATE, word.insertDate);
+        values.put(RecentTxtMarkSchmea.SCROLL_Y_POS, word.scrollYPos);
         return values;
     }
 
@@ -182,6 +184,7 @@ public class RecentTxtMarkDAO {
         int markIndex = -1;
         String markEnglish;
         long insertDate = -1L;
+        int scrollYPos = 0;
 
         public Long getListId() {
             return listId;
@@ -222,6 +225,14 @@ public class RecentTxtMarkDAO {
         public void setInsertDate(long insertDate) {
             this.insertDate = insertDate;
         }
+
+        public int getScrollYPos() {
+            return scrollYPos;
+        }
+
+        public void setScrollYPos(int scrollYPos) {
+            this.scrollYPos = scrollYPos;
+        }
     }
 
     interface RecentTxtMarkSchmea {
@@ -231,6 +242,7 @@ public class RecentTxtMarkDAO {
         String MARK_INDEX = "mark_index";
         String MARK_ENGLISH = "mark_english";
         String INSERT_DATE = "insert_date";
-        final String[] FROM = { LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE };
+        String SCROLL_Y_POS = "scroll_y_pos";
+        final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS};
     }
 }

@@ -11,7 +11,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "ExamBook";
-    static final int DATABASE_VERSION = 5;
+    static final int DATABASE_VERSION = 6;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,10 +78,10 @@ public class DBConnection extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
 
-        if (newVersion == 5) {
+        if (newVersion == 6) {
             // txt查單字紀錄表
             sb = new StringBuilder();
-            sb.append("  alter table recent_search add upload_type text ");
+            sb.append("  alter table recent_txt_mark add scroll_y_pos integer ");
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());
         }
