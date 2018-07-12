@@ -1,4 +1,4 @@
-package com.gtu.example.entity;
+package com.gtu.example.rabbitmq.dto;
 
 import java.io.Serializable;
 

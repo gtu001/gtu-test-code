@@ -16,19 +16,19 @@ public class TestController {
 
     @RequestMapping("/home")
     public String home() {
-        System.out.println("home!!");
+        log.info("home!!");
         return "Hello World!";
     }
     
     @GetMapping
     public String findAll(){
-        System.out.println("findAll!!");
+        log.info("findAll!!");
         return "OK";
     }
 
     @RequestMapping(value = "/gtu001Test", method = RequestMethod.GET)
     public String gtu001Test() {
-        System.out.println("gtu001Test!!");
+        log.info("gtu001Test!!");
         return "OK";
     }
 }

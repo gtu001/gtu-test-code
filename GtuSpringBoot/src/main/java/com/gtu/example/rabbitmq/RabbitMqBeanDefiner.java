@@ -26,6 +26,7 @@ public class RabbitMqBeanDefiner {
     public static final String DIRECT_EXCHANGE = "[spring_boot] direct_exchange";
     public static final String RPC_DIRECT_EXCHANGE = "[spring_boot] rpc_direct_exchange";
     public static final String RPC_QUEUE = "rpc_queue";
+    public static final String RPC_ROUTING_KEY = "rpc_routing_key";
     public static final String DIRECT_ROUTING_KEY = "direct_routing_key";
 
     public static void main(String[] args) {
@@ -56,7 +57,7 @@ public class RabbitMqBeanDefiner {
         public Binding rpcBinding() {
             return BindingBuilder.bind(rpcQueue())//
                     .to(rpcDirectExchange())//
-                    .with("XXXXXXXXXXXXXXXXXXX");
+                    .with(RPC_ROUTING_KEY);
         }
     }
 

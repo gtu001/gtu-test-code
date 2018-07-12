@@ -5,12 +5,14 @@ buildscript {
 	repositories {
 		mavenCentral()
     	jcenter()
+    	maven {
+	        url 'https://repo.spring.io/libs-release' // for spring-data
+	    }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
-	dependencies {
         classpath('se.transmode.gradle:gradle-docker:1.2')//for docker image
+        classpath "io.spring.gradle:dependency-management-plugin:0.4.0.RELEASE" // for spring-data
     }
 }
 
@@ -84,10 +86,19 @@ buildDocker.dependsOn(build)
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url 'https://repo.spring.io/libs-release' // for spring-data
+    }
 }
 
 configurations {
 	providedRuntime
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'org.springframework.data:spring-data-releasetrain:Kay-SR8' // for spring-data
+	}
 }
 
 dependencies {
@@ -103,18 +114,32 @@ dependencies {
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	
-	compile("se.transmode.gradle:gradle-docker:1.2") //for docker image
+	// docker-image ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	compile("se.transmode.gradle:gradle-docker:1.2") 
+	// docker-image ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 	
 	//compileOnly('javax.servlet:servlet-api:2.5')
 	//provided group: 'javax.servlet', name: 'servlet-api', version: '2.5'
 	
 	// rabbitMq ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-	
 	compile("ch.qos.logback:logback-classic")
-	compile group: 'org.slf4j', name: 'slf4j-api'
-	
+	compile 'org.slf4j:slf4j-api'
 	compile("org.springframework.amqp:spring-rabbit")
-	
 	// rabbitMq ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+	
+	// spring-data ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	//official usage
+	compile 'org.springframework.data:spring-data-jpa'
+    compile 'org.springframework.data:spring-data-rest'
+    compile 'org.springframework.boot:spring-boot-starter-data-rest'
+    compile 'org.springframework.data:spring-data-rest-core'
+    //actual usage
+	compile 'org.springframework.boot:spring-boot-starter-test'
+	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// for mongoDB
+	// compile 'org.springframework.data:spring-data-mongodb'
+	// for SqlDB
+	compile files('D:/my_tool/simple_dao_gen/derbyclient.jar')
+    // spring-data ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 }
 

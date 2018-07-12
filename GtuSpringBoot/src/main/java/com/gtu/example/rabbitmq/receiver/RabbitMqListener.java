@@ -9,7 +9,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import com.gtu.example.entity.RabbitMqCustomMessage;
+import com.gtu.example.rabbitmq.dto.RabbitMqCustomMessage;
 
 @Profile(value = { "rabbitmq" })
 @Service

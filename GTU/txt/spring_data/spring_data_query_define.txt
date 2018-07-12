@@ -1,0 +1,19 @@
+
+
+
+findBy[first|Top][Distinct]<Entity>By[And|Or]<columns...>[OrderBy]<columns...>[Asc|Desc]
+
+@Query("select u from User u") <--可自訂查詢語法
+
+
+[first|Top] -> 如後面不加數字,那只回傳單個Entity, 若 Top10 則回傳 List
+
+[And|Or] --> AND , OR , Between, LessThan, GreaterThan, Like , Ex : AndFirstNameAndLastName
+
+<column>[IgnoreCase] --> 某欄位無視大小寫
+<column...>[AllIgnoreCase] --> 全部欄位無視大小寫(寫最後)
+
+
+放置參數可用如下
+org.springframework.data.domain.Pageable 
+org.springframework.data.domain.Sort

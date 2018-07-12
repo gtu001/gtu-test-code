@@ -1,5 +1,7 @@
 package com.gtu.example.rabbitmq.rpc;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.DirectExchange;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.gtu.example.rabbitmq.RabbitMqBeanDefiner;
 
 @Profile(value = { "rabbitmq" })
 @Service
@@ -23,13 +27,13 @@ public class RabbitMqPpcClient {
     @Qualifier("rpcDirectExchange")
     private DirectExchange exchange;
 
-    int start = 0;
 
-    @Scheduled(fixedDelay = 1000, initialDelay = 500)
+    @Scheduled(fixedDelay = 100000, initialDelay = 500)
     public void send() {
-        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
-        log.info("[rpc client][sender] {} Requesting fib(" + start + ")", methodName);
-        Integer response = (Integer) template.convertSendAndReceive(exchange.getName(), "XXXXXXXXXXXXXXXXXXX", start++);
+        String methodName = new Object() {}.getClass().getEnclosingMethod().getName();//
+        log.info("[rpc client][sender] {} ", methodName);
+        String sendData = UUID.randomUUID().toString();
+        String response = (String) template.convertSendAndReceive(exchange.getName(), RabbitMqBeanDefiner.RPC_ROUTING_KEY, sendData);
         log.info("[rpc client][sender] {} Got '" + response + "'", methodName);
     }
 }

@@ -1073,10 +1073,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private final StringBuilder fileName = new StringBuilder();
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)
-        private Thread translateThread; //翻譯thread
+        private transient Thread translateThread; //翻譯thread
         private File dropboxPicDir;//設定dropbox下載圖片的目錄
         private File currentHtmlFile;//給html抓圖用
-        private Runnable scrollRecordApplyer;
+        private transient Runnable scrollRecordApplyer;
 
         public StringBuilder getFileName() {
             return fileName;
