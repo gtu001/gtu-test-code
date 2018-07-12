@@ -124,6 +124,9 @@ public class WordHtmlParser {
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
         content = _stepFinal_removeMultiChangeLine(content);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
+        
+        //最後做這塊才會正常
+        content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
         return content;
     }
@@ -136,7 +139,7 @@ public class WordHtmlParser {
             String titleStr = mth.group(1);
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
-                title = "{{title:" + contentFix(titleStr) + "}}";
+                title = "{{title:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
             }
             mth.appendReplacement(sb, title);
         }
@@ -152,7 +155,7 @@ public class WordHtmlParser {
             AtomicReference<String> errMsg = new AtomicReference<String>();
             try {
                 String normalContent = mth.group(1);
-                String normalContentNew = contentFix(normalContent);
+                String normalContentNew = StringUtil_.appendReplacementEscape(normalContent);
                 errMsg.set("處理前 : " + normalContent + " --> 處理後 : " + normalContentNew);
                 mth.appendReplacement(sb, normalContentNew);
             } catch (Exception ex) {
@@ -255,7 +258,7 @@ public class WordHtmlParser {
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String tempContent = mth.group(1);
-            tempContent = contentFix(tempContent);
+            tempContent = StringUtil_.appendReplacementEscape(tempContent);
             mth.appendReplacement(sb, tempContent);
         }
         mth.appendTail(sb);
@@ -314,15 +317,6 @@ public class WordHtmlParser {
             }
         }
         return content;
-    }
-
-    private String contentFix(String content) {
-        // escape &nbsp;
-        content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
-
-        // escape for
-        String rtnStr = StringUtil_.appendReplacementEscape(content);
-        return rtnStr;
     }
 
     public String getPicDirForDropbox() {
