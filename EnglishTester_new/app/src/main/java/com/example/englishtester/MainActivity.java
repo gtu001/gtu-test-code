@@ -363,9 +363,9 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
         super.onDestroy();
     }
 
-    //用在將此app設定為背景
     @Override
     public void onBackPressed() {
+        //用在將此app設定為背景
         moveTaskToBack(true);
     }
 

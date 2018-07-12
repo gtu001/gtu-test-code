@@ -45,6 +45,7 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
+import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
@@ -113,6 +114,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 紀錄scroll位置
      */
     ScrollViewYHolder scrollViewYHolder;
+    /**
+     * Home 鍵觀察者
+     */
+    HomeKeyWatcher homeKeyWatcher;
 
     EditText editText1;
     Button clearBtn;
@@ -401,6 +406,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         // 刪除舊資料
         recentTxtMarkService.deleteOldData();
         scrollViewYHolder = new ScrollViewYHolder(recentTxtMarkService);
+
+        //監視home鍵
+        homeKeyWatcher = new HomeKeyWatcher(this);
+        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
+            public void onPressed() {
+                scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+            }
+        });
+        homeKeyWatcher.startWatch();
+
         doOnoffService(true);
     }
 
@@ -940,8 +955,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.recentTxtMarkService = recentTxtMarkService;
         }
 
-        private void recordY(String fileName, ScrollView scrollView1) {
-            recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
+        private boolean recordY(String fileName, ScrollView scrollView1) {
+            Log.v(TAG, "[recordY] start ... " + fileName);
+            if (StringUtils.isNotBlank(fileName)) {
+                boolean updateResult = recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
+                Log.v(TAG, "[recordY] " + (updateResult ? "success" : "failed") + " ... " + fileName + " -> " + scrollView1.getScrollY());
+                return updateResult;
+            }
+            return false;
         }
 
         private void restoreY(final String fileName, final ScrollView scrollView1) {
@@ -1165,6 +1186,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     public void finish() {
         scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+        homeKeyWatcher.stopWatch();
         super.finish();
     }
 }

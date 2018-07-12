@@ -82,13 +82,13 @@ public class RecentTxtMarkService {
     /**
      * 更新卷軸位置
      */
-    public void updateScrollViewYPos(String fileName, int y) {
+    public boolean updateScrollViewYPos(String fileName, int y) {
         List<RecentTxtMark> list = getFileMark(fileName);
         if (list.isEmpty()) {
-            return;
+            return false;
         }
         RecentTxtMark vo = list.get(0);
         vo.setScrollYPos(y);
-        recentTxtMarkDAO.updateByVO(vo);
+        return recentTxtMarkDAO.updateByVO(vo) > 0;
     }
 }
