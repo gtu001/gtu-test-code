@@ -13,6 +13,7 @@ import gtu.file.FileUtil;
 import gtu.log.fakeAndroid.Log;
 import gtu.string.StringUtil_;
 
+
 public class WordHtmlParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
@@ -77,55 +78,12 @@ public class WordHtmlParser {
         validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step5_li_check(content);
         validateContent("_step5_li_check", content, checkStr);
-
-        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 1", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 2", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 3", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<div(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 4", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<ul(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 5", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<li(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 6", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<hr(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 7", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<u(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 8", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<b(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 9", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<html(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 10", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<span(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 11", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<\\/(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 12", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<o\\:p>");
-        validateContent("_stepFinal_hidden_tag 13", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<\\!\\[(?:.|\n)*?\\]\\>");
-        validateContent("_stepFinal_hidden_tag 14", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<\\!\\-\\-\\[(?:.|\n)*?\\]\\>");
-        validateContent("_stepFinal_hidden_tag 15", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<v\\:shape.*?\\>");
-        validateContent("_stepFinal_hidden_tag 16", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<table(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 17", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<td(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 18", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<tr(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 19", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<o\\:(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 20", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<v\\:(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 21", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
+        content = _step6_hiddenSomething(content, checkStr);
+        validateContent("_step6_hiddenSomething", content, checkStr);
         content = _stepFinal_removeMultiChangeLine(content);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
-        
-        //最後做這塊才會正常
+
+        // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
         return content;
@@ -286,6 +244,75 @@ public class WordHtmlParser {
         }
         mth.appendTail(sb);
         return sb.toString();
+    }
+
+    private String _step6_hiddenSomething(String content, String checkStr) {
+        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 1", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 2", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 3", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<div(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 4", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<ul(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 5", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<li(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 6", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<hr(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 7", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<u(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 8", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<b(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 9", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<html(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 10", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<span(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 11", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\/(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 12", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<o\\:p>");
+        validateContent("_stepFinal_hidden_tag 13", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\[(?:.|\n)*?\\]\\>");
+        validateContent("_stepFinal_hidden_tag 14", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<\\!\\-\\-\\[(?:.|\n)*?\\]\\>");
+        validateContent("_stepFinal_hidden_tag 15", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:shape.*?\\>");
+        validateContent("_stepFinal_hidden_tag 16", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<table(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 17", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<td(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 18", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<tr(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 19", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<o\\:(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 20", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<v\\:(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 21", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<main(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 22", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<em(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 23", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<canvas(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 24", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<time(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 25", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<h\\d(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 26", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<figure(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 27", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<svg(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 28", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<w\\:(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 29", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<p\\sclass\\=MsoNormal(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 30", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<p\\sclass\\=graf(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 30", content, checkStr);
+
+        content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
+        return content;
     }
 
     private String _stepFinal_hidden_tag(String content, String patternStr) {
