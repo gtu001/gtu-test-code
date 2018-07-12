@@ -5,6 +5,10 @@ buildscript {
         maven {
             url "https://maven.google.com" // Google's Maven repository
         }
+        maven {
+            //https://github.com/koral--/android-gif-drawable
+            url "https://oss.sonatype.org/content/repositories/snapshots" //for GifDrawable
+        }
         mavenCentral()
         jcenter()
     }
@@ -22,6 +26,10 @@ allprojects {
         maven {
             url "https://maven.google.com" // Google's Maven repository
             name 'Google'
+        }
+        maven {
+            //https://github.com/koral--/android-gif-drawable
+            url "https://oss.sonatype.org/content/repositories/snapshots" //for GifDrawable
         }
         mavenCentral()
         //jcenter()

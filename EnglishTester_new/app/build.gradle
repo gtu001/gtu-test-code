@@ -73,6 +73,9 @@ dependencies {
     //compile 'com.google.firebase:firebase-ads:10.2.0'
     compile 'com.google.firebase:firebase-ads:11.4.0'
     compile 'org.springframework:spring-web:4.3.18.RELEASE'
+
+    //https://github.com/koral--/android-gif-drawable
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.14' // for GifDrawable
 }
 
 apply plugin: 'com.google.gms.google-services'

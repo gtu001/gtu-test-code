@@ -157,6 +157,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         translateBtn = (Button) this.findViewById(R.id.translateBtn);
         linearLayout1 = (LinearLayout) this.findViewById(R.id.linearLayout1);
 
+        //for GIF Span
+        dto.txtView = txtView;
+
         //群組2
         editText1 = (EditText) this.findViewById(R.id.editText1);
         clearBtn = (Button) this.findViewById(R.id.clearBtn);
@@ -1098,6 +1101,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private File dropboxPicDir;//設定dropbox下載圖片的目錄
         private File currentHtmlFile;//給html抓圖用
         private transient Runnable scrollRecordApplyer;
+        private transient TextView txtView;//傳遞原文View
 
         public StringBuilder getFileName() {
             return fileName;
@@ -1129,6 +1133,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public void setDropboxPicDir(File dropboxPicDir) {
             this.dropboxPicDir = dropboxPicDir;
+        }
+
+        public TextView getTxtView() {
+            return txtView;
         }
     }
 
