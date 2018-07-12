@@ -15,6 +15,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -65,6 +66,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -315,6 +318,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     private void loadDropboxList() {
         final List<String> fileInfoList = new ArrayList<String>();
         final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
+        Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
+            @Override
+            public int compare(DropboxUtilV2.DropboxUtilV2_DropboxFile o1, DropboxUtilV2.DropboxUtilV2_DropboxFile o2) {
+                return new Long(o1.getServerModify()).compareTo(o2.getServerModify());
+            }
+        });
         for (int ii = 0; ii < fileLst.size(); ii++) {
             if (fileLst.get(ii).isFolder()) {
                 fileLst.remove(ii);
