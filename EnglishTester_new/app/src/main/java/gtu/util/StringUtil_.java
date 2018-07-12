@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class StringUtil_ {
 
-    public static boolean hasChinese(String str){
+    public static boolean hasChinese(String str) {
         return StringUtils.isNotBlank(getChineseWord(str, true));
     }
 
@@ -31,5 +31,45 @@ public class StringUtil_ {
             sb.append(mth.group());
         }
         return sb.toString();
+    }
+
+
+    public static String appendReplacementEscape(String content) {
+        try {
+            return new AppendReplacementEscaper(content).getResult();
+        } catch (Exception ex) {
+            throw new RuntimeException(String.format("[appendReplacementEscape][content]\n ERR : %s \n %s", //
+                    ex.getMessage(), content), ex);
+        }
+    }
+
+    private static class AppendReplacementEscaper {
+        String content;
+        String result;
+
+        AppendReplacementEscaper(String content) {
+            this.content = content;
+            result = StringUtils.trimToEmpty(content).toString();
+            result = replaceChar(result, '$');
+            result = replaceChar(result, '/');
+        }
+
+        private String replaceChar(String content, char from) {
+            StringBuffer sb = new StringBuffer();
+            char[] arry = StringUtils.trimToEmpty(content).toCharArray();
+            for (int ii = 0; ii < arry.length; ii++) {
+                char a = arry[ii];
+                if (a == from && (ii - 1) >= 0 && arry[ii - 1] != '\\') {
+                    sb.append("\\" + a);
+                } else {
+                    sb.append(a);
+                }
+            }
+            return sb.toString();
+        }
+
+        private String getResult() {
+            return result;
+        }
     }
 }

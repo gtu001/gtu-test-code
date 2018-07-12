@@ -366,6 +366,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         dto.scrollRecordApplyer = new Runnable() {
             @Override
             public void run() {
+                Log.v(TAG, "[scrollRecordApplyer] run!");
+
                 if (!StringUtils.isBlank(oldFileName)) {
                     //記錄舊的 scrollView Y
                     scrollViewYHolder.recordY(oldFileName, scrollView1);
@@ -660,8 +662,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         //更新卷軸
         if (dto.scrollRecordApplyer != null) {
-            txtView.invalidate();
-            scrollView1.invalidate();
             dto.scrollRecordApplyer.run();
         }
     }
@@ -811,11 +811,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
                     WordHtmlParser wordParser = WordHtmlParser.newInstance();
                     final String content = wordParser.getFromFile(txtFileZ.get());
-                    String dropboxDir = wordParser.getPicDirForDropbox();
+                    String dropboxPicDir = wordParser.getPicDirForDropbox();
 
-                    if (StringUtils.isNotBlank(dropboxDir)) {
-                        File dropboxPicDir = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxDir);
-                        dto.dropboxPicDir = dropboxPicDir;
+                    Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
+
+                    if (StringUtils.isNotBlank(dropboxPicDir)) {
+                        File dropboxPicDirF = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxPicDir);
+                        dto.dropboxPicDir = dropboxPicDirF;
                     } else {
                         dto.dropboxPicDir = null;
                     }
@@ -921,6 +923,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 紀錄 scrollView位置
      */
     private class ScrollViewYHolder {
+        private final String TAG = ScrollViewYHolder.class.getSimpleName();
 
         RecentTxtMarkService recentTxtMarkService;
 
@@ -932,12 +935,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
         }
 
-        private void restoreY(String fileName, final ScrollView scrollView1) {
+        private void restoreY(final String fileName, final ScrollView scrollView1) {
+            Log.v(TAG, "[restoreY] start ... " + fileName);
             final int posY = recentTxtMarkService.getScrollViewYPos(fileName);
             scrollView1.post(new Runnable() {
                 @Override
                 public void run() {
                     scrollView1.scrollTo(0, posY);
+                    Log.v(TAG, "[restoreY] : " + fileName + " -> " + posY);
                 }
             });
         }
@@ -1150,7 +1155,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     public void finish() {
-        super.finish();
         scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+        super.finish();
     }
 }

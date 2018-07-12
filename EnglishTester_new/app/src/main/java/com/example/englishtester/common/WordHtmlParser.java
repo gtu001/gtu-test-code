@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gtu.util.StringUtil_;
+
 
 public class WordHtmlParser {
 
@@ -20,12 +22,12 @@ public class WordHtmlParser {
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
 
-        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/Frankenstein’s Incel Demands a Girlfriend.htm");
+        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The revolution will wear a dashiki.htm");
 
         String result = parser.getFromFile(file, "1");
         String dropboxDir = parser.picDirForDropbox;
+        System.out.println("picDirForDropbox -- " + dropboxDir);
         System.out.println(result);
-        System.out.println(dropboxDir);
 
         System.out.println("done...");
     }
@@ -157,6 +159,7 @@ public class WordHtmlParser {
             } catch (Exception ex) {
                 for (int ii = 0; ii < 10; ii++)
                     Log.e(TAG, "處理失敗 : " + ex.getMessage() + " ==== " + errMsg.get());
+                ex.printStackTrace();
                 mth.appendReplacement(sb, mth.group());
             }
         }
@@ -213,6 +216,19 @@ public class WordHtmlParser {
         return StringUtils.trimToEmpty(srcDesc);
     }
 
+    private void filterImageDir(String srcDesc) {
+        if (StringUtils.isNotBlank(picDirForDropbox)) {
+            return;
+        }
+        try {
+            String tmp = StringUtils.trimToEmpty(srcDesc);
+            tmp = URLDecoder.decode(tmp, WORD_HTML_ENCODE);
+            picDirForDropbox = tmp.substring(0, tmp.lastIndexOf("/"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private String _step3_imageProc(String content, String checkPic) {
         Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"描述\\:\\s((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
@@ -224,6 +240,8 @@ public class WordHtmlParser {
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
                 Log.v(TAG, "!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
             }
+
+            filterImageDir(srcDesc);
 
             String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
             mth.appendReplacement(sb, repStr);
@@ -281,7 +299,7 @@ public class WordHtmlParser {
 
     private String _stepFinal_removeMultiChangeLine(String content) {
         Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
-        for (;;) {
+        for (; ; ) {
             boolean findOk = false;
             StringBuffer sb = new StringBuffer();
             Matcher mth = ptn.matcher(content);
@@ -304,14 +322,8 @@ public class WordHtmlParser {
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
         // escape for
-        String rtnStr = appendReplacementEscape(content);
+        String rtnStr = StringUtil_.appendReplacementEscape(content);
         return rtnStr;
-    }
-
-    private String appendReplacementEscape(String content) {
-        content = content.replaceAll("\\$", "\\\\$");
-        content = content.replaceAll("\\/", "\\\\/");
-        return content;
     }
 
     public String getPicDirForDropbox() {
