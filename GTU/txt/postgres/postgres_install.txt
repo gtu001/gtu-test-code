@@ -1,0 +1,11 @@
+https://hub.docker.com/_/postgres/
+
+docker pull postgres
+
+--------------------------------------------------------------------------
+啟動 (postgres port 5432)
+$ docker run --name <containerName> -p 5432:5432 -e POSTGRES_DB=<DB> -e POSTGRES_USER=<user> -e POSTGRES_PASSWORD=<pwd> -d postgres
+
+
+sqlplus
+$ docker run -it --rm --link <containerName>:postgres postgres psql -h postgres -U postgres

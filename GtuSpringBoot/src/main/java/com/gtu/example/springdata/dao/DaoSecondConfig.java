@@ -17,7 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
-@Profile({ "spring-data", "secondDB" })
+//@Profile({ "spring-data", "secondDB" })
 
 // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-two-datasources
 // https://github.com/tonym2105/samples/tree/master/boot-multidb-sample

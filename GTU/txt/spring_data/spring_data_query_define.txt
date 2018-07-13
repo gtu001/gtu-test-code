@@ -1,7 +1,9 @@
-
+https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.misc.jpa-context
 
 
 findBy[first|Top][Distinct]<Entity>By[And|Or]<columns...>[OrderBy]<columns...>[Asc|Desc]
+
+-->find…By, read…By, query…By, count…By, and get…By 可用
 
 @Query("select u from User u") <--可自訂查詢語法
 

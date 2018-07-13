@@ -186,6 +186,15 @@ public class DbConstant {
         return bds;
     }
 
+    public static DataSource getPostgresDataSource() {
+        DriverManagerDataSource bds = new DriverManagerDataSource();
+        bds.setUrl("jdbc:postgresql://192.168.99.100:5432/test");
+        bds.setUsername("test");
+        bds.setPassword("1234");
+        bds.setDriverClassName("org.postgresql.Driver");
+        return bds;
+    }
+
     public static Connection getTestConnection_CTBC() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -252,4 +261,6 @@ public class DbConstant {
     public static final String DRIVER_MSSQL = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
     public static final String DRIVER_DB2 = "com.ibm.db2.jcc.DB2Driver";
+    public static final String DRIVER_DERBY = "org.apache.derby.jdbc.ClientDriver";
+    public static final String DRIVER_POSTGRES = "org.postgresql.Driver";
 }
