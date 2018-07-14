@@ -24,13 +24,14 @@ public class RecentTxtMarkService {
     /**
      * 新增查詢單字
      */
-    public void addMarkWord(String fileName, String word, int index) {
+    public void addMarkWord(String fileName, String word, int index, boolean clickBookmark) {
         long currentTime = System.currentTimeMillis();
         RecentTxtMark bo = new RecentTxtMark();
         bo.fileName = fileName;
         bo.insertDate = currentTime;
         bo.markEnglish = word;
         bo.markIndex = index;
+        bo.bookmarkType = 1;
         List<RecentTxtMark> list = recentTxtMarkDAO.query(//
                 RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
                         RecentTxtMarkSchmea.MARK_ENGLISH + "=? and " + //
@@ -42,6 +43,7 @@ public class RecentTxtMarkService {
         } else {
             bo = list.get(0);
             bo.insertDate = currentTime;
+            bo.bookmarkType = bo.bookmarkType == 0 ? 1 : 0;
             int result = recentTxtMarkDAO.updateByVO(bo);
             Log.v(TAG, "update [" + result + "]" + ReflectionToStringBuilder.toString(bo));
         }

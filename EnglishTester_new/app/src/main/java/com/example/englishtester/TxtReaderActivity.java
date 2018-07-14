@@ -11,14 +11,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -50,6 +51,7 @@ import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
+import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WordHtmlParser;
 import com.google.android.gms.ads.NativeExpressAdView;
@@ -73,6 +75,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -981,6 +984,45 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
+    /**
+     * 移動到下個書籤
+     */
+    public void moveToNextBookmark() {
+        if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
+            Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int currentId = dto.currentBookmarkId;
+        List<Integer> lst = new ArrayList<>(dto.getBookmarkHolder().keySet());
+        if (!lst.contains(currentId)) {
+            currentId = lst.get(0);
+        } else {
+            int tmpId = lst.indexOf(currentId);
+            if (tmpId + 1 >= lst.size()) {
+                currentId = lst.get(0);
+            } else {
+                currentId = lst.get(tmpId + 1);
+            }
+        }
+
+        dto.currentBookmarkId = currentId;
+        final TxtReaderAppender.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
+        TxtCoordinateFetcher coordinate = new TxtCoordinateFetcher(this.txtView, spanObject, this.getWindowManager());
+
+        final Rect rect = coordinate.getCoordinate();
+
+        scrollView1.post(new Runnable() {
+            @Override
+            public void run() {
+                int offsetHeight = TxtReaderActivity.this.getResources().getDisplayMetrics().heightPixels / 2;
+                int newSrollY = scrollView1.getScrollY() + rect.top - offsetHeight;
+                scrollView1.scrollTo(rect.left, newSrollY);
+                Toast.makeText(TxtReaderActivity.this, "移到 : " + spanObject.getWord(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
@@ -1016,6 +1058,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
                 activity.setTxtContentFromFile(file, null, null);
+            }
+        }, //
+        BOOKMARK_MODE("書籤模式", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                boolean currentMode = !activity.dto.bookmarkMode.get();
+                activity.dto.bookmarkMode.set(currentMode);
+                Toast.makeText(activity, "書籤模式" + (currentMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
+            }
+        }, //
+        BOOKMARK_MODE_MOVETO("移動到書籤", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.moveToNextBookmark();
             }
         }, //
         ;
@@ -1102,6 +1156,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private File currentHtmlFile;//給html抓圖用
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
+        private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
+        private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
+        private int currentBookmarkId = -1;
 
         public StringBuilder getFileName() {
             return fileName;
@@ -1137,6 +1194,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public TextView getTxtView() {
             return txtView;
+        }
+
+        public boolean getBookmarkMode() {
+            return bookmarkMode.get();
+        }
+
+        public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
+            return bookmarkHolder;
+        }
+
+        public void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder) {
+            this.bookmarkHolder = bookmarkHolder;
         }
     }
 

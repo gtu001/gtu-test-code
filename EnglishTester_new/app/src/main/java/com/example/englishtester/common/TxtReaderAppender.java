@@ -33,6 +33,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,6 +117,7 @@ public class TxtReaderAppender {
             this.isWordHtml = isWordHtml;
             this.ss = new SpannableString(txtContent);
             this.maxPicWidth = maxPicWidth;
+            dto.setBookmarkHolder(new TreeMap<Integer, WordSpan>());
         }
 
         public SpannableString getResult() {
@@ -192,10 +194,6 @@ public class TxtReaderAppender {
                 __SpecialTagHolder_Pos altData = new __SpecialTagHolder_Pos(mth2, txtContent, 2);
 
                 ImageLoaderCandidate picProcess = new ImageLoaderCandidate(srcData.getContent(), altData.getContent());
-
-//                hiddenSpan(ss, start, srcData.getStart());
-//                hiddenSpan(ss, srcData.getEnd(), altData.getStart());
-//                hiddenSpan(ss, altData.getEnd(), end);
 
                 if (!picProcess.isGifFile) {
                     Bitmap smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), maxPicWidth);
@@ -287,30 +285,51 @@ public class TxtReaderAppender {
                     public void onClick(View view) {
                         Log.v(TAG, "click " + this.id + " - " + txtNow);
 
-                        //myService.searchWordForActivity(txtNow);
-                        try {
-                            checkFloatServiceOn();
+                        boolean isClickBookmark = false;
 
-                            mService.searchWord(txtNow);
-                        } catch (RemoteException e) {
-                            Log.e(TAG, e.getMessage(), e);
-                            Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
+                        if (!dto.getBookmarkMode()) {
+                            //myService.searchWordForActivity(txtNow);
+                            try {
+                                checkFloatServiceOn();
+
+                                mService.searchWord(txtNow);
+                            } catch (RemoteException e) {
+                                Log.e(TAG, e.getMessage(), e);
+                                Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            setMarking(true);
+                        } else {
+                            isClickBookmark = true;
+                            setBookmarking(!this.isBookmarking());
+                            putToBookmarkHolder(this);
                         }
 
-                        setMarking(true);
+                        // 新增單字
+                        recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, isClickBookmark);
+
                         view.invalidate();
                         txtView.invalidate();
-
-                        // 新增單字
-                        recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id);
                     }
                 };
+
+                //設定內文
+                clickableSpan.setWord(txtNow);
 
                 // 設定單字為以查詢狀態
                 for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
                     if (bo.getMarkIndex() == clickableSpan.id && StringUtils.equals(bo.getMarkEnglish(), txtNow)) {
                         Log.v(TAG, "remark : " + txtNow + " - " + clickableSpan.id);
-                        clickableSpan.setMarking(true);
+
+                        //書籤模式
+                        if (bo.getBookmarkType() == 1) {
+                            clickableSpan.setBookmarking(true);
+                            putToBookmarkHolder(clickableSpan);
+                        } else {
+                            //查詢模式
+                            clickableSpan.setMarking(true);
+                        }
+
                     }
                 }
 
@@ -318,6 +337,10 @@ public class TxtReaderAppender {
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
             }
+        }
+
+        private void putToBookmarkHolder(WordSpan clickableSpan) {
+            dto.getBookmarkHolder().put(clickableSpan.id, clickableSpan);
         }
     }
 
@@ -435,7 +458,9 @@ public class TxtReaderAppender {
 
     public static class WordSpan extends ClickableSpan {
         int id = -1;
+        private String word;
         private boolean marking = false;
+        private boolean bookmarking = false;
 
         public WordSpan() {
         }
@@ -452,6 +477,13 @@ public class TxtReaderAppender {
             if (marking) {
                 ds.setTypeface(Typeface.create("新細明體", Typeface.BOLD));
             }
+
+            // if the word selected is the same as the ID set the highlight flag
+            if (bookmarking) {
+                ds.setColor(ds.linkColor);
+                ds.bgColor = Color.YELLOW;
+//                ds.setARGB(255, 255, 255, 255);
+            }
         }
 
         @Override
@@ -460,6 +492,34 @@ public class TxtReaderAppender {
 
         public void setMarking(boolean m) {
             marking = m;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public boolean isMarking() {
+            return marking;
+        }
+
+        public boolean isBookmarking() {
+            return bookmarking;
+        }
+
+        public void setBookmarking(boolean bookmarking) {
+            this.bookmarking = bookmarking;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public void setWord(String word) {
+            this.word = word;
         }
     }
 }
