@@ -257,4 +257,23 @@ public class RecentTxtMarkDAO {
         String BOOKMARK_TYPE = "bookmark_type";
         final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS, BOOKMARK_TYPE};
     }
+
+    public enum BookmarkTypeEnum {
+        NONE(0),//
+        BOOKMARK(1),//
+        ;
+        final int type;
+
+        BookmarkTypeEnum(int type) {
+            this.type = type;
+        }
+
+        public boolean isMatch(int value) {
+            return value == type;
+        }
+
+        public int getType() {
+            return type;
+        }
+    }
 }

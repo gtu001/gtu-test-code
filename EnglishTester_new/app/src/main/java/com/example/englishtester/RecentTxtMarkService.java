@@ -31,7 +31,7 @@ public class RecentTxtMarkService {
         bo.insertDate = currentTime;
         bo.markEnglish = word;
         bo.markIndex = index;
-        bo.bookmarkType = 1;
+        bo.bookmarkType = getBookmarkType(null, clickBookmark);
         List<RecentTxtMark> list = recentTxtMarkDAO.query(//
                 RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
                         RecentTxtMarkSchmea.MARK_ENGLISH + "=? and " + //
@@ -43,10 +43,29 @@ public class RecentTxtMarkService {
         } else {
             bo = list.get(0);
             bo.insertDate = currentTime;
-            bo.bookmarkType = bo.bookmarkType == 0 ? 1 : 0;
+            bo.bookmarkType = getBookmarkType(bo.bookmarkType, clickBookmark);
             int result = recentTxtMarkDAO.updateByVO(bo);
             Log.v(TAG, "update [" + result + "]" + ReflectionToStringBuilder.toString(bo));
         }
+    }
+
+    private int getBookmarkType(Integer oldValue, boolean clickBookmarkAction) {
+        if (oldValue == null) { //insert
+            return clickBookmarkAction ? //
+                    RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType() : //
+                    RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+        } else { //update
+            if (clickBookmarkAction) {
+                if (oldValue == RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType()) {
+                    return RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType();
+                } else if (oldValue == RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
+                    return RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+                }
+            } else {
+                return RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+            }
+        }
+        throw new RuntimeException("無法判斷的 BookmarkType : " + oldValue + " , " + clickBookmarkAction);
     }
 
     /**
