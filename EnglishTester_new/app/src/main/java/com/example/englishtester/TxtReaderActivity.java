@@ -23,6 +23,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -1251,6 +1252,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     public void onPause() {
         // Pause the AdView.
         mAdView.pause();
+        scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
         super.onPause();
     }
 
@@ -1261,9 +1263,20 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         super.onDestroy();
     }
 
+    // 中斷處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
     public void finish() {
         scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
         homeKeyWatcher.stopWatch();
         super.finish();
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_POWER) {
+            scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+        }
+        return super.dispatchKeyEvent(event);
+    }
+    // 中斷處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 }

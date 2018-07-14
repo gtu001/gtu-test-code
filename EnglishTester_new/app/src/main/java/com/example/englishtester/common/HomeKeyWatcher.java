@@ -41,8 +41,8 @@ public class HomeKeyWatcher {
         final String SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS = "globalactions";
         final String SYSTEM_DIALOG_REASON_RECENT_APPS = "recentapps";//多工建
         final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";//home建
-        final String SYSTEM_DIALOG_REASON_LONGPRESSED_1 = "assist";//常按home建
-        final String SYSTEM_DIALOG_REASON_LONGPRESSED_2 = "voiceinteraction";//常按home建
+        final String SYSTEM_DIALOG_REASON_LONGPRESSED_1 = "assist";//長按home建
+        final String SYSTEM_DIALOG_REASON_LONGPRESSED_2 = "voiceinteraction";//長按home建
 
         @Override
         public void onReceive(Context context, Intent intent) {

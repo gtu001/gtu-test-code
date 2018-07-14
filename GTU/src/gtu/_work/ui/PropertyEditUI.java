@@ -92,6 +92,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
 
     static File currentFile;
 
+    private static final boolean DEBUG = !PropertiesUtil.isClassInJar(PropertyEditUI.class);
+
     /**
      * Auto-generated main method to display this JFrame
      */
@@ -323,7 +325,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     return;
                                 }
 
-                                Properties memoryProp = loadFromMemoryBank();
+                                // Properties memoryProp = loadFromMemoryBank();
+                                Properties memoryProp = new Properties();
 
                                 List<String> errSb = new ArrayList<String>();
                                 for (int row = 0; row < propTable.getModel().getRowCount(); row++) {
@@ -349,6 +352,29 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 }
                                 if (!errSb.isEmpty()) {
                                     JCommonUtil._jOptionPane_showMessageDialog_error("有錯誤單字:\n" + errSb);
+                                }
+                            }
+                        });
+                    }
+
+                    {
+                        JMenuItem jMenuItem6 = new JMenuItem();
+                        jMenu1.add(jMenuItem6);
+                        jMenuItem6.setText("檢查有效");
+                        jMenuItem6.addActionListener(new ActionListener() {
+                            private void setMeaning(String meaning, int rowPos) {
+                                propTable.getRowSorter().getModel().setValueAt(meaning, rowPos, 2);
+                            }
+
+                            public void actionPerformed(ActionEvent evt) {
+                                for (int row = 0; row < propTable.getModel().getRowCount(); row++) {
+                                    int rowPos = propTable.getRowSorter().convertRowIndexToModel(row);
+                                    String english = StringUtils.trimToEmpty((String) propTable.getRowSorter().getModel().getValueAt(rowPos, 1)).toLowerCase();
+                                    String desc = (String) propTable.getRowSorter().getModel().getValueAt(rowPos, 2);
+
+                                    if (StringUtils.trimToEmpty(desc).contains("未收錄此詞條")) {
+                                        setMeaning("", rowPos);
+                                    }
                                 }
                             }
                         });

@@ -68,6 +68,7 @@
 
 			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->

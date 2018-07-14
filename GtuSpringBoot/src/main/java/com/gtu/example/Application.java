@@ -27,7 +27,7 @@ public class Application {
     private ConfigurableApplicationContext ctx;
 
     public static void main(String[] args) throws Exception {
-        // System.setProperty("spring.profiles.active", "rabbitmq");
+//         System.setProperty("spring.profiles.active", "rabbitmq");
         System.setProperty("spring.profiles.active", "spring-data");
         SpringApplication.run(Application.class, args);
     }

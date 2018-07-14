@@ -1,0 +1,11 @@
+--------------------------------------------------------------------------
+# 在container 灌 curl
+
+apt-get update
+apt-get install curl
+	
+--------------------------------------------------------------------------
+# 在container 灌 vi
+
+apt-get update
+apt-get install vim

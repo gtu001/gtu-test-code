@@ -21,7 +21,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Profile({ "spring-data" })
+//@Profile({ "spring-data" })
 
 @Configuration
 
@@ -74,7 +74,8 @@ public class DaoConfig {
         map.put("hibernate.hbm2ddl.auto", "create");
         // map.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         // map.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        map.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
+//        map.put("hibernate.dialect", "org.hibernate.dialect.DerbyDialect");
+        map.put("hibernate.dialect", "org.hibernate.dialect.ProgressDialect");
         map.put("hibernate.show_sql", "true");
         return map;
     }
