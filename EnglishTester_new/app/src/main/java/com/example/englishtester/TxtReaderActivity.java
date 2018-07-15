@@ -333,7 +333,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
             @Override
             public int compare(DropboxUtilV2.DropboxUtilV2_DropboxFile o1, DropboxUtilV2.DropboxUtilV2_DropboxFile o2) {
-                return new Long(o1.getServerModify()).compareTo(o2.getServerModify());
+                return new Long(o1.getClientModify()).compareTo(o2.getClientModify());
             }
         });
         for (int ii = 0; ii < fileLst.size(); ii++) {

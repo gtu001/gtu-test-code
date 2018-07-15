@@ -5,35 +5,35 @@ import android.content.ContextWrapper;
 import android.util.Log;
 
 public class ClipboardHelper {
-    public static void copyToClipboard(ContextWrapper contextWrapper, String str) {
+    public static void copyToClipboard(Context context, String str) {
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) contextWrapper.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setText(str);
             Log.e("version", "1 version");
         } else {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) contextWrapper.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("text label", str);
             clipboard.setPrimaryClip(clip);
             Log.e("version", "2 version");
         }
     }
 
-    public static String copyFromClipboard(ContextWrapper contextWrapper) {
+    public static String copyFromClipboard(Context context) {
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) contextWrapper.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < clipboard.getPrimaryClip().getItemCount(); i++) {
                 sb.append(clipboard.getPrimaryClip().getItemAt(i).getText());
             }
             return sb.toString();
         } else {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) contextWrapper.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             CharSequence text = clipboard.getText();
-            if(text != null){
-                return text.toString(); 
-            }else{
+            if (text != null) {
+                return text.toString();
+            } else {
                 return "";
             }
         }

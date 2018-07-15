@@ -15,6 +15,7 @@ import gtu.file.FileUtil;
 import gtu.log.fakeAndroid.Log;
 import gtu.string.StringUtil_;
 
+
 public class WordHtmlParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
@@ -254,7 +255,9 @@ public class WordHtmlParser {
         try {
             String tmp = StringUtils.trimToEmpty(srcDesc);
             tmp = URLDecoder.decode(tmp, WORD_HTML_ENCODE);
-            picDirForDropbox = tmp.substring(0, tmp.lastIndexOf("/"));
+            tmp = tmp.substring(0, tmp.lastIndexOf("/"));
+            tmp = org.springframework.web.util.HtmlUtils.htmlUnescape(tmp);
+            picDirForDropbox = tmp;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -375,6 +378,8 @@ public class WordHtmlParser {
         validateContent("_stepFinal_hidden_tag 34", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<g\\s(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 35", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<figcaption\\s(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 36", content, checkStr);
 
         content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
@@ -393,7 +398,7 @@ public class WordHtmlParser {
     }
 
     private String _stepFinal_removeMultiChangeLine(String content) {
-        Pattern ptn = Pattern.compile("\n[\r\\s]*\n[\r\\s]*\n");
+        Pattern ptn = Pattern.compile("\n[\r\\s\t]*\n[\r\\s\t]*\n");
         for (; ; ) {
             boolean findOk = false;
             StringBuffer sb = new StringBuffer();

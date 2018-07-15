@@ -145,6 +145,7 @@ public class DropboxUtilV2 {
         private boolean isFolder = false;
         private long size = -1;
         private long serverModify = -1;
+        private long clientModify = -1;
 
         public DropboxUtilV2_DropboxFile(Metadata meta) {
             this.name = meta.getName();
@@ -153,9 +154,10 @@ public class DropboxUtilV2 {
                 this.isFolder = true;
             }
             if (meta instanceof com.dropbox.core.v2.files.FileMetadata) {
-                com.dropbox.core.v2.files.FileMetadata m2 = (com.dropbox.core.v2.files.FileMetadata)meta;
+                com.dropbox.core.v2.files.FileMetadata m2 = (com.dropbox.core.v2.files.FileMetadata) meta;
                 size = m2.getSize();
                 serverModify = m2.getServerModified().getTime();
+                clientModify = m2.getClientModified().getTime();
             }
         }
 
@@ -177,6 +179,10 @@ public class DropboxUtilV2 {
 
         public long getServerModify() {
             return serverModify;
+        }
+
+        public long getClientModify() {
+            return clientModify;
         }
     }
 }

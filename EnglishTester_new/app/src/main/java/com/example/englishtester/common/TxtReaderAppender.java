@@ -112,7 +112,7 @@ public class TxtReaderAppender {
         }
 
         private void normalTxtProcess() {
-            Pattern ptn = Pattern.compile("[a-zA-Z\\-]+", Pattern.DOTALL | Pattern.MULTILINE);
+            Pattern ptn = Pattern.compile("([a-zA-Z\\-]+|[\\u4e00-\\u9fa5]+)", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(txtContent);
             final String txtContent_ = txtContent;
 

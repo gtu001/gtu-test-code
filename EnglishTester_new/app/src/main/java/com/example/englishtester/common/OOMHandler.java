@@ -107,16 +107,8 @@ public class OOMHandler {
     }
 
     public static Bitmap fixPicScaleFixScreenWidth(Bitmap bm, Context context) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-
-        DisplayMetrics dm = context.getResources().getDisplayMetrics();
-
-        int newWidth1 = dm.widthPixels;
-        float scaleWidth = ((float) newWidth1) / width;
-        int newHeight = (int) (scaleWidth * height);
-
-        return Bitmap.createScaledBitmap(bm, newWidth1, newHeight, false);
+        int newWidth1 = context.getResources().getDisplayMetrics().widthPixels;
+        return fixPicScaleFixScreenWidth(bm, newWidth1);
     }
 
     public static Bitmap fixPicScaleFixScreenWidth(Bitmap bm, int customWidth) {
@@ -127,7 +119,11 @@ public class OOMHandler {
         float scaleWidth = ((float) newWidth1) / width;
         int newHeight = (int) (scaleWidth * height);
 
-        return Bitmap.createScaledBitmap(bm, newWidth1, newHeight, false);
+        Bitmap bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
+        if (bm != null) {
+            bm.recycle();
+        }
+        return bitmap;
     }
 
     public static Bitmap fixPicScale(Bitmap bm, int customWidth, int customHeight) {

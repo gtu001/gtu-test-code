@@ -1045,6 +1045,12 @@ public class FloatViewService extends Service {
                     return;
                 }
 
+                if (StringUtil_.hasChinese(text)) {
+                    //不使用剪貼簿設回原值
+                    pasteToClipboard("", text);
+                    return;
+                }
+
                 if (isNumbers(text) || isEmail(text)) {
                     //不使用剪貼簿設回原值
                     pasteToClipboard("", text);
@@ -1324,9 +1330,14 @@ public class FloatViewService extends Service {
      */
     public void searchWordForActivity(String word) {
         imageViewEraser.performClick();
-        autoCompleteTextView1.setText(word);
-        searchEnglishId();
-        doOpenCloseEditPanel(true);
+        word = StringUtils.trimToEmpty(word);
+        //原先做法
+//        autoCompleteTextView1.setText(word);
+//        searchEnglishId();
+//        doOpenCloseEditPanel(true);
+
+        //新作法
+        ClipboardHelper.copyToClipboard(this.getApplicationContext(), word);
     }
     // 與activity連線↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ (舊的寫法)
 
