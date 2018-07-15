@@ -195,16 +195,17 @@ public class TxtReaderAppenderForHtmlTag {
 
                 TxtReaderAppender.SimpleUrlLinkSpan hrefLinkSpan = new TxtReaderAppender.SimpleUrlLinkSpan(self.context, linkUrl.getContent());
                 log(linkUrl);
-                self.appendNormalIgnoreLst(pair);
 
                 //長度太長的link
-                if (!self.isHyperLinkToLong(linkLabel.getContent())) {
+                if (!self.isHyperLinkTooLong(linkLabel.getContent())) {
+                    self.appendNormalIgnoreLst(pair);
 
                     self.hiddenSpan(self.ss, self.getPairStart(pair), linkLabel.getStart());
                     self.hiddenSpan(self.ss, linkLabel.getEnd(), self.getPairEnd(pair));
 
                     self.ss.setSpan(hrefLinkSpan, linkLabel.getStart(), linkLabel.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else {
+                    self.appendNormalIgnoreLst(linkLabel.getStart(), linkLabel.getEnd());
 
                     self.hiddenSpan(self.ss, self.getPairStart(pair), linkUrl.getStart());
                     self.hiddenSpan(self.ss, linkUrl.getEnd(), linkLabel.getStart());
@@ -357,7 +358,7 @@ public class TxtReaderAppenderForHtmlTag {
         ss.setSpan(new RelativeSizeSpan(0f), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    private boolean isHyperLinkToLong(String urlContent) {
+    private boolean isHyperLinkTooLong(String urlContent) {
         return StringUtils.trimToEmpty(urlContent).length() > WordHtmlParser.HYPER_LINK_LABEL_MAX_LENGTH;
     }
 
