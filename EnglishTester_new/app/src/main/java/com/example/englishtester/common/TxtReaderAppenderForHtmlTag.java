@@ -205,7 +205,8 @@ public class TxtReaderAppenderForHtmlTag {
 
                     self.ss.setSpan(hrefLinkSpan, linkLabel.getStart(), linkLabel.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else {
-                    self.appendNormalIgnoreLst(linkLabel.getStart(), linkLabel.getEnd());
+                    self.appendNormalIgnoreLst(self.getPairStart(pair), linkLabel.getStart());
+                    self.appendNormalIgnoreLst(linkLabel.getEnd(), self.getPairEnd(pair));
 
                     self.hiddenSpan(self.ss, self.getPairStart(pair), linkUrl.getStart());
                     self.hiddenSpan(self.ss, linkUrl.getEnd(), linkLabel.getStart());
