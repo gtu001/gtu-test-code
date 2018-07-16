@@ -727,7 +727,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(parentView);
         final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
-        editText.setText("txtReaderFile" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
+        String tmpFileName = StringUtils.isNotBlank(dto.fileName) ? dto.fileName.toString() : "txtReaderFile";
+        editText.setText(tmpFileName + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
         builder.setTitle("儲存內容");
         builder.setMessage("路徑為 : " + saveToDir);
         builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {

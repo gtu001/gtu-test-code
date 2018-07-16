@@ -468,7 +468,7 @@ public class TxtReaderAppenderForHtmlTag {
     }
 
     private int getPairEnd(Pair<Integer, Integer> pair) {
-        return pair.getRight() + END_TAG.length();
+        return pair.getRight();
     }
 
     private void appendNormalIgnoreLst(Pair pair) {

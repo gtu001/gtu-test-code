@@ -104,21 +104,8 @@ public class WordHtmlParser {
 //        log( "RESULT : =======================================================================");
 //        logContent(content);
 //        log( "RESULT : =======================================================================");
-        saveResultTempFile(content, file);
 
         return content;
-    }
-
-    private void saveResultTempFile(String resultContent, File file) {
-        if (!BuildConfig.DEBUG) {
-            return;
-        }
-        File tmpFile = new File(Constant.PropertiesFindActivity_PATH + "/temp_" + file.getName() + ".txt");
-        try {
-            FileUtilAndroid.saveToFile(tmpFile, resultContent);
-        } catch (IOException e) {
-            Log.e(TAG, "saveResultTempFile ERR : " + e.getMessage(), e);
-        }
     }
 
     private void logContent(String content) {
