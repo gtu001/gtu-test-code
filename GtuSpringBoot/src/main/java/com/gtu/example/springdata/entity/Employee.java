@@ -1,22 +1,23 @@
 package com.gtu.example.springdata.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 //import org.springframework.data.annotation.Id;//誤用此Id
 import javax.persistence.Id;//這才對
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.context.annotation.Profile;
 //import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Profile("spring-data")
 @Entity
@@ -30,6 +31,7 @@ public class Employee extends AuditModel {
     // sequenceName = "question_sequence", //
     // initialValue = 1000//
     // )
+    @Column(name = "employee_id")
     private Long id;
 
     @NotBlank
@@ -56,6 +58,10 @@ public class Employee extends AuditModel {
     // "ID_B") }//
     // )
     // public List<B> lista = new ArrayList<B>();
+
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinColumn(name = "employee_id")
+    private List<WorkItem> workItems = new ArrayList<WorkItem>();
 
     private Employee() {
     }
@@ -104,5 +110,13 @@ public class Employee extends AuditModel {
 
     public void setAddress(List<Address> address) {
         this.address = address;
+    }
+
+    public List<WorkItem> getWorkItems() {
+        return workItems;
+    }
+
+    public void setWorkItems(List<WorkItem> workItems) {
+        this.workItems = workItems;
     }
 }
