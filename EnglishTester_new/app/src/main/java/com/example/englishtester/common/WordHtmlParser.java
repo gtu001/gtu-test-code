@@ -1,11 +1,16 @@
 package com.example.englishtester.common;
 
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.englishtester.BuildConfig;
+import com.example.englishtester.Constant;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -24,9 +29,9 @@ public class WordHtmlParser {
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
 
-        File file = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/Here’s why so many data scientists are leaving their jobs.htm");
+        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The Stress of Remote Working.htm");
 
-        String result = parser.getFromFile(file, "2222");
+        String result = parser.getFromFile(file, "");
         String dropboxDir = parser.picDirForDropbox;
         System.out.println("picDirForDropbox -- " + dropboxDir);
         System.out.println(result);
@@ -52,7 +57,7 @@ public class WordHtmlParser {
         if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
             throw new RuntimeException(stepLabel + " -> 查無 : " + checkStr);
         } else {
-            Log.v(TAG, "CHECK : " + stepLabel + " OK!!!");
+            log("CHECK : " + stepLabel + " OK!!!");
         }
     }
 
@@ -62,18 +67,22 @@ public class WordHtmlParser {
 
     public String getFromFile(File file, String checkStr) {
         String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
-//        Log.v(TAG, "ORIGN : =======================================================================");
-//        Log.v(TAG, content);
-//        Log.v(TAG, "ORIGN : =======================================================================");
+        log("ORIGN : =======================================================================");
+        log(content);
+        log("ORIGN : =======================================================================");
 
         content = _step0_hiddenHead(content);
         validateContent("_step0_hiddenHead", content, checkStr);
         content = _step1_hTitleHandler(content);
         validateContent("_step1_hTitleHandler", content, checkStr);
-        content = _step1_replaceTo_title(content);
-        validateContent("_step1_replaceTo_title", content, checkStr);
-        content = _step1_boldTag(content);
-        validateContent("_step1_boldTag", content, checkStr);
+        content = _step1_replaceTo_Bold(content);
+        validateContent("_step1_replaceTo_Bold", content, checkStr);
+        content = _step1_replaceTo_Italic(content);
+        validateContent("_step1_replaceTo_Italic", content, checkStr);
+        content = _step1_replaceStrongTag(content);
+        validateContent("_step1_replaceStrongTag", content, checkStr);
+        content = _step1_fontSize_Indicate(content);
+        validateContent("_step1_fontSize_Indicate", content, checkStr);
         content = _step2_normalContent(content);
         validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content);
@@ -92,11 +101,24 @@ public class WordHtmlParser {
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
-//        Log.v(TAG, "RESULT : =======================================================================");
+//        log( "RESULT : =======================================================================");
 //        logContent(content);
-//        Log.v(TAG, "RESULT : =======================================================================");
+//        log( "RESULT : =======================================================================");
+        saveResultTempFile(content, file);
 
         return content;
+    }
+
+    private void saveResultTempFile(String resultContent, File file) {
+        if (!BuildConfig.DEBUG) {
+            return;
+        }
+        File tmpFile = new File(Constant.PropertiesFindActivity_PATH + "/temp_" + file.getName() + ".txt");
+        try {
+            FileUtilAndroid.saveToFile(tmpFile, resultContent);
+        } catch (IOException e) {
+            Log.e(TAG, "saveResultTempFile ERR : " + e.getMessage(), e);
+        }
     }
 
     private void logContent(String content) {
@@ -104,7 +126,7 @@ public class WordHtmlParser {
         try {
             reader = new BufferedReader(new StringReader(content));
             for (String line = null; (line = reader.readLine()) != null; ) {
-                Log.v(TAG, line);
+                log(line);
             }
         } catch (Exception ex) {
             Log.e(TAG, "logContent ERR : " + ex.getMessage(), ex);
@@ -117,7 +139,7 @@ public class WordHtmlParser {
         }
     }
 
-    private String _step1_boldTag(String content) {
+    private String _step1_replaceStrongTag(String content) {
         Pattern titleStylePtn = Pattern.compile("\\<strong(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/strong\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -131,6 +153,43 @@ public class WordHtmlParser {
         }
         mth.appendTail(sb);
         return sb.toString();
+    }
+
+    private enum FontSizeIndicateEnum {
+        PTN01("\\<span(?:.|\n)*?font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
+//        PTN01("\\<span(?:.|\n)*?style\\=\"font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
+//        PTN02("\\<span(?:.|\n)*?style\\=\"mso\\-bidi\\-font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
+        ;
+
+        final Pattern ptn;
+
+        FontSizeIndicateEnum(String ptnStr) {
+            ptn = Pattern.compile(ptnStr, Pattern.DOTALL | Pattern.MULTILINE);
+        }
+
+        String apply(String content) {
+            StringBuffer sb = new StringBuffer();
+            Matcher mth = ptn.matcher(content);
+            while (mth.find()) {
+                String size = mth.group(1);
+                String text = mth.group(2);
+                String tmpVal = "";
+                log("....." + size + " , " + text);
+                if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
+                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}";
+                }
+                mth.appendReplacement(sb, tmpVal);
+            }
+            mth.appendTail(sb);
+            return sb.toString();
+        }
+    }
+
+    private String _step1_fontSize_Indicate(String content) {
+        for (FontSizeIndicateEnum e : FontSizeIndicateEnum.values()) {
+            content = e.apply(content);
+        }
+        return content;
     }
 
     private String _step0_hiddenHead(String content) {
@@ -153,7 +212,7 @@ public class WordHtmlParser {
             String titleText = mth.group(2);
             String title = "";
             if (StringUtils.isNotBlank(titleSize) && StringUtils.isNotBlank(titleText)) {
-                title = "{{h text:" + StringUtil_.appendReplacementEscape(titleText) + ",size:" + titleSize + "}}";
+                title = "{{h size:" + titleSize + ",text:" + StringUtil_.appendReplacementEscape(titleText) + "}}";
             }
             mth.appendReplacement(sb, title);
         }
@@ -161,15 +220,31 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step1_replaceTo_title(String content) {
-        Pattern titleStylePtn = Pattern.compile("\\<b\\>\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>\\<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
+    private String _step1_replaceTo_Bold(String content) {
+        Pattern titleStylePtn = Pattern.compile("\\<b\\>((?:.|\n)*?)<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String titleStr = mth.group(1);
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
-                title = "{{title:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
+                title = "{{b:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
+            }
+            mth.appendReplacement(sb, title);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String _step1_replaceTo_Italic(String content) {
+        Pattern titleStylePtn = Pattern.compile("\\<i\\>((?:.|\n)*?)<\\/i\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String titleStr = mth.group(1);
+            String title = "";
+            if (StringUtils.isNotBlank(titleStr)) {
+                title = "{{i:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
             }
             mth.appendReplacement(sb, title);
         }
@@ -215,7 +290,7 @@ public class WordHtmlParser {
             linkLabel = _stepFinal_hidden_tag(linkLabel, "\\<(?:.|\n)*?\\>");
             String replaeStr = "";
             if (StringUtils.isNotBlank(link) && StringUtils.isNotBlank(linkLabel)) {
-                replaeStr = "{{link:" + link + ",value:" + linkLabel + "}}";
+                replaeStr = "{{link:" + link + ",value:" + StringUtil_.appendReplacementEscape(linkLabel) + "}}";
             }
             mth.appendReplacement(sb, replaeStr);
         }
@@ -272,7 +347,7 @@ public class WordHtmlParser {
             String picLink = mth.group(2);
 
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
-                Log.v(TAG, "!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
+                log("!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
             }
 
             filterImageDir(srcDesc);
@@ -419,5 +494,13 @@ public class WordHtmlParser {
 
     public String getPicDirForDropbox() {
         return picDirForDropbox;
+    }
+
+    private static void log(Object message) {
+        System.out.println(message);
+        try {
+            Log.v(TAG, "" + message);
+        } catch (Exception ex) {
+        }
     }
 }

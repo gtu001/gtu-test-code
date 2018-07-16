@@ -19,7 +19,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +37,7 @@ public class TxtReaderAppenderForHtmlTag {
     private static final Pattern START = Pattern.compile("\\{\\{", Pattern.MULTILINE | Pattern.DOTALL);
     private static final Pattern END = Pattern.compile("\\}\\}", Pattern.MULTILINE | Pattern.DOTALL);
     private static final String START_TAG = "{{";
-    private static final String END_TAG = "{{";
+    private static final String END_TAG = "}}";
 
     private String txtContent;//
     private SpannableString ss;//
@@ -70,9 +72,13 @@ public class TxtReaderAppenderForHtmlTag {
             String txt = txtContent.substring(tag.getLeft(), tag.getRight());
 
             for (ContentDefineEnum e : ContentDefineEnum.values()) {
-                Matcher mth = e.ptn.matcher(txt);
-                if (mth.find()) {
-                    e.apply(tag, mth, this);
+                if (txt.startsWith(e.startWtih)) {
+                    Matcher mth = e.ptn.matcher(txt);
+                    if (mth.find()) {
+                        e.apply(tag, mth, this);
+                    } else {
+                        throw new RuntimeException("無法match設定 : " + e + " --> " + txt);
+                    }
                 }
             }
         }
@@ -112,27 +118,15 @@ public class TxtReaderAppenderForHtmlTag {
     }
 
     private enum ContentDefineEnum {
-        H_TITLE("h\\stext\\:((?:.|\n)*?),size\\:(\\d+)") {
+        H_TITLE("{{h ", "h\\ssize\\:(\\d+?),text\\:((?:.|\n)*?)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
                 __SpecialTagHolder_Pos text = new __SpecialTagHolder_Pos(pair, mth, 1);
                 __SpecialTagHolder_Pos size = new __SpecialTagHolder_Pos(pair, mth, 2);
 
-                log(text);
                 log(size);
-
-                Float fixSize = 1f;
-                switch (size.getContent()) {
-                    case "1":
-                        fixSize = 1.15f;
-                        break;
-                    case "2":
-                        fixSize = 1.25f;
-                        break;
-                    case "3":
-                        fixSize = 1.35f;
-                        break;
-                }
+                log(text);
+                float fixSize = getFontSizeScale(size.getContent());
 
                 self.hiddenSpan(self.ss, self.getPairStart(pair), text.getStart());
                 self.hiddenSpan(self.ss, text.getEnd(), self.getPairEnd(pair));
@@ -141,7 +135,7 @@ public class TxtReaderAppenderForHtmlTag {
                 self.ss.setSpan(new RelativeSizeSpan(fixSize), text.getStart(), text.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
-        TITLE("title\\:((?:.|\n)*)") {
+        BOLD("{{b:", "b\\:((?:.|\n)*)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
                 __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
@@ -154,7 +148,7 @@ public class TxtReaderAppenderForHtmlTag {
                 self.ss.setSpan(new RelativeSizeSpan(1.25f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
-        STRONG("strong\\:((?:.|\n)*)") {
+        ITALIC("{{i:", "i\\:((?:.|\n)*)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
                 __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
@@ -164,30 +158,54 @@ public class TxtReaderAppenderForHtmlTag {
                 self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
 
                 self.ss.setSpan(new StyleSpan(Typeface.ITALIC), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                self.ss.setSpan(new RelativeSizeSpan(1.25f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        },//
+        STRONG("{{strong:", "strong\\:((?:.|\n)*)\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
+                log(proc);
+
+                self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
+                self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
+
+                self.ss.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 self.ss.setSpan(new RelativeSizeSpan(1.1f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
-        IMG("img\\ssrc\\:((?:.|\n)*?)\\,alt\\:((?:.|\n)*)") {
+        IMG("{{img ", "img\\ssrc\\:((?:.|\n)*?)\\,alt\\:((?:.|\n)*)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
                 __SpecialTagHolder_Pos srcData = new __SpecialTagHolder_Pos(pair, mth, 1);
                 __SpecialTagHolder_Pos altData = new __SpecialTagHolder_Pos(pair, mth, 2);
 
-                log("src -> " + srcData);
-                log("alt -> " + altData);
+                log("IMG ADD ::: " + pair + " --- " + self.txtContent.substring(pair.getLeft(), pair.getRight()));
+
+//                log("src -> " + srcData);
+//                log("alt -> " + altData);
 
                 ImageLoaderCandidate picProcess = self.new ImageLoaderCandidate(srcData.getContent(), altData.getContent());
 
+                self.hiddenSpan(self.ss, self.getPairStart(pair), altData.getStart());
+                self.hiddenSpan(self.ss, altData.getEnd(), self.getPairEnd(pair));
+
                 if (!picProcess.isGifFile) {
-                    Bitmap smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), self.maxPicWidth);
-                    self.ss.setSpan(new ImageSpan(self.context, smiley, ImageSpan.ALIGN_BASELINE), self.getPairStart(pair), self.getPairEnd(pair), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    Bitmap smiley = null;
+                    try {
+                        smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), self.maxPicWidth);
+                    } catch (Throwable ex) {
+                        Log.e(TAG, "OOM " + ex.getMessage(), ex);
+                        smiley = self.onlinePicLoader.getNotfound404();
+                    }
+                    self.ss.setSpan(new ImageSpan(self.context, smiley, ImageSpan.ALIGN_BASELINE), altData.getStart(), altData.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else if (picProcess.localFile != null) {
                     ImageSpan imageSpan = GifSpanCreater.getGifSpan(picProcess.localFile, self.dto.getTxtView(), self.resetScaleAction);
-                    self.ss.setSpan(imageSpan, self.getPairStart(pair), self.getPairEnd(pair), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    self.ss.setSpan(imageSpan, altData.getStart(), altData.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
         },//
-        LINK("link\\:((?:.|\n)*?),value\\:((?:.|\n)*)") {
+        LINK("{{link:", "link\\:((?:.|\n)*?),value\\:((?:.|\n)*)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
                 final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(pair, mth, 1);
@@ -217,11 +235,39 @@ public class TxtReaderAppenderForHtmlTag {
                 }
             }
         },//
+        FONT("{{font ", "font\\ssize\\:((?:.|\n)*?),text\\:((?:.|\n)*)\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                final __SpecialTagHolder_Pos size = new __SpecialTagHolder_Pos(pair, mth, 1);
+                final __SpecialTagHolder_Pos text = new __SpecialTagHolder_Pos(pair, mth, 2);
+
+                float fixSize = 1f;
+                try {
+                    float indicateSize = Float.parseFloat(size.getContent());
+                    fixSize = indicateSize / 16f;
+                } catch (Exception ex) {
+                    Log.e(TAG, "Font Size Reset ERR : " + ex.getMessage(), ex);
+                }
+
+                final int LEN = 0;
+                self.hiddenSpan(self.ss, self.getPairStart(pair), text.getStart() - LEN);
+                self.hiddenSpan(self.ss, text.getEnd() + LEN, self.getPairEnd(pair));
+
+                if (Math.abs(fixSize - 1) > 0.1f) {
+                    log("SizeScale : " + fixSize + " - " + text);
+                    self.ss.setSpan(new RelativeSizeSpan(fixSize), text.getStart(), text.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } else {
+                    log("Intact !");
+                }
+            }
+        },//
         ;
 
         final Pattern ptn;
+        final String startWtih;
 
-        ContentDefineEnum(String ptnStr) {
+        ContentDefineEnum(String startWtih, String ptnStr) {
+            this.startWtih = startWtih;
             ptn = Pattern.compile(ptnStr, Pattern.DOTALL | Pattern.MULTILINE);
         }
 
@@ -230,20 +276,70 @@ public class TxtReaderAppenderForHtmlTag {
         }
 
         abstract void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self);
+
+        float getFontSizeScale(String hrStrContent) {
+            float fixSize = 1f;
+            switch (hrStrContent) {
+                case "1":
+                    fixSize = 1.15f;
+                    break;
+                case "2":
+                    fixSize = 1.25f;
+                    break;
+                case "3":
+                    fixSize = 1.35f;
+                    break;
+                case "4":
+                    fixSize = 1.45f;
+                    break;
+                case "5":
+                    fixSize = 1.55f;
+                    break;
+                case "6":
+                    fixSize = 1.65f;
+                    break;
+            }
+            return fixSize;
+        }
     }
 
 
     private class TagPairGetter {
+        private final String TAG = TagPairGetter.class.getSimpleName();
+
         public List<Pair<Integer, Integer>> get(String txtContent) {
-            Stack<Integer> startStk = getPosStack(START, txtContent);
-            Stack<Integer> endStk = getPosStack(END, txtContent);
+            Stack<Integer> startStk = getPosStack(START, txtContent, true);
+            Stack<Integer> endStk = getPosStack(END, txtContent, false);
             List<Pair<Integer, Integer>> lst = new ArrayList<Pair<Integer, Integer>>();
+            int errorCount = 0;
             for (int ii = 0; ii < endStk.size(); ii++) {
                 int endPos = endStk.get(ii);
                 int startPos = findMatchStartTag(startStk, endPos);
+
+                if (startPos < 0 || endPos < 0) {
+                    String errorStr = txtContent.substring(fixPos(startPos, txtContent), fixPos(endPos, txtContent));
+                    Log.e(TAG, "###### ERROR Pos : " + startPos + ", " + endPos + " -> " + errorStr);
+                    errorCount++;
+                    continue;
+                } else {
+//                String errorStr = txtContent.substring(fixPos(startPos, txtContent), fixPos(endPos, txtContent));
+//                Log.e(TAG, "###### OK Pos : " + startPos + ", " + endPos + " -> " + errorStr);
+                }
+
                 lst.add(Pair.of(startPos, endPos));
             }
+            Log.v(TAG, "###### ERROR Count : " + errorCount);
             return lst;
+        }
+
+        private int fixPos(int value, String txtContent) {
+            if (value < 0) {
+                return 0;
+            }
+            if (value >= txtContent.length()) {
+                return txtContent.length() - 1;
+            }
+            return value;
         }
 
         private int findMatchStartTag(Stack<Integer> startStk, int endTagPos) {
@@ -262,11 +358,15 @@ public class TxtReaderAppenderForHtmlTag {
             return tmpPos;
         }
 
-        private Stack<Integer> getPosStack(Pattern ptn, String txtContent) {
+        private Stack<Integer> getPosStack(Pattern ptn, String txtContent, boolean isStart) {
             Stack<Integer> stk = new Stack<Integer>();
             Matcher mth = ptn.matcher(txtContent);
             while (mth.find()) {
-                stk.push(mth.start());
+                if (isStart) {
+                    stk.push(mth.start());
+                } else {
+                    stk.push(mth.end());
+                }
             }
             return stk;
         }

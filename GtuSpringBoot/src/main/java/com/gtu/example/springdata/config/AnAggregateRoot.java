@@ -1,4 +1,4 @@
-package com.gtu.example.springdata.dao;
+package com.gtu.example.springdata.config;
 
 import java.util.ArrayList;
 import java.util.Collection;

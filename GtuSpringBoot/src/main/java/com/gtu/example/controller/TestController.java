@@ -1,13 +1,17 @@
 package com.gtu.example.controller;
 
+import javax.validation.Valid;
+
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.gtu.example.common.SecurityConfig;
 
 @RestController
 @RequestMapping("/api/books")
@@ -19,10 +23,17 @@ public class TestController {
         log.info("home!!");
         return "Hello World!";
     }
-    
-    @GetMapping
-    public String findAll(){
+
+    @GetMapping("/findAll")
+    public String findAll() {
         log.info("findAll!!");
+        return "OK";
+    }
+
+    @PostMapping("/postTest")
+    public String postTest(@Valid @RequestBody ReqBean bean) {
+        log.info("postTest!!");
+        log.info(ReflectionToStringBuilder.toString(bean));
         return "OK";
     }
 
@@ -30,5 +41,31 @@ public class TestController {
     public String gtu001Test() {
         log.info("gtu001Test!!");
         return "OK";
+    }
+
+    @RequestMapping("/find/{id}")
+    public String findById(@PathVariable("id") long id) {
+        return "you find id = " + id;
+    }
+
+    public static class ReqBean {
+        String test_column1;
+        String test_column2;
+
+        public String getTest_column1() {
+            return test_column1;
+        }
+
+        public void setTest_column1(String test_column1) {
+            this.test_column1 = test_column1;
+        }
+
+        public String getTest_column2() {
+            return test_column2;
+        }
+
+        public void setTest_column2(String test_column2) {
+            this.test_column2 = test_column2;
+        }
     }
 }

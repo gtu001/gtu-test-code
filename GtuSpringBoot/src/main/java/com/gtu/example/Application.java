@@ -1,5 +1,7 @@
 package com.gtu.example;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -11,8 +13,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-
-import com.gtu.example.rabbitmq.sender.RabbitMqSender;
 
 //@EnableJpaRepositories("org.baeldung.persistence.repo") 
 //@EntityScan("org.baeldung.persistence.model")
@@ -27,9 +27,9 @@ public class Application {
     private ConfigurableApplicationContext ctx;
 
     public static void main(String[] args) throws Exception {
-//         System.setProperty("spring.profiles.active", "rabbitmq");
+        // System.setProperty("spring.profiles.active", "rabbitmq");
         System.setProperty("spring.profiles.active", "spring-data");
-        SpringApplication.run(Application.class, args);
+        ConfigurableApplicationContext ctx2 = SpringApplication.run(Application.class, args);
     }
 
     @Bean
@@ -48,5 +48,14 @@ public class Application {
                 log.info("\t {} bean : {}", beanPrefix, beanName);
             }
         };
+    }
+
+    private void inspectBean(Object bean) {
+        for (Field f : bean.getClass().getDeclaredFields()) {
+            log.info("f---" + f.getName() + "\t" + f.getType().getSimpleName());
+        }
+        for (Method m : bean.getClass().getDeclaredMethods()) {
+            log.info("m---" + m.getName() + "\t" + m.getReturnType().getSimpleName());
+        }
     }
 }

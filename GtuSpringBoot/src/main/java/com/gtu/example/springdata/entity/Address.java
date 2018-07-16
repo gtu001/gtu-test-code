@@ -9,13 +9,15 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.gtu.example.springdata.config.AddressIdGenerator;
+
 @Entity
 @Table(name = "ADDRESS_1")
-//@EntityListeners(AddressEntityListener.class)
-public class Address {
+// @EntityListeners(AddressEntityListener.class)
+public class Address extends AuditModel {
 
     @Id
-    @GenericGenerator(name = "sequence_address_id", strategy = "com.gtu.example.springdata.dao.AddressIdGenerator")
+    @GenericGenerator(name = "sequence_address_id", strategy = "com.gtu.example.springdata.config.AddressIdGenerator")
     @GeneratedValue(generator = "sequence_address_id")
     @Column(name = "ADD_ID", unique = true, nullable = false)
     private String addressId;

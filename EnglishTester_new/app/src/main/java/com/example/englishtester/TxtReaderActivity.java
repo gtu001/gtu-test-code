@@ -840,9 +840,15 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     //給html抓圖用
                     dto.currentHtmlFile = txtFileZ.get();
 
+                    for (int ii = 0; ii < 10; ii++)
+                        Log.v(TAG, "[WordHtmlParser START]");
+
                     WordHtmlParser wordParser = WordHtmlParser.newInstance();
                     final String content = wordParser.getFromFile(txtFileZ.get());
                     String dropboxPicDir = wordParser.getPicDirForDropbox();
+
+                    for (int ii = 0; ii < 10; ii++)
+                        Log.v(TAG, "[WordHtmlParser END]");
 
                     Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
 

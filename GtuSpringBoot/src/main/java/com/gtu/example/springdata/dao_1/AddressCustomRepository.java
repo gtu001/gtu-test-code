@@ -1,9 +1,10 @@
-package com.gtu.example.springdata.dao;
+package com.gtu.example.springdata.dao_1;
 
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+//import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +13,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 //import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gtu.example.springdata.entity.Address;
 
-@Profile({ "spring-data" })
+@Profile({ "spring-data", "servers" })
 
 @Repository
 public class AddressCustomRepository {
@@ -45,5 +47,10 @@ public class AddressCustomRepository {
 
         Query query = em.createQuery(sb.toString());
         return query.getResultList();
+    }
+
+    @Transactional(value = "serversTransactionManager")
+    public void persist(Address address) {
+        em.persist(address);
     }
 }

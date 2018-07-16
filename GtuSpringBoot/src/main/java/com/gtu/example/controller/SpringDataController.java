@@ -13,10 +13,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gtu.example.springdata.dao.AddressCustomRepository;
-import com.gtu.example.springdata.dao.AddressRepository;
-import com.gtu.example.springdata.dao.EmployeeRepository;
-import com.gtu.example.springdata.dao.EmployeeRepository.NamesOnly;
+import com.gtu.example.springdata.dao_1.AddressCustomRepository;
+import com.gtu.example.springdata.dao_1.AddressRepository;
+import com.gtu.example.springdata.dao_1.EmployeePagingRepository;
+import com.gtu.example.springdata.dao_1.EmployeeRepository;
+import com.gtu.example.springdata.dao_1.EmployeeRepository.NamesOnly;
+import com.gtu.example.springdata.dao_2.EmployeeJpaRepository;
 import com.gtu.example.springdata.entity.Address;
 import com.gtu.example.springdata.entity.Employee;
 
@@ -26,10 +28,12 @@ import com.gtu.example.springdata.entity.Employee;
 @RequestMapping("/springdata/")
 public class SpringDataController {
 
-    private static final Logger log = LoggerFactory.getLogger(TestController.class);
+    private static final Logger log = LoggerFactory.getLogger(SpringDataController.class);
 
     private RandomAddressCreater addressCreater = new RandomAddressCreater();
 
+    @Autowired
+    private EmployeePagingRepository employeePagingRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
@@ -37,10 +41,13 @@ public class SpringDataController {
     @Autowired
     private AddressCustomRepository addressCustomRepository;
 
+    @Autowired
+    private EmployeeJpaRepository employeeJpaRepository;
+
     @RequestMapping("/employee/create")
     public String employee_createOne() {
         String uuid = UUID.randomUUID().toString();
-        Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid, null);
+        Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
         employeeRepository.save(vo);
         log.info(ReflectionToStringBuilder.toString(vo));
         return ReflectionToStringBuilder.toString(vo);
@@ -49,6 +56,32 @@ public class SpringDataController {
     @RequestMapping("/employee/findAll")
     public String employee_findAll() {
         Iterable<Employee> iter = employeeRepository.findAll();
+        Stream<Employee> targetStream = StreamSupport.stream(iter.spliterator(), false);
+        return targetStream.map((vo) -> ReflectionToStringBuilder.toString(vo))//
+                .reduce("", (v1, v2) -> v1 += v2 + "<br/>");
+    }
+
+    @RequestMapping("/employee/create_page")
+    public String employee_createOne_page() {
+        String uuid = UUID.randomUUID().toString();
+        Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
+        employeePagingRepository.save(vo);
+        log.info(ReflectionToStringBuilder.toString(vo));
+        return ReflectionToStringBuilder.toString(vo);
+    }
+
+    @RequestMapping("/employee/create2")
+    public String employee_createOne2() {
+        String uuid = UUID.randomUUID().toString();
+        Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
+        employeeJpaRepository.save(vo);
+        log.info(ReflectionToStringBuilder.toString(vo));
+        return ReflectionToStringBuilder.toString(vo);
+    }
+
+    @RequestMapping("/employee/findAll2")
+    public String employee_findAll2() {
+        Iterable<Employee> iter = employeeJpaRepository.findAll();
         Stream<Employee> targetStream = StreamSupport.stream(iter.spliterator(), false);
         return targetStream.map((vo) -> ReflectionToStringBuilder.toString(vo))//
                 .reduce("", (v1, v2) -> v1 += v2 + "<br/>");
@@ -66,6 +99,14 @@ public class SpringDataController {
     public String address_createOne() {
         Address d1 = addressCreater.getNewAddress();
         addressRepository.save(d1);
+        log.info(ReflectionToStringBuilder.toString(d1));
+        return ReflectionToStringBuilder.toString(d1);
+    }
+
+    @RequestMapping("/address/create_custom")
+    public String address_createOne_custom() {
+        Address d1 = addressCreater.getNewAddress();
+        addressCustomRepository.persist(d1);
         log.info(ReflectionToStringBuilder.toString(d1));
         return ReflectionToStringBuilder.toString(d1);
     }
