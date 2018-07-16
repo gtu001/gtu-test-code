@@ -676,14 +676,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 設定英文內容
      */
     private void setContentText(String content, boolean isHtmlFromWord) {
-        this.dto.content = content;
         TxtReaderAppender appender = new TxtReaderAppender(
                 this, recentTxtMarkService, mService, dto, txtView //
         );
         if (!isHtmlFromWord) {
             txtView.setText(appender.getAppendTxt(content));
+            this.dto.content = content;
         } else {
             txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.maxWidth - 10));
+            String pureContent = WordHtmlParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
+            this.dto.content = pureContent;
         }
         translateView.setText("");
         if (StringUtils.isNotBlank(content)) {

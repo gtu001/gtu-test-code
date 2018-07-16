@@ -31,7 +31,7 @@ public class WordHtmlParser {
 
         File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The Stress of Remote Working.htm");
 
-        String result = parser.getFromFile(file, "");
+        String result = parser.getFromFile(file, true, "");
         String dropboxDir = parser.picDirForDropbox;
         System.out.println("picDirForDropbox -- " + dropboxDir);
         System.out.println(result);
@@ -62,40 +62,40 @@ public class WordHtmlParser {
     }
 
     public String getFromFile(File file) {
-        return getFromFile(file, null);
+        return getFromFile(file, false, null);
     }
 
-    public String getFromFile(File file, String checkStr) {
+    public String getFromFile(File file, boolean isPure, String checkStr) {
         String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
         log("ORIGN : =======================================================================");
         log(content);
         log("ORIGN : =======================================================================");
 
-        content = _step0_hiddenHead(content);
+        content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);
-        content = _step1_hTitleHandler(content);
+        content = _step1_hTitleHandler(content, isPure);
         validateContent("_step1_hTitleHandler", content, checkStr);
-        content = _step1_replaceTo_Bold(content);
+        content = _step1_replaceTo_Bold(content, isPure);
         validateContent("_step1_replaceTo_Bold", content, checkStr);
-        content = _step1_replaceTo_Italic(content);
+        content = _step1_replaceTo_Italic(content, isPure);
         validateContent("_step1_replaceTo_Italic", content, checkStr);
-        content = _step1_replaceStrongTag(content);
+        content = _step1_replaceStrongTag(content, isPure);
         validateContent("_step1_replaceStrongTag", content, checkStr);
-        content = _step1_fontSize_Indicate(content);
+        content = _step1_fontSize_Indicate(content, isPure);
         validateContent("_step1_fontSize_Indicate", content, checkStr);
-        content = _step2_normalContent(content);
+        content = _step2_normalContent(content, isPure);
         validateContent("_step2_nomalContent", content, checkStr);
-        content = _step2_hrefTag(content);
+        content = _step2_hrefTag(content, isPure);
         validateContent("_step2_hrefTag", content, checkStr);
-        content = _step3_imageProc(content, checkStr);
+        content = _step3_imageProc(content, isPure, checkStr);
         validateContent("_step3_imageProc", content, checkStr);
-        content = _step4_wordBlockCheck(content);
+        content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
-        content = _step5_li_check(content);
+        content = _step5_li_check(content, isPure);
         validateContent("_step5_li_check", content, checkStr);
-        content = _step6_hiddenSomething(content, checkStr);
+        content = _step6_hiddenSomething(content, isPure, checkStr);
         validateContent("_step6_hiddenSomething", content, checkStr);
-        content = _stepFinal_removeMultiChangeLine(content);
+        content = _stepFinal_removeMultiChangeLine(content, isPure);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
 
         // 最後做這塊才會正常
@@ -126,7 +126,7 @@ public class WordHtmlParser {
         }
     }
 
-    private String _step1_replaceStrongTag(String content) {
+    private String _step1_replaceStrongTag(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<strong(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/strong\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -135,6 +135,9 @@ public class WordHtmlParser {
             String tmpVal = "";
             if (StringUtils.isNotBlank(boldStr)) {
                 tmpVal = "{{strong:" + StringUtil_.appendReplacementEscape(boldStr) + "}}";
+                if (isPure) {
+                    tmpVal = StringUtil_.appendReplacementEscape(boldStr);
+                }
             }
             mth.appendReplacement(sb, tmpVal);
         }
@@ -154,7 +157,7 @@ public class WordHtmlParser {
             ptn = Pattern.compile(ptnStr, Pattern.DOTALL | Pattern.MULTILINE);
         }
 
-        String apply(String content) {
+        String apply(String content, boolean isPure) {
             StringBuffer sb = new StringBuffer();
             Matcher mth = ptn.matcher(content);
             while (mth.find()) {
@@ -164,6 +167,9 @@ public class WordHtmlParser {
                 log("....." + size + " , " + text);
                 if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
                     tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}";
+                    if (isPure) {
+                        tmpVal = StringUtil_.appendReplacementEscape(text);
+                    }
                 }
                 mth.appendReplacement(sb, tmpVal);
             }
@@ -172,14 +178,14 @@ public class WordHtmlParser {
         }
     }
 
-    private String _step1_fontSize_Indicate(String content) {
+    private String _step1_fontSize_Indicate(String content, boolean isPure) {
         for (FontSizeIndicateEnum e : FontSizeIndicateEnum.values()) {
-            content = e.apply(content);
+            content = e.apply(content, isPure);
         }
         return content;
     }
 
-    private String _step0_hiddenHead(String content) {
+    private String _step0_hiddenHead(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<head\\>.*\\<\\/head\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -190,7 +196,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step1_hTitleHandler(String content) {
+    private String _step1_hTitleHandler(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<h(\\d+)(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/h\\d+\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -200,6 +206,9 @@ public class WordHtmlParser {
             String title = "";
             if (StringUtils.isNotBlank(titleSize) && StringUtils.isNotBlank(titleText)) {
                 title = "{{h size:" + titleSize + ",text:" + StringUtil_.appendReplacementEscape(titleText) + "}}";
+                if (isPure) {
+                    title = StringUtil_.appendReplacementEscape(titleText);
+                }
             }
             mth.appendReplacement(sb, title);
         }
@@ -207,7 +216,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step1_replaceTo_Bold(String content) {
+    private String _step1_replaceTo_Bold(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<b\\>((?:.|\n)*?)<\\/b\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -216,6 +225,9 @@ public class WordHtmlParser {
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
                 title = "{{b:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
+                if (isPure) {
+                    title = StringUtil_.appendReplacementEscape(titleStr);
+                }
             }
             mth.appendReplacement(sb, title);
         }
@@ -223,7 +235,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step1_replaceTo_Italic(String content) {
+    private String _step1_replaceTo_Italic(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<i\\>((?:.|\n)*?)<\\/i\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -232,6 +244,9 @@ public class WordHtmlParser {
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
                 title = "{{i:" + StringUtil_.appendReplacementEscape(titleStr) + "}}";
+                if (isPure) {
+                    title = StringUtil_.appendReplacementEscape(titleStr);
+                }
             }
             mth.appendReplacement(sb, title);
         }
@@ -239,7 +254,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step2_normalContent(String content) {
+    private String _step2_normalContent(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -261,7 +276,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step2_hrefTag(String content) {
+    private String _step2_hrefTag(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<a\\s*?href\\=\"((?:.|\n)*?)\"(?:.|\n)*?>((?:.|\n)*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -278,6 +293,9 @@ public class WordHtmlParser {
             String replaeStr = "";
             if (StringUtils.isNotBlank(link) && StringUtils.isNotBlank(linkLabel)) {
                 replaeStr = "{{link:" + link + ",value:" + StringUtil_.appendReplacementEscape(linkLabel) + "}}";
+                if (isPure) {
+                    replaeStr = StringUtil_.appendReplacementEscape(linkLabel);
+                }
             }
             mth.appendReplacement(sb, replaeStr);
         }
@@ -325,7 +343,7 @@ public class WordHtmlParser {
         }
     }
 
-    private String _step3_imageProc(String content, String checkPic) {
+    private String _step3_imageProc(String content, boolean isPure, String checkPic) {
         Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"描述\\:\\s((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -340,13 +358,17 @@ public class WordHtmlParser {
             filterImageDir(srcDesc);
 
             String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
+            if (isPure) {
+                repStr = "";
+            }
+
             mth.appendReplacement(sb, repStr);
         }
         mth.appendTail(sb);
         return sb.toString();
     }
 
-    private String _step4_wordBlockCheck(String content) {
+    private String _step4_wordBlockCheck(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=MsoNormal(?:.|\n)*?\\>((?:.|\n)*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -359,7 +381,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step5_li_check(String content) {
+    private String _step5_li_check(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<i\\>((?:.|\n)*?)\\<\\/i\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -371,7 +393,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step6_hiddenSomething(String content, String checkStr) {
+    private String _step6_hiddenSomething(String content, boolean isPure, String checkStr) {
         content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 1", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata(?:.|\n)*?\\>");
@@ -459,7 +481,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _stepFinal_removeMultiChangeLine(String content) {
+    private String _stepFinal_removeMultiChangeLine(String content, boolean isPure) {
         Pattern ptn = Pattern.compile("\n[\r\\s\t]*\n[\r\\s\t]*\n");
         for (; ; ) {
             boolean findOk = false;
