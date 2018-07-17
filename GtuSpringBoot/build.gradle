@@ -104,13 +104,16 @@ dependencyManagement {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
 	//compile('org.springframework.boot:spring-boot-maven-plugin')//加了會錯啊災
-	
 	//compile("org.springframework.boot:spring-boot-dependencies")//加了會錯啊災
 	compile("org.springframework.boot:spring-boot-starter-web")
-	
 	compile("org.springframework.boot:spring-boot-devtools")
-	
  	compile("org.springframework.boot:spring-boot-starter-security")
+ 	
+ 	// spring-mvc ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    //compile ('net.sf.json-lib:json-lib:2.4')
+    compile ('com.googlecode.json-simple:json-simple:1.1')
+    // spring-mvc ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	
