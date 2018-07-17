@@ -11,7 +11,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "ExamBook";
-    static final int DATABASE_VERSION = 7;
+    static final int DATABASE_VERSION = 13;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -68,7 +68,9 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("      file_name text not null,      ");
         sb.append("      mark_index int not null,      ");
         sb.append("      mark_english text not null,      ");
-        sb.append("      insert_date long not null               ");
+        sb.append("      insert_date long not null,              ");
+        sb.append("      bookmark_type integer,                        ");
+        sb.append("      scroll_y_pos integer                        ");
         sb.append("  );                                           ");
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
@@ -78,10 +80,15 @@ public class DBConnection extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
 
-        if (newVersion == 7) {
+        if (newVersion == 13) {
             // txt查單字紀錄表
             sb = new StringBuilder();
-            sb.append("  alter table recent_txt_mark add bookmark_type integer ");
+//            sb.append("  alter table recent_txt_mark add insert_Date_Dtype DATETIME   ");//add column
+//            sb.append("  DROP table recent_txt_mark ;   ");//add column
+
+            sb.append("  alter table recent_txt_mark add bookmark_type integer   ");//add column
+
+
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());
         }

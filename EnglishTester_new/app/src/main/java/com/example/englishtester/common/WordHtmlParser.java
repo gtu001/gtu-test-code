@@ -67,9 +67,17 @@ public class WordHtmlParser {
 
     public String getFromFile(File file, boolean isPure, String checkStr) {
         String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
-        log("ORIGN : =======================================================================");
-        log(content);
-        log("ORIGN : =======================================================================");
+        return getFromContent(content, isPure, checkStr);
+    }
+
+    public String getFromContent(String context) {
+        return getFromContent(context, false, null);
+    }
+
+    public String getFromContent(String content, boolean isPure, String checkStr) {
+//        log("ORIGN : =======================================================================");
+//        log(content);
+//        log("ORIGN : =======================================================================");
 
         content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);

@@ -8,6 +8,8 @@ import android.util.Log;
 import com.example.englishtester.DBConnection;
 import com.example.englishtester.RecentSearchDAO;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -86,6 +88,19 @@ public class DBUtil {
         c.close();
         db.close();
         return list;
+    }
+
+    public static List<Map<String, String>> getDbSchema(String tableName, Context context) {
+        String[] conditions = new String[0];
+        StringBuilder sb = new StringBuilder();
+        sb.append(" SELECT lower(name), sql FROM sqlite_master   ");
+        sb.append(" WHERE type = 'table'                  ");
+        if (StringUtils.isNotBlank(tableName)) {
+            sb.append(" and upper(name) = ? ");
+            conditions = new String[]{tableName.toUpperCase()};
+        }
+        sb.append(" ORDER BY name                         ");
+        return queryBySQL(sb.toString(), conditions, context);
     }
 
     private static Map<String, Object> __getRealRowData(Cursor c) {

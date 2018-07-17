@@ -54,6 +54,7 @@ import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.example.englishtester.common.WordHtmlParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
@@ -122,6 +123,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * Home 鍵觀察者
      */
     HomeKeyWatcher homeKeyWatcher;
+    /**
+     * 讀取網頁內容
+     */
+    WebViewHtmlFetcher webViewHtmlFetcher;
 
     EditText editText1;
     Button clearBtn;
@@ -423,6 +428,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         });
         homeKeyWatcher.startWatch();
 
+        webViewHtmlFetcher = WebViewHtmlFetcher.newInstance(this).isHtml(true);
         doOnoffService(true);
     }
 
@@ -684,8 +690,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.dto.content = content;
         } else {
             txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.maxWidth - 10));
-            String pureContent = WordHtmlParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
-            this.dto.content = pureContent;
+            if (dto.currentHtmlFile != null) {
+                this.dto.content = WordHtmlParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
+            } else if (StringUtils.isNotBlank(dto.currentHtmlContent)) {
+                this.dto.content = WordHtmlParser.newInstance().getFromContent(dto.currentHtmlContent, true, "");
+            }
         }
         translateView.setText("");
         if (StringUtils.isNotBlank(content)) {
@@ -748,6 +757,60 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     Toast.makeText(TxtReaderActivity.this, "儲存成功 : " + saveFile, Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     Toast.makeText(TxtReaderActivity.this, "儲存失敗!", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, e.getMessage(), e);
+                }
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
+
+    private void loadHtmlFromUrl() {
+        View parentView = LayoutInflater.from(this).inflate(R.layout.subview_single_edittext, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(parentView);
+        final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
+        builder.setTitle("開啟HTML");
+        builder.setMessage("開啟HTML : ");
+        builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String url = editText.getText().toString();
+                if (StringUtils.isBlank(url)) {
+                    Toast.makeText(TxtReaderActivity.this, "請輸入URL!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                try {
+                    webViewHtmlFetcher.htmlGet(new WebViewHtmlFetcher.HtmlGet() {
+                        @Override
+                        public void action(String contentOrign, Handler handler) {
+                            dto.currentHtmlFile = null;
+                            dto.dropboxPicDir = null;
+
+                            for (int ii = 0; ii < 10; ii++)
+                                Log.v(TAG, "[WordHtmlParser START]");
+
+                            WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                            final String content = wordParser.getFromContent(contentOrign);
+
+                            for (int ii = 0; ii < 10; ii++)
+                                Log.v(TAG, "[WordHtmlParser END]");
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setContentText(content, true);
+                                    translateView.setText("");
+                                }
+                            });
+                        }
+                    }).apply(url);
+                } catch (Exception e) {
+                    Toast.makeText(TxtReaderActivity.this, "讀取失敗!", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, e.getMessage(), e);
                 }
             }
@@ -842,6 +905,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 private void htmlProcess() {
                     //給html抓圖用
                     dto.currentHtmlFile = txtFileZ.get();
+                    dto.currentHtmlContent = null;
 
                     for (int ii = 0; ii < 10; ii++)
                         Log.v(TAG, "[WordHtmlParser START]");
@@ -1082,6 +1146,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.moveToNextBookmark();
             }
         }, //
+        LOAD_HTML_FROM_URL("開啟網頁", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.loadHtmlFromUrl();
+            }
+        }, //
         ;
 
         final String title;
@@ -1164,6 +1233,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient Thread translateThread; //翻譯thread
         private File dropboxPicDir;//設定dropbox下載圖片的目錄
         private File currentHtmlFile;//給html抓圖用
+        private String currentHtmlContent;//原始html內文
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode

@@ -3,6 +3,7 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,12 +21,6 @@ public class WebViewHtmlFetcher {
     private final Handler handler = new Handler();
     private boolean isHtml = true;
     private HtmlGet htmlGet;
-    private Runnable htmlGetRunnable;
-
-    public WebViewHtmlFetcher htmlGetRunnable(Runnable htmlGetRunnable) {
-        this.htmlGetRunnable = htmlGetRunnable;
-        return this;
-    }
 
     public WebViewHtmlFetcher isHtml(boolean isHtml) {
         this.isHtml = isHtml;
@@ -41,11 +36,18 @@ public class WebViewHtmlFetcher {
         this.webView.loadUrl(url);
     }
 
-    public WebViewHtmlFetcher(Context contex) {
+    public static WebViewHtmlFetcher newInstance(Context context) {
+        return new WebViewHtmlFetcher(context);
+    }
+
+    public WebViewHtmlFetcher(Context context) {
         this.context = context;
+
+        webView = new WebView(context);
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.addJavascriptInterface(new MyJavaScriptInterface(), "INTERFACE");
+
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -61,7 +63,7 @@ public class WebViewHtmlFetcher {
     }
 
     public interface HtmlGet {
-        public void action(String content);
+        public void action(String content, Handler handler);
     }
 
     private class MyJavaScriptInterface {
@@ -71,12 +73,10 @@ public class WebViewHtmlFetcher {
         @JavascriptInterface
         public void processContent(String aContent) {
             final String content = aContent;
-            Log.v(TAG, "content " + content);
+            for (int i = 0; i < 10; i++)
+                Log.v(TAG, "content " + content);
             if (htmlGet != null) {
-                htmlGet.action(content);
-            }
-            if (htmlGetRunnable != null) {
-                handler.post(htmlGetRunnable);
+                htmlGet.action(content, handler);
             }
         }
     }

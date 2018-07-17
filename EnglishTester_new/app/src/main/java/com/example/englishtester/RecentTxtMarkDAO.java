@@ -2,9 +2,11 @@ package com.example.englishtester;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -246,7 +248,7 @@ public class RecentTxtMarkDAO {
         }
     }
 
-    interface RecentTxtMarkSchmea {
+    public interface RecentTxtMarkSchmea {
         String TABLE_NAME = "recent_txt_mark";
         String LIST_ID = "list_id";
         String FILE_NAME = "file_name";

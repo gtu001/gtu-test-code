@@ -1,18 +1,19 @@
 package com.example.englishtester;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMark;
+import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMarkSchmea;
+import com.example.englishtester.common.DBUtil;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
-import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMark;
-import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMarkSchmea;
-
-import android.content.Context;
-import android.util.Log;
 
 public class RecentTxtMarkService {
 
@@ -108,6 +109,8 @@ public class RecentTxtMarkService {
     public void deleteOldData() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -30);
+        for (int ii = 0; ii < 10; ii++)
+            Log.v(TAG, "DELETE : " + DateFormatUtils.format(cal, "yyyy/MM/dd"));
         long daysBefore = cal.getTimeInMillis();
         int count = recentTxtMarkDAO.deleteByCondition(RecentTxtMarkSchmea.INSERT_DATE + "<?", new String[]{String.valueOf(daysBefore)});
         Log.v(TAG, "deleteOldData count " + count);
