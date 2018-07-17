@@ -1,10 +1,12 @@
 package com.example.englishtester.common;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -60,6 +62,21 @@ public class WebViewHtmlFetcher {
                 }
             }
         });
+
+        if (Build.VERSION.SDK_INT >= 19) {
+            webView.evaluateJavascript(
+                    "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();",
+                    new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String content) {
+                            for (int i = 0; i < 10; i++)
+                                Log.v(TAG, "content " + content);
+                            if (htmlGet != null) {
+                                htmlGet.action(content, handler);
+                            }
+                        }
+                    });
+        }
     }
 
     public interface HtmlGet {

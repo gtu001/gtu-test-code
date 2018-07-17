@@ -20,7 +20,6 @@ public class FloatViewChecker {
      * 判斷權限是否working
      */
     public static boolean isPermissionOk(Context context) {
-        boolean needApply = false;
         if (Build.VERSION.SDK_INT >= 23) {
             if (!Settings.canDrawOverlays(context)) {
                 return false;
