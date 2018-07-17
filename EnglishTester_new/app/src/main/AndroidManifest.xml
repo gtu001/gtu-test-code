@@ -56,8 +56,8 @@
 
         <service
             android:name="com.example.englishtester.FloatViewService"
-            android:process=":floatViewService"
             android:exported="false"
+            android:process=":floatViewService"
             android:stopWithTask="false">
             <intent-filter android:priority="1000">
                 <action android:name="FloatViewService" />
@@ -66,14 +66,14 @@
 
         <service
             android:name="com.example.englishtester.FloatViewAssistService"
-            android:process=":floatViewAssistService"
             android:exported="false"
+            android:process=":floatViewAssistService"
             android:stopWithTask="false" />
 
         <service
             android:name="com.example.englishtester.common.HermannEbbinghaus_Memory_Service"
-            android:process=":hermannEbbinghaus_Memory_Service"
             android:exported="false"
+            android:process=":hermannEbbinghaus_Memory_Service"
             android:stopWithTask="false" />
 
         <!--<receiver android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver">
