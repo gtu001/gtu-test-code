@@ -270,14 +270,33 @@ public class JCommonUtil {
      * 視窗關閉事件
      */
     public static void frameCloseConfirm(final JFrame jframe) {
+        frameCloseConfirm(jframe, true, null);
+    }
+
+    /**
+     * 視窗關閉事件
+     */
+    public static void frameCloseConfirm(final JFrame jframe, final boolean confirm, final ActionListener action) {
         jframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         jframe.addWindowListener(new WindowAdapter() {
 
             public void windowClosing(WindowEvent e) {
                 System.out.println("windowClosing");
-                int closeOption = JOptionPane.showConfirmDialog(null, "確定關閉?");
-                System.out.println("關閉選項" + closeOption);
-                if (closeOption == JOptionPane.YES_OPTION) {
+                if (confirm) {
+                    int closeOption = JOptionPane.showConfirmDialog(null, "確定關閉?");
+                    System.out.println("關閉選項" + closeOption);
+                    if (closeOption == JOptionPane.YES_OPTION) {
+                        if (action != null) {
+                            action.actionPerformed(new ActionEvent(jframe, -1, "close"));
+                        }
+                        jframe.setVisible(false);
+                        jframe.dispose();
+                        System.exit(0);
+                    }
+                } else {
+                    if (action != null) {
+                        action.actionPerformed(new ActionEvent(jframe, -1, "close"));
+                    }
                     jframe.setVisible(false);
                     jframe.dispose();
                     System.exit(0);
@@ -980,7 +999,7 @@ public class JCommonUtil {
             throw new RuntimeException("triggerButtonActionPerformed ERR :" + e.getMessage(), e);
         }
     }
-    
+
     /**
      * 取得底下的 component focus
      */

@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 /**
@@ -1063,6 +1064,53 @@ public class FileUtil {
         fileName = fileName.replaceAll("　", "");
         fileName = fileName.trim();
         return fileName;
+    }
+
+    /**
+     * 避掉黨名的特殊符號 \/:*?"<>|
+     */
+    public static String escapeFilename_replaceToFullChar(String filename, boolean escapeFileSeparator) {
+        StringBuffer sb = new StringBuffer();
+        char[] arry = StringUtils.trimToEmpty(filename).toCharArray();
+        for (char c : arry) {
+
+            switch (c) {
+            case ':':
+                c = '：';
+                break;//
+            case '*':
+                c = '＊';
+                break;//
+            case '?':
+                c = '？';
+                break;//
+            case '"':
+                c = '＂';
+                break;//
+            case '<':
+                c = '＜';
+                break;//
+            case '>':
+                c = '＞';
+                break;//
+            case '|':
+                c = '｜';
+                break;//
+            }
+
+            if (c == '\r' || c == '\n') {
+                continue;
+            }
+
+            if (escapeFileSeparator) {
+                if (c == '/' || c == '\\') {
+                    continue;
+                }
+            }
+
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     public static boolean contentEquals(File file1, File file2) {

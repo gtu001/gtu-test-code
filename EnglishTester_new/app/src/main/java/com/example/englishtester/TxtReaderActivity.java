@@ -37,7 +37,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.translate.demo.TransApi;
+import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DialogFontSizeChange;
@@ -485,7 +485,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     return;
                 }
                 //translateBtn.setEnabled(false);
-                final TransApi api = new TransApi(appId, securityKey);
+                final TransApiNew api = new TransApiNew(appId, securityKey);
 
                 final ProgressDialog progressDialog = new ProgressDialog(TxtReaderActivity.this);
                 progressDialog.setMessage("處理中,請稍候...");

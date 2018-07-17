@@ -1,7 +1,10 @@
 package com.example.englishtester;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -24,7 +27,7 @@ public class RecentTxtMarkService {
     /**
      * 新增查詢單字
      */
-    public void addMarkWord(String fileName, String word, int index, boolean clickBookmark) {
+    public RecentTxtMark addMarkWord(final String fileName, final String word, final int index, boolean clickBookmark) {
         long currentTime = System.currentTimeMillis();
         RecentTxtMark bo = new RecentTxtMark();
         bo.fileName = fileName;
@@ -32,11 +35,24 @@ public class RecentTxtMarkService {
         bo.markEnglish = word;
         bo.markIndex = index;
         bo.bookmarkType = getBookmarkType(null, clickBookmark);
-        List<RecentTxtMark> list = recentTxtMarkDAO.query(//
-                RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
-                        RecentTxtMarkSchmea.MARK_ENGLISH + "=? and " + //
-                        RecentTxtMarkSchmea.MARK_INDEX + "=?", //
-                new String[]{fileName, word, String.valueOf(index)});
+
+        Callable<List<RecentTxtMark>> fetchLst = new Callable<List<RecentTxtMark>>() {
+            public List<RecentTxtMark> call() throws Exception {
+                List<RecentTxtMark> list = recentTxtMarkDAO.query(//
+                        RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
+                                RecentTxtMarkSchmea.MARK_ENGLISH + "=? and " + //
+                                RecentTxtMarkSchmea.MARK_INDEX + "=?", //
+                        new String[]{fileName, word, String.valueOf(index)});
+                return list;
+            }
+        };
+
+        List<RecentTxtMark> list = Collections.emptyList();
+        try {
+            list = fetchLst.call();
+        } catch (Exception ex) {
+        }
+
         if (list.isEmpty()) {
             long result = recentTxtMarkDAO.insertWord(bo);
             Log.v(TAG, "insert [" + result + "]" + ReflectionToStringBuilder.toString(bo));
@@ -47,6 +63,15 @@ public class RecentTxtMarkService {
             int result = recentTxtMarkDAO.updateByVO(bo);
             Log.v(TAG, "update [" + result + "]" + ReflectionToStringBuilder.toString(bo));
         }
+
+        //debug ↓↓↓↓↓↓↓↓↓↓
+        try {
+            List<RecentTxtMark> lst2 = fetchLst.call();
+            return lst2.get(0);
+        } catch (Exception ex) {
+            return null;
+        }
+        //debug ↑↑↑↑↑↑↑↑↑↑
     }
 
     private int getBookmarkType(Integer oldValue, boolean clickBookmarkAction) {

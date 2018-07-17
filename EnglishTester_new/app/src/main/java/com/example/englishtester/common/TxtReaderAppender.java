@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.englishtester.BuildConfig;
 import com.example.englishtester.FloatViewService;
 import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
@@ -27,6 +28,7 @@ import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.TxtReaderActivity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -167,7 +169,16 @@ public class TxtReaderAppender {
                         }
 
                         // 新增單字
-                        recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, isClickBookmark);
+                        RecentTxtMarkDAO.RecentTxtMark clickVo = recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, isClickBookmark);
+
+                        //debug ↓↓↓↓↓↓↓↓↓↓
+                        if (BuildConfig.DEBUG && isClickBookmark) {
+                            try {
+                                Toast.makeText(activity, ReflectionToStringBuilder.toString(clickVo), Toast.LENGTH_SHORT).show();
+                            } catch (Exception ex) {
+                            }
+                        }
+                        //debug ↑↑↑↑↑↑↑↑↑↑
 
                         view.invalidate();
                         txtView.invalidate();
