@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -47,6 +48,7 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
+import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
@@ -1079,7 +1081,28 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      */
     public void moveToNextBookmark() {
         if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
-            Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
+
+            if (!BuildConfig.DEBUG) {
+                Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
+            } else {
+                //debug ↓↓↓↓↓↓↓↓
+                List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+                if (qList.isEmpty()) {
+                    Toast.makeText(this, "ERR mark size EMPTY !!", Toast.LENGTH_SHORT).show();
+                } else {
+                    int bookmarkCount = 0;
+                    int searchCount = 0;
+                    for (RecentTxtMarkDAO.RecentTxtMark v : qList) {
+                        if (RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.isMatch(v.getBookmarkType())) {
+                            bookmarkCount++;
+                        } else {
+                            searchCount++;
+                        }
+                    }
+                    Toast.makeText(this, "ERR 書簽 : " + bookmarkCount + "/ 查詢 : " + searchCount + " , all : " + qList.size(), Toast.LENGTH_SHORT).show();
+                }
+                //debug ↑↑↑↑↑↑↑↑
+            }
             return;
         }
 
