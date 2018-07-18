@@ -35,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +76,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -338,7 +340,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 讀取dropbox文件
      */
     private void loadDropboxList() {
-        final List<String> fileInfoList = new ArrayList<String>();
         final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
         Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
             @Override
@@ -352,15 +353,28 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 ii--;
             }
         }
+
+        List<Map<String, Object>> listItem = new ArrayList<>();
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
-            fileInfoList.add(String.format("%s (%s)", f.getName(),//
-                    FileUtilGtu.getSizeDescription(f.getSize())));
+            Map<String,Object> map = new HashMap<String, Object>();
+            map.put("ItemTitle", f.getName());
+            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
+            map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
+            listItem.add(map);
         }
-        new AlertDialog.Builder(TxtReaderActivity.this)//
-                .setTitle("選擇dropbox檔案")//
-                .setItems(fileInfoList.toArray(new String[0]), new DialogInterface.OnClickListener() {
+
+        SimpleAdapter aryAdapter = new SimpleAdapter(this, listItem,// 資料來源
+                R.layout.subview_dropboxlist, //
+                new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight"}, //
+                new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight}//
+        );
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(TxtReaderActivity.this);
+        builder.setTitle("選擇dropbox檔案");
+        builder.setAdapter(aryAdapter,
+                new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    public void onClick(DialogInterface dialog, int paramInt) {
                         final String filename = fileLst.get(paramInt).getName();
                         final String fileDropboxPath = fileLst.get(paramInt).getFullPath();
                         try {
@@ -376,10 +390,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         } catch (Exception e) {
                             Log.e(TAG, e.getMessage(), e);
                             throw new RuntimeException(e);
+                        } finally {
+                            dialog.dismiss();
                         }
                     }
-                })//
-                .show();
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     /**
