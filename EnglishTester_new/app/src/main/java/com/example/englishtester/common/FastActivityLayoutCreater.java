@@ -12,7 +12,7 @@ import android.widget.ScrollView;
 
 public class FastActivityLayoutCreater {
 
-    private static LinearLayout createSimpleScrollLinearLayout(Activity activity) {
+    public static LinearLayout createSimpleScrollLinearLayout(Activity activity) {
         LinearLayout layout = new LinearLayout(activity);
         ScrollView scroll = new ScrollView(activity);
         activity.setContentView(scroll);

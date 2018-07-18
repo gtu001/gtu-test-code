@@ -1,0 +1,17 @@
+		$.get("/springdata-dbMain/hello", {}, //
+		function(data) {//
+			alert(data + "..." + JSON.stringify(data));
+		}, "json")// xml,html,text,script,json,jsonp
+		.fail(function(jqXHR, textStatus, errorThrown) {//
+			var jqXHRJson = jqXHR['responseJSON'];
+			var msgInJqXHR = "";
+			for ( var ii in jqXHRJson) {
+				msgInJqXHR += ii + " : " + jqXHRJson[ii] + "\n";
+			}
+			alert(//
+			msgInJqXHR + //
+			"------------------------------\n" + 
+			"textStatus : " + textStatus + "\n" + //
+			"errorThrown : " + errorThrown //
+			);
+		});

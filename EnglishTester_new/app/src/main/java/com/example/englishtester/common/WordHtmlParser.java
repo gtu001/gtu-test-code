@@ -51,7 +51,7 @@ public class WordHtmlParser {
     }
 
     private void validateContent(String stepLabel, String content, String checkStr) {
-        if (StringUtils.isBlank(checkStr)) {
+        if (checkStr == null) {
             return;
         }
         if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
@@ -70,15 +70,37 @@ public class WordHtmlParser {
         return getFromContent(content, isPure, checkStr);
     }
 
+    public String getFromFileDebug(File file, boolean isPure) {
+        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
+        return getFromContent(content, isPure, "");
+    }
+
     public String getFromContent(String context) {
         return getFromContent(context, false, null);
     }
 
-    public String getFromContent(String content, boolean isPure, String checkStr) {
-//        log("ORIGN : =======================================================================");
-//        log(content);
-//        log("ORIGN : =======================================================================");
+    public String getFromContentDebug(String content, boolean isPure) {
+        return getFromContent(content, isPure, "");
+    }
 
+    public String getFromContent(String content, boolean isPure, String checkStr) {
+        log("ORIGN start : =======================================================================");
+        log(content);
+        log("ORIGN end   : =======================================================================");
+
+        try {
+            content = getFromContentMain(content, isPure, checkStr);
+        } catch (Throwable e) {
+            throw new RuntimeException("getFromContent ERR : " + e.getMessage(), e);
+        }
+
+        log("RESULT start : =======================================================================");
+        logContent(content);
+        log("RESULT end    : =======================================================================");
+        return content;
+    }
+
+    private String getFromContentMain(String content, boolean isPure, String checkStr) {
         content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);
         content = _step1_hTitleHandler(content, isPure);
@@ -95,8 +117,8 @@ public class WordHtmlParser {
         validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content, isPure);
         validateContent("_step2_hrefTag", content, checkStr);
-        content = _step3_imageProc(content, isPure, checkStr);
-        validateContent("_step3_imageProc", content, checkStr);
+        content = _step3_imageProcMaster(content, isPure, checkStr);
+        validateContent("_step3_imageProcMaster", content, checkStr);
         content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step5_li_check(content, isPure);
@@ -108,11 +130,6 @@ public class WordHtmlParser {
 
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
-
-//        log( "RESULT : =======================================================================");
-//        logContent(content);
-//        log( "RESULT : =======================================================================");
-
         return content;
     }
 
@@ -172,7 +189,6 @@ public class WordHtmlParser {
                 String size = mth.group(1);
                 String text = mth.group(2);
                 String tmpVal = "";
-                log("....." + size + " , " + text);
                 if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
                     tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}";
                     if (isPure) {
@@ -187,10 +203,19 @@ public class WordHtmlParser {
     }
 
     private String _step1_fontSize_Indicate(String content, boolean isPure) {
-        for (FontSizeIndicateEnum e : FontSizeIndicateEnum.values()) {
-            content = e.apply(content, isPure);
+        Pattern ptn = Pattern.compile("\\<span.*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Matcher mth = ptn.matcher(content);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+            String spanContent = mth.group();
+            for (FontSizeIndicateEnum e : FontSizeIndicateEnum.values()) {
+                spanContent = e.apply(spanContent, isPure);
+            }
+            spanContent = StringUtil_.appendReplacementEscape(spanContent);
+            mth.appendReplacement(sb, spanContent);
         }
-        return content;
+        mth.appendTail(sb);
+        return sb.toString();
     }
 
     private String _step0_hiddenHead(String content, boolean isPure) {
@@ -349,6 +374,20 @@ public class WordHtmlParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String _step3_imageProcMaster(String content, boolean isPure, String checkPic) {
+        Pattern ptn = Pattern.compile("\\<img.*?\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Matcher mth = ptn.matcher(content);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+            String spanContent = mth.group();
+            spanContent = _step3_imageProc(spanContent, isPure, checkPic);
+            spanContent = StringUtil_.appendReplacementEscape(spanContent);
+            mth.appendReplacement(sb, spanContent);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
     }
 
     private String _step3_imageProc(String content, boolean isPure, String checkPic) {

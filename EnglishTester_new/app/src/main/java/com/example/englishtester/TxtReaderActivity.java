@@ -19,7 +19,6 @@ import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -30,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -140,6 +140,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     ScrollView scrollView1;
 
+    WebView webView;
+
     private NativeExpressAdView mAdView;
 
     TxtReaderActivityDTO dto = new TxtReaderActivityDTO();
@@ -174,6 +176,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         clearBtn = (Button) this.findViewById(R.id.clearBtn);
         confirmBtn = (Button) this.findViewById(R.id.confirmBtn);
         linearLayout2 = (LinearLayout) this.findViewById(R.id.linearLayout2);
+        webView = new WebView(this);
 
         //卷軸
         scrollView1 = (ScrollView) this.findViewById(R.id.scrollView1);
@@ -428,7 +431,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         });
         homeKeyWatcher.startWatch();
 
-        webViewHtmlFetcher = WebViewHtmlFetcher.newInstance(this).isHtml(true);
+        //網頁取得器
+        webViewHtmlFetcher = new WebViewHtmlFetcher(this);
         doOnoffService(true);
     }
 
@@ -774,20 +778,28 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(parentView);
         final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
+        editText.setText("http://www.ign.com");
         builder.setTitle("開啟HTML");
         builder.setMessage("開啟HTML : ");
         builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String url = editText.getText().toString();
+                url = StringUtils.trimToEmpty(url).replaceAll("[\r\n]*", "");
+                editText.setText(url);
                 if (StringUtils.isBlank(url)) {
                     Toast.makeText(TxtReaderActivity.this, "請輸入URL!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 try {
-                    webViewHtmlFetcher.htmlGet(new WebViewHtmlFetcher.HtmlGet() {
+                    final AtomicReference<ProgressDialog> progDlg = new AtomicReference<ProgressDialog>();
+                    progDlg.set(new ProgressDialog(TxtReaderActivity.this));
+                    progDlg.get().setMessage("讀取中...");
+                    progDlg.get().show();
+
+                    webViewHtmlFetcher.applyConfig(true, new WebViewHtmlFetcher.HtmlGet() {
                         @Override
-                        public void action(String contentOrign, Handler handler) {
+                        public void action(final String contentOrign, final Handler handler) {
                             dto.currentHtmlFile = null;
                             dto.dropboxPicDir = null;
 
@@ -795,7 +807,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 Log.v(TAG, "[WordHtmlParser START]");
 
                             WordHtmlParser wordParser = WordHtmlParser.newInstance();
-                            final String content = wordParser.getFromContent(contentOrign);
+                            final String content = wordParser.getFromContentDebug(contentOrign, false);
 
                             for (int ii = 0; ii < 10; ii++)
                                 Log.v(TAG, "[WordHtmlParser END]");
@@ -805,10 +817,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 public void run() {
                                     setContentText(content, true);
                                     translateView.setText("");
+                                    progDlg.get().dismiss();
                                 }
                             });
                         }
-                    }).apply(url);
+                    });
+
+                    webViewHtmlFetcher.gotoUrl(url);
                 } catch (Exception e) {
                     Toast.makeText(TxtReaderActivity.this, "讀取失敗!", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, e.getMessage(), e);
@@ -931,6 +946,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         public void run() {
                             setContentText(content, true);
                             translateView.setText("");
+                            dialog.get().dismiss();
                         }
                     });
                 }
@@ -957,6 +973,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         public void run() {
                             setContentText(engSb.toString(), false);
                             translateView.setText(chsSb.toString());
+                            dialog.get().dismiss();
                         }
                     });
                 }
@@ -981,7 +998,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                dialog.get().dismiss();
                             }
                         });
                     }
