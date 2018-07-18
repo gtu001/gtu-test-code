@@ -1,3 +1,8 @@
 
 # 跳過測試
-gradle build -x test 
+$ gradle build -x test 
+
+
+# 找不到 org.gradle.wrapper.GradleWrapperMain 
+--> 在/build.gradle 目錄底下執行 
+$ gradle wrapper

@@ -145,5 +145,10 @@ dependencies {
 	compile files('D:/my_tool/simple_dao_gen/derbyclient.jar')
 	compile files('D:/my_tool/simple_dao_gen/postgresql-42.2.3.jar')
     // spring-data ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    
+    // gtu-custom ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+	compile ('org.reflections:reflections:0.9.11')
+    // gtu-custom ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    
 }
 

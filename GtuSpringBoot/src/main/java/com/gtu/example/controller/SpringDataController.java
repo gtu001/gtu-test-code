@@ -44,7 +44,7 @@ public class SpringDataController {
     @Autowired
     private EmployeeJpaRepository employeeJpaRepository;
 
-    @RequestMapping("/employee/create")
+    @RequestMapping(value = "/employee/create")
     public String employee_createOne() {
         String uuid = UUID.randomUUID().toString();
         Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
@@ -53,7 +53,7 @@ public class SpringDataController {
         return ReflectionToStringBuilder.toString(vo);
     }
 
-    @RequestMapping("/employee/findAll")
+    @RequestMapping(value = "/employee/findAll")
     public String employee_findAll() {
         Iterable<Employee> iter = employeeRepository.findAll();
         Stream<Employee> targetStream = StreamSupport.stream(iter.spliterator(), false);
@@ -61,7 +61,7 @@ public class SpringDataController {
                 .reduce("", (v1, v2) -> v1 += v2 + "<br/>");
     }
 
-    @RequestMapping("/employee/create_page")
+    @RequestMapping(value = "/employee/create_page")
     public String employee_createOne_page() {
         String uuid = UUID.randomUUID().toString();
         Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
@@ -70,7 +70,7 @@ public class SpringDataController {
         return ReflectionToStringBuilder.toString(vo);
     }
 
-    @RequestMapping("/employee/create2")
+    @RequestMapping(value = "/employee/create2")
     public String employee_createOne2() {
         String uuid = UUID.randomUUID().toString();
         Employee vo = new Employee("F_" + uuid, "L_" + uuid, "D_" + uuid);
@@ -79,7 +79,7 @@ public class SpringDataController {
         return ReflectionToStringBuilder.toString(vo);
     }
 
-    @RequestMapping("/employee/findAll2")
+    @RequestMapping(value = "/employee/findAll2")
     public String employee_findAll2() {
         Iterable<Employee> iter = employeeJpaRepository.findAll();
         Stream<Employee> targetStream = StreamSupport.stream(iter.spliterator(), false);
@@ -87,7 +87,7 @@ public class SpringDataController {
                 .reduce("", (v1, v2) -> v1 += v2 + "<br/>");
     }
 
-    @RequestMapping("/employee/findAll_nameOnly")
+    @RequestMapping(value = "/employee/findAll_nameOnly")
     public String employee_findAll_nameOnly() {
         Iterable<NamesOnly> iter = employeeRepository.findAll_nameOnly();
         Stream<NamesOnly> targetStream = StreamSupport.stream(iter.spliterator(), false);
@@ -95,7 +95,7 @@ public class SpringDataController {
                 .reduce("", (v1, v2) -> v1 += v2 + "<br/>");
     }
 
-    @RequestMapping("/address/create")
+    @RequestMapping(value = "/address/create")
     public String address_createOne() {
         Address d1 = addressCreater.getNewAddress();
         addressRepository.save(d1);
@@ -103,7 +103,7 @@ public class SpringDataController {
         return ReflectionToStringBuilder.toString(d1);
     }
 
-    @RequestMapping("/address/create_custom")
+    @RequestMapping(value = "/address/create_custom")
     public String address_createOne_custom() {
         Address d1 = addressCreater.getNewAddress();
         addressCustomRepository.persist(d1);
@@ -111,7 +111,7 @@ public class SpringDataController {
         return ReflectionToStringBuilder.toString(d1);
     }
 
-    @RequestMapping("/address/findAll_withRownum")
+    @RequestMapping(value = "/address/findAll_withRownum")
     public String address_findAll_withRownum() {
         Iterable<Address> iter = addressCustomRepository.findAllWithRownum();
         return StreamSupport.stream(iter.spliterator(), false)//

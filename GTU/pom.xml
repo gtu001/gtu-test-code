@@ -680,6 +680,14 @@
 			<version>5.0.0</version>
 		</dependency>
 
+		<!-- 取得pkg底下所有class -->
+		<!-- https://github.com/ronmamo/reflections -->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.11</version>
+		</dependency>
+
 	</dependencies>
 
 

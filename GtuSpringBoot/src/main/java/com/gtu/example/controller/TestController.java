@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     private static final Logger log = LoggerFactory.getLogger(TestController.class);
 
-    @RequestMapping("/home")
+    @RequestMapping(value = "/home")
     public String home() {
         log.info("home!!");
         return "Hello World!";
     }
 
-    @GetMapping("/findAll")
+    @GetMapping(value = "/findAll")
     public String findAll() {
         log.info("findAll!!");
         return "OK";
     }
 
-    @PostMapping("/postTest")
+    @PostMapping(value = "/postTest")
     public String postTest(@Valid @RequestBody ReqBean bean) {
         log.info("postTest!!");
         log.info(ReflectionToStringBuilder.toString(bean));
@@ -45,12 +45,12 @@ public class TestController {
         return "OK";
     }
 
-    @RequestMapping("/find/{id}")
+    @RequestMapping(value = "/find/{id}")
     public String findById(@PathVariable("id") long id) {
         return "you find id = " + id;
     }
     
-    @GetMapping("/greeting")
+    @GetMapping(value = "/greeting")
     public String greeting(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
         model.addAttribute("name", name);
         return "greeting";
