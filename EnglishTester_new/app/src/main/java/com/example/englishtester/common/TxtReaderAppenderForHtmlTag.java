@@ -420,29 +420,46 @@ public class TxtReaderAppenderForHtmlTag {
 
         private Bitmap getResult() {
             Bitmap tmp = null;
-            if (localFile != null && //
-                    (tmp = OOMHandler.new_decode(localFile)) != null) {
-                return tmp;
-            } else if (isOnlineImageFromURL(altData) && //
-                    (tmp = getPicFromURL(altData)) != null) {
-                return tmp;
+            if (localFile != null) {
+                tmp = OOMHandler.new_decode(localFile);
+                if (tmp != null) {
+                    return tmp;
+                }
+            }
+
+            if (isOnlineImageFromURL(altData)) {
+                tmp = getPicFromURL(altData);
+                if (tmp != null) {
+                    return tmp;
+                }
+            }
+
+            if (StringUtils.isNotBlank(dto.getCurrentHtmlUrl())) {
+                String prefixUrl = dto.getCurrentHtmlUrl();
+                if (!prefixUrl.endsWith("/")) {
+                    prefixUrl = prefixUrl + "/";
+                }
+                tmp = getPicFromURL(prefixUrl + altData);
+                if (tmp != null) {
+                    return tmp;
+                }
             }
             return onlinePicLoader.getNotfound404();
         }
+    }
 
-        private boolean isOnlineImageFromURL(String url) {
-            if (url.matches("https?\\:.*") || //
-                    url.matches("www\\..*") || //
-                    url.matches("\\w+\\.\\w+.*") //
-                    ) {
-                return true;
-            }
-            return false;
+    private boolean isOnlineImageFromURL(String url) {
+        if (url.matches("https?\\:.*") || //
+                url.matches("www\\..*") || //
+                url.matches("\\w+\\.\\w+.*") //
+                ) {
+            return true;
         }
+        return false;
+    }
 
-        private Bitmap getPicFromURL(String url) {
-            return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000);
-        }
+    private Bitmap getPicFromURL(String url) {
+        return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000);
     }
 
     private GifSpanCreater.ResetScale resetScaleAction = new GifSpanCreater.ResetScale() {

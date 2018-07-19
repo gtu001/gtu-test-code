@@ -801,10 +801,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         builder.setTitle("開啟HTML");
         builder.setMessage("開啟HTML : ");
         builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+
+            private String getURL() {
                 String url = editText.getText().toString();
                 url = StringUtils.trimToEmpty(url).replaceAll("[\r\n]*", "");
+                return url;
+            }
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String url = getURL();
                 editText.setText(url);
                 if (StringUtils.isBlank(url)) {
                     Toast.makeText(TxtReaderActivity.this, "請輸入URL!", Toast.LENGTH_SHORT).show();
@@ -822,6 +828,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             try {
                                 dto.currentHtmlFile = null;
                                 dto.dropboxPicDir = null;
+                                dto.currentHtmlUrl = url;
 
                                 for (int ii = 0; ii < 10; ii++)
                                     Log.v(TAG, "[WordHtmlParser START]");
@@ -951,6 +958,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     //給html抓圖用
                     dto.currentHtmlFile = txtFileZ.get();
                     dto.currentHtmlContent = null;
+                    dto.currentHtmlUrl = null;
 
                     for (int ii = 0; ii < 10; ii++)
                         Log.v(TAG, "[WordHtmlParser START]");
@@ -1301,6 +1309,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private File dropboxPicDir;//設定dropbox下載圖片的目錄
         private File currentHtmlFile;//給html抓圖用
         private String currentHtmlContent;//原始html內文
+        private String currentHtmlUrl;//html來源url
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
@@ -1353,6 +1362,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder) {
             this.bookmarkHolder = bookmarkHolder;
+        }
+
+        public String getCurrentHtmlUrl() {
+            return currentHtmlUrl;
         }
     }
 

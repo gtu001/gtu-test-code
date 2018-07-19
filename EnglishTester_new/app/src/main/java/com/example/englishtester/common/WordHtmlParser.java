@@ -229,15 +229,7 @@ public class WordHtmlParser {
     }
 
     private String _step0_hiddenHead(String content, boolean isPure) {
-//        Pattern titleStylePtn = Pattern.compile("\\<head.*\\<\\/head\\>", Pattern.DOTALL | Pattern.MULTILINE);
-//        StringBuffer sb = new StringBuffer();
-//        Matcher mth = titleStylePtn.matcher(content);
-//        while (mth.find()) {
-//            mth.appendReplacement(sb, "");
-//        }
-//        mth.appendTail(sb);
-//        return sb.toString();
-        return hiddenByTagMatcher("<head", "</head>", content);
+        return hiddenByTagMatcher("<head", "</head>", "\\<head[\r\n\\s\t\\>]{1}", "\\<\\/head\\>", 0, 0, content);
     }
 
     private String _step1_hTitleHandler(String content, boolean isPure) {
@@ -393,7 +385,8 @@ public class WordHtmlParser {
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {
             String spanContent = mth.group();
-            spanContent = _step3_imageProc(spanContent, isPure, checkPic);
+            spanContent = _step3_imageProc_WordMode(spanContent, isPure, checkPic);
+            spanContent = _step3_imageProc_InternetMode(spanContent, isPure, checkPic);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
         }
@@ -401,7 +394,7 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String _step3_imageProc(String content, boolean isPure, String checkPic) {
+    private String _step3_imageProc_WordMode(String content, boolean isPure, String checkPic) {
         Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"描述\\:\\s((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
@@ -410,12 +403,34 @@ public class WordHtmlParser {
             String picLink = mth.group(2);
 
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
-                log("!!!!!!  <<<_step3_imageProc>>> Find Pic : " + checkPic);
+                log("!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
             }
 
             filterImageDir(srcDesc);
 
             String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
+            if (isPure) {
+                repStr = "";
+            }
+
+            mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String _step3_imageProc_InternetMode(String content, boolean isPure, String checkPic) {
+        Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String srcDesc = mth.group(1);
+
+            if (StringUtils.isNotBlank(checkPic) && srcDesc.contains(checkPic)) {
+                log("!!!!!!  <<<_step3_imageProc_InternetMode>>> Find Pic : " + checkPic);
+            }
+
+            String repStr = "{{img src:" + "" + ",alt:" + srcDesc + "}}";
             if (isPure) {
                 repStr = "";
             }
@@ -451,8 +466,8 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
-    private String hiddenByTagMatcher(String startTag, String endTag, String content) {
-        TagMatcher tag = new TagMatcher(startTag, endTag, content, false);
+    private String hiddenByTagMatcher(String startTag, String endTag, String startPtn, String endPtn, int startTagOffset, int endTagOffset, String content) {
+        TagMatcher tag = new TagMatcher(startTag, endTag, startPtn, endPtn, startTagOffset, endTagOffset, content, false);
         while (tag.findUnique()) {
             tag.appendReplacementForUnique("", true, true);
         }
@@ -540,29 +555,20 @@ public class WordHtmlParser {
         validateContent("_stepFinal_hidden_tag 38", content, checkStr);
 
         //for Standard Html
-        content = hiddenByTagMatcher("<script", "</script>", content);
-        content = hiddenByTagMatcher("<rect", ">", content);
-        content = hiddenByTagMatcher("<polyline", ">", content);
-        content = hiddenByTagMatcher("<select", "</select>", content);
-        content = hiddenByTagMatcher("<circle", ">", content);
-        content = hiddenByTagMatcher("<input", ">", content);
-        content = hiddenByTagMatcher("<nav", ">", content);
+        content = hiddenByTagMatcher("<script", "</script>", "\\<script[\r\n\t\\s]{1}", "\\<\\/script\\>", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
-
-//        content = _stepFinal_hidden_tag(content, "\\<script(?:.|\n)*?\\<\\/script\\>");
-//        validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<rect(?:.|\n)*?\\>");
-//        validateContent("_stepFinal_hidden_tag STD 2", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<polyline(?:.|\n)*?\\>");
-//        validateContent("_stepFinal_hidden_tag STD 3", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<select(?:.|\n)*?\\<\\/select\\>");
-//        validateContent("_stepFinal_hidden_tag STD 4", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<circle(?:.|\n)*?\\>");
-//        validateContent("_stepFinal_hidden_tag STD 5", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<input(?:.|\n)*?\\>");
-//        validateContent("_stepFinal_hidden_tag STD 6", content, checkStr);
-//        content = _stepFinal_hidden_tag(content, "\\<nav(?:.|\n)*?\\>");
-//        validateContent("_stepFinal_hidden_tag STD 7", content, checkStr);
+        content = hiddenByTagMatcher("<rect", ">", "\\<rect[\n\r\t\\s]{1}", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 2", content, checkStr);
+        content = hiddenByTagMatcher("<polyline", ">", "\\<polyline[\r\n\t\\s]{1}", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 3", content, checkStr);
+        content = hiddenByTagMatcher("<select", "</select>", "\\<select[\r\n\t\\s]{1}", "\\<\\/select\\>", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 4", content, checkStr);
+        content = hiddenByTagMatcher("<circle", ">", "\\<circle[\r\n\t\\s]{1}", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 5", content, checkStr);
+        content = hiddenByTagMatcher("<input", ">", "\\<input[\r\n\t\\s]{1}", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 6", content, checkStr);
+        content = hiddenByTagMatcher("<nav", ">", "\\<nav[\r\n\t\\s]{1}", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 7", content, checkStr);
 
         return content;
     }

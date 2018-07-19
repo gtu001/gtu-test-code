@@ -1,35 +1,71 @@
 package gtu.regex.tag;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
+
+import gtu.log.fakeAndroid.Log;
 
 public class TagMatcher {
 
+    private static final String TAG = TagMatcher.class.getSimpleName();
+
     public static void main(String[] args) {
-        String startTag = "<";
-        String endTag = ">";
-        String content = "<111 333<4444> <5555<788888>>9999999>";
-
-        TagMatcher t = new TagMatcher(startTag, endTag, content, false);
-        while (t.find()) {
-            System.out.println(t.group());
-        }
-
-        System.out.println("unique = " + t.findUnique());
+//        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/WordHtmlParser_before_20180719.htm");
+//        String content = FileUtilGtu.loadFromFile(file, "UTF8");
+//
+//        String startTag = "\\<head(?:[\\s\n\r]{1})";
+//        String endTag = "\\<\\/head\\>";
+//        // String content = "<111 333<4444> <5555<788888>>9999999>";
+//
+//        TagMatcher t = new TagMatcher(startTag, endTag, content, true, true);
+//        while (t.find()) {
+//            System.out.println(t.group());
+//        }
+//
+//        System.out.println("unique = " + t.findUnique());
 
         System.out.println("done...");
     }
 
-    public TagMatcher(String startTag, String endTag, String content, boolean debugMode) {
+    public TagMatcher(String startTag, String endTag, String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset, String content, boolean debugMode) {
         this.startTag = startTag;
         this.endTag = endTag;
         this.content = content;
         this.debugMode = debugMode;
+        this.startPtn = null;
+        this.endPtn = null;
+        _initPatternReference(startPtnStr, endPtnStr, startTagOffset, endTagOffset);
     }
 
+    private void _initPatternReference(String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset) {
+        this.startTagOffset = 0;
+        this.endTagOffset = 0;
+        if (StringUtils.isNotBlank(startPtnStr)) {
+            this.startPtn = new StringUtilsByPattern(startPtnStr);
+            if (startTagOffset != null) {
+                this.startTagOffset = startTagOffset;
+            }
+        }
+        if (StringUtils.isNotBlank(endPtnStr)) {
+            this.endPtn = new StringUtilsByPattern(endPtnStr);
+            if (endTagOffset != null) {
+                this.endTagOffset = endTagOffset;
+            }
+        }
+    }
+
+    StringUtilsByPattern startPtn;
+    StringUtilsByPattern endPtn;
     String startTag;
     String endTag;
     String content;
     int startPad = 0;
+
+    int startTagOffset;
+    int endTagOffset;
+
     boolean debugMode = false;
     TagMatcherInfo info;
 
@@ -38,7 +74,11 @@ public class TagMatcher {
         info = null;
         while (find()) {
             String currentContent = this.group().groupWithoutTag();
-            if (!currentContent.contains(startTag) && !currentContent.contains(endTag)) {
+            if (StringUtils.isBlank(currentContent)) {
+                continue;
+            }
+            if ((startPtn != null ? !startPtn.contain(currentContent) : !currentContent.contains(startTag)) && //
+                    (endPtn != null ? !endPtn.contain(currentContent) : !currentContent.contains(endTag))) {
                 info = this.group();
                 return true;
             }
@@ -52,27 +92,32 @@ public class TagMatcher {
     }
 
     public boolean find() {
-        log("find ------------------------------------");
-        int startPos = content.indexOf(startTag, startPad);
+        Log.v(TAG, "find ------------------------------------");
+        int startPos = getStartPos();
+        Log.v(TAG, "-init-startPos : " + startPos + " --> " + fixLengthForDebug(StringUtils.substring(content, startPos)));
         if (startPos == -1) {
             info = null;
             return false;
         }
 
         int endPos = findMatchEnd(startPos);
+        if (endPos == -1) {
+            info = null;
+            return false;
+        }
 
         info = new TagMatcherInfo();
         info.content = content;
         info.startWithTag = startPos;
-        info.startWithoutTag = startPos + startTag.length();
+        info.startWithoutTag = startPos + getStartTagLength();
         info.endWithoutTag = endPos;
-        info.endWithTag = endPos + endTag.length();
+        info.endWithTag = endPos + getEndTagLength();
 
-        log("startPos : " + startPos);
-        log("endPos : " + endPos);
-        log("content : " + content.substring(startPos, endPos));
+        Log.v(TAG, "startPos : " + startPos);
+        Log.v(TAG, "endPos : " + endPos);
+        Log.v(TAG, "content : " + fixLengthForDebug(content.substring(startPos, endPos)));
 
-        startPad = startPos + startTag.length();
+        startPad = startPos + getStartTagLength();
         return true;
     }
 
@@ -88,7 +133,8 @@ public class TagMatcher {
         String resultContent = sb.toString();
         if (checkResult) {
             if (StringUtils.equals(resultContent, contentCopy)) {
-                throw new RuntimeException("未被正常取代!! : " + replace);
+                String message = String.format("未被正常取代!! startTag : %s, endTag : %s , group : %s , [replce to]--> %s ", startTag, endTag, info, replace);
+                throw new RuntimeException(message);
             }
         }
         if (resetContent) {
@@ -96,7 +142,7 @@ public class TagMatcher {
         }
         return resultContent;
     }
-    
+
     public void appendReplacement(StringBuffer sb, String replace) {
         throw new UnsupportedOperationException();
     }
@@ -109,10 +155,21 @@ public class TagMatcher {
         return info;
     }
 
-    private void log(String message) {
-        if (debugMode) {
-            System.out.println(message);
+    // private void Log.v(TAG, String message) {
+    // if (debugMode) {
+    // System.out.println(message);
+    // }
+    // }
+
+    private static String fixLengthForDebug(String str) {
+        if (str == null) {
+            return "";
         }
+        str = str.replaceAll("[\r\n]", "");
+        if (str.length() > 60) {
+            return StringUtils.substring(str, 0, 30) + "...." + StringUtils.substring(str, -30);
+        }
+        return str;
     }
 
     public static class TagMatcherInfo {
@@ -127,7 +184,7 @@ public class TagMatcher {
         @Override
         public String toString() {
             return "TagMatcherInfo [startWithoutTag=" + startWithoutTag + ", endWithoutTag=" + endWithoutTag + ", startWithTag=" + startWithTag + ", endWithTag=" + endWithTag + ", groupWithoutTag()="
-                    + groupWithoutTag() + ", groupWithTag()=" + groupWithTag() + "]";
+                    + fixLengthForDebug(groupWithoutTag()) + ", groupWithTag()=" + fixLengthForDebug(groupWithTag()) + "]";
         }
 
         public String groupWithoutTag() {
@@ -160,17 +217,24 @@ public class TagMatcher {
     }
 
     private int findMatchEnd(int startPos) {
-        log("----------------------------------");
+        Log.v(TAG, "----------------------------------");
         int endPos = -1;
         int token = 1;
 
         String tmpContent = content.substring(startPos);
 
-        while ((endPos = StringUtils.ordinalIndexOf(tmpContent, endTag, token)) != -1) {
-            String middleStr = tmpContent.substring(0, endPos + endTag.length());
-            log("middleStr : " + middleStr);
-            int startTagAppear = StringUtils.countMatches(middleStr, startTag);
-            int endTagAppear = StringUtils.countMatches(middleStr, endTag);
+        Log.v(TAG, " -- tmpContent : " + tmpContent);
+
+        while ((endPos = getEndPos(tmpContent, token)) != -1) {
+            Log.v(TAG, " -- endPos : " + endPos);
+
+            String middleStr = tmpContent.substring(0, endPos + getEndTagLength());
+            Log.v(TAG, "middleStr : " + fixLengthForDebug(middleStr));
+            int startTagAppear = countMatches_startTag(middleStr);
+            int endTagAppear = countMatches_endTag(middleStr);
+
+            Log.v(TAG, "startTagAppear : " + startTagAppear);
+            Log.v(TAG, "endTagAppear : " + endTagAppear);
 
             if (startTagAppear != endTagAppear) {
                 token++;
@@ -178,6 +242,98 @@ public class TagMatcher {
                 break;
             }
         }
+        if (endPos == -1) {
+            return -1;
+        }
         return endPos + startPos;
+    }
+
+    private int countMatches_startTag(String middleStr) {
+        return startPtn != null ? startPtn.countMatches(middleStr) : StringUtils.countMatches(middleStr, startTag);
+    }
+
+    private int countMatches_endTag(String middleStr) {
+        return endPtn != null ? endPtn.countMatches(middleStr) : StringUtils.countMatches(middleStr, endTag);
+    }
+
+    private int getEndPos(String tmpContent, int token) {
+        return endPtn != null ? //
+                endPtn.ordinalIndexOf(tmpContent, token) : //
+                StringUtils.ordinalIndexOf(tmpContent, endTag, token);
+    }
+
+    private int getStartPos() {
+        return startPtn != null ? //
+                startPtn.indexOf(content, startPad) : //
+                content.indexOf(startTag, startPad);
+    }
+
+    private int getStartTagLength() {
+        return startTag.length() + startTagOffset;
+    }
+
+    private int getEndTagLength() {
+        return endTag.length() + endTagOffset;
+    }
+
+    public static class StringUtilsByPattern {
+
+        private Pattern ptn = null;
+        private String group;
+
+        public StringUtilsByPattern(String ptnStr) {
+            ptn = Pattern.compile(ptnStr, Pattern.MULTILINE | Pattern.DOTALL);
+        }
+
+        public StringUtilsByPattern(Pattern ptn) {
+            this.ptn = ptn;
+        }
+
+        public int countMatches(String content) {
+            Matcher mth = ptn.matcher(content);
+            int count = 0;
+            while (mth.find()) {
+                count++;
+            }
+            return count;
+        }
+
+        public int ordinalIndexOf(String content, int token) {
+            Matcher mth = ptn.matcher(content);
+            int idx = 0;
+            while (mth.find()) {
+                idx++;
+                if (idx == token) {
+                    group = mth.group();
+                    return mth.start();
+                }
+            }
+            return -1;
+        }
+
+        public int indexOf(String content, int startPad) {
+            if (content.length() <= startPad) {
+                return -1;
+            }
+            content = content.substring(startPad);
+            Matcher mth = ptn.matcher(content);
+            while (mth.find()) {
+                group = mth.group();
+                return mth.start();
+            }
+            return -1;
+        }
+
+        public boolean contain(String content) {
+            return indexOf(content, 0) != -1;
+        }
+
+        public String group() {
+            return group;
+        }
+    }
+
+    public String getContent() {
+        return content;
     }
 }
