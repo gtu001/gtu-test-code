@@ -1,12 +1,12 @@
 package com.example.englishtester.common;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.Constant;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,17 +50,6 @@ public class WordHtmlParser {
         return new WordHtmlParser();
     }
 
-    private void validateContent(String stepLabel, String content, String checkStr) {
-        if (checkStr == null) {
-            return;
-        }
-        if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
-            throw new RuntimeException(stepLabel + " -> 查無 : " + checkStr);
-        } else {
-            log("CHECK : " + stepLabel + " OK!!!");
-        }
-    }
-
     public String getFromFile(File file) {
         return getFromFile(file, false, null);
     }
@@ -88,6 +77,8 @@ public class WordHtmlParser {
         log(content);
         log("ORIGN end   : =======================================================================");
 
+        saveToFileDebug("before", content);
+
         try {
             content = getFromContentMain(content, isPure, checkStr);
         } catch (Throwable e) {
@@ -100,7 +91,25 @@ public class WordHtmlParser {
         return content;
     }
 
+    private void saveToFileDebug(String suffix, String context) {
+        if (BuildConfig.DEBUG) {
+            String dateStr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+            String name = WordHtmlParser.class.getSimpleName();
+            if (StringUtils.isNotBlank(suffix)) {
+                name = name + "_" + suffix;
+            }
+            File file = new File(Constant.PropertiesFindActivity_PATH + File.separator + name + "_" + dateStr + ".txt");
+            try {
+                FileUtilAndroid.saveToFile(file, context);
+            } catch (Exception e) {
+                Log.e(TAG, "saveToFileDebug ERR : " + e.getMessage(), e);
+            }
+        }
+    }
+
+
     private String getFromContentMain(String content, boolean isPure, String checkStr) {
+        log("# getFromContentMain START...");
         content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);
         content = _step1_hTitleHandler(content, isPure);
@@ -130,6 +139,7 @@ public class WordHtmlParser {
 
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
+        log("# getFromContentMain END...");
         return content;
     }
 
@@ -219,14 +229,15 @@ public class WordHtmlParser {
     }
 
     private String _step0_hiddenHead(String content, boolean isPure) {
-        Pattern titleStylePtn = Pattern.compile("\\<head\\>.*\\<\\/head\\>", Pattern.DOTALL | Pattern.MULTILINE);
-        StringBuffer sb = new StringBuffer();
-        Matcher mth = titleStylePtn.matcher(content);
-        while (mth.find()) {
-            mth.appendReplacement(sb, "");
-        }
-        mth.appendTail(sb);
-        return sb.toString();
+//        Pattern titleStylePtn = Pattern.compile("\\<head.*\\<\\/head\\>", Pattern.DOTALL | Pattern.MULTILINE);
+//        StringBuffer sb = new StringBuffer();
+//        Matcher mth = titleStylePtn.matcher(content);
+//        while (mth.find()) {
+//            mth.appendReplacement(sb, "");
+//        }
+//        mth.appendTail(sb);
+//        return sb.toString();
+        return hiddenByTagMatcher("<head", "</head>", content);
     }
 
     private String _step1_hTitleHandler(String content, boolean isPure) {
@@ -440,6 +451,14 @@ public class WordHtmlParser {
         return sb.toString();
     }
 
+    private String hiddenByTagMatcher(String startTag, String endTag, String content) {
+        TagMatcher tag = new TagMatcher(startTag, endTag, content, false);
+        while (tag.findUnique()) {
+            tag.appendReplacementForUnique("", true, true);
+        }
+        return tag.getContent();
+    }
+
     private String _step6_hiddenSomething(String content, boolean isPure, String checkStr) {
         content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 1", content, checkStr);
@@ -511,9 +530,40 @@ public class WordHtmlParser {
         validateContent("_stepFinal_hidden_tag 35", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<figcaption\\s(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 36", content, checkStr);
-
         content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
+
+        //new 20180719
+        content = _stepFinal_hidden_tag(content, "\\<code\\s(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 37", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<pre\\s(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 38", content, checkStr);
+
+        //for Standard Html
+        content = hiddenByTagMatcher("<script", "</script>", content);
+        content = hiddenByTagMatcher("<rect", ">", content);
+        content = hiddenByTagMatcher("<polyline", ">", content);
+        content = hiddenByTagMatcher("<select", "</select>", content);
+        content = hiddenByTagMatcher("<circle", ">", content);
+        content = hiddenByTagMatcher("<input", ">", content);
+        content = hiddenByTagMatcher("<nav", ">", content);
+        validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
+
+//        content = _stepFinal_hidden_tag(content, "\\<script(?:.|\n)*?\\<\\/script\\>");
+//        validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<rect(?:.|\n)*?\\>");
+//        validateContent("_stepFinal_hidden_tag STD 2", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<polyline(?:.|\n)*?\\>");
+//        validateContent("_stepFinal_hidden_tag STD 3", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<select(?:.|\n)*?\\<\\/select\\>");
+//        validateContent("_stepFinal_hidden_tag STD 4", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<circle(?:.|\n)*?\\>");
+//        validateContent("_stepFinal_hidden_tag STD 5", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<input(?:.|\n)*?\\>");
+//        validateContent("_stepFinal_hidden_tag STD 6", content, checkStr);
+//        content = _stepFinal_hidden_tag(content, "\\<nav(?:.|\n)*?\\>");
+//        validateContent("_stepFinal_hidden_tag STD 7", content, checkStr);
+
         return content;
     }
 
@@ -557,6 +607,21 @@ public class WordHtmlParser {
         try {
             Log.v(TAG, "" + message);
         } catch (Exception ex) {
+        }
+    }
+
+    private void validateContent(String stepLabel, String content, String checkStr) {
+        if (checkStr == null) {
+            return;
+        }
+        if (checkStr != null && checkStr.length() == 0) {
+            log("PROC : " + stepLabel + " Done !!!");
+            return;
+        }
+        if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
+            throw new RuntimeException(stepLabel + " -> 查無 : " + checkStr);
+        } else {
+            log("CHECK : " + stepLabel + " OK!!!");
         }
     }
 }

@@ -1,0 +1,166 @@
+
+------------------------------------------------------------------------------
+基本
+<span[p|div]
+	th:text="#{home.welcome}
+	data-th-text="#{home.welcome}"  -->for HTML5
+></span> 
+
+<input type="text" name="userName" th:value="${user.name}" />
+
+------------------------------------------------------------------------------
+每個page專屬的國際化訊息
+↓↓↓ page
+/WEB-INF/templates/home.html  
+↓↓↓ config
+/WEB-INF/templates/home.properties　//default
+/WEB-INF/templates/home_en.properties //EN
+
+
+------------------------------------------------------------------------------
+
+
+${x}  --> request attribute.
+${param.x} --> request parameter 
+${session.x} --> session attribute
+${application.x} --> servlet context attribute
+
+------------------------------------------------------------------------------
+unescape 作法 --> th:utext
+
+	home.welcome=Welcome to our <b>fantastic</b> grocery store!
+	
+	<p th:utext="#{home.welcome}"></p>
+	
+------------------------------------------------------------------------------
+
+
+    Variable Expressions: ${...}
+    Selection Variable Expressions: *{...}
+    Message Expressions: #{...}
+    Link URL Expressions: @{...}
+    Fragment Expressions: ~{...}
+    
+    Ex : 
+    	'User is of type ' + (${user.isAdmin()} ? 'Administrator' : (${user.type} ?: 'Unknown'))
+
+------------------------------------------------------------------------------
+
+
+    #ctx
+    #vars
+    #locale
+    #request
+    #response
+    #session
+    #servletContext
+    
+    <span th:text="${#locale.country}">US</span>.
+
+------------------------------------------------------------------------------
+
+訊息帶參數
+
+	home.welcome=¡Bienvenido a nuestra tienda de comestibles, {0}!
+	
+	<p th:utext="#{home.welcome(${session.user.name})}">
+	  Welcome to our grocery store, Sebastian Pepper!
+	</p>
+	
+	<p th:utext="#{${welcomeMsgKey}(${session.user.name})}">   ----> key從參數來
+	  Welcome to our grocery store, Sebastian Pepper!
+	</p>
+
+------------------------------------------------------------------------------
+
+
+ctx.getVariable("today");
+((User) ctx.getVariable("session").get("user")).getName();
+
+
+
+
+------------------------------------------------------------------------------
+Util object
+
+    #execInfo: information about the template being processed.
+    #messages: methods for obtaining externalized messages inside variables expressions, in the same way as they would be obtained using #{…} syntax.
+    #uris: methods for escaping parts of URLs/URIs
+    #conversions: methods for executing the configured conversion service (if any).
+    #dates: methods for java.util.Date objects: formatting, component extraction, etc.
+    #calendars: analogous to #dates, but for java.util.Calendar objects.
+    #numbers: methods for formatting numeric objects.
+    #strings: methods for String objects: contains, startsWith, prepending/appending, etc.
+    #objects: methods for objects in general.
+    #bools: methods for boolean evaluation.
+    #arrays: methods for arrays.
+    #lists: methods for lists.
+    #sets: methods for sets.
+    #maps: methods for maps.
+    #aggregates: methods for creating aggregates on arrays or collections.
+    #ids: methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).
+
+	<span th:text="${#calendars.format(today,'dd MMMM yyyy')}">13 May 2011</span>
+
+
+
+------------------------------------------------------------------------------
+同屬於user物件的property可這樣寫 th:object
+
+  <div th:object="${session.user}">
+    <p>Name: <span th:text="*{firstName}">Sebastian</span>.</p>
+    <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
+    <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
+    <p>Surname: <span th:text="${session.user.lastName}">Pepper</span>.</p> <!-- equal *{lastName} --> 
+  </div>
+
+
+
+------------------------------------------------------------------------------
+
+	<!-- Will produce 'http://localhost:8080/gtvg/order/details?orderId=3' (plus rewriting) -->
+	<a href="details.html" 
+	   th:href="@{http://localhost:8080/gtvg/order/details(orderId=${o.id})}">view</a>
+	
+	<!-- Will produce '/gtvg/order/details?orderId=3' (plus rewriting) -->
+	<a href="details.html" th:href="@{/order/details(orderId=${o.id})}">view</a>
+	
+	重新指定變數 orderId=${o.id}
+	<!-- Will produce '/gtvg/order/3/details' (plus rewriting) -->
+	<a href="details.html" th:href="@{/order/{orderId}/details/{execType}(orderId=${o.id},execType='FAST')}">view</a>
+	ect ...
+	<a th:href="@{${url}(orderId=${o.id})}">view</a>
+	<a th:href="@{'/details/'+${user.login}(orderId=${o.id})}">view</a>
+
+------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    

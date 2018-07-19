@@ -356,7 +356,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         List<Map<String, Object>> listItem = new ArrayList<>();
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
-            Map<String,Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put("ItemTitle", f.getName());
             map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
             map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
@@ -819,26 +819,37 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     webViewHtmlFetcher.applyConfig(true, new WebViewHtmlFetcher.HtmlGet() {
                         @Override
                         public void action(final String contentOrign, final Handler handler) {
-                            dto.currentHtmlFile = null;
-                            dto.dropboxPicDir = null;
+                            try {
+                                dto.currentHtmlFile = null;
+                                dto.dropboxPicDir = null;
 
-                            for (int ii = 0; ii < 10; ii++)
-                                Log.v(TAG, "[WordHtmlParser START]");
+                                for (int ii = 0; ii < 10; ii++)
+                                    Log.v(TAG, "[WordHtmlParser START]");
 
-                            WordHtmlParser wordParser = WordHtmlParser.newInstance();
-                            final String content = wordParser.getFromContentDebug(contentOrign, false);
+                                WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                                final String content = wordParser.getFromContentDebug(contentOrign, false);
 
-                            for (int ii = 0; ii < 10; ii++)
-                                Log.v(TAG, "[WordHtmlParser END]");
+                                for (int ii = 0; ii < 10; ii++)
+                                    Log.v(TAG, "[WordHtmlParser END]");
 
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setContentText(content, true);
-                                    translateView.setText("");
-                                    progDlg.get().dismiss();
-                                }
-                            });
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setContentText(content, true);
+                                        translateView.setText("");
+                                        progDlg.get().dismiss();
+                                    }
+                                });
+                            } catch (Exception ex) {
+                                Log.e(TAG, "loadHtmlFromUrl ERR : " + ex.getMessage(), ex);
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(TxtReaderActivity.this, "不可預期的失敗!!", Toast.LENGTH_SHORT).show();
+                                        progDlg.get().dismiss();
+                                    }
+                                });
+                            }
                         }
                     });
 

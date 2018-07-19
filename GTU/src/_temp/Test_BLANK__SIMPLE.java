@@ -3,42 +3,28 @@ package _temp;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.console.SystemInUtil;
-import gtu.string.StringUtilForDb;
 
-public class Test47 {
+public class Test_BLANK__SIMPLE {
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        Test47 t = new Test47();
+        Test_BLANK__SIMPLE t = new Test_BLANK__SIMPLE();
 
         String text = SystemInUtil.readContent();
-
-        List<String> lst = new ArrayList<String>();
 
         LineNumberReader reader = new LineNumberReader(new StringReader(text));
         for (String line = null; (line = reader.readLine()) != null;) {
             line = StringUtils.trim(line);
 
-            if (StringUtils.isBlank(line)) {
-                continue;
-            }
-
-            String name = StringUtilForDb.dbFieldToJava(line);
-
-            lst.add(name);
-
-            System.out.println("private String " + name + ";");
-
-            // System.out.println(reader.getLineNumber() + "\t" + line);
+            System.out.println(reader.getLineNumber() + "\t" + line);
         }
 
         reader.close();
         System.out.println("done...");
     }
-
 }

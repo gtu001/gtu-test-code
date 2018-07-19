@@ -23,7 +23,7 @@ import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
 
-public class FlieNameReplacerUI extends JFrame {
+public class FileNameReplacerUI extends JFrame {
 
     private JPanel contentPane;
     private JTextField fileNameText;
@@ -32,7 +32,7 @@ public class FlieNameReplacerUI extends JFrame {
     private JButton executeBtn;
     private JButton clearBtn;
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(FlieNameReplacerUI.class);
+    private PropertiesUtilBean config = new PropertiesUtilBean(FileNameReplacerUI.class);
     private JCheckBox isFullPathOrJustNameChk;
     private JCheckBox useFullCharReplaceChk;
 
@@ -43,7 +43,7 @@ public class FlieNameReplacerUI extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    FlieNameReplacerUI frame = new FlieNameReplacerUI();
+                    FileNameReplacerUI frame = new FileNameReplacerUI();
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -55,7 +55,7 @@ public class FlieNameReplacerUI extends JFrame {
     /**
      * Create the frame.
      */
-    public FlieNameReplacerUI() {
+    public FileNameReplacerUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 420, 208);
         contentPane = new JPanel();
@@ -109,7 +109,7 @@ public class FlieNameReplacerUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    config.reflectSetConfig(FlieNameReplacerUI.this);
+                    config.reflectSetConfig(FileNameReplacerUI.this);
                     config.store();
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);

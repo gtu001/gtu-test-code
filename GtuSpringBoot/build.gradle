@@ -111,8 +111,7 @@ dependencies {
  	
  	// spring-mvc ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-    //compile ('net.sf.json-lib:json-lib:2.4')
-    compile ('com.googlecode.json-simple:json-simple:1.1')
+    compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15'
     // spring-mvc ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -133,7 +132,7 @@ dependencies {
 	// spring-data ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 	//official usage
 	compile 'org.springframework.data:spring-data-jpa'
-    compile 'org.springframework.data:spring-data-rest'
+    // compile 'org.springframework.data:spring-data-rest' 找不到
     compile 'org.springframework.boot:spring-boot-starter-data-rest'
     compile 'org.springframework.data:spring-data-rest-core'
     //actual usage

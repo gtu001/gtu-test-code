@@ -30,6 +30,9 @@ public class Address extends AuditModel {
     private String city;
     private String road;
 
+    private Address() {
+    }
+
     public Address(String city, String road) {
         this.city = city;
         this.road = road;

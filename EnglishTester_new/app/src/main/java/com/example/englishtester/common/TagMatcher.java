@@ -1,4 +1,4 @@
-package gtu.regex.tag;
+package com.example.englishtester.common;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,7 +88,8 @@ public class TagMatcher {
         String resultContent = sb.toString();
         if (checkResult) {
             if (StringUtils.equals(resultContent, contentCopy)) {
-                throw new RuntimeException("未被正常取代!! : " + replace);
+                String message = String.format("未被正常取代!! startTag : %s, endTag : %s , group : %s , [replce to]--> %s ", startTag, endTag, info, replace);
+                throw new RuntimeException(message);
             }
         }
         if (resetContent) {
@@ -96,7 +97,7 @@ public class TagMatcher {
         }
         return resultContent;
     }
-    
+
     public void appendReplacement(StringBuffer sb, String replace) {
         throw new UnsupportedOperationException();
     }
@@ -179,5 +180,9 @@ public class TagMatcher {
             }
         }
         return endPos + startPos;
+    }
+
+    public String getContent() {
+        return content;
     }
 }

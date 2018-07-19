@@ -46,7 +46,7 @@ public class StringUtilForDb {
      * @return
      */
     public static String dbFieldToJava(String columnName) {
-        String[] values = columnName.trim().toLowerCase().split("([-|_|.])");
+        String[] values = columnName.trim().toLowerCase().split("([-|_|.|\\s])");
         StringBuffer sb = new StringBuffer();
         for (int ii = 0; ii < values.length; ii++) {
             if (ii == 0 || values[ii].length() == 0) {
@@ -55,7 +55,9 @@ public class StringUtilForDb {
                 sb.append(values[ii].substring(0, 1).toUpperCase() + values[ii].substring(1));
             }
         }
-        return sb.toString();
+        String rtnJavaName = sb.toString();
+        rtnJavaName = StringUtils.uncapitalize(rtnJavaName);
+        return rtnJavaName;
     }
 
     /**
