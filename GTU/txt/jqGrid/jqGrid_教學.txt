@@ -1,0 +1,25 @@
+http://www.trirand.com/jqgridwiki/doku.php?id=wiki:methods
+
+//設定參數並重整
+jQuery("#grid_id").jqGrid('setGridParam',{...}).jqGrid('hideCol',"somecol").trigger("reloadGrid");
+jQuery("#grid_id").jqGrid('method', parameter1,...parameterN );
+
+//方法 -> jQuery("").getRowData
+getRowData 	取得列物件
+delRowData 	刪除指定的資料列
+setRowData 	修改指定的資料列
+setSelection 	切換指定的列為勾選或不勾選
+addRowData 	新增一筆資料列到最後
+sortGrid 	對Grid資料做排序處理
+reloadGrid 	重新讀資料到Grid
+
+//部份Grid參數 jQuery("").getGridParam("url")
+url 	取資料的網址
+sortname 	排序的欄名
+sortorder 	排序是升冪或降冪
+selrow 	取得被選取列
+selarrrow 	多選狀態下取得被選取的列記錄(select array row)
+page 	取得目前頁碼
+rowNum 	要求的列數
+datatype 	資料類型
+records 	Grid裡的記錄筆數

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gtu.example.common.JSONUtil;
+import com.gtu.example.common.JqGridHandler.JqReader;
+import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
 import com.gtu.example.common.PackageReflectionUtil;
 import com.gtu.example.common.RepositoryReflectionUtil;
 import com.gtu.example.springdata.entity.Address;
@@ -129,161 +133,91 @@ public class SpringDataDBMainController {
         return obj.toString();
     }
 
-    public static class JsonReader {
-        String root = "ttt";
-        int page = 1;
-        int total = 1;
-        List<Object> records = new ArrayList<>();
-        boolean repeatitems = true;
-        String cell = "cell";
-        String id = "id";
-        String userdata = "userdata";
-        SubGrid subgrid = new SubGrid();
+    @PostMapping(value = "/db_simple_query/{type}")
+    public String queryDBAction(@PathVariable("type") String type, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            log.info("# queryDBAction start ..");
+            OperateDefine define = this.getOperateDefine(request);
 
-        JsonReader() {
-            records.add(new Employee("1", "2", "3"));
-        }
+            SimpleJdGridCreater handler = new SimpleJdGridCreater(define.entityClz);
+            if ("colModel".equals(type)) {
+                return handler.getColModel().toString();
+            } else {
+                List<?> lst = (List<?>) define.repository.findAll();
+                log.info("size = {}", lst.size());
 
-        public String getRoot() {
-            return root;
-        }
-
-        public void setRoot(String root) {
-            this.root = root;
-        }
-
-        public int getPage() {
-            return page;
-        }
-
-        public void setPage(int page) {
-            this.page = page;
-        }
-
-        public int getTotal() {
-            return total;
-        }
-
-        public void setTotal(int total) {
-            this.total = total;
-        }
-
-        public List<Object> getRecords() {
-            return records;
-        }
-
-        public void setRecords(List<Object> records) {
-            this.records = records;
-        }
-
-        public boolean isRepeatitems() {
-            return repeatitems;
-        }
-
-        public void setRepeatitems(boolean repeatitems) {
-            this.repeatitems = repeatitems;
-        }
-
-        public String getCell() {
-            return cell;
-        }
-
-        public void setCell(String cell) {
-            this.cell = cell;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getUserdata() {
-            return userdata;
-        }
-
-        public void setUserdata(String userdata) {
-            this.userdata = userdata;
-        }
-
-        public SubGrid getSubgrid() {
-            return subgrid;
-        }
-
-        public void setSubgrid(SubGrid subgrid) {
-            this.subgrid = subgrid;
+                JqReader reader = handler.getSimpleJqReader(lst, null, new String[] { define.entityId }, null, 1, lst.size());
+                return handler.toJSONArray(reader).toString();
+            }
+        } catch (Exception ex) {
+            log.error("queryDBAction ERR : " + ex.getMessage(), ex);
+            return JSONUtil.getThrowable(ex).toString();
         }
     }
 
-    public static class SubGrid {
-        String root;
-        boolean repeatitems;
-        String cell;
-
-        public String getRoot() {
-            return root;
-        }
-
-        public void setRoot(String root) {
-            this.root = root;
-        }
-
-        public boolean isRepeatitems() {
-            return repeatitems;
-        }
-
-        public void setRepeatitems(boolean repeatitems) {
-            this.repeatitems = repeatitems;
-        }
-
-        public String getCell() {
-            return cell;
-        }
-
-        public void setCell(String cell) {
-            this.cell = cell;
-        }
+    private class OperateDefine<T, ID> {
+        Class<T> repositoryClz;
+        CrudRepository<T, ID> repository;
+        Class<T> entityClz;
+        Class<ID> entityKey;
+        String entityId;
+        String method;
+        T entity;
     }
 
-    @PostMapping(value = "/db_simple_query")
-    public String queryDBAction() {
-        return JSONObject.fromObject(new JsonReader()).toString();
+    private void debugParameter(HttpServletRequest request) {
+        log.info("debugParameter start ---");
+        for (Enumeration<String> enu = request.getParameterNames(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String value = request.getParameter(key);
+            log.info(" - param : {} - {}", key, value);
+        }
+        log.info("debugParameter end   ---");
+    }
+
+    private OperateDefine getOperateDefine(HttpServletRequest request) throws ClassNotFoundException {
+        this.debugParameter(request);
+
+        OperateDefine define = new OperateDefine();
+        define.repositoryClz = Class.forName(request.getParameter("repository"));
+        define.entityClz = Class.forName(request.getParameter("entityClz"));
+        define.entityKey = Class.forName(request.getParameter("entityKey"));
+        define.method = request.getParameter("method");
+        define.entityId = RepositoryReflectionUtil.getEntityId(define.entityClz);
+
+        log.info("getOperateDefine Result = {}", ReflectionToStringBuilder.toString(define, ToStringStyle.MULTI_LINE_STYLE));
+
+        define.repository = (CrudRepository) ctx.getBean(define.repositoryClz);
+        define.entity = PackageReflectionUtil.newInstanceDefault(define.entityClz, false);
+        if (define.entity == null) {
+            throw new RuntimeException("entity is null !!");
+        }
+
+        for (Enumeration<String> enu = request.getParameterNames(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String value = request.getParameter(key);
+            log.info("mapping to column : {} - {}", key, value);
+            try {
+                define.entity.getClass().getDeclaredField(key);
+                FieldUtils.writeDeclaredField(define.entity, key, value, true);
+            } catch (Exception ex) {
+                log.error("operateDBAction ERR : " + key + " -> " + ex.getCause());
+            }
+        }
+
+        log.info("# entity = {}", ReflectionToStringBuilder.toString(define.entity));
+        return define;
     }
 
     @PostMapping(value = "/db_operate")
     public String operateDBAction(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Class repositoryClz = Class.forName(request.getParameter("repository"));
-            Class entityClz = Class.forName(request.getParameter("entityClz"));
-            Class entityKey = Class.forName(request.getParameter("entityKey"));
-            String method = request.getParameter("method");
-
-            CrudRepository repository = (CrudRepository) ctx.getBean(repositoryClz);
-            Object entity = PackageReflectionUtil.newInstanceDefault(entityClz, false);
-            if (entity == null) {
-                throw new RuntimeException("entity is null !!");
-            }
-
-            for (Enumeration<String> enu = request.getParameterNames(); enu.hasMoreElements();) {
-                String key = (String) enu.nextElement();
-                String value = request.getParameter(key);
-                log.info("mapping to column : {} - {}", key, value);
-                try {
-                    entity.getClass().getDeclaredField(key);
-                    FieldUtils.writeDeclaredField(entity, key, value, true);
-                } catch (Exception ex) {
-                    log.error("operateDBAction ERR : " + key + " -> " + ex.getCause());
-                }
-            }
-
-            log.info("# entity = {}", ReflectionToStringBuilder.toString(entity));
+            OperateDefine define = this.getOperateDefine(request);
 
             Object resultObj = null;
-            if ("save".equals(method)) {
+            if ("save".equals(define.method)) {
                 log.info("# save !!");
-                resultObj = repository.save(entity);
+                resultObj = define.repository.save(define.entity);
             }
 
             if (resultObj != null) {
@@ -295,7 +229,8 @@ public class SpringDataDBMainController {
             }
         } catch (Exception ex) {
             log.error("operateDBAction ERR : " + ex.getMessage(), ex);
-            return JSONUtil.getThrowable(ex).toString();
+            // return JSONUtil.getThrowable(ex).toString();
+            return JSONUtil.getThrowableRoot(ex).toString();
         }
     }
 }

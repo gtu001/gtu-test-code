@@ -15,6 +15,25 @@ public class JSONUtil {
         return json;
     }
 
+    public static JSONObject getThrowablePrecise(Throwable ex) {
+        StringBuilder sb = new StringBuilder();
+        do {
+            sb.append(ex.getClass().getSimpleName() + " : " + ex.getMessage() + "\r\n");
+        } while ((ex = ex.getCause()) != null);
+        JSONObject json = new JSONObject();
+        json.put("messsage", sb.toString());
+        json.put("result", "error");
+        return json;
+    }
+
+    public static JSONObject getThrowableRoot(Throwable ex) {
+        Throwable root = ExceptionUtils.getRootCause(ex);
+        JSONObject json = new JSONObject();
+        json.put("messsage", root.getClass().getSimpleName() + " : " + root.getMessage());
+        json.put("result", "error");
+        return json;
+    }
+
     public static JSONObject getSuccess(String message) {
         JSONObject json = new JSONObject();
         if (StringUtils.isBlank(message)) {
