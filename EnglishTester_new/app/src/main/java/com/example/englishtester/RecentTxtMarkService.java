@@ -112,8 +112,15 @@ public class RecentTxtMarkService {
         for (int ii = 0; ii < 10; ii++)
             Log.v(TAG, "DELETE : " + DateFormatUtils.format(cal, "yyyy/MM/dd"));
         long daysBefore = cal.getTimeInMillis();
-        int count = recentTxtMarkDAO.deleteByCondition(RecentTxtMarkSchmea.INSERT_DATE + "<?", new String[]{String.valueOf(daysBefore)});
-        Log.v(TAG, "deleteOldData count " + count);
+
+//        int count = recentTxtMarkDAO.deleteByCondition(RecentTxtMarkSchmea.INSERT_DATE + "<?", new String[]{String.valueOf(daysBefore)});
+//        Log.v(TAG, "deleteOldData count " + count);
+
+        for (RecentTxtMark vo : recentTxtMarkDAO.queryAll()) {
+            if (vo.getInsertDate() < daysBefore) {
+                recentTxtMarkDAO.deleteByListId(String.valueOf(vo.getListId()));
+            }
+        }
     }
 
     /**
