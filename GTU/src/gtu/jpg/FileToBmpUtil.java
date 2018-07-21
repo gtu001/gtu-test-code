@@ -17,10 +17,8 @@ import gtu.file.FileUtil;
 public class FileToBmpUtil {
     public static void main(String[] args) throws IOException {
         FileToBmpUtil t = FileToBmpUtil.getInstance();
-//        t.buildImageFromFile(new File("C:/Users/gtu001/Desktop/good/問題處理.docx"), new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), 1000);
-//        t.getFileFromImage(new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), new File("C:/Users/gtu001/Desktop/xxxxx.docx"));
         
-        t.buildImageFromFile(new File("D:/my_tool/DebugMointerUI.jar"), new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), t.getWidth(new File("D:/my_tool/DebugMointerUI.jar")));
+        t.buildImageFromFile(new File("E:/my_tool/EnglishSearchUI/EnglishSearchUI.exe"), new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), t.getWidth(new File("E:/my_tool/EnglishSearchUI/EnglishSearchUI.exe")));
         t.getFileFromImage(new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), new File("C:/Users/gtu001/Desktop/xxxxx.jar"));
     }
     
@@ -78,7 +76,7 @@ public class FileToBmpUtil {
     }
 
     /**
-     * 建立Image檔案
+     * 將Image轉回檔案
      */
     public void getFileFromImage(File fromImageFile, File toFile) {
         try {
