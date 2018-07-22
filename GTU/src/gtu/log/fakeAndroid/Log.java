@@ -13,32 +13,33 @@ public class Log {
         stack2.addClass(Log.class);
         currentStackUtil = CurrentStackUtil.getInstance();
     }
+    
+    private static String getPrefix() {
+        StackTraceElement element = currentStackUtil.apply().currentStack();
+        String prefix = "(" + element.getClassName() + ":" + element.getLineNumber() + ") - ";
+        return prefix;
+    }
 
     public static void v(String tag, String message) {
         if (!debugMode) {
             return;
         }
-        StackTraceElement element = currentStackUtil.apply().currentStack();
-        String prefix = element.getClassName() + ":" + element.getLineNumber() + " - ";
-        System.out.println(prefix + "" + tag + " - " + message);
+        
+        System.out.println(getPrefix() + "" + tag + " - " + message);
     }
 
     public static void e(String tag, String message) {
         if (!debugMode) {
             return;
         }
-        StackTraceElement element = currentStackUtil.apply().currentStack();
-        String prefix = element.getClassName() + ":" + element.getLineNumber() + " - ";
-        System.out.println(prefix + "" + tag + " - " + message);
+        System.out.println(getPrefix() + "" + tag + " - " + message);
     }
 
     public static void e(String tag, String message, Throwable ex) {
         if (!debugMode) {
             return;
         }
-        StackTraceElement element = currentStackUtil.apply().currentStack();
-        String prefix = element.getClassName() + ":" + element.getLineNumber() + " - ";
-        System.out.println(prefix + "" + tag + " - " + message);
+        System.out.println(getPrefix() + "" + tag + " - " + message);
         ex.printStackTrace();
     }
 }

@@ -29,7 +29,7 @@ public class WordHtmlParser {
     public static void main(String[] args) {
         WordHtmlParser parser = WordHtmlParser.newInstance();
 
-        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The Stress of Remote Working.htm");
+        File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
 
         String result = parser.getFromFile(file, true, "");
         String dropboxDir = parser.picDirForDropbox;
@@ -74,7 +74,7 @@ public class WordHtmlParser {
 
     public String getFromContent(String content, boolean isPure, String checkStr) {
         log("ORIGN start : =======================================================================");
-        log(content);
+//        log(content);
         log("ORIGN end   : =======================================================================");
 
         saveToFileDebug("before", content);
@@ -86,7 +86,7 @@ public class WordHtmlParser {
         }
 
         log("RESULT start : =======================================================================");
-        logContent(content);
+//        logContent(content);
         log("RESULT end    : =======================================================================");
         return content;
     }
@@ -471,7 +471,9 @@ public class WordHtmlParser {
         while (tag.findUnique()) {
             tag.appendReplacementForUnique("", true, true);
         }
-        return tag.getContent();
+        String rtnVal = tag.getContent();
+        System.gc();
+        return rtnVal;
     }
 
     private String _step6_hiddenSomething(String content, boolean isPure, String checkStr) {
