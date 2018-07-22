@@ -391,7 +391,7 @@ public class TxtReaderAppenderForHtmlTag {
 
         private File getLocalFile(String filename) {
             try {
-                String realName = URLDecoder.decode(filename, WordHtmlParser.WORD_HTML_ENCODE);
+                String realName = URLDecoder.decode(filename, HtmlWordParser.WORD_HTML_ENCODE);
                 File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
                 if (localPicFile.exists() && localPicFile.canRead()) {
                     return localPicFile;
@@ -477,7 +477,7 @@ public class TxtReaderAppenderForHtmlTag {
     }
 
     private boolean isHyperLinkTooLong(String urlContent) {
-        return StringUtils.trimToEmpty(urlContent).length() > WordHtmlParser.HYPER_LINK_LABEL_MAX_LENGTH;
+        return StringUtils.trimToEmpty(urlContent).length() > HtmlWordParser.HYPER_LINK_LABEL_MAX_LENGTH;
     }
 
     private int getPairStart(Pair<Integer, Integer> pair) {

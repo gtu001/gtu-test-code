@@ -21,13 +21,13 @@ import java.util.regex.Pattern;
 import gtu.util.StringUtil_;
 
 
-public class WordHtmlParser {
+public class HtmlWordParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
 
     public static void main(String[] args) {
-        WordHtmlParser parser = WordHtmlParser.newInstance();
+        HtmlWordParser parser = HtmlWordParser.newInstance();
 
         File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
 
@@ -39,15 +39,15 @@ public class WordHtmlParser {
         System.out.println("done...");
     }
 
-    private static final String TAG = WordHtmlParser.class.getSimpleName();
+    private static final String TAG = HtmlWordParser.class.getSimpleName();
 
-    private WordHtmlParser() {
+    private HtmlWordParser() {
     }
 
     private String picDirForDropbox = "";
 
-    public static WordHtmlParser newInstance() {
-        return new WordHtmlParser();
+    public static HtmlWordParser newInstance() {
+        return new HtmlWordParser();
     }
 
     public String getFromFile(File file) {
@@ -94,7 +94,7 @@ public class WordHtmlParser {
     private void saveToFileDebug(String suffix, String context) {
         if (BuildConfig.DEBUG) {
             String dateStr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-            String name = WordHtmlParser.class.getSimpleName();
+            String name = HtmlWordParser.class.getSimpleName();
             if (StringUtils.isNotBlank(suffix)) {
                 name = name + "_" + suffix;
             }

@@ -22,8 +22,7 @@ public class TagMatcher {
         String startPtn = "\\<head[\r\n\\s\t\\>]{1}";
         String endPtn = "\\<\\/head\\>";
 
-
-        TagMatcher t = new TagMatcher(startTag, endTag, startPtn, endPtn, 0 , 0, content, true);
+        TagMatcher t = new TagMatcher(startTag, endTag, startPtn, endPtn, 0, 0, content, true);
         while (t.find()) {
             System.out.println(t.group());
             System.out.println("startPad = " + t.startPad);
@@ -132,9 +131,9 @@ public class TagMatcher {
         }
         String contentCopy = content.toString();
         StringBuffer sb = new StringBuffer();
-        sb.append(content.substring(0, info.getStartWithoutTag()));
+        sb.append(content.substring(0, info.getStartWithTag()));
         sb.append(replace);
-        sb.append(content.substring(info.getEndWithoutTag()));
+        sb.append(content.substring(info.getEndWithTag()));
         String resultContent = sb.toString();
         if (checkResult) {
             if (StringUtils.equals(resultContent, contentCopy)) {
@@ -259,17 +258,17 @@ public class TagMatcher {
         return endPtn != null ? endPtn.countMatches(middleStr) : StringUtils.countMatches(middleStr, endTag);
     }
 
-//    private int getEndPos(String tmpContent, int token) {
-//        return endPtn != null ? //
-//                endPtn.ordinalIndexOf(tmpContent, token) : //
-//                StringUtils.ordinalIndexOf(tmpContent, endTag, token);
-//    }
-//
-//    private int getStartPos() {
-//        return startPtn != null ? //
-//                startPtn.indexOf(content, startPad) : //
-//                content.indexOf(startTag, startPad);
-//    }
+    // private int getEndPos(String tmpContent, int token) {
+    // return endPtn != null ? //
+    // endPtn.ordinalIndexOf(tmpContent, token) : //
+    // StringUtils.ordinalIndexOf(tmpContent, endTag, token);
+    // }
+    //
+    // private int getStartPos() {
+    // return startPtn != null ? //
+    // startPtn.indexOf(content, startPad) : //
+    // content.indexOf(startTag, startPad);
+    // }
 
     private int getEndPos(String tmpContent, int token) {
         if (endPtn == null) {
@@ -279,7 +278,8 @@ public class TagMatcher {
             if (pos == -1) {
                 return -1;
             } else {
-                String tmpContent2 = StringUtils.substring(tmpContent, pos, endPtn.ptn.pattern().length());
+                String tmpContent2 = StringUtils.substring(tmpContent, pos, pos + endPtn.ptn.pattern().length());
+                Log.v(TAG, "<<<---" + tmpContent2);
                 int fixOffset = tmpContent2.indexOf(endTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
                 return pos + fixOffset;
@@ -296,8 +296,9 @@ public class TagMatcher {
             if (pos == -1) {
                 return -1;
             } else {
-                String tmpContent = StringUtils.substring(content, pos, startPtn.ptn.pattern().length());
-                int fixOffset = tmpContent.indexOf(endTag);
+                String tmpContent = StringUtils.substring(content, pos, pos + startPtn.ptn.pattern().length());
+                Log.v(TAG, "<<<---" + tmpContent);
+                int fixOffset = tmpContent.indexOf(startTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
                 return pos + fixOffset;
             }
@@ -373,9 +374,9 @@ public class TagMatcher {
         return content;
     }
 
-//    private static class Log {
-//        private static void v(String tag, String message){
-//            System.out.println(String.format("%s : %s", tag, message));
-//        }
-//    }
+    // private static class Log {
+    // private static void v(String tag, String message){
+    // System.out.println(String.format("%s : %s", tag, message));
+    // }
+    // }
 }
