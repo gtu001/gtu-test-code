@@ -3,6 +3,8 @@ package com.gtu.example.controller;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.MappedSuperclass;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,13 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gtu.example.common.JSONUtil;
+import com.gtu.example.common.JqGridHandler.EntityPrimaryKeySetter;
 import com.gtu.example.common.JqGridHandler.JqReader;
 import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
 import com.gtu.example.common.PackageReflectionUtil;
 import com.gtu.example.common.RepositoryReflectionUtil;
-import com.gtu.example.springdata.entity.Address;
-import com.gtu.example.springdata.entity.Employee;
-import com.gtu.example.springdata.entity.WorkItem;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -72,35 +73,44 @@ public class SpringDataDBMainController {
         return model;
     }
 
-    @GetMapping(value = "/table-get-columns")
-    public String tableColumns(@RequestParam(name = "table") String table) {
-        // 不word
-        Reflections reflections = new Reflections("com.gtu.example.springdata.entity");
-        Set<Class<?>> allClasses = reflections.getSubTypesOf(Object.class);
+    private Set<Class<?>> getAllTables() {
+        Set<Class<?>> all = new LinkedHashSet<>();
+        Set<Class<?>> s1 = new Reflections("com.gtu.example.springdata.entity").getSubTypesOf(Object.class);
+        log.info("getAllTables material {}", s1.size());
 
-        allClasses.add(WorkItem.class);
-        allClasses.add(Employee.class);
-        allClasses.add(Address.class);
-
-        log.info("<<" + allClasses);
-
-        Optional<List<String>> obj = allClasses.stream()//
-                .filter(c -> c.getSimpleName().equalsIgnoreCase(table))//
-                .findFirst().map(c -> {
-                    return Stream.of(c.getDeclaredFields())//
-                            .map(Field::getName)//
-                            .collect(Collectors.toList());
-                });
-        String rtnStr = JSONArray.fromObject(obj.get()).toString();
-        log.info("return : {}", rtnStr);
-        return rtnStr;
+        all.addAll(s1);
+        log.info("getAllTables = {}", all.size());
+        return all;
     }
 
-    @GetMapping(value = "/table-get-methodMapping")
-    public String tableMethodMapping(@RequestParam(name = "table") String table, //
-            @RequestParam(name = "operate") String operate) throws ClassNotFoundException {
+    @GetMapping(value = "/table-get-columns")
+    public String tableColumns(@RequestParam(name = "table") String table) {
+        Optional<List<String>> obj = getAllTables().stream()//
+                .filter(c -> c.getSimpleName().equalsIgnoreCase(table))//
+                .findFirst().map(c -> {
+                    List<String> lst1 = Stream.of(c.getDeclaredFields())//
+                            .map(Field::getName)//
+                            .collect(Collectors.toList());
 
-        Map<Class<Object>, Class[]> repositoryEntityMap = RepositoryReflectionUtil.getRepositoryEntityMap("com.gtu.example.springdata.dao_1");
+                    if (c.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                        List<String> lst2 = Stream.of(c.getSuperclass().getDeclaredFields()).map(Field::getName)//
+                                .collect(Collectors.toList());
+                        List<String> allLst = new ArrayList<>();
+
+                        allLst.addAll(lst2);
+                        allLst.addAll(lst1);
+                        return allLst;
+                    }
+
+                    return lst1;
+                });
+        return JSONArray.fromObject(obj.get()).toString();
+    }
+
+    @GetMapping(value = "/table-mapping")
+    public String tableMapping(@RequestParam(name = "table") String table) throws ClassNotFoundException {
+        Map<Class<Object>, Class[]> repositoryEntityMap = getAllRepostiriesMap();
+        
         Class<?> entityClz = Class.forName(String.format("com.gtu.example.springdata.entity.%s", table));
         Class<?>[] clz = repositoryEntityMap.get(entityClz);
 
@@ -109,28 +119,21 @@ public class SpringDataDBMainController {
 
         JSONObject obj = new JSONObject();
 
-        String method = "";
-        switch (operate) {
-        case "saveOrUpdate":
-            method = "save";
-        case "update":
-            method = "save";
-            break;
-        case "query":
-            method = "TODO";
-            break;
-        case "delete":
-            method = "delete";
-            break;
-        }
-
         obj.put("repository", repository.getName());
         obj.put("entityClz", entityClz.getName());
         obj.put("entityKey", entityKey.getName());
-        obj.put("method", method);
 
         log.info("return : {}", obj);
         return obj.toString();
+    }
+    
+    private Map<Class<Object>, Class[]> getAllRepostiriesMap() {
+        Map<Class<Object>, Class[]> all = new LinkedHashMap<>();
+        Map<Class<Object>, Class[]> m1 = RepositoryReflectionUtil.getRepositoryEntityMap("com.gtu.example.springdata.dao_1");
+        log.info("getAllRepostiriesMap material {}", m1.size());
+        all.putAll(m1);
+        log.info("getAllRepostiriesMap = {}", all.size());
+        return all;
     }
 
     @PostMapping(value = "/db_simple_query/{type}")
@@ -161,7 +164,6 @@ public class SpringDataDBMainController {
         Class<T> entityClz;
         Class<ID> entityKey;
         String entityId;
-        String method;
         T entity;
     }
 
@@ -182,7 +184,6 @@ public class SpringDataDBMainController {
         define.repositoryClz = Class.forName(request.getParameter("repository"));
         define.entityClz = Class.forName(request.getParameter("entityClz"));
         define.entityKey = Class.forName(request.getParameter("entityKey"));
-        define.method = request.getParameter("method");
         define.entityId = RepositoryReflectionUtil.getEntityId(define.entityClz);
 
         log.info("getOperateDefine Result = {}", ReflectionToStringBuilder.toString(define, ToStringStyle.MULTI_LINE_STYLE));
@@ -209,24 +210,40 @@ public class SpringDataDBMainController {
         return define;
     }
 
-    @PostMapping(value = "/db_operate")
-    public String operateDBAction(HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping(value = "/db_save")
+    public String saveDBAction(HttpServletRequest request, HttpServletResponse response) {
         try {
             OperateDefine define = this.getOperateDefine(request);
 
-            Object resultObj = null;
-            if ("save".equals(define.method)) {
-                log.info("# save !!");
-                resultObj = define.repository.save(define.entity);
+            Object resultObj = define.repository.save(define.entity);
+
+            JSONObject json = JSONUtil.getSuccess(null);
+            if (resultObj != null) {
+                json.put("entity", resultObj);
             }
 
-            if (resultObj != null) {
-                JSONObject json = JSONUtil.getSuccess(null);
-                json.put("entity", resultObj);
-                return json.toString();
-            } else {
-                return "done..";
-            }
+            return json.toString();
+        } catch (Exception ex) {
+            log.error("operateDBAction ERR : " + ex.getMessage(), ex);
+            // return JSONUtil.getThrowable(ex).toString();
+            return JSONUtil.getThrowableRoot(ex).toString();
+        }
+    }
+
+    @PostMapping(value = "/db_delete")
+    public String deleteDBAction(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            OperateDefine define = this.getOperateDefine(request);
+
+            String id = request.getParameter("id");
+
+            EntityPrimaryKeySetter entitySetter = new EntityPrimaryKeySetter(define.entity, id);
+
+            define.repository.delete(entitySetter.apply());
+
+            JSONObject json = JSONUtil.getSuccess(null);
+
+            return json.toString();
         } catch (Exception ex) {
             log.error("operateDBAction ERR : " + ex.getMessage(), ex);
             // return JSONUtil.getThrowable(ex).toString();

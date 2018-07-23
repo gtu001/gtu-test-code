@@ -23,10 +23,10 @@
 	$(document).ready(function() {
 		initTabLst();
 		tableOnSelect();
-		queryBtnBind();
-		saveOrUpdateBtnBind();
-		deleteBtnBind();
-		initShowSelected();
+		//queryBtnBind();
+		//saveOrUpdateBtnBind();
+		//deleteBtnBind();
+		//initShowSelected();
 	});
 
 	function tableOnSelect() {
@@ -44,6 +44,7 @@
 				table : tableName
 			}, //
 			function(data) {//
+				queryStuff();
 				/*
 					_bodyTable.empty();
 					for (var ii = 0; ii < data.length; ii++) {
@@ -59,12 +60,11 @@
 		});
 	}
 
-	function getMethodMapping(tableName, operateType) {
+	function getTableMapping(tableName) {
 		var rtnObj = $.ajax({
-			url : '/springdata-dbMain/table-get-methodMapping/',
+			url : '/springdata-dbMain/table-mapping/',
 			data : {
 				table : tableName,
-				operate : operateType
 			},
 			success : function(data) {
 			},
@@ -75,16 +75,16 @@
 		return rtnObj;
 	}
 
-	function getForm(operateType) {
+	function getForm() {
 		var formData = $("#form").serializeObject();
 		var table = $("select[name=tableNames]").val();
-		var mapping = getMethodMapping(table, operateType);
+		var mapping = getTableMapping(table);
 		formData = $.extend(formData, mapping);
 		return formData;
 	}
 
-	function postForm(operateType) {
-		var formData = getForm(operateType);
+	function postForm() {
+		var formData = getForm();
 		$.post("/springdata-dbMain/db_operate", formData, //
 		function(data) {//
 			alert(JSON.stringify(data));
@@ -182,7 +182,9 @@
 			del : true,
 			deltext : '刪除',
 			search : true,
-			refresh : true
+			searchtext :　"查詢",
+			refresh : true,
+			refreshtext : "重整",
 		},
 		// options for the Edit Dialog
 		{
@@ -190,10 +192,13 @@
 			recreateForm : true,
 			//checkOnUpdate : true,
 			//checkOnSubmit : true,
+			url : "/springdata-dbMain/db_save",
 			beforeSubmit : function(postdata, form, oper) {
-				alert("postdata = " + JSON.stringify(postdata));
-				alert("form = " + JSON.stringify(form));
-				alert("oper = " + JSON.stringify(oper));
+				postdata = $.extend(postdata, getForm());
+			
+				//alert("postdata = " + JSON.stringify(postdata));
+				//alert("form = " + JSON.stringify(form));
+				//alert("oper = " + JSON.stringify(oper));
 
 				if (confirm('確定要修改')) {
 					// do something
@@ -211,12 +216,47 @@
 		{
 			closeAfterAdd : true,
 			recreateForm : true,
+			url : "/springdata-dbMain/db_save",
+			beforeSubmit : function(postdata, form, oper) {
+				postdata = $.extend(postdata, getForm());
+			
+				//alert("postdata = " + JSON.stringify(postdata));
+				//alert("form = " + JSON.stringify(form));
+				//alert("oper = " + JSON.stringify(oper));
+
+				if (confirm('確定要新增')) {
+					// do something
+					return [ true, '' ];
+				} else {
+					return [ false, '取消!!' ];
+				}
+			},
 			errorTextFormat : function(data) {
 				return 'Error: ' + data.responseText
 			}
 		},
 		// options for the Delete Dailog
 		{
+			url : "/springdata-dbMain/db_delete",
+			onclickSubmit : function(data, d1, d2){
+				var postData = data['delData'];
+				postData = $.extend(postData, getForm());
+			},
+			
+			beforeSubmit : function(postdata, form, oper) {
+				postdata = $.extend(postdata, getForm());
+				
+				//alert("postdata = " + JSON.stringify(postdata));
+				//alert("form = " + JSON.stringify(form));
+				//alert("oper = " + JSON.stringify(oper));
+				
+				if (confirm('確定要刪除')) {
+					// do something
+					return [ true, '' ];
+				} else {
+					return [ false, '取消!!' ];
+				}
+			},
 			errorTextFormat : function(data) {
 				return 'Error: ' + data.responseText
 			}
@@ -277,12 +317,6 @@
 	<form id="form" action="/GtuSpringBoot/main">
 
 		表名稱: <select name="tableNames"></select><br />
-		<table id="dbBody"></table>
-		<input type="button" name="query" value="query" /> <input
-			type="button" name="saveOrUpdate" value="saveOrUpdate" /> <input
-			type="button" name="delete" value="delete" /> <input type="reset"
-			name="clear" value="clear" /><br /> <input type="button"
-			id="showSelected" value="show selected" /><br />
 	</form>
 
 	<table id="jqGrid"></table>

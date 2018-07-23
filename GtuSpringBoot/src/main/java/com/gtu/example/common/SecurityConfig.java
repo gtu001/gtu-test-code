@@ -9,6 +9,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import com.gtu.example.rabbitmq.RabbitMqBeanDefiner;
 
+/**
+ * 預設的 spring security 
+ * 帳號 : user
+ * 密碼[[在log]]
+ * ↓↓↓↓↓↓
+ * Using generated security password: <password>
+ * ↑↑↑↑↑↑
+ * 
+ * disable作法
+ * ↓↓↓↓↓↓
+ * org.springframework.boot:spring-boot-starter-security
+ * ↑↑↑↑↑↑
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {

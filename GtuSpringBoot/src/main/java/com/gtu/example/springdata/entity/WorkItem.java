@@ -24,6 +24,9 @@ public class WorkItem {
         this.description = description;
     }
 
+    private WorkItem() {
+    }
+
     public Long getId() {
         return id;
     }

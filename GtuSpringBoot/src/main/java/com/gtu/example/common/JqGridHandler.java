@@ -5,18 +5,24 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 
 import com.google.common.base.Optional;
 import com.gtu.example.common.JqGridHandler.JqReader.JqRow;
@@ -41,6 +47,23 @@ public class JqGridHandler {
             List<ColModel> lst = new ArrayList<ColModel>();
 
             String entityId = RepositoryReflectionUtil.getEntityId(clz);
+
+            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                Class<?> parentClz = clz.getSuperclass();
+
+                for (Field f : parentClz.getDeclaredFields()) {
+                    ColModel col = new ColModel(f.getName(), f.getName());
+
+                    // pk
+                    if (entityId != null && col.getName().equals(entityId)) {
+                        col.edithidden.setEdithidden(true);
+                    }
+
+                    col.setEditable(true);
+
+                    lst.add(col);
+                }
+            }
 
             for (Field f : clz.getDeclaredFields()) {
                 ColModel col = new ColModel(f.getName(), f.getName());
@@ -81,6 +104,76 @@ public class JqGridHandler {
         }
     }
 
+    public static class EntityPrimaryKeySetter<T, ID> {
+        Class<T> entityClz;
+        Class<ID> entityPkClz;
+        String entityId;
+        ID eneityPkObj;
+        T entity;
+
+        public EntityPrimaryKeySetter(T entity, Object pkObj) {
+            this.entity = entity;
+            this.entityClz = (Class<T>) entity.getClass();
+            this.entityId = RepositoryReflectionUtil.getEntityId(entityClz);
+            log.info("> entityId = {}", entityId);
+
+            try {
+                this.entityPkClz = (Class<ID>) entityClz.getDeclaredField(entityId).getType();
+                log.info("> entityPkClz = {}", entityPkClz);
+            } catch (NoSuchFieldException | SecurityException e) {
+                throw new RuntimeException("EntityPrimaryKeySetter <init> ERR : " + e.getMessage(), e);
+            }
+
+            boolean isPrimitiveOrWrapped = ClassUtils.isPrimitiveOrWrapper(entityPkClz);
+            log.info("> isPrimitiveOrWrapped = {}", isPrimitiveOrWrapped);
+            if (!isPrimitiveOrWrapped && !__isDoWithPrimitive(entityPkClz)) {
+                // Model Bean
+                eneityPkObj = (ID) PackageReflectionUtil.newInstanceDefault(entityPkClz, false);
+                this.__processMapToBean(eneityPkObj, pkObj);
+            } else {
+                eneityPkObj = (ID) __primitiveConvert(pkObj, entityPkClz);
+            }
+            log.info("> eneityPkObj = {}", ReflectionToStringBuilder.toString(eneityPkObj));
+        }
+
+        private Object __primitiveConvert(Object value, Class<ID> targetClz) {
+            if (value == null) {
+                return null;
+            }
+            return ConvertUtils.convert(String.valueOf(value), targetClz);
+        }
+
+        private void __processMapToBean(Object eneityPkObj, Object pkObj) {
+            if (pkObj instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) pkObj;
+                try {
+                    BeanUtils.populate(eneityPkObj, map);
+                } catch (Exception e) {
+                    throw new RuntimeException("__processMapToBean ERR : " + e.getMessage(), e);
+                }
+            } else {
+                throw new RuntimeException("Must be a Map : " + pkObj.getClass().getName());
+            }
+        }
+
+        private boolean __isDoWithPrimitive(Class<?> entityPkClz) {
+            if (entityPkClz == String.class) {
+                return true;
+            }
+            return false;
+        }
+
+        public T apply() {
+            try {
+                log.info("apply  {} , {}, {}", entity, entityId, eneityPkObj);
+                FieldUtils.writeDeclaredField(entity, entityId, eneityPkObj, true);
+                return entity;
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("EntityPrimaryKeySetter <init> ERR : " + e.getMessage(), e);
+            }
+        }
+    }
+
     // {
     // "total": "xxx",
     // "page": "yyy",
@@ -116,6 +209,13 @@ public class JqGridHandler {
                     this.fieldNamesOrderedSet = Stream.of(entity.getClass().getDeclaredFields())//
                             .map(Field::getName)//
                             .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                    if (entity.getClass().getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                        Set<String> parentCol = Stream.of(entity.getClass().getSuperclass().getDeclaredFields())//
+                                .map(Field::getName)//
+                                .collect(Collectors.toCollection(LinkedHashSet::new));
+                        this.fieldNamesOrderedSet.addAll(parentCol);
+                    }
                 }
 
                 List<String> pkArry = new ArrayList<>();
@@ -132,7 +232,24 @@ public class JqGridHandler {
                             }
                         }
                     } catch (Exception e) {
-                        log.info("JqRow <init> warning : " + fname + " -> " + e.getMessage());
+                        // log.info("JqRow <init> warning : " + fname + " -> " +
+                        // e.getMessage());
+                        try {
+                            Class<?> parentClz = entity.getClass().getSuperclass();
+                            Field field = parentClz.getDeclaredField(fname);
+                            field.setAccessible(true);
+                            Object val = field.get(entity);
+                            String valStr = "" + Optional.fromNullable(val).or("");
+                            this.cell.add(valStr);
+
+                            if (pkColumns != null) {
+                                if (ArrayUtils.contains(pkColumns, fname)) {
+                                    pkArry.add(valStr);
+                                }
+                            }
+                        } catch (Exception e2) {
+                            log.info("JqRow <init> warning : " + fname + " -> " + e2.getMessage());
+                        }
                     }
                 }
 
