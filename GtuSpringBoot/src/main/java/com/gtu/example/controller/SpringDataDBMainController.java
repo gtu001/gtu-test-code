@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.gtu.example.common.JSONUtil;
+import com.gtu.example.common.JqGridHandler.EntityPrimaryKeySetter;
 import com.gtu.example.common.JqGridHandler.JqReader;
 import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
 import com.gtu.example.common.PackageReflectionUtil;
@@ -96,10 +97,8 @@ public class SpringDataDBMainController {
         return rtnStr;
     }
 
-    @GetMapping(value = "/table-get-methodMapping")
-    public String tableMethodMapping(@RequestParam(name = "table") String table, //
-            @RequestParam(name = "operate") String operate) throws ClassNotFoundException {
-
+    @GetMapping(value = "/table-mapping")
+    public String tableMapping(@RequestParam(name = "table") String table) throws ClassNotFoundException {
         Map<Class<Object>, Class[]> repositoryEntityMap = RepositoryReflectionUtil.getRepositoryEntityMap("com.gtu.example.springdata.dao_1");
         Class<?> entityClz = Class.forName(String.format("com.gtu.example.springdata.entity.%s", table));
         Class<?>[] clz = repositoryEntityMap.get(entityClz);
@@ -109,25 +108,9 @@ public class SpringDataDBMainController {
 
         JSONObject obj = new JSONObject();
 
-        String method = "";
-        switch (operate) {
-        case "saveOrUpdate":
-            method = "save";
-        case "update":
-            method = "save";
-            break;
-        case "query":
-            method = "TODO";
-            break;
-        case "delete":
-            method = "delete";
-            break;
-        }
-
         obj.put("repository", repository.getName());
         obj.put("entityClz", entityClz.getName());
         obj.put("entityKey", entityKey.getName());
-        obj.put("method", method);
 
         log.info("return : {}", obj);
         return obj.toString();
@@ -161,7 +144,6 @@ public class SpringDataDBMainController {
         Class<T> entityClz;
         Class<ID> entityKey;
         String entityId;
-        String method;
         T entity;
     }
 
@@ -182,7 +164,6 @@ public class SpringDataDBMainController {
         define.repositoryClz = Class.forName(request.getParameter("repository"));
         define.entityClz = Class.forName(request.getParameter("entityClz"));
         define.entityKey = Class.forName(request.getParameter("entityKey"));
-        define.method = request.getParameter("method");
         define.entityId = RepositoryReflectionUtil.getEntityId(define.entityClz);
 
         log.info("getOperateDefine Result = {}", ReflectionToStringBuilder.toString(define, ToStringStyle.MULTI_LINE_STYLE));
@@ -209,24 +190,40 @@ public class SpringDataDBMainController {
         return define;
     }
 
-    @PostMapping(value = "/db_operate")
-    public String operateDBAction(HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping(value = "/db_save")
+    public String saveDBAction(HttpServletRequest request, HttpServletResponse response) {
         try {
             OperateDefine define = this.getOperateDefine(request);
 
-            Object resultObj = null;
-            if ("save".equals(define.method)) {
-                log.info("# save !!");
-                resultObj = define.repository.save(define.entity);
-            }
+            Object resultObj = define.repository.save(define.entity);
 
+            JSONObject json = JSONUtil.getSuccess(null);
             if (resultObj != null) {
-                JSONObject json = JSONUtil.getSuccess(null);
                 json.put("entity", resultObj);
-                return json.toString();
-            } else {
-                return "done..";
             }
+            
+            return json.toString();
+        } catch (Exception ex) {
+            log.error("operateDBAction ERR : " + ex.getMessage(), ex);
+            // return JSONUtil.getThrowable(ex).toString();
+            return JSONUtil.getThrowableRoot(ex).toString();
+        }
+    }
+    
+    @PostMapping(value = "/db_delete")
+    public String deleteDBAction(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            OperateDefine define = this.getOperateDefine(request);
+            
+            String id = request.getParameter("id");
+            
+            EntityPrimaryKeySetter entitySetter = new EntityPrimaryKeySetter(define.entity, id);
+
+            define.repository.delete(entitySetter.apply());
+
+            JSONObject json = JSONUtil.getSuccess(null);
+            
+            return json.toString();
         } catch (Exception ex) {
             log.error("operateDBAction ERR : " + ex.getMessage(), ex);
             // return JSONUtil.getThrowable(ex).toString();

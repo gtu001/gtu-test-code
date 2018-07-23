@@ -11,6 +11,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class StringUtil_ {
@@ -604,6 +605,16 @@ public class StringUtil_ {
     public static boolean isUUID(String str) {
         final Pattern UUID_PATTERN = Pattern.compile("^\\w{8}\\-\\w{4}\\-\\w{4}\\-\\w{4}\\-\\w{12}$");
         return UUID_PATTERN.matcher(str).find();
+    }
+
+    /**
+     * 字串轉成原始型別物件
+     */
+    public static <T> Object stringToPrimitive(String value, Class<T> targetClz) {
+        if (value == null) {
+            return null;
+        }
+        return ConvertUtils.convert(value, targetClz);
     }
 
     public static String appendReplacementEscape(String content) {

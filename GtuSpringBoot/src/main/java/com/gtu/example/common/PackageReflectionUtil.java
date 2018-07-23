@@ -65,8 +65,7 @@ public class PackageReflectionUtil {
                     cons.setAccessible(true);
                     entity = cons.newInstance(new Object[0]);
                 } catch (Exception e2) {
-                    if (debug)
-                        e2.printStackTrace();
+                    throw new RuntimeException("newInstanceDefault ERR : " + e2.getMessage(), e2);
                 }
             }
         }
