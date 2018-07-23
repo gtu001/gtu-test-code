@@ -13,6 +13,7 @@ public class EpubReaderTest001 {
 
     // http://www.siegmann.nl/static/epublib/apidocs/nl/siegmann/epublib/epub/EpubReader.html
     // http://www.siegmann.nl/epublib/android/
+    // https://github.com/psiegman/epublib <--viewer here
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // read epub file
         EpubReader epubReader = new EpubReader();
