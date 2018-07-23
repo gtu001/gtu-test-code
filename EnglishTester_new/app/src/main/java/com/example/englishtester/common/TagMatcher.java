@@ -2,29 +2,33 @@ package com.example.englishtester.common;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.util.Log;
+
 
 public class TagMatcher {
 
     private static final String TAG = TagMatcher.class.getSimpleName();
 
     public static void main(String[] args) {
-//        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/WordHtmlParser_before_20180719.htm");
-//        String content = FileUtilGtu.loadFromFile(file, "UTF8");
-//
-//        String startTag = "\\<head(?:[\\s\n\r]{1})";
-//        String endTag = "\\<\\/head\\>";
-//        // String content = "<111 333<4444> <5555<788888>>9999999>";
-//
-//        TagMatcher t = new TagMatcher(startTag, endTag, content, true, true);
-//        while (t.find()) {
-//            System.out.println(t.group());
-//        }
-//
-//        System.out.println("unique = " + t.findUnique());
+        File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
+        String content = FileUtilGtu.loadFromFile(file, "UTF8");
+
+        String startTag = "<head";
+        String endTag = "</head>";
+        String startPtn = "\\<head[\r\n\\s\t\\>]{1}";
+        String endPtn = "\\<\\/head\\>";
+
+        TagMatcher t = new TagMatcher(startTag, endTag, startPtn, endPtn, 0, 0, content, true);
+        while (t.find()) {
+            System.out.println(t.group());
+            System.out.println("startPad = " + t.startPad);
+        }
+
+        System.out.println("unique = " + t.findUnique());
 
         System.out.println("done...");
     }
@@ -127,9 +131,9 @@ public class TagMatcher {
         }
         String contentCopy = content.toString();
         StringBuffer sb = new StringBuffer();
-        sb.append(content.substring(0, info.getStartWithoutTag()));
+        sb.append(content.substring(0, info.getStartWithTag()));
         sb.append(replace);
-        sb.append(content.substring(info.getEndWithoutTag()));
+        sb.append(content.substring(info.getEndWithTag()));
         String resultContent = sb.toString();
         if (checkResult) {
             if (StringUtils.equals(resultContent, contentCopy)) {
@@ -223,8 +227,6 @@ public class TagMatcher {
 
         String tmpContent = content.substring(startPos);
 
-        Log.v(TAG, " -- tmpContent : " + tmpContent);
-
         while ((endPos = getEndPos(tmpContent, token)) != -1) {
             Log.v(TAG, " -- endPos : " + endPos);
 
@@ -256,16 +258,51 @@ public class TagMatcher {
         return endPtn != null ? endPtn.countMatches(middleStr) : StringUtils.countMatches(middleStr, endTag);
     }
 
+    // private int getEndPos(String tmpContent, int token) {
+    // return endPtn != null ? //
+    // endPtn.ordinalIndexOf(tmpContent, token) : //
+    // StringUtils.ordinalIndexOf(tmpContent, endTag, token);
+    // }
+    //
+    // private int getStartPos() {
+    // return startPtn != null ? //
+    // startPtn.indexOf(content, startPad) : //
+    // content.indexOf(startTag, startPad);
+    // }
+
     private int getEndPos(String tmpContent, int token) {
-        return endPtn != null ? //
-                endPtn.ordinalIndexOf(tmpContent, token) : //
-                StringUtils.ordinalIndexOf(tmpContent, endTag, token);
+        if (endPtn == null) {
+            return StringUtils.ordinalIndexOf(tmpContent, endTag, token);
+        } else {
+            int pos = endPtn.ordinalIndexOf(tmpContent, token);
+            if (pos == -1) {
+                return -1;
+            } else {
+                String tmpContent2 = StringUtils.substring(tmpContent, pos, pos + endPtn.ptn.pattern().length());
+                Log.v(TAG, "<<<---" + tmpContent2);
+                int fixOffset = tmpContent2.indexOf(endTag);
+                fixOffset = fixOffset == -1 ? 0 : fixOffset;
+                return pos + fixOffset;
+            }
+        }
+
     }
 
     private int getStartPos() {
-        return startPtn != null ? //
-                startPtn.indexOf(content, startPad) : //
-                content.indexOf(startTag, startPad);
+        if (startPtn == null) {
+            return content.indexOf(startTag, startPad);
+        } else {
+            int pos = startPtn.indexOf(content, startPad);
+            if (pos == -1) {
+                return -1;
+            } else {
+                String tmpContent = StringUtils.substring(content, pos, pos + startPtn.ptn.pattern().length());
+                Log.v(TAG, "<<<---" + tmpContent);
+                int fixOffset = tmpContent.indexOf(startTag);
+                fixOffset = fixOffset == -1 ? 0 : fixOffset;
+                return pos + fixOffset;
+            }
+        }
     }
 
     private int getStartTagLength() {
@@ -336,4 +373,10 @@ public class TagMatcher {
     public String getContent() {
         return content;
     }
+
+    // private static class Log {
+    // private static void v(String tag, String message){
+    // System.out.println(String.format("%s : %s", tag, message));
+    // }
+    // }
 }

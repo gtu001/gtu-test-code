@@ -58,7 +58,7 @@ import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
-import com.example.englishtester.common.WordHtmlParser;
+import com.example.englishtester.common.HtmlWordParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -714,9 +714,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         } else {
             txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.maxWidth - 10));
             if (dto.currentHtmlFile != null) {
-                this.dto.content = WordHtmlParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
+                this.dto.content = HtmlWordParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
             } else if (StringUtils.isNotBlank(dto.currentHtmlContent)) {
-                this.dto.content = WordHtmlParser.newInstance().getFromContent(dto.currentHtmlContent, true, "");
+                this.dto.content = HtmlWordParser.newInstance().getFromContent(dto.currentHtmlContent, true, "");
             }
         }
         translateView.setText("");
@@ -831,13 +831,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 dto.currentHtmlUrl = url;
 
                                 for (int ii = 0; ii < 10; ii++)
-                                    Log.v(TAG, "[WordHtmlParser START]");
+                                    Log.v(TAG, "[HtmlWordParser START]");
 
-                                WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                                HtmlWordParser wordParser = HtmlWordParser.newInstance();
                                 final String content = wordParser.getFromContentDebug(contentOrign, false);
 
                                 for (int ii = 0; ii < 10; ii++)
-                                    Log.v(TAG, "[WordHtmlParser END]");
+                                    Log.v(TAG, "[HtmlWordParser END]");
 
                                 handler.post(new Runnable() {
                                     @Override
@@ -961,14 +961,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     dto.currentHtmlUrl = null;
 
                     for (int ii = 0; ii < 10; ii++)
-                        Log.v(TAG, "[WordHtmlParser START]");
+                        Log.v(TAG, "[HtmlWordParser START]");
 
-                    WordHtmlParser wordParser = WordHtmlParser.newInstance();
+                    HtmlWordParser wordParser = HtmlWordParser.newInstance();
                     final String content = wordParser.getFromFile(txtFileZ.get());
                     String dropboxPicDir = wordParser.getPicDirForDropbox();
 
                     for (int ii = 0; ii < 10; ii++)
-                        Log.v(TAG, "[WordHtmlParser END]");
+                        Log.v(TAG, "[HtmlWordParser END]");
 
                     Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
 

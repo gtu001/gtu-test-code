@@ -21,15 +21,15 @@ import java.util.regex.Pattern;
 import gtu.util.StringUtil_;
 
 
-public class WordHtmlParser {
+public class HtmlWordParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
 
     public static void main(String[] args) {
-        WordHtmlParser parser = WordHtmlParser.newInstance();
+        HtmlWordParser parser = HtmlWordParser.newInstance();
 
-        File file = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/The Stress of Remote Working.htm");
+        File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
 
         String result = parser.getFromFile(file, true, "");
         String dropboxDir = parser.picDirForDropbox;
@@ -39,15 +39,15 @@ public class WordHtmlParser {
         System.out.println("done...");
     }
 
-    private static final String TAG = WordHtmlParser.class.getSimpleName();
+    private static final String TAG = HtmlWordParser.class.getSimpleName();
 
-    private WordHtmlParser() {
+    private HtmlWordParser() {
     }
 
     private String picDirForDropbox = "";
 
-    public static WordHtmlParser newInstance() {
-        return new WordHtmlParser();
+    public static HtmlWordParser newInstance() {
+        return new HtmlWordParser();
     }
 
     public String getFromFile(File file) {
@@ -74,7 +74,7 @@ public class WordHtmlParser {
 
     public String getFromContent(String content, boolean isPure, String checkStr) {
         log("ORIGN start : =======================================================================");
-        log(content);
+//        log(content);
         log("ORIGN end   : =======================================================================");
 
         saveToFileDebug("before", content);
@@ -86,7 +86,7 @@ public class WordHtmlParser {
         }
 
         log("RESULT start : =======================================================================");
-        logContent(content);
+//        logContent(content);
         log("RESULT end    : =======================================================================");
         return content;
     }
@@ -94,7 +94,7 @@ public class WordHtmlParser {
     private void saveToFileDebug(String suffix, String context) {
         if (BuildConfig.DEBUG) {
             String dateStr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-            String name = WordHtmlParser.class.getSimpleName();
+            String name = HtmlWordParser.class.getSimpleName();
             if (StringUtils.isNotBlank(suffix)) {
                 name = name + "_" + suffix;
             }
@@ -471,7 +471,9 @@ public class WordHtmlParser {
         while (tag.findUnique()) {
             tag.appendReplacementForUnique("", true, true);
         }
-        return tag.getContent();
+        String rtnVal = tag.getContent();
+        System.gc();
+        return rtnVal;
     }
 
     private String _step6_hiddenSomething(String content, boolean isPure, String checkStr) {

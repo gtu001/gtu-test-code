@@ -88,16 +88,16 @@ public class FileToBmpUtilUI extends JFrame {
         srcFileText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                try{
+                try {
                     File file = JCommonUtil.filePathCheck(srcFileText.getText(), "檔案來源", false);
                     initToBmpText();
-                    widthText.setText(String.valueOf(FileToBmpUtil.getInstance().getWidth(file)));
-                }catch(Exception ex){
+                    widthText.setText(String.valueOf(FileToBmpUtilVer2.getInstance().getWidth(file)));
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         }));
-        
+
         JLabel lblDestBmp = new JLabel("dest bmp");
         panel.add(lblDestBmp, "2, 4, right, default");
 
@@ -114,19 +114,19 @@ public class FileToBmpUtilUI extends JFrame {
         JButton btnGo = new JButton("go");
         btnGo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
-                try{
+                try {
                     File srcFile = JCommonUtil.filePathCheck(srcFileText.getText(), "檔案來源", false);
                     File toBmpFile = new File(toBmpText.getText());
-                    if(!toBmpFile.getParentFile().exists()){
+                    if (!toBmpFile.getParentFile().exists()) {
                         toBmpFile.getParentFile().mkdirs();
                     }
-                    if(!StringUtils.isNumeric(widthText.getText())){
+                    if (!StringUtils.isNumeric(widthText.getText())) {
                         Validate.isTrue(false, "寬度有誤");
                     }
                     int width = Integer.parseInt(widthText.getText());
-                    FileToBmpUtil.getInstance().buildImageFromFile(srcFile, toBmpFile, width);
+                    FileToBmpUtilVer2.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生圖檔成功 : " + toBmpFile);
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
@@ -139,13 +139,13 @@ public class FileToBmpUtilUI extends JFrame {
         widthText.setColumns(10);
         panel.add(widthText, "4, 6, fill, default");
         panel.add(btnGo, "2, 8");
-        
+
         usePicNameCheckbox = new JCheckBox("使用圖片檔名");
         usePicNameCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try{
+                try {
                     initToBmpText();
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
@@ -191,15 +191,15 @@ public class FileToBmpUtilUI extends JFrame {
         JButton btnGo_1 = new JButton("go");
         btnGo_1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
-                try{
+                try {
                     File srcBmpFile = JCommonUtil.filePathCheck(srcBmpText.getText(), "BMP檔案來源", "bmp");
                     File toFile = new File(toFileText.getText());
-                    if(!toFile.getParentFile().exists()){
-                        toFile.getParentFile().mkdirs(); 
+                    if (!toFile.getParentFile().exists()) {
+                        toFile.getParentFile().mkdirs();
                     }
-                    FileToBmpUtil.getInstance().getFileFromImage(srcBmpFile, toFile);
+                    FileToBmpUtilVer2.getInstance().getFileFromImage_FixName(srcBmpFile, toFile);
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 : " + toFile);
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
@@ -211,13 +211,13 @@ public class FileToBmpUtilUI extends JFrame {
      * 初始化圖檔
      */
     private void initToBmpText() {
-        if(usePicNameCheckbox.isSelected()){
+        if (usePicNameCheckbox.isSelected()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
             String fileName = sdf.format(new Date());
             toBmpText.setText(new File(FileUtil.DESKTOP_PATH, "IMG" + fileName + ".bmp").getAbsolutePath());
-        }else{
+        } else {
             File file = new File(srcFileText.getText());
-            if(file.isFile()){
+            if (file.isFile()) {
                 toBmpText.setText(new File(FileUtil.DESKTOP_PATH, file.getName() + ".bmp").getAbsolutePath());
             }
         }

@@ -11,6 +11,7 @@
 	<property name="main_class_full" value="gtu.jpg.FileToBmpUtilUI" />
 	<property name="main_class" value="FileToBmpUtilUI" />
 	<property name="rename_jarname" value="${main_class}" />
+	<property name="icon_name" value="tk_aiengine.ico" />
 	<!--${main_class}-->
 
 
@@ -26,6 +27,7 @@
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -42,18 +44,29 @@
 	</target>
 	-->
 
+	<target name="jarToExe" if="${enable}">
+		<echo># jarToExe = ${enable}</echo>
+		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
+			<icon enable="true">${src_dir}/resource/images/ico/${icon_name}</icon>
+			<singleton enable="true">${main_class}</singleton>
+		</jarToExe>
+	</target>
+
 	<target name="buildClassSet" if="${enable}">
 		<echo># buildClassSet = ${enable}</echo>
 		<mkdir dir="${jars_dir}" />
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
+
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
-			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
+			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
-
+			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 
 		</jarfinder>
@@ -117,6 +130,10 @@
 
 		<antcall target="clean">
 			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="jarToExe">
 			<param name="enable" value="true" />
 		</antcall>
 

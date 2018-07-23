@@ -119,9 +119,14 @@ public class OOMHandler {
         float scaleWidth = ((float) newWidth1) / width;
         int newHeight = (int) (scaleWidth * height);
 
-        Bitmap bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
-        if (bm != null) {
-            bm.recycle();
+        Bitmap bitmap = null;
+        try {
+            Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
+            if (bm != null) {
+                bm.recycle();
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, "fixPicScaleFixScreenWidth ERR : " + ex.getMessage(), ex);
         }
         return bitmap;
     }
