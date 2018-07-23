@@ -1,4 +1,5 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gtu.test</groupId>
@@ -14,6 +15,11 @@
 		<repository>
 			<id>local Repository</id>
 			<url>file://${basedir}/lib</url><!-- 專案目錄/lib/ -->
+		</repository>
+
+		<repository>
+			<id>psiegman-repo</id><!-- epub -->
+			<url>https://github.com/psiegman/mvn-repo/raw/master/releases</url>
 		</repository>
 	</repositories>
 
@@ -514,7 +520,7 @@
 			<artifactId>DebugMointerUI</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
+			<systemPath>e:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
 		</dependency><!-- ${project.basedir}/src/main/webapp/WEB-INF/lib/DebugMointerUI.jar -->
 
 		<!-- dropbox -->
@@ -617,7 +623,7 @@
 			<version>2.2.3</version>
 			<scope>system</scope>
 			<!-- <systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath> -->
-			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
+			<systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -688,6 +694,12 @@
 			<version>0.9.11</version>
 		</dependency>
 
+		<!-- epub -->
+		<dependency>
+			<groupId>nl.siegmann.epublib</groupId>
+			<artifactId>epublib-core</artifactId>
+			<version>3.1</version>
+		</dependency>
 	</dependencies>
 
 
