@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -40,6 +41,14 @@ public class RepositoryReflectionUtil {
         for (Field f : clz.getDeclaredFields()) {
             if (f.isAnnotationPresent(javax.persistence.Id.class)) {
                 return f.getName();
+            }
+        }
+
+        if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+            for (Field f : clz.getSuperclass().getDeclaredFields()) {
+                if (f.isAnnotationPresent(javax.persistence.Id.class)) {
+                    return f.getName();
+                }
             }
         }
         return null;

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -46,6 +47,23 @@ public class JqGridHandler {
             List<ColModel> lst = new ArrayList<ColModel>();
 
             String entityId = RepositoryReflectionUtil.getEntityId(clz);
+
+            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                Class<?> parentClz = clz.getSuperclass();
+
+                for (Field f : parentClz.getDeclaredFields()) {
+                    ColModel col = new ColModel(f.getName(), f.getName());
+
+                    // pk
+                    if (entityId != null && col.getName().equals(entityId)) {
+                        col.edithidden.setEdithidden(true);
+                    }
+
+                    col.setEditable(true);
+
+                    lst.add(col);
+                }
+            }
 
             for (Field f : clz.getDeclaredFields()) {
                 ColModel col = new ColModel(f.getName(), f.getName());
@@ -191,6 +209,13 @@ public class JqGridHandler {
                     this.fieldNamesOrderedSet = Stream.of(entity.getClass().getDeclaredFields())//
                             .map(Field::getName)//
                             .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                    if (entity.getClass().getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                        Set<String> parentCol = Stream.of(entity.getClass().getSuperclass().getDeclaredFields())//
+                                .map(Field::getName)//
+                                .collect(Collectors.toCollection(LinkedHashSet::new));
+                        this.fieldNamesOrderedSet.addAll(parentCol);
+                    }
                 }
 
                 List<String> pkArry = new ArrayList<>();
@@ -207,7 +232,24 @@ public class JqGridHandler {
                             }
                         }
                     } catch (Exception e) {
-                        log.info("JqRow <init> warning : " + fname + " -> " + e.getMessage());
+                        // log.info("JqRow <init> warning : " + fname + " -> " +
+                        // e.getMessage());
+                        try {
+                            Class<?> parentClz = entity.getClass().getSuperclass();
+                            Field field = parentClz.getDeclaredField(fname);
+                            field.setAccessible(true);
+                            Object val = field.get(entity);
+                            String valStr = "" + Optional.fromNullable(val).or("");
+                            this.cell.add(valStr);
+
+                            if (pkColumns != null) {
+                                if (ArrayUtils.contains(pkColumns, fname)) {
+                                    pkArry.add(valStr);
+                                }
+                            }
+                        } catch (Exception e2) {
+                            log.info("JqRow <init> warning : " + fname + " -> " + e2.getMessage());
+                        }
                     }
                 }
 
