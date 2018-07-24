@@ -26,57 +26,92 @@ import org.springframework.util.ClassUtils;
 
 import com.google.common.base.Optional;
 import com.gtu.example.common.JqGridHandler.JqReader.JqRow;
-import com.gtu.example.controller.SpringDataDBMainController;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class JqGridHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(SpringDataDBMainController.class);
+    private static final Logger log = LoggerFactory.getLogger(JqGridHandler.class);
 
     public static class SimpleJdGridCreater<T> {
 
         Class<T> clz;
+        List<ColModel> colModelLst;
+        String entityId;
+        List<String> entityIds = new ArrayList<String>();
+        Class<?> pkClz;
 
         public SimpleJdGridCreater(Class<T> clz) {
             this.clz = clz;
         }
 
+        private void handlePrimaryColumns(String entityId, Class<?> clz, List<Field> pksLst) {
+            // 處理pks
+            Field tempFld = FieldUtils.getDeclaredField(clz, entityId, true);
+            if (tempFld == null) {
+                return;
+            }
+            pkClz = tempFld.getType();
+            if (!ClassUtils.isPrimitiveOrWrapper(pkClz) && //
+                    pkClz != String.class //
+            ) {
+                for (Field fld : pkClz.getDeclaredFields()) {
+                    entityIds.add(fld.getName());
+                    pksLst.add(fld);
+                }
+            } else {
+                entityIds.add(entityId);
+                pksLst.add(FieldUtils.getDeclaredField(clz, entityId, true));
+            }
+
+            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                this.handlePrimaryColumns(entityId, clz.getSuperclass(), pksLst);
+            }
+        }
+
+        private boolean __isColumnExists(final String fieldName, List<ColModel> lst) {
+            return lst.stream().filter(c -> c.getIndex().equals(fieldName)).collect(Collectors.counting()) > 0;
+        }
+
+        private void handleColumn(Class<?> clz, List<ColModel> lst) {
+            for (Field f : clz.getDeclaredFields()) {
+                ColModel col = new ColModel(f.getName(), f.getName());
+                col.setEditable(true);
+                if (__isColumnExists(f.getName(), lst)) {
+                    continue;
+                }
+                lst.add(col);
+            }
+            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                handleColumn(clz.getSuperclass(), lst);
+            }
+        }
+
         public JSONArray getColModel() {
             List<ColModel> lst = new ArrayList<ColModel>();
 
-            String entityId = RepositoryReflectionUtil.getEntityId(clz);
+            entityId = RepositoryReflectionUtil.getEntityId(clz);
 
-            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
-                Class<?> parentClz = clz.getSuperclass();
+            List<Field> pkFld = new ArrayList<>();
 
-                for (Field f : parentClz.getDeclaredFields()) {
-                    ColModel col = new ColModel(f.getName(), f.getName());
-
-                    // pk
-                    if (entityId != null && col.getName().equals(entityId)) {
-                        col.edithidden.setEdithidden(true);
-                    }
-
-                    col.setEditable(true);
-
-                    lst.add(col);
-                }
-            }
-
-            for (Field f : clz.getDeclaredFields()) {
+            this.handlePrimaryColumns(entityId, clz, pkFld);
+            for (Field f : pkFld) {
                 ColModel col = new ColModel(f.getName(), f.getName());
-
-                // pk
-                if (entityId != null && col.getName().equals(entityId)) {
-                    col.edithidden.setEdithidden(true);
-                }
-
+                col.edithidden.setEdithidden(true);
                 col.setEditable(true);
-
+                if (__isColumnExists(f.getName(), lst)) {
+                    continue;
+                }
                 lst.add(col);
             }
+
+            // 處理欄位
+            handleColumn(clz, lst);
+
+            // 保留一份 重要!!
+            this.colModelLst = lst;
+
             return JSONArray.fromObject(lst);
         }
 
@@ -231,13 +266,18 @@ public class JqGridHandler {
                                 pkArry.add(valStr);
                             }
                         }
-                    } catch (Exception e) {
-                        // log.info("JqRow <init> warning : " + fname + " -> " +
-                        // e.getMessage());
+                    } catch (org.hibernate.exception.SQLGrammarException e) {
+                        if (e.getMessage().contains("could not extract ResultSet")) {
+                            this.cell.add("<ResultSet Error>");
+                            log.error("JqRow <init> : " + fname + " -> " + e.getMessage());
+                        } else {
+                            this.cell.add("<Error>");
+                            log.error("JqRow <init> : " + fname + " -> " + e.getMessage(), e);
+                        }
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         try {
                             Class<?> parentClz = entity.getClass().getSuperclass();
-                            Field field = parentClz.getDeclaredField(fname);
-                            field.setAccessible(true);
+                            Field field = FieldUtils.getDeclaredField(parentClz, fname, true);
                             Object val = field.get(entity);
                             String valStr = "" + Optional.fromNullable(val).or("");
                             this.cell.add(valStr);
@@ -248,12 +288,19 @@ public class JqGridHandler {
                                 }
                             }
                         } catch (Exception e2) {
-                            log.info("JqRow <init> warning : " + fname + " -> " + e2.getMessage());
+                            this.cell.add("<Error>");
+                            log.error("JqRow <init> : " + fname + " -> " + e2.getMessage(), e2);
                         }
+                    } catch (Exception ex) {
+                        this.cell.add("<Error>");
+                        log.error("JqRow <init> : " + fname + " -> " + ex.getMessage(), ex);
                     }
                 }
 
                 this.id = StringUtils.join(pkArry, Optional.fromNullable(primaryKeyDelimitChar).or('^'));
+
+                log.info("column name : {}", fieldNamesOrderedSet);
+                log.info("value  name : {}", cell);
             }
 
             public String getId() {

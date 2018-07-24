@@ -33,7 +33,7 @@ public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    @Autowired
+    @Autowired 
     private ConfigurableApplicationContext ctx;
 
     public static void main(String[] args) throws Exception {

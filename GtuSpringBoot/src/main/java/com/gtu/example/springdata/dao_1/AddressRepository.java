@@ -8,5 +8,5 @@ import com.gtu.example.springdata.entity.Address;
 
 @Profile({ "spring-data", "servers" })
 // @Repository//網路說這東西沒有用
-public interface AddressRepository extends CrudRepository<Address, Long> {
+public interface AddressRepository extends CrudRepository<Address, String> {
 }

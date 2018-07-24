@@ -1,18 +1,18 @@
 package com.gtu.example.springdata.entity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.stream.Stream;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Table(name = "ADDRESS_1")
@@ -29,11 +29,21 @@ public class Address extends AuditModel {
     // private void ensureId() {
     // this.setAddressId(UUID.randomUUID().toString());
     // }
-
+    
     private String city;
     private String road;
-
-    private Address() {
+    
+    @OneToOne(//
+//          mappedBy = "addressId", // 未知 (打開會錯)
+          cascade = CascadeType.ALL, //
+          orphanRemoval = true, //
+          fetch = FetchType.LAZY//
+  ) //
+    @JoinColumn(name = "addressId")
+    @JsonIgnore
+    private Employee employee;
+    
+    public Address() {
     }
 
     public Address(String city, String road) {
@@ -63,5 +73,13 @@ public class Address extends AuditModel {
 
     public void setRoad(String road) {
         this.road = road;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 }

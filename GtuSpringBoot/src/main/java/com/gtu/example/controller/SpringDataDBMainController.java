@@ -3,7 +3,6 @@ package com.gtu.example.controller;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.gtu.example.common.DBRelationHelper;
 import com.gtu.example.common.JSONUtil;
 import com.gtu.example.common.JqGridHandler.EntityPrimaryKeySetter;
 import com.gtu.example.common.JqGridHandler.JqReader;
@@ -75,7 +75,7 @@ public class SpringDataDBMainController {
 
     private Set<Class<?>> getAllTables() {
         Set<Class<?>> all = new LinkedHashSet<>();
-        Set<Class<?>> s1 = new Reflections("com.gtu.example.springdata.entity").getSubTypesOf(Object.class);
+        Set<Class<?>> s1 = PackageReflectionUtil.getSubClasses(new Reflections("com.gtu.example.springdata.entity"));
         log.info("getAllTables material {}", s1.size());
 
         all.addAll(s1);
@@ -109,8 +109,8 @@ public class SpringDataDBMainController {
 
     @GetMapping(value = "/table-mapping")
     public String tableMapping(@RequestParam(name = "table") String table) throws ClassNotFoundException {
-        Map<Class<Object>, Class[]> repositoryEntityMap = getAllRepostiriesMap();
-        
+        Map<Class<Object>, Class[]> repositoryEntityMap = DBRelationHelper.getAllRepostiriesMap();
+
         Class<?> entityClz = Class.forName(String.format("com.gtu.example.springdata.entity.%s", table));
         Class<?>[] clz = repositoryEntityMap.get(entityClz);
 
@@ -125,15 +125,6 @@ public class SpringDataDBMainController {
 
         log.info("return : {}", obj);
         return obj.toString();
-    }
-    
-    private Map<Class<Object>, Class[]> getAllRepostiriesMap() {
-        Map<Class<Object>, Class[]> all = new LinkedHashMap<>();
-        Map<Class<Object>, Class[]> m1 = RepositoryReflectionUtil.getRepositoryEntityMap("com.gtu.example.springdata.dao_1");
-        log.info("getAllRepostiriesMap material {}", m1.size());
-        all.putAll(m1);
-        log.info("getAllRepostiriesMap = {}", all.size());
-        return all;
     }
 
     @PostMapping(value = "/db_simple_query/{type}")
@@ -214,6 +205,12 @@ public class SpringDataDBMainController {
     public String saveDBAction(HttpServletRequest request, HttpServletResponse response) {
         try {
             OperateDefine define = this.getOperateDefine(request);
+
+            // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            // 處理客製關聯塞直
+            DBRelationHelper relationHelper = new DBRelationHelper(define.entity, ctx);
+            relationHelper.relationProcess();
+            // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
             Object resultObj = define.repository.save(define.entity);
 

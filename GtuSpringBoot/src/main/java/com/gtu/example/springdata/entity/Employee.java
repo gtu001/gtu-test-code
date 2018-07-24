@@ -2,6 +2,7 @@ package com.gtu.example.springdata.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,17 +12,29 @@ import javax.persistence.GeneratedValue;
 //import org.springframework.data.annotation.Id;//誤用此Id
 import javax.persistence.Id;//這才對
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.context.annotation.Profile;
 //import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.gtu.example.springdata.dao_1.AddressRepository;
+
+import net.minidev.json.annotate.JsonIgnore;
+
+/**
+ * @author wistronits
+ *
+ */
 @Profile("spring-data")
 @Entity
 // @Document // for MongoDB
+@Table(name = "employee_1")
 public class Employee extends AuditModel {
 
     @Id
@@ -41,29 +54,30 @@ public class Employee extends AuditModel {
     @Size(min = 3, max = 100)
     private String description;
 
-    @OneToMany(targetEntity = Address.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_id")
-    private List<Address> address;
+    @Transient
+    @GtuDBRelation(setter = "setAddress", repository = "AddressRepository", method="")
+    private String empAddressId;
 
-    // @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    // @JoinColumn(name = "manager_id", nullable = true)
-    // @OnDelete(action = OnDeleteAction.CASCADE)
-    // @JsonIgnore
-    // private Employee manager;
+    @OneToOne(//
+            // mappedBy = "addressId", // 未知 (打開會錯)
+            cascade = CascadeType.ALL, //
+            orphanRemoval = true, //
+            fetch = FetchType.LAZY//
+    ) //
+    @JoinColumn(name = "empAddressId") // 自己的欄位
+    @JsonIgnore
+    private Address address;
 
-    // @ManyToMany(cascade = { CascadeType.ALL })
-    // @JoinTable(name = "A_B", joinColumns = { //
-    // @JoinColumn(name = "ID_A", referencedColumnName = "ID_A") }, //
-    // inverseJoinColumns = { @JoinColumn(name = "ID_B", referencedColumnName =
-    // "ID_B") }//
-    // )
-    // public List<B> lista = new ArrayList<B>();
-
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinColumn(name = "employee_id")
+    @ManyToMany
+    @JoinTable(//
+            name = "work_item", //
+            joinColumns = @JoinColumn(name = "work_job_id"), // 對方的
+            inverseJoinColumns = @JoinColumn(name = "emp_work_id")// 對方對回來的
+    ) //
+    @JsonIgnore
     private List<WorkItem> workItems = new ArrayList<WorkItem>();
 
-    private Employee() {
+    public Employee() {
     }
 
     public Employee(String firstName, String lastName, String description) {
@@ -104,19 +118,36 @@ public class Employee extends AuditModel {
         this.description = description;
     }
 
-    public List<Address> getAddress() {
-        return address;
-    }
-
-    public void setAddress(List<Address> address) {
-        this.address = address;
-    }
-
     public List<WorkItem> getWorkItems() {
         return workItems;
     }
 
     public void setWorkItems(List<WorkItem> workItems) {
         this.workItems = workItems;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public String getEmpAddressId() {
+        return empAddressId;
+    }
+
+    public void setEmpAddressId(String empAddressId) {
+        this.empAddressId = empAddressId;
+    }
+
+    // custom 用ID設定addressId
+    public void setAddressByAddressId(String addressId, AddressRepository repository) {
+        Optional<Address> opt = repository.findById(addressId);
+        if (opt.isPresent()) {
+            Address addr = opt.get();
+            this.setAddress(addr);
+        }
     }
 }

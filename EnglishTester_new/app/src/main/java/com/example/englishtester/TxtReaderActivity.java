@@ -973,7 +973,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
 
                     if (StringUtils.isNotBlank(dropboxPicDir)) {
-                        File dropboxPicDirF = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxPicDir);
+                        File dropboxPicDirF = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxPicDir, -1);
                         dto.dropboxPicDir = dropboxPicDirF;
                     } else {
                         dto.dropboxPicDir = null;

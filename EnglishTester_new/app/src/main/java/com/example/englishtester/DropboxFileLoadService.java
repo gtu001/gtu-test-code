@@ -19,6 +19,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class DropboxFileLoadService {
 
@@ -145,7 +149,7 @@ public class DropboxFileLoadService {
         }, -1L);
     }
 
-    public File downloadHtmlReferencePicDir(final String dropboxDirName) {
+    public File downloadHtmlReferencePicDir(final String dropboxDirName, final long timeout) {
         return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
             @Override
             public File call() throws Exception {
@@ -156,32 +160,49 @@ public class DropboxFileLoadService {
                         dirFile.mkdirs();
                     }
 
-                    DbxClientV2 client = getClient();
+                    final DbxClientV2 client = getClient();
                     List<DropboxUtilV2.DropboxUtilV2_DropboxFile> picLst = DropboxUtilV2.listFilesV2(ENGLISH_TXT_FOLDER + File.separator + dropboxDirName, client);
 
                     //for check
                     List<File> downloadLst = new ArrayList<File>();
 
-                    for (DropboxUtilV2.DropboxUtilV2_DropboxFile pic : picLst) {
+                    ExecutorService executor = Executors.newFixedThreadPool(5);
+                    List<Callable<File>> downloadTaskLst = new ArrayList<>();
+
+                    for (final DropboxUtilV2.DropboxUtilV2_DropboxFile pic : picLst) {
                         if (!pic.getName().matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")) {
                             continue;
                         }
 
                         tmpPath = pic.getFullPath();
 
-                        File targetPicFile = new File(dirFile, pic.getName());
+                        final File targetPicFile = new File(dirFile, pic.getName());
                         downloadLst.add(targetPicFile);
 
                         if (targetPicFile.exists() && targetPicFile.canRead() && targetPicFile.length() > 0) {
                             continue;
                         }
 
-                        FileOutputStream outputStream = new FileOutputStream(targetPicFile);
-                        DropboxUtilV2.download(pic.getFullPath(), outputStream, client);
-                        Log.v(TAG, "下載ref pic : " + targetPicFile);
+                        downloadTaskLst.add(new Callable<File>() {
+                            @Override
+                            public File call() throws Exception {
+                                FileOutputStream outputStream = new FileOutputStream(targetPicFile);
+                                DropboxUtilV2.download(pic.getFullPath(), outputStream, client);
+                                Log.v(TAG, "下載ref pic : " + targetPicFile);
+                                return targetPicFile;
+                            }
+                        });
                     }
 
-                    for (File f : downloadLst) {
+                    List<Future<File>> rtnLst = null;
+                    if (timeout != -1) {
+                        rtnLst = executor.invokeAll(downloadTaskLst, timeout, TimeUnit.MILLISECONDS);
+                    } else {
+                        rtnLst = executor.invokeAll(downloadTaskLst);
+                    }
+
+                    for (Future<File> fu : rtnLst) {
+                        File f = fu.get();
                         Log.v(TAG, "####### 圖片 : " + (f.exists() && f.canRead()) + " -> " + f + " -> " + FileUtilGtu.getSizeDescription(f.length()));
                     }
                     return dirFile;

@@ -120,13 +120,9 @@ public class OOMHandler {
         int newHeight = (int) (scaleWidth * height);
 
         Bitmap bitmap = null;
-        try {
-            Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
-            if (bm != null) {
-                bm.recycle();
-            }
-        } catch (Throwable ex) {
-            Log.e(TAG, "fixPicScaleFixScreenWidth ERR : " + ex.getMessage(), ex);
+        bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
+        if (bm != null) {
+            bm.recycle();
         }
         return bitmap;
     }

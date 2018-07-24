@@ -4,6 +4,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.reflections.Reflections;
 import org.reflections.Store;
@@ -15,6 +20,39 @@ import com.google.common.collect.Multimap;
 public class PackageReflectionUtil {
 
     private static final Logger log = LoggerFactory.getLogger(PackageReflectionUtil.class);
+
+    public static Set<String> getSubClassPaths(Reflections reflections) {
+        Set<String> lst = new LinkedHashSet<>();
+        Set<Class<? extends Object>> respositories = reflections.getSubTypesOf(java.lang.Object.class);
+        for (Object v : respositories) {
+            // System.out.println("--" + v);
+        }
+        Store store = reflections.getStore();
+        // System.out.println(FieldUtils.readDeclaredField(store, "storeMap",
+        // true));
+        Set<String> set = store.keySet();
+        for (String v : set) {
+            // System.out.println("--" + v);
+            Multimap<String, String> map = store.get(v);
+            // System.out.println("size = " + map.size());
+            for (String k1 : map.keys()) {
+                Collection<String> values = map.get(k1);
+                // System.out.println(values);
+                lst.addAll(values);
+            }
+        }
+        return lst;
+    }
+
+    public static Set<Class<?>> getSubClasses(Reflections reflections)  {
+        return getSubClassPaths(reflections).stream().map(str -> {
+            try {
+                return Class.forName(str);
+            } catch (Exception ex) {
+                throw new RuntimeException("getSubClasses ERR : " + ex.getMessage(), ex);
+            }
+        }).collect(Collectors.toCollection(HashSet::new));
+    }
 
     public static <T> Class<T> getClassGenericClz(Class<T> clz, int genericIndex) {
         ParameterizedType type = (ParameterizedType) clz.getGenericInterfaces()[0];

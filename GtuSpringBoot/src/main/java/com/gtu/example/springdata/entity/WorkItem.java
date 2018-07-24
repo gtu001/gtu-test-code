@@ -4,17 +4,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "work_item")
 public class WorkItem {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name = "employee_id")
-    private String employeeId;
-
+    @Column(name = "work_job_id")
+    private String workJobId;
+    
     private String workName;
 
     private String description;
@@ -24,7 +26,7 @@ public class WorkItem {
         this.description = description;
     }
 
-    private WorkItem() {
+    public WorkItem() {
     }
 
     public Long getId() {
@@ -33,14 +35,6 @@ public class WorkItem {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
     }
 
     public String getWorkName() {
@@ -57,5 +51,13 @@ public class WorkItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getWorkJobId() {
+        return workJobId;
+    }
+
+    public void setWorkJobId(String workJobId) {
+        this.workJobId = workJobId;
     }
 }
