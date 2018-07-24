@@ -19,3 +19,23 @@ findBy[first|Top][Distinct]<Entity>By[And|Or]<columns...>[OrderBy]<columns...>[A
 放置參數可用如下
 org.springframework.data.domain.Pageable 
 org.springframework.data.domain.Sort
+
+
+
+---------------------------------------------------------------------------------------
+
+
+    // Employee, firstName 要跟java一模一樣大寫小
+    @Query(value = "select t from Employee t where t.firstName = :param1 ")
+    public List<Employee> findByCustomQuery(@Param("param1") String param1);
+    
+    @Query(value = "select t from Employee t where t.firstName = ?1 ")
+     public List<Employee> findByCustomQuery(String param1);
+    
+    // native 要用 *
+    @Query(value = "select * from Employee t where t.firstName = :param1 ", nativeQuery = true) 
+    public List<Employee> findByCustomQuery(String param1);
+    
+    
+---------------------------------------------------------------------------------------
+    

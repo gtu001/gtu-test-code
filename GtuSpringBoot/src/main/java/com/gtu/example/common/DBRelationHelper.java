@@ -1,18 +1,22 @@
 package com.gtu.example.common;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.ClassUtils;
 
 import com.gtu.example.springdata.entity.GtuDBRelation;
 
@@ -59,11 +63,25 @@ public class DBRelationHelper {
 
                     Map<Class<Object>, Class[]> map = getAllRepostiriesMap();
 
-                    Optional opt = map.values().stream().map(cs -> cs[0]).filter(c -> c.getName().contains(dbQuery.repository())).findAny();
+                    Optional opt = map.values().stream().map(cs -> cs[0]).filter(c -> {
+                        if (c.getSimpleName().equals(dbQuery.repository())) {
+                            log.info("find repository = {}", c);
+                            return true;
+                        }
+                        return false;
+                    }).findAny();
+
                     if (opt.isPresent()) {
                         Object respositoryUncheck = ctx.getBean((Class) opt.get());
 
-                        Object valueUncheck = MethodUtils.invokeMethod(respositoryUncheck, repositoryMethod, dependencyValue);
+                        Class<?> paramClz = __getMethodInvokeParameterClz(respositoryUncheck, repositoryMethod);
+
+                        if (ClassUtils.isPrimitiveOrWrapper(paramClz) || paramClz == String.class) {
+                            dependencyValue = ConvertUtils.convert(dependencyValue, paramClz);
+                        }
+
+                        Object valueUncheck = valueUncheck = MethodUtils.invokeMethod(respositoryUncheck, repositoryMethod, dependencyValue);
+
                         Object realValue = null;
 
                         if (valueUncheck instanceof Optional) {
@@ -80,6 +98,20 @@ public class DBRelationHelper {
                 log.error("write dependency ERR : " + ex.getMessage(), ex);
             }
         }
+    }
+
+    private Class<?> __getMethodInvokeParameterClz(Object respositoryUncheck, final String repositoryMethod) {
+        log.info("find method = {}", repositoryMethod);
+        Optional<Method> opt = Stream.of(respositoryUncheck.getClass().getDeclaredMethods()).filter(m -> {
+            if (m.getName().equals(repositoryMethod)) {
+                return true;
+            }
+            return false;
+        }).findAny();
+        if (opt.isPresent()) {
+            return opt.get().getParameterTypes()[0];
+        }
+        throw new RuntimeException("找不到對應method : " + respositoryUncheck.getClass().getName() + "." + repositoryMethod);
     }
 
 }

@@ -193,7 +193,16 @@ public class SpringDataDBMainController {
                 define.entity.getClass().getDeclaredField(key);
                 FieldUtils.writeDeclaredField(define.entity, key, value, true);
             } catch (Exception ex) {
-                log.error("operateDBAction ERR : " + key + " -> " + ex.getCause());
+                if (define.entity.getClass().getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                    Class<?> parentClz = define.entity.getClass().getSuperclass();
+                    try {
+                        FieldUtils.getDeclaredField(parentClz, key, true).set(define.entity, value);
+                    } catch (Exception ex2) {
+                        log.error("operateDBAction ERR : " + key + " -> " + ex2.getCause());
+                    }
+                } else {
+                    log.error("operateDBAction ERR : " + key + " -> " + ex.getCause());
+                }
             }
         }
 
