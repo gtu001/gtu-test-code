@@ -3,6 +3,7 @@ package com.gtu.example.common;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -19,6 +26,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang.reflect.MethodUtils;
+import org.hibernate.collection.internal.PersistentBag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -41,9 +50,11 @@ public class JqGridHandler {
         String entityId;
         List<String> entityIds = new ArrayList<String>();
         Class<?> pkClz;
+        boolean ignoreComplex;
 
-        public SimpleJdGridCreater(Class<T> clz) {
+        public SimpleJdGridCreater(Class<T> clz, boolean ignoreComplex) {
             this.clz = clz;
+            this.ignoreComplex = ignoreComplex;
         }
 
         private void handlePrimaryColumns(String entityId, Class<?> clz, List<Field> pksLst) {
@@ -74,8 +85,27 @@ public class JqGridHandler {
             return lst.stream().filter(c -> c.getIndex().equals(fieldName)).collect(Collectors.counting()) > 0;
         }
 
+        public static boolean isRelationField(Field f) {
+            if (f.isAnnotationPresent(ManyToMany.class) || //
+                    f.isAnnotationPresent(OneToMany.class) || //
+                    f.isAnnotationPresent(ManyToOne.class) || //
+                    f.isAnnotationPresent(OneToOne.class) //
+            ) {
+                return true;
+            }
+            return false;
+        }
+
         private void handleColumn(Class<?> clz, List<ColModel> lst) {
             for (Field f : clz.getDeclaredFields()) {
+
+                // 是否忽略複雜欄位
+                if (ignoreComplex) {
+                    if (isRelationField(f)) {
+                        continue;
+                    }
+                }
+
                 ColModel col = new ColModel(f.getName(), f.getName());
                 col.setEditable(true);
                 if (__isColumnExists(f.getName(), lst)) {
@@ -123,6 +153,27 @@ public class JqGridHandler {
             List<JqRow<Entity>> rows = new ArrayList<>();
             for (int ii = 0; ii < lst.size(); ii++) {
                 Entity t = lst.get(ii);
+                JqRow<Entity> row = new JqRow<Entity>(t, columnOrdery, primaryKeyColumn, primaryKeyDelimitChar);
+                rows.add(row);
+            }
+            reader.setRows(rows);
+
+            reader.setTotal(totalCount);
+            reader.setPage(pageNo);
+
+            return reader;
+        }
+
+        public <Entity, SubEntity> JqReader<Entity, SubEntity> getSimpleJqReader(//
+                Collection<Entity> lst, //
+                @Nullable Character primaryKeyDelimitChar, int pageNo, int totalCount) {
+            JqReader<Entity, SubEntity> reader = new JqReader<Entity, SubEntity>();
+
+            String[] columnOrdery = this.colModelLst.stream().map(c -> c.getIndex()).toArray(String[]::new);
+            String[] primaryKeyColumn = entityIds.stream().toArray(String[]::new);
+
+            List<JqRow<Entity>> rows = new ArrayList<>();
+            for (Entity t : lst) {
                 JqRow<Entity> row = new JqRow<Entity>(t, columnOrdery, primaryKeyColumn, primaryKeyDelimitChar);
                 rows.add(row);
             }
@@ -251,6 +302,8 @@ public class JqGridHandler {
                                 .collect(Collectors.toCollection(LinkedHashSet::new));
                         this.fieldNamesOrderedSet.addAll(parentCol);
                     }
+                } else {
+                    this.fieldNamesOrderedSet = Stream.of(fieldNamesOrdered).collect(Collectors.toCollection(LinkedHashSet::new));
                 }
 
                 List<String> pkArry = new ArrayList<>();
@@ -276,9 +329,11 @@ public class JqGridHandler {
                         }
                     } catch (IllegalArgumentException | IllegalAccessException e) {
                         try {
-                            Class<?> parentClz = entity.getClass().getSuperclass();
-                            Field field = FieldUtils.getDeclaredField(parentClz, fname, true);
-                            Object val = field.get(entity);
+                            Class<?> parentClz = getMappedSuperclassFromEntity(entity);
+                            log.info("MappedSuperclass = {}", parentClz);
+                            log.info("entity = {}, {}", entity, entity.getClass().getName());
+
+                            Object val = getFieldFromEntity(parentClz, entity, fname);
                             String valStr = "" + Optional.fromNullable(val).or("");
                             this.cell.add(valStr);
 
@@ -428,6 +483,83 @@ public class JqGridHandler {
 
         public void setSubgrid(SubGrid<D> subgrid) {
             this.subgrid = subgrid;
+        }
+    }
+
+    public static class SubgridHandler {
+
+        private SimpleJdGridCreater handler;
+
+        private String fieldName;
+        private JSONArray colModel;
+        private JSONObject rowReader;
+
+        public SubgridHandler(Object entity, String fieldName, EntityManager entityManager) {
+            this.colModel = new JSONArray();
+            this.rowReader = new JSONObject();
+
+            Field relationField = FieldUtils.getDeclaredField(entity.getClass(), fieldName, true);
+
+            Object relationObject;
+            try {
+                relationObject = relationField.get(entity);
+            } catch (Exception e) {
+                log.error("SubgridHandler <init> ERR : " + e.getMessage(), e);
+                return;
+            }
+
+            Collection relationLst = null;
+
+            if (relationObject != null) {
+
+                int processType = 1;
+
+                // verify
+                if (relationObject instanceof org.hibernate.collection.internal.PersistentBag) {
+                    PersistentBag tmpBag = (PersistentBag) relationObject;
+                    boolean loadOk = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(tmpBag);
+                    if ((loadOk && tmpBag.empty()) || //
+                            !loadOk) {
+                        processType = -1;
+                    }
+                }
+
+                // 一般處理
+                switch (processType) {
+                case 1:
+                    Class<?> fieldOrignClz = relationField.getType();
+                    if (Collection.class.isAssignableFrom(fieldOrignClz)) {
+                        fieldOrignClz = PackageReflectionUtil.getClassGenericClz(fieldOrignClz, 0);
+                        relationLst = (Collection) relationObject;
+                    } else {
+                        relationLst = new ArrayList();
+                        relationLst.add(relationObject);
+                    }
+
+                    log.info("relationObject = {}", relationObject);
+
+                    handler = new SimpleJdGridCreater(fieldOrignClz, true);
+
+                    colModel = handler.getColModel();
+                    rowReader = SimpleJdGridCreater.toJSONArray(handler.getSimpleJqReader(relationLst, null, 1, relationLst.size()));
+                    break;
+                case -1:
+                    log.info("subgrid : {} 物件為空!!", fieldName);
+                    break;
+                }
+            }
+        }
+
+        public JSONArray getColModel() {
+            return colModel;
+        }
+
+        public JSONObject getRowReader() {
+            return rowReader;
+        }
+
+        public String getFieldName() {
+            return fieldName;
         }
     }
 
@@ -600,6 +732,33 @@ public class JqGridHandler {
 
         public void setEdithidden(EditHiddenRule edithidden) {
             this.edithidden = edithidden;
+        }
+    }
+
+    public static Class<?> getMappedSuperclassFromEntity(Object entity) {
+        for (Class<?> superClz = entity.getClass();; superClz = superClz.getSuperclass()) {
+            if (superClz != null && superClz.isAnnotationPresent(MappedSuperclass.class)) {
+                return superClz;
+            } else if (superClz == null) {
+                return null;
+            }
+        }
+    }
+
+    public static Object getFieldFromEntity(Class indicateClz, Object entity, String fieldName) {
+        try {
+            Field field = FieldUtils.getDeclaredField(indicateClz, fieldName, true);
+            return field.get(entity);
+        } catch (Exception ex) {
+            try {
+                return MethodUtils.invokeMethod(entity, "get" + StringUtils.uncapitalise(fieldName), new Object[0]);
+            } catch (Exception ex1) {
+                try {
+                    return MethodUtils.invokeMethod(entity, "is" + StringUtils.uncapitalise(fieldName), new Object[0]);
+                } catch (Exception ex2) {
+                    throw new RuntimeException("無法取得此欄位 : " + fieldName, ex1);
+                }
+            }
         }
     }
 }

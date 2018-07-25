@@ -171,6 +171,39 @@
 				}
 				//alert("gridComplete 查詢完成!\n" + data.length);
 			},
+			subGrid: true,
+		    subGridRowExpanded: function (subgridDivId, rowId) {
+		        var subgridTableId = subgridDivId + "_t";
+		        $("#" + subgridDivId).html("<table id='" + subgridTableId + "'></table>");
+		        //alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
+		        
+		        var formData = getForm();
+		        formData = $.extend(formData, {rowId : rowId});
+				$.post("/springdata-dbMain/query_relation", formData, //
+				function(data) {//
+					var dataStr = JSON.stringify(data);
+					alert(dataStr);
+				}, "json")//
+				.fail(jqueryTool.ajaxFailFunc);
+		        
+		        /*
+		        $("#" + subgridTableId).jqGrid({
+		            datatype: 'local',
+		            data: mySubgrids[rowId],
+		            colNames: ['Col 1', 'Col 2', 'Col 3'],
+		            colModel: [
+		                { name: 'c1', width: 100 },
+		                { name: 'c2', width: 100 },
+		                { name: 'c3', width: 100 }
+		            ],
+		        });
+		        */
+		    },
+		    subGridRowColapsed: function (subgridDivId, rowId) {
+		        var subgridTableId = subgridDivId + "_t";
+		        $("#" + subgridDivId).html("<table id='" + subgridTableId + "'></table>");
+		        alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
+		    },
 		});
 
 		$("#jqGrid").navGrid('#jqGridPager', // the buttons to appear on the toolbar of the grid
@@ -261,6 +294,17 @@
 				return 'Error: ' + data.responseText
 			}
 		});
+	}
+	
+	function subgridGenerate(gridId, caption, colNames, colModel){
+		$("#" + gridId).jqGrid('GridUnload');//remove
+		$("#" + gridId).jqGrid({
+            datatype: 'local',
+            caption : caption,
+            data: {},
+            colNames: colNames,
+            colModel: colModel,
+        });
 	}
 
 	function queryBtnBind() {

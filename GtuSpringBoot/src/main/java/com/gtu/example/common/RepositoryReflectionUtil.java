@@ -1,24 +1,51 @@
 package com.gtu.example.common;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.util.ClassUtils;
 
 import com.gtu.example.controller.SpringDataDBMainController;
 
 public class RepositoryReflectionUtil {
 
     private static final Logger log = LoggerFactory.getLogger(SpringDataDBMainController.class);
+
+    public static Object findById(Class<? extends CrudRepository> repositoryClz, CrudRepository repository, Object value) {
+        Class<?> paramClz = PackageReflectionUtil.getClassGenericClz(repositoryClz, 1);
+        Method findById = null;
+        for (Method m : repositoryClz.getMethods()) {
+            if (m.getName().equals("findById")) {
+                findById = m;
+                break;
+            }
+        }
+
+        if (ClassUtils.isPrimitiveOrWrapper(paramClz)) {
+            value = ConvertUtils.convert(value, paramClz);
+        } else if (paramClz == String.class) {
+            value = value == null ? null : String.valueOf(value);
+        } else {
+            log.warn("尚無支援 : " + paramClz);
+        }
+
+        try {
+            return ((Optional) findById.invoke(repository, value)).orElse(null);
+        } catch (Exception e) {
+            throw new RuntimeException("findById ERR : " + e.getMessage(), e);
+        }
+    }
 
     public static <Entity> Map<Class<Entity>, Class[]> getRepositoryEntityMap(String daoPackagePath) {
         Reflections reflections = new Reflections(daoPackagePath);

@@ -44,7 +44,7 @@ public class PackageReflectionUtil {
         return lst;
     }
 
-    public static Set<Class<?>> getSubClasses(Reflections reflections)  {
+    public static Set<Class<?>> getSubClasses(Reflections reflections) {
         return getSubClassPaths(reflections).stream().map(str -> {
             try {
                 return Class.forName(str);
