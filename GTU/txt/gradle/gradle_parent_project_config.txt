@@ -1,0 +1,70 @@
+settings.gradle 設定如下 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+// 按目錄結構
+include ':Taida_Model'
+include ':services/Accounting'  
+include ':bluewhale'
+
+
+
+--------------------------------------------------------------------------------
+build.gradle 設定如下 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+
+
+
+
+//指定所有project行為
+allprojects {
+    task hello {
+        doLast { task ->
+            println "Hi, I'm $task.project.name"
+        }
+    }
+}
+
+//指定root以外一律會做的行為
+subprojects {
+    hello {
+        doLast {
+            println "\t subprojects - hello.doLast"
+        }
+        
+        //可在底下project build.gradle 加入 ext.arctic = true|false 做控制
+        afterEvaluate { Project project ->
+            // project.hasProperty("arctic") = project.ext.has("arctic") 相同
+            if (project.hasProperty("arctic") && project.arctic) { 
+                doLast { 
+                        println '- I love to spend time in the arctic waters.' 
+                }
+            }
+        }
+    }
+}
+
+//指定某project行為
+project(':bluewhale').hello {
+    doLast {
+        println "\t project(bluewhale).doLast"
+    }
+}
+
+//指定行為, 加入條件式 projectName != tropicalFish 
+configure(subprojects.findAll {it.name != 'tropicalFish'}) {
+    hello {
+        doLast {
+            println '\t I love to spend time in the arctic waters.'
+        }
+    }
+}
+
+
+/*
+====> 可在底下的project 的 build.gradle 加入以下測試有沒有被呼叫
+hello.doLast {
+	println "- XXXXXXXXXXXXXXXXXX."
+}
+
+====> for afterEvaluate 那段
+ext.arctic = true|false
+*/

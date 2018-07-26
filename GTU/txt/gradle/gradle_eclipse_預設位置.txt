@@ -1,0 +1,3 @@
+eclipse 的 gradle 預設位置
+
+C:\Users\<user name>\.gradle 

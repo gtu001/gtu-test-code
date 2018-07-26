@@ -185,12 +185,16 @@
 					console.log(dataStr);
 					
 					var getLocalMapLst = function(data){
-						var rtnArry = new Array();
-						var arry = data['rowReader']['rows'];
-						for(var i in arry){
-							rtnArry.push(arry[i]['loaclMap']);
+						try{
+							var rtnArry = new Array();
+							var arry = data['rowReader']['rows'];
+							for(var i in arry){
+								rtnArry.push(arry[i]['loaclMap']);
+							}
+							return rtnArry;
+						}catch(e){
+							return [];
 						}
-						return rtnArry;
 					}
 					
 					var subgridArry = data['subgrid'];

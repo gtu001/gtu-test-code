@@ -53,7 +53,7 @@ public class Application {
                 String beanPrefix = "";
                 if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {
                     beanPrefix = "<GTU>";       
-                }  
+                }   
  
                 log.info("\t {} bean : {}", beanPrefix, beanName);   
             }   
