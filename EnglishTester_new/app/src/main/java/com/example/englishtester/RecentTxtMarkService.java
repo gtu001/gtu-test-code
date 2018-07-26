@@ -107,6 +107,10 @@ public class RecentTxtMarkService {
      * 刪除舊資料
      */
     public void deleteOldData() {
+        if (true) {
+            return;
+        }
+
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -30);
         for (int ii = 0; ii < 10; ii++)
