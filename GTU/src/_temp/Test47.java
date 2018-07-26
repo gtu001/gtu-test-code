@@ -30,6 +30,12 @@ public class Test47 {
 
             String name = StringUtilForDb.dbFieldToJava(line);
 
+            if (lst.size() == 0) {
+                System.out.println("@Id \n@GeneratedValue \n private Long " + name + ";");
+                lst.add(name);
+                continue;
+            }
+
             lst.add(name);
 
             System.out.println("private String " + name + ";");

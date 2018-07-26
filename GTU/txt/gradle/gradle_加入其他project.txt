@@ -1,0 +1,23 @@
+project 加入其他 project 作法
+
+--> taida_model 被關聯的 project
+
+----------------------------------------------------------------------
+
+project 設定如下
+
+↓↓↓↓↓↓ settings.gradle  ↓↓↓↓↓↓  (PS : 若不work, 改在 parent 的 settings.gradle 設定)
+
+include ":taida_model"
+project(":taida_model").projectDir = file("../../Taida_Model")
+
+
+↓↓↓↓↓↓ build.gradle  ↓↓↓↓↓↓
+
+dependencies {
+    compile project(":taida_model")
+}
+
+
+
+----------------------------------------------------------------------

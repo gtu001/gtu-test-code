@@ -171,6 +171,50 @@
 				}
 				//alert("gridComplete 查詢完成!\n" + data.length);
 			},
+			subGrid: true,
+		    subGridRowExpanded: function (subgridDivId, rowId) {
+		        var subgridTableId = subgridDivId + "_div";
+		        $("#" + subgridDivId).html("<div id="+subgridTableId+">");
+		        //alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
+		        
+		        var formData = getForm();
+		        formData = $.extend(formData, {rowId : rowId});
+				$.post("/springdata-dbMain/query_relation", formData, //
+				function(data) {//
+					var dataStr = JSON.stringify(data);
+					console.log(dataStr);
+					
+					var getLocalMapLst = function(data){
+						try{
+							var rtnArry = new Array();
+							var arry = data['rowReader']['rows'];
+							for(var i in arry){
+								rtnArry.push(arry[i]['loaclMap']);
+							}
+							return rtnArry;
+						}catch(e){
+							return [];
+						}
+					}
+					
+					var subgridArry = data['subgrid'];
+					for(var ii = 0 ; ii < subgridArry.length ; ii ++){
+						var d = subgridArry[ii];
+						
+						var caption = d['fieldName'];
+						var colNames = d['colModel'];
+						var colModel = d['colModel'];
+						var data = getLocalMapLst(d);
+						
+						//建立關聯表
+						subgridGenerate(subgridTableId, ii, caption, colNames, colModel, data);
+					}
+					
+				}, "json")//
+				.fail(jqueryTool.ajaxFailFunc);
+		    },
+		    subGridRowColapsed: function (subgridDivId, rowId) {
+		    },
 		});
 
 		$("#jqGrid").navGrid('#jqGridPager', // the buttons to appear on the toolbar of the grid
@@ -261,6 +305,20 @@
 				return 'Error: ' + data.responseText
 			}
 		});
+	}
+	
+	function subgridGenerate(appendDivId, index, caption, colNames, colModel, data){
+		var subgridTableId = appendDivId + "_tab_" + index;
+		$("#" + appendDivId).append($("<table id="+ subgridTableId +" />"))
+	
+		$("#" + subgridTableId).jqGrid('GridUnload');//remove
+		$("#" + subgridTableId).jqGrid({
+            datatype: 'local',
+            caption : caption,
+            data: data,
+            //colNames: colNames,
+            colModel: colModel,
+        });
 	}
 
 	function queryBtnBind() {

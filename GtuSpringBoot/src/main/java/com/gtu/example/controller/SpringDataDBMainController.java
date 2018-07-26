@@ -11,10 +11,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityManager;
 import javax.persistence.MappedSuperclass;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.reflect.FieldUtils;
@@ -22,6 +24,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +40,7 @@ import com.gtu.example.common.JSONUtil;
 import com.gtu.example.common.JqGridHandler.EntityPrimaryKeySetter;
 import com.gtu.example.common.JqGridHandler.JqReader;
 import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
+import com.gtu.example.common.JqGridHandler.SubgridHandler;
 import com.gtu.example.common.PackageReflectionUtil;
 import com.gtu.example.common.RepositoryReflectionUtil;
 
@@ -51,6 +55,9 @@ public class SpringDataDBMainController {
 
     @Autowired
     private ConfigurableApplicationContext ctx;
+    @Autowired
+    @Qualifier("serversEntityManager")
+    private EntityManager entityManager;
 
     @GetMapping(value = "/hello")
     public String hello() {
@@ -133,14 +140,15 @@ public class SpringDataDBMainController {
             log.info("# queryDBAction start ..");
             OperateDefine define = this.getOperateDefine(request);
 
-            SimpleJdGridCreater handler = new SimpleJdGridCreater(define.entityClz);
+            SimpleJdGridCreater handler = new SimpleJdGridCreater(define.entityClz, false);
             if ("colModel".equals(type)) {
                 return handler.getColModel().toString();
             } else {
                 List<?> lst = (List<?>) define.repository.findAll();
                 log.info("size = {}", lst.size());
 
-                JqReader reader = handler.getSimpleJqReader(lst, null, new String[] { define.entityId }, null, 1, lst.size());
+                handler.getColModel();
+                JqReader reader = handler.getSimpleJqReader(lst, null, 1, lst.size());
                 return handler.toJSONArray(reader).toString();
             }
         } catch (Exception ex) {
@@ -256,4 +264,35 @@ public class SpringDataDBMainController {
             return JSONUtil.getThrowableRoot(ex).toString();
         }
     }
+
+    @PostMapping(value = "/query_relation")
+    public String queryRelation(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String rowId = request.getParameter("rowId");
+            String[] pks = null;
+            if (StringUtils.isNotBlank(rowId)) {
+                pks = rowId.split("^", -1);
+            }
+
+            OperateDefine define = this.getOperateDefine(request);
+            Object entity = RepositoryReflectionUtil.findById(define.repositoryClz, define.repository, pks[0]);
+
+            JSONObject json = JSONUtil.getSuccess(null);
+            JSONArray arry = new JSONArray();
+
+            for (Field f : entity.getClass().getDeclaredFields()) {
+                if (SimpleJdGridCreater.isRelationField(f)) {
+                    SubgridHandler subgrid = new SubgridHandler(entity, f.getName(), entityManager);
+                    arry.add(subgrid);
+                }
+            }
+            json.put("subgrid", arry);
+            return json.toString();
+        } catch (Exception ex) {
+            log.error("operateDBAction ERR : " + ex.getMessage(), ex);
+            // return JSONUtil.getThrowable(ex).toString();
+            return JSONUtil.getThrowableRoot(ex).toString();
+        }
+    }
+
 }
