@@ -173,8 +173,8 @@
 			},
 			subGrid: true,
 		    subGridRowExpanded: function (subgridDivId, rowId) {
-		        var subgridTableId = subgridDivId + "_t";
-		        $("#" + subgridDivId).html("<table id='" + subgridTableId + "'></table>");
+		        var subgridTableId = subgridDivId + "_div";
+		        $("#" + subgridDivId).html("<div id="+subgridTableId+">");
 		        //alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
 		        
 		        var formData = getForm();
@@ -182,27 +182,34 @@
 				$.post("/springdata-dbMain/query_relation", formData, //
 				function(data) {//
 					var dataStr = JSON.stringify(data);
-					alert(dataStr);
+					console.log(dataStr);
+					
+					var getLocalMapLst = function(data){
+						var rtnArry = new Array();
+						var arry = data['rowReader']['rows'];
+						for(var i in arry){
+							rtnArry.push(arry[i]['loaclMap']);
+						}
+						return rtnArry;
+					}
+					
+					var subgridArry = data['subgrid'];
+					for(var ii = 0 ; ii < subgridArry.length ; ii ++){
+						var d = subgridArry[ii];
+						
+						var caption = d['fieldName'];
+						var colNames = d['colModel'];
+						var colModel = d['colModel'];
+						var data = getLocalMapLst(d);
+						
+						//建立關聯表
+						subgridGenerate(subgridTableId, ii, caption, colNames, colModel, data);
+					}
+					
 				}, "json")//
 				.fail(jqueryTool.ajaxFailFunc);
-		        
-		        /*
-		        $("#" + subgridTableId).jqGrid({
-		            datatype: 'local',
-		            data: mySubgrids[rowId],
-		            colNames: ['Col 1', 'Col 2', 'Col 3'],
-		            colModel: [
-		                { name: 'c1', width: 100 },
-		                { name: 'c2', width: 100 },
-		                { name: 'c3', width: 100 }
-		            ],
-		        });
-		        */
 		    },
 		    subGridRowColapsed: function (subgridDivId, rowId) {
-		        var subgridTableId = subgridDivId + "_t";
-		        $("#" + subgridDivId).html("<table id='" + subgridTableId + "'></table>");
-		        alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
 		    },
 		});
 
@@ -296,13 +303,16 @@
 		});
 	}
 	
-	function subgridGenerate(gridId, caption, colNames, colModel){
-		$("#" + gridId).jqGrid('GridUnload');//remove
-		$("#" + gridId).jqGrid({
+	function subgridGenerate(appendDivId, index, caption, colNames, colModel, data){
+		var subgridTableId = appendDivId + "_tab_" + index;
+		$("#" + appendDivId).append($("<table id="+ subgridTableId +" />"))
+	
+		$("#" + subgridTableId).jqGrid('GridUnload');//remove
+		$("#" + subgridTableId).jqGrid({
             datatype: 'local',
             caption : caption,
-            data: {},
-            colNames: colNames,
+            data: data,
+            //colNames: colNames,
             colModel: colModel,
         });
 	}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -36,6 +36,7 @@ import org.springframework.util.ClassUtils;
 import com.google.common.base.Optional;
 import com.gtu.example.common.JqGridHandler.JqReader.JqRow;
 
+import net.minidev.json.annotate.JsonIgnore;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -280,16 +281,30 @@ public class JqGridHandler {
         private String cell;
         private String id;
         private String userdata;
-        private SubGrid<D> subgrid;
+        private SubGrid subgrid;
 
         public static class JqRow<Entity> {
             String id;
             List<String> cell;
             @Transient
+            @JsonIgnore
             Set<String> fieldNamesOrderedSet;
+            Map<String, Object> loaclMap;
+            
+            private void _setValue(String fieldName, Object value, String[] pkColumns, List<String> pkArry){
+                String valStr = "" + Optional.fromNullable(value).or("");
+                this.cell.add(valStr);
+                this.loaclMap.put(fieldName, valStr);
+                if (pkColumns != null) {
+                    if (ArrayUtils.contains(pkColumns, fieldName)) {
+                        pkArry.add(valStr);
+                    }
+                }
+            }
 
             public JqRow(Entity entity, @Nullable String[] fieldNamesOrdered, @Nullable String[] pkColumns, @Nullable Character primaryKeyDelimitChar) {
                 this.cell = new ArrayList<>();
+                this.loaclMap = new LinkedHashMap<String,Object>();
 
                 if (fieldNamesOrdered == null) {
                     this.fieldNamesOrderedSet = Stream.of(entity.getClass().getDeclaredFields())//
@@ -311,20 +326,14 @@ public class JqGridHandler {
                 for (String fname : fieldNamesOrderedSet) {
                     try {
                         Object val = FieldUtils.readDeclaredField(entity, fname, true);
-                        String valStr = "" + Optional.fromNullable(val).or("");
-                        this.cell.add(valStr);
+                        this._setValue(fname, val, pkColumns, pkArry);
 
-                        if (pkColumns != null) {
-                            if (ArrayUtils.contains(pkColumns, fname)) {
-                                pkArry.add(valStr);
-                            }
-                        }
                     } catch (org.hibernate.exception.SQLGrammarException e) {
                         if (e.getMessage().contains("could not extract ResultSet")) {
-                            this.cell.add("<ResultSet Error>");
+                            this._setValue(fname, "<ResultSet Error>", null, null);
                             log.error("JqRow <init> : " + fname + " -> " + e.getMessage());
                         } else {
-                            this.cell.add("<Error>");
+                            this._setValue(fname, "<Error>", null, null);
                             log.error("JqRow <init> : " + fname + " -> " + e.getMessage(), e);
                         }
                     } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -334,14 +343,7 @@ public class JqGridHandler {
                             log.info("entity = {}, {}", entity, entity.getClass().getName());
 
                             Object val = getFieldFromEntity(parentClz, entity, fname);
-                            String valStr = "" + Optional.fromNullable(val).or("");
-                            this.cell.add(valStr);
-
-                            if (pkColumns != null) {
-                                if (ArrayUtils.contains(pkColumns, fname)) {
-                                    pkArry.add(valStr);
-                                }
-                            }
+                            this._setValue(fname, val, pkColumns, pkArry);
                         } catch (Exception e2) {
                             this.cell.add("<Error>");
                             log.error("JqRow <init> : " + fname + " -> " + e2.getMessage(), e2);
@@ -381,20 +383,23 @@ public class JqGridHandler {
             public void setFieldNamesOrderedSet(Set<String> fieldNamesOrderedSet) {
                 this.fieldNamesOrderedSet = fieldNamesOrderedSet;
             }
+
+            public Map<String, Object> getLoaclMap() {
+                return loaclMap;
+            }
+
+            public void setLoaclMap(Map<String, Object> loaclMap) {
+                this.loaclMap = loaclMap;
+            }
         }
 
-        public static class SubGrid<D> {
-            private List<D> rows;
+        public static class SubGrid {
+            private String root = "rows";
+            private String row = "row";
             private boolean repeatitems = true;
             private String cell;
 
-            public List<D> getRows() {
-                return rows;
-            }
-
-            public void setRows(List<D> rows) {
-                this.rows = rows;
-            }
+            // {root: "rows", row: "row", repeatitems: true, cell: "cell"}
 
             public boolean isRepeatitems() {
                 return repeatitems;
@@ -406,6 +411,22 @@ public class JqGridHandler {
 
             public String getCell() {
                 return cell;
+            }
+
+            public String getRoot() {
+                return root;
+            }
+
+            public void setRoot(String root) {
+                this.root = root;
+            }
+
+            public String getRow() {
+                return row;
+            }
+
+            public void setRow(String row) {
+                this.row = row;
             }
 
             public void setCell(String cell) {
@@ -477,11 +498,11 @@ public class JqGridHandler {
             this.userdata = userdata;
         }
 
-        public SubGrid<D> getSubgrid() {
+        public SubGrid getSubgrid() {
             return subgrid;
         }
 
-        public void setSubgrid(SubGrid<D> subgrid) {
+        public void setSubgrid(SubGrid subgrid) {
             this.subgrid = subgrid;
         }
     }
@@ -494,7 +515,10 @@ public class JqGridHandler {
         private JSONArray colModel;
         private JSONObject rowReader;
 
+        private JSONArray loaclLst;
+
         public SubgridHandler(Object entity, String fieldName, EntityManager entityManager) {
+            this.fieldName = fieldName;
             this.colModel = new JSONArray();
             this.rowReader = new JSONObject();
 
@@ -750,15 +774,16 @@ public class JqGridHandler {
             Field field = FieldUtils.getDeclaredField(indicateClz, fieldName, true);
             return field.get(entity);
         } catch (Exception ex) {
-            try {
-                return MethodUtils.invokeMethod(entity, "get" + StringUtils.uncapitalise(fieldName), new Object[0]);
-            } catch (Exception ex1) {
+            String tmpFieldName = StringUtils.capitalize(fieldName);
+            String[] invokeMethodNames = new String[] { "get" + tmpFieldName, "is" + tmpFieldName };
+            for (String fname : invokeMethodNames) {
                 try {
-                    return MethodUtils.invokeMethod(entity, "is" + StringUtils.uncapitalise(fieldName), new Object[0]);
-                } catch (Exception ex2) {
-                    throw new RuntimeException("無法取得此欄位 : " + fieldName, ex1);
+                    return MethodUtils.invokeMethod(entity, fname, new Object[0]);
+                } catch (Exception ex1) {
+                    log.info("找不到method : {} - {}", fname, ex1.getMessage());
                 }
             }
+            throw new RuntimeException("無法取得此欄位 : " + fieldName, ex);
         }
     }
 }
