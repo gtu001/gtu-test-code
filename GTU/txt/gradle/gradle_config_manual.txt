@@ -1,0 +1,16 @@
+
+
+設定 src 目錄
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java' //可設多組
+            srcDir 'src1/main/java' //可設多組
+            srcDir 'src2/main/java' //可設多組
+        }
+    }
+}
+
+
+---------------------------------------------------------------------------------------

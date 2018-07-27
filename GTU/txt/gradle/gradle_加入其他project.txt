@@ -6,7 +6,8 @@ project 加入其他 project 作法
 
 project 設定如下
 
-↓↓↓↓↓↓ settings.gradle  ↓↓↓↓↓↓  (PS : 若不work, 改在 parent 的 settings.gradle 設定)
+↓↓↓↓↓↓ settings.gradle  ↓↓↓↓↓↓  (PS1 : 若不work, 改在 parent 的 settings.gradle 設定)
+								(PS2 :         測試過後 兩邊的 settings.gradle 都要加設定)
 
 include ":taida_model"
 project(":taida_model").projectDir = file("../../Taida_Model")

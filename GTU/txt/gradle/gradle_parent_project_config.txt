@@ -1,8 +1,8 @@
 settings.gradle 設定如下 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
 // 按目錄結構
-include ':Taida_Model'
-include ':services/Accounting'  
+include ':Taida_Model'			 //目錄結構為    root_project/Taida_Model
+include ':services:Accounting'   //目錄結構為    root_project/services/Accounting
 include ':bluewhale'
 
 
