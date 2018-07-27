@@ -1122,9 +1122,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
             } else {
                 //debug ↓↓↓↓↓↓↓↓
+                int totalCount = recentTxtMarkService.countAll();
+                String totalMessage = " 總筆數 : " + totalCount;
+
                 List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
                 if (qList.isEmpty()) {
-                    Toast.makeText(this, "ERR mark size EMPTY !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "ERR mark size EMPTY !!" + totalMessage, Toast.LENGTH_SHORT).show();
                 } else {
                     int bookmarkCount = 0;
                     int searchCount = 0;
@@ -1135,7 +1138,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             searchCount++;
                         }
                     }
-                    Toast.makeText(this, "ERR 書簽 : " + bookmarkCount + "/ 查詢 : " + searchCount + " , all : " + qList.size(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "ERR 書簽 : " + bookmarkCount + "/ 查詢 : " + searchCount + " , all : " + qList.size() + totalMessage, Toast.LENGTH_SHORT).show();
                 }
                 //debug ↑↑↑↑↑↑↑↑
             }

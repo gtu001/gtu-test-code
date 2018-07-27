@@ -173,9 +173,9 @@ public class TxtReaderAppender {
                         RecentTxtMarkDAO.RecentTxtMark clickVo = recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, isClickBookmark);
 
                         //debug ↓↓↓↓↓↓↓↓↓↓
-                        if (BuildConfig.DEBUG && isClickBookmark) {
+                        if (BuildConfig.DEBUG) {
                             try {
-                                Toast.makeText(activity, ReflectionToStringBuilder.toString(clickVo), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, ">> " + clickVo.getFileName(), Toast.LENGTH_SHORT).show();
                             } catch (Exception ex) {
                             }
                         }

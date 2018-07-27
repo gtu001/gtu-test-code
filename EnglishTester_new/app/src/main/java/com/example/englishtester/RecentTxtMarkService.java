@@ -151,4 +151,11 @@ public class RecentTxtMarkService {
         vo.setScrollYPos(y);
         return recentTxtMarkDAO.updateByVO(vo) > 0;
     }
+
+    /**
+     * 計算全部筆數
+     */
+    public int countAll() {
+        return recentTxtMarkDAO.countAll();
+    }
 }

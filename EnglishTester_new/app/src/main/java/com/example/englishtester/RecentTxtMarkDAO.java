@@ -1,18 +1,19 @@
 package com.example.englishtester;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.example.englishtester.common.DBUtil;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RecentTxtMarkDAO {
 
@@ -24,6 +25,16 @@ public class RecentTxtMarkDAO {
     public RecentTxtMarkDAO(Context context) {
         this.context = context;
 //        helper = new DBConnection(context);
+    }
+
+    public int countAll() {
+        String sql = String.format("select count(*) as CNT from %s ", RecentTxtMarkSchmea.TABLE_NAME);
+        List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sql, new String[0], context);
+        if (lst.isEmpty()) {
+            return -1;
+        }
+        Integer intVal = (Integer) (lst.get(0).get("CNT"));
+        return intVal;
     }
 
     String[] queryAllWord() {
