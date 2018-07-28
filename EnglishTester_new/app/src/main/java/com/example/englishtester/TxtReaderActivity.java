@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
+import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
@@ -49,8 +51,8 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
-import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.HomeKeyWatcher;
+import com.example.englishtester.common.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
@@ -58,7 +60,6 @@ import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
-import com.example.englishtester.common.HtmlWordParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -67,9 +68,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -406,7 +410,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         final String oldFileName = dto.fileName.toString();
 
         if (dto.fileName.length() > 0) {
-            dto.fileName.delete(0, dto.fileName.length() - 1);
+            dto.fileName.delete(0, dto.fileName.length());
         }
         dto.fileName.append(newName);
         Log.v(TAG, "current fileName : " + dto.fileName);
@@ -1175,6 +1179,39 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         });
     }
 
+    private void debug____dumpFileNameLog() {
+        String name = String.format("tmpFileName%s.txt", DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd"));
+        File fff = new File(Constant.PropertiesFindActivity_PATH + "/" + name);
+        fff = FileConstantAccessUtil.getFile(this, fff);
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(" select count(file_name) as cnt,                ");
+        sb.append("         file_name,                             ");
+        sb.append("         max(insert_date) as max_insert_date    ");
+        sb.append(" from recent_txt_mark                           ");
+        sb.append(" group by file_name                             ");
+        sb.append(" order by max_insert_date desc                  ");
+        List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sb.toString(), new String[0], this);
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fff)));
+            for (Map<String, Object> val : lst) {
+                writer.write(val.toString());
+                writer.newLine();
+            }
+            writer.flush();
+
+            Toast.makeText(this, "Debug : " + fff, Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Log.e(TAG, "debug____dumpFileNameLog ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex) {
+            }
+        }
+    }
+
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
@@ -1229,6 +1266,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.loadHtmlFromUrl();
             }
         }, //
+//        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                activity.debug____dumpFileNameLog();
+//            }
+//        }, //
+//        LOAD_IMAGE_MODE("是否要載入圖片", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                boolean isImageLoadMode = !activity.dto.isImageLoadMode.get();
+//                activity.dto.isImageLoadMode.set(isImageLoadMode);
+//                Toast.makeText(activity, "書籤模式" + (isImageLoadMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
+//            }
+//        }, //
         ;
 
         final String title;
@@ -1316,6 +1365,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
+        private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
         private int currentBookmarkId = -1;
 
@@ -1369,6 +1419,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public String getCurrentHtmlUrl() {
             return currentHtmlUrl;
+        }
+
+        public boolean isImageLoadMode() {
+            return isImageLoadMode.get();
         }
     }
 

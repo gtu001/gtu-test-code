@@ -13,6 +13,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class RecentTxtMarkService {
@@ -107,24 +108,12 @@ public class RecentTxtMarkService {
      * 刪除舊資料
      */
     public void deleteOldData() {
-        if (true) {
-            return;
-        }
-
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -30);
-        for (int ii = 0; ii < 10; ii++)
-            Log.v(TAG, "DELETE : " + DateFormatUtils.format(cal, "yyyy/MM/dd"));
         long daysBefore = cal.getTimeInMillis();
 
-//        int count = recentTxtMarkDAO.deleteByCondition(RecentTxtMarkSchmea.INSERT_DATE + "<?", new String[]{String.valueOf(daysBefore)});
-//        Log.v(TAG, "deleteOldData count " + count);
-
-        for (RecentTxtMark vo : recentTxtMarkDAO.queryAll()) {
-            if (vo.getInsertDate() < daysBefore) {
-                recentTxtMarkDAO.deleteByListId(String.valueOf(vo.getListId()));
-            }
-        }
+        int count = recentTxtMarkDAO.deleteByCondition(RecentTxtMarkSchmea.INSERT_DATE + "<?", new String[]{String.valueOf(daysBefore)});
+        Log.v(TAG, "deleteOldData count " + count);
     }
 
     /**

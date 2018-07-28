@@ -24,7 +24,7 @@ public class OnlinePicLoader {
     }
 
     public Bitmap getNotfound404() {
-        if (NOTFOUND404 == null) {
+        if (NOTFOUND404 == null || NOTFOUND404.isRecycled()) {
             NOTFOUND404 = OOMHandler.new_decode(context, R.drawable.notfound_404);
         }
         return NOTFOUND404;

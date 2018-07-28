@@ -175,7 +175,7 @@ public class TxtReaderAppender {
                         //debug ↓↓↓↓↓↓↓↓↓↓
                         if (BuildConfig.DEBUG) {
                             try {
-                                Toast.makeText(activity, ">> " + clickVo.getFileName(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, ">> " + clickVo.getFileName() + " = " + clickVo.getInsertDate(), Toast.LENGTH_SHORT).show();
                             } catch (Exception ex) {
                             }
                         }
