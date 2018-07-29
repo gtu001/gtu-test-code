@@ -132,7 +132,7 @@ public class TxtReaderAppender {
                     continue;
                 }
 
-                final String txtNow = StringUtils.trimToEmpty(txtContent_.substring(start, end));
+                final String txtNow = mth.group(); //txtContent_.substring(start, end)
                 if (StringUtils.isBlank(txtNow) || StringUtils.equals(txtNow, "-") || StringUtils.length(txtNow) == 1) {
                     continue;
                 }
@@ -175,7 +175,7 @@ public class TxtReaderAppender {
                         //debug ↓↓↓↓↓↓↓↓↓↓
                         if (BuildConfig.DEBUG) {
                             try {
-                                Toast.makeText(activity, ">> " + clickVo.getFileName() + " = " + clickVo.getInsertDate(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(activity, ">> " + clickVo.getFileName() + " = " + clickVo.getInsertDate(), Toast.LENGTH_SHORT).show();
                             } catch (Exception ex) {
                             }
                         }
@@ -206,7 +206,7 @@ public class TxtReaderAppender {
                     }
                 }
 
-                Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + txtNow);
+                Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + StringUtils.substring(txtNow, 0, 10) + "...");
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
             }

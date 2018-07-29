@@ -100,11 +100,13 @@ public class RecentTxtMarkDAO {
         if (StringUtils.isBlank(word.fileName)) {
             throw new RuntimeException("fileName不可為空!");
         }
-        if (word.markIndex == -1) {
-            throw new RuntimeException("markIndex不可為空!");
-        }
-        if (StringUtils.isBlank(word.markEnglish)) {
-            throw new RuntimeException("markEnglish不可為空!");
+        if (word.getBookmarkType() == BookmarkTypeEnum.NONE.getType()) {
+            if (word.markIndex == -1) {
+                throw new RuntimeException("markIndex不可為空!");
+            }
+            if (StringUtils.isBlank(word.markEnglish)) {
+                throw new RuntimeException("markEnglish不可為空!");
+            }
         }
         if (word.insertDate == -1) {
             throw new RuntimeException("insertDate不可為空!");
@@ -274,6 +276,8 @@ public class RecentTxtMarkDAO {
     public enum BookmarkTypeEnum {
         NONE(0),//
         BOOKMARK(1),//
+        SCROLL_Y_POS(2),//
+        SCROLLVIEW_HEIGHT(3),//
         ;
         final int type;
 

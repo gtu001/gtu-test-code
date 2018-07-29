@@ -13,11 +13,9 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -55,6 +53,7 @@ import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
+import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
@@ -62,6 +61,7 @@ import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.google.android.gms.ads.NativeExpressAdView;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -76,6 +76,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -358,11 +360,34 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         }
 
+        //判斷是否有閱讀過的紀錄
+        Transformer<String, String> transformer = new Transformer<String, String>() {
+            @Override
+            public String transform(String fileName) {
+                Pattern ptn = Pattern.compile("(.*)\\.(?:txt|htm|html)");
+                Matcher mth = ptn.matcher(fileName);
+                if (mth.find()) {
+                    fileName = mth.group(1);
+                }
+                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, TxtReaderActivity.this.recentTxtMarkService);
+                int scrollY = scrollYService.getScrollYVO_value();
+                int maxHeight = scrollYService.getMaxHeightYVO_value();
+                if (scrollY == -1 || maxHeight == -1) {
+                    return "";
+                }
+                BigDecimal val = new BigDecimal(scrollY).divide(new BigDecimal(maxHeight), 4, RoundingMode.HALF_UP);
+                val = val.multiply(new BigDecimal(100));
+                val = val.setScale(1, RoundingMode.HALF_UP);
+                return "[已讀:" + String.valueOf(val) + "%]";
+            }
+        };
+
         List<Map<String, Object>> listItem = new ArrayList<>();
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
             Map<String, Object> map = new HashMap<String, Object>();
+            String readMark = transformer.transform(f.getName());
             map.put("ItemTitle", f.getName());
-            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
+            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss") + readMark);
             map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
             listItem.add(map);
         }
@@ -1093,19 +1118,25 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.recentTxtMarkService = recentTxtMarkService;
         }
 
-        private boolean recordY(String fileName, ScrollView scrollView1) {
+        private void recordY(String fileName, ScrollView scrollView1) {
             Log.v(TAG, "[recordY] start ... " + fileName);
             if (StringUtils.isNotBlank(fileName)) {
-                boolean updateResult = recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
-                Log.v(TAG, "[recordY] " + (updateResult ? "success" : "failed") + " ... " + fileName + " -> " + scrollView1.getScrollY());
-                return updateResult;
+
+                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
+                scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
+                scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
+
+                Log.v(TAG, "[recordY][scrollY]   " + fileName + " -> " + scrollView1.getScrollY());
+                Log.v(TAG, "[recordY][maxHeight] " + fileName + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
             }
-            return false;
         }
 
         private void restoreY(final String fileName, final ScrollView scrollView1) {
             Log.v(TAG, "[restoreY] start ... " + fileName);
-            final int posY = recentTxtMarkService.getScrollViewYPos(fileName);
+
+            RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
+            final int posY = scrollYService.getScrollYVO_value();
+
             scrollView1.post(new Runnable() {
                 @Override
                 public void run() {
@@ -1121,31 +1152,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      */
     public void moveToNextBookmark() {
         if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
-
-            if (!BuildConfig.DEBUG) {
-                Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
-            } else {
-                //debug ↓↓↓↓↓↓↓↓
-                int totalCount = recentTxtMarkService.countAll();
-                String totalMessage = " 總筆數 : " + totalCount;
-
-                List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
-                if (qList.isEmpty()) {
-                    Toast.makeText(this, "ERR mark size EMPTY !!" + totalMessage, Toast.LENGTH_SHORT).show();
-                } else {
-                    int bookmarkCount = 0;
-                    int searchCount = 0;
-                    for (RecentTxtMarkDAO.RecentTxtMark v : qList) {
-                        if (RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.isMatch(v.getBookmarkType())) {
-                            bookmarkCount++;
-                        } else {
-                            searchCount++;
-                        }
-                    }
-                    Toast.makeText(this, "ERR 書簽 : " + bookmarkCount + "/ 查詢 : " + searchCount + " , all : " + qList.size() + totalMessage, Toast.LENGTH_SHORT).show();
-                }
-                //debug ↑↑↑↑↑↑↑↑
-            }
+            Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
             return;
         }
 
