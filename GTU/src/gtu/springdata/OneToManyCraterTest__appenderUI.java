@@ -90,16 +90,16 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
             public void process(DocumentEvent event) {
                 try {
                     String text = StringUtils.trimToEmpty(repositoryText.getText());
-//                    MaterialDefinitionPropertyRepository
+                    // MaterialDefinitionPropertyRepository
                     Pattern ptn = Pattern.compile("(.*Property)Repository");
                     Matcher mth = ptn.matcher(text);
-                    if(mth.matches()){
+                    if (mth.matches()) {
                         String toType = mth.group(1);
                         String fromType = toType.replaceAll("Property$", "");
                         String javaName = StringUtils.uncapitalize(toType).replaceAll("y$", "ies") + "Id";
                         String listName = StringUtils.uncapitalize(toType).replaceAll("y$", "ies");
                         String method = "find4Relation";
-                        
+
                         javaNameText.setText(javaName);
                         refToTypeText.setText(toType);
                         refFromTypeText.setText(fromType);
@@ -275,7 +275,9 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
                     FileUtil.saveToFile(refToTypeFile, content1, "UTF8");
                     FileUtil.saveToFile(refFromTypeFile, content2, "UTF8");
                     FileUtil.saveToFile(repositoryFile, content3, "UTF8");
-                } catch (IOException e1) {
+
+                    JCommonUtil._jOptionPane_showMessageDialog_info("成功!");
+                } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
             }
