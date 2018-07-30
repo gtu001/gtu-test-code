@@ -13,7 +13,6 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -42,6 +41,7 @@ import android.widget.Toast;
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
+import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
@@ -49,29 +49,35 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
-import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.HomeKeyWatcher;
+import com.example.englishtester.common.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.MainAdViewHelper;
+import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
-import com.example.englishtester.common.HtmlWordParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -354,11 +360,34 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         }
 
+        //判斷是否有閱讀過的紀錄
+        Transformer<String, String> transformer = new Transformer<String, String>() {
+            @Override
+            public String transform(String fileName) {
+                Pattern ptn = Pattern.compile("(.*)\\.(?:txt|htm|html)");
+                Matcher mth = ptn.matcher(fileName);
+                if (mth.find()) {
+                    fileName = mth.group(1);
+                }
+                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, TxtReaderActivity.this.recentTxtMarkService);
+                int scrollY = scrollYService.getScrollYVO_value();
+                int maxHeight = scrollYService.getMaxHeightYVO_value();
+                if (scrollY == -1 || maxHeight == -1) {
+                    return "";
+                }
+                BigDecimal val = new BigDecimal(scrollY).divide(new BigDecimal(maxHeight), 4, RoundingMode.HALF_UP);
+                val = val.multiply(new BigDecimal(100));
+                val = val.setScale(1, RoundingMode.HALF_UP);
+                return "[已讀:" + String.valueOf(val) + "%]";
+            }
+        };
+
         List<Map<String, Object>> listItem = new ArrayList<>();
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
             Map<String, Object> map = new HashMap<String, Object>();
+            String readMark = transformer.transform(f.getName());
             map.put("ItemTitle", f.getName());
-            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
+            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss") + readMark);
             map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
             listItem.add(map);
         }
@@ -406,7 +435,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         final String oldFileName = dto.fileName.toString();
 
         if (dto.fileName.length() > 0) {
-            dto.fileName.delete(0, dto.fileName.length() - 1);
+            dto.fileName.delete(0, dto.fileName.length());
         }
         dto.fileName.append(newName);
         Log.v(TAG, "current fileName : " + dto.fileName);
@@ -1089,19 +1118,25 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.recentTxtMarkService = recentTxtMarkService;
         }
 
-        private boolean recordY(String fileName, ScrollView scrollView1) {
+        private void recordY(String fileName, ScrollView scrollView1) {
             Log.v(TAG, "[recordY] start ... " + fileName);
             if (StringUtils.isNotBlank(fileName)) {
-                boolean updateResult = recentTxtMarkService.updateScrollViewYPos(fileName, scrollView1.getScrollY());
-                Log.v(TAG, "[recordY] " + (updateResult ? "success" : "failed") + " ... " + fileName + " -> " + scrollView1.getScrollY());
-                return updateResult;
+
+                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
+                scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
+                scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
+
+                Log.v(TAG, "[recordY][scrollY]   " + fileName + " -> " + scrollView1.getScrollY());
+                Log.v(TAG, "[recordY][maxHeight] " + fileName + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
             }
-            return false;
         }
 
         private void restoreY(final String fileName, final ScrollView scrollView1) {
             Log.v(TAG, "[restoreY] start ... " + fileName);
-            final int posY = recentTxtMarkService.getScrollViewYPos(fileName);
+
+            RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
+            final int posY = scrollYService.getScrollYVO_value();
+
             scrollView1.post(new Runnable() {
                 @Override
                 public void run() {
@@ -1117,31 +1152,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      */
     public void moveToNextBookmark() {
         if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
-
-            if (!BuildConfig.DEBUG) {
-                Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
-            } else {
-                //debug ↓↓↓↓↓↓↓↓
-                int totalCount = recentTxtMarkService.countAll();
-                String totalMessage = " 總筆數 : " + totalCount;
-
-                List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
-                if (qList.isEmpty()) {
-                    Toast.makeText(this, "ERR mark size EMPTY !!" + totalMessage, Toast.LENGTH_SHORT).show();
-                } else {
-                    int bookmarkCount = 0;
-                    int searchCount = 0;
-                    for (RecentTxtMarkDAO.RecentTxtMark v : qList) {
-                        if (RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.isMatch(v.getBookmarkType())) {
-                            bookmarkCount++;
-                        } else {
-                            searchCount++;
-                        }
-                    }
-                    Toast.makeText(this, "ERR 書簽 : " + bookmarkCount + "/ 查詢 : " + searchCount + " , all : " + qList.size() + totalMessage, Toast.LENGTH_SHORT).show();
-                }
-                //debug ↑↑↑↑↑↑↑↑
-            }
+            Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1173,6 +1184,39 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 Toast.makeText(TxtReaderActivity.this, "移到 : " + spanObject.getWord(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void debug____dumpFileNameLog() {
+        String name = String.format("tmpFileName%s.txt", DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd"));
+        File fff = new File(Constant.PropertiesFindActivity_PATH + "/" + name);
+        fff = FileConstantAccessUtil.getFile(this, fff);
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(" select count(file_name) as cnt,                ");
+        sb.append("         file_name,                             ");
+        sb.append("         max(insert_date) as max_insert_date    ");
+        sb.append(" from recent_txt_mark                           ");
+        sb.append(" group by file_name                             ");
+        sb.append(" order by max_insert_date desc                  ");
+        List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sb.toString(), new String[0], this);
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fff)));
+            for (Map<String, Object> val : lst) {
+                writer.write(val.toString());
+                writer.newLine();
+            }
+            writer.flush();
+
+            Toast.makeText(this, "Debug : " + fff, Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Log.e(TAG, "debug____dumpFileNameLog ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex) {
+            }
+        }
     }
 
     // --------------------------------------------------------------------
@@ -1229,6 +1273,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.loadHtmlFromUrl();
             }
         }, //
+//        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                activity.debug____dumpFileNameLog();
+//            }
+//        }, //
+//        LOAD_IMAGE_MODE("是否要載入圖片", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                boolean isImageLoadMode = !activity.dto.isImageLoadMode.get();
+//                activity.dto.isImageLoadMode.set(isImageLoadMode);
+//                Toast.makeText(activity, "書籤模式" + (isImageLoadMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
+//            }
+//        }, //
         ;
 
         final String title;
@@ -1316,6 +1372,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
+        private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
         private int currentBookmarkId = -1;
 
@@ -1369,6 +1426,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public String getCurrentHtmlUrl() {
             return currentHtmlUrl;
+        }
+
+        public boolean isImageLoadMode() {
+            return isImageLoadMode.get();
         }
     }
 

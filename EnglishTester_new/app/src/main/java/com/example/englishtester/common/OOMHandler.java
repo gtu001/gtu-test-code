@@ -18,7 +18,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
@@ -121,7 +120,7 @@ public class OOMHandler {
 
         Bitmap bitmap = null;
         bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
-        if (bm != null) {
+        if (bm != null && bm != bitmap) {
             bm.recycle();
         }
         return bitmap;

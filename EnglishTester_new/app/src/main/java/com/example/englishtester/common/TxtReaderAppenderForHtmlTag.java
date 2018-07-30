@@ -185,7 +185,7 @@ public class TxtReaderAppenderForHtmlTag {
 //                log("src -> " + srcData);
 //                log("alt -> " + altData);
 
-                ImageLoaderCandidate picProcess = self.new ImageLoaderCandidate(srcData.getContent(), altData.getContent());
+                ImageLoaderCandidate picProcess = self.new ImageLoaderCandidate(srcData.getContent(), altData.getContent(), self.dto.isImageLoadMode());
 
                 self.hiddenSpan(self.ss, self.getPairStart(pair), altData.getStart());
                 self.hiddenSpan(self.ss, altData.getEnd(), self.getPairEnd(pair));
@@ -377,11 +377,13 @@ public class TxtReaderAppenderForHtmlTag {
         String altData;
         boolean isGifFile;
         File localFile;
+        boolean isNeedLoadImage;
 
-        ImageLoaderCandidate(String srcData, String altData) {
+        ImageLoaderCandidate(String srcData, String altData, boolean isNeedLoadImage) {
             this.srcData = srcData;
             this.altData = altData;
             this.isGifFile = isGif(srcData);
+            this.isNeedLoadImage = isNeedLoadImage;
             try {
                 this.localFile = getLocalFile(srcData);
             } catch (Exception ex) {
@@ -419,6 +421,10 @@ public class TxtReaderAppenderForHtmlTag {
         }
 
         private Bitmap getResult() {
+            if (!isNeedLoadImage) {
+                return onlinePicLoader.getNotfound404();
+            }
+
             Bitmap tmp = null;
             if (localFile != null) {
                 tmp = OOMHandler.new_decode(localFile);
