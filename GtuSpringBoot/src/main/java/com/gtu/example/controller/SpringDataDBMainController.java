@@ -3,11 +3,9 @@ package com.gtu.example.controller;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,8 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang.reflect.FieldUtils;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.gtu.example.common.DBRelationHelper;
 import com.gtu.example.common.JSONUtil;
+import com.gtu.example.common.JqGridHandler;
 import com.gtu.example.common.JqGridHandler.EntityPrimaryKeySetter;
 import com.gtu.example.common.JqGridHandler.JqReader;
 import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
@@ -80,19 +77,9 @@ public class SpringDataDBMainController {
         return model;
     }
 
-    private Set<Class<?>> getAllTables() {
-        Set<Class<?>> all = new LinkedHashSet<>();
-        Set<Class<?>> s1 = PackageReflectionUtil.getSubClasses(new Reflections("com.gtu.example.springdata.entity"));
-        log.info("getAllTables material {}", s1.size());
-
-        all.addAll(s1);
-        log.info("getAllTables = {}", all.size());
-        return all;
-    }
-
     @GetMapping(value = "/table-get-columns")
     public String tableColumns(@RequestParam(name = "table") String table) {
-        Optional<List<String>> obj = getAllTables().stream()//
+        Optional<List<String>> obj = DBRelationHelper.getAllTables().stream()//
                 .filter(c -> c.getSimpleName().equalsIgnoreCase(table))//
                 .findFirst().map(c -> {
                     List<String> lst1 = Stream.of(c.getDeclaredFields())//
@@ -199,12 +186,12 @@ public class SpringDataDBMainController {
             log.info("mapping to column : {} - {}", key, value);
             try {
                 define.entity.getClass().getDeclaredField(key);
-                FieldUtils.writeDeclaredField(define.entity, key, value, true);
+                JqGridHandler.setFieldToEntity(define.entityClz, define.entity, key, value);
             } catch (Exception ex) {
                 if (define.entity.getClass().getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
                     Class<?> parentClz = define.entity.getClass().getSuperclass();
                     try {
-                        FieldUtils.getDeclaredField(parentClz, key, true).set(define.entity, value);
+                        JqGridHandler.setFieldToEntity(parentClz, define.entity, key, value);
                     } catch (Exception ex2) {
                         log.error("operateDBAction ERR : " + key + " -> " + ex2.getCause());
                     }

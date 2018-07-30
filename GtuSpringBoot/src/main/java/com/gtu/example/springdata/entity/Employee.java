@@ -55,7 +55,7 @@ public class Employee extends AuditModel {
     private String description;
 
     @Transient
-    @GtuDBRelation(setter = "setAddress", repository = "AddressRepository", method="")
+    @DynamicDBRelation(setter = "setAddress", repository = "AddressRepository", method="")
     private String empAddressId;
 
     @OneToOne(//

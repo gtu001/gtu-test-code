@@ -2,27 +2,43 @@ package com.gtu.example.common;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.ClassUtils;
 
-import com.gtu.example.springdata.entity.GtuDBRelation;
+import com.gtu.example.springdata.entity.DynamicDBRelation;
 
 public class DBRelationHelper {
 
     private static final Logger log = LoggerFactory.getLogger(DBRelationHelper.class);
+
+    public static Set<Class<?>> getAllTables() {
+        Set<Class<?>> all = new LinkedHashSet<>();
+        Set<Class<?>> s1 = PackageReflectionUtil.getSubClasses(new Reflections("com.gtu.example.springdata.entity"));
+        s1 = s1.stream().filter(clz -> clz.isAnnotationPresent(Entity.class)).sorted(Comparator.comparing(Class::getSimpleName)).collect(Collectors.toCollection(LinkedHashSet::new));
+        log.info("getAllTables material {}", s1.size());
+        all.addAll(s1);
+        log.info("getAllTables = {}", all.size());
+        return all;
+    }
 
     public static Map<Class<Object>, Class[]> getAllRepostiriesMap() {
         Map<Class<Object>, Class[]> all = new LinkedHashMap<>();
@@ -42,9 +58,11 @@ public class DBRelationHelper {
     }
 
     public void relationProcess() {
+        log.info("## relationProcess ## start");
         for (Field fld : entity.getClass().getDeclaredFields()) {
             try {
-                if (fld.isAnnotationPresent(Transient.class) && fld.isAnnotationPresent(GtuDBRelation.class)) {
+                if (// fld.isAnnotationPresent(Transient.class) &&
+                fld.isAnnotationPresent(DynamicDBRelation.class)) {
 
                     Object dependencyValue = FieldUtils.readDeclaredField(entity, fld.getName(), true);
 
@@ -52,7 +70,7 @@ public class DBRelationHelper {
                         continue;
                     }
 
-                    GtuDBRelation dbQuery = (GtuDBRelation) fld.getAnnotation(GtuDBRelation.class);
+                    DynamicDBRelation dbQuery = (DynamicDBRelation) fld.getAnnotation(DynamicDBRelation.class);
 
                     String setterName = dbQuery.setter();
                     String repositoryMethod = dbQuery.method();
@@ -80,7 +98,7 @@ public class DBRelationHelper {
                             dependencyValue = ConvertUtils.convert(dependencyValue, paramClz);
                         }
 
-                        Object valueUncheck = valueUncheck = MethodUtils.invokeMethod(respositoryUncheck, repositoryMethod, dependencyValue);
+                        Object valueUncheck = MethodUtils.invokeMethod(respositoryUncheck, repositoryMethod, dependencyValue);
 
                         Object realValue = null;
 
@@ -98,6 +116,7 @@ public class DBRelationHelper {
                 log.error("write dependency ERR : " + ex.getMessage(), ex);
             }
         }
+        log.info("## relationProcess ## end");
     }
 
     private Class<?> __getMethodInvokeParameterClz(Object respositoryUncheck, final String repositoryMethod) {

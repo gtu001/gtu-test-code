@@ -7,9 +7,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-@Target({METHOD, FIELD})
-@Retention(RUNTIME) 
-public @interface GtuDBRelation {
+@Target({ METHOD, FIELD })
+@Retention(RUNTIME)
+public @interface DynamicDBRelation {
 
     String setter();
 

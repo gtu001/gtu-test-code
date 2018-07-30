@@ -1,0 +1,9 @@
+
+A project 底下有 dependancy 有 B project
+
+B 的  build.gradle 要加以下
+
+bootJar.enabled = false
+jar.enabled = true
+
+--------------------------------------------------------------------

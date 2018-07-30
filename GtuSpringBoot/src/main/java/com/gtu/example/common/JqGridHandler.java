@@ -2,6 +2,7 @@ package com.gtu.example.common;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -9,8 +10,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ManyToMany;
@@ -41,6 +45,15 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class JqGridHandler {
+
+    public static void main(String[] args) throws NoSuchFieldException, SecurityException {
+        // Field f =
+        // PersonnelSpecification.class.getDeclaredField("personnelSpecificationProperties");
+        //
+        // System.out.println(ReflectionToStringBuilder.toString(f,
+        // ToStringStyle.MULTI_LINE_STYLE));
+        // System.out.println(ReflectionToStringBuilder.toString(f.getType(), ToStringStyle.MULTI_LINE_STYLE));
+    }
 
     private static final Logger log = LoggerFactory.getLogger(JqGridHandler.class);
 
@@ -223,13 +236,6 @@ public class JqGridHandler {
             log.info("> eneityPkObj = {}", ReflectionToStringBuilder.toString(eneityPkObj));
         }
 
-        private Object __primitiveConvert(Object value, Class<ID> targetClz) {
-            if (value == null) {
-                return null;
-            }
-            return ConvertUtils.convert(String.valueOf(value), targetClz);
-        }
-
         private void __processMapToBean(Object eneityPkObj, Object pkObj) {
             if (pkObj instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) pkObj;
@@ -290,8 +296,8 @@ public class JqGridHandler {
             @JsonIgnore
             Set<String> fieldNamesOrderedSet;
             Map<String, Object> loaclMap;
-            
-            private void _setValue(String fieldName, Object value, String[] pkColumns, List<String> pkArry){
+
+            private void _setValue(String fieldName, Object value, String[] pkColumns, List<String> pkArry) {
                 String valStr = "" + Optional.fromNullable(value).or("");
                 this.cell.add(valStr);
                 this.loaclMap.put(fieldName, valStr);
@@ -304,7 +310,7 @@ public class JqGridHandler {
 
             public JqRow(Entity entity, @Nullable String[] fieldNamesOrdered, @Nullable String[] pkColumns, @Nullable Character primaryKeyDelimitChar) {
                 this.cell = new ArrayList<>();
-                this.loaclMap = new LinkedHashMap<String,Object>();
+                this.loaclMap = new LinkedHashMap<String, Object>();
 
                 if (fieldNamesOrdered == null) {
                     this.fieldNamesOrderedSet = Stream.of(entity.getClass().getDeclaredFields())//
@@ -544,7 +550,15 @@ public class JqGridHandler {
                     boolean loadOk = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(tmpBag);
                     if ((loadOk && tmpBag.empty()) || //
                             !loadOk) {
-                        processType = -1;
+                        try {
+                            relationObject = StreamSupport.stream(//
+                                    Spliterators.spliteratorUnknownSize(tmpBag.iterator(), Spliterator.ORDERED), //
+                                    false).collect(Collectors.toList());
+                            processType = 1;
+                        } catch (Exception ex) {
+                            processType = -1;
+                            log.error("[SubgridHandler] retry failed : " + ex.getMessage(), ex);
+                        }
                     }
                 }
 
@@ -555,6 +569,11 @@ public class JqGridHandler {
                     if (Collection.class.isAssignableFrom(fieldOrignClz)) {
                         fieldOrignClz = PackageReflectionUtil.getClassGenericClz(fieldOrignClz, 0);
                         relationLst = (Collection) relationObject;
+
+                        // 如果取步道
+                        if (fieldOrignClz == null && !relationLst.isEmpty()) {
+                            fieldOrignClz = relationLst.iterator().next().getClass();
+                        }
                     } else {
                         relationLst = new ArrayList();
                         relationLst.add(relationObject);
@@ -781,6 +800,39 @@ public class JqGridHandler {
                     return MethodUtils.invokeMethod(entity, fname, new Object[0]);
                 } catch (Exception ex1) {
                     log.info("找不到method : {} - {}", fname, ex1.getMessage());
+                }
+            }
+            throw new RuntimeException("無法取得此欄位 : " + fieldName, ex);
+        }
+    }
+
+    private static Object __primitiveConvert(Object value, Class targetClz) {
+        if (value == null) {
+            return null;
+        }
+        if (targetClz == String.class) {
+            return String.valueOf(value);
+        }
+        return ConvertUtils.convert(String.valueOf(value), targetClz);
+    }
+
+    public static void setFieldToEntity(Class indicateClz, Object entity, String fieldName, Object value) {
+        try {
+            Field field = FieldUtils.getDeclaredField(indicateClz, fieldName, true);
+            value = __primitiveConvert(value, field.getType());
+            field.set(entity, value);
+            return;
+        } catch (Exception ex) {
+            String methodName = "set" + StringUtils.capitalize(fieldName);
+            for (Method mth : entity.getClass().getDeclaredMethods()) {
+                if (mth.getName().equals(methodName)) {
+                    value = __primitiveConvert(value, mth.getParameterTypes()[0]);
+                    try {
+                        mth.invoke(entity, value);
+                        return;
+                    } catch (Exception e) {
+                        log.info("找不到method : {} - {}", fieldName, ex.getMessage());
+                    }
                 }
             }
             throw new RuntimeException("無法取得此欄位 : " + fieldName, ex);
