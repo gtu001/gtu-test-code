@@ -1314,6 +1314,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.v(TAG, "# onOptionsItemSelected");
         super.onOptionsItemSelected(item);
+
+        //預處理
+        if (true) {
+            scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+        }
+
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         for (TaskInfo task : TaskInfo.values()) {
