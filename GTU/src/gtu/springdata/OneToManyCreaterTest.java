@@ -22,7 +22,16 @@ public class OneToManyCreaterTest {
         sb.append("            orphanRemoval = true, //                                                       \n");
         sb.append("            fetch = FetchType.LAZY//                                                       \n");
         sb.append("    ) //                                                                                   \n");
-        sb.append("    @JoinColumn(name = \"${ref_db_column!'ref_db_column'}\") //                         \n");
+
+        switch (2) {
+        case 1:// 拿pk當外建
+            sb.append("    @JoinColumn(name = \"${ref_db_column!'ref_db_column'}\") //                         \n");
+            break;
+        case 2:// 自訂外建(不拿pk當外建)
+            sb.append("    @JoinColumn(foreignKey = @ForeignKey(name = \"${ref_db_column!'ref_db_column'}\")) //  \n");
+            break;
+        }
+
         sb.append("    @JsonIgnore                                                                            \n");
         sb.append("    private List<${ref_java_type!'ref_java_type'}> ${java_lst_name!'java_lst_name'};         \n");
         sb.append("                                                                                           \n");

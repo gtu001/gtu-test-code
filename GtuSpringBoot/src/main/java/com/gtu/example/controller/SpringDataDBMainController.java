@@ -207,6 +207,7 @@ public class SpringDataDBMainController {
 
     @PostMapping(value = "/db_save")
     public String saveDBAction(HttpServletRequest request, HttpServletResponse response) {
+        log.info("## saveDBAction ..start");
         try {
             OperateDefine define = this.getOperateDefine(request);
 
@@ -228,6 +229,8 @@ public class SpringDataDBMainController {
             log.error("operateDBAction ERR : " + ex.getMessage(), ex);
             // return JSONUtil.getThrowable(ex).toString();
             return JSONUtil.getThrowableRoot(ex).toString();
+        } finally {
+            log.info("## saveDBAction ..end");
         }
     }
 
