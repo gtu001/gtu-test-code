@@ -96,9 +96,9 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
                     if (mth.matches()) {
                         String toType = mth.group(1);
                         String fromType = toType.replaceAll("Property$", "");
-                        String javaName = StringUtils.uncapitalize(toType).replaceAll("y$", "ies") + "Id";
-                        String listName = StringUtils.uncapitalize(toType).replaceAll("y$", "ies");
-                        String method = "find4Relation";
+                        String javaName = toJavaListName(toType) + "Id";
+                        String listName = toJavaListName(toType);
+                        String method = "findRelation4" + toType;
 
                         javaNameText.setText(javaName);
                         refToTypeText.setText(toType);
@@ -124,6 +124,28 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
 
         refToTypeText = new JTextField();
         refToTypeText.setColumns(10);
+        refToTypeText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                try {
+                    String $refToTypeText = StringUtils.trimToEmpty(refToTypeText.getText());
+                    if (StringUtils.isNotBlank($refToTypeText)) {
+                        String javaName = toJavaListName($refToTypeText) + "Id";
+                        String listName = toJavaListName($refToTypeText);
+                        String method = "findRelation4" + $refToTypeText;
+                        String repository = $refToTypeText + "Repository";
+
+                        javaNameText.setText(javaName);
+                        listNameText.setText(listName);
+                        methodText.setText(method);
+                        repositoryText.setText(repository);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        }));
+
         contentPane.add(refToTypeText, "4, 6, fill, default");
 
         JLabel lblJavaName = new JLabel("java name");
@@ -170,9 +192,11 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
 
             private String appendBlock(File file, String blockContent) throws IOException {
                 List<String> lst = (FileUtils.readLines(file));
-                Pattern ptn = Pattern.compile("private\\s(?:String|Long)\\s\\w+\\;");
-                int maxPos = findPos(lst, ptn);
 
+                int maxPos = findPos(lst, Pattern.compile("[↑]+"));
+                if (maxPos == -1) {
+                    maxPos = findPos(lst, Pattern.compile("private\\s(?:String|Long)\\s\\w+\\;"));
+                }
                 if (maxPos == -1) {
                     maxPos = findPosFromEnd(lst);
                 }
@@ -299,4 +323,12 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
         contentPane.add(btnNewButton, "2, 18");
     }
 
+    private String toJavaListName(String formType) {
+        formType = StringUtils.uncapitalize(formType);
+        if (formType.endsWith("y")) {
+            return formType.replaceAll("y$", "ies");
+        } else {
+            return formType + "s";
+        }
+    }
 }

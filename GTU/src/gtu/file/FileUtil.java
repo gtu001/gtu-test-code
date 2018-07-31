@@ -235,34 +235,44 @@ public class FileUtil {
      * @return
      */
     public static String loadFromFile(File file, String encode) {
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encode));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encode));
             String line = null;
             StringBuilder sb = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 sb.append(line + "\r\n");
             }
-            reader.close();
             return sb.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
         }
     }
 
     public static List<String> loadFromFile_asList(File file, String encode) {
+        BufferedReader reader = null;
         try {
             List<String> lst = new ArrayList<String>();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encode));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), encode));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 lst.add(line);
             }
-            reader.close();
             return lst;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
         }
     }
 

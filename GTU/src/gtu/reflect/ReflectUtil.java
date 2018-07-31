@@ -14,8 +14,8 @@ public class ReflectUtil {
 
     private ReflectUtil() {
     }
-    
-    public static <T> T newInstance(Class<T> clz){
+
+    public static <T> T newInstance(Class<T> clz) {
         try {
             Constructor<T> constructor = clz.getDeclaredConstructor(new Class[0]);
             constructor.setAccessible(true);
@@ -89,19 +89,26 @@ public class ReflectUtil {
             throw new RuntimeException(ex);
         }
     }
-    
+
     /**
      * 取得Field的泛型 TODO
      */
-    public static Class<?> getFieldGenericType(Field field){
-//        Type type = null;
-//        try {
-//            type = ((ParameterizedType) fld.getGenericType()).getActualTypeArguments()[0];
-//        } catch (Exception ex) {
-//        }
-        ParameterizedType type = (ParameterizedType)field.getGenericType();
+    public static Class<?> getFieldGenericType(Field field) {
+        // Type type = null;
+        // try {
+        // type = ((ParameterizedType)
+        // fld.getGenericType()).getActualTypeArguments()[0];
+        // } catch (Exception ex) {
+        // }
+        ParameterizedType type = (ParameterizedType) field.getGenericType();
         System.out.println(ReflectionToStringBuilder.toString(type, ToStringStyle.MULTI_LINE_STYLE));
         return (Class<?>) type.getRawType();
+    }
+
+    public static Class<?> getFieldGenericType_2(Field field) {
+        ParameterizedType type = (ParameterizedType) field.getGenericType();
+        Class<?> genericType = (Class<?>) type.getActualTypeArguments()[0];
+        return genericType;
     }
 
     public static class Anno {
@@ -115,14 +122,12 @@ public class ReflectUtil {
             return new Anno(beanClz);
         }
 
-        public <T extends Annotation> T getMethod(String methodName, Class<?>[] paramTypes, Class<T> anno)
-                throws SecurityException, NoSuchMethodException {
+        public <T extends Annotation> T getMethod(String methodName, Class<?>[] paramTypes, Class<T> anno) throws SecurityException, NoSuchMethodException {
             Method method = beanClz.getDeclaredMethod(methodName, paramTypes);
             return method.getAnnotation(anno);
         }
 
-        public <T extends Annotation> T getField(String fieldName, Class<T> anno) throws SecurityException,
-                NoSuchFieldException {
+        public <T extends Annotation> T getField(String fieldName, Class<T> anno) throws SecurityException, NoSuchFieldException {
             Field field = beanClz.getDeclaredField(fieldName);
             return field.getAnnotation(anno);
         }
