@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
@@ -1158,6 +1159,10 @@ public class FileUtil {
             System.out.println("取消建立目錄, 路徑已存在 : " + file);
             return false;
         }
+    }
+
+    public static String fixPath(String filePathName, boolean isUnixSeparator) {
+        return FilenameUtils.normalize(filePathName, isUnixSeparator);
     }
 
     public static class FileZ {

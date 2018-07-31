@@ -22,6 +22,7 @@
 
 	$(document).ready(function() {
 		initTabLst();
+		initTabLst_4_autocomplete();
 		tableOnSelect();
 		//queryBtnBind();
 		//saveOrUpdateBtnBind();
@@ -59,7 +60,7 @@
 			.fail(jqueryTool.ajaxFailFunc);
 		});
 	}
-
+	
 	function getTableMapping(tableName) {
 		var rtnObj = $.ajax({
 			url : '/springdata-dbMain/table-mapping/',
@@ -120,6 +121,7 @@
 
 		var postData = getForm("query");
 		var colModel = queryColModel();
+		var caption = $("select[name=tableNames]").val();
 
 		$("#jqGrid").jqGrid({
 			url : "/springdata-dbMain/db_simple_query/dataRows",
@@ -129,7 +131,7 @@
 			colModel : colModel,
 			viewrecords : true, // show the current page, data rang and total records on the toolbar
 			width : 780,
-			height : 200,
+			height : 500,
 			rowNum : 30,
 			rownumbers : true,
 			loadonce : false, // this is just for the demo
@@ -139,7 +141,7 @@
 			pager : "#jqGridPager",
 			rowList : [ 25, 50, 75, 100 ],
 			gridview : true,
-			caption : 'Select from existing server',
+			caption : caption,
 			loadtext : 'Loading, please wait',
 			emptyRecords : "No Accounts Found",
 			onSelectRow : function(id) {
@@ -347,7 +349,23 @@
 		}, "json")// xml,html,text,script,json,jsonp
 		.fail(jqueryTool.ajaxFailFunc);
 	}
+	
+	function initTabLst_4_autocomplete() {
+		$.get("/springdata-dbMain/tables", {}, //
+		function(data) {//
+			$("input[name=tableNames_autoComplete]").autocomplete({
+				source: data
+		    });
+		    $("input[name=tableNames_autoComplete]").on("autocompletechange", function(event, ui){
+		   		$("select[name=tableNames]").val($(this).val());
+				$("select[name=tableNames]").trigger("change");
+		    });
+		    $("input[name=tableNames_autoComplete]").css("width", "300px");
+		}, "json")
+		.fail(jqueryTool.ajaxFailFunc);
+	}
 
+	/* 不work */
 	function initShowSelected() {
 		$('#showSelected')
 				.on(
@@ -366,6 +384,18 @@
 							$('#jqGrid').trigger('reloadGrid');
 						});
 	}
+	
+	function jqGrid_height_setter(jqGridId, value){
+		if(value == undefined){
+			value = "auto";
+		}else{
+			value = value + "px";
+		}
+		var divElement = $("#" + jqGridId).parents('div.ui-jqgrid-bdiv');
+		$(divElement).css("max-height", value);
+		$(divElement).css("height", value);
+	}
+	
 </script>
 <title></title>
 </head>
@@ -374,7 +404,8 @@
 	<span style="color: red" th:text="${message}" />
 	<form id="form" action="/GtuSpringBoot/main">
 
-		表名稱: <select name="tableNames"></select><br />
+		表名稱: <select name="tableNames"></select><input
+			name="tableNames_autoComplete" size="20"><br />
 	</form>
 
 	<table id="jqGrid"></table>

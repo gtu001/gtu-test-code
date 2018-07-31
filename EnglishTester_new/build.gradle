@@ -9,6 +9,14 @@ buildscript {
             //https://github.com/koral--/android-gif-drawable
             url "https://oss.sonatype.org/content/repositories/snapshots" //for GifDrawable
         }
+        maven {
+            name "psiegman-repo"
+            url "https://github.com/psiegman/mvn-repo/raw/master/releases" //for epub
+        }
+        maven {
+            url "https://jitpack.io" //for github
+        }
+
         mavenCentral()
         jcenter()
     }
@@ -31,6 +39,14 @@ allprojects {
             //https://github.com/koral--/android-gif-drawable
             url "https://oss.sonatype.org/content/repositories/snapshots" //for GifDrawable
         }
+        maven {
+            name "psiegman-repo"
+            url "https://github.com/psiegman/mvn-repo/raw/master/releases" //for epub
+        }
+        maven {
+            url "https://jitpack.io" //for github
+        }
+
         mavenCentral()
         //jcenter()
     }

@@ -130,6 +130,25 @@ public class OOMHandler {
         return Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
     }
 
+    public static Bitmap new_decode(InputStream inputStream) {
+        try {
+            Bitmap bitmap = null;
+            for (int ii = 0; ; ii++) {
+                try {
+                    bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
+                    Log.v(TAG, "Bitmap scale = " + ii);
+                    return bitmap;
+                } catch (OutOfMemoryError ex) {
+                    Log.v(TAG, "Bitmap scale = " + ii);
+                    bitmap.recycle();
+                    System.gc();
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
     public static Bitmap new_decode(File f) {
         try {
             InputStream inputStream = new FileInputStream(f);
