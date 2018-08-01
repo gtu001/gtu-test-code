@@ -3,6 +3,7 @@ package com.gtu.example.common;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -52,7 +53,8 @@ public class JqGridHandler {
         //
         // System.out.println(ReflectionToStringBuilder.toString(f,
         // ToStringStyle.MULTI_LINE_STYLE));
-        // System.out.println(ReflectionToStringBuilder.toString(f.getType(), ToStringStyle.MULTI_LINE_STYLE));
+        // System.out.println(ReflectionToStringBuilder.toString(f.getType(),
+        // ToStringStyle.MULTI_LINE_STYLE));
     }
 
     private static final Logger log = LoggerFactory.getLogger(JqGridHandler.class);
@@ -296,6 +298,7 @@ public class JqGridHandler {
             @JsonIgnore
             Set<String> fieldNamesOrderedSet;
             Map<String, Object> loaclMap;
+            Entity entity;
 
             private void _setValue(String fieldName, Object value, String[] pkColumns, List<String> pkArry) {
                 String valStr = "" + Optional.fromNullable(value).or("");
@@ -311,6 +314,7 @@ public class JqGridHandler {
             public JqRow(Entity entity, @Nullable String[] fieldNamesOrdered, @Nullable String[] pkColumns, @Nullable Character primaryKeyDelimitChar) {
                 this.cell = new ArrayList<>();
                 this.loaclMap = new LinkedHashMap<String, Object>();
+                this.entity = entity;
 
                 if (fieldNamesOrdered == null) {
                     this.fieldNamesOrderedSet = Stream.of(entity.getClass().getDeclaredFields())//
@@ -329,34 +333,35 @@ public class JqGridHandler {
 
                 List<String> pkArry = new ArrayList<>();
 
-                for (String fname : fieldNamesOrderedSet) {
-                    try {
-                        Object val = FieldUtils.readDeclaredField(entity, fname, true);
-                        this._setValue(fname, val, pkColumns, pkArry);
-
-                    } catch (org.hibernate.exception.SQLGrammarException e) {
-                        if (e.getMessage().contains("could not extract ResultSet")) {
-                            this._setValue(fname, "<ResultSet Error>", null, null);
-                            log.error("JqRow <init> : " + fname + " -> " + e.getMessage());
-                        } else {
-                            this._setValue(fname, "<Error>", null, null);
-                            log.error("JqRow <init> : " + fname + " -> " + e.getMessage(), e);
-                        }
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                if (entity != null) {
+                    for (String fname : fieldNamesOrderedSet) {
                         try {
-                            Class<?> parentClz = getMappedSuperclassFromEntity(entity);
-                            log.info("MappedSuperclass = {}", parentClz);
-                            log.info("entity = {}, {}", entity, entity.getClass().getName());
-
-                            Object val = getFieldFromEntity(parentClz, entity, fname);
+                            Object val = FieldUtils.readDeclaredField(entity, fname, true);
                             this._setValue(fname, val, pkColumns, pkArry);
-                        } catch (Exception e2) {
+                        } catch (org.hibernate.exception.SQLGrammarException e) {
+                            if (e.getMessage().contains("could not extract ResultSet")) {
+                                this._setValue(fname, "<ResultSet Error>", null, null);
+                                log.error("JqRow <init> : " + fname + " -> " + e.getMessage());
+                            } else {
+                                this._setValue(fname, "<Error>", null, null);
+                                log.error("JqRow <init> : " + fname + " -> " + e.getMessage(), e);
+                            }
+                        } catch (IllegalArgumentException | IllegalAccessException e) {
+                            try {
+                                Class<?> parentClz = getMappedSuperclassFromEntity(entity);
+                                log.info("MappedSuperclass = {}", parentClz);
+                                log.info("entity = {}, {}", entity, entity.getClass().getName());
+
+                                Object val = getFieldFromEntity(parentClz, entity, fname);
+                                this._setValue(fname, val, pkColumns, pkArry);
+                            } catch (Exception e2) {
+                                this.cell.add("<Error>");
+                                log.error("JqRow <init> : " + fname + " -> " + e2.getMessage(), e2);
+                            }
+                        } catch (Exception ex) {
                             this.cell.add("<Error>");
-                            log.error("JqRow <init> : " + fname + " -> " + e2.getMessage(), e2);
+                            log.error("JqRow <init> : " + fname + " -> " + ex.getMessage(), ex);
                         }
-                    } catch (Exception ex) {
-                        this.cell.add("<Error>");
-                        log.error("JqRow <init> : " + fname + " -> " + ex.getMessage(), ex);
                     }
                 }
 
@@ -520,6 +525,7 @@ public class JqGridHandler {
         private String fieldName;
         private JSONArray colModel;
         private JSONObject rowReader;
+        private Collection relationLst;
 
         private JSONArray loaclLst;
 
@@ -538,58 +544,55 @@ public class JqGridHandler {
                 return;
             }
 
-            Collection relationLst = null;
+            int processType = 1;
 
-            if (relationObject != null) {
-
-                int processType = 1;
-
-                // verify
-                if (relationObject instanceof org.hibernate.collection.internal.PersistentBag) {
-                    PersistentBag tmpBag = (PersistentBag) relationObject;
-                    boolean loadOk = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(tmpBag);
-                    if ((loadOk && tmpBag.empty()) || //
-                            !loadOk) {
-                        try {
-                            relationObject = StreamSupport.stream(//
-                                    Spliterators.spliteratorUnknownSize(tmpBag.iterator(), Spliterator.ORDERED), //
-                                    false).collect(Collectors.toList());
-                            processType = 1;
-                        } catch (Exception ex) {
-                            processType = -1;
-                            log.error("[SubgridHandler] retry failed : " + ex.getMessage(), ex);
-                        }
+            // verify
+            if (relationObject instanceof org.hibernate.collection.internal.PersistentBag) {
+                PersistentBag tmpBag = (PersistentBag) relationObject;
+                boolean loadOk = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(tmpBag);
+                if ((loadOk && tmpBag.empty()) || //
+                        !loadOk) {
+                    try {
+                        relationObject = StreamSupport.stream(//
+                                Spliterators.spliteratorUnknownSize(tmpBag.iterator(), Spliterator.ORDERED), //
+                                false).collect(Collectors.toList());
+                        processType = 1;
+                    } catch (Exception ex) {
+                        processType = -1;
+                        log.error("[SubgridHandler] retry failed : " + ex.getMessage(), ex);
                     }
                 }
+            }
 
-                // 一般處理
-                switch (processType) {
-                case 1:
-                    Class<?> fieldOrignClz = relationField.getType();
-                    if (Collection.class.isAssignableFrom(fieldOrignClz)) {
-                        fieldOrignClz = PackageReflectionUtil.getClassGenericClz(fieldOrignClz, 0);
-                        relationLst = (Collection) relationObject;
+            // 一般處理
+            switch (processType) {
+            case 1:
+                Class<?> fieldOrignClz = relationField.getType();
+                if (Collection.class.isAssignableFrom(fieldOrignClz)) {
+                    fieldOrignClz = getFieldGenericType(relationField);
+                    relationLst = (Collection) relationObject;
 
-                        // 如果取步道
-                        if (fieldOrignClz == null && !relationLst.isEmpty()) {
-                            fieldOrignClz = relationLst.iterator().next().getClass();
-                        }
-                    } else {
-                        relationLst = new ArrayList();
+                    // 如果取步道
+                    if (fieldOrignClz == null && !relationLst.isEmpty()) {
+                        fieldOrignClz = relationLst.iterator().next().getClass();
+                    }
+                } else {
+                    relationLst = new ArrayList();
+                    if (relationObject != null) {
                         relationLst.add(relationObject);
                     }
-
-                    log.info("relationObject = {}", relationObject);
-
-                    handler = new SimpleJdGridCreater(fieldOrignClz, true);
-
-                    colModel = handler.getColModel();
-                    rowReader = SimpleJdGridCreater.toJSONArray(handler.getSimpleJqReader(relationLst, null, 1, relationLst.size()));
-                    break;
-                case -1:
-                    log.info("subgrid : {} 物件為空!!", fieldName);
-                    break;
                 }
+
+                log.info("relationObject = {}", relationObject);
+
+                handler = new SimpleJdGridCreater(fieldOrignClz, true);
+
+                colModel = handler.getColModel();
+                rowReader = SimpleJdGridCreater.toJSONArray(handler.getSimpleJqReader(relationLst, null, 1, relationLst.size()));
+                break;
+            case -1:
+                log.info("subgrid : {} 物件為空!!", fieldName);
+                break;
             }
         }
 
@@ -603,6 +606,12 @@ public class JqGridHandler {
 
         public String getFieldName() {
             return fieldName;
+        }
+
+        private static Class<?> getFieldGenericType(Field field) {
+            ParameterizedType type = (ParameterizedType) field.getGenericType();
+            Class<?> genericType = (Class<?>) type.getActualTypeArguments()[0];
+            return genericType;
         }
     }
 
@@ -825,7 +834,7 @@ public class JqGridHandler {
         } catch (Exception ex) {
             String methodName = "set" + StringUtils.capitalize(fieldName);
             for (Method mth : entity.getClass().getDeclaredMethods()) {
-                if (mth.getName().equals(methodName)) {
+                if (mth.getName().equals(methodName) && mth.getParameterCount() == 1) {
                     value = __primitiveConvert(value, mth.getParameterTypes()[0]);
                     try {
                         mth.invoke(entity, value);

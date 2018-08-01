@@ -143,7 +143,7 @@
 			gridview : true,
 			caption : caption,
 			loadtext : 'Loading, please wait',
-			emptyRecords : "No Accounts Found",
+			emptyRecords : "No data Found",
 			onSelectRow : function(id) {
 				if (id && id !== lastSel) {
 					jQuery('#grid_id').restoreRow(lastSel);
@@ -320,6 +320,8 @@
             data: data,
             //colNames: colNames,
             colModel: colModel,
+            loadtext : 'Loading, please wait',
+			emptyRecords : "No data Found",
         });
 	}
 

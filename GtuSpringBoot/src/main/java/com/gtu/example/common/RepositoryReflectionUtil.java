@@ -65,19 +65,23 @@ public class RepositoryReflectionUtil {
     }
 
     public static String getEntityId(Class<?> clz) {
-        for (Field f : clz.getDeclaredFields()) {
-            if (f.isAnnotationPresent(javax.persistence.Id.class)) {
-                return f.getName();
-            }
-        }
-
-        if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
-            for (Field f : clz.getSuperclass().getDeclaredFields()) {
+        try {
+            for (Field f : clz.getDeclaredFields()) {
                 if (f.isAnnotationPresent(javax.persistence.Id.class)) {
                     return f.getName();
                 }
             }
+            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                for (Field f : clz.getSuperclass().getDeclaredFields()) {
+                    if (f.isAnnotationPresent(javax.persistence.Id.class)) {
+                        return f.getName();
+                    }
+                }
+            }
+            throw new Exception("查無Id!!");
+        } catch (Exception ex) {
+            String clzName = clz == null ? "<class is null>" : clz.getName();
+            throw new RuntimeException("getEntityId Err : " + ex.getMessage() + " --> " + clzName, ex);
         }
-        return null;
     }
 }
