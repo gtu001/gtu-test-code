@@ -9,9 +9,9 @@ import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.log4j.Logger;
 
-public class EntityFieldUtil {
+public class EntityFieldReflectionUtil {
 
-    private static final Logger log = Logger.getLogger(EntityFieldUtil.class);
+    private static final Logger log = Logger.getLogger(EntityFieldReflectionUtil.class);
 
     /**
      * @param indicateClz
@@ -69,7 +69,7 @@ public class EntityFieldUtil {
         } catch (Exception ex) {
             String methodName = "set" + StringUtils.capitalize(fieldName);
             for (Method mth : entity.getClass().getDeclaredMethods()) {
-                if (mth.getName().equals(methodName)) {
+                if (mth.getName().equals(methodName) && mth.getParameterCount() == 1) {
                     value = __primitiveConvert(value, mth.getParameterTypes()[0]);
                     try {
                         mth.invoke(entity, value);

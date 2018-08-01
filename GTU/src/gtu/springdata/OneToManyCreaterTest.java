@@ -15,37 +15,34 @@ public class OneToManyCreaterTest {
 
     static {
         StringBuffer sb = new StringBuffer();
-        sb.append("    // relation ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                                          \n");
-        sb.append("                                                                                           \n");
-        sb.append("    @OneToMany(//                                                                          \n");
-        sb.append("            cascade = CascadeType.ALL, //                                                  \n");
-        sb.append("            orphanRemoval = true, //                                                       \n");
-        sb.append("            fetch = FetchType.LAZY//                                                       \n");
-        sb.append("    ) //                                                                                   \n");
-
-        switch (2) {
+        sb.append("    // relation ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓                          \n");
+        sb.append("                                                                           \n");
+        sb.append("    @OneToMany(//                                                          \n");
+        sb.append("            cascade = CascadeType.ALL, //                                  \n");
+        sb.append("            orphanRemoval = false, //                                      \n");
+        sb.append("            fetch = FetchType.LAZY//                                       \n");
+        sb.append("    ) //                                                                   \n");
+        
+        switch (1) {
         case 1:// 拿pk當外建
             sb.append("    @JoinColumn(name = \"${ref_db_column!'ref_db_column'}\") //                         \n");
             break;
-        case 2:// 自訂外建(不拿pk當外建)
+        case 2:// 自訂外建(無效果)
             sb.append("    @JoinColumn(foreignKey = @ForeignKey(name = \"${ref_db_column!'ref_db_column'}\")) //  \n");
             break;
         }
-
-        sb.append("    @JsonIgnore                                                                            \n");
+        
+        sb.append("    @JsonIgnore                                                            \n");
         sb.append("    private List<${ref_java_type!'ref_java_type'}> ${java_lst_name!'java_lst_name'};         \n");
-        sb.append("                                                                                           \n");
-        sb.append("//    @Transient                                                                           \n");
-        sb.append("    @Column(name = \"${ref_db_column!'ref_db_column'}\")                                \n");
-        sb.append("    @DynamicDBRelation(//                                                                  \n");
-        sb.append("            setter = \"${setter!'setter'}\", //                             \n");
-        sb.append("            repository = \"${repository!'repository'}\", //                    \n");
+        sb.append("                                                                           \n");
+        sb.append("    @Transient                                                             \n");
+        sb.append("    @DynamicDBRelation(//                                                  \n");
+        sb.append("            setter = \"${setter!'setter'}\", //                            \n");
+        sb.append("            repository = \"${repository!'repository'}\", //                  \n");
         sb.append("            method = \"${method!'method'}\")                                \n");
-        sb.append("    private Long ${ref_java_name!'ref_java_name'};                                       \n");
-        sb.append("                                                                                           \n");
-        sb.append("    // relation ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑                                          \n");
-        sb.append("                                                                                           \n");
-
+        sb.append("    private String ${ref_java_name!'ref_java_name'};                                  \n");
+        sb.append("                                                                           \n");
+        sb.append("    // relation ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑                          \n");
         MASTER_BLOCK = sb.toString();
         sb.delete(0, sb.length());
 
@@ -76,13 +73,13 @@ public class OneToManyCreaterTest {
     public void execute(Map<String, Object> root) {
         // 請勿砍掉 ↓↓↓↓↓↓↓
         // Map<String, Object> root = new HashMap<String,Object>();
-        // root.put("ref_db_column", "personnel_specification_properties_id");
-        // root.put("java_lst_name", "personnelSpecificationProperties");
-        // root.put("ref_java_type", "PersonnelSpecificationProperty");
-        // root.put("ref_java_name", "personnelSpecificationPropertiesId");
-        // root.put("setter", "setPersonnelSpecificationProperties");
-        // root.put("repository", "PersonnelSpecificationPropertyRepository");
-        // root.put("method", "find4PersonnelSpecificationRelation");
+        // root.put("ref_db_column", "material_actual_id");
+        // root.put("java_lst_name", "materialActualProperties");
+        // root.put("ref_java_type", "MaterialActualProperty"); // target entity
+        // root.put("ref_java_name", "materialActualIdDynamic"); //from entity pk (for dynamic)
+        // root.put("setter", "setMaterialActualProperties");
+        // root.put("repository", "MaterialActualPropertyRepository");
+        // root.put("method", "find4Relation");
         // 請勿砍掉 ↑↑↑↑↑↑↑
         try {
             if (root.containsKey("ref_db_column") && //

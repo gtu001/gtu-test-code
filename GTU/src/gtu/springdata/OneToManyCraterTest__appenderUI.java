@@ -96,7 +96,7 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
                     if (mth.matches()) {
                         String toType = mth.group(1);
                         String fromType = toType.replaceAll("Property$", "");
-                        String javaName = toJavaListName(toType) + "Id";
+                        String javaName = toJavaListName(fromType) + "Id" + "Dynamic";
                         String listName = toJavaListName(toType);
                         String method = "findRelation4" + toType;
 
@@ -118,6 +118,20 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
         refFromTypeText = new JTextField();
         refFromTypeText.setColumns(10);
         contentPane.add(refFromTypeText, "4, 4, fill, default");
+        refFromTypeText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                try {
+                    String $refFromTypeText = StringUtils.trimToEmpty(refFromTypeText.getText());
+                    if (StringUtils.isNotBlank($refFromTypeText)) {
+                        String javaName = toJavaListName($refFromTypeText) + "Id" + "Dynamic";
+                        javaNameText.setText(javaName);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        }));
 
         JLabel lblRefType = new JLabel("ref to type");
         contentPane.add(lblRefType, "2, 6, right, default");
@@ -130,12 +144,12 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
                 try {
                     String $refToTypeText = StringUtils.trimToEmpty(refToTypeText.getText());
                     if (StringUtils.isNotBlank($refToTypeText)) {
-                        String javaName = toJavaListName($refToTypeText) + "Id";
+                        String javaName = toJavaListName($refToTypeText) + "Id" + "Dynamic";
                         String listName = toJavaListName($refToTypeText);
                         String method = "findRelation4" + $refToTypeText;
                         String repository = $refToTypeText + "Repository";
 
-                        javaNameText.setText(javaName);
+                        // javaNameText.setText(javaName);
                         listNameText.setText(listName);
                         methodText.setText(method);
                         repositoryText.setText(repository);
@@ -281,6 +295,18 @@ public class OneToManyCraterTest__appenderUI extends JFrame {
                     root.put("setter", "set" + StringUtils.capitalise(listName));
                     root.put("repository", repository);
                     root.put("method", methodName);
+
+                    // Map<String, Object> root = new HashMap<String,Object>();
+                    // root.put("ref_db_column", "material_actual_id");
+                    // root.put("java_lst_name", "materialActualProperties");
+                    // root.put("ref_java_type", "MaterialActualProperty"); //
+                    // target entity
+                    // root.put("ref_java_name", "materialActualId"); //from
+                    // entity pk
+                    // root.put("setter", "setMaterialActualProperties");
+                    // root.put("repository",
+                    // "MaterialActualPropertyRepository");
+                    // root.put("method", "find4Relation");
 
                     t.execute(root);
 

@@ -105,7 +105,7 @@ public class ReflectUtil {
         return (Class<?>) type.getRawType();
     }
 
-    public static Class<?> getFieldGenericType_2(Field field) {
+    public static Class<?> getFieldGenericType_4Collection(Field field) {
         ParameterizedType type = (ParameterizedType) field.getGenericType();
         Class<?> genericType = (Class<?>) type.getActualTypeArguments()[0];
         return genericType;
