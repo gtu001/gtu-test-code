@@ -64,7 +64,13 @@ public class SimpleCrudRepositoryGenerater {
         reader.close();
 
         // -------------------------------------------------------------------------
-        for (String entityName : lstOrign) {
+        // main process
+        this.execute(lstOrign, entityPackage, repositoryPackage, srcFolder);
+        // -------------------------------------------------------------------------
+    }
+
+    public void execute(List<String> entityLst, String entityPackage, String repositoryPackage, File srcFolder) {
+        for (String entityName : entityLst) {
             String entityPackageName = entityPackage + "." + entityName;
             this.processFile(entityPackageName, repositoryPackage, srcFolder);
         }
