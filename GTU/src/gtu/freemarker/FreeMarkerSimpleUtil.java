@@ -42,101 +42,125 @@ public class FreeMarkerSimpleUtil {
         System.out.println("done...");
     }
 
-    public static void replace(File outputFile, final URL srcUrl, Map<String, Object> root) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
-        URLTemplateLoader urlTemplate = new URLTemplateLoader() {
-            @Override
-            protected URL getURL(String name) {
-                return srcUrl;
+    public static void replace(File outputFile, final URL srcUrl, Map<String, Object> root) {
+        try {
+            Configuration cfg = new Configuration();
+            URLTemplateLoader urlTemplate = new URLTemplateLoader() {
+                @Override
+                protected URL getURL(String name) {
+                    return srcUrl;
+                }
+            };
+            cfg.setTemplateLoader(urlTemplate);
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+            Template temp = cfg.getTemplate("aaa");
+
+            FileWriter out = new FileWriter(outputFile);
+            temp.process(root, out);
+            out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public static String replace(String templateSource, Map<String, Object> root) {
+        try {
+            Configuration cfg = new Configuration();
+
+            StringTemplateLoader stringTemplatge = new StringTemplateLoader();
+            stringTemplatge.putTemplate("aaa", templateSource);
+
+            cfg.setTemplateLoader(stringTemplatge);
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+            Template temp = cfg.getTemplate("aaa");
+
+            StringWriter out = new StringWriter();
+            temp.process(root, out);
+            out.flush();
+            return out.getBuffer().toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public static void replace(String templateSource, Map<String, Object> root, OutputStream outputStream) {
+        try {
+            Configuration cfg = new Configuration();
+
+            StringTemplateLoader stringTemplatge = new StringTemplateLoader();
+            stringTemplatge.putTemplate("aaa", templateSource);
+
+            cfg.setTemplateLoader(stringTemplatge);
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+            Template temp = cfg.getTemplate("aaa");
+
+            Writer out = new OutputStreamWriter(outputStream);
+            temp.process(root, out);
+            out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public static void replace(String templateSource, Map<String, Object> root, Writer out) {
+        try {
+            Configuration cfg = new Configuration();
+
+            StringTemplateLoader stringTemplatge = new StringTemplateLoader();
+            stringTemplatge.putTemplate("aaa", templateSource);
+
+            cfg.setTemplateLoader(stringTemplatge);
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+            Template temp = cfg.getTemplate("aaa");
+
+            temp.process(root, out);
+            out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public static void replace(File file, Map<String, Object> root, OutputStream outputStream) {
+        try {
+            Configuration cfg = new Configuration();
+
+            String defaultEncode = cfg.getEncoding(cfg.getLocale());
+            System.out.println("!!!!!defaultEncode == " + defaultEncode);
+
+            if (!file.isFile()) {
+                throw new IllegalArgumentException("not a file! : " + file);
             }
-        };
-        cfg.setTemplateLoader(urlTemplate);
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-        Template temp = cfg.getTemplate("aaa");
 
-        FileWriter out = new FileWriter(outputFile);
-        temp.process(root, out);
-        out.flush();
-    }
+            cfg.setDirectoryForTemplateLoading(file.getParentFile());
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
 
-    public static String replace(String templateSource, Map<String, Object> root) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
+            Template temp = cfg.getTemplate(file.getName());
 
-        StringTemplateLoader stringTemplatge = new StringTemplateLoader();
-        stringTemplatge.putTemplate("aaa", templateSource);
-
-        cfg.setTemplateLoader(stringTemplatge);
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-        Template temp = cfg.getTemplate("aaa");
-
-        StringWriter out = new StringWriter();
-        temp.process(root, out);
-        out.flush();
-        return out.getBuffer().toString();
-    }
-
-    public static void replace(String templateSource, Map<String, Object> root, OutputStream outputStream) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
-
-        StringTemplateLoader stringTemplatge = new StringTemplateLoader();
-        stringTemplatge.putTemplate("aaa", templateSource);
-
-        cfg.setTemplateLoader(stringTemplatge);
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-        Template temp = cfg.getTemplate("aaa");
-
-        Writer out = new OutputStreamWriter(outputStream);
-        temp.process(root, out);
-        out.flush();
-    }
-
-    public static void replace(String templateSource, Map<String, Object> root, Writer out) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
-
-        StringTemplateLoader stringTemplatge = new StringTemplateLoader();
-        stringTemplatge.putTemplate("aaa", templateSource);
-
-        cfg.setTemplateLoader(stringTemplatge);
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-        Template temp = cfg.getTemplate("aaa");
-
-        temp.process(root, out);
-        out.flush();
-    }
-
-    public static void replace(File file, Map<String, Object> root, OutputStream outputStream) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
-
-        String defaultEncode = cfg.getEncoding(cfg.getLocale());
-        System.out.println("!!!!!defaultEncode == " + defaultEncode);
-
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("not a file! : " + file);
+            Writer out = new OutputStreamWriter(outputStream);
+            temp.process(root, out);
+            out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         }
-
-        cfg.setDirectoryForTemplateLoading(file.getParentFile());
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-
-        Template temp = cfg.getTemplate(file.getName());
-
-        Writer out = new OutputStreamWriter(outputStream);
-        temp.process(root, out);
-        out.flush();
     }
 
-    public static void replace(File file, Map<String, Object> root, Writer out) throws IOException, TemplateException {
-        Configuration cfg = new Configuration();
+    public static void replace(File file, Map<String, Object> root, Writer out) {
+        try {
+            Configuration cfg = new Configuration();
 
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("not a file!");
+            if (!file.isFile()) {
+                throw new IllegalArgumentException("not a file!");
+            }
+
+            cfg.setDirectoryForTemplateLoading(file.getParentFile());
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+
+            Template temp = cfg.getTemplate(file.getName());
+
+            temp.process(root, out);
+            out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         }
-
-        cfg.setDirectoryForTemplateLoading(file.getParentFile());
-        cfg.setObjectWrapper(new DefaultObjectWrapper());
-
-        Template temp = cfg.getTemplate(file.getName());
-
-        temp.process(root, out);
-        out.flush();
     }
 }

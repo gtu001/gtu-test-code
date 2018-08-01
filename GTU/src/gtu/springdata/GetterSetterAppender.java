@@ -27,10 +27,10 @@ import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Multimap;
 
-public class GetterSetterAppender_Test {
+public class GetterSetterAppender {
 
     public static void main(String[] args) {
-        GetterSetterAppender_Test t = new GetterSetterAppender_Test();
+        GetterSetterAppender t = new GetterSetterAppender();
         File baseDir = new File("D:/workstuff/workspace_taida");
 
         t.execute("com.delta.mes.model.isa95", baseDir);

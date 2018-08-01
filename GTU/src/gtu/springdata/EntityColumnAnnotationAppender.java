@@ -26,10 +26,10 @@ import org.reflections.Store;
 
 import com.google.common.collect.Multimap;
 
-public class EntityBeautifierMainTest {
+public class EntityColumnAnnotationAppender {
 
     public static void main(String[] args) {
-        EntityBeautifierMainTest t = new EntityBeautifierMainTest();
+        EntityColumnAnnotationAppender t = new EntityColumnAnnotationAppender();
 
         File dir = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java");
 

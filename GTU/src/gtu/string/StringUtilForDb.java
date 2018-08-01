@@ -28,7 +28,7 @@ public class StringUtilForDb {
     }
 
     public static void main(String[] args) {
-        for (String field : Arrays.asList("aaa_bbb_ccc", "DDD_EEE_FFF")) {
+        for (String field : Arrays.asList("aaa_bbb_ccc", "DDD_EEE_FFF", "tttt oooo eeee wwww", "eEE-AAAA-plplp")) {
             System.out.println("dbFieldToJava = " + dbFieldToJava(field));
         }
 
