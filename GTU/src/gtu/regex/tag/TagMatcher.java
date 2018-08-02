@@ -1,6 +1,8 @@
 package gtu.regex.tag;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +33,10 @@ public class TagMatcher {
         System.out.println("unique = " + t.findUnique());
 
         System.out.println("done...");
+    }
+
+    public TagMatcher(String startTag, String endTag, String startPtnStr, String endPtnStr, String content, boolean debugMode) {
+        this(startTag, endTag, startPtnStr, endPtnStr, 0, 0, content, debugMode);
     }
 
     public TagMatcher(String startTag, String endTag, String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset, String content, boolean debugMode) {
@@ -65,7 +71,7 @@ public class TagMatcher {
     String startTag;
     String endTag;
     String content;
-    int startPad = 0;
+    StartPadHolder startPad = new StartPadHolder();
 
     int startTagOffset;
     int endTagOffset;
@@ -74,7 +80,6 @@ public class TagMatcher {
     TagMatcherInfo info;
 
     public boolean findUnique() {
-        startPad = 0;
         info = null;
         while (find()) {
             String currentContent = this.group().groupWithoutTag();
@@ -90,13 +95,10 @@ public class TagMatcher {
         return false;
     }
 
-    public void reset(String content) {
-        this.content = content;
-        this.startPad = 0;
-    }
-
     public boolean find() {
         Log.v(TAG, "find ------------------------------------");
+        startPad.setupStartPad();
+
         int startPos = getStartPos();
         Log.v(TAG, "-init-startPos : " + startPos + " --> " + fixLengthForDebug(StringUtils.substring(content, startPos)));
         if (startPos == -1) {
@@ -121,11 +123,28 @@ public class TagMatcher {
         Log.v(TAG, "endPos : " + endPos);
         Log.v(TAG, "content : " + fixLengthForDebug(content.substring(startPos, endPos)));
 
-        startPad = startPos + getStartTagLength();
+        // startPad = startPos + getStartTagLength();
+        startPad.startTagLength = getStartTagLength();
         return true;
     }
 
-    public String appendReplacementForUnique(String replace, boolean checkResult, boolean resetContent) {
+    private class StartPadHolder {
+        int startPad = 0;
+        int startTagLength = 0;
+        boolean resetStartPad = false;
+
+        private void setupStartPad() {
+            if (resetStartPad) {
+                startPad = 0;
+            } else {
+                startPad = startPad + startTagLength;
+            }
+            resetStartPad = false;
+            Log.v(TAG, "^^^ startPad : " + startPad);
+        }
+    }
+
+    public String appendReplacementForUnique(String replace, boolean checkResult, boolean resetContent, boolean resetStartPos) {
         if (info == null) {
             throw new RuntimeException("請先執行findUnique");
         }
@@ -142,8 +161,9 @@ public class TagMatcher {
             }
         }
         if (resetContent) {
-            this.reset(resultContent);
+            this.content = resultContent;
         }
+        this.startPad.resetStartPad = resetStartPos;
         return resultContent;
     }
 
@@ -278,7 +298,9 @@ public class TagMatcher {
             if (pos == -1) {
                 return -1;
             } else {
-                String tmpContent2 = StringUtils.substring(tmpContent, pos, pos + endPtn.ptn.pattern().length());
+                // String tmpContent2 = StringUtils.substring(tmpContent, pos,
+                // pos + endPtn.ptn.pattern().length());
+                String tmpContent2 = StringUtils.substring(tmpContent, pos, pos + endPtn.group().length());
                 Log.v(TAG, "<<<---" + tmpContent2);
                 int fixOffset = tmpContent2.indexOf(endTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
@@ -290,13 +312,15 @@ public class TagMatcher {
 
     private int getStartPos() {
         if (startPtn == null) {
-            return content.indexOf(startTag, startPad);
+            return content.indexOf(startTag, startPad.startPad);
         } else {
-            int pos = startPtn.indexOf(content, startPad);
+            int pos = startPtn.indexOf(content, startPad.startPad);
             if (pos == -1) {
                 return -1;
             } else {
-                String tmpContent = StringUtils.substring(content, pos, pos + startPtn.ptn.pattern().length());
+                // String tmpContent = StringUtils.substring(content, pos, pos +
+                // startPtn.ptn.pattern().length());
+                String tmpContent = StringUtils.substring(content, pos, pos + startPtn.group().length());
                 Log.v(TAG, "<<<---" + tmpContent);
                 int fixOffset = tmpContent.indexOf(startTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
@@ -306,11 +330,19 @@ public class TagMatcher {
     }
 
     private int getStartTagLength() {
-        return startTag.length() + startTagOffset;
+        if (startPtn == null) {
+            return startTag.length() + startTagOffset;
+        } else {
+            return startPtn.group().length() + startTagOffset;
+        }
     }
 
     private int getEndTagLength() {
-        return endTag.length() + endTagOffset;
+        if (endPtn == null) {
+            return endTag.length() + endTagOffset;
+        } else {
+            return endPtn.group().length() + endTagOffset;
+        }
     }
 
     public static class StringUtilsByPattern {

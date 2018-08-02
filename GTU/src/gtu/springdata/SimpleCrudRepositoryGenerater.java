@@ -28,7 +28,7 @@ public class SimpleCrudRepositoryGenerater {
         sb.append("import {1};                                                            \n");
         sb.append("                                                                       \n");
         sb.append("@Profile('{' \"spring-data\", \"servers\" })                                 \n");
-        sb.append("public interface {2} extends CrudRepository<{3}, Long> '{'         \n");
+        sb.append("public interface {2} extends CrudRepository<{3}, String> '{'         \n"); // Long TODO 
         sb.append("                                                                       \n");
         sb.append("}                                                                      \n");
         sb.append("                                                                       \n");
@@ -44,7 +44,7 @@ public class SimpleCrudRepositoryGenerater {
     public void execute() throws IOException {
         // FIXME ↓↓↓↓↓↓
         // -------------------------------------------------------------------------
-        String entityPackage = "com.delta.mes.model.isa95.resources.physicalasset";
+        String entityPackage = "com.delta.mes.model.isa95.operations.definition";
         String repositoryPackage = "com.delta.mes.model.isa95.new_dao";
         File srcFolder = new File("D:/workstuff/workspace_taida/Taida_Model/src/main/java/");
         // FIXME ↑↑↑↑↑↑

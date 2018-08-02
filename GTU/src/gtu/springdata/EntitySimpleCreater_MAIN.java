@@ -20,8 +20,8 @@ public class EntitySimpleCreater_MAIN {
     public static void main(String[] args) throws IllegalAccessException, IOException {
         // FIXME ↓↓↓↓↓↓
         // -------------------------------------------------------------------------
-        File srcDir = new File("C:/Users/wistronits/Desktop/新增資料夾");
-        String packagePath = "com.delta.mes.model.isa95.resources.physicalasset";
+        File srcDir = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java");
+        String packagePath = "com.delta.mes.model.isa95.operations.definition";
         String className = "";
         // FIXME ↑↑↑↑↑↑
         // -------------------------------------------------------------------------
@@ -54,7 +54,8 @@ public class EntitySimpleCreater_MAIN {
             String javaName = lstOrign.get(ii);
             String type = "String";
             if (ii == 0) {
-                type = "Long";
+//                type = "Long";
+                type = "String";
             }
             lst.add(___JavaPropertyConfig.ofJavaName(javaName, type));
         }

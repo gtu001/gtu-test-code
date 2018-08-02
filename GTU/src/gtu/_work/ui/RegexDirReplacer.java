@@ -1,14 +1,5 @@
 package gtu._work.ui;
 
-import gtu.clipboard.ClipboardUtil;
-import gtu.file.FileUtil;
-import gtu.properties.PropertiesUtil;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JFileChooserUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JOptionPaneUtil;
-import gtu.swing.util.JPopupMenuUtil;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -32,6 +25,8 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -45,6 +40,20 @@ import javax.swing.WindowConstants;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import gtu.clipboard.ClipboardUtil;
+import gtu.file.FileUtil;
+import gtu.properties.PropertiesUtil;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFileChooserUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JPopupMenuUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -100,27 +109,50 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                             srcList = new JList();
                             jScrollPane1.setViewportView(srcList);
                             srcList.setModel(srcListModel);
+                            {
+                                panel = new JPanel();
+                                jScrollPane1.setRowHeaderView(panel);
+                                panel.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("default:grow"), }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                                {
+                                    childrenDirChkbox = new JCheckBox("含子目錄");
+                                    childrenDirChkbox.setSelected(true);
+                                    panel.add(childrenDirChkbox, "1, 1");
+                                }
+                                {
+                                    subFileNameText = new JTextField();
+                                    panel.add(subFileNameText, "1, 2, fill, default");
+                                    subFileNameText.setColumns(10);
+                                    subFileNameText.setText("(txt|java)");
+                                }
+                                {
+                                    replaceOldFileChkbox = new JCheckBox("備份舊檔");
+                                    replaceOldFileChkbox.setSelected(true);
+                                    panel.add(replaceOldFileChkbox, "1, 3");
+                                }
+                                {
+                                    charsetText = new JTextField();
+                                    panel.add(charsetText, "1, 5, fill, default");
+                                    charsetText.setColumns(10);
+                                    charsetText.setText("UTF8");
+                                }
+                            }
                             srcList.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     JListUtil.newInstance(srcList).defaultMouseClickOpenFile(evt);
 
                                     JPopupMenuUtil.newInstance(srcList).applyEvent(evt)//
-                                    .addJMenuItem("load files from clipboard", new ActionListener() {
-                                        public void actionPerformed(ActionEvent arg0) {
-                                            String content = ClipboardUtil.getInstance().getContents();
-                                            DefaultListModel model = (DefaultListModel)srcList.getModel();
-                                            StringTokenizer tok = new StringTokenizer(content, "\t\n\r\f", false);
-                                            for(;tok.hasMoreElements();){
-                                                String val = ((String)tok.nextElement()).trim();
-                                                model.addElement(new File(val));
-                                            }
-                                        }
-                                    }).addJMenuItem("charset", new ActionListener() {
-                                        public void actionPerformed(ActionEvent arg0) {
-                                            String encode = JCommonUtil._jOptionPane_showInputDialog("please choice charset", charset);
-                                            charset = Charset.forName(encode).displayName();
-                                        }
-                                    }).show();
+                                            .addJMenuItem("load files from clipboard", new ActionListener() {
+                                                public void actionPerformed(ActionEvent arg0) {
+                                                    String content = ClipboardUtil.getInstance().getContents();
+                                                    DefaultListModel model = (DefaultListModel) srcList.getModel();
+                                                    StringTokenizer tok = new StringTokenizer(content, "\t\n\r\f", false);
+                                                    for (; tok.hasMoreElements();) {
+                                                        String val = ((String) tok.nextElement()).trim();
+                                                        model.addElement(new File(val));
+                                                    }
+                                                }
+                                            }).show();
                                 }
                             });
                             srcList.addKeyListener(new KeyAdapter() {
@@ -135,16 +167,34 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                         jPanel1.add(addDirFiles, BorderLayout.NORTH);
                         addDirFiles.setText("add dir files");
                         addDirFiles.addActionListener(new ActionListener() {
+
                             public void actionPerformed(ActionEvent evt) {
                                 File file = JFileChooserUtil.newInstance().selectDirectoryOnly().showOpenDialog().getApproveSelectedFile();
                                 if (file == null || !file.isDirectory()) {
                                     return;
                                 }
-                                DefaultListModel model = new DefaultListModel();
-                                for (File f : file.listFiles()) {
-                                    if (f.isFile()) {
-                                        model.addElement(f);
+
+                                List<File> fileLst = new ArrayList<File>();
+
+                                String subName = StringUtils.trimToEmpty(subFileNameText.getText());
+                                if (StringUtils.isBlank(subName)) {
+                                    subName = ".*";
+                                }
+                                String patternStr = ".*\\." + subName;
+
+                                if (childrenDirChkbox.isSelected()) {
+                                    FileUtil.searchFileMatchs(file, patternStr, fileLst);
+                                } else {
+                                    for (File f : file.listFiles()) {
+                                        if (f.isFile() && f.getName().matches(patternStr)) {
+                                            fileLst.add(f);
+                                        }
                                     }
+                                }
+
+                                DefaultListModel model = new DefaultListModel();
+                                for (File f : fileLst) {
+                                    model.addElement(f);
                                 }
                                 srcList.setModel(model);
                             }
@@ -178,18 +228,14 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                         {
                             repToText = new JTextField();
                         }
-                        jPanel3Layout.setHorizontalGroup(jPanel3Layout
-                                .createSequentialGroup()
-                                .addContainerGap(25, 25)
-                                .addGroup(
-                                        jPanel3Layout.createParallelGroup()
-                                                .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repFromText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE))
-                                                .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repToText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE)))
+                        jPanel3Layout.setHorizontalGroup(jPanel3Layout.createSequentialGroup().addContainerGap(25, 25)
+                                .addGroup(jPanel3Layout.createParallelGroup()
+                                        .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repFromText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repToText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE)))
                                 .addContainerGap(20, Short.MAX_VALUE));
                         jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup().addContainerGap()
-                                .addComponent(repFromText, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addComponent(repToText, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                                .addComponent(repFromText, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(repToText, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
                     }
                     {
                         addToTemplate = new JButton();
@@ -251,9 +297,9 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                                     DefaultListModel model = (DefaultListModel) newRepList.getModel();
                                     int lastIndex = model.getSize() - 1;
                                     Object swap = null;
-                                    
+
                                     StringBuilder dsb = new StringBuilder();
-                                    for(Object current : objects){
+                                    for (Object current : objects) {
                                         int index = model.indexOf(current);
                                         switch (evt.getKeyCode()) {
                                         case 38:// up
@@ -271,14 +317,14 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                                             }
                                             break;
                                         case 127:// del
-                                            OldNewFile current_ = (OldNewFile)current;
+                                            OldNewFile current_ = (OldNewFile) current;
                                             dsb.append(current_.newFile.getName() + "\t" + (current_.newFile.delete() ? "T" : "F") + "\n");
                                             current_.newFile.delete();
                                             model.removeElement(current);
                                         }
                                     }
-                                    
-                                    if(dsb.length() > 0){
+
+                                    if (dsb.length() > 0) {
                                         JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog("del result!\n" + dsb, "DELETE");
                                     }
                                 }
@@ -371,8 +417,19 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    static String charset = Charset.forName("BIG5").displayName();
+
+    public String getCharset() {
+        try {
+            String tmpCharset = charsetText.getText();
+            if (StringUtils.isBlank(tmpCharset)) {
+                tmpCharset = "UTF8";
+            }
+            String charset = Charset.forName(tmpCharset).displayName();
+            return charset;
+        } catch (Exception ex) {
+            throw new RuntimeException("getCharset ERR : " + ex.getMessage(), ex);
+        }
+    }
 
     private JTabbedPane jTabbedPane1;
     private JPanel jPanel1;
@@ -400,6 +457,12 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
     static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class), "RegexReplacer.properties");
     static Properties prop = new Properties();
+    private JPanel panel;
+    private JComboBox comboBox;
+    private JCheckBox childrenDirChkbox;
+    private JTextField subFileNameText;
+    private JCheckBox replaceOldFileChkbox;
+    private JTextField charsetText;
     static {
         try {
             if (!propFile.exists()) {
@@ -437,7 +500,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             OldNewFile oldNewFile = null;
             for (int ii = 0; ii < model.getSize(); ii++) {
                 oldFile = (File) model.getElementAt(ii);
-                replaceText = FileUtil.loadFromFile(oldFile, charset);
+                replaceText = FileUtil.loadFromFile(oldFile, getCharset());
                 bakupReplaceText = replaceText.toString();
 
                 for (int jj = 0; jj < pmodel.getSize(); jj++) {
@@ -447,7 +510,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
                 if (!bakupReplaceText.equals(replaceText)) {
                     newFile = new File(oldFile.getParent(), oldFile.getName() + ".replace");
-                    FileUtil.saveToFile(newFile, replaceText, charset);
+                    FileUtil.saveToFile(newFile, replaceText, getCharset());
                     successMsg.append(newFile.getName() + "\n");
                     oldNewFile = new OldNewFile();
                     oldNewFile.oldFile = oldFile;
@@ -481,15 +544,22 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             File newFile = null;
             File oldFile = null;
             OldNewFile oldNewFile = null;
+
             for (int ii = 0; ii < model.getSize(); ii++) {
                 oldFile = (File) model.getElementAt(ii);
-                replaceText = FileUtil.loadFromFile(oldFile, charset);
+                replaceText = FileUtil.loadFromFile(oldFile, getCharset());
                 bakupReplaceText = replaceText.toString();
                 replaceText = replacer(fromPattern, toFormat, replaceText, oldFile);
 
                 if (!bakupReplaceText.equals(replaceText)) {
-                    newFile = new File(oldFile.getParent(), oldFile.getName() + ".replace");
-                    FileUtil.saveToFile(newFile, replaceText, charset);
+
+                    if (replaceOldFileChkbox.isSelected()) {
+                        oldFile.renameTo(new File(oldFile.getParentFile(), oldFile.getName() + ".bak"));
+                    }
+
+                    newFile = oldFile;
+
+                    FileUtil.saveToFile(newFile, replaceText, getCharset());
                     successMsg.append(newFile.getName() + "\n");
                     oldNewFile = new OldNewFile();
                     oldNewFile.oldFile = oldFile;
@@ -529,8 +599,8 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                 tempStr = toFormat.toString();
                 sb.append(replaceText.substring(startPos, matcher.start()));
                 for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                    System.out.println(ii + " -- " + matcher.group(ii));
                     tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                    System.out.println("group[" + ii + "] -- " + matcher.group(ii) + "\t--> " + tempStr);
                 }
                 sb.append(tempStr);
                 startPos = matcher.end();
@@ -540,7 +610,8 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
             return sb.toString();
         } catch (Exception ex) {
-            //            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
+            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
+            // getTitle());
             errMsg.append(file.getName() + ":" + ex + "\n");
             return errorRtn;
         }
