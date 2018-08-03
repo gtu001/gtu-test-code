@@ -40,7 +40,7 @@ public class GetterSetterAppender {
 
     public void execute(String basePackage, File baseDir) {
         javaLst = new ArrayList<>();
-        searchFilefind(baseDir, ".*\\.java", javaLst);
+        searchFilefind(baseDir, ".*\\.java$", javaLst);
 
         Reflections ref = new Reflections(basePackage);
 

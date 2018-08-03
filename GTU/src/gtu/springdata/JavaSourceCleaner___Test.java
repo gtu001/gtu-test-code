@@ -14,14 +14,14 @@ public class JavaSourceCleaner___Test {
     public static void main(String[] args) {
         JavaSourceCleaner___Test t = new JavaSourceCleaner___Test();
         // File baseDir = new File("D:/workstuff/workspace_taida/Taida_Model");
-        File baseDir = new File("D:/workstuff/workspace_taida/isa95-model");
+        File baseDir = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java/com/delta/mes/model/isa95/resources/equipment");
         File javaFile = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java/com/delta/mes/model/isa95/operations/capability/PersonnelCapability.java");
 
         List<File> fileLst = new ArrayList<File>();
         FileUtil.searchFileMatchs(baseDir, ".*\\.java", fileLst);
 //        fileLst.add(javaFile);
 
-        fileLst.stream().forEach(t::doCleanserFile__for__DynamicAnnotation);
+        fileLst.stream().forEach(t::doCleanserFile__for__removeManyToMany);
 
         System.out.println("done...");
     }
@@ -100,4 +100,31 @@ public class JavaSourceCleaner___Test {
         System.out.println("fix : " + file);
         FileUtil.saveToFile(file, tagMatcher.getContent(), "UTF8");
     }
+    
+    private void doCleanserFile__for__removeManyToMany(File file) {
+        String content1 = FileUtil.loadFromFile(file, "UTF8");
+
+        TagMatcher tagMatcher = new TagMatcher("// relation ↓", "// relation ↑", "\\/\\/\\s+relation\\s+↓+", "\\/\\/\\s+relation\\s+↑+", content1);
+
+        boolean findOk = false;
+
+        while (tagMatcher.findUnique()) {
+            String tagContent = tagMatcher.group().groupWithTag();
+
+            if (tagContent.contains("@ManyToMany")) {
+                tagContent = "";
+                findOk = true;
+            } else {
+                break;
+            }
+
+            tagMatcher.appendReplacementForUnique(tagContent, findOk, true, false);
+        }
+
+        if (findOk) {
+            System.out.println("fix : " + file);
+            FileUtil.saveToFile(file, tagMatcher.getContent(), "UTF8");
+        }
+    }
+    
 }

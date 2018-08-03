@@ -21,7 +21,7 @@ public class EntitySimpleCreater_MAIN {
         // FIXME ↓↓↓↓↓↓
         // -------------------------------------------------------------------------
         File srcDir = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java");
-        String packagePath = "com.delta.mes.model.isa95.operations.definition";
+        String packagePath = "com.delta.mes.model.isa95.resources.equipment";
         String className = "";
         // FIXME ↑↑↑↑↑↑
         // -------------------------------------------------------------------------

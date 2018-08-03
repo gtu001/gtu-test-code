@@ -108,11 +108,11 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                         String listName = toJavaListName(toType);
                         String method = "findRelation4" + toType;
 
-                        JTextFieldUtil.setText(javaNameText, javaName);
-                        JTextFieldUtil.setText(refToTypeText, toType);
-                        JTextFieldUtil.setText(refFromTypeText, fromType);
-                        JTextFieldUtil.setText(listNameText, listName);
-                        JTextFieldUtil.setText(methodText, method);
+                        javaNameText.setText(javaName);
+                        refToTypeText.setText(toType);
+                        refFromTypeText.setText(fromType);
+                        listNameText.setText(listName);
+                        methodText.setText(method);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -133,7 +133,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                     String $refFromTypeText = StringUtils.trimToEmpty(refFromTypeText.getText());
                     if (StringUtils.isNotBlank($refFromTypeText)) {
                         String javaName = toJavaListName($refFromTypeText) + "Id";
-                        JTextFieldUtil.setText(javaNameText, javaName);
+                        javaNameText.setText(javaName);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -156,10 +156,10 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                         String method = "findRelation4" + $refToTypeText;
                         String repository = $refToTypeText + "Repository";
 
-                        // JTextFieldUtil.setText(javaNameText, javaName);
-                        JTextFieldUtil.setText(listNameText, listName);
-                        JTextFieldUtil.setText(methodText, method);
-                        JTextFieldUtil.setText(repositoryText, repository);
+                        // javaNameText.setText(javaName);
+                        listNameText.setText(listName);
+                        methodText.setText(method);
+                        repositoryText.setText(repository);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);

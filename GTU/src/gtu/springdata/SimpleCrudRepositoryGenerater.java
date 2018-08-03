@@ -44,7 +44,7 @@ public class SimpleCrudRepositoryGenerater {
     public void execute() throws IOException {
         // FIXME ↓↓↓↓↓↓
         // -------------------------------------------------------------------------
-        String entityPackage = "com.delta.mes.model.isa95.operations.definition";
+        String entityPackage = "com.delta.mes.model.isa95.resources.equipment";
         String repositoryPackage = "com.delta.mes.model.isa95.new_dao";
         File srcFolder = new File("D:/workstuff/workspace_taida/Taida_Model/src/main/java/");
         // FIXME ↑↑↑↑↑↑
