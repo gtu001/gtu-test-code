@@ -14,4 +14,4 @@ FROM
     JOIN information_schema.constraint_column_usage AS ccu
       ON ccu.constraint_name = tc.constraint_name
       AND ccu.table_schema = tc.table_schema
-WHERE  constraint_type = 'FOREIGN KEY' AND tc.table_name='mytable';
+WHERE 1=1 -- constraint_type = 'FOREIGN KEY' AND tc.table_name='mytable';

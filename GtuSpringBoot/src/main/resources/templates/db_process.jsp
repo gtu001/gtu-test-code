@@ -173,6 +173,10 @@
 				}
 				//alert("gridComplete 查詢完成!\n" + data.length);
 			},
+			onCellSelect: function (rowId, iCol, content, event) {
+		    	//alert("rowId : " + rowId + " , iCol : " + iCol + " , content : " + content + " , event : " + event);
+		    	detailEditDialog(rowId, iCol, content, event);
+		    },
 			subGrid: true,
 		    subGridRowExpanded: function (subgridDivId, rowId) {
 		        var subgridTableId = subgridDivId + "_div";
@@ -183,34 +187,10 @@
 		        formData = $.extend(formData, {rowId : rowId});
 				$.post("/springdata-dbMain/query_relation", formData, //
 				function(data) {//
-					var dataStr = JSON.stringify(data);
-					console.log(dataStr);
-					
-					var getLocalMapLst = function(data){
-						try{
-							var rtnArry = new Array();
-							var arry = data['rowReader']['rows'];
-							for(var i in arry){
-								rtnArry.push(arry[i]['loaclMap']);
-							}
-							return rtnArry;
-						}catch(e){
-							return [];
-						}
-					}
-					
-					var subgridArry = data['subgrid'];
-					for(var ii = 0 ; ii < subgridArry.length ; ii ++){
-						var d = subgridArry[ii];
-						
-						var caption = d['fieldName'];
-						var colNames = d['colModel'];
-						var colModel = d['colModel'];
-						var data = getLocalMapLst(d);
-						
-						//建立關聯表
-						subgridGenerate(subgridTableId, ii, caption, colNames, colModel, data);
-					}
+				
+					//產生關聯資料
+					var subgridCreater = new SubgridCreater(data, subgridTableId);
+					subgridCreater.init();
 					
 				}, "json")//
 				.fail(jqueryTool.ajaxFailFunc);
@@ -219,7 +199,12 @@
 		    },
 		});
 
-		$("#jqGrid").navGrid('#jqGridPager', // the buttons to appear on the toolbar of the grid
+		//pager config
+		subBarPagerConfig("#jqGrid", "#jqGridPager"); // the buttons to appear on the toolbar of the grid
+	}
+
+	function subBarPagerConfig(jqGrid, jqGridPagerId){
+		$(jqGrid).navGrid(jqGridPagerId , // the buttons to appear on the toolbar of the grid
 		{
 			add : true,
 			addtext : '新增',
@@ -309,20 +294,12 @@
 		});
 	}
 	
-	function subgridGenerate(appendDivId, index, caption, colNames, colModel, data){
-		var subgridTableId = appendDivId + "_tab_" + index;
-		$("#" + appendDivId).append($("<table id="+ subgridTableId +" />"))
-	
-		$("#" + subgridTableId).jqGrid('GridUnload');//remove
-		$("#" + subgridTableId).jqGrid({
-            datatype: 'local',
-            caption : caption,
-            data: data,
-            //colNames: colNames,
-            colModel: colModel,
-            loadtext : 'Loading, please wait',
-			emptyRecords : "No data Found",
-        });
+	//TODO
+	function detailEditDialog(rowId, iCol, content, event){
+		var colModel = $("#jqGrid").jqGrid ('getGridParam', 'colModel');
+    	var columnName = colModel[iCol]['index'];
+    	var form = getForm();
+    	form = $.extend(form, {rowId:rowId, columnName:columnName});
 	}
 
 	function queryBtnBind() {
@@ -398,6 +375,63 @@
 		$(divElement).css("height", value);
 	}
 	
+	function SubgridCreater(data, subgridTableId){
+		var dataStr = JSON.stringify(data);
+		this.data = data;
+		console.log(dataStr);
+		
+		this.init = function(){
+			this.subgridArry = this.data['subgrid'];
+		
+			for(var ii = 0 ; ii < this.subgridArry.length ; ii ++){
+				var d = this.subgridArry[ii];
+				
+				var caption = d['fieldName'];
+				var colNames = d['colModel'];
+				var colModel = d['colModel'];
+				var data = this.getLocalMapLst(d);
+				
+				//建立關聯表
+				this.subgridGenerate(subgridTableId, ii, caption, colNames, colModel, data);
+			};
+		};
+		
+		this.getLocalMapLst = function(data){
+			try{
+				var rtnArry = new Array();
+				var arry = data['rowReader']['rows'];
+				for(var i in arry){
+					rtnArry.push(arry[i]['loaclMap']);
+				}
+				return rtnArry;
+			}catch(e){
+				return [];
+			}
+		};
+		
+		this.subgridGenerate = function(appendDivId, index, caption, colNames, colModel, data){
+			var subgridTableId = appendDivId + "_tab_" + index;
+			var subgridNavBarId = appendDivId + "_navBar_" + index;
+			$("#" + appendDivId).append($("<table id="+ subgridTableId +" />"));
+			$("#" + appendDivId).append($("<div id="+ subgridNavBarId +" />"));
+		
+			$("#" + subgridTableId).jqGrid('GridUnload');//remove
+			$("#" + subgridTableId).jqGrid({
+	            datatype: 'local',
+	            caption : caption,
+	            data: data,
+	            //colNames: colNames,
+	            colModel: colModel,
+	            loadtext : 'Loading, please wait',
+	            emptyRecords : "No data Found",
+	            pager : '#' + subgridNavBarId,
+				loadComplete : function(data, response) {
+				},
+	        }); //.navGrid("xxxxxxxxx", {})
+	        
+	        subBarPagerConfig("#" + subgridTableId, '#' + subgridNavBarId);
+		};
+	}
 </script>
 <title></title>
 </head>
@@ -407,7 +441,8 @@
 	<form id="form" action="/GtuSpringBoot/main">
 
 		表名稱: <select name="tableNames"></select><input
-			name="tableNames_autoComplete" size="20"><br />
+			name="tableNames_autoComplete" size="20"> <input
+			type="button" name="query" value="reload" /> <br />
 	</form>
 
 	<table id="jqGrid"></table>
