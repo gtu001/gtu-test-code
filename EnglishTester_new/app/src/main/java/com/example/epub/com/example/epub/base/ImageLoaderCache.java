@@ -1,4 +1,4 @@
-package com.example.epub.com.example.epub.viewer;
+package com.example.epub.com.example.epub.base;
 
 import android.graphics.Bitmap;
 import android.util.Log;
