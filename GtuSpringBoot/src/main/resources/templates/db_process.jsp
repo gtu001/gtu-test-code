@@ -189,7 +189,7 @@
 				function(data) {//
 				
 					//產生關聯資料
-					var subgridCreater = new SubgridCreater(data, subgridTableId);
+					var subgridCreater = new SubgridCreater(data, subgridTableId, rowId);
 					subgridCreater.init();
 					
 				}, "json")//
@@ -199,12 +199,7 @@
 		    },
 		});
 
-		//pager config
-		subBarPagerConfig("#jqGrid", "#jqGridPager"); // the buttons to appear on the toolbar of the grid
-	}
-
-	function subBarPagerConfig(jqGrid, jqGridPagerId){
-		$(jqGrid).navGrid(jqGridPagerId , // the buttons to appear on the toolbar of the grid
+		$("#jqGrid").navGrid("#jqGridPager" , // the buttons to appear on the toolbar of the grid
 		{
 			add : true,
 			addtext : '新增',
@@ -293,7 +288,7 @@
 			}
 		});
 	}
-	
+
 	//TODO
 	function detailEditDialog(rowId, iCol, content, event){
 		var colModel = $("#jqGrid").jqGrid ('getGridParam', 'colModel');
@@ -375,9 +370,10 @@
 		$(divElement).css("height", value);
 	}
 	
-	function SubgridCreater(data, subgridTableId){
+	function SubgridCreater(data, subgridTableId, masterId){
 		var dataStr = JSON.stringify(data);
 		this.data = data;
+		this.masterId = masterId;
 		console.log(dataStr);
 		
 		this.init = function(){
@@ -429,8 +425,88 @@
 				},
 	        }); //.navGrid("xxxxxxxxx", {})
 	        
-	        subBarPagerConfig("#" + subgridTableId, '#' + subgridNavBarId);
+	        this.subBarPagerConfig("#" + subgridTableId, '#' + subgridNavBarId, {rowId:this.masterId, fieldName:caption });
 		};
+		
+		this.subBarPagerConfig = function(jqGrid, jqGridPagerId, appendMap){
+			$(jqGrid).navGrid(jqGridPagerId , // the buttons to appear on the toolbar of the grid
+			{
+				add : true,
+				addtext : '新增',
+				edit : true,
+				edittext : '修改',
+				del : true,
+				deltext : '刪除',
+				refresh : true,
+				refreshtext : "重整",
+			},
+			{
+				editCaption : "修改視窗",
+				recreateForm : true,
+				url : "/springdata-dbMain/relation_detail_process",
+				beforeSubmit : function(postdata, form, oper) {
+					postdata = $.extend(postdata, getForm(), {oper:oper}, appendMap);
+				
+					//alert("postdata = " + JSON.stringify(postdata));
+					//alert("form = " + JSON.stringify(form));
+	
+					if (confirm('確定要修改')) {
+						// do something
+						return [ true, '' ];
+					} else {
+						return [ false, '取消!!' ];
+					}
+				},
+				closeAfterEdit : true,
+				errorTextFormat : function(data) {
+					return 'Error: ' + data.responseText
+				}
+			},
+			{
+				closeAfterAdd : true,
+				recreateForm : true,
+				url : "/springdata-dbMain/relation_detail_process",
+				beforeSubmit : function(postdata, form, oper) {
+					postdata = $.extend(postdata, getForm(), {oper:oper}, appendMap);
+				
+					//alert("postdata = " + JSON.stringify(postdata));
+					//alert("form = " + JSON.stringify(form));
+	
+					if (confirm('確定要新增')) {
+						// do something
+						return [ true, '' ];
+					} else {
+						return [ false, '取消!!' ];
+					}
+				},
+				errorTextFormat : function(data) {
+					return 'Error: ' + data.responseText
+				}
+			},
+			{
+				url : "/springdata-dbMain/relation_detail_process",
+				onclickSubmit : function(data, d1, d2){
+					var postData = data['delData'];
+					postdata = $.extend(postData, getForm(), {oper:"del"}, appendMap);
+				},
+				
+				beforeSubmit : function(postdata, form, oper) {
+				
+					//alert("postdata = " + JSON.stringify(postdata));
+					//alert("form = " + JSON.stringify(form));
+					
+					if (confirm('確定要刪除')) {
+						// do something
+						return [ true, '' ];
+					} else {
+						return [ false, '取消!!' ];
+					}
+				},
+				errorTextFormat : function(data) {
+					return 'Error: ' + data.responseText
+				}
+			});
+		}
 	}
 </script>
 <title></title>

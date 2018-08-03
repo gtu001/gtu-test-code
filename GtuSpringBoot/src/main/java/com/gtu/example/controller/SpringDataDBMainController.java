@@ -3,6 +3,7 @@ package com.gtu.example.controller;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +40,7 @@ import com.gtu.example.common.JqGridHandler.JqReader;
 import com.gtu.example.common.JqGridHandler.SimpleJdGridCreater;
 import com.gtu.example.common.JqGridHandler.SubgridHandler;
 import com.gtu.example.common.PackageReflectionUtil;
+import com.gtu.example.common.RelationEntityRowHandler;
 import com.gtu.example.common.RepositoryReflectionUtil;
 
 import net.sf.json.JSONArray;
@@ -285,4 +287,60 @@ public class SpringDataDBMainController {
         }
     }
 
+    private Map<String, Object> getParameterMap(HttpServletRequest request) {
+        Map<String, Object> map = new HashMap<>();
+        for (Enumeration<?> enu = request.getParameterNames(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String value = request.getParameter(key);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    @PostMapping(value = "/relation_detail_process")
+    public String relationDetailProcess(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String rowId = request.getParameter("rowId");
+            String detailId = request.getParameter("id");
+            String fieldName = request.getParameter("fieldName");
+            String oper = request.getParameter("oper");
+            String[] pks = null;
+            if (StringUtils.isNotBlank(rowId)) {
+                pks = rowId.split("^", -1);
+            }
+
+            OperateDefine define = this.getOperateDefine(request);
+            Object entity = RepositoryReflectionUtil.findById(define.repositoryClz, define.repository, pks[0]);
+
+            Map<String, Object> valueMap = getParameterMap(request);
+            RelationEntityRowHandler relationHandler = new RelationEntityRowHandler(define.entityClz, entity, fieldName);
+
+            switch (oper) {
+            case "add":
+                relationHandler.insert(valueMap);
+                break;
+            case "edit":
+                relationHandler.update(valueMap, detailId);
+                break;
+            case "del":
+                relationHandler.delete(detailId);
+                break;
+            default:
+                throw new Exception("未定義 oper : " + oper);
+                // break;
+            }
+
+            Object resultObj = define.repository.save(entity);
+
+            JSONObject json = JSONUtil.getSuccess("ok");
+            if (resultObj != null) {
+                json.put("entity", resultObj);
+            }
+            return json.toString();
+        } catch (Exception ex) {
+            log.error("operateDBAction ERR : " + ex.getMessage(), ex);
+            // return JSONUtil.getThrowable(ex).toString();
+            return JSONUtil.getThrowableRoot(ex).toString();
+        }
+    }
 }

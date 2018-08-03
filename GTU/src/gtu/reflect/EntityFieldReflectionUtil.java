@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.reflect.MethodUtils;
 import org.apache.log4j.Logger;
+import org.springframework.util.ClassUtils;
 
 public class EntityFieldReflectionUtil {
 
@@ -47,7 +48,10 @@ public class EntityFieldReflectionUtil {
         if (targetClz == String.class) {
             return String.valueOf(value);
         }
-        return ConvertUtils.convert(String.valueOf(value), targetClz);
+        if (ClassUtils.isPrimitiveOrWrapper(targetClz)) {
+            return ConvertUtils.convert(String.valueOf(value), targetClz);
+        }
+        return value;
     }
 
     /**
@@ -68,7 +72,7 @@ public class EntityFieldReflectionUtil {
             return;
         } catch (Exception ex) {
             String methodName = "set" + StringUtils.capitalize(fieldName);
-            for (Method mth : entity.getClass().getDeclaredMethods()) {
+            for (Method mth : entity.getClass().getMethods()) {
                 if (mth.getName().equals(methodName) && mth.getParameterCount() == 1) {
                     value = __primitiveConvert(value, mth.getParameterTypes()[0]);
                     try {

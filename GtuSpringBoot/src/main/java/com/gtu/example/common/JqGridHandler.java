@@ -822,7 +822,10 @@ public class JqGridHandler {
         if (targetClz == String.class) {
             return String.valueOf(value);
         }
-        return ConvertUtils.convert(String.valueOf(value), targetClz);
+        if (ClassUtils.isPrimitiveOrWrapper(targetClz)) {
+            return ConvertUtils.convert(String.valueOf(value), targetClz);
+        }
+        return value;
     }
 
     public static void setFieldToEntity(Class indicateClz, Object entity, String fieldName, Object value) {
@@ -833,7 +836,7 @@ public class JqGridHandler {
             return;
         } catch (Exception ex) {
             String methodName = "set" + StringUtils.capitalize(fieldName);
-            for (Method mth : entity.getClass().getDeclaredMethods()) {
+            for (Method mth : entity.getClass().getMethods()) {
                 if (mth.getName().equals(methodName) && mth.getParameterCount() == 1) {
                     value = __primitiveConvert(value, mth.getParameterTypes()[0]);
                     try {
