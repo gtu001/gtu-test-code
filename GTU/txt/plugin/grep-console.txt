@@ -1,0 +1,3 @@
+http://marian.schedenig.name/projects/grep-console/
+
+在preference 輸入 grep console 即可設定
