@@ -9,17 +9,19 @@ import java.util.regex.Pattern;
 import gtu.file.FileUtil;
 import gtu.regex.tag.TagMatcher;
 
-public class RepositoryCleaner___Test {
+public class JavaSourceCleaner___Test {
 
     public static void main(String[] args) {
-        RepositoryCleaner___Test t = new RepositoryCleaner___Test();
+        JavaSourceCleaner___Test t = new JavaSourceCleaner___Test();
         // File baseDir = new File("D:/workstuff/workspace_taida/Taida_Model");
         File baseDir = new File("D:/workstuff/workspace_taida/isa95-model");
+        File javaFile = new File("D:/workstuff/workspace_taida/isa95-model/src/main/java/com/delta/mes/model/isa95/operations/capability/PersonnelCapability.java");
 
         List<File> fileLst = new ArrayList<File>();
         FileUtil.searchFileMatchs(baseDir, ".*\\.java", fileLst);
+//        fileLst.add(javaFile);
 
-        fileLst.stream().forEach(t::doCleanserFile__for__entity);
+        fileLst.stream().forEach(t::doCleanserFile__for__DynamicAnnotation);
 
         System.out.println("done...");
     }
@@ -48,7 +50,7 @@ public class RepositoryCleaner___Test {
     private void doCleanserFile__for__entity(File file) {
         String content1 = FileUtil.loadFromFile(file, "UTF8");
 
-        TagMatcher tagMatcher = new TagMatcher("// relation ↓", "// relation ↑", "\\/\\/\\s+relation\\s+↓+", "\\/\\/\\s+relation\\s+↑+", content1, true);
+        TagMatcher tagMatcher = new TagMatcher("// relation ↓", "// relation ↑", "\\/\\/\\s+relation\\s+↓+", "\\/\\/\\s+relation\\s+↑+", content1);
 
         boolean findOk = false;
 
@@ -69,5 +71,33 @@ public class RepositoryCleaner___Test {
             System.out.println("fix : " + file);
             FileUtil.saveToFile(file, tagMatcher.getContent(), "UTF8");
         }
+    }
+
+    // @Transient
+    // @DynamicDBRelation(//
+    // setter = "setEquipmentActualProperties", //
+    // repository = "EquipmentActualPropertyRepository", //
+    // method = "findRelation4EquipmentActualProperty")
+    // private String equipmentActualsId;
+
+    private void doCleanserFile__for__DynamicAnnotation(File file) {
+        String content1 = FileUtil.loadFromFile(file, "UTF8");
+
+        String orignContent = content1.toString();
+
+        TagMatcher tagMatcher = new TagMatcher("@Transient", ";", "\\@Transient(?:\r|\n|\\s|\t)*?\\@DynamicDBRelation", "\\w+\\;", content1);
+
+        while (tagMatcher.findUnique()) {
+            String tagContent = tagMatcher.group().groupWithTag();
+            tagMatcher.appendReplacementForUnique("", false, true, false);
+        }
+
+        if (orignContent.equals(tagMatcher.getContent())) {
+            return;
+        }
+
+        System.out.println(tagMatcher.getContent());
+        System.out.println("fix : " + file);
+        FileUtil.saveToFile(file, tagMatcher.getContent(), "UTF8");
     }
 }

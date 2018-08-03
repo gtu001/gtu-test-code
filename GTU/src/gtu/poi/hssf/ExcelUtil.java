@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
@@ -25,6 +23,7 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -87,26 +86,26 @@ public class ExcelUtil {
                 }
             }
         };
-        Map<Integer, Integer> m2 = new TreeMap<Integer,Integer>();
-        while(true) {
-            int exponent = (Integer)c1.transform(column);
+        Map<Integer, Integer> m2 = new TreeMap<Integer, Integer>();
+        while (true) {
+            int exponent = (Integer) c1.transform(column);
             column -= Math.pow(26, exponent);
-            
+
             int value = 0;
-            if(m2.containsKey(exponent)) {
+            if (m2.containsKey(exponent)) {
                 value = m2.get(exponent);
             }
-            value ++;
+            value++;
             m2.put(exponent, value);
-            
-            if(exponent == 0) {
+
+            if (exponent == 0) {
                 m2.put(exponent, column + 1);
                 break;
             }
         }
         StringBuilder sb = new StringBuilder();
-        for(int k : m2.keySet()) {
-            char c = (char)(m2.get(k) + 64);
+        for (int k : m2.keySet()) {
+            char c = (char) (m2.get(k) + 64);
             sb.insert(0, c);
         }
         return sb.toString();
@@ -131,91 +130,183 @@ public class ExcelUtil {
     /**
      * 讀取檔案成Workbook物件
      */
-    public HSSFWorkbook readExcel(File file) throws Exception {
-        int size = (int) (file.length() - file.length() % 512);
-        byte[] buffer = new byte[size];
-        InputStream inputFile = new FileInputStream(file);
-        inputFile.read(buffer, 0, size);
-        inputFile.close();
-        InputStream byteIS = new ByteArrayInputStream(buffer);
-        byteIS.close();
-        return new HSSFWorkbook(byteIS);
+    public HSSFWorkbook readExcel(File file) {
+        try {
+            int size = (int) (file.length() - file.length() % 512);
+            byte[] buffer = new byte[size];
+            InputStream inputFile = new FileInputStream(file);
+            inputFile.read(buffer, 0, size);
+            inputFile.close();
+            InputStream byteIS = new ByteArrayInputStream(buffer);
+            byteIS.close();
+            return new HSSFWorkbook(byteIS);
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel ERR : " + ex.getMessage(), ex);
+        }
     }
 
     /**
      * 讀取檔案成Workbook物件
      */
-    public HSSFWorkbook readExcel2(File file) throws Exception {
-        InputStream inputFile = new FileInputStream(file);
+    public HSSFWorkbook readExcel2(File file) {
+        try {
+            InputStream inputFile = new FileInputStream(file);
 
-        // read entire stream into byte array:
-        ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int count;
-        while ((count = inputFile.read(buffer)) != -1)
-            byteOS.write(buffer, 0, count);
-        byteOS.close();
-        byte[] allBytes = byteOS.toByteArray();
+            // read entire stream into byte array:
+            ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = inputFile.read(buffer)) != -1)
+                byteOS.write(buffer, 0, count);
+            byteOS.close();
+            byte[] allBytes = byteOS.toByteArray();
 
-        // create workbook from array:
-        InputStream byteIS = new ByteArrayInputStream(allBytes);
-        HSSFWorkbook workBook = new HSSFWorkbook(byteIS);
-        return workBook;
-    }
-    
-    /**
-     * 讀取檔案成Workbook物件
-     */
-    public XSSFWorkbook readExcel_xlsx(File file) throws Exception {
-        int size = (int) (file.length() - file.length() % 512);
-        byte[] buffer = new byte[size];
-        InputStream inputFile = new FileInputStream(file);
-        inputFile.read(buffer, 0, size);
-        inputFile.close();
-        InputStream byteIS = new ByteArrayInputStream(buffer);
-        byteIS.close();
-        return new XSSFWorkbook(byteIS);
+            // create workbook from array:
+            InputStream byteIS = new ByteArrayInputStream(allBytes);
+            HSSFWorkbook workBook = new HSSFWorkbook(byteIS);
+            return workBook;
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel2 ERR : " + ex.getMessage(), ex);
+        }
     }
 
     /**
      * 讀取檔案成Workbook物件
      */
-    public XSSFWorkbook readExcel2_xlsx(File file) throws Exception {
-        InputStream inputFile = new FileInputStream(file);
+    public XSSFWorkbook readExcel_xlsx(File file) {
+        try {
+            int size = (int) (file.length() - file.length() % 512);
+            byte[] buffer = new byte[size];
+            InputStream inputFile = new FileInputStream(file);
+            inputFile.read(buffer, 0, size);
+            inputFile.close();
+            InputStream byteIS = new ByteArrayInputStream(buffer);
+            byteIS.close();
+            return new XSSFWorkbook(byteIS);
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel_xlsx ERR : " + ex.getMessage(), ex);
+        }
+    }
 
-        // read entire stream into byte array:
-        ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int count;
-        while ((count = inputFile.read(buffer)) != -1)
-            byteOS.write(buffer, 0, count);
-        byteOS.close();
-        byte[] allBytes = byteOS.toByteArray();
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public XSSFWorkbook readExcel2_xlsx(File file) {
+        try {
+            InputStream inputFile = new FileInputStream(file);
 
-        // create workbook from array:
-        InputStream byteIS = new ByteArrayInputStream(allBytes);
-        XSSFWorkbook workBook = new XSSFWorkbook(byteIS);
-        return workBook;
+            // read entire stream into byte array:
+            ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = inputFile.read(buffer)) != -1)
+                byteOS.write(buffer, 0, count);
+            byteOS.close();
+            byte[] allBytes = byteOS.toByteArray();
+
+            // create workbook from array:
+            InputStream byteIS = new ByteArrayInputStream(allBytes);
+            XSSFWorkbook workBook = new XSSFWorkbook(byteIS);
+            return workBook;
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel2_xlsx ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public HSSFWorkbook readExcel(InputStream inputStream) {
+        try {
+            return new HSSFWorkbook(inputStream);
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public HSSFWorkbook readExcel2(InputStream inputStream) {
+        try {
+            // read entire stream into byte array:
+            ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = inputStream.read(buffer)) != -1)
+                byteOS.write(buffer, 0, count);
+            byteOS.close();
+            byte[] allBytes = byteOS.toByteArray();
+
+            // create workbook from array:
+            InputStream byteIS = new ByteArrayInputStream(allBytes);
+            HSSFWorkbook workBook = new HSSFWorkbook(byteIS);
+            return workBook;
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel2 ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public XSSFWorkbook readExcel_xlsx(InputStream inputStream) {
+        try {
+            return new XSSFWorkbook(inputStream);
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel_xlsx ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 讀取檔案成Workbook物件
+     */
+    public XSSFWorkbook readExcel2_xlsx(InputStream inputStream) {
+        try {
+            // read entire stream into byte array:
+            ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = inputStream.read(buffer)) != -1)
+                byteOS.write(buffer, 0, count);
+            byteOS.close();
+            byte[] allBytes = byteOS.toByteArray();
+
+            // create workbook from array:
+            InputStream byteIS = new ByteArrayInputStream(allBytes);
+            XSSFWorkbook workBook = new XSSFWorkbook(byteIS);
+            return workBook;
+        } catch (Exception ex) {
+            throw new RuntimeException("readExcel2_xlsx ERR : " + ex.getMessage(), ex);
+        }
     }
 
     /**
      * 寫檔
      */
-    public void writeExcel(File file, Workbook workbook) throws FileNotFoundException, IOException {
-        if (workbook.getNumberOfSheets() == 0) {
-            workbook.createSheet();
+    public void writeExcel(File file, Workbook workbook) {
+        try {
+            if (workbook.getNumberOfSheets() == 0) {
+                workbook.createSheet();
+            }
+            workbook.write(new FileOutputStream(file));
+        } catch (Exception ex) {
+            throw new RuntimeException("writeExcel ERR : " + ex.getMessage(), ex);
         }
-        workbook.write(new FileOutputStream(file));
     }
 
     /**
      * 寫檔
      */
-    public void writeExcel(String filename, Workbook workbook) throws FileNotFoundException, IOException {
-        if (workbook.getNumberOfSheets() == 0) {
-            workbook.createSheet();
+    public void writeExcel(String filename, Workbook workbook) {
+        try {
+            if (workbook.getNumberOfSheets() == 0) {
+                workbook.createSheet();
+            }
+            workbook.write(new FileOutputStream(filename));
+        } catch (Exception ex) {
+            throw new RuntimeException("writeExcel ERR : " + ex.getMessage(), ex);
         }
-        workbook.write(new FileOutputStream(filename));
     }
 
     /**
@@ -343,6 +434,28 @@ public class ExcelUtil {
             return Byte.toString(cell.getErrorCellValue());
         default:
             return "##POI## Unknown cell type";
+        }
+    }
+
+    /**
+     * 設日期直靠這個
+     */
+    public static class DateValueSetter {
+        private CellStyle cellStyle;
+
+        public static DateValueSetter of(String formatPattern, Workbook wb) {
+            return new DateValueSetter(formatPattern, wb);
+        }
+
+        private DateValueSetter(String formatPattern, Workbook wb) {
+            cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(createHelper.createDataFormat().getFormat(formatPattern));
+        }
+
+        public void set(Cell cell, Date date) {
+            cell.setCellValue(date);
+            cell.setCellStyle(cellStyle);
         }
     }
 
@@ -478,7 +591,7 @@ public class ExcelUtil {
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             row = sheet.getRow(ii);
             System.out.format("row:%d", ii);
-            if(row == null) {
+            if (row == null) {
                 System.out.println();
                 continue;
             }
@@ -492,6 +605,18 @@ public class ExcelUtil {
                 System.out.format("\t%d[%s]", jj, value);
             }
             System.out.println();
+        }
+    }
+
+    public void debugShowSheetData__________BLANK_4_TEMPLATE(Sheet sheet) {
+        for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
+            Row row = sheet.getRow(ii);
+            if (row == null) {
+                continue;
+            }
+            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                String value = ExcelUtil.getInstance().readCell(row.getCell(jj));
+            }
         }
     }
 
@@ -573,7 +698,7 @@ public class ExcelUtil {
             }
         }
     }
-    
+
     /**
      * sheet.addMergedRegion(CellRangeAddress.valueOf("B2:D5"));
      */

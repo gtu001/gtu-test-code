@@ -1,4 +1,4 @@
-package gtu._work;
+package gtu._work.timesheet;
 
 import gtu.date.DateUtil;
 import gtu.number.RandomUtil;
