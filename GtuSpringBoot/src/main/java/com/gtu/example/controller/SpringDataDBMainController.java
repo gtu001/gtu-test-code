@@ -55,7 +55,7 @@ public class SpringDataDBMainController {
     @Autowired
     private ConfigurableApplicationContext ctx;
     @Autowired
-    @Qualifier("serversEntityManager")
+//    @Qualifier("serversEntityManager")
     private EntityManager entityManager;
 
     @GetMapping(value = "/hello")

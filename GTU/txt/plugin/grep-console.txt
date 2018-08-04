@@ -1,3 +1,4 @@
 http://marian.schedenig.name/projects/grep-console/
+http://marketplace.eclipse.org/content/grep-console
 
 在preference 輸入 grep console 即可設定

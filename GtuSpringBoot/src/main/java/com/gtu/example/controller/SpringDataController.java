@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class SpringDataController {
     @Autowired
     private AddressCustomRepository addressCustomRepository;
 
-    @Autowired
-    private EmployeeJpaRepository employeeJpaRepository;
+//    @Autowired
+    private EmployeeJpaRepository employeeJpaRepository = Mockito.mock(EmployeeJpaRepository.class);
 
     @RequestMapping(value = "/employee/create")
     public String employee_createOne() {

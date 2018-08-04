@@ -20,7 +20,7 @@ import com.gtu.example.controller.SpringDataDBMainController;
 
 public class RepositoryReflectionUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(SpringDataDBMainController.class);
+    private static final Logger log = LoggerFactory.getLogger(RepositoryReflectionUtil.class);
 
     public static Object findById(Class<? extends CrudRepository> repositoryClz, CrudRepository repository, Object value) {
         Class<?> paramClz = PackageReflectionUtil.getClassGenericClz(repositoryClz, 1);

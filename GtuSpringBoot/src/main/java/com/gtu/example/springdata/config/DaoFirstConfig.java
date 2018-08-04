@@ -27,18 +27,18 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-two-datasources
 // https://github.com/tonym2105/samples/tree/master/boot-multidb-sample
 //
-@Configuration // 若同時需要兩個DB作法<註解此行就disable>
-@EntityScan("com.gtu.example.model.entity")
+//@Configuration // 若同時需要兩個DB作法<註解此行就disable>
+//@EntityScan("com.gtu.example.model.entity")
 
-@EnableJpaRepositories(//
-        entityManagerFactoryRef = "serversEntityManager", //
-        transactionManagerRef = "serversTransactionManager", //
-        basePackages = { "com.gtu.example.springdata.dao_1" }//
-) //
+//@EnableJpaRepositories(//
+//        entityManagerFactoryRef = "serversEntityManager", //
+//        transactionManagerRef = "serversTransactionManager", //
+//        basePackages = { "com.gtu.example.springdata.dao_1" }//
+//) //
 
 // @EnableMongoRepositories
-@EnableJpaAuditing
-@Primary
+//@EnableJpaAuditing
+//@Primary
 public class DaoFirstConfig {
 
     @Bean(name = "serversEntityManager")

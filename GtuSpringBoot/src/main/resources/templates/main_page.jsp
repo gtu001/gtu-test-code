@@ -12,7 +12,7 @@
 <body>
 
 	<span style="color:red" th:text="${message}" />
-	<form action="/GtuSpringBoot/main" method="get">
+	<form action="/GtuSpringBoot/general-controller/main" method="get">
 		請輸入功能 : 
 		<select name="path">
 			<option value="">請選擇</option>

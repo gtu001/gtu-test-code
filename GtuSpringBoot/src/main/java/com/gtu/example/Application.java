@@ -36,36 +36,36 @@ public class Application {
     @Autowired 
     private ConfigurableApplicationContext ctx;
 
-    public static void main(String[] args) throws Exception {
-        // System.setProperty("spring.profiles.active", "rabbitmq") ;
+    public static void main(String[] args) throws Exception {  
+        // System.setProperty("spring.profiles.active", "rabbitmq") ; 
         System.setProperty("spring.profiles.active", "spring-data");
-        ConfigurableApplicationContext ctx2 = SpringApplication.run(Application.class, args);
-    }
-
+        ConfigurableApplicationContext ctx2 = SpringApplication.run(Application.class, args);        
+    } 
+   
     @Bean
-    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-        return args -> {
-            log.info("Let's inspect the beans provided by Spring Boot:"); 
-
-            String[] beanNames = ctx.getBeanDefinitionNames();  
+    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {     
+        return args -> {  
+            log.info("Let's inspect the beans provided by Spring Boot:");   
+    
+            String[] beanNames = ctx.getBeanDefinitionNames();     
             Arrays.sort(beanNames); 
-            for (String beanName : beanNames) { 
-                String beanPrefix = "";
-                if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {
+            for (String beanName : beanNames) {  
+                String beanPrefix = ""; 
+                if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {  
                     beanPrefix = "<GTU>";       
-                }   
+                }    
  
-                log.info("\t {} bean : {}", beanPrefix, beanName);   
+                log.info("\t {} bean : {}", beanPrefix, beanName);     
             }   
-        }; 
+        };   
     }
 
     private void inspectBean(Object bean) {
         for (Field f : bean.getClass().getDeclaredFields()) {
             log.info("f---" + f.getName() + "\t" + f.getType().getSimpleName());
         }
-        for (Method m : bean.getClass().getDeclaredMethods()) {
+        for (Method m : bean.getClass().getDeclaredMethods()) { 
             log.info("m---" + m.getName() + "\t" + m.getReturnType().getSimpleName());
         }
-    }
+    } 
 }

@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,8 +27,8 @@ public class SpringDataCrudController {
     
     private static final Logger log = LoggerFactory.getLogger(SpringDataCrudController.class);
 
-    @Autowired
-    private EmployeeJpaRepository employeeJpaRepository;
+//    @Autowired
+    private EmployeeJpaRepository employeeJpaRepository = Mockito.mock(EmployeeJpaRepository.class);
 
     @GetMapping(value = "/findAll")
     // public Page<Question> findAll(Pageable pageable) {

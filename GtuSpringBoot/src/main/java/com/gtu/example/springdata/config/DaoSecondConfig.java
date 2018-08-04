@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -30,14 +31,15 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 @EnableJpaRepositories(//
         entityManagerFactoryRef = "domainsEntityManager", //
         transactionManagerRef = "domainsTransactionManager", //
-        basePackages = { "com.gtu.example.springdata.dao_2" }//
+        basePackages = { "com.gtu.example.springdata.dao_1" }//
 ) //
 
 @EnableJpaAuditing
+@Primary
 public class DaoSecondConfig {
 
     @Bean(name = "domainsEntityManager")
-    public LocalContainerEntityManagerFactoryBean getdomainsEntityManager(//
+    public LocalContainerEntityManagerFactoryBean getDomainsEntityManager(//
             EntityManagerFactoryBuilder builder, //
             @Qualifier("domainsDataSource") DataSource domainsDataSource) {
         return builder.dataSource(domainsDataSource)//
@@ -57,6 +59,7 @@ public class DaoSecondConfig {
         return map;
     }
 
+    @Primary
     @Bean("domainsDataSourceProperties")
     @ConfigurationProperties("datasource.domains")
     public DataSourceProperties domainsDataSourceProperties() {

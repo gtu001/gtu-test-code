@@ -6,8 +6,18 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class ExceptionStackUtil {
-    
+
+    public static Throwable getRootCause(Throwable ex) {
+        Throwable root = ExceptionUtils.getRootCause(ex);
+        if (root == null) {
+            root = ex;
+        }
+        return root;
+    }
+
     public static String parseToString(Throwable ge) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

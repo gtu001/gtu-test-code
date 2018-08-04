@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/GtuSpringBoot/")  
+@RequestMapping("/general-controller/")  
 public class GeneralController {
     private static final Logger log = LoggerFactory.getLogger(GeneralController.class);
 
@@ -23,6 +23,7 @@ public class GeneralController {
 
     @GetMapping("/main")
     public ModelAndView main(@RequestParam(required = false) String path) {
+        log.info("# main ");
         ModelAndView model = new ModelAndView();
         if (StringUtils.isBlank(path)) {
             model.setViewName("main_page");

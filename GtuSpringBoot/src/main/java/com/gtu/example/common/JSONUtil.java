@@ -28,6 +28,9 @@ public class JSONUtil {
 
     public static JSONObject getThrowableRoot(Throwable ex) {
         Throwable root = ExceptionUtils.getRootCause(ex);
+        if (root == null) {
+            root = ex;
+        }
         JSONObject json = new JSONObject();
         json.put("messsage", root.getClass().getSimpleName() + " : " + root.getMessage());
         json.put("result", "error");

@@ -28,7 +28,8 @@ public class AddressCustomRepository {
     AddressRepository addressRepository;
 
     @Autowired
-    @Qualifier("serversEntityManager")
+//    @Qualifier("serversEntityManager")
+    @Qualifier("domainsEntityManager")
     private EntityManager em;
 
     // @Autowired // 兩個datasource不work

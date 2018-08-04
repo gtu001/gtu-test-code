@@ -6,18 +6,20 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF8">
-<link href="/css/jquery_ui/jquery-ui.css" rel="stylesheet">
-<script src="/js/jquery-3.3.1.js"></script>
-<script src="/js/jquery-ui.js"></script>
-<script src="/js/gtu_util.js"></script>
-<script src="/js/vue.js"></script>
+<link href="/GtuSpringBoot/css/jquery_ui/jquery-ui.css" rel="stylesheet">
+<script src="/GtuSpringBoot/js/jquery-3.3.1.js"></script>
+<script src="/GtuSpringBoot/js/jquery-ui.js"></script>
+<script src="/GtuSpringBoot/js/gtu_util.js"></script>
+<script src="/GtuSpringBoot/js/vue.js"></script>
 <!-- jqGrid ↓↓↓↓↓ -->
 <link rel="stylesheet" type="text/css" media="screen"
-	href="/css/jquery_jqGrid/ui.jqgrid.css" />
-<script src="/js/grid.locale-tw.js" type="text/javascript"></script>
-<script src="/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+	href="/GtuSpringBoot/css/jquery_jqGrid/ui.jqgrid.css" />
+<script src="/GtuSpringBoot/js/grid.locale-tw.js" type="text/javascript"></script>
+<script src="/GtuSpringBoot/js/jquery.jqGrid.min.js" type="text/javascript"></script>
 <!-- jqGrid ↑↑↑↑↑ -->
 <script type="text/javascript">
+
+	const WEB_PREFIX = "/GtuSpringBoot";
 	var jqueryTool = new JqueryTool();
 
 	$(document).ready(function() {
@@ -41,7 +43,7 @@
 				return;
 			}
 
-			$.get("/springdata-dbMain/table-get-columns/", {
+			$.get(WEB_PREFIX + "/springdata-dbMain/table-get-columns/", {
 				table : tableName
 			}, //
 			function(data) {//
@@ -63,7 +65,7 @@
 	
 	function getTableMapping(tableName) {
 		var rtnObj = $.ajax({
-			url : '/springdata-dbMain/table-mapping/',
+			url : WEB_PREFIX + '/springdata-dbMain/table-mapping/',
 			data : {
 				table : tableName,
 			},
@@ -86,7 +88,7 @@
 
 	function postForm() {
 		var formData = getForm();
-		$.post("/springdata-dbMain/db_operate", formData, //
+		$.post(WEB_PREFIX + "/springdata-dbMain/db_operate", formData, //
 		function(data) {//
 			alert(JSON.stringify(data));
 		}, "json")//
@@ -102,7 +104,7 @@
 	function queryColModel() {
 		var formData = getForm("query");
 		var rtnObj = $.ajax({
-			url : '/springdata-dbMain/db_simple_query/colModel',
+			url : WEB_PREFIX + '/springdata-dbMain/db_simple_query/colModel',
 			data : formData,
 			success : function(data) {
 			},
@@ -122,9 +124,9 @@
 		var postData = getForm("query");
 		var colModel = queryColModel();
 		var caption = $("select[name=tableNames]").val();
-
+		
 		$("#jqGrid").jqGrid({
-			url : "/springdata-dbMain/db_simple_query/dataRows",
+			url : WEB_PREFIX + "/springdata-dbMain/db_simple_query/dataRows",
 			datatype : "json",
 			mtype : 'POST',
 			postData : postData,
@@ -184,20 +186,40 @@
 		        //alert(subgridTableId + " -- " + $("#" + subgridTableId).length + " -- " + rowId);
 		        
 		        var formData = getForm();
-		        formData = $.extend(formData, {rowId : rowId});
-				$.post("/springdata-dbMain/query_relation", formData, //
-				function(data) {//
+		        formData = $.extend(formData, {rowId:rowId});
+		        
+		        var fetchDataFunc = function(){
+			        var data = $.ajax({
+						url : WEB_PREFIX + "/springdata-dbMain/query_relation",
+						data : formData,
+						type : "POST",
+						success : function(data) {
+						},
+						error : jqueryTool.ajaxFailFunc,
+						async : false,
+						dataType : 'json',
+					}).responseJSON;
+					return data;
+		        }
 				
-					//產生關聯資料
-					var subgridCreater = new SubgridCreater(data, subgridTableId, rowId);
-					subgridCreater.init();
-					
-				}, "json")//
-				.fail(jqueryTool.ajaxFailFunc);
+				//產生關聯資料
+				var subgridCreater = new SubgridCreater(fetchDataFunc, subgridTableId, rowId, "#jqGrid");
+				subgridCreater.init();
 		    },
 		    subGridRowColapsed: function (subgridDivId, rowId) {
 		    },
 		});
+		
+		var afterSubmit = function(response, postdata){
+			var repTxt = response.responseText;
+			console.log("repTxt = " +repTxt);
+			var json = JSON.parse(repTxt);
+			if("result" in json && json['result'] == 'error'){
+				return [false, json["messsage"]];
+			}else{
+				return [true, "OK", repTxt];
+			}
+		};
 
 		$("#jqGrid").navGrid("#jqGridPager" , // the buttons to appear on the toolbar of the grid
 		{
@@ -218,7 +240,8 @@
 			recreateForm : true,
 			//checkOnUpdate : true,
 			//checkOnSubmit : true,
-			url : "/springdata-dbMain/db_save",
+			url : WEB_PREFIX + "/springdata-dbMain/db_save",
+			afterSubmit : afterSubmit,
 			beforeSubmit : function(postdata, form, oper) {
 				postdata = $.extend(postdata, getForm());
 			
@@ -242,7 +265,8 @@
 		{
 			closeAfterAdd : true,
 			recreateForm : true,
-			url : "/springdata-dbMain/db_save",
+			url : WEB_PREFIX + "/springdata-dbMain/db_save",
+			afterSubmit : afterSubmit,
 			beforeSubmit : function(postdata, form, oper) {
 				postdata = $.extend(postdata, getForm());
 			
@@ -263,7 +287,9 @@
 		},
 		// options for the Delete Dailog
 		{
-			url : "/springdata-dbMain/db_delete",
+			url : WEB_PREFIX + "/springdata-dbMain/db_delete",
+			afterSubmit : afterSubmit,
+			
 			onclickSubmit : function(data, d1, d2){
 				var postData = data['delData'];
 				postData = $.extend(postData, getForm());
@@ -311,7 +337,7 @@
 	}
 
 	function initTabLst() {
-		$.get("/springdata-dbMain/tables", {}, //
+		$.get(WEB_PREFIX + "/springdata-dbMain/tables", {}, //
 		function(data) {//
 			var tabSel = $("select[name=tableNames]");
 			tabSel.append($("<option />").attr("value", "").text("請選擇.."));
@@ -325,7 +351,7 @@
 	}
 	
 	function initTabLst_4_autocomplete() {
-		$.get("/springdata-dbMain/tables", {}, //
+		$.get(WEB_PREFIX + "/springdata-dbMain/tables", {}, //
 		function(data) {//
 			$("input[name=tableNames_autoComplete]").autocomplete({
 				source: data
@@ -370,13 +396,16 @@
 		$(divElement).css("height", value);
 	}
 	
-	function SubgridCreater(data, subgridTableId, masterId){
-		var dataStr = JSON.stringify(data);
-		this.data = data;
+	function SubgridCreater(fetchDataFunc, subgridTableId, masterId, mainGrid){
+		this.fetchDataFunc = fetchDataFunc;
 		this.masterId = masterId;
-		console.log(dataStr);
+		this.mainGrid = mainGrid;
+		this.data = null;
+		var self = this;
 		
 		this.init = function(){
+			this.data = this.fetchDataFunc();
+		
 			this.subgridArry = this.data['subgrid'];
 		
 			for(var ii = 0 ; ii < this.subgridArry.length ; ii ++){
@@ -406,13 +435,13 @@
 		};
 		
 		this.subgridGenerate = function(appendDivId, index, caption, colNames, colModel, data){
-			var subgridTableId = appendDivId + "_tab_" + index;
-			var subgridNavBarId = appendDivId + "_navBar_" + index;
-			$("#" + appendDivId).append($("<table id="+ subgridTableId +" />"));
-			$("#" + appendDivId).append($("<div id="+ subgridNavBarId +" />"));
+			this.subgridTableId = appendDivId + "_tab_" + index;
+			this.subgridNavBarId = appendDivId + "_navBar_" + index;
+			$("#" + appendDivId).append($("<table id="+ this.subgridTableId +" />"));
+			$("#" + appendDivId).append($("<div id="+ this.subgridNavBarId +" />"));
 		
-			$("#" + subgridTableId).jqGrid('GridUnload');//remove
-			$("#" + subgridTableId).jqGrid({
+			$("#" + this.subgridTableId).jqGrid('GridUnload');//remove
+			$("#" + this.subgridTableId).jqGrid({
 	            datatype: 'local',
 	            caption : caption,
 	            data: data,
@@ -420,15 +449,30 @@
 	            colModel: colModel,
 	            loadtext : 'Loading, please wait',
 	            emptyRecords : "No data Found",
-	            pager : '#' + subgridNavBarId,
+	            pager : '#' + this.subgridNavBarId,
 				loadComplete : function(data, response) {
 				},
+				loadonce : true,
 	        }); //.navGrid("xxxxxxxxx", {})
 	        
-	        this.subBarPagerConfig("#" + subgridTableId, '#' + subgridNavBarId, {rowId:this.masterId, fieldName:caption });
+	        this.subBarPagerConfig("#" + this.subgridTableId, '#' + this.subgridNavBarId, {rowId:this.masterId, fieldName:caption });
 		};
 		
 		this.subBarPagerConfig = function(jqGrid, jqGridPagerId, appendMap){
+			var afterSubmit = function(response, postdata){
+				var repTxt = response.responseText;
+				console.log("repTxt = " +repTxt);
+				var json = JSON.parse(repTxt);
+				
+				self.triggerReload();
+				
+				if("result" in json && json['result'] == 'error'){
+					return [false, json["messsage"]];
+				}else{
+					return [true, "OK", repTxt];
+				}
+			};
+		
 			$(jqGrid).navGrid(jqGridPagerId , // the buttons to appear on the toolbar of the grid
 			{
 				add : true,
@@ -443,7 +487,9 @@
 			{
 				editCaption : "修改視窗",
 				recreateForm : true,
-				url : "/springdata-dbMain/relation_detail_process",
+				url : WEB_PREFIX + "/springdata-dbMain/relation_detail_process",
+				afterSubmit : afterSubmit,
+				reloadAfterSubmit : true,
 				beforeSubmit : function(postdata, form, oper) {
 					postdata = $.extend(postdata, getForm(), {oper:oper}, appendMap);
 				
@@ -465,7 +511,9 @@
 			{
 				closeAfterAdd : true,
 				recreateForm : true,
-				url : "/springdata-dbMain/relation_detail_process",
+				url : WEB_PREFIX + "/springdata-dbMain/relation_detail_process",
+				afterSubmit : afterSubmit,
+				reloadAfterSubmit : true,
 				beforeSubmit : function(postdata, form, oper) {
 					postdata = $.extend(postdata, getForm(), {oper:oper}, appendMap);
 				
@@ -484,7 +532,10 @@
 				}
 			},
 			{
-				url : "/springdata-dbMain/relation_detail_process",
+				url : WEB_PREFIX + "/springdata-dbMain/relation_detail_process",
+				afterSubmit : afterSubmit,
+				reloadAfterSubmit : true,
+				
 				onclickSubmit : function(data, d1, d2){
 					var postData = data['delData'];
 					postdata = $.extend(postData, getForm(), {oper:"del"}, appendMap);
@@ -507,6 +558,18 @@
 				}
 			});
 		}
+		
+		this.triggerReload = function(){
+			$(this.mainGrid).collapseSubGridRow(this.masterId);
+			$(this.mainGrid).expandSubGridRow(this.masterId);
+		}
+	}
+	
+	function getRowColumnData(columnName){
+		var rowId = $("#jqGrid").jqGrid('getGridParam','selrow');  
+		var rowData = $("#jqGrid").getRowData(rowId);
+		var colData = rowData[columnName];   // perticuler Column name of jqgrid that you want to access
+		return colData;
 	}
 </script>
 <title></title>
