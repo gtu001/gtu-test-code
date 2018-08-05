@@ -7,11 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -23,9 +27,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,6 +40,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -47,8 +54,10 @@ import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinUtil_forWin;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 
 public class AVChoicerUI extends JFrame {
 
@@ -72,6 +81,10 @@ public class AVChoicerUI extends JFrame {
     private JLabel deleteAVFileLabel;
     private JLabel movCountLabel;
     private JButton replayBtn;
+    private JTextField moveToText;
+    private JList moveToList;
+    private MoveToHandler moveToHandler = new MoveToHandler();
+    private JCheckBox moveToChkJpgChkBox;
 
     /**
      * Launch the application.
@@ -131,7 +144,7 @@ public class AVChoicerUI extends JFrame {
         panel_7.add(movCountLabel);
         panel_7.add(openContainDirBtn);
         panel_7.add(deleteAVFileBtn);
-        
+
         replayBtn = new JButton("重播");
         replayBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -237,12 +250,188 @@ public class AVChoicerUI extends JFrame {
         });
         panel_2.add(saveConfigBtn2, "2, 20");
 
+        JPanel panel_11 = new JPanel();
+        tabbedPane.addTab("MoveTo", null, panel_11, null);
+        panel_11.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_12 = new JPanel();
+        panel_11.add(panel_12, BorderLayout.WEST);
+
+        JPanel panel_13 = new JPanel();
+        panel_11.add(panel_13, BorderLayout.EAST);
+
+        JPanel panel_14 = new JPanel();
+        panel_11.add(panel_14, BorderLayout.SOUTH);
+
+        JPanel panel_15 = new JPanel();
+        panel_11.add(panel_15, BorderLayout.NORTH);
+
+        JButton moveToAddBtn = new JButton("add");
+        moveToAddBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                moveToHandler.add();
+            }
+        });
+
+        moveToText = new JTextField();
+        panel_15.add(moveToText);
+        moveToText.setColumns(10);
+        panel_15.add(moveToAddBtn);
+
+        JButton moveToSaveBtn = new JButton("save");
+        moveToSaveBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                moveToHandler.save();
+            }
+        });
+        panel_15.add(moveToSaveBtn);
+
+        JButton moveToReloadBtn = new JButton("reload");
+        moveToReloadBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                moveToHandler.reload();
+            }
+        });
+        panel_15.add(moveToReloadBtn);
+
+        JButton moveToBtn = new JButton("移動");
+        moveToBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                moveToHandler.moveTo();
+            }
+        });
+        panel_15.add(moveToBtn);
+
+        moveToChkJpgChkBox = new JCheckBox("檢查jpg");
+        panel_15.add(moveToChkJpgChkBox);
+
+        moveToList = new JList();
+        panel_11.add(moveToList, BorderLayout.CENTER);
+        moveToList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent paramKeyEvent) {
+                JListUtil.newInstance(moveToList).defaultJListKeyPressed(paramKeyEvent);
+            }
+        });
+        moveToList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent paramMouseEvent) {
+                if(JMouseEventUtil.buttonLeftClick(2, paramMouseEvent)) {
+                    File dir = new File((String)JListUtil.getLeadSelectionObject(moveToList));
+                    DesktopUtil.openDir(dir);
+                }
+            }
+        });
+
         config.reflectInit(this);
         initAvDirList();
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
         JCommonUtil.defaultToolTipDelay();
+    }
+
+    private class MoveToHandler {
+        private PropertiesUtilBean moveConfig = new PropertiesUtilBean(MoveToHandler.class, AVChoicerUI.class.getSimpleName() + "_" + MoveToHandler.class.getSimpleName());
+
+        private void add() {
+            try {
+                File dir = JCommonUtil.filePathCheck(moveToText.getText(), "輸入目錄", true);
+                if (!dir.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在:" + dir);
+                    return;
+                }
+                moveConfig.getConfigProp().setProperty(dir.getAbsolutePath(), dir.getAbsolutePath());
+                reload();
+                moveToText.setText("");
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+
+        private void moveTo() {
+            try {
+                File dir = new File((String) moveToList.getSelectedValue());
+
+                if (moveToChkJpgChkBox.isSelected() && currentFileHandler.getJpgFile() == null) {
+                    boolean openDir = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("沒有jpg圖, 要開啟來源嗎?", "開啟目錄");
+                    if (openDir) {
+                        currentFileHandler.openContainDir();
+                        return;
+                    }
+                }
+
+                StringBuffer sb = new StringBuffer();
+                sb.append("確定移動到 : " + dir + "\r\n");
+                sb.append("檔案1 : " + currentFileHandler.getAvFile() + "\r\n");
+                sb.append("檔案2 : " + currentFileHandler.getJpgFile() + "\r\n");
+
+                boolean moveChk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString(), "移動");
+
+                if (moveChk) {
+
+                    Object[] p1 = fileMove(currentFileHandler.getAvFile(), getMoveTargetFile(dir, currentFileHandler.getAvFile()));
+                    Object[] p2 = fileMove(currentFileHandler.getJpgFile(), getMoveTargetFile(dir, currentFileHandler.getJpgFile()));
+
+                    StringBuffer sb1 = new StringBuffer();
+                    sb1.append("移動結果 : \r\n");
+                    sb1.append("檔案1 : " + Arrays.toString(p1) + "\r\n");
+                    sb1.append("檔案1 : " + Arrays.toString(p2) + "\r\n");
+
+                    JCommonUtil._jOptionPane_showMessageDialog_info(sb1.toString());
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("移動取消!");
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+
+        private File getMoveTargetFile(File dir, File srcFile) {
+            if (srcFile == null) {
+                return null;
+            }
+            return new File(dir, srcFile.getName());
+        }
+
+        private Object[] fileMove(File srcFile, File toFile) {
+            Boolean result = false;
+            String errorMessage = "";
+            try {
+                if (srcFile == null || !srcFile.exists()) {
+                    return new Object[] { false, "檔案不存在!" };
+                }
+
+                FileUtils.moveFile(srcFile, toFile);
+                result = toFile.exists();
+            } catch (Exception ex) {
+                errorMessage = ex.toString();
+            }
+            return new Object[] { result, toFile, errorMessage };
+        }
+
+        private void save() {
+            try {
+                moveConfig.store();
+                moveConfig.reload();
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+
+        private void reload() {
+            try {
+                DefaultListModel model = JListUtil.createModel();
+                for (Enumeration enu = moveConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+                    String key = (String) enu.nextElement();
+                    String value = moveConfig.getConfigProp().getProperty(key);
+                    model.addElement(key);
+                }
+                moveToList.setModel(model);
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
     }
 
     private void initAvDirList() {
@@ -417,13 +606,34 @@ public class AVChoicerUI extends JFrame {
 
     private class CurrentFileHandler {
         private AtomicReference<File> tempFile = new AtomicReference<File>();
+        private AtomicReference<File> tempJpgFile = new AtomicReference<File>();
         private AtomicReference<File> tempDir = new AtomicReference<File>();
+
+        private File __findJpgFile(File avFile) {
+            String currentFileName = FileUtil.getNameNoSubName(avFile);
+            Pattern ptn = Pattern.compile(currentFileName, Pattern.CASE_INSENSITIVE);
+            return Stream.of(avFile.getParentFile().listFiles()).filter(f -> f.getName().endsWith(".jpg")).filter(f -> {
+                String jpgName = FileUtil.getNameNoSubName(f);
+                Matcher mth = ptn.matcher(jpgName);
+                return mth.find();
+            }).findAny().orElse(null);
+        }
+
+        public File getAvFile() {
+            return tempFile.get();
+        }
+
+        public File getJpgFile() {
+            return tempJpgFile.get();
+        }
 
         private void setFile(File avFile) {
             tempFile.set(avFile);
+            tempJpgFile.set(__findJpgFile(avFile));// 找圖片
+
             choiceAVBtn.setToolTipText(avFile.getName());
             tempDir.set(avFile.getParentFile());
-            setTitle(avFile.getName());
+            setTitle(avFile.getParentFile().getName() + "/" + avFile.getName());
             String desc = DateFormatUtil.format(avFile.lastModified(), "yyyy/MM/dd") + " " + FileUtil.getSizeDescription(avFile.length());
             deleteAVFileLabel.setText(desc);
             setCountLabel();
@@ -484,7 +694,7 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil.handleException(e);
             }
         }
-                
+
         private void replay() {
             try {
                 File exe = getMediaPlayerExe();
@@ -499,7 +709,7 @@ public class AVChoicerUI extends JFrame {
     private void resetCacheFileList() {
         cacheFileList = null;
     }
-    
+
     private File getMediaPlayerExe() throws Exception {
         File exe = config.getConfigProp().keySet().stream()//
                 .filter(key -> ((String) key).startsWith(AV_EXE_KEY))//

@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -22,6 +23,7 @@ import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.log.JdkLoggerUtil;
+import gtu.runtime.DesktopUtil;
 
 public class PropertiesUtilBean {
 
@@ -99,6 +101,10 @@ public class PropertiesUtilBean {
         this.init(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties"));
     }
 
+    public PropertiesUtilBean(Class<?> clz, String fileName) {
+        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), fileName + "_config.properties"));
+    }
+
     public void store() {
         try {
             fileChangeHandler.merge(configProp);
@@ -108,6 +114,18 @@ public class PropertiesUtilBean {
             logger.info("store success!");
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public void openDir() {
+        DesktopUtil.openDir(propFile);
+    }
+
+    public void browse() {
+        try {
+            DesktopUtil.browse(propFile.toURL().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -92,6 +92,14 @@ public class DesktopUtil {
     public static void openDir(String url) {
         try {
             File f = getFile(url);
+            openDir(f);
+        } catch (Exception e) {
+            throw new RuntimeException("openDir ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public static void openDir(File f) {
+        try {
             if (f == null) {
                 return;
             }
