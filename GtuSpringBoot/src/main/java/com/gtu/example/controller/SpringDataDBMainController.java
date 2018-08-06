@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.MappedSuperclass;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -21,7 +23,6 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,9 @@ import com.gtu.example.common.JqGridHandler.SubgridHandler;
 import com.gtu.example.common.PackageReflectionUtil;
 import com.gtu.example.common.RelationEntityRowHandler;
 import com.gtu.example.common.RepositoryReflectionUtil;
+import com.gtu.example.springdata.entity.Address;
+import com.gtu.example.springdata.entity.Car;
+import com.gtu.example.springdata.entity.Employee;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -52,10 +56,35 @@ public class SpringDataDBMainController {
 
     private static final Logger log = LoggerFactory.getLogger(SpringDataDBMainController.class);
 
+    @GetMapping(value = "/test001")
+    @Transactional
+    public String test_____001() {
+        Employee employee = new Employee();
+        List<Car> cars = new ArrayList<>();
+        Car car = new Car();
+        car.setBrand("1111");
+        car.setEmployee(employee);
+        cars.add(car);
+        employee.setCars(cars);
+
+        employee.setDescription("3333");
+        employee.setFirstName("fffff");
+        employee.setLastName("llll");
+
+        Address addr = new Address();
+        addr.setAddressId("addr");
+        addr.setCity("city");
+        addr.setRoad("road");
+        // employee.setAddress(addr);
+
+        entityManager.persist(employee);
+        return "done...";
+    }
+
     @Autowired
     private ConfigurableApplicationContext ctx;
     @Autowired
-//    @Qualifier("serversEntityManager")
+    // @Qualifier("serversEntityManager")
     private EntityManager entityManager;
 
     @GetMapping(value = "/hello")
@@ -65,10 +94,7 @@ public class SpringDataDBMainController {
 
     @GetMapping(value = "/tables")
     public String tables() {
-        List<String> tabLst = new ArrayList<String>();
-        tabLst.add("Address");
-        tabLst.add("Employee");
-        tabLst.add("WorkItem");
+        Set<String> tabLst = DBRelationHelper.getAllTables_str();
         return JSONArray.fromObject(tabLst).toString();
     }
 
@@ -298,7 +324,9 @@ public class SpringDataDBMainController {
     }
 
     @PostMapping(value = "/relation_detail_process")
+    @Transactional
     public String relationDetailProcess(HttpServletRequest request, HttpServletResponse response) {
+        log.info("[WARN] relationDetailProcess start");
         try {
             String rowId = request.getParameter("rowId");
             String detailId = request.getParameter("id");
@@ -331,16 +359,19 @@ public class SpringDataDBMainController {
             }
 
             Object resultObj = define.repository.save(entity);
+            // entityManager.persist(entity);
 
             JSONObject json = JSONUtil.getSuccess("ok");
-            if (resultObj != null) {
-                json.put("entity", resultObj);
-            }
+            // if (resultObj != null) {
+            // json.put("entity", resultObj);
+            // }
             return json.toString();
         } catch (Exception ex) {
             log.error("operateDBAction ERR : " + ex.getMessage(), ex);
             // return JSONUtil.getThrowable(ex).toString();
             return JSONUtil.getThrowableRoot(ex).toString();
+        } finally {
+            log.info("[WARN] relationDetailProcess end");
         }
     }
 }

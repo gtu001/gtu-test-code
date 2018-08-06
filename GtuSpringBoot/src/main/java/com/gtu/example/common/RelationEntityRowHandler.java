@@ -5,8 +5,12 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import javax.persistence.ManyToOne;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,7 @@ public class RelationEntityRowHandler {
     boolean isCollection;
     Object detailEntity;
     String detailEntityPkId;
+    boolean isDetailEntityPkIdGeneratedValue;
 
     public RelationEntityRowHandler(Class entityClz, Object masterEntity, String fieldName) {
         this.masterEntity = masterEntity;
@@ -47,26 +52,39 @@ public class RelationEntityRowHandler {
 
         detailOrignObj = JqGridHandler.getFieldFromEntity(entityClz, masterEntity, field.getName());
         detailEntityPkId = RepositoryReflectionUtil.getEntityId(detailClz);
+        isDetailEntityPkIdGeneratedValue = RepositoryReflectionUtil.isIdGeneratedValue(detailClz);
     }
 
     private void setBackToMasterEntity() {
         JqGridHandler.setFieldToEntity(entityClz, masterEntity, fieldName, detailOrignObj);
     }
 
+    private void setDetailEntity2MaterEntity() {
+        Field masterField = Stream.of(detailClz.getDeclaredFields()).filter(f -> f.getType() == entityClz && f.isAnnotationPresent(ManyToOne.class)).findAny().orElse(null);
+        if (masterField != null) {
+            JqGridHandler.setFieldToEntity(detailClz, detailEntity, masterField.getName(), masterEntity);
+        }
+    }
+
     private void setDetailEntityFromMap(Map<String, Object> entityMap) {
         entityMap.keySet().stream().forEach(key -> {
             try {
+                if (detailEntityPkId.equals(key) && isDetailEntityPkIdGeneratedValue) {
+                    return;
+                }
                 Object value = entityMap.get(key);
                 JqGridHandler.setFieldToEntity(detailClz, detailEntity, key, value);
             } catch (Exception ex) {
                 log.warn("[field not found][" + key + "]!!");
             }
         });
+        log.info("detail : {}", ReflectionToStringBuilder.toString(this.detailEntity));
     }
 
     public void insert(Map<String, Object> entityMap) {
         this.detailEntity = PackageReflectionUtil.newInstanceDefault(detailClz, true);
         this.setDetailEntityFromMap(entityMap);
+        this.setDetailEntity2MaterEntity();
 
         // 設定 detail
         if (isCollection) {
@@ -103,6 +121,7 @@ public class RelationEntityRowHandler {
 
         // 塞值
         this.setDetailEntityFromMap(entityMap);
+        this.setDetailEntity2MaterEntity();
 
         // 設定回 master entity
         setBackToMasterEntity();

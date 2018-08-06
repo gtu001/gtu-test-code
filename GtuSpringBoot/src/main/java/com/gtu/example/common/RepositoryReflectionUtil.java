@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.beanutils.ConvertUtils;
@@ -65,23 +66,43 @@ public class RepositoryReflectionUtil {
     }
 
     public static String getEntityId(Class<?> clz) {
-        try {
-            for (Field f : clz.getDeclaredFields()) {
-                if (f.isAnnotationPresent(javax.persistence.Id.class)) {
-                    return f.getName();
-                }
-            }
-            if (clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
-                for (Field f : clz.getSuperclass().getDeclaredFields()) {
+        return new EntityIdHandler(clz).entityId;
+    }
+
+    public static boolean isIdGeneratedValue(Class<?> clz) {
+        return new EntityIdHandler(clz).isGeneratedValue;
+    }
+
+    private static class EntityIdHandler {
+        String entityId;
+        boolean isGeneratedValue = false;
+
+        private boolean isGeneratedValueChk(Field type) {
+            return type.isAnnotationPresent(GeneratedValue.class);
+        }
+
+        EntityIdHandler(Class<?> clz) {
+            try {
+                for (Field f : clz.getDeclaredFields()) {
                     if (f.isAnnotationPresent(javax.persistence.Id.class)) {
-                        return f.getName();
+                        entityId = f.getName();
+                        isGeneratedValue = isGeneratedValueChk(f);
                     }
                 }
+                if (entityId == null && clz.getSuperclass().isAnnotationPresent(MappedSuperclass.class)) {
+                    for (Field f : clz.getSuperclass().getDeclaredFields()) {
+                        if (f.isAnnotationPresent(javax.persistence.Id.class)) {
+                            entityId = f.getName();
+                            isGeneratedValue = isGeneratedValueChk(f);
+                        }
+                    }
+                }
+
+            } catch (Exception ex) {
+                String clzName = clz == null ? "<class is null>" : clz.getName();
+                throw new RuntimeException("getEntityId Err : " + ex.getMessage() + " --> " + clzName, ex);
             }
-            throw new Exception("查無Id!!");
-        } catch (Exception ex) {
-            String clzName = clz == null ? "<class is null>" : clz.getName();
-            throw new RuntimeException("getEntityId Err : " + ex.getMessage() + " --> " + clzName, ex);
         }
     }
+
 }

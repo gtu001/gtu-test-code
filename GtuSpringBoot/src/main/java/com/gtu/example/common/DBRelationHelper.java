@@ -8,11 +8,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.MethodUtils;
@@ -29,6 +29,10 @@ import com.gtu.example.springdata.entity.DynamicDBRelation;
 public class DBRelationHelper {
 
     private static final Logger log = LoggerFactory.getLogger(DBRelationHelper.class);
+
+    public static Set<String> getAllTables_str() {
+        return getAllTables().stream().map(c -> c.getSimpleName()).collect(Collectors.toCollection(TreeSet::new));
+    }
 
     public static Set<Class<?>> getAllTables() {
         Set<Class<?>> all = new LinkedHashSet<>();

@@ -1,8 +1,6 @@
 package com.gtu.example.springdata.entity;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,21 +12,23 @@ import javax.persistence.Id;//這才對
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import org.springframework.context.annotation.Profile;
 //import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.gtu.example.springdata.dao_1.AddressRepository;
-
 import net.minidev.json.annotate.JsonIgnore;
 
 /**
  * @author wistronits
+ *
+ */
+/**
+ * @author gtu001
  *
  */
 @Profile("spring-data")
@@ -54,12 +54,8 @@ public class Employee extends AuditModel {
     @Size(min = 3, max = 100)
     private String description;
 
-    @Transient
-    @DynamicDBRelation(setter = "setAddress", repository = "AddressRepository", method="")
-    private String empAddressId;
-
     @OneToOne(//
-            // mappedBy = "addressId", // 未知 (打開會錯)
+              // mappedBy = "addressId", // 未知 (打開會錯)
             cascade = CascadeType.ALL, //
             orphanRemoval = true, //
             fetch = FetchType.LAZY//
@@ -75,7 +71,14 @@ public class Employee extends AuditModel {
             inverseJoinColumns = @JoinColumn(name = "emp_work_id")// 對方對回來的
     ) //
     @JsonIgnore
-    private List<WorkItem> workItems = new ArrayList<WorkItem>();
+    private List<WorkItem> workItems;
+
+    @OneToMany(//
+            mappedBy = "employee", //
+            cascade = CascadeType.ALL, //
+            orphanRemoval = true//
+    )
+    private List<Car> cars;
 
     public Employee() {
     }
@@ -134,20 +137,11 @@ public class Employee extends AuditModel {
         this.address = address;
     }
 
-    public String getEmpAddressId() {
-        return empAddressId;
+    public List<Car> getCars() {
+        return cars;
     }
 
-    public void setEmpAddressId(String empAddressId) {
-        this.empAddressId = empAddressId;
-    }
-
-    // custom 用ID設定addressId
-    public void setAddressByAddressId(String addressId, AddressRepository repository) {
-        Optional<Address> opt = repository.findById(addressId);
-        if (opt.isPresent()) {
-            Address addr = opt.get();
-            this.setAddress(addr);
-        }
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
 }
