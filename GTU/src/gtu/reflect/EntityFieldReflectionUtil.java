@@ -30,11 +30,15 @@ public class EntityFieldReflectionUtil {
         } catch (Exception ex) {
             String tmpFieldName = StringUtils.capitalize(fieldName);
             String[] invokeMethodNames = new String[] { "get" + tmpFieldName, "is" + tmpFieldName };
-            for (String fname : invokeMethodNames) {
-                try {
-                    return MethodUtils.invokeMethod(entity, fname, new Object[0]);
-                } catch (Exception ex1) {
-                    log.info("找不到method : " + fname + " - " + ex1.getMessage());
+            for (Method mth : indicateClz.getMethods()) {
+                for (String mthName : invokeMethodNames) {
+                    if (mth.getName().equalsIgnoreCase(mthName)) {
+                        try {
+                            return MethodUtils.invokeMethod(entity, mth.getName(), new Object[0]);
+                        } catch (Exception ex1) {
+                            log.info("找不到method : " + mth.getName() + " - " + ex1.getMessage());
+                        }
+                    }
                 }
             }
             throw new RuntimeException("無法取得此欄位 : " + fieldName, ex);
@@ -72,8 +76,8 @@ public class EntityFieldReflectionUtil {
             return;
         } catch (Exception ex) {
             String methodName = "set" + StringUtils.capitalize(fieldName);
-            for (Method mth : entity.getClass().getMethods()) {
-                if (mth.getName().equals(methodName) && mth.getParameterCount() == 1) {
+            for (Method mth : indicateClz.getMethods()) {
+                if (mth.getName().equalsIgnoreCase(methodName) && mth.getParameterCount() == 1) {
                     value = __primitiveConvert(value, mth.getParameterTypes()[0]);
                     try {
                         mth.invoke(entity, value);

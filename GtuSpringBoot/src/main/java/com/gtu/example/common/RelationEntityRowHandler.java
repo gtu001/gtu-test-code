@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -63,6 +64,13 @@ public class RelationEntityRowHandler {
 
     private void setBackToMasterEntity() {
         JqGridHandler.setFieldToEntity(entityClz, masterEntity, fieldName, detailOrignObj);
+    }
+
+    private void setDetailEntity2OneToOne() {
+        Field masterField = Stream.of(detailClz.getDeclaredFields()).filter(f -> f.getType() == entityClz && f.isAnnotationPresent(OneToOne.class)).findAny().orElse(null);
+        if (masterField != null) {
+            JqGridHandler.setFieldToEntity(detailClz, detailEntity, masterField.getName(), masterEntity);
+        }
     }
 
     private void setDetailEntity2ManyToOne() {
@@ -136,6 +144,7 @@ public class RelationEntityRowHandler {
     public void insert(Map<String, Object> entityMap) {
         this.detailEntity = PackageReflectionUtil.newInstanceDefault(detailClz, true);
         this.setDetailEntityFromMap(entityMap);
+        this.setDetailEntity2OneToOne();
         this.setDetailEntity2ManyToOne();
         this.setDetailEntity2ManyToMany('i');
         this.___insert(this.detailEntity);

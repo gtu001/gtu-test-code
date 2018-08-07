@@ -55,12 +55,11 @@ public class Employee extends AuditModel {
     private String description;
 
     @OneToOne(//
-              // mappedBy = "addressId", // 未知 (打開會錯)
+            mappedBy = "employee", //
             cascade = CascadeType.ALL, //
             orphanRemoval = true, //
             fetch = FetchType.LAZY//
     ) //
-    @JoinColumn(name = "empAddressId") // 自己的欄位
     @JsonIgnore
     private Address address;
 

@@ -18,7 +18,7 @@ import net.minidev.json.annotate.JsonIgnore;
 @Table(name = "ADDRESS_1")
 // @EntityListeners(AddressEntityListener.class)
 public class Address extends AuditModel {
-    
+
     @Id
     @GenericGenerator(name = "sequence_address_id", strategy = "com.gtu.example.springdata.config.AddressIdGenerator")
     @GeneratedValue(generator = "sequence_address_id")
@@ -29,20 +29,19 @@ public class Address extends AuditModel {
     // private void ensureId() {
     // this.setAddressId(UUID.randomUUID().toString());
     // }
-    
+
     private String city;
     private String road;
-    
+
     @OneToOne(//
-//          mappedBy = "addressId", // 未知 (打開會錯)
-          cascade = CascadeType.ALL, //
-          orphanRemoval = true, //
-          fetch = FetchType.LAZY//
-  ) //
-    @JoinColumn(name = "addressId")
+            cascade = CascadeType.ALL, //
+            orphanRemoval = true, //
+            fetch = FetchType.LAZY//
+    ) //
+    @JoinColumn(name = "employee_id")
     @JsonIgnore
     private Employee employee;
-    
+
     public Address() {
     }
 
