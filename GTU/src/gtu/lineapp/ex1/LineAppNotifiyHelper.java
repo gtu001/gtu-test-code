@@ -5,16 +5,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 /**
  * https://notify-bot.line.me/my/
@@ -57,50 +52,12 @@ public class LineAppNotifiyHelper {
         return this;
     }
 
-    private static class BeanToHttpForm {
-        private Object bean;
-        private StringBuffer sb = new StringBuffer();
-
-        private BeanToHttpForm(Object bean) {
-            this.bean = bean;
-            this.load();
-        }
-
-        private void appendParameter(String name, String value) throws UnsupportedEncodingException {
-            String prefix = (sb.length() != 0) ? "&" : "";
-            sb.append(prefix + name + "=" + URLEncoder.encode(value, "UTF8"));
-        }
-
-        private void load() {
-            Class targetClz = bean.getClass();
-            for (; targetClz != null && targetClz != Object.class; targetClz = targetClz.getSuperclass()) {
-                for (Field f : targetClz.getDeclaredFields()) {
-                    if (ClassUtils.isPrimitiveOrWrapper(f.getType()) || f.getType() == String.class) {
-                        try {
-                            Object val = FieldUtils.getDeclaredField(targetClz, f.getName(), true).get(bean);
-                            val = val == null ? "" : val;
-                            String strVal = String.valueOf(val);
-
-                            appendParameter(f.getName(), strVal);
-                        } catch (Exception e) {
-                            System.out.println("Warning " + f.getName() + " --> " + e.getMessage());
-                        }
-                    }
-                }
-            }
-        }
-
-        public String getParameterString() {
-            return sb.toString();
-        }
-    }
-
     public String send() {
         try {
             Validate.notNull(message, "必須設定message!");
             Validate.notEmpty(lineToken, "必須設定lineToken");
 
-            String postForm = new BeanToHttpForm(message).getParameterString();
+            String postForm = BeanToHttpForm.newInstance(message).getParameterString();
             System.out.println("#postForm = " + postForm);
 
             String result = doPostRequest(URL, postForm, "UTF8", lineToken);
