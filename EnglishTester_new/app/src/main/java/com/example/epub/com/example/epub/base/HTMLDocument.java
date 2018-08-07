@@ -7,7 +7,6 @@ package com.example.epub.com.example.epub.base;
 public class HTMLDocument {
 
     public void remove(int start, int end) {
-
     }
 
     public int getLength() {
@@ -15,6 +14,6 @@ public class HTMLDocument {
     }
 
     public ParserCallback getReader(int pos) {
-        return null;
+        return new DamnCoreParserCallback();
     }
 }

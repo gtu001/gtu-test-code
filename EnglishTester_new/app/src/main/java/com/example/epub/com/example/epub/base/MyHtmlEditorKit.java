@@ -9,22 +9,7 @@ public class MyHtmlEditorKit {
         return new HTMLDocument();
     }
 
-
     public Parser getParser() {
-        return null;
+        return new MyParser();
     }
-
-    public static class MyParserCallback {
-
-        private ParserCallback parserCallback;
-
-        public MyParserCallback(ParserCallback parserCallback) {
-            this.parserCallback = parserCallback;
-        }
-
-        public void flush() {
-
-        }
-    }
-
 }

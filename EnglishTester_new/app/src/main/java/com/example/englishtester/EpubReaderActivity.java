@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.HomeKeyWatcher;
@@ -23,14 +24,22 @@ import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.epub.com.example.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.epub.EpubReader;
 
 public class EpubReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
 
@@ -54,6 +63,10 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
      */
     HomeKeyWatcher homeKeyWatcher;
 
+    /**
+     * epub 服務
+     */
+    EpubViewerMainHandler epubViewerMainHandler = new EpubViewerMainHandler();
 
     TxtReaderActivity.TxtReaderActivityDTO dto = new TxtReaderActivity.TxtReaderActivityDTO();
 
@@ -99,7 +112,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
     /**
      * 從檔案設定內容
      */
-    private void setTxtContentFromFile(final File txtFile, final String title, final Callable<File> txtFileGetterCall) {
+    private void setTxtContentFromFile(final File epubFile, final String title, final Callable<File> txtFileGetterCall) {
         try {
             final Handler handler = new Handler();
 
@@ -108,8 +121,8 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             dialog.get().setMessage("讀取中...");
             dialog.get().show();
 
-            final AtomicReference<File> txtFileZ = new AtomicReference<>();
-            txtFileZ.set(txtFile);
+            final AtomicReference<File> epubFileZ = new AtomicReference<>();
+            epubFileZ.set(epubFile);
 
             new Thread(new Runnable() {
 
@@ -129,7 +142,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                         public void run() {
                             String titleVal = "";
                             if (title == null) {
-                                titleVal = txtFileZ.get().getName();
+                                titleVal = epubFileZ.get().getName();
                             } else {
                                 titleVal = title;
                             }
@@ -139,29 +152,44 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                     });
                 }
 
-                private void htmlProcess() {
+                private void epubProcess() {
+                    try {
+                        File file = epubFileZ.get();
 
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            translateView.setText("");
-                            dialog.get().dismiss();
-                        }
-                    });
+                        InputStream bookStream = new FileInputStream(file);
+                        Book book = (new EpubReader()).readEpub(bookStream);
+
+                        epubViewerMainHandler.getHtmlDocumentFactory().init(book);
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                translateView.setText("");
+                                dialog.get().dismiss();
+                            }
+                        });
+                    } catch (Exception ex) {
+                        Log.e(TAG, "epubProcess ERR : " + ex.getMessage(), ex);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(EpubReaderActivity.this, "讀取失敗", Toast.LENGTH_SHORT).show();
+                                dialog.get().dismiss();
+                            }
+                        });
+                    }
                 }
 
                 @Override
                 public void run() {
                     try {
                         if (txtFileGetterCall != null) {
-                            txtFileZ.set(txtFileGetterCall.call());
+                            epubFileZ.set(txtFileGetterCall.call());
                         }
 
                         setTitleNameProcess();
 
-
-                        Log.v(TAG, "----------" + txtFileZ);//TODO
-
+                        this.epubProcess();
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     } finally {
