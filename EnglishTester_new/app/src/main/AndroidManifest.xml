@@ -134,6 +134,9 @@
             android:name="TxtReaderActivity"
             android:label="文字閱讀器" />
         <activity
+            android:name="EpubReaderActivity"
+            android:label="Epub閱讀器" />
+        <activity
             android:name="DropboxApplicationActivity"
             android:label="Dropbox App申請" />
         <activity

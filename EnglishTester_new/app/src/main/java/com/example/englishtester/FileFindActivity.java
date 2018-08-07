@@ -1,13 +1,10 @@
 package com.example.englishtester;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -16,7 +13,8 @@ import android.widget.TextView;
 
 import com.example.englishtester.common.ExternalStorage;
 import com.example.englishtester.common.ExternalStorageV2;
-import com.example.englishtester.common.FileConstantAccessUtil;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,14 +39,21 @@ public class FileFindActivity extends ListActivity {
     private ExtensionChecker extensionChecker;
     private RootDirHolder rootDirHolder;
 
+    public static final String FILE_PATTERN_KEY = FileFindActivity.class.getName() + "_FILE_PATTERN_KEY";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_directory);
 
+        String defaultPattern = ".*";
+        if (getIntent().getExtras().containsKey(FILE_PATTERN_KEY)) {
+            defaultPattern = getIntent().getExtras().getString(FILE_PATTERN_KEY);
+        }
+
         //init service
-        extensionChecker = new ExtensionChecker("(txt|htm|html)");
+        extensionChecker = new ExtensionChecker(defaultPattern);
         rootDirHolder = new RootDirHolder();
 
         mPath = (TextView) findViewById(R.id.filePathLabel);
@@ -60,8 +65,8 @@ public class FileFindActivity extends ListActivity {
         mPath.setText("");
         pathList = new ArrayList<Map<String, Object>>();
 
-        addPathMap(rootDirHolder.sdCardTitle, rootDirHolder.sdCard.getAbsolutePath());
-        addPathMap(rootDirHolder.externalSdCardTitle, rootDirHolder.externalSdCard.getAbsolutePath());
+        //設定可選目錄
+        rootDirHolder.addPathMapItems();
 
         SimpleAdapter fileList = new SimpleAdapter(this, pathList,// 資料來源
                 R.layout.subview_propview, //
@@ -109,8 +114,8 @@ public class FileFindActivity extends ListActivity {
         });
 
         if (!rootDirHolder.isRootDir(f)) {
-            addPathMap("回到 " + rootDirHolder.sdCardTitle, rootDirHolder.sdCard.getAbsolutePath());
-            addPathMap("回到 " + rootDirHolder.externalSdCardTitle, rootDirHolder.externalSdCard.getAbsolutePath());
+            //設定可選目錄
+            rootDirHolder.addPathMapItems();
             addPathMap("回上一層 ../", f.getParent());
         }
 
@@ -224,19 +229,39 @@ public class FileFindActivity extends ListActivity {
     private class RootDirHolder {
         File sdCard;
         File externalSdCard;
+        List<File> externalSdCardLst;
 
         String sdCardTitle = "內部記憶體";
         String externalSdCardTitle = "SD Card";
 
         RootDirHolder() {
             Map<String, File> externalLocations = ExternalStorageV2.getAllStorageLocations(FileFindActivity.this);
+            Pair<Integer, Integer> pair = ExternalStorageV2.getExternalSdCardRange(FileFindActivity.this);
+
             sdCard = externalLocations.get(ExternalStorage.SD_CARD);
             externalSdCard = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD);
+
+            externalSdCardLst = new ArrayList<>();
+            if (ExternalStorageV2.isRangeValid(pair)) {
+                for (int ii = pair.getLeft(); ii <= pair.getRight(); ii++) {
+                    File f = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD + ii);
+                    externalSdCardLst.add(f);
+                }
+            }
+        }
+
+        private void addPathMapItems() {
+            addPathMap("回到 " + sdCardTitle, sdCard.getAbsolutePath());
+            addPathMap("回到 " + externalSdCardTitle, externalSdCard.getAbsolutePath());
+
+            for (int ii = 0; ii < externalSdCardLst.size(); ii++) {
+                addPathMap("回到 " + externalSdCardTitle + ii, externalSdCardLst.get(ii).getAbsolutePath());
+            }
         }
 
         private boolean isRootDir(File file) {
             if (file.isDirectory()) {
-                return file.equals(sdCard) || file.equals(externalSdCard);
+                return file.equals(sdCard) || file.equals(externalSdCard) || externalSdCardLst.contains(file);
             }
             return false;
         }

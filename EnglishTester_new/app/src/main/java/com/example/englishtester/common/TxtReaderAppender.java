@@ -49,12 +49,12 @@ public class TxtReaderAppender {
     private static final String TAG = TxtReaderAppender.class.getSimpleName();
 
     RecentTxtMarkService recentTxtMarkService;
-    TxtReaderActivity activity;
+    ITxtReaderActivity activity;
     IFloatServiceAidlInterface mService;
     TxtReaderActivity.TxtReaderActivityDTO dto;
     TextView txtView;
 
-    public TxtReaderAppender(TxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderActivity.TxtReaderActivityDTO dto, TextView txtView) {
+    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderActivity.TxtReaderActivityDTO dto, TextView txtView) {
         this.recentTxtMarkService = recentTxtMarkService;
         this.activity = activity;
         this.mService = mService;
@@ -109,7 +109,7 @@ public class TxtReaderAppender {
                     maxPicWidth,//
                     normalIgnoreLst,//
                     dto,//
-                    activity//
+                    activity.getApplicationContext()//
             );
             ruler.apply();
         }
@@ -140,7 +140,7 @@ public class TxtReaderAppender {
                 WordSpan clickableSpan = new WordSpan(index) {
 
                     private void checkFloatServiceOn() {
-                        if (!ServiceUtil.isServiceRunning(activity, FloatViewService.class)) {
+                        if (!ServiceUtil.isServiceRunning(activity.getApplicationContext(), FloatViewService.class)) {
                             activity.doOnoffService(true);
                         }
                     }
@@ -159,7 +159,7 @@ public class TxtReaderAppender {
                                 mService.searchWord(txtNow);
                             } catch (RemoteException e) {
                                 Log.e(TAG, e.getMessage(), e);
-                                Toast.makeText(activity, "查詢失敗!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity.getApplicationContext(), "查詢失敗!", Toast.LENGTH_SHORT).show();
                             }
 
                             setMarking(true);

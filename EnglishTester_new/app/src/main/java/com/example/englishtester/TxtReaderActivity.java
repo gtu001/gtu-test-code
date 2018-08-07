@@ -52,6 +52,7 @@ import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
+import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.SharedPreferencesUtil;
@@ -92,7 +93,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks {
+public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
 
     private static final String TAG = TxtReaderActivity.class.getSimpleName();
 
@@ -1254,6 +1255,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
                 activity.setTxtContentFromFile(file, null, null);
+            }
+
+            @Override
+            protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(txt|htm|html)");
+                super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
         BOOKMARK_MODE("書籤模式", MENU_FIRST++, REQUEST_CODE++, null) {

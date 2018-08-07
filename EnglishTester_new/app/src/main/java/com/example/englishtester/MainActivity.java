@@ -60,6 +60,13 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
         //----------------------------------------------------------------
         contentView.addView(createLabel(""));
+        contentView.addView(createLabel("Epub閱讀器 TODO"));
+        contentView.addView(createButton("Epub閱讀器 TODO",//
+                createOnClickListener(EpubReaderActivity.class, new Bundle(), null),
+                R.drawable.answer_button_lightblue));
+
+        //----------------------------------------------------------------
+        contentView.addView(createLabel(""));
         contentView.addView(createLabel("於系統字庫挑選單字做測驗, 記憶單字"));
         contentView.addView(createButton("背單字",//
                 createOnClickListener(ReciteMainActivity.class, new Bundle(), null),
