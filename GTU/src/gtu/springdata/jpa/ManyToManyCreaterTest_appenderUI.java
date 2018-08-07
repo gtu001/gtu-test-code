@@ -54,6 +54,7 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
                 try {
                     ManyToManyCreaterTest_appenderUI frame = new ManyToManyCreaterTest_appenderUI();
                     frame.setVisible(true);
+                    frame.baseDirText.setText("D:/workstuff/workspace_taida/isa95-model");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -214,6 +215,7 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
         panel.add(clearBtn);
 
         this.setTitle("ManyToMany");
+        JCommonUtil.setJFrameCenter(this);
     }
 
     private class PerformExecute extends __JpaRelation_PerformExecute {
@@ -240,14 +242,9 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
         }
 
         private void initFile() {
-            fromEntityFile = fileLst.stream().filter(f -> compare(f.getName(), this.fromEntity)).findAny()//
-                    .orElseThrow(() -> {
-                        throw new RuntimeException("找不到fromEntity");
-                    });
-            targetEntityFile = fileLst.stream().filter(f -> compare(f.getName(), this.targetEntity)).findAny()//
-                    .orElseThrow(() -> {
-                        throw new RuntimeException("找不到targetEntity");
-                    });
+            fromEntityFile = this.getOptionsFile(fileLst, this.fromEntity);
+            targetEntityFile = this.getOptionsFile(fileLst, this.targetEntity);
+
             fromEntity = fixName(fromEntityFile.getName());
             targetEntity = fixName(targetEntityFile.getName());
         }

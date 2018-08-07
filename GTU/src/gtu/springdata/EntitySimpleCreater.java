@@ -43,7 +43,7 @@ public class EntitySimpleCreater {
         sb.append("@Table(name = \"${tableName!'tableName undefined'}\")                                                    \n");
         sb.append("public class ${className!'className undefined'} {                                         \n");
         sb.append("    @Id                                                    \n");
-        sb.append("    @GeneratedValue                                        \n");
+        sb.append("    //@GeneratedValue                                        \n");
         sb.append(" <#list propertiesLst as var>                                                                    \n");
         sb.append("    @Column(name = \"${var.dbColumn!'dbColumn undefined'}\")                                                       \n");
         sb.append("    private ${var.type!'type undefined'} ${var.javaName!'javaName undefined'};                                                       \n");

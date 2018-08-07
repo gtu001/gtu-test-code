@@ -4,9 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -27,7 +29,8 @@ public class RelationEntityRowHandler {
     final Class<?> detailClz;
 
     Object detailOrignObj;
-    boolean isCollection;
+    boolean isCollectionType;
+    boolean isSetType;
     Object detailEntity;
     String detailEntityPkId;
     boolean isDetailEntityPkIdGeneratedValue;
@@ -43,9 +46,12 @@ public class RelationEntityRowHandler {
             return;
         }
 
-        if (Collection.class.isAssignableFrom(field.getType())) {
+        if (java.util.Collection.class.isAssignableFrom(field.getType())) {
             detailClz = getFieldGenericType(field);
-            isCollection = true;
+            isCollectionType = true;
+            if (java.util.Set.class.isAssignableFrom(field.getType())) {
+                isSetType = true;
+            }
         } else {
             detailClz = field.getType();
         }
@@ -59,10 +65,30 @@ public class RelationEntityRowHandler {
         JqGridHandler.setFieldToEntity(entityClz, masterEntity, fieldName, detailOrignObj);
     }
 
-    private void setDetailEntity2MaterEntity() {
+    private void setDetailEntity2ManyToOne() {
         Field masterField = Stream.of(detailClz.getDeclaredFields()).filter(f -> f.getType() == entityClz && f.isAnnotationPresent(ManyToOne.class)).findAny().orElse(null);
         if (masterField != null) {
             JqGridHandler.setFieldToEntity(detailClz, detailEntity, masterField.getName(), masterEntity);
+        }
+    }
+
+    private void setDetailEntity2ManyToMany(char type) {
+        Field masterField = Stream.of(detailClz.getDeclaredFields())
+                .filter(//
+                        f -> (Collection.class.isAssignableFrom(f.getType()) && //
+                                getFieldGenericType(f) == entityClz && //
+                                f.isAnnotationPresent(ManyToMany.class)))
+                .findAny().orElse(null);
+        if (masterField != null) {
+            RelationEntityRowHandler t = new RelationEntityRowHandler(detailClz, detailEntity, masterField.getName());
+
+            switch (type) {
+            case 'i':
+                t.___insert(this.masterEntity);
+                break;
+            default:
+                throw new RuntimeException("未知 type ! : " + type);
+            }
         }
     }
 
@@ -81,18 +107,21 @@ public class RelationEntityRowHandler {
         log.info("detail : {}", ReflectionToStringBuilder.toString(this.detailEntity));
     }
 
-    public void insert(Map<String, Object> entityMap) {
-        this.detailEntity = PackageReflectionUtil.newInstanceDefault(detailClz, true);
-        this.setDetailEntityFromMap(entityMap);
-        this.setDetailEntity2MaterEntity();
+    private void ___insert(Object detailEntity) {
+        this.detailEntity = detailEntity;
 
         // 設定 detail
-        if (isCollection) {
+        if (isCollectionType) {
             Collection coll = null;
             if (detailOrignObj != null) {
                 coll = (Collection) detailOrignObj;
             } else {
-                coll = new ArrayList<>();
+                // 可能是set
+                if (isSetType) {
+                    coll = new LinkedHashSet<>();
+                } else {
+                    coll = new ArrayList<>();
+                }
             }
             coll.add(this.detailEntity);
             detailOrignObj = coll;
@@ -104,9 +133,17 @@ public class RelationEntityRowHandler {
         setBackToMasterEntity();
     }
 
+    public void insert(Map<String, Object> entityMap) {
+        this.detailEntity = PackageReflectionUtil.newInstanceDefault(detailClz, true);
+        this.setDetailEntityFromMap(entityMap);
+        this.setDetailEntity2ManyToOne();
+        this.setDetailEntity2ManyToMany('i');
+        this.___insert(this.detailEntity);
+    }
+
     public void update(Map<String, Object> entityMap, Object id) {
         // 找到對的Entity
-        if (isCollection) {
+        if (isCollectionType) {
             Collection coll = (Collection) detailOrignObj;
             for (Object entity : coll) {
                 Object pkVal = JqGridHandler.getFieldFromEntity(detailClz, entity, detailEntityPkId);
@@ -121,7 +158,7 @@ public class RelationEntityRowHandler {
 
         // 塞值
         this.setDetailEntityFromMap(entityMap);
-        this.setDetailEntity2MaterEntity();
+        this.setDetailEntity2ManyToOne();
 
         // 設定回 master entity
         setBackToMasterEntity();
@@ -129,7 +166,7 @@ public class RelationEntityRowHandler {
 
     public void delete(Object id) {
         // 找到對的Entity
-        if (isCollection) {
+        if (isCollectionType) {
             Collection coll = (Collection) detailOrignObj;
             for (Object entity : coll) {
                 Object pkVal = JqGridHandler.getFieldFromEntity(detailClz, entity, detailEntityPkId);

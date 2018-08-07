@@ -12,11 +12,15 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -31,9 +35,10 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import javax.swing.JCheckBox;
+import gtu.swing.util.JOptionPaneUtil;
 
 public class OneToManyCreaterTest__appenderUI extends JFrame {
 
@@ -52,7 +57,11 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
     private JLabel lblListName;
     private JLabel lblNewLabel;
     private JTextField dbColumnNameText;
+    private JPanel panel_1;
     private JCheckBox cleanerChk;
+    private JRadioButton unidirectionalRadio;
+    private JRadioButton bidirectionalRadio;
+    private ButtonGroup buttonGroup;
 
     /**
      * Launch the application.
@@ -63,6 +72,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                 try {
                     OneToManyCreaterTest__appenderUI frame = new OneToManyCreaterTest__appenderUI();
                     frame.setVisible(true);
+                    frame.projectFolderText.setText("D:/workstuff/workspace_taida/isa95-model");// TODO
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -82,7 +92,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
         contentPane.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         lblRefFromType = new JLabel("ref from type");
@@ -142,8 +152,17 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
         contentPane.add(dbColumnNameText, "4, 8, fill, default");
         dbColumnNameText.setColumns(10);
 
+        panel_1 = new JPanel();
+        contentPane.add(panel_1, "4, 14, fill, fill");
+
         cleanerChk = new JCheckBox("cleaner");
-        contentPane.add(cleanerChk, "4, 14");
+        panel_1.add(cleanerChk);
+
+        unidirectionalRadio = new JRadioButton("unidirectional");
+        panel_1.add(unidirectionalRadio);
+
+        bidirectionalRadio = new JRadioButton("bidirectional");
+        panel_1.add(bidirectionalRadio);
 
         lblNewLabel_1 = new JLabel("baseDir");
         contentPane.add(lblNewLabel_1, "2, 16, right, default");
@@ -155,7 +174,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
         btnNewButton = new JButton("執行");
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                PerformExecuteClz tt = new PerformExecuteClz();
+                PerformExecuteClz tt = null;
                 try {
 
                     String refFromType1 = refFromTypeText.getText(); //
@@ -164,6 +183,14 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                     String dbColumnName = dbColumnNameText.getText(); //
                     boolean doCleanser = cleanerChk.isSelected(); //
                     String projectDir = projectFolderText.getText(); //
+
+                    if (unidirectionalRadio == JButtonGroupUtil.getSelectedButton(buttonGroup)) {
+                        tt = new PerformExecuteClz_Unidirectional();
+                    } else if (bidirectionalRadio == JButtonGroupUtil.getSelectedButton(buttonGroup)) {
+                        tt = new PerformExecuteClz_Bidirectional();
+                    } else {
+                        throw new Exception("請選擇radio");
+                    }
 
                     tt.actionPerformed(refFromType1, refToType1, javaListName, dbColumnName, doCleanser, projectDir);
 
@@ -197,7 +224,10 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
         });
         panel.add(testBtn);
 
+        buttonGroup = JButtonGroupUtil.createRadioButtonGroup(unidirectionalRadio, bidirectionalRadio);
+
         this.setTitle("OneToMany");
+        JCommonUtil.setJFrameCenter(this);
     }
 
     public static class __JpaRelation_PerformExecute {
@@ -292,10 +322,36 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                 return formType + "s";
             }
         }
+
+        protected File getOptionsFile(List<File> fileLst, String fileName) {
+            List<File> lst = fileLst.stream().filter(f -> compare(f.getName(), fileName)).collect(Collectors.toList());
+            System.out.println("找到檔案數 : " + fileName + "->" + lst.size());
+            if (lst.isEmpty()) {
+                throw new RuntimeException("找不到檔案 : " + fileName);
+            }
+            if (lst.size() == 1) {
+                return lst.get(0);
+            }
+            File optionFile = (File) JOptionPaneUtil.newInstance().showInputDialog_drowdown("有重複檔案  " + fileName, "重複檔案數 : " + lst.size(), lst.toArray(new File[0]), null);
+            if (optionFile != null) {
+                return optionFile;
+            }
+            throw new RuntimeException("未選擇檔案 : " + fileName);
+        }
     }
 
-    private class PerformExecuteClz extends __JpaRelation_PerformExecute {
-        private void actionPerformed(//
+    private abstract class PerformExecuteClz extends __JpaRelation_PerformExecute {
+        public abstract void actionPerformed(//
+                String refFromType1, //
+                String refToType1, //
+                String javaListName, //
+                String dbColumnName, //
+                boolean doCleanser, //
+                String projectDir) throws IOException;
+    }
+
+    private class PerformExecuteClz_Unidirectional extends PerformExecuteClz {
+        public void actionPerformed(//
                 String refFromType1, //
                 String refToType1, //
                 String javaListName, //
@@ -319,14 +375,8 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
             System.out.println(refToType.get());
             System.out.println(fileLst.size());
 
-            File refFromTypeFile = fileLst.stream().filter(f -> compare(f.getName(), refFromType.get())).findAny()//
-                    .orElseThrow(() -> {
-                        throw new RuntimeException("找不到refFromType");
-                    });
-            File refToTypeFile = fileLst.stream().filter(f -> compare(f.getName(), refToType.get())).findAny()//
-                    .orElseThrow(() -> {
-                        throw new RuntimeException("找不到refToType");
-                    });
+            File refFromTypeFile = this.getOptionsFile(fileLst, refFromType.get());
+            File refToTypeFile = this.getOptionsFile(fileLst, refToType.get());
 
             if (doCleanser) {
                 doCleanserFile(refFromTypeFile);
@@ -342,7 +392,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
             root.put("java_lst_name", javaListName);
             // 請勿砍掉 ↑↑↑↑↑↑↑
 
-            t.execute(root);
+            t.execute(root, 1);
 
             String content2 = appendBlock(refFromTypeFile, t.getMasterBlock());
 
@@ -351,6 +401,70 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
             System.out.println("-----------------------------------------------------------------------");
 
             FileUtil.saveToFile(refFromTypeFile, content2, "UTF8");
+        }
+    }
+
+    private class PerformExecuteClz_Bidirectional extends PerformExecuteClz {
+        public void actionPerformed(//
+                String refFromType1, //
+                String refToType1, //
+                String javaListName, //
+                String dbColumnName, //
+                boolean doCleanser, //
+                String projectDir) throws IOException {//
+            OneToManyCreaterTest t = new OneToManyCreaterTest();
+
+            File dir = JCommonUtil.filePathCheck(projectDir, "專案目錄", true);
+
+            List<File> fileLst = new ArrayList<File>();
+            FileUtil.searchFilefind(dir, ".*\\.java", fileLst);
+
+            AtomicReference<String> refFromType = new AtomicReference<>();
+            AtomicReference<String> refToType = new AtomicReference<>();
+
+            refFromType.set(refFromType1);
+            refToType.set(refToType1);
+
+            System.out.println(refFromType.get());
+            System.out.println(refToType.get());
+            System.out.println(fileLst.size());
+
+            File refFromTypeFile = this.getOptionsFile(fileLst, refFromType.get());
+            File refToTypeFile = this.getOptionsFile(fileLst, refToType.get());
+
+            if (doCleanser) {
+                doCleanserFile(refFromTypeFile);
+                doCleanserFile(refToTypeFile);
+            }
+
+            refFromType.set(fixName(refFromTypeFile.getName()));
+            refToType.set(fixName(refToTypeFile.getName()));
+
+            // 請勿砍掉 ↓↓↓↓↓↓↓
+            Map<String, Object> root = new HashMap<String, Object>();
+            root.put("ref_db_column", dbColumnName);
+            root.put("ref_entity_detail_type", refToType.get());
+            root.put("java_lst_name", javaListName);
+
+            // new
+            root.put("java_master_name", StringUtils.uncapitalize(refFromType.get()));
+            root.put("ref_entity_master_type", refFromType.get());
+            // 請勿砍掉 ↑↑↑↑↑↑↑
+
+            t.execute(root, 2);
+
+            String content1 = appendBlock(refFromTypeFile, t.getMasterBlock());
+            String content2 = appendBlock(refToTypeFile, t.getDetailBlock());
+
+            System.out.println("-----------------------------------------------------------------------");
+            System.out.println(content1);
+            System.out.println("-----------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------");
+            System.out.println(content2);
+            System.out.println("-----------------------------------------------------------------------");
+
+            FileUtil.saveToFile(refFromTypeFile, content1, "UTF8");
+            FileUtil.saveToFile(refToTypeFile, content2, "UTF8");
         }
     }
 }
