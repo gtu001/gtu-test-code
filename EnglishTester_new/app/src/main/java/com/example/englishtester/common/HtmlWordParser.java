@@ -467,9 +467,9 @@ public class HtmlWordParser {
     }
 
     private String hiddenByTagMatcher(String startTag, String endTag, String startPtn, String endPtn, int startTagOffset, int endTagOffset, String content) {
-        TagMatcher tag = new TagMatcher(startTag, endTag, startPtn, endPtn, startTagOffset, endTagOffset, content, false);
+        TagMatcher tag = new TagMatcher(startTag, endTag, startPtn, endPtn, startTagOffset, endTagOffset, content);
         while (tag.findUnique()) {
-            tag.appendReplacementForUnique("", true, true);
+            tag.appendReplacementForUnique("", true, true, true);
         }
         String rtnVal = tag.getContent();
         System.gc();

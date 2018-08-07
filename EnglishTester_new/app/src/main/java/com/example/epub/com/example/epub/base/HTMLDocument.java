@@ -7,6 +7,7 @@ package com.example.epub.com.example.epub.base;
 public class HTMLDocument {
 
     public void remove(int start, int end) {
+        //TODO
     }
 
     public int getLength() {
