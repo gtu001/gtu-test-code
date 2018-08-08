@@ -9,6 +9,7 @@ import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.example.englishtester.R;
 import com.example.englishtester.TxtReaderActivity;
@@ -21,6 +22,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -45,15 +47,35 @@ public class TxtReaderAppenderForHtmlTag {
     private List<Pair<Integer, Integer>> normalIgnoreLst;//
     private Bitmap hyperlink;//
     private Context context;
-    private TxtReaderActivity.TxtReaderActivityDTO dto;
+    private ITxtReaderActivityDTO dto;
     private OnlinePicLoader onlinePicLoader;
+
+    public interface ITxtReaderActivityDTO {
+        TextView getTxtView();
+
+        boolean isImageLoadMode();
+
+        File getCurrentHtmlFile();
+
+        File getDropboxPicDir();
+
+        String getCurrentHtmlUrl();
+
+        void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder);
+
+        StringBuilder getFileName();
+
+        boolean getBookmarkMode();
+
+        Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
+    }
 
     public TxtReaderAppenderForHtmlTag(//
                                        String txtContent,//
                                        SpannableString ss,//
                                        int maxPicWidth,//
                                        List<Pair<Integer, Integer>> normalIgnoreLst,//
-                                       TxtReaderActivity.TxtReaderActivityDTO dto,//
+                                       ITxtReaderActivityDTO dto,//
                                        Context context//
     ) {
         this.txtContent = txtContent;

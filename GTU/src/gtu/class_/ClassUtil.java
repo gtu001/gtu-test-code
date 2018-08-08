@@ -1,11 +1,5 @@
 package gtu.class_;
 
-import gtu.properties.PropertiesUtil;
-
-import java.io.File;
-import java.net.URL;
-
-
 public class ClassUtil {
 
     public static void main(String[] args) {
@@ -33,5 +27,23 @@ public class ClassUtil {
         }else{
             return left.isAssignableFrom(right);
         }
+    }
+    
+    public static boolean isPrimitiveOrWrapper(Class<?> clz) {
+        Class<?>[] clzs = new Class[] { //
+                int.class, Integer.class, //
+                long.class, Long.class, //
+                short.class, Short.class, //
+                float.class, Float.class, //
+                double.class, Double.class, //
+                byte.class, Byte.class, //
+                boolean.class, Boolean.class,//
+        };
+        for (Class<?> c : clzs) {
+            if (c == clz) {
+                return true;
+            }
+        }
+        return false;
     }
 }

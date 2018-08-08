@@ -59,6 +59,7 @@ import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.TxtReaderAppenderForHtmlTag;
 import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.google.android.gms.ads.NativeExpressAdView;
 
@@ -465,7 +466,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         recentTxtMarkService = new RecentTxtMarkService(this);
 
         appleFontApplyer = new AppleFontApplyer();
-        paddingAdjuster = new PaddingAdjuster();
+        paddingAdjuster = new PaddingAdjuster(this.getApplicationContext());
 
         // 刪除舊資料
         recentTxtMarkService.deleteOldData();
@@ -1078,15 +1079,15 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
-    private class PaddingAdjuster {
+    public static class PaddingAdjuster {
         Display d;
         int width;
         int height;
         int maxWidth;
         int maxHeight;
 
-        PaddingAdjuster() {
-            d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        public PaddingAdjuster(Context context) {
+            d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
             width = (int) ((double) d.getWidth() * 0.1 / 2);
             height = (int) ((double) d.getHeight() * 0.1 / 2);
 
@@ -1373,7 +1374,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         return true;
     }
 
-    public static class TxtReaderActivityDTO implements Serializable {
+    public static class TxtReaderActivityDTO implements TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO, Serializable {
         private final StringBuilder fileName = new StringBuilder();
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)

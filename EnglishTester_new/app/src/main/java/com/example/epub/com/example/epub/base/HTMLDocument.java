@@ -20,23 +20,12 @@ public class HTMLDocument {
     private URL baseUrl;
     private Dictionary<Object, Object> documentProperties = null;
 
-    public void appendPage(String html) {
-        if (sb.length() > 0) {
-            sb.append(CHANGE_PAGE_TAG + "\r\n");
-        }
+    public void addHtml(String html) {
         sb.append(html);
     }
 
-    public List<String> getPages() {
-        List<String> lst = new ArrayList<>();
-        if (sb.length() > 0) {
-            Scanner scan = new Scanner(sb.toString());
-            scan.useDelimiter(Pattern.quote(CHANGE_PAGE_TAG));
-            while (scan.hasNext()) {
-                lst.add(scan.next());
-            }
-        }
-        return lst;
+    public String getHtml(){
+        return sb.toString();
     }
 
     public void remove(int start, int end) {

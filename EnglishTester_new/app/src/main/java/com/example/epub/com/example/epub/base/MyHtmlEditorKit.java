@@ -8,11 +8,11 @@ public class MyHtmlEditorKit {
 
     private HTMLDocument htmlDocument;
 
-    public MyHtmlEditorKit(){
-        htmlDocument = new HTMLDocument();
+    public MyHtmlEditorKit() {
     }
 
     public HTMLDocument createDefaultDocument() {
+        this.htmlDocument = new HTMLDocument();
         return htmlDocument;
     }
 

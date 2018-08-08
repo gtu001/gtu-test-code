@@ -26,7 +26,7 @@ public class MyParser implements Parser {
     public void parse(Reader contentReader, ParserCallback parserCallback, boolean ignoreCharSet) {
         String htmlContent = getString((StringReader) contentReader);
         Log.v(TAG, "html = " + htmlContent);
-        this.htmlDocument.appendPage(htmlContent);
+        this.htmlDocument.addHtml(htmlContent);
     }
 
     private String getString(StringReader contentReader) {

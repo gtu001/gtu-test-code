@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
         contentView.addView(createLabel(""));
         contentView.addView(createLabel("Epub閱讀器 TODO"));
         contentView.addView(createButton("Epub閱讀器 TODO",//
-                createOnClickListener(EpubReaderActivity.class, new Bundle(), null),
+                createOnClickListener(EpubReaderEpubActivity.class, new Bundle(), null),
                 R.drawable.answer_button_lightblue));
 
         //----------------------------------------------------------------

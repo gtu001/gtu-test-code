@@ -29,10 +29,8 @@ import com.example.epub.com.example.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,9 +40,9 @@ import java.util.regex.Pattern;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.epub.EpubReader;
 
-public class EpubReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
+public class EpubReaderEpubActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity, EpubViewerMainHandler.EpubActivityInterface {
 
-    private static final String TAG = EpubReaderActivity.class.getSimpleName();
+    private static final String TAG = EpubReaderEpubActivity.class.getSimpleName();
 
     public static final String KEY_CONTENT = "EpubReaderActivity_content";
 
@@ -53,7 +51,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             TxtReaderAppender.SimpleUrlLinkSpan.class//
     };//
 
-    EpubReaderActivity self = EpubReaderActivity.this;
+    EpubReaderEpubActivity self = EpubReaderEpubActivity.this;
 
     /**
      * 綁定服務器
@@ -66,12 +64,17 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
      */
     HomeKeyWatcher homeKeyWatcher;
 
+    TxtReaderActivity.PaddingAdjuster paddingAdjuster;
+
     /**
      * epub 服務
      */
-    EpubViewerMainHandler epubViewerMainHandler = new EpubViewerMainHandler(self);
+    EpubViewerMainHandler epubViewerMainHandler;
 
-    TxtReaderActivity.TxtReaderActivityDTO dto = new TxtReaderActivity.TxtReaderActivityDTO();
+    /**
+     * 最近查詢單字
+     */
+    RecentTxtMarkService recentTxtMarkService;
 
     TextView txtReaderView;
     TextView translateView;
@@ -93,13 +96,15 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
         nextPageBtn = findViewById(R.id.nextPageBtn);
 
         this.initView();
+        this.initServices();
+        this.initViewAfterService();
 
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
-        final EpubReaderActivity data = (EpubReaderActivity) getLastNonConfigurationInstance();
+        final EpubReaderEpubActivity data = (EpubReaderEpubActivity) getLastNonConfigurationInstance();
         if (data != null) {// 表示不是由於Configuration改變觸發的onCreate()
             Log.v(TAG, "load old status!");
-            this.dto = data.dto;
+//            this.dto = data.dto;
         } else {
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
@@ -118,15 +123,54 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
         previousPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                epubViewerMainHandler.getNavigator().gotoPreviousSpineSection(self);
+                epubViewerMainHandler.gotoPreviousSpineSection();
             }
         });
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                epubViewerMainHandler.getNavigator().gotoNextSpineSection(self);
+                epubViewerMainHandler.gotoNextSpineSection();
             }
         });
+    }
+
+    private void initViewAfterService() {
+        this.txtReaderView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+        this.translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+    }
+
+    private void initServices() {
+        epubViewerMainHandler = new EpubViewerMainHandler(txtReaderView, this);
+        recentTxtMarkService = new RecentTxtMarkService(this);
+
+        //監視home鍵
+        homeKeyWatcher = new HomeKeyWatcher(this);
+        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
+            public void onPressed() {
+            }
+        });
+        homeKeyWatcher.startWatch();
+
+        this.paddingAdjuster = new TxtReaderActivity.PaddingAdjuster(this.getApplicationContext());
+    }
+
+    public void setTitle(String titleVal) {
+        TitleTextSetter.setText(EpubReaderEpubActivity.this, titleVal);
+    }
+
+    @Override
+    public IFloatServiceAidlInterface getFloatService() {
+        return mService;
+    }
+
+    @Override
+    public RecentTxtMarkService getRecentTxtMarkService() {
+        return recentTxtMarkService;
+    }
+
+    @Override
+    public int getFixScreenWidth() {
+        return paddingAdjuster.width - 10;
     }
 
     /**
@@ -137,7 +181,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             final Handler handler = new Handler();
 
             final AtomicReference<ProgressDialog> dialog = new AtomicReference<ProgressDialog>();
-            dialog.set(new ProgressDialog(EpubReaderActivity.this));
+            dialog.set(new ProgressDialog(EpubReaderEpubActivity.this));
             dialog.get().setMessage("讀取中...");
             dialog.get().show();
 
@@ -167,7 +211,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                                 titleVal = title;
                             }
                             titleVal = fixName(titleVal);
-                            TitleTextSetter.setText(EpubReaderActivity.this, titleVal);
+                            setTitle(titleVal);
                         }
                     });
                 }
@@ -179,7 +223,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                         InputStream bookStream = new FileInputStream(file);
                         Book book = (new EpubReader()).readEpub(bookStream);
 
-                        epubViewerMainHandler.getHtmlDocumentFactory().init(book);
+                        epubViewerMainHandler.initBook(book);
 
                         handler.post(new Runnable() {
                             @Override
@@ -193,7 +237,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(EpubReaderActivity.this, "讀取失敗", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EpubReaderEpubActivity.this, "讀取失敗", Toast.LENGTH_SHORT).show();
                                 dialog.get().dismiss();
                             }
                         });
@@ -236,7 +280,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
         } else {
-            Intent intent = new Intent(EpubReaderActivity.this, FloatViewService.class);
+            Intent intent = new Intent(EpubReaderEpubActivity.this, FloatViewService.class);
             if (isOn) {
                 startService(intent);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -280,23 +324,23 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
 
     enum TaskInfo {
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onOptionsItemSelected(final EpubReaderActivity activity, Intent intent, Bundle bundle) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
 //                activity.openFontSizeDialog();
             }
         }, //
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(epub檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
-            protected void onActivityResult(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+            protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
                 activity.setTxtContentFromFile(file, null, null);
             }
 
-            protected void onOptionsItemSelected(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(epub)");
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
         TTTTTTTTTTTTTTTTTTTTTTTT("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onOptionsItemSelected(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
                 File file = new File(filename);
                 activity.setTxtContentFromFile(file, null, null);
@@ -315,13 +359,13 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             this.clz = clz;
         }
 
-        protected void onOptionsItemSelected(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+        protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
             intent.setClass(activity, clz);
             intent.putExtras(bundle);
             activity.startActivityForResult(intent, requestCode);
         }
 
-        protected void onActivityResult(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+        protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
             Log.v(TAG, "onActivityResult TODO!! = " + this.name());
         }
     }

@@ -51,10 +51,10 @@ public class TxtReaderAppender {
     RecentTxtMarkService recentTxtMarkService;
     ITxtReaderActivity activity;
     IFloatServiceAidlInterface mService;
-    TxtReaderActivity.TxtReaderActivityDTO dto;
+    TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO dto;
     TextView txtView;
 
-    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderActivity.TxtReaderActivityDTO dto, TextView txtView) {
+    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO dto, TextView txtView) {
         this.recentTxtMarkService = recentTxtMarkService;
         this.activity = activity;
         this.mService = mService;
