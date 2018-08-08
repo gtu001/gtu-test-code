@@ -298,7 +298,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 初始化閱讀器
      */
     private void initTextView() {
-        float fontsize = new FontSizeApplyer().getFontSize(this);
+        float fontsize = new FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
         txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
@@ -313,7 +313,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 初始化翻譯氣
      */
     private void initTranslateView() {
-        float fontsize = new FontSizeApplyer().getFontSize(this);
+        float fontsize = new FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
         translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
@@ -327,19 +327,19 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 字型大小修改
      */
-    private class FontSizeApplyer {
+    public static class FontSizeApplyer {
         private static final float DEFAULT_FONTSIZE = 48f;
 
-        private float getFontSize(ContextWrapper context) {
-            if (SharedPreferencesUtil.hasData(context, TxtReaderActivity.class.getSimpleName(), "fontSize")) {
+        public float getFontSize(ContextWrapper context, Class clz) {
+            if (SharedPreferencesUtil.hasData(context, clz.getSimpleName(), "fontSize")) {
                 return Float.parseFloat(SharedPreferencesUtil.getData(context, TxtReaderActivity.class.getSimpleName(), "fontSize"));
             } else {
                 return DEFAULT_FONTSIZE;
             }
         }
 
-        private void setFontSize(ContextWrapper context, float size) {
-            SharedPreferencesUtil.putData(context, TxtReaderActivity.class.getSimpleName(), "fontSize", String.valueOf(size));
+        public void setFontSize(ContextWrapper context, float size, Class clz) {
+            SharedPreferencesUtil.putData(context, clz.getSimpleName(), "fontSize", String.valueOf(size));
         }
     }
 
@@ -465,7 +465,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
 
-        appleFontApplyer = new AppleFontApplyer();
+        appleFontApplyer = new AppleFontApplyer(this);
         paddingAdjuster = new PaddingAdjuster(this.getApplicationContext());
 
         // 刪除舊資料
@@ -770,7 +770,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         dialog.apply(txtView.getTextSize(), Arrays.asList(txtView, translateView), new DialogFontSizeChange.ApplyFontSize() {
             @Override
             public void applyFontSize(float fontSize) {
-                new FontSizeApplyer().setFontSize(TxtReaderActivity.this, fontSize);
+                new FontSizeApplyer().setFontSize(TxtReaderActivity.this, fontSize, TxtReaderActivity.class);
             }
         });
         dialog.show();
@@ -1096,11 +1096,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
-    private class AppleFontApplyer {
+    public static class AppleFontApplyer {
         Typeface myriadProRegular;
 
-        AppleFontApplyer() {
-            myriadProRegular = Typeface.createFromAsset(getAssets(), "fonts/Myriad Pro Regular.ttf");
+        AppleFontApplyer(Context context) {
+            myriadProRegular = Typeface.createFromAsset(context.getAssets(), "fonts/Myriad Pro Regular.ttf");
         }
 
         void apply(TextView view) {

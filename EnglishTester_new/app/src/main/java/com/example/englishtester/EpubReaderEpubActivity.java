@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +22,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.englishtester.common.ClickableSpanMethodCreater;
+import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
@@ -32,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -75,6 +81,11 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
      * 最近查詢單字
      */
     RecentTxtMarkService recentTxtMarkService;
+
+    /**
+     * 蘋果字型
+     */
+    TxtReaderActivity.AppleFontApplyer appleFontApplyer;
 
     TextView txtReaderView;
     TextView translateView;
@@ -135,6 +146,19 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     }
 
     private void initViewAfterService() {
+        float fontsize = new TxtReaderActivity.FontSizeApplyer().getFontSize(this, EpubReaderEpubActivity.class);
+        this.txtReaderView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
+        this.txtReaderView.setHighlightColor(Color.TRANSPARENT);
+        this.txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
+        this.txtReaderView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+
+//        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
+//        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
+        this.txtReaderView.setLineSpacing(10, 1.4f);
+
+        this.appleFontApplyer.apply(this.txtReaderView);
+        this.appleFontApplyer.apply(this.translateView);
+
         this.txtReaderView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
         this.translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
     }
@@ -152,6 +176,23 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         homeKeyWatcher.startWatch();
 
         this.paddingAdjuster = new TxtReaderActivity.PaddingAdjuster(this.getApplicationContext());
+        this.appleFontApplyer = new TxtReaderActivity.AppleFontApplyer(this);
+
+        this.doOnoffService(true);
+    }
+
+    /**
+     * 開啟字形大小修改Dialog
+     */
+    private void openFontSizeDialog() {
+        DialogFontSizeChange dialog = new DialogFontSizeChange(this);
+        dialog.apply(txtReaderView.getTextSize(), Arrays.asList(txtReaderView, translateView), new DialogFontSizeChange.ApplyFontSize() {
+            @Override
+            public void applyFontSize(float fontSize) {
+                new TxtReaderActivity.FontSizeApplyer().setFontSize(EpubReaderEpubActivity.this, fontSize, EpubReaderEpubActivity.class);
+            }
+        });
+        dialog.show();
     }
 
     public void setTitle(String titleVal) {
@@ -325,7 +366,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     enum TaskInfo {
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-//                activity.openFontSizeDialog();
+                activity.openFontSizeDialog();
             }
         }, //
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(epub檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
