@@ -97,6 +97,9 @@ public class MainActivity extends ActionBarActivity { //
         f_bbqChickenWing(R.id.item_f_bbqChickenWing, new int[]{R.drawable.f_bbq_chicken_wing_01, R.drawable.f_bbq_chicken_wing_02, R.drawable.f_bbq_chicken_wing_03, R.drawable.f_bbq_chicken_wing_04, R.drawable.f_bbq_chicken_wing_05}), //
         f_bigMicTwo(R.id.item_f_bigMicTwo, new int[]{R.drawable.f_big_mic_two_01, R.drawable.f_big_mic_two_02, R.drawable.f_big_mic_two_03, R.drawable.f_big_mic_two_04, R.drawable.f_big_mic_two_05}), //
         f_chickenFiredBurgerTwo(R.id.item_f_chickenFiredBurgerTwo, new int[]{R.drawable.f_chicken_fired_burger_two_01, R.drawable.f_chicken_fired_burger_two_02, R.drawable.f_chicken_fired_burger_two_03, R.drawable.f_chicken_fired_burger_two_04, R.drawable.f_chicken_fired_burger_two_05}), //
+        f_redteaTwo(R.id.item_f_redteaTwo, new int[]{R.drawable.f_redtea_01, R.drawable.f_redtea_02, R.drawable.f_redtea_03, R.drawable.f_redtea_04, R.drawable.f_redtea_05}), //
+        f_milkteaTen(R.id.item_f_milkteaTen, new int[]{R.drawable.f_milktea_ten_01, R.drawable.f_milktea_ten_02, R.drawable.f_milktea_ten_03, R.drawable.f_milktea_ten_04, R.drawable.f_milktea_ten_05}), //
+        f_chickenWingTwo(R.id.item_f_chickenWingTwo, new int[]{R.drawable.f_chicken_wing_oneone_01, R.drawable.f_chicken_wing_oneone_02, R.drawable.f_chicken_wing_oneone_03, R.drawable.f_chicken_wing_oneone_04, R.drawable.f_chicken_wing_oneone_05}), //
         ;
 
         final int menuId;

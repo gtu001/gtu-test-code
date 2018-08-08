@@ -183,4 +183,16 @@
         android:id="@+id/item_f_chickenFiredBurgerTwo"
         android:orderInCategory="100"
         android:title="嫩煎雞腿堡買一送一(new)" />
+    <item
+        android:id="@+id/item_f_redteaTwo"
+        android:orderInCategory="100"
+        android:title="大杯冰紅茶買一送一(new)" />
+    <item
+        android:id="@+id/item_f_milkteaTen"
+        android:orderInCategory="100"
+        android:title="10圓小杯冰奶茶(new)" />
+    <item
+        android:id="@+id/item_f_chickenWingTwo"
+        android:orderInCategory="100"
+        android:title="勁辣香雞翅買一送一(new)" />
 </menu>
