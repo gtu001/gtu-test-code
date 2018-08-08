@@ -19,7 +19,7 @@ public class HrSpan extends ReplacementSpan {
                      @IntRange(from = 0) int end, float x, int top, int y, int bottom,
                      @NonNull Paint paint) {
         // Draws an 8px tall rectangle the same
-        // width as the TextView
+        // padWidth as the TextView
         canvas.drawRect(x, top, y, top + 8, paint);
     }
 }

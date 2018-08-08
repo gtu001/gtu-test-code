@@ -43,8 +43,8 @@ public class FullPageMentionDialog {
 
 //        DisplayMetrics dm = new DisplayMetrics();
 //        this.getWindowManager().getDefaultDisplay().getMetrics(dm);
-//        int width = dm.widthPixels;
-//        int height = dm.heightPixels;
+//        int padWidth = dm.widthPixels;
+//        int padHeight = dm.heightPixels;
 
         ImageView imageView = new ImageView(context);
         layout.addView(imageView, //

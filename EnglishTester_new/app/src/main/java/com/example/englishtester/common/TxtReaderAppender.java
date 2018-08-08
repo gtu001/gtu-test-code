@@ -26,6 +26,7 @@ import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -51,10 +52,10 @@ public class TxtReaderAppender {
     RecentTxtMarkService recentTxtMarkService;
     ITxtReaderActivity activity;
     IFloatServiceAidlInterface mService;
-    TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO dto;
+    ITxtReaderActivityDTO dto;
     TextView txtView;
 
-    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO dto, TextView txtView) {
+    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, ITxtReaderActivityDTO dto, TextView txtView) {
         this.recentTxtMarkService = recentTxtMarkService;
         this.activity = activity;
         this.mService = mService;

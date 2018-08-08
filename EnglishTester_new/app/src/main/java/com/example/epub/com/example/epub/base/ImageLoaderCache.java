@@ -80,13 +80,39 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
 
 
     private String getResourceHref(String requestUrl) {
-        String resourceHref = requestUrl.toString().substring(Bitmap_URL_PREFIX.length());
-        resourceHref = currentFolder + resourceHref;
-        resourceHref = FilenameUtils.normalize(resourceHref);
-        // normalize uses the SYSTEM_SEPARATOR, which on windows is a '\'
-        // replace with '/' to make it href '/'
-        resourceHref = resourceHref.replaceAll("\\\\", "/");
-        return resourceHref;
+        Log.v(TAG, "# -- getResourceHref -- start");
+        Log.v(TAG, "currentFolder = " + currentFolder);
+        Log.v(TAG, "requestUrl = " + requestUrl);
+        if (requestUrl.toString().startsWith(Bitmap_URL_PREFIX)) {
+            String resourceHref = requestUrl.toString().substring(Bitmap_URL_PREFIX.length());
+            resourceHref = currentFolder + resourceHref;
+            resourceHref = FilenameUtils.normalize(resourceHref);
+            // normalize uses the SYSTEM_SEPARATOR, which on windows is a '\'
+            // replace with '/' to make it href '/'
+            resourceHref = resourceHref.replaceAll("\\\\", "/");
+            return resourceHref;
+        } else {
+            //gtu001 custom ↓↓↓↓↓↓
+            String tmpDir = currentFolder;
+            if (tmpDir.endsWith("/")) {
+                tmpDir = StringUtils.substring(tmpDir, 0, -1);
+            }
+            while (requestUrl.startsWith("../")) {
+                requestUrl = requestUrl.substring("../".length());
+                if (tmpDir.lastIndexOf("/") != -1) {
+                    tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf("/"));
+                } else {
+                    tmpDir = "";
+                }
+            }
+            String rtnPath = FilenameUtils.normalize(tmpDir + "/" + requestUrl);
+            if (rtnPath.startsWith("/")) {
+                rtnPath = rtnPath.substring(1);
+            }
+            Log.v(TAG, "rtnPath = " + rtnPath);
+            //gtu001 custom ↑↑↑↑↑↑
+            return rtnPath;
+        }
     }
 
     /**
@@ -120,6 +146,14 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
 
         // get the Bitmap resource href
         String resourceHref = getResourceHref(BitmapURL);
+
+        //-----------------------------------------------------------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        for (Resource res : book.getResources().getAll()) {
+            Log.v(TAG, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + res.getHref());
+        }
+
+        //-----------------------------------------------------------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
         // find the Bitmap resource in the book resources
         Resource BitmapResource = book.getResources().getByHref(resourceHref);

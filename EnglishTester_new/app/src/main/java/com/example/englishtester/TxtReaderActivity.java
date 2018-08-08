@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -50,7 +51,10 @@ import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
-import com.example.englishtester.common.HtmlWordParser;
+import com.example.englishtester.common.OOMHandler;
+import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.MainAdViewHelper;
@@ -80,6 +84,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -122,11 +127,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 蘋果字型
      */
-    AppleFontApplyer appleFontApplyer;
+    ReaderCommonHelper.AppleFontApplyer appleFontApplyer;
     /**
      * 邊界調整
      */
-    PaddingAdjuster paddingAdjuster;
+    ReaderCommonHelper.PaddingAdjuster paddingAdjuster;
     /**
      * 紀錄scroll位置
      */
@@ -302,7 +307,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
         txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
-        txtView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+        paddingAdjuster.applyPadding(txtView);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         txtView.setLineSpacing(10, 1.4f);
@@ -317,7 +322,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
         translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
-        translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+        paddingAdjuster.applyPadding(translateView);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         translateView.setLineSpacing(10, 1.4f);
@@ -465,8 +470,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
 
-        appleFontApplyer = new AppleFontApplyer(this);
-        paddingAdjuster = new PaddingAdjuster(this.getApplicationContext());
+        appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);
+        paddingAdjuster = new ReaderCommonHelper.PaddingAdjuster(this.getApplicationContext());
 
         // 刪除舊資料
         recentTxtMarkService.deleteOldData();
@@ -743,7 +748,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             txtView.setText(appender.getAppendTxt(content));
             this.dto.content = content;
         } else {
-            txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.maxWidth - 10));
+            txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.getMaxWidth() - 10));
             if (dto.currentHtmlFile != null) {
                 this.dto.content = HtmlWordParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
             } else if (StringUtils.isNotBlank(dto.currentHtmlContent)) {
@@ -1079,35 +1084,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
-    public static class PaddingAdjuster {
-        Display d;
-        int width;
-        int height;
-        int maxWidth;
-        int maxHeight;
-
-        public PaddingAdjuster(Context context) {
-            d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            width = (int) ((double) d.getWidth() * 0.1 / 2);
-            height = (int) ((double) d.getHeight() * 0.1 / 2);
-
-            maxWidth = d.getWidth() - (2 * width);
-            maxHeight = d.getHeight() - (2 * height);
-        }
-    }
-
-    public static class AppleFontApplyer {
-        Typeface myriadProRegular;
-
-        AppleFontApplyer(Context context) {
-            myriadProRegular = Typeface.createFromAsset(context.getAssets(), "fonts/Myriad Pro Regular.ttf");
-        }
-
-        void apply(TextView view) {
-            view.setTypeface(myriadProRegular);
-        }
-    }
-
     /**
      * 紀錄 scrollView位置
      */
@@ -1374,7 +1350,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         return true;
     }
 
-    public static class TxtReaderActivityDTO implements TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO, Serializable {
+    public static class TxtReaderActivityDTO implements ITxtReaderActivityDTO, Serializable {
+
         private final StringBuilder fileName = new StringBuilder();
         private String content;//英文本文
         private String contentCopy;//英文本文備份(用來判斷是否翻譯過)

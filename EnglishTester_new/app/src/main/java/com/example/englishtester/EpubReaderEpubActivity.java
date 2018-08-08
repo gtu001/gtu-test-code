@@ -28,6 +28,7 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
+import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.epub.com.example.epub.base.EpubViewerMainHandler;
@@ -70,7 +71,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
      */
     HomeKeyWatcher homeKeyWatcher;
 
-    TxtReaderActivity.PaddingAdjuster paddingAdjuster;
+    ReaderCommonHelper.PaddingAdjuster paddingAdjuster;
 
     /**
      * epub 服務
@@ -85,7 +86,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     /**
      * 蘋果字型
      */
-    TxtReaderActivity.AppleFontApplyer appleFontApplyer;
+    ReaderCommonHelper.AppleFontApplyer appleFontApplyer;
 
     TextView txtReaderView;
     TextView translateView;
@@ -150,17 +151,17 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         this.txtReaderView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         this.txtReaderView.setHighlightColor(Color.TRANSPARENT);
         this.txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
-        this.txtReaderView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+        paddingAdjuster.applyPadding(this.txtReaderView);
 
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         this.txtReaderView.setLineSpacing(10, 1.4f);
+        this.translateView.setLineSpacing(10, 1.4f);
 
         this.appleFontApplyer.apply(this.txtReaderView);
         this.appleFontApplyer.apply(this.translateView);
 
-        this.txtReaderView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
-        this.translateView.setPadding(paddingAdjuster.width, paddingAdjuster.height, paddingAdjuster.width, paddingAdjuster.height);
+        paddingAdjuster.applyPadding(this.translateView);
     }
 
     private void initServices() {
@@ -175,8 +176,8 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         });
         homeKeyWatcher.startWatch();
 
-        this.paddingAdjuster = new TxtReaderActivity.PaddingAdjuster(this.getApplicationContext());
-        this.appleFontApplyer = new TxtReaderActivity.AppleFontApplyer(this);
+        this.paddingAdjuster = new ReaderCommonHelper.PaddingAdjuster(this.getApplicationContext());
+        this.appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);
 
         this.doOnoffService(true);
     }
@@ -211,7 +212,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
 
     @Override
     public int getFixScreenWidth() {
-        return paddingAdjuster.width - 10;
+        return paddingAdjuster.getMaxWidth() - 10;
     }
 
     /**
@@ -380,13 +381,19 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
-        TTTTTTTTTTTTTTTTTTTTTTTT("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
+//        FOR_TEST("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+//                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
+//                File file = new File(filename);
+//                activity.setTxtContentFromFile(file, null, null);
+//            }
+//        },//
+        SHOW_ORIGN_HTML("顯示原始Html", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
-                File file = new File(filename);
-                activity.setTxtContentFromFile(file, null, null);
+                activity.translateView.setText(activity.epubViewerMainHandler.getHtmlContent());
             }
-        };
+        },//
+        ;
 
         final String title;
         final int option;

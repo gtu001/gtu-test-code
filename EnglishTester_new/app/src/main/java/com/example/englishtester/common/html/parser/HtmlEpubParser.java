@@ -1,16 +1,18 @@
-package com.example.englishtester.common;
+package com.example.englishtester.common.html.parser;
 
 import android.util.Log;
 
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.Constant;
+import com.example.englishtester.common.FileUtilAndroid;
+import com.example.englishtester.common.FileUtilGtu;
+import com.example.englishtester.common.TagMatcher;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -21,13 +23,13 @@ import java.util.regex.Pattern;
 import gtu.util.StringUtil_;
 
 
-public class HtmlWordParser {
+public class HtmlEpubParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
 
     public static void main(String[] args) {
-        HtmlWordParser parser = HtmlWordParser.newInstance();
+        HtmlEpubParser parser = HtmlEpubParser.newInstance();
 
         File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
 
@@ -39,15 +41,15 @@ public class HtmlWordParser {
         System.out.println("done...");
     }
 
-    private static final String TAG = HtmlWordParser.class.getSimpleName();
+    private static final String TAG = HtmlEpubParser.class.getSimpleName();
 
-    private HtmlWordParser() {
+    private HtmlEpubParser() {
     }
 
     private String picDirForDropbox = "";
 
-    public static HtmlWordParser newInstance() {
-        return new HtmlWordParser();
+    public static HtmlEpubParser newInstance() {
+        return new HtmlEpubParser();
     }
 
     public String getFromFile(File file) {
@@ -94,7 +96,7 @@ public class HtmlWordParser {
     private void saveToFileDebug(String suffix, String context) {
         if (BuildConfig.DEBUG) {
             String dateStr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-            String name = HtmlWordParser.class.getSimpleName();
+            String name = HtmlEpubParser.class.getSimpleName();
             if (StringUtils.isNotBlank(suffix)) {
                 name = name + "_" + suffix;
             }

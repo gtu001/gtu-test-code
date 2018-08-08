@@ -1,6 +1,7 @@
 package com.example.epub.com.example.epub.base;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.RemoteException;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -18,6 +19,10 @@ import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.TxtReaderAppenderForHtmlTag;
+import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml;
+import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.html.parser.HtmlEpubParser;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -32,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +62,9 @@ public class EpubViewerMainHandler {
     private Navigator navigator;
     private EpubActivityInterface epubActivityInterface;
 
+    private AtomicReference<String> htmlContent = new AtomicReference<>();
+    private AtomicReference<String> customContent = new AtomicReference<>();
+
     private EpubDTO dto;
 
     public EpubViewerMainHandler(TextView textView, EpubActivityInterface epubActivityInterface) {
@@ -64,7 +73,7 @@ public class EpubViewerMainHandler {
         this.epubSpannableTextHandler = new EpubSpannableTextHandler();
         this.self = textView;
         this.epubActivityInterface = epubActivityInterface;
-        this.dto = new EpubDTO();
+        this.dto = new EpubDTO(this.textView);
     }
 
     public void initBook(Book book) {
@@ -90,7 +99,7 @@ public class EpubViewerMainHandler {
         int getFixScreenWidth();
     }
 
-    public class EpubSpannableTextHandler implements NavigationEventListener {
+    private class EpubSpannableTextHandler implements NavigationEventListener {
         private final String TAG = EpubSpannableTextHandler.class.getSimpleName();
 
         private EpubSpannableTextHandler() {
@@ -128,10 +137,16 @@ public class EpubViewerMainHandler {
 
                 //設定內文
                 HTMLDocument currentDocument = EpubViewerMainHandler.this.htmlDocumentFactory.getDocument(resource);
-                String htmlContent = currentDocument.getHtml();
+                dto.setHTMLDocument(currentDocument);
+                htmlContent.set(currentDocument.getHtml());
+
+                //處理成克制版
+                HtmlEpubParser wordParser = HtmlEpubParser.newInstance();
+                String $tempResultContent = wordParser.getFromContent(htmlContent.get());
+                customContent.set($tempResultContent);
 
                 TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), epubActivityInterface.getFloatService(), dto, EpubViewerMainHandler.this.textView);
-                SpannableString spannableString = txtReaderAppender.getAppendTxt_HtmlFromWord(htmlContent, epubActivityInterface.getFixScreenWidth());
+                SpannableString spannableString = txtReaderAppender.getAppendTxt_HtmlFromWord(customContent.get(), epubActivityInterface.getFixScreenWidth());
                 EpubViewerMainHandler.this.textView.setText(spannableString);
             }
 
@@ -159,11 +174,18 @@ public class EpubViewerMainHandler {
         }
     }
 
-    private class EpubDTO implements TxtReaderAppenderForHtmlTag.ITxtReaderActivityDTO {
+    public static class EpubDTO implements ITxtReaderActivityDTO {
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
 
         private StringBuilder fileName;
+        private TextView textView;
+        private HTMLDocument htmlDocument;
 
+        public EpubDTO(TextView textView) {
+            this.textView = textView;
+        }
+
+        @Override
         public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
             return bookmarkHolder;
         }
@@ -179,20 +201,6 @@ public class EpubViewerMainHandler {
         }
 
         @Override
-        public File getCurrentHtmlFile() {
-            return null;
-        }
-
-        @Override
-        public File getDropboxPicDir() {
-            return null;
-        }
-
-        @Override
-        public String getCurrentHtmlUrl() {
-            return "<Unsupported [getCurrentHtmlUrl]>";
-        }
-
         public void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder) {
             this.bookmarkHolder = bookmarkHolder;
         }
@@ -217,5 +225,27 @@ public class EpubViewerMainHandler {
         public boolean getBookmarkMode() {
             return false;
         }
+
+        public void setHTMLDocument(HTMLDocument document) {
+            this.htmlDocument = document;
+        }
+
+        public Bitmap getBitmapForEpub(ImageLoaderCandidate4EpubHtml imgLoader) {
+            ImageLoaderCache cache = (ImageLoaderCache) this.htmlDocument.getDocumentProperties().get("BitmapCache");
+            if (StringUtils.isBlank(imgLoader.getAltData()) && StringUtils.isNotBlank(imgLoader.getSrcData())) {
+                return cache.get(imgLoader.getSrcData());
+            } else if (StringUtils.isBlank(imgLoader.getSrcData()) && StringUtils.isNotBlank(imgLoader.getAltData())) {
+                return cache.get(imgLoader.getAltData());
+            }
+            return null;
+        }
+    }
+
+    public String getHtmlContent() {
+        return htmlContent.get();
+    }
+
+    public String getCustomContent() {
+        return customContent.get();
     }
 }

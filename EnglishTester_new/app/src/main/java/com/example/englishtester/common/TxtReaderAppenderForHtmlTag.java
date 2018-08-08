@@ -9,21 +9,19 @@ import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.example.englishtester.R;
-import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.html.image.IImageLoaderCandidate;
+import com.example.englishtester.common.html.image.ImageLoaderCandidate4WordHtml;
+import com.example.englishtester.common.html.image.ImageLoaderFactory;
+import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
-import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,26 +47,8 @@ public class TxtReaderAppenderForHtmlTag {
     private Context context;
     private ITxtReaderActivityDTO dto;
     private OnlinePicLoader onlinePicLoader;
+    private ImageLoaderFactory imageLoaderFactory;
 
-    public interface ITxtReaderActivityDTO {
-        TextView getTxtView();
-
-        boolean isImageLoadMode();
-
-        File getCurrentHtmlFile();
-
-        File getDropboxPicDir();
-
-        String getCurrentHtmlUrl();
-
-        void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder);
-
-        StringBuilder getFileName();
-
-        boolean getBookmarkMode();
-
-        Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
-    }
 
     public TxtReaderAppenderForHtmlTag(//
                                        String txtContent,//
@@ -85,6 +65,7 @@ public class TxtReaderAppenderForHtmlTag {
         this.context = context;
         this.dto = dto;
         this.onlinePicLoader = new OnlinePicLoader(context);
+        this.imageLoaderFactory = ImageLoaderFactory.newInstance(dto.isImageLoadMode(), onlinePicLoader, dto);
     }
 
     public void apply() {
@@ -207,12 +188,12 @@ public class TxtReaderAppenderForHtmlTag {
 //                log("src -> " + srcData);
 //                log("alt -> " + altData);
 
-                ImageLoaderCandidate picProcess = self.new ImageLoaderCandidate(srcData.getContent(), altData.getContent(), self.dto.isImageLoadMode());
+                IImageLoaderCandidate picProcess = self.imageLoaderFactory.getLoader(srcData.getContent(), altData.getContent());
 
                 self.hiddenSpan(self.ss, self.getPairStart(pair), altData.getStart());
                 self.hiddenSpan(self.ss, altData.getEnd(), self.getPairEnd(pair));
 
-                if (!picProcess.isGifFile) {
+                if (!picProcess.isGifFile()) {
                     Bitmap smiley = null;
                     try {
                         smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), self.maxPicWidth);
@@ -221,8 +202,8 @@ public class TxtReaderAppenderForHtmlTag {
                         smiley = self.onlinePicLoader.getNotfound404();
                     }
                     self.ss.setSpan(new ImageSpan(self.context, smiley, ImageSpan.ALIGN_BASELINE), altData.getStart(), altData.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                } else if (picProcess.localFile != null) {
-                    ImageSpan imageSpan = GifSpanCreater.getGifSpan(picProcess.localFile, self.dto.getTxtView(), self.resetScaleAction);
+                } else if (picProcess.getLocalFile() != null) {
+                    ImageSpan imageSpan = GifSpanCreater.getGifSpan(picProcess.getLocalFile(), self.dto.getTxtView(), self.resetScaleAction);
                     self.ss.setSpan(imageSpan, altData.getStart(), altData.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
@@ -392,102 +373,6 @@ public class TxtReaderAppenderForHtmlTag {
             }
             return stk;
         }
-    }
-
-    private class ImageLoaderCandidate {
-        String srcData;
-        String altData;
-        boolean isGifFile;
-        File localFile;
-        boolean isNeedLoadImage;
-
-        ImageLoaderCandidate(String srcData, String altData, boolean isNeedLoadImage) {
-            this.srcData = srcData;
-            this.altData = altData;
-            this.isGifFile = isGif(srcData);
-            this.isNeedLoadImage = isNeedLoadImage;
-            try {
-                this.localFile = getLocalFile(srcData);
-            } catch (Exception ex) {
-                Log.e(TAG, ex.getMessage(), ex);
-            }
-        }
-
-        private File getLocalFile(String filename) {
-            try {
-                String realName = URLDecoder.decode(filename, HtmlWordParser.WORD_HTML_ENCODE);
-                File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
-                if (localPicFile.exists() && localPicFile.canRead()) {
-                    return localPicFile;
-                }
-
-                if (realName.contains("/")) {
-                    realName = realName.substring(realName.lastIndexOf("/"));
-                }
-                File dropboxPic = new File(dto.getDropboxPicDir(), realName);
-                if (dropboxPic.exists() && dropboxPic.canRead()) {
-                    return dropboxPic;
-                }
-
-                throw new Exception("查無檔案 : " + filename);
-            } catch (Exception ex) {
-                throw new RuntimeException("getLocalFile ERR : " + ex.getMessage(), ex);
-            }
-        }
-
-        private boolean isGif(String srcData) {
-            if (StringUtils.isNotBlank(srcData) && srcData.matches("(?i).*\\.gif")) {
-                return true;
-            }
-            return false;
-        }
-
-        private Bitmap getResult() {
-            if (!isNeedLoadImage) {
-                return onlinePicLoader.getNotfound404();
-            }
-
-            Bitmap tmp = null;
-            if (localFile != null) {
-                tmp = OOMHandler.new_decode(localFile);
-                if (tmp != null) {
-                    return tmp;
-                }
-            }
-
-            if (isOnlineImageFromURL(altData)) {
-                tmp = getPicFromURL(altData);
-                if (tmp != null) {
-                    return tmp;
-                }
-            }
-
-            if (StringUtils.isNotBlank(dto.getCurrentHtmlUrl())) {
-                String prefixUrl = dto.getCurrentHtmlUrl();
-                if (!prefixUrl.endsWith("/")) {
-                    prefixUrl = prefixUrl + "/";
-                }
-                tmp = getPicFromURL(prefixUrl + altData);
-                if (tmp != null) {
-                    return tmp;
-                }
-            }
-            return onlinePicLoader.getNotfound404();
-        }
-    }
-
-    private boolean isOnlineImageFromURL(String url) {
-        if (url.matches("https?\\:.*") || //
-                url.matches("www\\..*") || //
-                url.matches("\\w+\\.\\w+.*") //
-                ) {
-            return true;
-        }
-        return false;
-    }
-
-    private Bitmap getPicFromURL(String url) {
-        return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000);
     }
 
     private GifSpanCreater.ResetScale resetScaleAction = new GifSpanCreater.ResetScale() {
