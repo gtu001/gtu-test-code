@@ -38,6 +38,7 @@ import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JLabelUtil;
 import gtu.swing.util.JOptionPaneUtil;
 
 public class OneToManyCreaterTest__appenderUI extends JFrame {
@@ -95,7 +96,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
-        lblRefFromType = new JLabel("ref from type");
+        lblRefFromType = new JLabel(JLabelUtil.getText("ref from type"));
         contentPane.add(lblRefFromType, "2, 2, right, default");
 
         refFromTypeText = new JTextField();
@@ -116,7 +117,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
             }
         }));
 
-        JLabel lblRefType = new JLabel("ref to type");
+        JLabel lblRefType = new JLabel(JLabelUtil.getText("ref to type"));
         contentPane.add(lblRefType, "2, 4, right, default");
 
         refToTypeText = new JTextField();
@@ -164,7 +165,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
         bidirectionalRadio = new JRadioButton("bidirectional");
         panel_1.add(bidirectionalRadio);
 
-        lblNewLabel_1 = new JLabel("baseDir");
+        lblNewLabel_1 = new JLabel(JLabelUtil.getText("baseDir"));
         contentPane.add(lblNewLabel_1, "2, 16, right, default");
 
         projectFolderText = new JTextField();

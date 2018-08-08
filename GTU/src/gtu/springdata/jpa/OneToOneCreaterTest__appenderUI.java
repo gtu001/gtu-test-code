@@ -34,6 +34,7 @@ import gtu.springdata.jpa.OneToManyCreaterTest__appenderUI.__JpaRelation_Perform
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JLabelUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 
 public class OneToOneCreaterTest__appenderUI extends JFrame {
@@ -89,7 +90,7 @@ public class OneToOneCreaterTest__appenderUI extends JFrame {
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
-        lblRefFromType = new JLabel("ref from type");
+        lblRefFromType = new JLabel(JLabelUtil.getText("ref from type"));
         contentPane.add(lblRefFromType, "2, 2, right, default");
 
         refFromTypeText = new JTextField();
@@ -110,7 +111,7 @@ public class OneToOneCreaterTest__appenderUI extends JFrame {
             }
         }));
 
-        JLabel lblRefType = new JLabel("ref to type");
+        JLabel lblRefType = new JLabel(JLabelUtil.getText("ref to type"));
         contentPane.add(lblRefType, "2, 4, right, default");
 
         refToTypeText = new JTextField();

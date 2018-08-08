@@ -32,6 +32,7 @@ import gtu.file.FileUtil;
 import gtu.springdata.jpa.OneToManyCreaterTest__appenderUI.__JpaRelation_PerformExecute;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JLabelUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 
 public class ManyToManyCreaterTest_appenderUI extends JFrame {
@@ -84,7 +85,7 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
         contentPane.add(middleTableText, "4, 2, fill, default");
         middleTableText.setColumns(10);
 
-        JLabel lblFromEntity = new JLabel("from entity");
+        JLabel lblFromEntity = new JLabel(JLabelUtil.getText("from entity"));
         contentPane.add(lblFromEntity, "2, 4, right, default");
 
         FocusAdapter fromEntityAndTargetEntityFocusAdapter = new FocusAdapter() {
@@ -121,7 +122,7 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
         }));
         fromEntityText.addFocusListener(fromEntityAndTargetEntityFocusAdapter);
 
-        JLabel lblTargetEntity = new JLabel("target entity");
+        JLabel lblTargetEntity = new JLabel(JLabelUtil.getText("target entity"));
         contentPane.add(lblTargetEntity, "2, 6, right, default");
 
         targetEntityText = new JTextField();

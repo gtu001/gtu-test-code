@@ -72,7 +72,7 @@ public class WorkTimesheetProduce_4IBM {
 
     private class ProcessRow {
         private String[] fromTime = new String[] { "08:55", "08:56", "08:57", "08:58", "08:59", "09:00", "09:01", "09:02", "09:03" };
-        private String[] $$toTime = new String[] { "18:00", "18:01", "18:02", "18:03", "18:04", "18:05", "18:06", "18:07", "18:08" };
+        private String[] $$toTime = new String[] { "6:00", "6:01", "6:02", "6:03", "6:04", "6:05", "6:06", "6:07", "6:08" };
 
         ProcessRow(Row row, int rowIndex, FindStartRow firstRow, Map<String, Integer> workMap) {
             Cell cell = row.getCell((int) firstRow.weekend.getX());
