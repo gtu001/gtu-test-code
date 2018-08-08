@@ -16,18 +16,17 @@ import java.io.StringReader;
 public class MyParser implements Parser {
     private static final String TAG = MyParser.class.getSimpleName();
 
+    private HTMLDocument htmlDocument;
+
+    public MyParser(HTMLDocument htmlDocument) {
+        this.htmlDocument = htmlDocument;
+    }
+
     @Override
     public void parse(Reader contentReader, ParserCallback parserCallback, boolean ignoreCharSet) {
-        Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-
-        Log.v(TAG, "contentReader = " + contentReader);
-        Log.v(TAG, "parserCallback = " + parserCallback);
-        Log.v(TAG, "ignoreCharSet = " + ignoreCharSet);
-
-        String content = getString((StringReader) contentReader);
-
-
-        Log.v(TAG, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        String htmlContent = getString((StringReader) contentReader);
+        Log.v(TAG, "html = " + htmlContent);
+        this.htmlDocument.appendPage(htmlContent);
     }
 
     private String getString(StringReader contentReader) {
@@ -38,7 +37,6 @@ public class MyParser implements Parser {
             for (String line = null; (line = reader.readLine()) != null; ) {
                 sb.append(line + "\r\n");
             }
-            Log.v(TAG, "html = " + sb.toString());
             return sb.toString();
         } catch (Exception ex) {
             throw new RuntimeException("parse ERR : " + ex.getMessage(), ex);

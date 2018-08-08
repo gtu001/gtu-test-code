@@ -1,12 +1,18 @@
 package com.example.epub.com.example.epub.base;
 
+import android.util.Log;
+
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import gtu.util.ClassUtil;
 import nl.siegmann.epublib.browsersupport.NavigationEvent;
 import nl.siegmann.epublib.browsersupport.NavigationEventListener;
 import nl.siegmann.epublib.browsersupport.Navigator;
@@ -15,6 +21,9 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +35,8 @@ import org.slf4j.LoggerFactory;
  * @author paul.siegmann
  */
 public class HTMLDocumentFactory implements NavigationEventListener {
+
+    private static final String TAG = HTMLDocumentFactory.class.getSimpleName();
 
     private static final Logger log = LoggerFactory.getLogger(HTMLDocumentFactory.class);
 
@@ -41,11 +52,21 @@ public class HTMLDocumentFactory implements NavigationEventListener {
     private Map<String, HTMLDocument> documentCache = new HashMap<String, HTMLDocument>();
     private MyHtmlEditorKit editorKit;
 
-    public HTMLDocumentFactory(Navigator navigator, MyHtmlEditorKit editorKit) {
+    //gtu001 custom ↓↓↓↓↓↓
+    private Navigator navigator;
+    private Object self;
+    //gtu001 custom ↑↑↑↑↑↑
+
+    public HTMLDocumentFactory(Navigator navigator, MyHtmlEditorKit editorKit, Object self) {
+        //gtu001 custom ↓↓↓↓↓↓
+        this.navigator = navigator;
+        this.self = self;
+        //gtu001 custom ↑↑↑↑↑↑
+
         this.editorKit = editorKit;
-        this.imageLoaderCache = new ImageLoaderCache(navigator);
-        init(navigator.getBook());
-        navigator.addNavigationEventListener(this);
+        this.imageLoaderCache = new ImageLoaderCache(this.navigator);
+        init(this.navigator.getBook());
+        this.navigator.addNavigationEventListener(this);
     }
 
     public void init(Book book) {
@@ -54,6 +75,10 @@ public class HTMLDocumentFactory implements NavigationEventListener {
         }
         imageLoaderCache.initBook(book);
         initDocumentCache(book);
+
+        //gtu001 custom ↓↓↓↓↓↓
+        this.navigator.gotoBook(book, self);
+        //gtu001 custom ↑↑↑↑↑↑
     }
 
     private void putDocument(Resource resource, HTMLDocument document) {
@@ -207,8 +232,29 @@ public class HTMLDocumentFactory implements NavigationEventListener {
 
     @Override
     public void navigationPerformed(NavigationEvent navigationEvent) {
+        Log.v(TAG, "navigationPerformed start -------------------------------------------------------------");
+        Log.v(TAG, "navigationPerformed debug start -------------------------------------------------------------");
+        for (Method m : NavigationEvent.class.getDeclaredMethods()) {
+            if (ClassUtil.isPrimitiveOrWrapper(m.getReturnType()) || m.getReturnType() == String.class) {
+                try {
+                    Object value = MethodUtils.invokeMethod(navigationEvent, m.getName());
+                    Log.v(TAG, ">" + m.getName() + "\t" + value);
+                } catch (Exception e) {
+                    Log.e(TAG, "navigationPerformed err : " + m.getName() + " --> " + e.getMessage());
+                }
+            }
+        }
+
+        Log.v(TAG, ReflectionToStringBuilder.toString(navigationEvent, ToStringStyle.MULTI_LINE_STYLE));
+        Log.v(TAG, "navigationPerformed debug end   -------------------------------------------------------------");
+
         if (navigationEvent.isBookChanged() || navigationEvent.isResourceChanged()) {
             imageLoaderCache.clear();
         }
+
+        HTMLDocument currentDocument = this.getDocument(navigationEvent.getCurrentResource());
+        List<String> pageLst = currentDocument.getPages();
+
+        Log.v(TAG, "navigationPerformed end   -------------------------------------------------------------");
     }
 }

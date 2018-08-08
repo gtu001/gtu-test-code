@@ -9,6 +9,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -66,20 +68,14 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
         }
     }
 
-    //TODO xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx FIX ME
     public void initImageLoader(HTMLDocument document) {
-
-    }
-
-    //TODO xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx FIX ME
-    public void initBitmapLoader(HTMLDocument document) {
-//        try {
-//            document.setBase(new URL(BitmapLoaderCache.Bitmap_URL_PREFIX));
-//        } catch (MalformedURLException e) {
-//            log.error(e.getMessage());
-//        }
-//        setContextResource(navigator.getCurrentResource());
-//        document.getDocumentProperties().put("BitmapCache", this);
+        try {
+            document.setBase(new URL(ImageLoaderCache.Bitmap_URL_PREFIX));
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "initImageLoader ERR : " + e.getMessage(), e);
+        }
+        setContextResource(navigator.getCurrentResource());
+        document.getDocumentProperties().put("BitmapCache", this);
     }
 
 

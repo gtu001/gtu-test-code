@@ -5,11 +5,18 @@ package com.example.epub.com.example.epub.base;
  */
 
 public class MyHtmlEditorKit {
+
+    private HTMLDocument htmlDocument;
+
+    public MyHtmlEditorKit(){
+        htmlDocument = new HTMLDocument();
+    }
+
     public HTMLDocument createDefaultDocument() {
-        return new HTMLDocument();
+        return htmlDocument;
     }
 
     public Parser getParser() {
-        return new MyParser();
+        return new MyParser(htmlDocument);
     }
 }

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,8 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
             TxtReaderAppender.SimpleUrlLinkSpan.class//
     };//
 
+    EpubReaderActivity self = EpubReaderActivity.this;
+
     /**
      * 綁定服務器
      */
@@ -66,7 +69,7 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
     /**
      * epub 服務
      */
-    EpubViewerMainHandler epubViewerMainHandler = new EpubViewerMainHandler();
+    EpubViewerMainHandler epubViewerMainHandler = new EpubViewerMainHandler(self);
 
     TxtReaderActivity.TxtReaderActivityDTO dto = new TxtReaderActivity.TxtReaderActivityDTO();
 
@@ -89,6 +92,8 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
         previousPageBtn = findViewById(R.id.previousPageBtn);
         nextPageBtn = findViewById(R.id.nextPageBtn);
 
+        this.initView();
+
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final EpubReaderActivity data = (EpubReaderActivity) getLastNonConfigurationInstance();
@@ -107,6 +112,21 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                 Log.e(TAG, ex.getMessage(), ex);
             }
         }
+    }
+
+    private void initView() {
+        previousPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                epubViewerMainHandler.getNavigator().gotoPreviousSpineSection(self);
+            }
+        });
+        nextPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                epubViewerMainHandler.getNavigator().gotoNextSpineSection(self);
+            }
+        });
     }
 
     /**
@@ -275,7 +295,13 @@ public class EpubReaderActivity extends Activity implements FloatViewService.Cal
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
-        ;
+        TTTTTTTTTTTTTTTTTTTTTTTT("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(EpubReaderActivity activity, Intent intent, Bundle bundle) {
+                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
+                File file = new File(filename);
+                activity.setTxtContentFromFile(file, null, null);
+            }
+        };
 
         final String title;
         final int option;

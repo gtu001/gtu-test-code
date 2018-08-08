@@ -171,10 +171,7 @@ public class FileFindActivity extends ListActivity {
             } else {
                 // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得檔案回傳
                 if (extensionChecker.isMatch(file)) {
-                    Intent intent = new Intent();
-                    intent.putExtra(BUNDLE_FILE, file);
-                    this.setResult(RESULT_OK, intent);
-                    this.finish();
+                    returnChoiceFile(file);
                 }
                 // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 取得檔案回傳
             }
@@ -188,6 +185,16 @@ public class FileFindActivity extends ListActivity {
                         }
                     }).show();
         }
+    }
+
+    private void returnChoiceFile(File file) {
+        Log.v(TAG, "↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得檔案回傳");
+        Log.v(TAG, "choice file : " + file);
+        Log.v(TAG, "↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 取得檔案回傳");
+        Intent intent = new Intent();
+        intent.putExtra(BUNDLE_FILE, file);
+        this.setResult(RESULT_OK, intent);
+        this.finish();
     }
 
     public static class FileFindActivityStarter {

@@ -12,9 +12,9 @@ public class EpubViewerMainHandler {
     private HTMLDocumentFactory htmlDocumentFactory;
     private MyHtmlEditorKit myHtmlEditorKit;
 
-    public EpubViewerMainHandler() {
+    public EpubViewerMainHandler(Object self) {
         myHtmlEditorKit = new MyHtmlEditorKit();
-        htmlDocumentFactory = new HTMLDocumentFactory(navigator, myHtmlEditorKit);
+        htmlDocumentFactory = new HTMLDocumentFactory(navigator, myHtmlEditorKit, self);
     }
 
     public Navigator getNavigator() {
