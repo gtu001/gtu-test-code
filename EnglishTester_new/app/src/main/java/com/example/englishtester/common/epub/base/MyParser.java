@@ -1,11 +1,9 @@
-package com.example.epub.com.example.epub.base;
+package com.example.englishtester.common.epub.base;
 
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 

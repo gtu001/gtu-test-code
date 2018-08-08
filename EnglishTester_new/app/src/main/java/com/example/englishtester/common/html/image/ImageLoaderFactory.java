@@ -5,7 +5,7 @@ import android.util.Log;
 import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.OnlinePicLoader;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
-import com.example.epub.com.example.epub.base.EpubViewerMainHandler;
+import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 /**
  * Created by gtu001 on 2018/8/8.

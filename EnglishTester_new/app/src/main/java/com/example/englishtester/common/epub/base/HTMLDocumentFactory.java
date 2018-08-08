@@ -1,18 +1,14 @@
-package com.example.epub.com.example.epub.base;
+package com.example.englishtester.common.epub.base;
 
 import android.util.Log;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import gtu.util.ClassUtil;
 import nl.siegmann.epublib.browsersupport.NavigationEvent;
 import nl.siegmann.epublib.browsersupport.NavigationEventListener;
 import nl.siegmann.epublib.browsersupport.Navigator;
@@ -21,10 +17,7 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

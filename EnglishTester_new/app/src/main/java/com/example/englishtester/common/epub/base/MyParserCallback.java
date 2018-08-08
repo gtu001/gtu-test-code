@@ -1,4 +1,4 @@
-package com.example.epub.com.example.epub.base;
+package com.example.englishtester.common.epub.base;
 
 public class MyParserCallback extends ParserCallback {
 

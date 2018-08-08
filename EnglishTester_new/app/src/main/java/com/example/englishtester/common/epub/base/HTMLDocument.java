@@ -1,12 +1,8 @@
-package com.example.epub.com.example.epub.base;
+package com.example.englishtester.common.epub.base;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 /**
  * Created by wistronits on 2018/7/31.

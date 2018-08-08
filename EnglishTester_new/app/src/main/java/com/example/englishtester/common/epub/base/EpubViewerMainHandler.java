@@ -1,45 +1,27 @@
-package com.example.epub.com.example.epub.base;
+package com.example.englishtester.common.epub.base;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.RemoteException;
 import android.text.SpannableString;
-import android.text.Spanned;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.englishtester.BuildConfig;
-import com.example.englishtester.FloatViewService;
-import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
-import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.TxtReaderAppender;
-import com.example.englishtester.common.TxtReaderAppenderForHtmlTag;
 import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlEpubParser;
-import com.example.englishtester.common.html.parser.HtmlWordParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import gtu.util.ClassUtil;
 import nl.siegmann.epublib.browsersupport.NavigationEvent;

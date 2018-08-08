@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
@@ -31,7 +30,7 @@ import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
-import com.example.epub.com.example.epub.base.EpubViewerMainHandler;
+import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
