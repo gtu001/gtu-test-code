@@ -92,6 +92,10 @@ public class EpubViewerMainHandler {
         this.navigator.gotoNextSpineSection(this.self);
     }
 
+    public void gotoSpineSection(int spinePos){
+        this.navigator.gotoSpineSection(spinePos, this.self);
+    }
+
     public interface EpubActivityInterface extends ITxtReaderActivity {
         void setTitle(String titleVal);
 

@@ -5,15 +5,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,14 +19,12 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,7 +46,6 @@ import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
-import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
@@ -59,12 +53,9 @@ import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.MainAdViewHelper;
-import com.example.englishtester.common.ScrollViewHelper;
-import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
-import com.example.englishtester.common.TxtReaderAppenderForHtmlTag;
 import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.google.android.gms.ads.NativeExpressAdView;
 
@@ -85,7 +76,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -944,8 +934,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
             new Thread(new Runnable() {
 
-                private void onComplete(Runnable runnable) {
+                private void onTxtViewComplete(Runnable runnable) {
                     ((TextView4SpannableString) txtView).setOnRenderCompleteCallback(runnable);
+//                    handler.post(runnable);
                 }
 
                 private String fixName(String title) {
@@ -1000,11 +991,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         dto.dropboxPicDir = null;
                     }
 
-                    onComplete(new Runnable() {
+                    handler.post(new Runnable(){
                         @Override
                         public void run() {
                             setContentText(content, true);
                             translateView.setText("");
+                        }
+                    });
+
+                    onTxtViewComplete(new Runnable() {
+                        @Override
+                        public void run() {
                             dialog.get().dismiss();
                         }
                     });
@@ -1027,11 +1024,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
                     }
 
-                    onComplete(new Runnable() {
+                    handler.post(new Runnable(){
                         @Override
                         public void run() {
                             setContentText(engSb.toString(), false);
                             translateView.setText(chsSb.toString());
+                        }
+                    });
+
+                    onTxtViewComplete(new Runnable() {
+                        @Override
+                        public void run() {
                             dialog.get().dismiss();
                         }
                     });

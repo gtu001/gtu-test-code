@@ -42,11 +42,13 @@ import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.ViewGroupHelper;
+import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,8 +65,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             TxtReaderAppender.WordSpan.class, //
             TxtReaderAppender.SimpleUrlLinkSpan.class//
     };//
-
-    EpubReaderEpubActivity self = EpubReaderEpubActivity.this;
 
     /**
      * 綁定服務器
@@ -255,6 +255,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
                         epubViewerMainHandler.initBook(file);
 
+                        ViewPagerHelper.triggerPageSelected(viewPager, null);
+
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -381,9 +383,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     private void initViewPager() {
         int totalPageCount = 1000;
 
-        MyPageAdapter pageAdapter = new MyPageAdapter(getSupportFragmentManager(), totalPageCount);
+        MyPageAdapter pageAdapter = new MyPageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pageAdapter);
-        viewPager.setCurrentItem(0);
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             int oldPosition = -1;
 
@@ -406,7 +407,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 translateView = fragment.translateView;
                 initViewpagerChildrenView();
 
-                final ProgressDialog myDialog = ProgressDialog.show(EpubReaderEpubActivity.this, "讀取中", "正在讀取...", true);
+                final ProgressDialog myDialog = ProgressDialog.show(EpubReaderEpubActivity.this, null, "讀取中...", true, false);
                 myDialog.show();
 
                 final Handler handler = new Handler();
@@ -485,11 +486,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
      * PageAdapter
      */
     class MyPageAdapter extends FragmentPagerAdapter {
-        int totalCount = 1;
-
-        public MyPageAdapter(FragmentManager fm, int totalCount) {
+        public MyPageAdapter(FragmentManager fm) {
             super(fm);
-            this.totalCount = totalCount;
         }
 
         @Override
@@ -499,7 +497,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
         @Override
         public int getCount() {
-            return this.totalCount;
+            return Integer.MAX_VALUE;
         }
     }
     // --------------------------------------------------------------------
