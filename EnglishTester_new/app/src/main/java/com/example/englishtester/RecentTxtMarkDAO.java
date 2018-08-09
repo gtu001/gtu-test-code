@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.englishtester.common.DBUtil;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -22,9 +23,35 @@ public class RecentTxtMarkDAO {
     //    final DBConnection helper;
     final Context context;
 
+    private final Transformer transferToEntity = new Transformer<Cursor, RecentTxtMarkDAO.RecentTxtMark>() {
+        public RecentTxtMarkDAO.RecentTxtMark transform(Cursor input) {
+            return RecentTxtMarkDAO.this.transferWord(input);
+        }
+    };
+
     public RecentTxtMarkDAO(Context context) {
         this.context = context;
 //        helper = new DBConnection(context);
+    }
+
+    //取得相關黨名的書籤
+    public List<RecentTxtMarkDAO.RecentTxtMark> queryBookmarkLikeLst(String fileName, int bookmarkType) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+
+        String table = RecentTxtMarkSchmea.TABLE_NAME;
+        String[] columns = null;
+        String selection = String.format(" %1$s like ? || '%' and %2$s = ? ", RecentTxtMarkSchmea.FILE_NAME, RecentTxtMarkSchmea.BOOKMARK_TYPE);
+        String[] selectionArgs = new String[]{fileName, String.valueOf(bookmarkType)};
+        String groupBy = null;
+        String having = null;
+        String orderBy = RecentTxtMarkSchmea.INSERT_DATE + " DESC ";
+        String limit = null;
+
+        Cursor c = db.query(table, columns, selection,
+                selectionArgs, groupBy, having,
+                orderBy, limit);
+
+        return DBUtil.transferToLst(c, db, transferToEntity);
     }
 
     public int countAll() {
@@ -37,7 +64,7 @@ public class RecentTxtMarkDAO {
         return intVal;
     }
 
-    String[] queryAllWord() {
+    public String[] queryAllWord() {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, null, null, null, null, null);
         c.moveToFirst();
@@ -50,7 +77,7 @@ public class RecentTxtMarkDAO {
         return list;
     }
 
-    List<RecentTxtMark> query(String whereCondition, String[] whereArray) {
+    public List<RecentTxtMark> query(String whereCondition, String[] whereArray) {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, whereCondition, whereArray, null, null, null);
         c.moveToFirst();
@@ -67,7 +94,7 @@ public class RecentTxtMarkDAO {
         return list;
     }
 
-    List<RecentTxtMark> queryAll() {
+    public List<RecentTxtMark> queryAll() {
         SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
         Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, null, null, null, null, null);
         c.moveToFirst();
@@ -113,7 +140,7 @@ public class RecentTxtMarkDAO {
         }
     }
 
-    long insertWord(RecentTxtMark word) {
+    public long insertWord(RecentTxtMark word) {
         validationWord(word);
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         ContentValues values = this.transferWord(word);
@@ -122,7 +149,7 @@ public class RecentTxtMarkDAO {
         return result;
     }
 
-    int updateByVO(RecentTxtMark word) {
+    public int updateByVO(RecentTxtMark word) {
         validationWord(word);
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         ContentValues values = this.transferWord(word);
@@ -132,7 +159,7 @@ public class RecentTxtMarkDAO {
         return result;
     }
 
-    int deleteByListId(String currentId) {
+    public int deleteByListId(String currentId) {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         String where = RecentTxtMarkSchmea.LIST_ID + "=?";
         int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, where, new String[]{currentId});
@@ -140,14 +167,14 @@ public class RecentTxtMarkDAO {
         return result;
     }
 
-    int deleteByCondition(String whereCondition, String[] properties) {
+    public int deleteByCondition(String whereCondition, String[] properties) {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, whereCondition, properties);
         db.close();
         return result;
     }
 
-    int deleteAll() {
+    public int deleteAll() {
         throw new UnsupportedOperationException("尚不提供此操作!");
         // SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         // int result = db.delete(RecentTxtMarkSchmea.TABLE_NAME, null, null);

@@ -53,6 +53,7 @@ import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
@@ -135,7 +136,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 紀錄scroll位置
      */
-    ScrollViewYHolder scrollViewYHolder;
+    ReaderCommonHelper.ScrollViewYHolder scrollViewYHolder;
     /**
      * Home 鍵觀察者
      */
@@ -303,7 +304,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 初始化閱讀器
      */
     private void initTextView() {
-        float fontsize = new FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
+        float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
         txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
@@ -318,7 +319,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 初始化翻譯氣
      */
     private void initTranslateView() {
-        float fontsize = new FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
+        float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
         translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
@@ -328,26 +329,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         translateView.setLineSpacing(10, 1.4f);
         appleFontApplyer.apply(translateView);
     }
-
-    /**
-     * 字型大小修改
-     */
-    public static class FontSizeApplyer {
-        private static final float DEFAULT_FONTSIZE = 48f;
-
-        public float getFontSize(ContextWrapper context, Class clz) {
-            if (SharedPreferencesUtil.hasData(context, clz.getSimpleName(), "fontSize")) {
-                return Float.parseFloat(SharedPreferencesUtil.getData(context, TxtReaderActivity.class.getSimpleName(), "fontSize"));
-            } else {
-                return DEFAULT_FONTSIZE;
-            }
-        }
-
-        public void setFontSize(ContextWrapper context, float size, Class clz) {
-            SharedPreferencesUtil.putData(context, clz.getSimpleName(), "fontSize", String.valueOf(size));
-        }
-    }
-
 
     /**
      * 讀取dropbox文件
@@ -376,7 +357,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 if (mth.find()) {
                     fileName = mth.group(1);
                 }
-                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, TxtReaderActivity.this.recentTxtMarkService);
+                ReaderCommonHelper.ScrollYService scrollYService = new ReaderCommonHelper.ScrollYService(fileName, TxtReaderActivity.this);
                 int scrollY = scrollYService.getScrollYVO_value();
                 int maxHeight = scrollYService.getMaxHeightYVO_value();
                 if (scrollY == -1 || maxHeight == -1) {
@@ -452,7 +433,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             public void run() {
                 Log.v(TAG, "[scrollRecordApplyer] run!");
 
-                if (!StringUtils.isBlank(oldFileName)) {
+                if (StringUtils.isNotBlank(oldFileName)) {
                     //記錄舊的 scrollView Y
                     scrollViewYHolder.recordY(oldFileName, scrollView1);
                 }
@@ -475,7 +456,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         // 刪除舊資料
         recentTxtMarkService.deleteOldData();
-        scrollViewYHolder = new ScrollViewYHolder(recentTxtMarkService);
+        scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
 
         //監視home鍵
         homeKeyWatcher = new HomeKeyWatcher(this);
@@ -775,7 +756,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         dialog.apply(txtView.getTextSize(), Arrays.asList(txtView, translateView), new DialogFontSizeChange.ApplyFontSize() {
             @Override
             public void applyFontSize(float fontSize) {
-                new FontSizeApplyer().setFontSize(TxtReaderActivity.this, fontSize, TxtReaderActivity.class);
+                new ReaderCommonHelper.FontSizeApplyer().setFontSize(TxtReaderActivity.this, fontSize, TxtReaderActivity.class);
             }
         });
         dialog.show();
@@ -963,6 +944,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
             new Thread(new Runnable() {
 
+                private void onComplete(Runnable runnable) {
+                    ((TextView4SpannableString) txtView).setOnRenderCompleteCallback(runnable);
+                }
+
                 private String fixName(String title) {
                     title = StringUtils.trimToEmpty(title);
                     Pattern ptn = Pattern.compile("(.*?)\\.(?:htm|html|txt|properties)", Pattern.CASE_INSENSITIVE);
@@ -1015,7 +1000,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         dto.dropboxPicDir = null;
                     }
 
-                    handler.post(new Runnable() {
+                    onComplete(new Runnable() {
                         @Override
                         public void run() {
                             setContentText(content, true);
@@ -1042,7 +1027,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
                     }
 
-                    handler.post(new Runnable() {
+                    onComplete(new Runnable() {
                         @Override
                         public void run() {
                             setContentText(engSb.toString(), false);
@@ -1085,47 +1070,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     /**
-     * 紀錄 scrollView位置
-     */
-    private class ScrollViewYHolder {
-        private final String TAG = ScrollViewYHolder.class.getSimpleName();
-
-        RecentTxtMarkService recentTxtMarkService;
-
-        ScrollViewYHolder(RecentTxtMarkService recentTxtMarkService) {
-            this.recentTxtMarkService = recentTxtMarkService;
-        }
-
-        private void recordY(String fileName, ScrollView scrollView1) {
-            Log.v(TAG, "[recordY] start ... " + fileName);
-            if (StringUtils.isNotBlank(fileName)) {
-
-                RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
-                scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
-                scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
-
-                Log.v(TAG, "[recordY][scrollY]   " + fileName + " -> " + scrollView1.getScrollY());
-                Log.v(TAG, "[recordY][maxHeight] " + fileName + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
-            }
-        }
-
-        private void restoreY(final String fileName, final ScrollView scrollView1) {
-            Log.v(TAG, "[restoreY] start ... " + fileName);
-
-            RecentTxtMarkService.ScrollYService scrollYService = new RecentTxtMarkService.ScrollYService(fileName, this.recentTxtMarkService);
-            final int posY = scrollYService.getScrollYVO_value();
-
-            scrollView1.post(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView1.scrollTo(0, posY);
-                    Log.v(TAG, "[restoreY] : " + fileName + " -> " + posY);
-                }
-            });
-        }
-    }
-
-    /**
      * 移動到下個書籤
      */
     public void moveToNextBookmark() {
@@ -1134,7 +1078,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             return;
         }
 
-        int currentId = dto.currentBookmarkId;
+        int currentId = -1;
         List<Integer> lst = new ArrayList<>(dto.getBookmarkHolder().keySet());
         if (!lst.contains(currentId)) {
             currentId = lst.get(0);
@@ -1147,7 +1091,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         }
 
-        dto.currentBookmarkId = currentId;
         final TxtReaderAppender.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
         TxtCoordinateFetcher coordinate = new TxtCoordinateFetcher(this.txtView, spanObject, this.getWindowManager());
 
@@ -1365,7 +1308,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
         private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
-        private int currentBookmarkId = -1;
 
         public StringBuilder getFileName() {
             return fileName;

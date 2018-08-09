@@ -147,13 +147,11 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
         // get the Bitmap resource href
         String resourceHref = getResourceHref(BitmapURL);
 
-        //-----------------------------------------------------------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-        for (Resource res : book.getResources().getAll()) {
-            Log.v(TAG, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + res.getHref());
-        }
-
-        //-----------------------------------------------------------xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        //For Debug -----------------------------------------------------------
+//        for (Resource res : book.getResources().getAll()) {
+//            Log.v(TAG, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + res.getHref());
+//        }
+        //For Debug -----------------------------------------------------------
 
         // find the Bitmap resource in the book resources
         Resource BitmapResource = book.getResources().getByHref(resourceHref);

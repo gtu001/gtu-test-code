@@ -8,6 +8,7 @@ import android.util.Log;
 import com.example.englishtester.DBConnection;
 import com.example.englishtester.RecentSearchDAO;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -126,5 +127,21 @@ public class DBUtil {
             map.put(columnName, value);
         }
         return map;
+    }
+
+    public static <T> List<T> transferToLst(Cursor c, SQLiteDatabase db, Transformer<Cursor, T> transformer) {
+        c.moveToFirst();
+        List<T> list = new ArrayList<T>();
+        int total = c.getCount();
+        if (total == 0) {
+            return list;
+        }
+        for (int ii = 0; ii < total; ii++) {
+            list.add(transformer.transform(c));
+            c.moveToNext();
+        }
+        c.close();
+        db.close();
+        return list;
     }
 }

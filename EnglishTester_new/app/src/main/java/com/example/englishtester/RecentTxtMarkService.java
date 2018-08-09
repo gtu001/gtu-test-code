@@ -26,6 +26,13 @@ public class RecentTxtMarkService {
     }
 
     /**
+     * 查詢所有書籤內容
+     */
+    public List<RecentTxtMark> queryBookmarkLikeLst(String fileName, int bookmarkType) {
+        return recentTxtMarkDAO.queryBookmarkLikeLst(fileName, bookmarkType);
+    }
+
+    /**
      * 新增查詢單字
      */
     public RecentTxtMark addMarkWord(final String fileName, final String word, final int index, boolean clickBookmark) {
@@ -76,22 +83,18 @@ public class RecentTxtMarkService {
     }
 
     private int getBookmarkType(Integer oldValue, boolean clickBookmarkAction) {
+        int none = RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+        int bookmark = RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType();
+
         if (oldValue == null) { //insert
-            return clickBookmarkAction ? //
-                    RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType() : //
-                    RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+            return clickBookmarkAction ? bookmark : none;
         } else { //update
             if (clickBookmarkAction) {
-                if (oldValue == RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType()) {
-                    return RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType();
-                } else if (oldValue == RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
-                    return RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
-                }
+                return oldValue == none ? bookmark : none;
             } else {
-                return RecentTxtMarkDAO.BookmarkTypeEnum.NONE.getType();
+                return none;
             }
         }
-        throw new RuntimeException("無法判斷的 BookmarkType : " + oldValue + " , " + clickBookmarkAction);
     }
 
     /**
@@ -114,96 +117,6 @@ public class RecentTxtMarkService {
                 RecentTxtMarkSchmea.FILE_NAME + "=? ", //
                 new String[]{fileName});
         return lst;
-    }
-
-    /**
-     * 取得所有 scrollY紀錄
-     */
-    public static class ScrollYService {
-
-        String fileName;
-        RecentTxtMarkService service;
-
-        public ScrollYService(String fileName, RecentTxtMarkService service) {
-            this.fileName = fileName;
-            this.service = service;
-        }
-
-        private RecentTxtMark getVO(int bookmarkType) {
-            List<RecentTxtMark> list = service.recentTxtMarkDAO.query(//
-                    RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
-                            RecentTxtMarkSchmea.BOOKMARK_TYPE + "=? ", //
-                    new String[]{fileName, String.valueOf(bookmarkType)});
-
-            if (!list.isEmpty()) {
-                return list.get(0);
-            }
-            return null;
-        }
-
-        private RecentTxtMark getScrollYVO() {
-            final int bookmarkType = RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType();
-            return getVO(bookmarkType);
-        }
-
-        private RecentTxtMark getMaxHeightYVO() {
-            final int bookmarkType = RecentTxtMarkDAO.BookmarkTypeEnum.SCROLLVIEW_HEIGHT.getType();
-            return getVO(bookmarkType);
-        }
-
-        public int getScrollYVO_value() {
-            RecentTxtMark vo = getScrollYVO();
-            if (vo != null) {
-                return vo.getScrollYPos();
-            }
-            return -1;
-        }
-
-        public int getMaxHeightYVO_value() {
-            RecentTxtMark vo = getMaxHeightYVO();
-            if (vo != null) {
-                return vo.getScrollYPos();
-            }
-            return -1;
-        }
-
-        private RecentTxtMark createVO(int bookmarkType) {
-            RecentTxtMark recentTxtVo = new RecentTxtMark();
-            recentTxtVo.setFileName(fileName);
-            recentTxtVo.setInsertDate(System.currentTimeMillis());
-            recentTxtVo.setBookmarkType(bookmarkType);
-            recentTxtVo.setMarkEnglish("");
-            recentTxtVo.setMarkIndex(-1);
-            return recentTxtVo;
-        }
-
-        public void updateCurrentScrollY(int currentScrollY) {
-            RecentTxtMark vo1 = getScrollYVO();
-            if (vo1 == null) {
-                vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType());
-                vo1.setScrollYPos(currentScrollY);
-                long result = service.recentTxtMarkDAO.insertWord(vo1);
-                Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
-            } else {
-                vo1.setScrollYPos(currentScrollY);
-                long result = service.recentTxtMarkDAO.updateByVO(vo1);
-                Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
-            }
-        }
-
-        public void updateMaxHeight(int maxHeight) {
-            RecentTxtMark vo1 = getMaxHeightYVO();
-            if (vo1 == null) {
-                vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLLVIEW_HEIGHT.getType());
-                vo1.setScrollYPos(maxHeight);
-                long result = service.recentTxtMarkDAO.insertWord(vo1);
-                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
-            } else {
-                vo1.setScrollYPos(maxHeight);
-                long result = service.recentTxtMarkDAO.updateByVO(vo1);
-                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
-            }
-        }
     }
 
     /**

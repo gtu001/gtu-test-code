@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.englishtester.common.DBUtil;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -22,6 +23,12 @@ public class RecentSearchDAO {
 
     //    final DBConnection helper;
     final Context context;
+
+    private final Transformer transferToEntity = new Transformer<Cursor, RecentSearch>() {
+        public RecentSearch transform(Cursor input) {
+            return RecentSearchDAO.this.transferWord(input);
+        }
+    };
 
     public RecentSearchDAO(Context context) {
         this.context = context;
@@ -166,22 +173,6 @@ public class RecentSearchDAO {
         // return result;
     }
 
-    private List<RecentSearch> transferToLst(Cursor c, SQLiteDatabase db) {
-        c.moveToFirst();
-        List<RecentSearch> list = new ArrayList<RecentSearch>();
-        int total = c.getCount();
-        if (total == 0) {
-            return list;
-        }
-        for (int ii = 0; ii < total; ii++) {
-            list.add(transferWord(c));
-            c.moveToNext();
-        }
-        c.close();
-        db.close();
-        return list;
-    }
-
     //取得n比需上傳的單字
     public int queryNeedUploadSize() {
         String selection = String.format(" %1$s is null or %1$s = '' ", RecentSearchSchema.UPLOAD_TYPE);
@@ -212,7 +203,7 @@ public class RecentSearchDAO {
                 selectionArgs, groupBy, having,
                 orderBy, limit);
 
-        return this.transferToLst(c, db);
+        return DBUtil.transferToLst(c, db, transferToEntity);
     }
 
     //取得n比需上傳的單字
@@ -232,7 +223,7 @@ public class RecentSearchDAO {
                 selectionArgs, groupBy, having,
                 orderBy, limit);
 
-        return this.transferToLst(c, db);
+        return DBUtil.transferToLst(c, db, transferToEntity);
     }
 
     /**

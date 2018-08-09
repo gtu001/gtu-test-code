@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.ContentValues;
@@ -24,6 +25,12 @@ public class EnglishwordInfoDAO {
     //    final DBConnection helper;
     final Context context;
     private static QueryAllKeeper qryAllKeeper;
+
+    private final Transformer transferToEntity = new Transformer<Cursor, EnglishwordInfoDAO.EnglishWord>() {
+        public EnglishwordInfoDAO.EnglishWord transform(Cursor input) {
+            return EnglishwordInfoDAO.this.transferWord(input);
+        }
+    };
 
     public EnglishwordInfoDAO(Context context) {
         this.context = context;

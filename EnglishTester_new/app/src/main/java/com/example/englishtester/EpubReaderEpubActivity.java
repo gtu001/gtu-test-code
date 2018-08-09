@@ -1,6 +1,5 @@
 package com.example.englishtester;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,45 +7,53 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FloatViewChecker;
+import com.example.englishtester.common.FragmentUtil;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.ViewGroupHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.epub.EpubReader;
-
-public class EpubReaderEpubActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity, EpubViewerMainHandler.EpubActivityInterface {
+public class EpubReaderEpubActivity extends FragmentActivity implements FloatViewService.Callbacks, ITxtReaderActivity, EpubViewerMainHandler.EpubActivityInterface, EpubViewerMainHandler.EpubChangePageEvent {
 
     private static final String TAG = EpubReaderEpubActivity.class.getSimpleName();
 
@@ -64,33 +71,17 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
      */
 //    FloatViewService myService;
     IFloatServiceAidlInterface mService;
-
-    /**
-     * Home 鍵觀察者
-     */
     HomeKeyWatcher homeKeyWatcher;
-
     ReaderCommonHelper.PaddingAdjuster paddingAdjuster;
-
-    /**
-     * epub 服務
-     */
     EpubViewerMainHandler epubViewerMainHandler;
-
-    /**
-     * 最近查詢單字
-     */
     RecentTxtMarkService recentTxtMarkService;
-
-    /**
-     * 蘋果字型
-     */
     ReaderCommonHelper.AppleFontApplyer appleFontApplyer;
+    ReaderCommonHelper.ScrollViewYHolder scrollViewYHolder;
 
     TextView txtReaderView;
     TextView translateView;
-    Button previousPageBtn;
-    Button nextPageBtn;
+    ScrollView scrollView1;
+    ViewPager viewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,15 +91,11 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         //contentView = createContentView();
         setContentView(R.layout.activity_epub_reader);
 
-        txtReaderView = findViewById(R.id.txtReaderView);
-        translateView = findViewById(R.id.translateView);
+        viewPager = findViewById(R.id.viewpager);
 
-        previousPageBtn = findViewById(R.id.previousPageBtn);
-        nextPageBtn = findViewById(R.id.nextPageBtn);
-
-        this.initView();
+        this.initViewPager();
         this.initServices();
-        this.initViewAfterService();
+        this.initTextViewAfterService();
 
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
@@ -130,26 +117,20 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         }
     }
 
-    private void initView() {
-        previousPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                epubViewerMainHandler.gotoPreviousSpineSection();
-            }
-        });
-        nextPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                epubViewerMainHandler.gotoNextSpineSection();
-            }
-        });
-    }
+    private void initTextViewAfterService() {
+        if (txtReaderView == null || translateView == null) {
+            Log.w(TAG, "initTextViewAfterService WARN 尚未初始化!!!");
+            return;
+        }
 
-    private void initViewAfterService() {
-        float fontsize = new TxtReaderActivity.FontSizeApplyer().getFontSize(this, EpubReaderEpubActivity.class);
+        float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, EpubReaderEpubActivity.class);
+
         this.txtReaderView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
+        this.translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
+
         this.txtReaderView.setHighlightColor(Color.TRANSPARENT);
         this.txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
+
         paddingAdjuster.applyPadding(this.txtReaderView);
 
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
@@ -164,7 +145,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     }
 
     private void initServices() {
-        epubViewerMainHandler = new EpubViewerMainHandler(txtReaderView, this);
+        epubViewerMainHandler = new EpubViewerMainHandler(this, this);
         recentTxtMarkService = new RecentTxtMarkService(this);
 
         //監視home鍵
@@ -178,6 +159,8 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         this.paddingAdjuster = new ReaderCommonHelper.PaddingAdjuster(this.getApplicationContext());
         this.appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);
 
+        this.scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
+
         this.doOnoffService(true);
     }
 
@@ -189,13 +172,21 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         dialog.apply(txtReaderView.getTextSize(), Arrays.asList(txtReaderView, translateView), new DialogFontSizeChange.ApplyFontSize() {
             @Override
             public void applyFontSize(float fontSize) {
-                new TxtReaderActivity.FontSizeApplyer().setFontSize(EpubReaderEpubActivity.this, fontSize, EpubReaderEpubActivity.class);
+                new ReaderCommonHelper.FontSizeApplyer().setFontSize(EpubReaderEpubActivity.this, fontSize, EpubReaderEpubActivity.class);
             }
         });
         dialog.show();
     }
 
     public void setTitle(String titleVal) {
+        if (StringUtils.isNotBlank(this.getTitle())) {
+
+            if (scrollView1 != null) {
+                //記錄舊的 scrollView Y
+                scrollViewYHolder.recordY(this.getTitle().toString(), scrollView1);
+            }
+        }
+
         TitleTextSetter.setText(EpubReaderEpubActivity.this, titleVal);
     }
 
@@ -212,6 +203,17 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     @Override
     public int getFixScreenWidth() {
         return paddingAdjuster.getMaxWidth() - 10;
+    }
+
+    @Override
+    public String fixNameToTitle(String orignFileName) {
+        orignFileName = StringUtils.trimToEmpty(orignFileName);
+        Pattern ptn = Pattern.compile("(.*?)\\.(?:epub)", Pattern.CASE_INSENSITIVE);
+        Matcher mth = ptn.matcher(orignFileName);
+        if (mth.find()) {
+            return mth.group(1);
+        }
+        return orignFileName;
     }
 
     /**
@@ -231,16 +233,6 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
 
             new Thread(new Runnable() {
 
-                private String fixName(String title) {
-                    title = StringUtils.trimToEmpty(title);
-                    Pattern ptn = Pattern.compile("(.*?)\\.(?:epub)", Pattern.CASE_INSENSITIVE);
-                    Matcher mth = ptn.matcher(title);
-                    if (mth.find()) {
-                        return mth.group(1);
-                    }
-                    return title;
-                }
-
                 private void setTitleNameProcess() {
                     handler.post(new Runnable() {
                         @Override
@@ -251,7 +243,7 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
                             } else {
                                 titleVal = title;
                             }
-                            titleVal = fixName(titleVal);
+                            titleVal = fixNameToTitle(titleVal);
                             setTitle(titleVal);
                         }
                     });
@@ -261,15 +253,14 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
                     try {
                         File file = epubFileZ.get();
 
-                        InputStream bookStream = new FileInputStream(file);
-                        Book book = (new EpubReader()).readEpub(bookStream);
-
-                        epubViewerMainHandler.initBook(book);
+                        epubViewerMainHandler.initBook(file);
 
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                translateView.setText("");
+                                if (translateView != null) {
+                                    translateView.setText("");
+                                }
                                 dialog.get().dismiss();
                             }
                         });
@@ -354,10 +345,163 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
     };
 
     @Override
+    public void afterTxtViewChange() {
+        //回復新的 scrollView Y
+        scrollViewYHolder.restoreY(this.getTitle().toString(), scrollView1);
+    }
+
+    /**
+     * 移動到下個書籤
+     */
+    public void moveToNextBookmark() {
+        //TODO
+    }
+
+    @Override
     public void updateClient(long data) {
         // TODO
     }
 
+    // --------------------------------------------------------------------
+
+    private void initViewpagerChildrenView() {
+        epubViewerMainHandler.getDto().setTextView(txtReaderView);
+        initTextViewAfterService();
+
+        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
+            public void onPressed() {
+                scrollViewYHolder.recordY(EpubReaderEpubActivity.this.getTitle().toString(), scrollView1);
+            }
+        });
+    }
+
+    /**
+     * 初始化ViewPager
+     */
+    private void initViewPager() {
+        int totalPageCount = 1000;
+
+        MyPageAdapter pageAdapter = new MyPageAdapter(getSupportFragmentManager(), totalPageCount);
+        viewPager.setAdapter(pageAdapter);
+        viewPager.setCurrentItem(0);
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            int oldPosition = -1;
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                Log.v(TAG, "##### onPageScrolled");
+            }
+
+            @Override
+            public void onPageSelected(final int position) {
+                Log.v(TAG, "##### onPageSelected");
+
+                final MyFragment fragment = (MyFragment) FragmentUtil.getCurrentViewPagerFragment(R.id.viewpager, viewPager, EpubReaderEpubActivity.this.getSupportFragmentManager());
+                if (fragment == null) {
+                    return;
+                }
+
+                scrollView1 = fragment.scrollView1;
+                txtReaderView = fragment.txtReaderView;
+                translateView = fragment.translateView;
+                initViewpagerChildrenView();
+
+                final ProgressDialog myDialog = ProgressDialog.show(EpubReaderEpubActivity.this, "讀取中", "正在讀取...", true);
+                myDialog.show();
+
+                final Handler handler = new Handler();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (position > oldPosition) {
+                            epubViewerMainHandler.gotoNextSpineSection();
+                        } else {
+                            epubViewerMainHandler.gotoPreviousSpineSection();
+                        }
+
+                        ((TextView4SpannableString) txtReaderView).setOnRenderCompleteCallback(new Runnable() {
+                            @Override
+                            public void run() {
+                                myDialog.dismiss();
+                                oldPosition = position;
+                            }
+                        });
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Log.v(TAG, "##### onPageScrollStateChanged");
+            }
+        });
+    }
+
+
+    /**
+     * Fragment
+     */
+    public static class MyFragment extends Fragment {
+
+        public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
+
+        private int pageIndex = 0;
+
+        public static final MyFragment newInstance(String message, int pageIndex) {
+            MyFragment f = new MyFragment();
+            Bundle bdl = new Bundle(1);
+            bdl.putString(EXTRA_MESSAGE, message);
+            f.setArguments(bdl);
+            f.pageIndex = pageIndex;
+            return f;
+        }
+
+        private ScrollView scrollView1;
+        private TextView txtReaderView;
+        private TextView translateView;
+        private ViewGroup container;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            String message = getArguments().getString(EXTRA_MESSAGE);
+
+            View parentView = inflater.inflate(R.layout.subview_epub_reader, container, false);
+
+            this.container = container;
+            scrollView1 = (ScrollView) parentView.findViewById(R.id.scrollView1);
+            txtReaderView = (TextView) parentView.findViewById(R.id.txtReaderView);
+            translateView = (TextView) parentView.findViewById(R.id.translateView);
+
+            return parentView;
+        }
+    }
+
+    private Fragment generateFragment(int position) {
+        return MyFragment.newInstance("", position);
+    }
+
+    /**
+     * PageAdapter
+     */
+    class MyPageAdapter extends FragmentPagerAdapter {
+        int totalCount = 1;
+
+        public MyPageAdapter(FragmentManager fm, int totalCount) {
+            super(fm);
+            this.totalCount = totalCount;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return generateFragment(position);
+        }
+
+        @Override
+        public int getCount() {
+            return this.totalCount;
+        }
+    }
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
@@ -380,16 +524,23 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
-//        FOR_TEST("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
-//            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-//                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
-//                File file = new File(filename);
-//                activity.setTxtContentFromFile(file, null, null);
-//            }
-//        },//
-        SHOW_ORIGN_HTML("顯示原始Html", MENU_FIRST++, REQUEST_CODE++, null) {
+        BOOKMARK_MODE("書籤模式", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                boolean currentMode = !activity.epubViewerMainHandler.getDto().getBookmarkMode();
+                activity.epubViewerMainHandler.getDto().setBookmarkMode(currentMode);
+                Toast.makeText(activity, "書籤模式" + (currentMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
+            }
+        }, //
+        BOOKMARK_MODE_MOVETO("移動到書籤", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                activity.moveToNextBookmark();
+            }
+        }, //
+        FOR_TEST("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                activity.translateView.setText(activity.epubViewerMainHandler.getHtmlContent());
+                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
+                File file = new File(filename);
+                activity.setTxtContentFromFile(file, null, null);
             }
         },//
         ;
@@ -498,11 +649,11 @@ public class EpubReaderEpubActivity extends Activity implements FloatViewService
         Log.v(TAG, "onSaveInstanceState");
     }
 
-    @Override
-    public Object onRetainNonConfigurationInstance() {
-        Log.v(TAG, "onRetainNonConfigurationInstance");
-        return this;
-    }
+//    @Override
+//    public Object onRetainNonConfigurationInstance() {
+//        Log.v(TAG, "onRetainNonConfigurationInstance");
+//        return this;
+//    }
 
     // 測試螢幕翻轉 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     @Override
