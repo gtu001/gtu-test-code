@@ -1,0 +1,7 @@
+$ gradle dependencies
+
+找衝突的jar 
+
+    compile('org.apache.commons:commons-io:1.3.2') { //要加括號
+        exclude group: 'commons-io', module: 'commons-io'
+    }
