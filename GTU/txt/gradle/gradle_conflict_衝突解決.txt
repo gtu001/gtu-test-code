@@ -1,4 +1,5 @@
-$ gradle dependencies
+$ gradle dependencies > xxxxx.txt
+
 
 找衝突的jar 
 
