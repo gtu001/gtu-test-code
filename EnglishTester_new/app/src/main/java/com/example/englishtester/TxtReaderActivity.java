@@ -84,8 +84,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -991,7 +993,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         dto.dropboxPicDir = null;
                     }
 
-                    handler.post(new Runnable(){
+                    handler.post(new Runnable() {
                         @Override
                         public void run() {
                             setContentText(content, true);
@@ -1024,7 +1026,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
                     }
 
-                    handler.post(new Runnable(){
+                    handler.post(new Runnable() {
                         @Override
                         public void run() {
                             setContentText(engSb.toString(), false);
@@ -1076,38 +1078,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 移動到下個書籤
      */
     public void moveToNextBookmark() {
-        if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
-            Toast.makeText(this, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        int currentId = -1;
-        List<Integer> lst = new ArrayList<>(dto.getBookmarkHolder().keySet());
-        if (!lst.contains(currentId)) {
-            currentId = lst.get(0);
-        } else {
-            int tmpId = lst.indexOf(currentId);
-            if (tmpId + 1 >= lst.size()) {
-                currentId = lst.get(0);
-            } else {
-                currentId = lst.get(tmpId + 1);
-            }
-        }
-
-        final TxtReaderAppender.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
-        TxtCoordinateFetcher coordinate = new TxtCoordinateFetcher(this.txtView, spanObject, this.getWindowManager());
-
-        final Rect rect = coordinate.getCoordinate();
-
-        scrollView1.post(new Runnable() {
-            @Override
-            public void run() {
-                int offsetHeight = TxtReaderActivity.this.getResources().getDisplayMetrics().heightPixels / 2;
-                int newSrollY = scrollView1.getScrollY() + rect.top - offsetHeight;
-                scrollView1.scrollTo(rect.left, newSrollY);
-                Toast.makeText(TxtReaderActivity.this, "移到 : " + spanObject.getWord(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        ReaderCommonHelper.getInst().moveToNextBookmark(dto, txtView, scrollView1, this, this.getWindowManager());
     }
 
     private void debug____dumpFileNameLog() {
@@ -1311,6 +1282,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
         private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
+        private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
 
         public StringBuilder getFileName() {
             return fileName;
@@ -1366,6 +1338,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public boolean isImageLoadMode() {
             return isImageLoadMode.get();
+        }
+
+        public AtomicReference<Integer> getBookmarkIndexHolder() {
+            return bookmarkIndexHolder;
         }
     }
 

@@ -92,7 +92,7 @@ public class EpubViewerMainHandler {
         this.navigator.gotoNextSpineSection(this.self);
     }
 
-    public void gotoSpineSection(int spinePos){
+    public void gotoSpineSection(int spinePos) {
         this.navigator.gotoSpineSection(spinePos, this.self);
     }
 
@@ -210,6 +210,7 @@ public class EpubViewerMainHandler {
         private AtomicReference<String> htmlContent = new AtomicReference<>();
         private AtomicReference<String> customContent = new AtomicReference<>();
         private boolean bookmarkMode = false;
+        private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
 
         public EpubDTO() {
         }
@@ -292,6 +293,11 @@ public class EpubViewerMainHandler {
 
         public void setBookmarkMode(boolean bookmarkMode) {
             this.bookmarkMode = bookmarkMode;
+        }
+
+        @Override
+        public AtomicReference<Integer> getBookmarkIndexHolder() {
+            return bookmarkIndexHolder;
         }
     }
 

@@ -301,23 +301,34 @@ public class RecentTxtMarkDAO {
     }
 
     public enum BookmarkTypeEnum {
-        NONE(0),//
-        BOOKMARK(1),//
-        SCROLL_Y_POS(2),//
-        SCROLLVIEW_HEIGHT(3),//
+        NONE(0, "NONE"),//
+        BOOKMARK(1, "書籤"),//
+        SCROLL_Y_POS(2, "最後瀏覽位置"),//
+        SCROLLVIEW_HEIGHT(3, "卷軸高度"),//
         ;
         final int type;
+        final String label;
 
-        BookmarkTypeEnum(int type) {
+        BookmarkTypeEnum(int type, String label) {
             this.type = type;
+            this.label = label;
         }
 
-        public boolean isMatch(int value) {
-            return value == type;
+        public static BookmarkTypeEnum valueOfByType(int type){
+            for(BookmarkTypeEnum e : BookmarkTypeEnum.values()){
+                if(e.getType() == type){
+                    return e;
+                }
+            }
+            return null;
         }
 
         public int getType() {
             return type;
+        }
+
+        public String getLabel() {
+            return label;
         }
     }
 }

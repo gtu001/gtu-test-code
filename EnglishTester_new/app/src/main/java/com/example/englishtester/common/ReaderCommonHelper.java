@@ -21,7 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -242,5 +244,47 @@ public class ReaderCommonHelper {
                 Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
         }
+    }
+
+    /**
+     * 移動到下個書籤
+     */
+    public void moveToNextBookmark(ITxtReaderActivityDTO dto, TextView txtView, final ScrollView scrollView1, final Context context, WindowManager windowManager) {
+        if (dto.getBookmarkHolder() == null || dto.getBookmarkHolder().isEmpty()) {
+            Toast.makeText(context, "目前沒有書籤紀錄!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int currentId = dto.getBookmarkIndexHolder().get();
+
+        List<Integer> lst = new ArrayList<>(new TreeSet<>(dto.getBookmarkHolder().keySet()));
+        Collections.reverse(lst);
+
+        if (!lst.contains(currentId)) {
+            currentId = lst.get(0);
+        } else {
+            int tmpId = lst.indexOf(currentId);
+            if (tmpId + 1 >= lst.size()) {
+                currentId = lst.get(0);
+            } else {
+                currentId = lst.get(tmpId + 1);
+            }
+        }
+        dto.getBookmarkIndexHolder().set(currentId);
+
+        final TxtReaderAppender.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
+        TxtCoordinateFetcher coordinate = new TxtCoordinateFetcher(txtView, spanObject, windowManager);
+
+        final Rect rect = coordinate.getCoordinate();
+
+        scrollView1.post(new Runnable() {
+            @Override
+            public void run() {
+                int offsetHeight = context.getResources().getDisplayMetrics().heightPixels / 2;
+                int newSrollY = scrollView1.getScrollY() + rect.top - offsetHeight;
+                scrollView1.scrollTo(rect.left, newSrollY);
+                Toast.makeText(context, "移到 : " + spanObject.getWord(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

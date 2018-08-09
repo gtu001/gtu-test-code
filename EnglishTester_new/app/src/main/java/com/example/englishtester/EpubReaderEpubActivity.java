@@ -1,17 +1,17 @@
 package com.example.englishtester;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -25,12 +25,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.common.ClickableSpanMethodCreater;
+import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FragmentUtil;
@@ -41,15 +42,18 @@ import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
-import com.example.englishtester.common.ViewGroupHelper;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.File;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -77,6 +81,9 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     RecentTxtMarkService recentTxtMarkService;
     ReaderCommonHelper.AppleFontApplyer appleFontApplyer;
     ReaderCommonHelper.ScrollViewYHolder scrollViewYHolder;
+
+    //若不為空則導至該頁
+    AtomicReference<Integer> gotoPageHolder = new AtomicReference();
 
     TextView txtReaderView;
     TextView translateView;
@@ -254,7 +261,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                         File file = epubFileZ.get();
 
                         epubViewerMainHandler.initBook(file);
-
                         ViewPagerHelper.triggerPageSelected(viewPager, null);
 
                         handler.post(new Runnable() {
@@ -355,13 +361,102 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     /**
      * 移動到下個書籤
      */
+    public void moveToBookmarkPage() {
+        MoveToNextBookmarkHandler moveHandler = new MoveToNextBookmarkHandler();
+        moveHandler.initReference();
+        moveHandler.showDlg();
+    }
+
+    /**
+     * 移動到下個書籤
+     */
     public void moveToNextBookmark() {
-        //TODO
+        if (txtReaderView == null || scrollView1 == null || epubViewerMainHandler == null || epubViewerMainHandler.getDto() == null) {
+            Toast.makeText(this, "尚未開啟書籍", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ReaderCommonHelper.getInst().moveToNextBookmark(epubViewerMainHandler.getDto(), txtReaderView, scrollView1, this, this.getWindowManager());
     }
 
     @Override
     public void updateClient(long data) {
         // TODO
+    }
+
+    private class MoveToNextBookmarkHandler implements DialogInterface.OnClickListener {
+
+        private List<Row> lst = new ArrayList<>();
+        private List<Map<String, Object>> lst4Adapter = new ArrayList<>();
+
+        private class Row {
+            String file_name;
+            int bookmark_type;
+            long insert_date;
+
+            private Row(Map<String, Object> map) {
+//                {file_name=Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz[4], bookmark_type=2, insert_date=496398149}
+                file_name = (String) map.get("file_name");
+                bookmark_type = (Integer) map.get("bookmark_type");
+                insert_date = (Integer) map.get("insert_date");
+            }
+
+            private Map<String, Object> toAdapterMap() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("ItemTitle", file_name);
+                map.put("ItemDetail", RecentTxtMarkDAO.BookmarkTypeEnum.valueOfByType(bookmark_type).getLabel());
+                map.put("ItemDetailRight", DateFormatUtils.format(insert_date, "yyyy/MM/dd HH:mm:ss"));
+                return map;
+            }
+        }
+
+        private void initReference() {
+            String fileName = fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date   ");
+            sb.append(" from recent_txt_mark                                                ");
+            sb.append(" where bookmark_type in (%s) and file_name like '%s%%'               ");
+            sb.append("  group by file_name                                                 ");
+            sb.append("  order by 3 desc                                                    ");
+
+            String bookmarkTypeStr = StringUtils.join(Arrays.asList(RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType(), RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType()), ",");
+
+            String sql = String.format(sb.toString(), bookmarkTypeStr, fileName);
+            List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sql, new String[0], EpubReaderEpubActivity.this);
+            for (Map<String, Object> map : lst) {
+                Row row = new Row(map);
+                this.lst.add(row);
+                this.lst4Adapter.add(row.toAdapterMap());
+            }
+        }
+
+        private void showDlg() {
+            SimpleAdapter aryAdapter = new SimpleAdapter(EpubReaderEpubActivity.this, lst4Adapter,// 資料來源
+                    R.layout.subview_dropboxlist, //
+                    new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight"}, //
+                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight}//
+            );
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(EpubReaderEpubActivity.this);
+            builder.setTitle("選擇dropbox檔案");
+            builder.setAdapter(aryAdapter, this);
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Row row = lst.get(which);
+            Pattern ptn = Pattern.compile("^.*\\[(\\d+)\\]$");
+            Matcher mth = ptn.matcher(row.file_name);
+            int pos = 0;
+            if (mth.find()) {
+                pos = Integer.parseInt(mth.group(1));
+            }
+
+            gotoPageHolder.set(pos);
+            ViewPagerHelper.triggerPageSelected(viewPager, null);
+        }
     }
 
     // --------------------------------------------------------------------
@@ -414,10 +509,15 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (position > oldPosition) {
-                            epubViewerMainHandler.gotoNextSpineSection();
+                        if (gotoPageHolder.get() != null) {
+                            epubViewerMainHandler.gotoSpineSection(gotoPageHolder.get());
+                            gotoPageHolder.set(null);
                         } else {
-                            epubViewerMainHandler.gotoPreviousSpineSection();
+                            if (position > oldPosition) {
+                                epubViewerMainHandler.gotoNextSpineSection();
+                            } else {
+                                epubViewerMainHandler.gotoPreviousSpineSection();
+                            }
                         }
 
                         ((TextView4SpannableString) txtReaderView).setOnRenderCompleteCallback(new Runnable() {
@@ -527,6 +627,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 boolean currentMode = !activity.epubViewerMainHandler.getDto().getBookmarkMode();
                 activity.epubViewerMainHandler.getDto().setBookmarkMode(currentMode);
                 Toast.makeText(activity, "書籤模式" + (currentMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
+            }
+        }, //
+        BOOKMARK_MODE_PAGES("移動到最後瀏覽頁", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                activity.moveToBookmarkPage();
             }
         }, //
         BOOKMARK_MODE_MOVETO("移動到書籤", MENU_FIRST++, REQUEST_CODE++, null) {

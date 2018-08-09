@@ -5,6 +5,7 @@ import android.widget.TextView;
 import com.example.englishtester.common.TxtReaderAppender;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public interface ITxtReaderActivityDTO {
     TextView getTxtView();
@@ -18,4 +19,6 @@ public interface ITxtReaderActivityDTO {
     boolean getBookmarkMode();
 
     Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
+
+    AtomicReference<Integer> getBookmarkIndexHolder();
 }
