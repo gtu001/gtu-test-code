@@ -639,13 +639,13 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.moveToNextBookmark();
             }
         }, //
-        FOR_TEST("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
-                File file = new File(filename);
-                activity.setTxtContentFromFile(file, null, null);
-            }
-        },//
+//        FOR_TEST("TEST", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+//                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
+//                File file = new File(filename);
+//                activity.setTxtContentFromFile(file, null, null);
+//            }
+//        },//
         ;
 
         final String title;
