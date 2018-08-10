@@ -15,7 +15,9 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+
 import com.example.englishtester.common.Log;
+
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -121,7 +123,15 @@ public class TxtReaderAppender {
             final String txtContent_ = txtContent;
 
             Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
-            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = new ArrayList<>();
+//            try {
+            qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+//            } catch (java.lang.IllegalStateException ex1) {
+//                Log.e(TAG, "normalTxtProcess DB query recentTxtMark ERR : " + ex1.getMessage(), ex1, 20);
+//                if (!ex1.getMessage().contains("Cannot perform this operation because the connection pool has been closed.")) {
+//                    throw ex1;
+//                }
+//            }
             Log.v(TAG, "recentTxtMark list size = " + qList.size());
 
             int index = 0;
@@ -207,7 +217,10 @@ public class TxtReaderAppender {
                     }
                 }
 
-                Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + StringUtils.substring(txtNow, 0, 10) + "...");
+                if (index % 100 == 0) {
+                    Log.v(TAG, "setSpan - " + clickableSpan.id + " - " + StringUtils.substring(txtNow, 0, 10) + "...");
+                }
+
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
             }

@@ -1032,7 +1032,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         });
 
-        for (final UrlConfig d : lst) {
+        for (
+
+        final UrlConfig d : lst) {
             model.addRow(UrlTableConfigEnum.getRow(d, this));
         }
 
@@ -1158,6 +1160,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
         }
+
     }
 
     private void deleteBtnAction() {
@@ -1234,13 +1237,28 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String isUseRemarkOpen;// 是否使用remarkOpen
         String isHidden;// 是否隱藏此項目
 
+        private static SpecialCharHandler specialCharHandler;
+
+        static {
+            specialCharHandler = new SpecialCharHandler();
+        }
+
         private static String getConfigValue(UrlConfig d) {
-            return d.title + "^" + d.tag + "^" + d.remark + "^" + d.timestamp + "^" + d.commandType + "^" + d.timestampLastest + "^" + d.clickTimes + "^" + d.isUseRemarkOpen + "^" + d.isHidden;
+            String title = specialCharHandler.getBeforeSave(d.title);
+            String tag = specialCharHandler.getBeforeSave(d.tag);
+            String timestamp = specialCharHandler.getBeforeSave(d.timestamp);
+            String commandType = specialCharHandler.getBeforeSave(d.commandType);
+            String timestampLastest = specialCharHandler.getBeforeSave(d.timestampLastest);
+            String clickTimes = specialCharHandler.getBeforeSave(d.clickTimes);
+            String isUseRemarkOpen = specialCharHandler.getBeforeSave(d.isUseRemarkOpen);
+            String isHidden = specialCharHandler.getBeforeSave(d.isHidden);
+            String remark = specialCharHandler.getBeforeSave(d.remark);
+            return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden;
         }
 
         private static String getArryStr(String[] args, int index) {
             if (args != null && args.length > index) {
-                return args[index];
+                return specialCharHandler.getFromProperty(args[index]);
             }
             return "";
         }
@@ -1273,6 +1291,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return d;
             }
             throw new RuntimeException("無法取得設定 : " + key + " -> " + propertiesValue);
+        }
+
+        private static class SpecialCharHandler {
+            private final String REP_STR = "_#SPECIALCHAR#_";
+
+            private String getBeforeSave(String orignRemark) {
+                String text = StringUtils.trimToEmpty(orignRemark);
+                text = text.replaceAll("\\^", REP_STR);
+                return text;
+            }
+
+            private String getFromProperty(String orignRemark) {
+                String text = StringUtils.trimToEmpty(orignRemark);
+                return text.replaceAll(Pattern.quote(REP_STR), "^");
+            }
         }
     }
 
@@ -1456,6 +1489,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
                     popupUtil//
                             .addJMenuItem("URL以參數開啟", new ActionListener() {
+
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     try {

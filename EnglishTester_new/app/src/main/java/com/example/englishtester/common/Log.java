@@ -10,6 +10,8 @@ import com.example.englishtester.BuildConfig;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Created by wistronits on 2018/8/10.
  */
@@ -17,6 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 public class Log {
 
     private static final String DEFAULT_TAG = "<Unknowed Class>";
+    private static final AtomicReference<Boolean> debugSwitch = new AtomicReference<>(true);
+
+    public static void setDebugSwitch(boolean onOff) {
+        debugSwitch.set(onOff);
+    }
 
     private static final Class<?>[] IGNORE_TOAST_CLZ = new Class[]{//
             ReaderCommonHelper.ScrollViewYHolder.class,//
@@ -42,6 +49,12 @@ public class Log {
         android.util.Log.d(info.getTag(), message);
     }
 
+    public static void v(String tag, String message, int times) {
+        ClassInfo info = new ClassInfo(Log.class, tag);
+        for (int ii = 0; ii < times; ii++)
+            android.util.Log.v(info.getTag(), message);
+    }
+
     public static void v(String tag, String message) {
         ClassInfo info = new ClassInfo(Log.class, tag);
         android.util.Log.v(info.getTag(), message);
@@ -59,6 +72,14 @@ public class Log {
 
     public static void e(String tag, String message, Throwable e) {
         ClassInfo info = new ClassInfo(Log.class, tag);
+        android.util.Log.e(info.getTag(), message, e);
+    }
+
+    public static void e(String tag, String message, Throwable e, int times) {
+        ClassInfo info = new ClassInfo(Log.class, tag);
+        for (int ii = 0; ii < times; ii++) {
+            android.util.Log.e(info.getTag(), message);
+        }
         android.util.Log.e(info.getTag(), message, e);
     }
 
@@ -81,7 +102,7 @@ public class Log {
             return;
         }
 
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG && debugSwitch.get()) {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
@@ -89,6 +110,14 @@ public class Log {
                 }
             });
         }
+    }
+
+    public static void toast(final Context context, final String message) {
+        toast(context, message, Toast.LENGTH_SHORT);
+    }
+
+    public static void toast_long(final Context context, final String message) {
+        toast(context, message, Toast.LENGTH_LONG);
     }
 
     private static class ClassInfo {
@@ -102,13 +131,12 @@ public class Log {
 
         private ClassInfo(Class ignoreClz, String defaultTag) {
             this.defaultTag = defaultTag;
-            if (!BuildConfig.DEBUG) {
+            if (!BuildConfig.DEBUG || !debugSwitch.get()) {
                 return;
             }
 
             this.ignoreClz = ignoreClz;
             stk = getCurrentStackTrace();
-            String tag = DEFAULT_TAG;
             if (stk != null) {
                 try {
                     clz = Class.forName(stk.getClassName());
