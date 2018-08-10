@@ -1,11 +1,9 @@
 package com.example.englishtester.common;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ScrollView;
@@ -13,8 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.RecentTxtMarkDAO;
-import com.example.englishtester.RecentTxtMarkService;
-import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
@@ -121,21 +117,23 @@ public class ReaderCommonHelper {
             this.context = context;
         }
 
+
         public void recordY(String currentTitle, ScrollView scrollView1) {
-            Log.v(TAG, "[recordY] start ... " + currentTitle);
+            android.util.Log.v(TAG, "[recordY] start ... " + currentTitle);
             if (StringUtils.isNotBlank(currentTitle)) {
 
                 ScrollYService scrollYService = new ScrollYService(currentTitle, context);
                 scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
                 scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
 
-                Log.v(TAG, "[recordY][scrollY]   " + currentTitle + " -> " + scrollView1.getScrollY());
-                Log.v(TAG, "[recordY][maxHeight] " + currentTitle + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
+                Log.toast(context, "[recordY][scrollY]   " + currentTitle + " -> " + scrollView1.getScrollY(), Toast.LENGTH_SHORT);
+                android.util.Log.v(TAG, "[recordY][scrollY]   " + currentTitle + " -> " + scrollView1.getScrollY());
+                android.util.Log.v(TAG, "[recordY][maxHeight] " + currentTitle + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
             }
         }
 
         public void restoreY(final String currentTitle, final ScrollView scrollView1) {
-            Log.v(TAG, "[restoreY] start ... " + currentTitle);
+            android.util.Log.v(TAG, "[restoreY] start ... " + currentTitle);
 
             ScrollYService scrollYService = new ScrollYService(currentTitle, context);
             final AtomicReference<Integer> posY = new AtomicReference<>();
@@ -148,7 +146,8 @@ public class ReaderCommonHelper {
                 @Override
                 public void run() {
                     scrollView1.scrollTo(0, posY.get());
-                    Log.v(TAG, "[restoreY] : " + currentTitle + " -> " + posY.get());
+                    Log.toast(context, "[restoreY] : " + currentTitle + " -> " + posY.get(), Toast.LENGTH_SHORT);
+                    android.util.Log.v(TAG, "[restoreY] : " + currentTitle + " -> " + posY.get());
                 }
             });
         }
@@ -223,11 +222,11 @@ public class ReaderCommonHelper {
                 vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType());
                 vo1.setScrollYPos(currentScrollY);
                 long result = recentTxtMarkDAO.insertWord(vo1);
-                Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                android.util.Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             } else {
                 vo1.setScrollYPos(currentScrollY);
                 long result = recentTxtMarkDAO.updateByVO(vo1);
-                Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                android.util.Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
         }
 
@@ -237,11 +236,11 @@ public class ReaderCommonHelper {
                 vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLLVIEW_HEIGHT.getType());
                 vo1.setScrollYPos(maxHeight);
                 long result = recentTxtMarkDAO.insertWord(vo1);
-                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                android.util.Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             } else {
                 vo1.setScrollYPos(maxHeight);
                 long result = recentTxtMarkDAO.updateByVO(vo1);
-                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                android.util.Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
         }
     }
