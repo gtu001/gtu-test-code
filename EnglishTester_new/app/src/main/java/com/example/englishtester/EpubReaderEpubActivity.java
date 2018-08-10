@@ -14,8 +14,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -40,6 +38,7 @@ import com.example.englishtester.common.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.RecyclerPagerAdapter;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -57,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -471,7 +471,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     private void initViewPager() {
         int totalPageCount = 1000;
 
-        MyPageAdapter pageAdapter = new MyPageAdapter(getSupportFragmentManager());
+        MyPageAdapter pageAdapter = new MyPageAdapter(this); //getSupportFragmentManager()
         viewPager.setAdapter(pageAdapter);
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -483,31 +483,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             @Override
             public void onPageSelected(final int position) {
                 Log.v(TAG, "##### onPageSelected");
-
-                final MyFragment fragment = (MyFragment) FragmentUtil.getCurrentViewPagerFragment(R.id.viewpager, viewPager, EpubReaderEpubActivity.this.getSupportFragmentManager());
-                if (fragment == null) {
-                    return;
-                }
-
-                scrollView1 = fragment.scrollView1;
-                txtReaderView = fragment.txtReaderView;
-                translateView = fragment.translateView;
-
-                final AtomicReference<ProgressDialog> dlg = new AtomicReference<>(LoadingProgressDlg.createSimpleLoadingDlg(EpubReaderEpubActivity.this));
-                ((TextView4SpannableString) txtReaderView).setOnRenderStartCallback(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.v(TAG, txtReaderView.hashCode() + "------start----" + position, 10);
-                        dlg.get().show();
-                    }
-                });
-                ((TextView4SpannableString) txtReaderView).setOnRenderCompleteCallback(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.v(TAG, txtReaderView.hashCode() + "------end----" + position, 10);
-                        dlg.get().dismiss();
-                    }
-                });
             }
 
             @Override
@@ -517,90 +492,95 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         });
     }
 
+    private void progressDlgHandle(TextView txtReaderView) {
+        final AtomicReference<ProgressDialog> dlg = new AtomicReference<>(LoadingProgressDlg.createSimpleLoadingDlg(EpubReaderEpubActivity.this));
+        ((TextView4SpannableString) txtReaderView).getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dlg.get().show();
+            }
+        });
+        ((TextView4SpannableString) txtReaderView).setOnRenderCompleteCallback(new Runnable() {
+            @Override
+            public void run() {
+                dlg.get().dismiss();
+            }
+        });
+    }
 
-    /**
-     * Fragment
-     */
-    public static class MyFragment extends Fragment {
 
-        public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
-
-        private int pageIndex = 0;
-
-        private EpubReaderEpubActivity self;
-        private AtomicBoolean startRendering = new AtomicBoolean(false);
-
-        public static final MyFragment newInstance(String message, int pageIndex, EpubReaderEpubActivity self) {
-            MyFragment f = new MyFragment();
-            Bundle bdl = new Bundle(1);
-            bdl.putString(EXTRA_MESSAGE, message);
-            f.setArguments(bdl);
-            f.pageIndex = pageIndex;
-            f.self = self;
-            return f;
-        }
+    private class MyViewHolder extends RecyclerPagerAdapter.ViewHolder {
 
         private ScrollView scrollView1;
         private TextView txtReaderView;
         private TextView translateView;
         private ViewGroup container;
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            String message = getArguments().getString(EXTRA_MESSAGE);
-
-            View parentView = inflater.inflate(R.layout.subview_epub_reader, container, false);
-
-            this.container = container;
-            scrollView1 = (ScrollView) parentView.findViewById(R.id.scrollView1);
-            txtReaderView = (TextView) parentView.findViewById(R.id.txtReaderView);
-            translateView = (TextView) parentView.findViewById(R.id.translateView);
-
-            //init view
-            self.initViewpagerChildrenView(txtReaderView, translateView);
-
-            final Handler handler = new Handler();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        if (!startRendering.get() && self.epubViewerMainHandler.isInitDone()) {
-                            self.epubViewerMainHandler.gotoSpineSection(pageIndex);
-                            startRendering.set(true);
-                            break;
-                        }
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }
-            }).start();
-
-            return parentView;
+        public MyViewHolder(View itemView) {
+            super(itemView);
         }
     }
 
     /**
      * PageAdapter
      */
-    class MyPageAdapter extends FragmentPagerAdapter {
-        public MyPageAdapter(FragmentManager fm) {
-            super(fm);
+    private class MyPageAdapter extends RecyclerPagerAdapter {
+
+        EpubReaderEpubActivity self;
+
+        MyPageAdapter(EpubReaderEpubActivity self) {
+            this.self = self;
         }
 
         @Override
-        public Fragment getItem(int position) {
-            return MyFragment.newInstance("", position, EpubReaderEpubActivity.this);
-        }
-
-        @Override
-        public int getCount() {
+        public int getItemCount() {
             return Integer.MAX_VALUE;
         }
+
+        private AtomicInteger pageHolder = new AtomicInteger(-1);
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, final int position) {
+            MyViewHolder my = (MyViewHolder) holder;
+            //init view
+            self.initViewpagerChildrenView(my.txtReaderView, my.translateView);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        if (self.epubViewerMainHandler.isInitDone() && pageHolder.get() != position) {
+                            self.epubViewerMainHandler.gotoSpineSection(position);
+                            pageHolder.set(position);
+                            break;
+                        } else if (pageHolder.get() == position) {
+                            break;
+                        } else {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                            }
+                        }
+                    }
+                }
+            }).start();
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup container, int viewType) {
+            View parentView = LayoutInflater.from(self).inflate(R.layout.subview_epub_reader, container, false);
+
+            MyViewHolder my = new MyViewHolder(parentView);
+            my.container = container;
+            my.scrollView1 = (ScrollView) parentView.findViewById(R.id.scrollView1);
+            my.txtReaderView = (TextView) parentView.findViewById(R.id.txtReaderView);
+            my.translateView = (TextView) parentView.findViewById(R.id.translateView);
+
+            return my;
+        }
     }
+
+
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
