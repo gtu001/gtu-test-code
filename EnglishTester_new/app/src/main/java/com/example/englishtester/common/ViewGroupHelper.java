@@ -4,7 +4,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 

@@ -3,7 +3,7 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.DBConnection;
 import com.example.englishtester.RecentSearchDAO;

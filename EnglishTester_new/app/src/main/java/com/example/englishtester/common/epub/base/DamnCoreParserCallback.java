@@ -1,6 +1,6 @@
 package com.example.englishtester.common.epub.base;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 /**
  * Created by wistronits on 2018/8/7.

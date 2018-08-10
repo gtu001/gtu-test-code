@@ -19,7 +19,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;

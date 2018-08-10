@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import java.util.HashMap;

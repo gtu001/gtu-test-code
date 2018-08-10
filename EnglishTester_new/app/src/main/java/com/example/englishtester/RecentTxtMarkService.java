@@ -1,7 +1,7 @@
 package com.example.englishtester;
 
 import android.content.Context;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMark;
 import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMarkSchmea;

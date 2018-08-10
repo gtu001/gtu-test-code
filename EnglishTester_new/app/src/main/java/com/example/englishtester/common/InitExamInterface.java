@@ -1,6 +1,6 @@
 package com.example.englishtester.common;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.Constant;
 import com.example.englishtester.EnglishwordInfoDAO;

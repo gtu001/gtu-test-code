@@ -6,7 +6,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;

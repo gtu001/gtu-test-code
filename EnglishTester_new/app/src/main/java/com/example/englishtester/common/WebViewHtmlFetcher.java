@@ -3,7 +3,7 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;

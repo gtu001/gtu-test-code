@@ -6,7 +6,7 @@ import java.io.InputStream;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 public class GifDecoder extends Thread{
 

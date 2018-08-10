@@ -3,7 +3,7 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;

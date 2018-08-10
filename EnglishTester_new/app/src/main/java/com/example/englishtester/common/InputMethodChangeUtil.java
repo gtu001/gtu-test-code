@@ -2,7 +2,7 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.inputmethodservice.InputMethodService;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;

@@ -3,7 +3,7 @@ package com.example.englishtester.common.epub.base;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.text.SpannableString;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.TextView;
 
 import com.example.englishtester.RecentTxtMarkService;
@@ -94,6 +94,10 @@ public class EpubViewerMainHandler {
 
     public void gotoSpineSection(int spinePos) {
         this.navigator.gotoSpineSection(spinePos, this.self);
+    }
+
+    public int getCurrentSpineSection() {
+        return this.navigator.getCurrentSectionPos();
     }
 
     public interface EpubActivityInterface extends ITxtReaderActivity {

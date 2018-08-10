@@ -1,6 +1,6 @@
 package com.example.englishtester.common.html.parser;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.Constant;

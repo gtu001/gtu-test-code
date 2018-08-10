@@ -2,7 +2,7 @@ package gtu._work.etc;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import com.example.englishtester.DropboxEnglishService;

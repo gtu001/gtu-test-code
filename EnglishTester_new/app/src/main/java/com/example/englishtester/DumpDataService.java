@@ -8,7 +8,7 @@ import android.os.Handler;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.JsonWriter;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import com.dropbox.core.v2.DbxClientV2;

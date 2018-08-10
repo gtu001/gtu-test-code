@@ -10,7 +10,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;

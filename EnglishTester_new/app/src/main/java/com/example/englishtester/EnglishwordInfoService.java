@@ -29,7 +29,7 @@ import android.content.ContextWrapper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
@@ -402,7 +402,7 @@ public class EnglishwordInfoService {
                     dialog02.cancel();
                     return;
                 }
-                final int MaxCount = 2000;
+                final int MaxCount = 3000;
                 if (prop.size() > MaxCount) {
                     handler.post(new Runnable() {
                         @Override

@@ -4,7 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 /**
  * Created by gtu001 on 2018/6/4.

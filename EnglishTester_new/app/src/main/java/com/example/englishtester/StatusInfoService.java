@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.HermannEbbinghaus_Memory_Service;

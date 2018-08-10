@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;

@@ -2,7 +2,7 @@ package com.example.englishtester;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 

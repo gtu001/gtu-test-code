@@ -8,7 +8,7 @@ import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.R;
 import com.example.englishtester.common.html.image.IImageLoaderCandidate;

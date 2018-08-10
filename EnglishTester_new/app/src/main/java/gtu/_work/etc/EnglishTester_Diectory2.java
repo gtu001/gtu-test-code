@@ -1,6 +1,6 @@
 package gtu._work.etc;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 /**
  * Created by gtu001 on 2017/6/27.

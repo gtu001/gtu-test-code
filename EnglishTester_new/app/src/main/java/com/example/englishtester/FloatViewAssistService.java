@@ -13,7 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;

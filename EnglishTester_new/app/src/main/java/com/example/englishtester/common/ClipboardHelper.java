@@ -2,7 +2,7 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 public class ClipboardHelper {
     public static void copyToClipboard(Context context, String str) {

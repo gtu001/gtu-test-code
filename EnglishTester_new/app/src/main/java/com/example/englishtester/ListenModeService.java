@@ -1,7 +1,7 @@
 package com.example.englishtester;
 
 import android.graphics.Color;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.TextView;
 
 public class ListenModeService {

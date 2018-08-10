@@ -2,7 +2,7 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.provider.Settings;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 import com.example.englishtester.BuildConfig;

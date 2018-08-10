@@ -2,7 +2,7 @@ package com.example.englishtester.common;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;

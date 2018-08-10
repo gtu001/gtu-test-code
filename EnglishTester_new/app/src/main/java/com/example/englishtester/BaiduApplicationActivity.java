@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;

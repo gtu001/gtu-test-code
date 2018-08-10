@@ -1,6 +1,6 @@
 package com.example.englishtester.common.epub.base;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import java.io.Reader;
 import java.io.StringReader;

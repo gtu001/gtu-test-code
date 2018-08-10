@@ -4,7 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
 public class DBConnection extends SQLiteOpenHelper {

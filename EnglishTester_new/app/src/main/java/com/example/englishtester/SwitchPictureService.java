@@ -23,7 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;

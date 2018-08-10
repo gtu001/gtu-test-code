@@ -10,7 +10,7 @@ import android.os.IInterface;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.RemoteException;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import com.example.englishtester.MainActivity;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;

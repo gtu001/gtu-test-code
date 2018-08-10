@@ -17,7 +17,7 @@ import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;

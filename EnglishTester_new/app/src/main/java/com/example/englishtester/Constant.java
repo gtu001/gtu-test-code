@@ -2,7 +2,7 @@ package com.example.englishtester;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 import java.io.File;
 import java.io.FileInputStream;

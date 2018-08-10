@@ -5,7 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;

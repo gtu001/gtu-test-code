@@ -2,7 +2,7 @@ package com.example.englishtester.common;
 
 import android.graphics.drawable.Drawable;
 import android.text.style.ImageSpan;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.widget.TextView;
 
 import java.io.File;

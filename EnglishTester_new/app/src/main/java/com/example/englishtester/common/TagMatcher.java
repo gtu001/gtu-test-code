@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
+import com.example.englishtester.common.Log;
 
 
 import java.io.File;

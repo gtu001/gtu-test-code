@@ -15,7 +15,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
+import com.example.englishtester.common.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,8 +120,8 @@ public class TxtReaderAppender {
             Matcher mth = ptn.matcher(txtContent);
             final String txtContent_ = txtContent;
 
-            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
             Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
             Log.v(TAG, "recentTxtMark list size = " + qList.size());
 
             int index = 0;
