@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.common.DBUtil;
@@ -91,6 +92,30 @@ public class RecentTxtMarkDAO {
             c.moveToNext();
         }
         c.close();
+        return list;
+    }
+
+    public List<RecentTxtMark> query__NON_CLOSE(String whereCondition, String[] whereArray) {
+        SQLiteDatabase db = null;
+        for (; db == null || !db.isOpen(); ) {
+            db = DBConnection.getInstance(context).getReadableDatabase();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+        Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, whereCondition, whereArray, null, null, null);
+        c.moveToFirst();
+        List<RecentTxtMark> list = new ArrayList<RecentTxtMark>();
+        int total = c.getCount();
+        if (total == 0) {
+            return list;
+        }
+        for (int ii = 0; ii < total; ii++) {
+            list.add(transferWord(c));
+            c.moveToNext();
+        }
+//        c.close();
         return list;
     }
 
@@ -314,9 +339,9 @@ public class RecentTxtMarkDAO {
             this.label = label;
         }
 
-        public static BookmarkTypeEnum valueOfByType(int type){
-            for(BookmarkTypeEnum e : BookmarkTypeEnum.values()){
-                if(e.getType() == type){
+        public static BookmarkTypeEnum valueOfByType(int type) {
+            for (BookmarkTypeEnum e : BookmarkTypeEnum.values()) {
+                if (e.getType() == type) {
                     return e;
                 }
             }

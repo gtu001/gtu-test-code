@@ -1,6 +1,7 @@
 package com.example.englishtester.common;
 
 import android.support.v4.view.ViewPager;
+
 import com.example.englishtester.common.Log;
 
 import java.lang.reflect.Method;
@@ -22,6 +23,8 @@ public class ViewPagerHelper {
                 try {
                     if (pageIdx.get() == null) {
                         pageIdx.set(viewPager.getCurrentItem());
+                    } else if (pageIdx.get() != viewPager.getCurrentItem()) {
+                        viewPager.setCurrentItem(pageIdx.get());
                     }
 
                     Method mth = ViewPager.class.getDeclaredMethod("dispatchOnPageSelected", int.class);

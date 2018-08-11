@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import gtu.util.ClassUtil;
@@ -45,23 +46,24 @@ import nl.siegmann.epublib.epub.EpubReader;
 
 public class EpubViewerMainHandler {
 
+    private static final String TAG = EpubViewerMainHandler.class.getSimpleName();
+
     private HTMLDocumentFactory htmlDocumentFactory;
     private MyHtmlEditorKit myHtmlEditorKit;
     private EpubSpannableTextHandler epubSpannableTextHandler;
     private Object self;
     private Navigator navigator;
     private EpubActivityInterface epubActivityInterface;
-    private EpubChangePageEvent epubChangePageEvent;
     private final Handler handler = new Handler();
+    private Runnable pagesReadyEvent;
 
     private EpubDTO dto;
 
-    public EpubViewerMainHandler(EpubActivityInterface epubActivityInterface, EpubChangePageEvent epubChangePageEvent) {
+    public EpubViewerMainHandler(EpubActivityInterface epubActivityInterface) {
         this.myHtmlEditorKit = new MyHtmlEditorKit();
         this.epubSpannableTextHandler = new EpubSpannableTextHandler();
         this.self = this;
         this.epubActivityInterface = epubActivityInterface;
-        this.epubChangePageEvent = epubChangePageEvent;
         this.dto = new EpubDTO();
     }
 
@@ -85,18 +87,33 @@ public class EpubViewerMainHandler {
         if (this.navigator != null && this.navigator.getBook() != null && dto != null && dto.getTxtView() != null && dto.getBookFile() != null) {
             return true;
         }
+        Log.v(TAG, "isInitDone fail : 1:" + (this.navigator != null) + " , 2:"
+                        + (this.navigator != null && this.navigator.getBook() != null) + " , 3:"
+                        + (this.dto != null) + " , 4:"
+                        + (this.dto.getTxtView() != null) + " , 5:"
+                        + (this.dto.getBookFile() != null) + ""
+                , 20
+        );
         return false;
     }
 
-    public void gotoPreviousSpineSection() {
+    public void gotoFirstSpineSection(Runnable pagesReadyEvent) {
+        setPagesReadyEvent(pagesReadyEvent);
+        this.navigator.gotoFirstSpineSection(this.self);
+    }
+
+    public void gotoPreviousSpineSection(Runnable pagesReadyEvent) {
+        setPagesReadyEvent(pagesReadyEvent);
         this.navigator.gotoPreviousSpineSection(this.self);
     }
 
-    public void gotoNextSpineSection() {
+    public void gotoNextSpineSection(Runnable pagesReadyEvent) {
+        setPagesReadyEvent(pagesReadyEvent);
         this.navigator.gotoNextSpineSection(this.self);
     }
 
-    public void gotoSpineSection(int spinePos) {
+    public void gotoSpineSection(int spinePos, Runnable pagesReadyEvent) {
+        setPagesReadyEvent(pagesReadyEvent);
         this.navigator.gotoSpineSection(spinePos, this.self);
     }
 
@@ -112,12 +129,6 @@ public class EpubViewerMainHandler {
         RecentTxtMarkService getRecentTxtMarkService();
 
         int getFixScreenWidth();
-
-        String fixNameToTitle(String orignFileName);
-    }
-
-    public interface EpubChangePageEvent {
-        void afterTxtViewChange();
     }
 
     private class EpubSpannableTextHandler implements NavigationEventListener {
@@ -150,12 +161,12 @@ public class EpubViewerMainHandler {
             Log.v(TAG, "resource2 " + resource2);
 
             if (navigationEvent.isResourceChanged() || navigationEvent.isSpinePosChanged()) {
-                Log.v(TAG, "change CONTENT !!!!");
+                Log.v(TAG, "change CONTENT !!!!", 10);
 
                 //設定標題
-                String fileName = EpubViewerMainHandler.this.epubActivityInterface.fixNameToTitle(dto.getBookFile().getName());
-                fileName = fileName + "[" + navigationEvent.getCurrentSpinePos() + "]";
-                dto.setFileName(fileName);
+//                String fileName = EpubViewerMainHandler.this.epubActivityInterface.fixNameToTitle(dto.getBookFile().getName());
+//                fileName = fileName + "[" + navigationEvent.getCurrentSpinePos() + "]";
+//                dto.setFileName(fileName);
 
                 //設定內文
                 HTMLDocument currentDocument = EpubViewerMainHandler.this.htmlDocumentFactory.getDocument(resource);
@@ -171,19 +182,11 @@ public class EpubViewerMainHandler {
                 Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_PageDivide(dto.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
                 dto.getPageContentHolder().setPages(pageHolder.getLeft(), pageHolder.getRight());
+                dto.getPageContentHolder().setSpinePos(navigationEvent.getCurrentSpinePos());
 
-                //TODO
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        EpubViewerMainHandler.this.epubActivityInterface.setTitle(dto.getFileName().toString());
-//                        EpubViewerMainHandler.this.dto.textView.setText(spannableString);
-//                    }
-//                });
-//
-//                if (epubChangePageEvent != null) {
-//                    epubChangePageEvent.afterTxtViewChange();
-//                }
+                if (pagesReadyEvent != null) {
+                    pagesReadyEvent.run();
+                }
             }
 
             Log.v(TAG, "navigationPerformed end   -------------------------------------------------------------");
@@ -217,12 +220,16 @@ public class EpubViewerMainHandler {
     }
 
     public static class PageContentHolder {
+        private AtomicInteger spinePos = new AtomicInteger(-1);
         private List<SpannableString> pages;
         private List<String> pages4Debug;
 
         private int currentPageIndex = 0;
 
-        public String getPageStatus() {
+        public String getPageDivideStatus() {
+            if (pages.size() <= 1) {
+                return "";
+            }
             return String.format("(%d/%d)", this.currentPageIndex + 1, pages.size());
         }
 
@@ -232,6 +239,15 @@ public class EpubViewerMainHandler {
 
         public boolean isEmpty() {
             return pages == null || pages.isEmpty();
+        }
+
+        public SpannableString gotoPage(int index) {
+            if (index < 0) {
+                currentPageIndex = 0;
+            } else if (index >= pages.size()) {
+                currentPageIndex = pages.size() - 1;
+            }
+            return pages.get(currentPageIndex);
         }
 
         public void setPages(List<SpannableString> pages, List<String> pages4Debug) {
@@ -278,6 +294,14 @@ public class EpubViewerMainHandler {
         public SpannableString lastPage() {
             this.currentPageIndex = this.pages.size() - 1;
             return this.pages.get(this.currentPageIndex);
+        }
+
+        public int getSpinePos() {
+            return spinePos.get();
+        }
+
+        public void setSpinePos(int spinePos) {
+            this.spinePos.set(spinePos);
         }
     }
 
@@ -399,5 +423,9 @@ public class EpubViewerMainHandler {
 
     public EpubDTO getDto() {
         return dto;
+    }
+
+    public void setPagesReadyEvent(Runnable pagesReadyEvent) {
+        this.pagesReadyEvent = pagesReadyEvent;
     }
 }
