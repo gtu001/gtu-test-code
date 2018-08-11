@@ -12,9 +12,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableString;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,7 +31,6 @@ import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FloatViewChecker;
-import com.example.englishtester.common.FragmentUtil;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
@@ -55,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -541,19 +539,77 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            MyViewHolder my = (MyViewHolder) holder;
+            final MyViewHolder my = (MyViewHolder) holder;
             //init view
             self.initViewpagerChildrenView(my.txtReaderView, my.translateView);
 
+            final Handler handler = new Handler();
+
             new Thread(new Runnable() {
+
+                boolean debugMode = false;
+
+                private void setViewContennt(final SpannableString spannable) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!debugMode) {
+                                my.txtReaderView.setText(spannable);
+                            } else {
+                                String debugContent = self.epubViewerMainHandler.getDto().getPageContentHolder().getPageContent4Debug();
+                                my.txtReaderView.setText(debugContent);
+                            }
+                            Toast.makeText(self, getPageStatus(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                private String getPageStatus() {
+                    return self.epubViewerMainHandler.getCurrentSpinePos() + " : " + self.epubViewerMainHandler.getDto().getPageContentHolder().getPageStatus();
+                }
+
+                private boolean loadBufferedPages() {
+                    SpannableString spannable = null;
+                    if (!self.epubViewerMainHandler.getDto().getPageContentHolder().isEmpty()) {
+                        if (position > pageHolder.get()) {
+                            spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().nextPage();
+                        } else if (position < pageHolder.get()) {
+                            spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().previousPage();
+                        } else {
+                            throw new RuntimeException("應該不會發生-----------" + position + " - " + pageHolder.get());
+                        }
+                    }
+                    if (spannable == null) {
+                        return false;
+                    }
+                    setViewContennt(spannable);
+                    pageHolder.set(position);
+                    return true;
+                }
+
+                private void loadNextSpineSection() {
+                    if (position > pageHolder.get()) {
+                        self.epubViewerMainHandler.gotoNextSpineSection();
+                        SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().firstPage();
+                        pageHolder.set(position);
+                        setViewContennt(spannable);
+                    } else if (position < pageHolder.get()) {
+                        self.epubViewerMainHandler.gotoPreviousSpineSection();
+                        SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().lastPage();
+                        pageHolder.set(position);
+                        setViewContennt(spannable);
+                    } else {
+                        throw new RuntimeException("應該不會發生-----------" + position + " - " + pageHolder.get());
+                    }
+                }
+
                 @Override
                 public void run() {
-                    while (true) {
-                        if (self.epubViewerMainHandler.isInitDone() && pageHolder.get() != position) {
-                            self.epubViewerMainHandler.gotoSpineSection(position);
-                            pageHolder.set(position);
-                            break;
-                        } else if (pageHolder.get() == position) {
+                    A:
+                    while (!loadBufferedPages()) {
+                        if (self.epubViewerMainHandler.isInitDone()) {
+                            //self.epubViewerMainHandler.gotoSpineSection(position);
+                            loadNextSpineSection();
                             break;
                         } else {
                             try {
@@ -629,7 +685,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         },//
         DEBUG_ONLY_002("DEBUG_ONLY_002", MENU_FIRST++, REQUEST_CODE++, null, true) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                String value = activity.epubViewerMainHandler.getCurrentSpineSection() + " - " + activity.viewPager.getCurrentItem();
+                String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
                 Log.toast(activity, value);
             }
         },//

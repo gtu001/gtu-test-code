@@ -3,7 +3,9 @@ package com.example.englishtester.common.epub.base;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.text.SpannableString;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.TextView;
 
 import com.example.englishtester.RecentTxtMarkService;
@@ -16,6 +18,7 @@ import com.example.englishtester.common.html.parser.HtmlEpubParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -96,8 +100,8 @@ public class EpubViewerMainHandler {
         this.navigator.gotoSpineSection(spinePos, this.self);
     }
 
-    public int getCurrentSpineSection() {
-        return this.navigator.getCurrentSectionPos();
+    public int getCurrentSpinePos() {
+        return this.navigator.getCurrentSpinePos();
     }
 
     public interface EpubActivityInterface extends ITxtReaderActivity {
@@ -164,19 +168,22 @@ public class EpubViewerMainHandler {
                 dto.customContent.set($tempResultContent);
 
                 TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), epubActivityInterface.getFloatService(), dto, EpubViewerMainHandler.this.dto.textView);
-                final SpannableString spannableString = txtReaderAppender.getAppendTxt_HtmlFromWord(dto.customContent.get(), epubActivityInterface.getFixScreenWidth());
+                Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_PageDivide(dto.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        EpubViewerMainHandler.this.epubActivityInterface.setTitle(dto.getFileName().toString());
-                        EpubViewerMainHandler.this.dto.textView.setText(spannableString);
-                    }
-                });
+                dto.getPageContentHolder().setPages(pageHolder.getLeft(), pageHolder.getRight());
 
-                if (epubChangePageEvent != null) {
-                    epubChangePageEvent.afterTxtViewChange();
-                }
+                //TODO
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        EpubViewerMainHandler.this.epubActivityInterface.setTitle(dto.getFileName().toString());
+//                        EpubViewerMainHandler.this.dto.textView.setText(spannableString);
+//                    }
+//                });
+//
+//                if (epubChangePageEvent != null) {
+//                    epubChangePageEvent.afterTxtViewChange();
+//                }
             }
 
             Log.v(TAG, "navigationPerformed end   -------------------------------------------------------------");
@@ -203,6 +210,77 @@ public class EpubViewerMainHandler {
         }
     }
 
+    public enum PageForwardEnum {
+        NEXT_PAGE(), //
+        PREVIOUS_PAGE(), //
+        JUMP_SPINE_SECTION(), //
+    }
+
+    public static class PageContentHolder {
+        private List<SpannableString> pages;
+        private List<String> pages4Debug;
+
+        private int currentPageIndex = 0;
+
+        public String getPageStatus() {
+            return String.format("(%d/%d)", this.currentPageIndex + 1, pages.size());
+        }
+
+        public String getPageContent4Debug() {
+            return pages4Debug.get(this.currentPageIndex);
+        }
+
+        public boolean isEmpty() {
+            return pages == null || pages.isEmpty();
+        }
+
+        public void setPages(List<SpannableString> pages, List<String> pages4Debug) {
+            this.pages = pages;
+            this.pages4Debug = pages4Debug;
+            this.currentPageIndex = 0;
+        }
+
+        public boolean hasNext() {
+            if (this.currentPageIndex + 1 >= pages.size()) {
+                return false;
+            }
+            return true;
+        }
+
+        public boolean hasPrevious() {
+            if (this.currentPageIndex - 1 < 0) {
+                return false;
+            }
+            return true;
+        }
+
+        public SpannableString nextPage() {
+            if (!hasNext()) {
+                return null;
+            }
+            this.currentPageIndex++;
+            return this.pages.get(this.currentPageIndex);
+        }
+
+        public SpannableString previousPage() {
+            if (!hasPrevious()) {
+                return null;
+            }
+            this.currentPageIndex--;
+            return this.pages.get(this.currentPageIndex);
+        }
+
+        public SpannableString firstPage() {
+            this.currentPageIndex = 0;
+            return this.pages.get(this.currentPageIndex);
+        }
+
+        public SpannableString lastPage() {
+            this.currentPageIndex = this.pages.size() - 1;
+            return this.pages.get(this.currentPageIndex);
+        }
+    }
+
     public static class EpubDTO implements ITxtReaderActivityDTO {
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
 
@@ -215,6 +293,8 @@ public class EpubViewerMainHandler {
         private AtomicReference<String> customContent = new AtomicReference<>();
         private boolean bookmarkMode = false;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
+        private PageContentHolder pageContentHolder = new PageContentHolder();
+        private PageForwardEnum pageForwardEnum;
 
         public EpubDTO() {
         }
@@ -302,6 +382,18 @@ public class EpubViewerMainHandler {
         @Override
         public AtomicReference<Integer> getBookmarkIndexHolder() {
             return bookmarkIndexHolder;
+        }
+
+        public PageContentHolder getPageContentHolder() {
+            return pageContentHolder;
+        }
+
+        public PageForwardEnum getPageForwardEnum() {
+            return pageForwardEnum;
+        }
+
+        public void setPageForwardEnum(PageForwardEnum pageForwardEnum) {
+            this.pageForwardEnum = pageForwardEnum;
         }
     }
 
