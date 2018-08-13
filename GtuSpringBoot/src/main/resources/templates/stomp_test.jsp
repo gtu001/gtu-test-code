@@ -49,8 +49,9 @@
 		var ws = new WebSocket('ws://192.168.99.100:15674/ws');//5672
 		var client = Stomp.over(ws);
 		var on_connect = function() {
-			console.log('connected');
-			alert("connected");
+			client.subscribe("/queue/test", function(d) {
+				alert(d.body);
+	        });
 		};
 		var on_error = function() {
 			console.log('error');

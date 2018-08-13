@@ -66,6 +66,6 @@ public class Application {
         }
         for (Method m : bean.getClass().getDeclaredMethods()) { 
             log.info("m---" + m.getName() + "\t" + m.getReturnType().getSimpleName());
-        }
+        }  
     } 
 }
