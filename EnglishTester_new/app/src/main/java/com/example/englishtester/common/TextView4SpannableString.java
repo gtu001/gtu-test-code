@@ -58,4 +58,9 @@ public class TextView4SpannableString extends android.support.v7.widget.AppCompa
     public void setOnRenderStartCallback(Runnable onRenderStartCallback) {
         this.onRenderStartCallback = onRenderStartCallback;
     }
+
+    @Override
+    public Handler getHandler() {
+        return handler;
+    }
 }

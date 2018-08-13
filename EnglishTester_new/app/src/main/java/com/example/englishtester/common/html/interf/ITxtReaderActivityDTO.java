@@ -21,4 +21,5 @@ public interface ITxtReaderActivityDTO {
     Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
 
     AtomicReference<Integer> getBookmarkIndexHolder();
+
 }

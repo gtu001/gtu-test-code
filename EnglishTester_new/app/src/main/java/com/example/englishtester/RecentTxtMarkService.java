@@ -113,7 +113,7 @@ public class RecentTxtMarkService {
      * 取得檔案mark紀錄
      */
     public synchronized List<RecentTxtMark> getFileMark(String fileName) {
-        List<RecentTxtMark> lst = recentTxtMarkDAO.query(//
+        List<RecentTxtMark> lst = recentTxtMarkDAO.query__NON_CLOSE(//
                 RecentTxtMarkSchmea.FILE_NAME + "=? ", //
                 new String[]{fileName});
         return lst;

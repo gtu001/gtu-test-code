@@ -247,6 +247,19 @@ public class TxtReaderAppender {
         return appender.getResult();
     }
 
+    /**
+     * 建立可點擊文件
+     */
+    public Pair<List<SpannableString>, List<String>> getAppendTxt_HtmlFromWord_PageDivide(String txtContent, int maxPicWidth) {
+        List<SpannableString> pageDividLst = new ArrayList<>();
+        List<String> pages = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
+        for (String page : pages) {
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth);
+            pageDividLst.add(appender.getResult());
+        }
+        return Pair.of(pageDividLst, pages);
+    }
+
     public static class SimpleUrlLinkSpan extends ClickableSpan {
         Context context;
         String url;
