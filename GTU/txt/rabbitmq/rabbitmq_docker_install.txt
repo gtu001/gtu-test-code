@@ -38,6 +38,15 @@ Ex: docker exec some-rabbit  rabbitmqctl start_app <--啟動
 
 -------------------------------------------------------------------------------
 
+
+設定黨位置
+
+/etc/rabbitmq/
+
+參考網址 https://www.rabbitmq.com/configure.html#config-location
+-------------------------------------------------------------------------------
+
+
 啟用 managerment-plugin 可用 http://localhost:15672 進度管理畫面
 
 指令如下
@@ -47,9 +56,9 @@ $ rabbitmq-plugins enable rabbitmq_management
 
 -------------------------------------------------------------------------------
 
-設定黨位置
 
-/etc/rabbitmq/
+ 加入 stomp plugin (websocket)
+ 
+$ rabbitmq-plugins enable rabbitmq_web_stomp
 
-參考網址 https://www.rabbitmq.com/configure.html#config-location
 -------------------------------------------------------------------------------

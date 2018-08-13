@@ -26,12 +26,12 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Cacheable
-@Entity(name = "ImageGroup")
-@Table(name = "image_group", indexes = { @Index(name = "img_grp_tenant_name_idx", columnList = "tenant,name"),
-        @Index(name = "img_grp_tenant_idx", columnList = "tenant") }, uniqueConstraints = {
-                @UniqueConstraint(name = "img_grp_tenant_name_uq", columnNames = { "tenant", "name" }), })
-@SequenceGenerator(name = "image_group_id_sequence", sequenceName = "image_group_id_seq", initialValue = 1)
+//@Cacheable
+//@Entity(name = "ImageGroup")
+//@Table(name = "image_group", indexes = { @Index(name = "img_grp_tenant_name_idx", columnList = "tenant,name"),
+//        @Index(name = "img_grp_tenant_idx", columnList = "tenant") }, uniqueConstraints = {
+//                @UniqueConstraint(name = "img_grp_tenant_name_uq", columnNames = { "tenant", "name" }), })
+//@SequenceGenerator(name = "image_group_id_sequence", sequenceName = "image_group_id_seq", initialValue = 1)
 public class ImageGroupDO {
 
     /** The id. */

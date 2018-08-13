@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Bean;
 // 若被強制 redirect 到 login畫面
 // @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class.class })
 
-public class Application {
+public class Application { 
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
@@ -41,7 +41,7 @@ public class Application {
         System.setProperty("spring.profiles.active", "spring-data");
         ConfigurableApplicationContext ctx2 = SpringApplication.run(Application.class, args);        
     } 
-   
+    
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {     
         return args -> {  
@@ -52,12 +52,12 @@ public class Application {
             for (String beanName : beanNames) {  
                 String beanPrefix = ""; 
                 if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {  
-                    beanPrefix = "<GTU>";       
+                    beanPrefix =  "<GTU>";       
                 }    
  
                 log.info("\t {} bean : {}", beanPrefix, beanName);     
-            }   
-        };   
+            }      
+        };     
     }
 
     private void inspectBean(Object bean) {

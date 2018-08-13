@@ -17,6 +17,7 @@
 		<select name="path">
 			<option value="">請選擇</option>
 			<option value="/springdata-dbMain/dbMain">DB</option>
+			<option value="/stomp_test/stomp_main">stomp</option>
 		</select>
 		<br />
 		 <input type="submit" value="GO" /><br />
