@@ -1,0 +1,28 @@
+[
+{
+  "table" : [
+  {"item_id":"M1", "item_qty":"1"}, 
+   {"item_id":"M2", "item_qty":"2"}, 
+    {"item_id":"M3", "item_qty":"3"}, 
+     {"item_id":"M4", "item_qty":"4"}
+  ]
+},
+
+{
+  "table" : [
+    {"item_id":"T1", "item_qty":"11"}, 
+   {"item_id":"T2", "item_qty":"22"}, 
+    {"item_id":"T3", "item_qty":"33"}, 
+     {"item_id":"T4", "item_qty":"44"}
+  ]
+},
+
+{
+  "table" : [
+    {"item_id":"W1", "item_qty":"111"}, 
+   {"item_id":"W2", "item_qty":"222"}, 
+    {"item_id":"W3", "item_qty":"333"}, 
+     {"item_id":"W4", "item_qty":"444"}
+  ]
+}
+]

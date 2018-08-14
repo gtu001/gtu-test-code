@@ -26,4 +26,11 @@ public class StompTestController {
         model.setViewName("stomp_test_ex1");// stomp_test XXX
         return model;
     }
+    
+    @GetMapping(value = "/stomp_test_ex2")
+    public ModelAndView stomp_test_ex2() {
+        ModelAndView model = new ModelAndView();
+        model.setViewName("stomp_test_ex2");// stomp_test XXX
+        return model;
+    }
 }
