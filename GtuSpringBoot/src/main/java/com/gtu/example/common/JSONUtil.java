@@ -2,12 +2,19 @@ package com.gtu.example.common;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.gtu.example.controller.JqBootgridTestController;
 
 import net.sf.json.JSONObject;
 
 public class JSONUtil {
 
+    private static final Logger log = LoggerFactory.getLogger(JSONUtil.class);
+
     public static JSONObject getThrowable(Throwable ex) {
+        log.error("<<ERROR>> : " + ex.getMessage(), ex);
         JSONObject json = new JSONObject();
         json.put("messsage", ex.getMessage());
         json.put("result", "error");
@@ -16,6 +23,7 @@ public class JSONUtil {
     }
 
     public static JSONObject getThrowablePrecise(Throwable ex) {
+        log.error("<<ERROR>> : " + ex.getMessage(), ex);
         StringBuilder sb = new StringBuilder();
         do {
             sb.append(ex.getClass().getSimpleName() + " : " + ex.getMessage() + "\r\n");
@@ -27,6 +35,7 @@ public class JSONUtil {
     }
 
     public static JSONObject getThrowableRoot(Throwable ex) {
+        log.error("<<ERROR>> : " + ex.getMessage(), ex);
         Throwable root = ExceptionUtils.getRootCause(ex);
         if (root == null) {
             root = ex;

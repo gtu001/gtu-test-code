@@ -1,0 +1,32 @@
+{
+    "product-id": "OniutraPCB",
+    "product-name": "Oniutra PCBA",
+    "plan-quantity": "100",
+    "actula-quantity": "0",
+    "in-progress-work-requests": [
+        {    
+            "work-request-id": "WR-A12345-0001",
+            "work-unit": "RBE120006"
+        },
+        {    
+            "work-request-id": "WR-A12345-0002",
+            "work-unit": "RBE120006"
+        },
+        {    
+            "work-request-id": "WR-A12345-0003",
+            "work-unit": "RBE120004"
+        },
+        {    
+            "work-request-id": "WR-A12345-0004",
+            "work-unit": "RBE120003"
+        },
+        {    
+            "work-request-id": "WR-A12345-0005",
+            "work-unit": "RBE120002"
+        },
+        {    
+            "work-request-id": "WR-A12345-0006",
+            "work-unit": "RBE120001"
+        }
+    ]
+}       

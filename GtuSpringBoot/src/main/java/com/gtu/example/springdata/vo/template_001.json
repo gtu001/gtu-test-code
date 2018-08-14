@@ -1,0 +1,30 @@
+{
+	"product-id": "OniutraPCB",
+    "product-name": "Oniutra PCBA",
+    "work-units": [
+        {
+            "work-unit": "RBE120001",
+            "name": "Solder Paste Printing"
+        },
+        {
+            "work-unit": "RBE120002",
+            "name": "Pick-and-Place Machines"
+        },
+        {
+            "work-unit": "RBE120003",
+            "name": "DIP Insertion(Manual)"
+        },
+        {
+            "work-unit": "RBE120004",
+            "name": "Rwflow Oven"
+        },
+        {
+            "work-unit": "RBE120005",
+            "name": "PCB AOI Machine"
+        },
+        {
+            "work-unit": "RBE120006",
+            "name": "PCB Router"
+        }
+    ]
+}

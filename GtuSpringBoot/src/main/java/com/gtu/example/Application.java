@@ -30,35 +30,35 @@ import org.springframework.context.annotation.Bean;
 // @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class.class })
 
 public class Application { 
-
+  
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-    @Autowired 
-    private ConfigurableApplicationContext ctx;
-
-    public static void main(String[] args) throws Exception {  
-        // System.setProperty("spring.profiles.active", "rabbitmq") ; 
-        System.setProperty("spring.profiles.active", "spring-data");
+    @Autowired  
+    private ConfigurableApplicationContext ctx;          
+  
+    public static void main(String[] args) throws Exception {   
+        // System.setProperty("spring.profiles.active", "rabbitmq") ;   
+        System.setProperty("spring.profiles.active", "spring-data"); 
         ConfigurableApplicationContext ctx2 = SpringApplication.run(Application.class, args);        
-    } 
-    
-    @Bean
+    }   
+       
+    @Bean 
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {     
         return args -> {  
             log.info("Let's inspect the beans provided by Spring Boot:");   
     
-            String[] beanNames = ctx.getBeanDefinitionNames();     
+            String[] beanNames = ctx.getBeanDefinitionNames();      
             Arrays.sort(beanNames); 
-            for (String beanName : beanNames) {  
-                String beanPrefix = ""; 
+            for (String beanName : beanNames) {    
+                String beanPrefix = "";  
                 if (ctx.getBean(beanName).getClass().getName().startsWith("com.gtu")) {  
                     beanPrefix =  "<GTU>";       
-                }    
+                }         
  
                 log.info("\t {} bean : {}", beanPrefix, beanName);     
-            }      
-        };     
-    }
+            }           
+        };         
+    } 
 
     private void inspectBean(Object bean) {
         for (Field f : bean.getClass().getDeclaredFields()) {
