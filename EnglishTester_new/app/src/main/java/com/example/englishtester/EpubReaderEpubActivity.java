@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
+import com.example.englishtester.common.EmailUtil;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
@@ -263,7 +264,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                         File file = epubFileZ.get();
 
                         epubViewerMainHandler.initBook(file);
-                        gotoViewPagerPosition(INITIAL_POSITION);
+                        epubViewerMainHandler.gotoFirstSpineSection(null);
+                        gotoViewPagerPosition(0);
 
                         handler.post(new Runnable() {
                             @Override
@@ -509,6 +511,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             @Override
             public void onPageSelected(final int position) {
                 Log.v(TAG, "##### onPageSelected");
+
+                if (position <= epubViewerMainHandler.getPageContentHolderSize(null) - 3) {
+                    epubViewerMainHandler.gotoNextSpineSection(new Runnable() {
+                        @Override
+                        public void run() {
+                        }
+                    });
+                }
             }
 
             @Override
@@ -534,6 +544,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         });
     }
 
+    private AtomicReference<Map<Integer, Integer>> spineHolder = new AtomicReference<>();
 
     private class MyViewHolder extends RecyclerPagerAdapter.ViewHolder {
 
@@ -547,12 +558,67 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         }
     }
 
+    private class PageForwardThread extends Thread {
+
+        MyViewHolder my;
+        int position;
+
+        PageForwardThread(final MyViewHolder my, int position) {
+            this.my = my;
+            this.self = EpubReaderEpubActivity.this;
+        }
+
+        protected boolean debugMode = false;
+        protected EpubReaderEpubActivity self;
+
+        public void run() {
+            setTextViewContent();
+        }
+
+        protected void setTextViewContent() {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (epubViewerMainHandler == null || !epubViewerMainHandler.isInitDone()) {
+                        return;
+                    }
+
+                    if (!debugMode) {
+                        SpannableString spannable = epubViewerMainHandler.gotoPosition(position);
+                        my.txtReaderView.setText(spannable);
+                    } else {
+//                        String debugContent = self.epubViewerMainHandler.getPageContentHolder(position).getPageContent4Debug();
+//                        my.txtReaderView.setText(debugContent);
+                    }
+
+                    String pageStatus = getPageStatus();
+                    String title = fixNameToTitle(self.epubViewerMainHandler.getDto().getBookFile().getName()) + "[" + pageStatus + "]";
+                    self.epubViewerMainHandler.getDto().setFileName(title);
+                    setTitle(title);
+
+                    Toast.makeText(self, "debugPage : " + self.viewPager.getCurrentItem() + " ----> " + pageStatus, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        protected String getPageStatus() {
+            if (epubViewerMainHandler == null || !self.epubViewerMainHandler.isInitDone()) {
+                return "InitNotOk";
+            }
+
+            String divideDetial = self.epubViewerMainHandler.getPageContentHolder(position).getPageDivideStatus();
+            divideDetial = StringUtils.isBlank(divideDetial) ? "" : " " + divideDetial;
+            return self.epubViewerMainHandler.getCurrentSpinePos() + divideDetial;
+        }
+    }
+
     /**
      * PageAdapter
      */
     private class MyPageAdapter extends RecyclerPagerAdapter {
 
         EpubReaderEpubActivity self;
+        boolean debugMode = false;
 
         MyPageAdapter(EpubReaderEpubActivity self) {
             this.self = self;
@@ -576,13 +642,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             final Handler handler = new Handler();
 
-            if (position == INITIAL_POSITION) {
-                this.getCoverPageProcess(my).start();
-            } else if (position == BOOKMARK_POSITION) {
-                this.getBookmarkForwardProcess(my).start();
-            } else {
-                this.getNormalForwardProcess(my, position).start();
-            }
+            PageForwardThread pageForwardThread = new PageForwardThread(my, position);
+            pageForwardThread.start();
         }
 
         @Override
@@ -596,173 +657,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             my.translateView = (TextView) parentView.findViewById(R.id.translateView);
 
             return my;
-        }
-
-        private class PageForwardThread extends Thread {
-
-            MyViewHolder my;
-
-            PageForwardThread(final MyViewHolder my) {
-                this.my = my;
-            }
-
-            protected boolean debugMode = false;
-
-            protected void setTextViewContent(final SpannableString spannable) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!debugMode) {
-                            my.txtReaderView.setText(spannable);
-                        } else {
-                            String debugContent = self.epubViewerMainHandler.getDto().getPageContentHolder().getPageContent4Debug();
-                            my.txtReaderView.setText(debugContent);
-                        }
-
-                        String pageStatus = getPageStatus();
-                        String title = fixNameToTitle(self.epubViewerMainHandler.getDto().getBookFile().getName()) + "[" + pageStatus + "]";
-                        self.epubViewerMainHandler.getDto().setFileName(title);
-                        setTitle(title);
-
-                        Toast.makeText(self, pageStatus, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            protected String getPageStatus() {
-                String divideDetial = self.epubViewerMainHandler.getDto().getPageContentHolder().getPageDivideStatus();
-                divideDetial = StringUtils.isBlank(divideDetial) ? "" : " " + divideDetial;
-                return self.epubViewerMainHandler.getCurrentSpinePos() + divideDetial;
-            }
-        }
-
-        private Thread getNormalForwardProcess(final MyViewHolder my, final int position) {
-            return new PageForwardThread(my) {
-
-                private boolean loadBufferedPages() {
-                    SpannableString spannable = null;
-                    if (!self.epubViewerMainHandler.getDto().getPageContentHolder().isEmpty()) {
-                        if (position > pageHolder.get()) {
-                            spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().nextPage();
-                        } else if (position < pageHolder.get()) {
-                            spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().previousPage();
-                        } else {
-                            throw new RuntimeException("應該不會發生-----------" + position + " - " + pageHolder.get());
-                        }
-                    }
-                    if (spannable == null) {
-                        return false;
-                    }
-                    setTextViewContent(spannable);
-                    pageHolder.set(position);
-                    return true;
-                }
-
-                private void loadNextSpineSection() {
-                    if (position > pageHolder.get()) {
-                        self.epubViewerMainHandler.gotoNextSpineSection(new Runnable() {
-                            @Override
-                            public void run() {
-                                SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().firstPage();
-                                pageHolder.set(position);
-                                setTextViewContent(spannable);
-                            }
-                        });
-                    } else if (position < pageHolder.get()) {
-                        self.epubViewerMainHandler.gotoPreviousSpineSection(new Runnable() {
-                            @Override
-                            public void run() {
-                                SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().lastPage();
-                                pageHolder.set(position);
-                                setTextViewContent(spannable);
-                            }
-                        });
-                    } else {
-                        throw new RuntimeException("應該不會發生-----------" + position + " - " + pageHolder.get());
-                    }
-                }
-
-                @Override
-                public void run() {
-                    A:
-                    while (!loadBufferedPages()) {
-                        if (self.epubViewerMainHandler.isInitDone()) {
-                            //self.epubViewerMainHandler.gotoSpineSection(position);
-                            loadNextSpineSection();
-                            break A;
-                        } else {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        private Thread getBookmarkForwardProcess(final MyViewHolder my) {
-            return new PageForwardThread(my) {
-
-                private void loadSpineSection_byBookmark() {
-                    self.epubViewerMainHandler.gotoSpineSection(spineGotoInfo.get().getLeft(), new Runnable() {
-                        @Override
-                        public void run() {
-                            SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().gotoPage(spineGotoInfo.get().getRight());
-                            setTextViewContent(spannable);
-                            pageHolder.set(BOOKMARK_POSITION);
-                        }
-                    });
-                }
-
-                @Override
-                public void run() {
-                    A:
-                    while (true) {
-                        if (self.epubViewerMainHandler.isInitDone()) {
-                            loadSpineSection_byBookmark();
-                            break A;
-                        } else {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        private Thread getCoverPageProcess(MyViewHolder my) {
-            return new PageForwardThread(my) {
-
-                private void loadCoverPageProcess() {
-                    self.epubViewerMainHandler.gotoFirstSpineSection(new Runnable() {
-                        @Override
-                        public void run() {
-                            SpannableString spannable = self.epubViewerMainHandler.getDto().getPageContentHolder().firstPage();
-                            setTextViewContent(spannable);
-                            pageHolder.set(INITIAL_POSITION);
-                        }
-                    });
-                }
-
-                @Override
-                public void run() {
-                    A:
-                    while (true) {
-                        if (self.epubViewerMainHandler.isInitDone()) {
-                            loadCoverPageProcess();
-                            break A;
-                        } else {
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    }
-                }
-            };
         }
     }
 
@@ -795,6 +689,9 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(epub)");
+                if (BuildConfig.DEBUG) {
+                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                }
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
@@ -815,14 +712,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.moveToNextBookmark();
             }
         }, //
-        DEBUG_ONLY_001("DEBUG_ONLY_001", MENU_FIRST++, REQUEST_CODE++, null, true) {
-            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                String filename = "/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/books/Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz.epub";
-                File file = new File(filename);
-                activity.setTxtContentFromFile(file, null, null);
-            }
-        },//
-        DEBUG_ONLY_002("DEBUG_ONLY_002", MENU_FIRST++, REQUEST_CODE++, null, true) {
+        DEBUG_ONLY_002("________Pos", MENU_FIRST++, REQUEST_CODE++, null, true) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
                 Log.toast(activity, value);

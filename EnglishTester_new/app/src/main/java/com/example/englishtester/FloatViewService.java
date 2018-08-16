@@ -19,7 +19,9 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+
 import com.example.englishtester.common.Log;
+
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -59,6 +61,7 @@ import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -569,31 +572,20 @@ public class FloatViewService extends Service {
                     WindowItemListIconDialog win = new WindowItemListIconDialog(mWindowManager, FloatViewService.this.getApplicationContext());
 
                     List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-                    addItem("查詢歷史", R.drawable.icon_history, list);
-                    addItem("開啟主程式", R.drawable.janna, list);
-                    addItem("放大鏡移動", R.drawable.icon_mouse_move, list);
-                    addItem("關閉懸浮字典", R.drawable.icon_close_app, list);
+                    for (ConfigDialogEnum e : ConfigDialogEnum.values()) {
+                        addItem(e.name(), e.getIcon(FloatViewService.this), list);
+                    }
 
                     win.showItemListDialog("功能設定", list, new OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            switch (position) {
-                                case 0:
-                                    recentSearchHistory();
-                                    break;
-                                case 1:
-                                    openMainProgram();
-                                    break;
-                                case 2:
-                                    magnifierAlert();
-                                    break;
-                                case 3:
-                                    stopThisService();
-                                    break;
+                            for (ConfigDialogEnum e : ConfigDialogEnum.values()) {
+                                if (e.ordinal() == position) {
+                                    e.process(FloatViewService.this);
+                                }
                             }
                         }
                     });
-
                 }
             });
 
@@ -601,6 +593,61 @@ public class FloatViewService extends Service {
             refTextView = (TextView) contentView.findViewById(R.id.refTextView);
             refTextView.setVisibility(View.GONE);
         }
+    }
+
+    private static enum ConfigDialogEnum {
+        SEARCH_HISTORY("查詢歷史", R.drawable.icon_history) {
+            @Override
+            void process(FloatViewService self) {
+                self.recentSearchHistory();
+            }
+        },//
+        OPEN_PROGRAM("開啟主程式", R.drawable.janna) {
+            @Override
+            void process(FloatViewService self) {
+                self.openMainProgram();
+            }
+        },//
+        ICON_MOVE("放大鏡移動", R.drawable.icon_mouse_move) {
+            @Override
+            void process(FloatViewService self) {
+                self.magnifierAlert();
+            }
+        },//
+        LISTENER_CLIPBOARD("監聽記事本", null) {
+            public int getIcon(FloatViewService self) {
+                boolean state = self.clipboardListenerHandler.isCurrentState();
+                return state ? R.drawable.switch_on_icon : R.drawable.switch_off_icon;
+            }
+
+            @Override
+            void process(FloatViewService self) {
+                boolean state = !self.clipboardListenerHandler.isCurrentState();
+                self.clipboardListenerHandler.doStart(state);
+                Toast.makeText(self, "監聽" + (state ? "on" : "off"), Toast.LENGTH_SHORT).show();
+            }
+        },//
+        EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app) {
+            @Override
+            void process(FloatViewService self) {
+                self.stopThisService();
+            }
+        },//
+        ;
+
+        final String label;
+        final Integer iconVal;
+
+        ConfigDialogEnum(String label, Integer iconVal) {
+            this.label = label;
+            this.iconVal = iconVal;
+        }
+
+        public int getIcon(FloatViewService self) {
+            return this.iconVal;
+        }
+
+        abstract void process(FloatViewService self);
     }
 
     /**
@@ -935,11 +982,18 @@ public class FloatViewService extends Service {
     private class ClipboardListenerHandler implements ClipboardManager.OnPrimaryClipChangedListener {
         final ClipboardManager clipboard;
 
+        boolean currentState = false;
+
         private ClipboardListenerHandler() {
             clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         }
 
+        public boolean isCurrentState() {
+            return currentState;
+        }
+
         public void doStart(boolean start) {
+            currentState = start;
             if (start) {
                 clipboard.addPrimaryClipChangedListener(this);
             } else {

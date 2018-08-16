@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
+
 import com.example.englishtester.common.Log;
+
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -64,7 +66,7 @@ public class DumpLogActivity extends Activity {
         String emailText = "懸浮字典發生問題 " + sdf.format(new Date());
         List<String> filePaths = new ArrayList<String>();
         filePaths.add(logFile.getAbsolutePath());
-        EmailUtil.sendEmail(this, emailTo, emailCC, subject, emailText, filePaths);
+        EmailUtil.sendEmail(this, new String[]{emailTo}, new String[]{emailCC}, subject, emailText, filePaths);
     }
 
     /**

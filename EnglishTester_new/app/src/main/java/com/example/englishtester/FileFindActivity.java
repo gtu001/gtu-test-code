@@ -5,7 +5,9 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
 import com.example.englishtester.common.Log;
+
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -40,6 +42,7 @@ public class FileFindActivity extends ListActivity {
     private RootDirHolder rootDirHolder;
 
     public static final String FILE_PATTERN_KEY = FileFindActivity.class.getName() + "_FILE_PATTERN_KEY";
+    public static final String FILE_START_DIRS = FileFindActivity.class.getName() + "_FILE_START_DIRS";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,13 +51,17 @@ public class FileFindActivity extends ListActivity {
         setContentView(R.layout.activity_file_directory);
 
         String defaultPattern = ".*";
+        String[] defultCustomDirs = null;
         if (getIntent().getExtras().containsKey(FILE_PATTERN_KEY)) {
             defaultPattern = getIntent().getExtras().getString(FILE_PATTERN_KEY);
+        }
+        if (getIntent().getExtras().containsKey(FILE_START_DIRS)) {
+            defultCustomDirs = getIntent().getExtras().getStringArray(FILE_START_DIRS);
         }
 
         //init service
         extensionChecker = new ExtensionChecker(defaultPattern);
-        rootDirHolder = new RootDirHolder();
+        rootDirHolder = new RootDirHolder(defultCustomDirs);
 
         mPath = (TextView) findViewById(R.id.filePathLabel);
 
@@ -241,7 +248,7 @@ public class FileFindActivity extends ListActivity {
         String sdCardTitle = "內部記憶體";
         String externalSdCardTitle = "SD Card";
 
-        RootDirHolder() {
+        RootDirHolder(String[] extensionDirs) {
             Map<String, File> externalLocations = ExternalStorageV2.getAllStorageLocations(FileFindActivity.this);
             Pair<Integer, Integer> pair = ExternalStorageV2.getExternalSdCardRange(FileFindActivity.this);
 
@@ -253,6 +260,16 @@ public class FileFindActivity extends ListActivity {
                 for (int ii = pair.getLeft(); ii <= pair.getRight(); ii++) {
                     File f = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD + ii);
                     externalSdCardLst.add(f);
+                }
+            }
+
+            //custom root dirs
+            if (extensionDirs != null) {
+                for (String dir : extensionDirs) {
+                    File $dir = new File(dir);
+                    if ($dir.exists() && $dir.isDirectory()) {
+                        externalSdCardLst.add($dir);
+                    }
                 }
             }
         }
