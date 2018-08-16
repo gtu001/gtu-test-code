@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import gtu.other.line.LineAppNotifiyHelper;
+
 /**
  * Created by wistronits on 2018/8/10.
  */
@@ -91,6 +93,20 @@ public class Log {
     public static void v(String tag, String message, Throwable e) {
         ClassInfo info = new ClassInfo(Log.class, tag);
         android.util.Log.v(info.getTag(), message, e);
+    }
+
+    public static void line(String tag, final String message) {
+        ClassInfo info = new ClassInfo(Log.class, tag);
+        android.util.Log.v(info.getTag(), message);
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                LineAppNotifiyHelper._BaseMessasgeBuilder mm = new LineAppNotifiyHelper._BaseMessasgeBuilder();
+                mm.setMessage(message);
+                LineAppNotifiyHelper.newInstance().defaultToken().message(mm).send();
+            }
+        });
     }
 
     public static void toast(final Context context, final String message, final int duringType) {

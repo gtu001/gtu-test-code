@@ -96,7 +96,7 @@ public class EpubViewerMainHandler {
                         + (this.dto != null) + " , 4:"
                         + (this.dto.getTxtView() != null) + " , 5:"
                         + (this.dto.getBookFile() != null) + ""
-                , 20
+                , 0
         );
         return false;
     }
@@ -192,6 +192,10 @@ public class EpubViewerMainHandler {
                     pageContentHolder.setSpinePos(navigationEvent.getCurrentSpinePos());
 
                     dto.spineRangeHolder.put(navigationEvent.getCurrentSpinePos(), pageContentHolder);
+
+                    Log.line(TAG, "PUT________" + navigationEvent.getCurrentSpinePos());
+                } else {
+                    Log.v(TAG, "unchange CONTENT !!!!", 10);
                 }
 
                 if (pagesReadyEvent != null) {
@@ -464,10 +468,6 @@ public class EpubViewerMainHandler {
     }
 
     public int getPageContentHolderSize(Integer untilPage) {
-        if (!this.isInitDone()) {
-            return -1;
-        }
-
         List keys = new ArrayList<Integer>(dto.spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         int totlaSize = 0;
@@ -481,10 +481,6 @@ public class EpubViewerMainHandler {
     }
 
     public PageContentHolder getPageContentHolder(int position) {
-        if (!this.isInitDone()) {
-            return null;
-        }
-
         List keys = new ArrayList<Integer>(dto.spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         for (int ii = 0; ii < keys.size(); ii++) {
@@ -499,21 +495,32 @@ public class EpubViewerMainHandler {
         throw new RuntimeException("ERR!!  try to find position : " + position);
     }
 
-    public SpannableString gotoPosition(int position) {
+    public boolean isReady4Position() {
         if (!this.isInitDone()) {
-            return null;
+            return false;
         }
+        if (dto == null || dto.spineRangeHolder == null ||
+                dto.spineRangeHolder.spineHolder == null || dto.spineRangeHolder.spineHolder.get() == null) {
+            return false;
+        }
+        if (dto.spineRangeHolder.spineHolder.get().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 
+    public SpannableString gotoPosition(int position) {
         int ttt_totalSize = getPageContentHolderSize(null);
         List keys = new ArrayList<Integer>(dto.spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
-        int totlaSize = 0;
         for (int ii = 0; ii < keys.size(); ii++) {
-            int tmpTotalSize = totlaSize;
-            totlaSize += dto.spineRangeHolder.spineHolder.get().get(ii).pages.size();
-            if (tmpTotalSize <= position && totlaSize >= position) {
+            Pair<Integer, Integer> pair = dto.spineRangeHolder.getPageRange(ii);
+            if (pair == null) {
+                throw new RuntimeException("spinePos Err : " + ii + " , try to find position : " + position);
+            }
+            if (pair.getLeft() <= position && pair.getRight() >= position) {
                 PageContentHolder holder = dto.spineRangeHolder.spineHolder.get().get(ii);
-                int currPos = position - tmpTotalSize;
+                int currPos = position - pair.getLeft();
                 holder.currentPageIndex = currPos;
                 return holder.gotoPage(currPos);
             }

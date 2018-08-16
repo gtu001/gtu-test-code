@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+
 import com.example.englishtester.common.Log;
+
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -136,7 +138,20 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
 
         //----------------------------------------------------------------
+        contentView.addView(createLabel("Test"));
+        contentView.addView(createButton("Test",//
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.line(TAG, "DDDDDDDDDD");
+                    }
+                }
+        ));
 
+        //----------------------------------------------------------------
+        //----------------------------------------------------------------
+        //----------------------------------------------------------------
+        //----------------------------------------------------------------
         //----------------------------------------------------------------
 
         //----------------------------------------------------------------

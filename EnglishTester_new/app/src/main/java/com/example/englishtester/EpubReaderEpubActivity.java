@@ -571,18 +571,45 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         protected boolean debugMode = false;
         protected EpubReaderEpubActivity self;
 
+        private AtomicReference<Boolean> firstPageInit = new AtomicReference<>();
+
+        private void sleep_t(long t) {
+            try {
+                sleep(t);
+            } catch (Exception e) {
+            }
+        }
+
         public void run() {
-            setTextViewContent();
+            while (true) {
+                if (epubViewerMainHandler != null && epubViewerMainHandler.isInitDone()) {
+                    if (firstPageInit.get() == null && !epubViewerMainHandler.isReady4Position()) {
+                        firstPageInit.set(false);
+                        epubViewerMainHandler.gotoFirstSpineSection(new Runnable() {
+                            @Override
+                            public void run() {
+                                firstPageInit.set(true);
+                            }
+                        });
+
+                        sleep_t(100);
+                        continue;
+                    } else if (!firstPageInit.get()) {
+                        sleep_t(100);
+                        continue;
+                    }
+
+                    setTextViewContent();
+                    break;
+                }
+            }
+
         }
 
         protected void setTextViewContent() {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (epubViewerMainHandler == null || !epubViewerMainHandler.isInitDone()) {
-                        return;
-                    }
-
                     if (!debugMode) {
                         SpannableString spannable = epubViewerMainHandler.gotoPosition(position);
                         my.txtReaderView.setText(spannable);
