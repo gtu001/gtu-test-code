@@ -45,6 +45,7 @@ import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -283,6 +284,13 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                                 dialog.get().dismiss();
                             }
                         });
+
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                pageAdapter.notifyDataSetChanged();
+                            }
+                        }, 1000L);
                     } catch (Exception ex) {
                         Log.e(TAG, "epubProcess ERR : " + ex.getMessage(), ex);
                         handler.post(new Runnable() {
@@ -544,7 +552,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         });
     }
 
-    private AtomicReference<Map<Integer, Integer>> spineHolder = new AtomicReference<>();
 
     private class MyViewHolder extends RecyclerPagerAdapter.ViewHolder {
 
@@ -552,7 +559,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         private TextView txtReaderView;
         private TextView translateView;
         private ViewGroup container;
-        private PageForwardThread pageForwardThread;
+        private boolean isDone = false;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -637,9 +644,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                     int currentItem = self.viewPager.getCurrentItem();
                     Toast.makeText(self, "debugPage : " + currentItem + " ----> " + pageStatus, Toast.LENGTH_SHORT).show();
 
-                    if (position == currentItem) {
-                        //pageAdapter.notifyDataSetChanged();
-                    }
+                    my.isDone = true;
                 }
             });
         }
@@ -683,10 +688,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             final Handler handler = new Handler();
 
-            if (my.pageForwardThread == null) {
-                my.pageForwardThread = new PageForwardThread(my, position);
-                my.pageForwardThread.start();
-            }
+            PageForwardThread pageForwardThread = new PageForwardThread(my, position);
+            pageForwardThread.start();
         }
 
         @Override
