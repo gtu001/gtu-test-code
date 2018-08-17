@@ -1,6 +1,7 @@
 package com.example.englishtester.common.epub.base;
 
 import android.graphics.Bitmap;
+
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.common.OOMHandler;
@@ -32,6 +33,8 @@ import nl.siegmann.epublib.util.CollectionUtil;
  * @author paul
  */
 class ImageLoaderCache extends Dictionary<String, Bitmap> {
+
+    public static final String BITMAP_RESOURCE_KEY = "BitmapCache";
 
     public static final String Bitmap_URL_PREFIX = "http:/";
 
@@ -75,7 +78,8 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
             Log.e(TAG, "initImageLoader ERR : " + e.getMessage(), e);
         }
         setContextResource(navigator.getCurrentResource());
-        document.getDocumentProperties().put("BitmapCache", this);
+        Log.v(TAG, " put ImageLoader : " + document.getId() + " , " + document.getTitle() + " , " + document.getHref());
+        document.getDocumentProperties().put(BITMAP_RESOURCE_KEY, this);
     }
 
 

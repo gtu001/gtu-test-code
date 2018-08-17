@@ -9,10 +9,11 @@ import com.example.englishtester.BuildConfig;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import gtu.other.line.LineAppNotifiyHelper;
+import gtu.other.line.LineAppNotifiyHelper_Simple;
 
 /**
  * Created by wistronits on 2018/8/10.
@@ -102,9 +103,19 @@ public class Log {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                LineAppNotifiyHelper._BaseMessasgeBuilder mm = new LineAppNotifiyHelper._BaseMessasgeBuilder();
-                mm.setMessage(message);
-                LineAppNotifiyHelper.newInstance().defaultToken().message(mm).send();
+                LineAppNotifiyHelper_Simple.getInstance().send(message);
+            }
+        });
+    }
+
+    public static void line(String tag, final String message, final Throwable e) {
+        ClassInfo info = new ClassInfo(Log.class, tag);
+        android.util.Log.e(info.getTag(), message, e);
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                LineAppNotifiyHelper_Simple.getInstance().send(message + "======" + ExceptionUtils.getMessage(e));
             }
         });
     }

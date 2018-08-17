@@ -1,5 +1,7 @@
 package com.example.englishtester.common.epub.base;
 
+import com.example.englishtester.common.Log;
+
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -10,17 +12,23 @@ import java.util.Hashtable;
 
 public class HTMLDocument {
 
+    private static final String TAG = HTMLDocument.class.getSimpleName();
+
     private static final String CHANGE_PAGE_TAG = "<!--pageChange-->";
 
     private StringBuffer sb = new StringBuffer();
     private URL baseUrl;
     private Dictionary<Object, Object> documentProperties = null;
 
+    private String href;
+    private String title;
+    private String id;
+
     public void addHtml(String html) {
         sb.append(html);
     }
 
-    public String getHtml(){
+    public String getHtml() {
         return sb.toString();
     }
 
@@ -45,5 +53,29 @@ public class HTMLDocument {
             documentProperties = new Hashtable<Object, Object>(2);
         }
         return documentProperties;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

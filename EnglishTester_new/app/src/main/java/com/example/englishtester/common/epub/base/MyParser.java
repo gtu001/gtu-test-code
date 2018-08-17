@@ -3,6 +3,8 @@ package com.example.englishtester.common.epub.base;
 
 import com.example.englishtester.common.Log;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -23,7 +25,7 @@ public class MyParser implements Parser {
     @Override
     public void parse(Reader contentReader, ParserCallback parserCallback, boolean ignoreCharSet) {
         String htmlContent = getString((StringReader) contentReader);
-        Log.v(TAG, "html = " + htmlContent);
+        Log.v(TAG, "html = " + htmlContent, 0);
         this.htmlDocument.addHtml(htmlContent);
     }
 

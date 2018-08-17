@@ -97,6 +97,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     ScrollView scrollView1;
     ViewPager viewPager;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
@@ -107,7 +108,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
         viewPager = findViewById(R.id.viewpager);
 
-        this.initViewPager();
         this.initServices();
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
@@ -263,16 +263,23 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                     try {
                         File file = epubFileZ.get();
 
+                        //設定書籍 及 初始化
                         epubViewerMainHandler.initBook(file);
-                        epubViewerMainHandler.gotoFirstSpineSection(null);
-                        gotoViewPagerPosition(0);
 
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
+
+                                initViewPager();
+
+                                viewPager.setCurrentItem(0);
+
+                                gotoViewPagerPosition(0);
+
                                 if (translateView != null) {
                                     translateView.setText("");
                                 }
+
                                 dialog.get().dismiss();
                             }
                         });
@@ -511,14 +518,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             @Override
             public void onPageSelected(final int position) {
                 Log.v(TAG, "##### onPageSelected");
-
-                if (position <= epubViewerMainHandler.getPageContentHolderSize(null) - 3) {
-                    epubViewerMainHandler.gotoNextSpineSection(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
-                }
+                Toast.makeText(EpubReaderEpubActivity.this, "#Go " + position, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -552,6 +552,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         private TextView txtReaderView;
         private TextView translateView;
         private ViewGroup container;
+        private PageForwardThread pageForwardThread;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -560,12 +561,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
     private class PageForwardThread extends Thread {
 
+        EpubViewerMainHandler.PageContentHolder pageHolder;
         MyViewHolder my;
         int position;
 
         PageForwardThread(final MyViewHolder my, int position) {
             this.my = my;
             this.self = EpubReaderEpubActivity.this;
+            this.position = position;
         }
 
         protected boolean debugMode = false;
@@ -584,6 +587,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             while (true) {
                 if (epubViewerMainHandler != null && epubViewerMainHandler.isInitDone()) {
                     if (firstPageInit.get() == null && !epubViewerMainHandler.isReady4Position()) {
+
                         firstPageInit.set(false);
                         epubViewerMainHandler.gotoFirstSpineSection(new Runnable() {
                             @Override
@@ -592,18 +596,24 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                             }
                         });
 
+                        epubViewerMainHandler.triggerEvent();
+
                         sleep_t(100);
                         continue;
-                    } else if (!firstPageInit.get()) {
+                    } else if (firstPageInit.get() != null && !firstPageInit.get()) {
+
                         sleep_t(100);
                         continue;
                     }
 
+                    //設定此頁內容
                     setTextViewContent();
                     break;
                 }
-            }
 
+                sleep_t(100);
+                continue;
+            }
         }
 
         protected void setTextViewContent() {
@@ -611,11 +621,12 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 @Override
                 public void run() {
                     if (!debugMode) {
-                        SpannableString spannable = epubViewerMainHandler.gotoPosition(position);
+                        pageHolder = epubViewerMainHandler.gotoPosition(position);
+                        SpannableString spannable = pageHolder.getCurrentPage();
                         my.txtReaderView.setText(spannable);
                     } else {
-//                        String debugContent = self.epubViewerMainHandler.getPageContentHolder(position).getPageContent4Debug();
-//                        my.txtReaderView.setText(debugContent);
+                        String debugContent = pageHolder.getPageContent4Debug();
+                        my.txtReaderView.setText(debugContent);
                     }
 
                     String pageStatus = getPageStatus();
@@ -623,7 +634,12 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                     self.epubViewerMainHandler.getDto().setFileName(title);
                     setTitle(title);
 
-                    Toast.makeText(self, "debugPage : " + self.viewPager.getCurrentItem() + " ----> " + pageStatus, Toast.LENGTH_SHORT).show();
+                    int currentItem = self.viewPager.getCurrentItem();
+                    Toast.makeText(self, "debugPage : " + currentItem + " ----> " + pageStatus, Toast.LENGTH_SHORT).show();
+
+                    if (position == currentItem) {
+                        //pageAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
@@ -633,7 +649,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 return "InitNotOk";
             }
 
-            String divideDetial = self.epubViewerMainHandler.getPageContentHolder(position).getPageDivideStatus();
+            String divideDetial = pageHolder.getPageDivideStatus();
             divideDetial = StringUtils.isBlank(divideDetial) ? "" : " " + divideDetial;
             return self.epubViewerMainHandler.getCurrentSpinePos() + divideDetial;
         }
@@ -656,8 +672,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             return Integer.MAX_VALUE;
         }
 
-        private AtomicInteger pageHolder = new AtomicInteger(-1);
-
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
             final MyViewHolder my = (MyViewHolder) holder;
@@ -669,8 +683,10 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             final Handler handler = new Handler();
 
-            PageForwardThread pageForwardThread = new PageForwardThread(my, position);
-            pageForwardThread.start();
+            if (my.pageForwardThread == null) {
+                my.pageForwardThread = new PageForwardThread(my, position);
+                my.pageForwardThread.start();
+            }
         }
 
         @Override
@@ -774,7 +790,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
             Log.v(TAG, "onActivityResult TODO!! = " + this.name());
         }
-
     }
 
     @Override

@@ -53,6 +53,18 @@ public abstract class RecyclerPagerAdapter<VH extends RecyclerPagerAdapter.ViewH
         return POSITION_NONE;
     }
 
+    //gtu001 custom ↓↓↓↓↓↓
+    public void releaseAllView(ViewGroup parent) {
+        int viewType = getItemViewType(0);
+        RecycleCache cache = mRecycleTypeCaches.get(viewType);
+        for (int ii = 0; ii < cache.mCaches.size(); ii++) {
+            ViewHolder vh = cache.mCaches.get(ii);
+            vh.detach(parent);
+        }
+        cache.mCaches.clear();
+    }
+    //gtu001 custom ↑↑↑↑↑↑
+
     @SuppressWarnings("unchecked")
     @Override
     public Object instantiateItem(ViewGroup parent, int position) {

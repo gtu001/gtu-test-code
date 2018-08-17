@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.concurrent.ArrayBlockingQueue;
 
 
@@ -21,7 +22,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  * @author gtu001
  */
-public class LineAppNotifiyHelper {
+public class LineAppNotifiyHelper_Simple {
 
     final static int MAX_SIZE = Integer.MAX_VALUE;
 
@@ -31,43 +32,26 @@ public class LineAppNotifiyHelper {
 
     public static void main(String[] args) {
         String lineToken = "qVxcCOM9qUmxVUwUKxmd320JA3a6fe6PPhafqxUou2R";
-
-        _StickerMessasgeBuilder m1 = new _StickerMessasgeBuilder();
-        m1.setMessage("純裕測試!!");
-        m1.setStickerId("1");
-        m1.setStickerPackageId("1");
-
-        String result = LineAppNotifiyHelper.newInstance().lineToken(lineToken).message(m1).send();
-        System.out.println(result);
+        LineAppNotifiyHelper_Simple.getInstance().send(lineToken, "test");
         System.out.println("done...v2");
     }
 
-    private _BaseMessasgeBuilder message;
-    private String lineToken;
+    private static final LineAppNotifiyHelper_Simple _INST = new LineAppNotifiyHelper_Simple();
 
-    public LineAppNotifiyHelper message(_BaseMessasgeBuilder message) {
-        this.message = message;
-        return this;
+    public static LineAppNotifiyHelper_Simple getInstance() {
+        return _INST;
     }
 
-    public LineAppNotifiyHelper defaultToken() {
-        this.lineToken = "qVxcCOM9qUmxVUwUKxmd320JA3a6fe6PPhafqxUou2R";
-        return this;
+    public String send(String message) {
+        return this.send("qVxcCOM9qUmxVUwUKxmd320JA3a6fe6PPhafqxUou2R", message);
     }
 
-    public LineAppNotifiyHelper lineToken(String lineToken) {
-        this.lineToken = lineToken;
-        return this;
-    }
-
-    public String send() {
+    public String send(final String lineToken, String message) {
         try {
             Assert.assertNotNull("必須設定message!", message);
             Assert.assertTrue("必須設定lineToken", StringUtils.isNotBlank(lineToken));
 
-            final String postForm = BeanToHttpForm.newInstance(message).getParameterString();
-            System.out.println("#postForm = " + postForm);
-
+            final String postForm = "&message=" + URLEncoder.encode(message, "UTF8");
             final ArrayBlockingQueue<String> waitQue = new ArrayBlockingQueue<String>(1);
 
             new Thread(new Runnable() {
@@ -90,65 +74,11 @@ public class LineAppNotifiyHelper {
         }
     }
 
-    public static LineAppNotifiyHelper newInstance() {
-        return new LineAppNotifiyHelper();
+    public static LineAppNotifiyHelper_Simple newInstance() {
+        return new LineAppNotifiyHelper_Simple();
     }
 
-    private LineAppNotifiyHelper() {
-    }
-
-    public static class _BaseMessasgeBuilder {
-        private String message;// "測試一下"
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
-
-    public static class _StickerMessasgeBuilder extends _BaseMessasgeBuilder {
-        String stickerPackageId;// "1"
-        String stickerId;// "2"
-
-        public String getStickerPackageId() {
-            return stickerPackageId;
-        }
-
-        public String getStickerId() {
-            return stickerId;
-        }
-
-        public void setStickerPackageId(String stickerPackageId) {
-            this.stickerPackageId = stickerPackageId;
-        }
-
-        public void setStickerId(String stickerId) {
-            this.stickerId = stickerId;
-        }
-    }
-
-    public static class _ImageMessasgeBuilder extends _BaseMessasgeBuilder {
-        String imageThumbnail; // '預覽縮圖網址',
-        String imageFullsize; // 圖片網址'
-
-        public String getImageThumbnail() {
-            return imageThumbnail;
-        }
-
-        public String getImageFullsize() {
-            return imageFullsize;
-        }
-
-        public void setImageThumbnail(String imageThumbnail) {
-            this.imageThumbnail = imageThumbnail;
-        }
-
-        public void setImageFullsize(String imageFullsize) {
-            this.imageFullsize = imageFullsize;
-        }
+    private LineAppNotifiyHelper_Simple() {
     }
 
     public static void setHeaderToken(HttpURLConnection myURLConnection, String token) throws ProtocolException {

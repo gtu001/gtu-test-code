@@ -200,6 +200,11 @@ public class HTMLDocumentFactory implements NavigationEventListener {
             Reader contentReader = new StringReader(pageContent);
             parser.parse(contentReader, parserCallback, true);
             parserCallback.flush();
+            //gtu001 custom ↓↓↓↓↓↓
+            document.setHref(resource.getHref());
+            document.setTitle(resource.getTitle());
+            document.setId(resource.getId());
+            //gtu001 custom ↑↑↑↑↑↑
             result = document;
         } catch (Exception e) {
             log.error(e.getMessage());
