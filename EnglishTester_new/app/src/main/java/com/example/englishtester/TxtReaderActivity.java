@@ -991,6 +991,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
                     Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
 
+                    //設定default pic root dir
+                    dto.setCacheDir(TxtReaderActivity.this.getCacheDir());
+
                     if (StringUtils.isNotBlank(dropboxPicDir)) {
                         File dropboxPicDirF = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxPicDir, -1);
                         dto.dropboxPicDir = dropboxPicDirF;
@@ -1294,6 +1297,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
+        private File cacheDir;
 
         public StringBuilder getFileName() {
             return fileName;
@@ -1364,6 +1368,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         public void setFileName(String title) {
             fileName.delete(0, fileName.length());
             fileName.append(title);
+        }
+
+        public File getCacheDir() {
+            return cacheDir;
+        }
+
+        public void setCacheDir(File cacheDir) {
+            this.cacheDir = cacheDir;
         }
     }
 

@@ -2,7 +2,9 @@ package com.example.englishtester;
 
 import android.content.Context;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.Toast;
 
 import com.dropbox.core.DbxException;

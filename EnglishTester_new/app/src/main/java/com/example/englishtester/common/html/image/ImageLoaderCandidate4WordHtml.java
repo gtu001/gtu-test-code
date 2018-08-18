@@ -1,6 +1,7 @@
 package com.example.englishtester.common.html.image;
 
 import android.graphics.Bitmap;
+
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.TxtReaderActivity;
@@ -48,10 +49,16 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
                 return localPicFile;
             }
 
-            if (realName.contains("/")) {
-                realName = realName.substring(realName.lastIndexOf("/"));
+            if (dto.getDropboxPicDir() == null && realName.contains("/")) {
+                String middleDir = realName.substring(0, realName.lastIndexOf("/"));
+                dto.setDropboxPicDir(new File(dto.getCacheDir(), middleDir));
             }
-            File dropboxPic = new File(dto.getDropboxPicDir(), realName);
+
+            String imageFileName = realName;
+            if (realName.contains("/")) {
+                imageFileName = realName.substring(realName.lastIndexOf("/"));
+            }
+            File dropboxPic = new File(dto.getDropboxPicDir(), imageFileName);
             if (dropboxPic.exists() && dropboxPic.canRead()) {
                 return dropboxPic;
             }

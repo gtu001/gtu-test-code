@@ -46,8 +46,6 @@ public class HtmlWordParser extends HtmlBaseParser {
     private HtmlWordParser() {
     }
 
-    private String picDirForDropbox = "";
-
     public static HtmlWordParser newInstance() {
         return new HtmlWordParser();
     }

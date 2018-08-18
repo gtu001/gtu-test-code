@@ -46,8 +46,6 @@ public class HtmlEpubParser extends HtmlBaseParser {
     private HtmlEpubParser() {
     }
 
-    private String picDirForDropbox = "";
-
     public static HtmlEpubParser newInstance() {
         return new HtmlEpubParser();
     }
