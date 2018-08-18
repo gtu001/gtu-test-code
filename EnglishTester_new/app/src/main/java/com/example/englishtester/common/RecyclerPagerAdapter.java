@@ -64,7 +64,7 @@ public abstract class RecyclerPagerAdapter<VH extends RecyclerPagerAdapter.ViewH
         cache.mCaches.clear();
     }
 
-    public List<ViewHolder> getAllViewHolder(ViewGroup parent) {
+    public void getAllViewHolder(ViewGroup parent) {
         int viewType = getItemViewType(0);
         RecycleCache cache = mRecycleTypeCaches.get(viewType);
         List<ViewHolder> lst = new ArrayList<>();
@@ -72,7 +72,7 @@ public abstract class RecyclerPagerAdapter<VH extends RecyclerPagerAdapter.ViewH
             ViewHolder vh = cache.mCaches.get(ii);
             lst.add(vh);
         }
-        return lst;
+        cache.mCaches.clear();
     }
     //gtu001 custom ↑↑↑↑↑↑
 

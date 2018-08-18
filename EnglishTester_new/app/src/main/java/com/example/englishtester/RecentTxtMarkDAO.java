@@ -235,6 +235,7 @@ public class RecentTxtMarkDAO {
         values.put(RecentTxtMarkSchmea.INSERT_DATE, word.insertDate);
         values.put(RecentTxtMarkSchmea.SCROLL_Y_POS, word.scrollYPos);
         values.put(RecentTxtMarkSchmea.BOOKMARK_TYPE, word.bookmarkType);
+        values.put(RecentTxtMarkSchmea.PAGE_INDEX, word.pageIndex);
         return values;
     }
 
@@ -255,6 +256,7 @@ public class RecentTxtMarkDAO {
         long insertDate = -1L;
         int scrollYPos = 0;
         int bookmarkType;//0:不適書籤 | 1:是書籤
+        int pageIndex = -1;//頁碼
 
         public Long getListId() {
             return listId;
@@ -322,7 +324,8 @@ public class RecentTxtMarkDAO {
         String INSERT_DATE = "insert_date";
         String SCROLL_Y_POS = "scroll_y_pos";
         String BOOKMARK_TYPE = "bookmark_type";
-        final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS, BOOKMARK_TYPE};
+        String PAGE_INDEX = "page_index";
+        final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS, BOOKMARK_TYPE, PAGE_INDEX};
     }
 
     public enum BookmarkTypeEnum {

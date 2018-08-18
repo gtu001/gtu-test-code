@@ -22,11 +22,6 @@ import gtu.other.line.LineAppNotifiyHelper_Simple;
 public class Log {
 
     private static final String DEFAULT_TAG = "<Unknowed Class>";
-    private static final AtomicReference<Boolean> debugSwitch = new AtomicReference<>(true);
-
-    public static void setDebugSwitch(boolean onOff) {
-        debugSwitch.set(onOff);
-    }
 
     private static final Class<?>[] IGNORE_TOAST_CLZ = new Class[]{//
             ReaderCommonHelper.ScrollViewYHolder.class,//
@@ -97,25 +92,25 @@ public class Log {
     }
 
     public static void line(String tag, final String message) {
-        ClassInfo info = new ClassInfo(Log.class, tag);
+        final ClassInfo info = new ClassInfo(Log.class, tag);
         android.util.Log.v(info.getTag(), message);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                LineAppNotifiyHelper_Simple.getInstance().send(message);
+                LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + message);
             }
         });
     }
 
     public static void line(String tag, final String message, final Throwable e) {
-        ClassInfo info = new ClassInfo(Log.class, tag);
+        final ClassInfo info = new ClassInfo(Log.class, tag);
         android.util.Log.e(info.getTag(), message, e);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                LineAppNotifiyHelper_Simple.getInstance().send(message + "======" + ExceptionUtils.getMessage(e));
+                LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + message + "======" + ExceptionUtils.getMessage(e));
             }
         });
     }
@@ -129,7 +124,7 @@ public class Log {
             return;
         }
 
-        if (BuildConfig.DEBUG && debugSwitch.get()) {
+        if (BuildConfig.DEBUG) {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
@@ -158,7 +153,7 @@ public class Log {
 
         private ClassInfo(Class ignoreClz, String defaultTag) {
             this.defaultTag = defaultTag;
-            if (!BuildConfig.DEBUG || !debugSwitch.get()) {
+            if (!BuildConfig.DEBUG) {
                 return;
             }
 

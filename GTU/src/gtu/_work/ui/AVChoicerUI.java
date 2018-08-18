@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -55,6 +56,7 @@ import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.runtime.DesktopUtil;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -85,6 +87,7 @@ public class AVChoicerUI extends JFrame {
     private JList moveToList;
     private MoveToHandler moveToHandler = new MoveToHandler();
     private JCheckBox moveToChkJpgChkBox;
+    private HideInSystemTrayHelper trayUtil;
 
     /**
      * Launch the application.
@@ -316,8 +319,8 @@ public class AVChoicerUI extends JFrame {
         moveToList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent paramMouseEvent) {
-                if(JMouseEventUtil.buttonLeftClick(2, paramMouseEvent)) {
-                    File dir = new File((String)JListUtil.getLeadSelectionObject(moveToList));
+                if (JMouseEventUtil.buttonLeftClick(2, paramMouseEvent)) {
+                    File dir = new File((String) JListUtil.getLeadSelectionObject(moveToList));
                     DesktopUtil.openDir(dir);
                 }
             }
@@ -329,6 +332,9 @@ public class AVChoicerUI extends JFrame {
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
         JCommonUtil.defaultToolTipDelay();
+
+        trayUtil = HideInSystemTrayHelper.newInstance();
+        trayUtil.apply(this);
     }
 
     private class MoveToHandler {
@@ -586,6 +592,10 @@ public class AVChoicerUI extends JFrame {
                     });
         }
 
+        if(cacheFileList == null) {
+            cacheFileList = new ArrayList<>();
+        }
+        
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
 
         File choiceFile = null;
@@ -672,7 +682,7 @@ public class AVChoicerUI extends JFrame {
             if (result) {
                 try {
                     boolean delResult = RecycleBinUtil_forWin.moveTo(file);
-                    JCommonUtil._jOptionPane_showMessageDialog_error(delResult ? "刪除成功!" : "刪除失敗");
+                    trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
                     resetCacheFileList();

@@ -12,8 +12,6 @@ public interface ITxtReaderActivityDTO {
 
     boolean isImageLoadMode();
 
-    void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder);
-
     StringBuilder getFileName();
 
     boolean getBookmarkMode();
@@ -22,4 +20,7 @@ public interface ITxtReaderActivityDTO {
 
     AtomicReference<Integer> getBookmarkIndexHolder();
 
+    int getPageIndex();
+
+    void setFileName(String title);
 }

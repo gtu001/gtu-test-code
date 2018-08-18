@@ -28,6 +28,7 @@ import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +79,6 @@ public class TxtReaderAppender {
             this.isWordHtml = isWordHtml;
             this.ss = new SpannableString(txtContent);
             this.maxPicWidth = maxPicWidth;
-            dto.setBookmarkHolder(new TreeMap<Integer, WordSpan>());
         }
 
         public SpannableString getResult() {
@@ -123,16 +123,18 @@ public class TxtReaderAppender {
             final String txtContent_ = txtContent;
 
             Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
-            List<RecentTxtMarkDAO.RecentTxtMark> qList = new ArrayList<>();
-//            try {
-            qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
-//            } catch (java.lang.IllegalStateException ex1) {
-//                Log.e(TAG, "normalTxtProcess DB query recentTxtMark ERR : " + ex1.getMessage(), ex1, 20);
-//                if (!ex1.getMessage().contains("Cannot perform this operation because the connection pool has been closed.")) {
-//                    throw ex1;
-//                }
-//            }
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
             Log.v(TAG, "recentTxtMark list size = " + qList.size());
+
+            //debug ↓↓↓↓↓↓↓↓↓↓
+            if (BuildConfig.DEBUG) {
+                StringBuilder sb = new StringBuilder();
+                for (RecentTxtMarkDAO.RecentTxtMark v : qList) {
+                    sb.append(v.getFileName() + " : " + v.getMarkEnglish() + " : " + v.getMarkIndex() + "\r\n");
+                }
+//                Log.line(TAG, ">> mark size : " + dto.getFileName().toString() + " -->  \n" + sb);
+            }
+            //debug ↑↑↑↑↑↑↑↑↑↑
 
             int index = 0;
             while (mth.find()) {
@@ -158,7 +160,7 @@ public class TxtReaderAppender {
 
                     @Override
                     public void onClick(View view) {
-                        Log.v(TAG, "click " + this.id + " - " + txtNow);
+                        Log.v(TAG, "click " + this.id + " - " + txtNow, 0);
 
                         boolean isClickBookmark = false;
 
@@ -181,14 +183,11 @@ public class TxtReaderAppender {
                         }
 
                         // 新增單字
-                        RecentTxtMarkDAO.RecentTxtMark clickVo = recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, isClickBookmark);
+                        RecentTxtMarkDAO.RecentTxtMark clickVo = recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, dto.getPageIndex(), isClickBookmark);
 
                         //debug ↓↓↓↓↓↓↓↓↓↓
                         if (BuildConfig.DEBUG) {
-                            try {
-                                //Toast.makeText(activity, ">> " + clickVo.getFileName() + " = " + clickVo.getInsertDate(), Toast.LENGTH_SHORT).show();
-                            } catch (Exception ex) {
-                            }
+//                            Log.line(TAG, "MARK : " + clickVo.getFileName() + " --- " + clickVo.getMarkEnglish() + " --- " + clickVo.getMarkIndex() + ", p-" + dto.getPageIndex());
                         }
                         //debug ↑↑↑↑↑↑↑↑↑↑
 
@@ -213,7 +212,6 @@ public class TxtReaderAppender {
                             //查詢模式
                             clickableSpan.setMarking(true);
                         }
-
                     }
                 }
 
@@ -250,10 +248,27 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Pair<List<SpannableString>, List<String>> getAppendTxt_HtmlFromWord_PageDivide(String txtContent, int maxPicWidth) {
+    public Pair<List<SpannableString>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
         List<SpannableString> pageDividLst = new ArrayList<>();
         List<String> pages = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
-        for (String page : pages) {
+
+        String fileName = dto.getFileName().toString();
+
+        //拿掉原本[*]部分
+        Pattern ptn = Pattern.compile("^(.*)\\[.*?\\]$");
+        Matcher mth = ptn.matcher(fileName);
+        if (mth.find()) {
+            fileName = mth.group(1);
+        }
+
+        int pageSize = pages.size();
+        EpubViewerMainHandler.EpubPageTitleHandler titleHandler = new EpubViewerMainHandler.EpubPageTitleHandler(fileName, spinePos, pageSize);
+
+        for (int ii = 0; ii < pages.size(); ii++) {
+            String page = pages.get(ii);
+
+            dto.setFileName(titleHandler.getTitle(ii));
+
             TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth);
             pageDividLst.add(appender.getResult());
         }

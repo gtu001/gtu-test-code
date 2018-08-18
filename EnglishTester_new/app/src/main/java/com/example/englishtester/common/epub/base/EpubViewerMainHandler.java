@@ -14,6 +14,8 @@ import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml
 import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlEpubParser;
 
+import junit.framework.Assert;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,18 +26,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Observable;
+import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gtu.util.ClassUtil;
 import nl.siegmann.epublib.browsersupport.NavigationEvent;
@@ -84,7 +87,7 @@ public class EpubViewerMainHandler {
             this.navigator = new Navigator(book);
             this.htmlDocumentFactory = new HTMLDocumentFactory(navigator, myHtmlEditorKit, self, epubSpannableTextHandler);
             this.dto.setBookFile(bookFile);
-            this.dto.spineRangeHolder = new SpineRangeHolder();
+            this.dto.bookStatusHolder = new BookStatusHolder();
         } catch (Exception ex) {
             throw new RuntimeException("initBook ERR : " + ex.getMessage(), ex);
         }
@@ -189,13 +192,8 @@ public class EpubViewerMainHandler {
                 Log.v(TAG, "change CONTENT !!!!", 10);
 
                 PageContentHolder pageContentHolder = null;
-                if (!dto.spineRangeHolder.getSpineHolder().get().containsKey(navigationEvent.getCurrentSpinePos())) {
+                if (!dto.bookStatusHolder.spineRangeHolder.getSpineHolder().get().containsKey(navigationEvent.getCurrentSpinePos())) {
                     pageContentHolder = new PageContentHolder();
-
-                    //設定標題
-//                String fileName = EpubViewerMainHandler.this.epubActivityInterface.fixNameToTitle(dto.getBookFile().getName());
-//                fileName = fileName + "[" + navigationEvent.getCurrentSpinePos() + "]";
-//                dto.setFileName(fileName);
 
                     //設定內文
                     HTMLDocument currentDocument = EpubViewerMainHandler.this.htmlDocumentFactory.getDocument(resource);
@@ -207,13 +205,14 @@ public class EpubViewerMainHandler {
                     String $tempResultContent = wordParser.getFromContent(pageContentHolder.htmlContent.get());
                     pageContentHolder.customContent.set($tempResultContent);
 
+                    dto.setFileName(dto.getBookFile().getName());
                     TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), epubActivityInterface.getFloatService(), dto, EpubViewerMainHandler.this.dto.textView);
-                    Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_PageDivide(pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
+                    Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
                     pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getRight());
                     pageContentHolder.setSpinePos(navigationEvent.getCurrentSpinePos());
 
-                    dto.spineRangeHolder.put(navigationEvent.getCurrentSpinePos(), pageContentHolder);
+                    dto.bookStatusHolder.spineRangeHolder.put(navigationEvent.getCurrentSpinePos(), pageContentHolder, dto.getBookFile());
 
 //                    Log.line(TAG, "PUT________" + navigationEvent.getCurrentSpinePos());
                 } else {
@@ -265,19 +264,16 @@ public class EpubViewerMainHandler {
         private AtomicReference<String> htmlContent = new AtomicReference<>();
         private AtomicReference<String> customContent = new AtomicReference<>();
 
-        public String getPageDivideStatus() {
-            if (pages.size() <= 1) {
-                return "";
-            }
-            return String.format("(%d/%d)", this.currentPageIndex + 1, pages.size());
-        }
-
         public boolean isEmpty() {
             return pages == null || pages.isEmpty();
         }
 
         public SpannableString getCurrentPage() {
             return pages.get(currentPageIndex);
+        }
+
+        public int size() {
+            return pages.size();
         }
 
         public String getPageContent4Debug() {
@@ -354,11 +350,13 @@ public class EpubViewerMainHandler {
         public AtomicReference<String> getCustomContent() {
             return customContent;
         }
+
+        public int getCurrentPageIndex() {
+            return currentPageIndex;
+        }
     }
 
     public static class EpubDTO implements ITxtReaderActivityDTO {
-        private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
-
         private File bookFile;
         private StringBuilder fileName;
         private TextView textView;
@@ -367,7 +365,9 @@ public class EpubViewerMainHandler {
         private boolean bookmarkMode = false;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private PageForwardEnum pageForwardEnum;
-        private SpineRangeHolder spineRangeHolder;
+        private BookStatusHolder bookStatusHolder;
+
+        private int pageIndex = -1;
 
         public EpubDTO() {
         }
@@ -378,7 +378,7 @@ public class EpubViewerMainHandler {
 
         @Override
         public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
-            return bookmarkHolder;
+            return bookStatusHolder.bookmarkHolder.getBookmarkHolder(this.getFileName().toString());
         }
 
         @Override
@@ -389,11 +389,6 @@ public class EpubViewerMainHandler {
         @Override
         public boolean isImageLoadMode() {
             return false;
-        }
-
-        @Override
-        public void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder) {
-            this.bookmarkHolder = bookmarkHolder;
         }
 
         public void setFileName(String fname) {
@@ -461,12 +456,40 @@ public class EpubViewerMainHandler {
         }
 
         public SpineRangeHolder getSpineRangeHolder() {
-            return spineRangeHolder;
+            return bookStatusHolder.spineRangeHolder;
+        }
+
+        @Override
+        public int getPageIndex() {
+            return pageIndex;
+        }
+
+        public void setPageIndex(int pageIndex) {
+            this.pageIndex = pageIndex;
         }
     }
 
-    private static class SpineRangeHolder {
+    private static class BookmarkHolder {
+
+        Map<String, Map<Integer, TxtReaderAppender.WordSpan>> fileNameBookmark = new HashMap<>();
+
+        Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder(String currentFileName) {
+            Assert.assertTrue(StringUtils.isNotBlank(currentFileName));
+            if (!fileNameBookmark.containsKey(currentFileName)) {
+                fileNameBookmark.put(currentFileName, new TreeMap<Integer, TxtReaderAppender.WordSpan>());
+            }
+            return fileNameBookmark.get(currentFileName);
+        }
+    }
+
+    private static class BookStatusHolder {
+        private SpineRangeHolder spineRangeHolder = new SpineRangeHolder();
+        private BookmarkHolder bookmarkHolder = new BookmarkHolder();
+    }
+
+    private static class SpineRangeHolder extends Observable {
         private AtomicReference<Map<Integer, PageContentHolder>> spineHolder = new AtomicReference<>();
+        private Map<Integer, String> titleMap = new HashMap<>();
 
         private SpineRangeHolder() {
             spineHolder.set(new HashMap<Integer, PageContentHolder>());
@@ -476,8 +499,20 @@ public class EpubViewerMainHandler {
             return spineHolder;
         }
 
-        private void put(int spinePos, PageContentHolder spineHolder) {
-            this.spineHolder.get().put(spinePos, spineHolder);
+        private void processTitleMap(int spinePos, PageContentHolder pageHolder, File bookFile) {
+            String fileName = bookFile.getName();
+            int pageSize = pageHolder.size();
+            EpubViewerMainHandler.EpubPageTitleHandler titleHandler = new EpubViewerMainHandler.EpubPageTitleHandler(fileName, spinePos, pageSize);
+
+            Pair<Integer, Integer> pageIdx = getPageRange(spinePos);
+            for (int ii = pageIdx.getLeft(), idx = 0; ii <= pageIdx.getRight(); ii++, idx++) {
+                titleMap.put(ii, titleHandler.getTitle(idx));
+            }
+        }
+
+        private void put(int spinePos, PageContentHolder pageHolder, File bookFile) {
+            this.spineHolder.get().put(spinePos, pageHolder);
+            this.processTitleMap(spinePos, pageHolder, bookFile);
         }
 
         //page index 從 0 開始 (left : include , right : include)
@@ -503,48 +538,35 @@ public class EpubViewerMainHandler {
         this.pagesReadyEvent = pagesReadyEvent;
     }
 
-    public int getPageContentHolderSize(Integer untilPage) {
-        List keys = new ArrayList<Integer>(dto.spineRangeHolder.spineHolder.get().keySet());
-        Collections.sort(keys);
-        int totlaSize = 0;
-        for (int ii = 0; ii < keys.size(); ii++) {
-            totlaSize += dto.spineRangeHolder.spineHolder.get().get(ii).pages.size();
-            if (untilPage != null && untilPage == ii) {
-                return totlaSize;
-            }
-        }
-        return totlaSize;
-    }
-
     public boolean isReady4Position() {
         if (!this.isInitDone()) {
             return false;
         }
-        if (dto == null || dto.spineRangeHolder == null ||
-                dto.spineRangeHolder.spineHolder == null || dto.spineRangeHolder.spineHolder.get() == null) {
+        if (dto == null || dto.bookStatusHolder == null || dto.bookStatusHolder.spineRangeHolder == null ||
+                dto.bookStatusHolder.spineRangeHolder.spineHolder == null || dto.bookStatusHolder.spineRangeHolder.spineHolder.get() == null) {
             return false;
         }
-        if (dto.spineRangeHolder.spineHolder.get().isEmpty()) {
+        if (dto.bookStatusHolder.spineRangeHolder.spineHolder.get().isEmpty()) {
             return false;
         }
         return true;
     }
 
     public PageContentHolder gotoPosition(int position) {
-        List keys = new ArrayList<Integer>(dto.spineRangeHolder.spineHolder.get().keySet());
+        List keys = new ArrayList<Integer>(dto.bookStatusHolder.spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         for (int ii = 0; ii < keys.size(); ii++) {
-            Pair<Integer, Integer> pair = dto.spineRangeHolder.getPageRange(ii);
+            Pair<Integer, Integer> pair = dto.bookStatusHolder.spineRangeHolder.getPageRange(ii);
 
             if (pair != null) {
                 boolean b1 = pair.getLeft() <= position;
                 boolean b2 = pair.getRight() >= position;
 
                 if (b1 && b2) {
-                    PageContentHolder pageContentHolder = dto.spineRangeHolder.spineHolder.get().get(ii);
+                    PageContentHolder pageContentHolder = dto.bookStatusHolder.spineRangeHolder.spineHolder.get().get(ii);
                     int currPos = position - pair.getLeft();
                     pageContentHolder.currentPageIndex = currPos;
-//                Log.line(TAG, "## position - " + position + " -> currPos - " + currPos);
+//                    Log.line(TAG, "## position : " + position + " , currPos : " + currPos + " , pair : " + pair + " , spine : " + ii + " -- " + dto.getPageIndex());
                     return pageContentHolder;
                 }
             }
@@ -566,5 +588,51 @@ public class EpubViewerMainHandler {
         } catch (InterruptedException e) {
         }
         return gotoPosition(position);
+    }
+
+    public static class EpubPageTitleHandler {
+
+        String fileName;
+        int currentSpinePos;
+        int pageSize;
+
+        public EpubPageTitleHandler(String fileName, int currentSpinePos, int pageSize) {
+            this.fileName = fileName;
+            this.currentSpinePos = currentSpinePos;
+            this.pageSize = pageSize;
+        }
+
+        public String getTitle(int index) {
+            String pageStatus = getPageStatus(index);
+            String title = fixNameToTitle(this.fileName) + "[" + pageStatus + "]";
+            return title;
+        }
+
+        private String getPageStatus(int index) {
+            String divideDetial = getPageDivideStatus(index);
+            divideDetial = StringUtils.isBlank(divideDetial) ? "" : " " + divideDetial;
+            return this.currentSpinePos + divideDetial;
+        }
+
+        private String getPageDivideStatus(int index) {
+            if (this.pageSize <= 1) {
+                return "";
+            }
+            return String.format("(%d/%d)", index + 1, this.pageSize);
+        }
+
+        public static String fixNameToTitle(String orignFileName) {
+            orignFileName = StringUtils.trimToEmpty(orignFileName);
+            Pattern ptn = Pattern.compile("(.*?)\\.(?:epub)", Pattern.CASE_INSENSITIVE);
+            Matcher mth = ptn.matcher(orignFileName);
+            if (mth.find()) {
+                return mth.group(1);
+            }
+            return orignFileName;
+        }
+    }
+
+    public String getCurrentTitle(int position) {
+        return dto.bookStatusHolder.spineRangeHolder.titleMap.get(position);
     }
 }

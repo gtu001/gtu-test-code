@@ -138,16 +138,6 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
 
         //----------------------------------------------------------------
-        contentView.addView(createLabel("Test"));
-        contentView.addView(createButton("Test",//
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.line(TAG, "DDDDDDDDDD");
-                    }
-                }
-        ));
-
         //----------------------------------------------------------------
         //----------------------------------------------------------------
         //----------------------------------------------------------------

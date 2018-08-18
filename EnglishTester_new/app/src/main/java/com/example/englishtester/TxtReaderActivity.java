@@ -10,16 +10,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
-
-import com.example.englishtester.common.Log;
-
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApiNew;
+import com.example.englishtester.common.ActionBarSimpleHandler;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DBUtil;
@@ -48,17 +45,17 @@ import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
-import com.example.englishtester.common.ReaderCommonHelper;
-import com.example.englishtester.common.TextView4SpannableString;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
-import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
+import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
+import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
-import com.example.englishtester.common.TxtCoordinateFetcher;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
+import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.collections4.Transformer;
@@ -86,10 +83,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -139,6 +135,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 讀取網頁內容
      */
     WebViewHtmlFetcher webViewHtmlFetcher;
+    /**
+     * title自訂
+     */
+    ActionBarSimpleHandler actionBarCustomTitleHandler;
 
     EditText editText1;
     Button clearBtn;
@@ -463,6 +463,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         //網頁取得器
         webViewHtmlFetcher = new WebViewHtmlFetcher(this);
+
+        this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
         doOnoffService(true);
     }
 
@@ -966,6 +968,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             titleVal = fixName(titleVal);
                             setFileName(titleVal);
                             TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
+                            actionBarCustomTitleHandler.setText(titleVal);
                         }
                     });
                 }
@@ -1044,6 +1047,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     });
                 }
 
+                private void initDto() {
+                    dto.setBookmarkHolder(new TreeMap<Integer, TxtReaderAppender.WordSpan>());
+                }
+
                 @Override
                 public void run() {
                     try {
@@ -1052,6 +1059,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
 
                         setTitleNameProcess();
+
+                        initDto();
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
                             htmlProcess();
@@ -1344,6 +1353,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public AtomicReference<Integer> getBookmarkIndexHolder() {
             return bookmarkIndexHolder;
+        }
+
+        @Override
+        public int getPageIndex() {
+            return -1;
+        }
+
+        @Override
+        public void setFileName(String title) {
+            fileName.delete(0, fileName.length());
+            fileName.append(title);
         }
     }
 
