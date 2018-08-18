@@ -33,6 +33,7 @@ import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
 import com.example.englishtester.common.FloatViewChecker;
+import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
@@ -96,6 +97,10 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
         super.onCreate(savedInstanceState);
+
+        if (!FullPageMentionDialog.isAlreadyFullPageMention(this.getClass().getName(), this)) {
+            FullPageMentionDialog.builder(R.drawable.full_page_mention_001, this).showDialog();
+        }
 
         //contentView = createContentView();
         setContentView(R.layout.activity_epub_reader);
@@ -759,6 +764,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
                 Log.toast(activity, value);
+            }
+        },//
+        DEBUG_ONLY_003("________Debug", MENU_FIRST++, REQUEST_CODE++, null, true) {
+            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                int position = activity.viewPager.getCurrentItem();
+                EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(position);
+                String debugContent = holder.getPageContent4Debug();
+                Log.line(TAG, debugContent);
             }
         },//
         ;

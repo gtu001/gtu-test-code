@@ -124,8 +124,8 @@ public class TxtReaderAppenderForHtmlTag {
         H_TITLE("{{h ", "h\\ssize\\:(\\d+?),text\\:((?:.|\n)*?)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
-                __SpecialTagHolder_Pos text = new __SpecialTagHolder_Pos(pair, mth, 1);
-                __SpecialTagHolder_Pos size = new __SpecialTagHolder_Pos(pair, mth, 2);
+                __SpecialTagHolder_Pos size = new __SpecialTagHolder_Pos(pair, mth, 1);
+                __SpecialTagHolder_Pos text = new __SpecialTagHolder_Pos(pair, mth, 2);
 
                 log(size);
                 log(text);
