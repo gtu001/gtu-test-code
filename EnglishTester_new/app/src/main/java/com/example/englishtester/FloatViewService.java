@@ -573,7 +573,7 @@ public class FloatViewService extends Service {
 
                     List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
                     for (ConfigDialogEnum e : ConfigDialogEnum.values()) {
-                        addItem(e.name(), e.getIcon(FloatViewService.this), list);
+                        addItem(e.label, e.getIcon(FloatViewService.this), list);
                     }
 
                     win.showItemListDialog("功能設定", list, new OnItemClickListener() {
