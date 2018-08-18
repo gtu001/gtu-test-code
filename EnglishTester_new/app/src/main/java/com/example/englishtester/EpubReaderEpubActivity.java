@@ -455,6 +455,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         }
 
         private void showDlg() {
+            if (lst4Adapter.isEmpty()) {
+                Toast.makeText(EpubReaderEpubActivity.this, "尚無書籤紀錄", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             SimpleAdapter aryAdapter = new SimpleAdapter(EpubReaderEpubActivity.this, lst4Adapter,// 資料來源
                     R.layout.subview_dropboxlist, //
                     new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight"}, //
@@ -462,7 +467,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             );
 
             AlertDialog.Builder builder = new AlertDialog.Builder(EpubReaderEpubActivity.this);
-            builder.setTitle("選擇dropbox檔案");
+            builder.setTitle("請選擇書籤");
             builder.setAdapter(aryAdapter, this);
             AlertDialog alert = builder.create();
             alert.show();
@@ -529,7 +534,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             @Override
             public void onPageSelected(final int position) {
                 Log.v(TAG, "##### onPageSelected");
-                Toast.makeText(EpubReaderEpubActivity.this, "#Go " + position, Toast.LENGTH_SHORT).show();
                 epubViewerMainHandler.getDto().setPageIndex(position);
 
                 setTitle(epubViewerMainHandler.getCurrentTitle(position));
