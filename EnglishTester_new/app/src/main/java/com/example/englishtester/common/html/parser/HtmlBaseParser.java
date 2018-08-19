@@ -104,12 +104,16 @@ public abstract class HtmlBaseParser {
         validateContent("_step1_hTitleHandler", content, checkStr);
         content = _step1_replaceTo_Bold(content, isPure);
         validateContent("_step1_replaceTo_Bold", content, checkStr);
+        content = _step1_replaceTo_NormalPTag(content, isPure);
+        validateContent("_step1_replaceTo_NormalPTag", content, checkStr);
         content = _step1_replaceTo_Italic(content, isPure);
         validateContent("_step1_replaceTo_Italic", content, checkStr);
         content = _step1_replaceStrongTag(content, isPure);
         validateContent("_step1_replaceStrongTag", content, checkStr);
         content = _step1_fontSize_Indicate(content, isPure);
         validateContent("_step1_fontSize_Indicate", content, checkStr);
+        content = _step1_fontSize_Indicate_4PTag(content, isPure);
+        validateContent("_step1_fontSize_Indicate_4PTag", content, checkStr);
         content = _step2_normalContent(content, isPure);
         validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content, isPure);
@@ -176,9 +180,8 @@ public abstract class HtmlBaseParser {
     }
 
     protected enum FontSizeIndicateEnum {
-        PTN01("\\<span(?:.|\n)*?font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
-//        PTN01("\\<span(?:.|\n)*?style\\=\"font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
-//        PTN02("\\<span(?:.|\n)*?style\\=\"mso\\-bidi\\-font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
+        SPAN001("\\<span(?:.|\n)*?font\\-size\\:([\\d\\.]+)pt\\;(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>"),//
+        P001("\\<p(?:.|\\n)*?font\\-size\\:\\s*?([\\d\\.]+)(?:px|pt)(?:.|\\n)*?\\>(.*?)\\<\\/p\\>"),//
         ;
 
         final Pattern ptn;
@@ -195,7 +198,7 @@ public abstract class HtmlBaseParser {
                 String text = mth.group(2);
                 String tmpVal = "";
                 if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
-                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}";
+                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}\r\n\r\n";
                     if (isPure) {
                         tmpVal = StringUtil_.appendReplacementEscape(text);
                     }
@@ -208,14 +211,26 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _step1_fontSize_Indicate(String content, boolean isPure) {
-        Pattern ptn = Pattern.compile("\\<span.*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern ptn = Pattern.compile("\\<span(?:.|\n)*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
         Matcher mth = ptn.matcher(content);
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {
             String spanContent = mth.group();
-            for (HtmlBaseParser.FontSizeIndicateEnum e : HtmlBaseParser.FontSizeIndicateEnum.values()) {
-                spanContent = e.apply(spanContent, isPure);
-            }
+            spanContent = FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
+            spanContent = StringUtil_.appendReplacementEscape(spanContent);
+            mth.appendReplacement(sb, spanContent);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step1_fontSize_Indicate_4PTag(String content, boolean isPure) {
+        Pattern ptn = Pattern.compile("\\<p(?:.|\n)*?\\<\\/p\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Matcher mth = ptn.matcher(content);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+            String spanContent = mth.group();
+            spanContent = FontSizeIndicateEnum.P001.apply(spanContent, isPure);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
         }
@@ -239,6 +254,25 @@ public abstract class HtmlBaseParser {
                 title = "{{h size:" + titleSize + ",text:" + StringUtil_.appendReplacementEscape(titleText) + "}}";
                 if (isPure) {
                     title = StringUtil_.appendReplacementEscape(titleText);
+                }
+            }
+            mth.appendReplacement(sb, title);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step1_replaceTo_NormalPTag(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile("\\<p\\>((?:.|\n)*?)<\\/p\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String titleStr = mth.group(1);
+            String title = "";
+            if (StringUtils.isNotBlank(titleStr)) {
+                title = StringUtil_.appendReplacementEscape(titleStr) + "\r\n\r\n";
+                if (isPure) {
+                    title = StringUtil_.appendReplacementEscape(titleStr);
                 }
             }
             mth.appendReplacement(sb, title);
@@ -628,7 +662,7 @@ public abstract class HtmlBaseParser {
         }
     }
 
-    protected void validateLog(String stepLabel){
+    protected void validateLog(String stepLabel) {
         log("CHECK : " + stepLabel + " OK!!!");
     }
 }

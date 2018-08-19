@@ -104,6 +104,15 @@ public class FileFindActivity extends ListActivity {
         pathList = new ArrayList<Map<String, Object>>();
 
         File f = new File(filePath);
+
+        if (!rootDirHolder.isRootDir(f)) {
+            //設定可選目錄
+            addPathMap("回上一層 ../", f.getParent());
+        } else {
+            rootDirHolder.addPathMapItems();
+            return;
+        }
+
         File[] files = f.listFiles();
 
         List<File> sortFileList = new ArrayList<File>();
@@ -119,12 +128,6 @@ public class FileFindActivity extends ListActivity {
                 return 0;
             }
         });
-
-        if (!rootDirHolder.isRootDir(f)) {
-            //設定可選目錄
-            rootDirHolder.addPathMapItems();
-            addPathMap("回上一層 ../", f.getParent());
-        }
 
         if (files != null && files.length != 0) {
             for (int ii = 0; ii < sortFileList.size(); ii++) {

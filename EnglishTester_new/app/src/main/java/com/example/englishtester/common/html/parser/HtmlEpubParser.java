@@ -95,24 +95,12 @@ public class HtmlEpubParser extends HtmlBaseParser {
     @Override
     protected String _stepFinal_customPlus(String content, boolean isPure) {
 
-        content = _stepFinal_customPlus_TagP_noAttribute(content, isPure);
-        validateLog("_stepFinal_customPlus_TagP_noAttribute <epub 001>");
+//        content = _stepFinal_customPlus_TagP_noAttribute(content, isPure);
+//        validateLog("_stepFinal_customPlus_TagP_noAttribute <epub 001>");
 
         return content;
     }
 
-    private String _stepFinal_customPlus_TagP_noAttribute(String content, boolean isPure) {
-        Pattern titleStylePtn = Pattern.compile("\\<p\\>((?:.|\n)*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
-        StringBuffer sb = new StringBuffer();
-        Matcher mth = titleStylePtn.matcher(content);
-        while (mth.find()) {
-            String tempContent = mth.group(1);
-            tempContent = StringUtil_.appendReplacementEscape(tempContent) + "\r\n\r\n";
-            mth.appendReplacement(sb, tempContent);
-        }
-        mth.appendTail(sb);
-        return sb.toString();
-    }
 
     public String getPicDirForDropbox() {
         return picDirForDropbox;

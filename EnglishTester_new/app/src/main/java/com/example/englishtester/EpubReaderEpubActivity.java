@@ -197,6 +197,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 //記錄舊的 scrollView Y
                 scrollViewYHolder.recordY(this.getTitle().toString(), getScrollView1());
             }
+
+            if (getScrollView1() != null) {
+                //記錄舊的 scrollView Y
+                scrollViewYHolder.restoreY(titleVal, getScrollView1());
+            }
         }
 
         TitleTextSetter.setText(EpubReaderEpubActivity.this, titleVal);
