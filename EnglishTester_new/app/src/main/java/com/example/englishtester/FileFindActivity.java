@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.example.englishtester.common.ExternalStorage;
 import com.example.englishtester.common.ExternalStorageV2;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -88,7 +89,7 @@ public class FileFindActivity extends ListActivity {
         map.put("file_name", name);
         map.put("path", path);
         File file = new File(path);
-        if (file.isDirectory()) {
+        if (file.isDirectory() || StringUtils.isBlank(path)) {
             map.put("icon", R.drawable.icon_folder);
         } else if (extensionChecker.isMatch(file)) {
             map.put("icon", R.drawable.icon_file);
@@ -98,23 +99,11 @@ public class FileFindActivity extends ListActivity {
         pathList.add(map);
     }
 
-    private void getFileDir(String filePath) {
-        mPath.setText(filePath);
-
-        pathList = new ArrayList<Map<String, Object>>();
-
-        File f = new File(filePath);
-
-        if (!rootDirHolder.isRootDir(f)) {
-            //設定可選目錄
-            addPathMap("回上一層 ../", f.getParent());
-        } else {
-            rootDirHolder.addPathMapItems();
-            return;
+    private List<File> getCurrentDirLst(File dirFile) {
+        if (!dirFile.isDirectory()) {
+            return new ArrayList<>();
         }
-
-        File[] files = f.listFiles();
-
+        File[] files = dirFile.listFiles();
         List<File> sortFileList = new ArrayList<File>();
         sortFileList.addAll(Arrays.asList(files));
         Collections.sort(sortFileList, new Comparator<File>() {
@@ -128,13 +117,34 @@ public class FileFindActivity extends ListActivity {
                 return 0;
             }
         });
+        return sortFileList;
+    }
 
-        if (files != null && files.length != 0) {
-            for (int ii = 0; ii < sortFileList.size(); ii++) {
-                File file = sortFileList.get(ii);
-                String fileName = file.getName();
-                addPathMap(fileName, file.getPath());
+
+    private void getFileDir(String filePath) {
+        mPath.setText(filePath);
+
+        pathList = new ArrayList<Map<String, Object>>();
+
+        File currentDir = new File(filePath);
+
+        if (StringUtils.isBlank(filePath)) {
+            rootDirHolder.addPathMapItems();
+            return;
+        } else {
+            addPathMap("回到根目錄", "");
+
+            //跟目錄不回上一層
+            if (!rootDirHolder.isRootDir(currentDir)) {
+                addPathMap("回上一層 ../", currentDir.getParent());
             }
+        }
+
+        List<File> sortFileList = getCurrentDirLst(currentDir);
+        for (int ii = 0; ii < sortFileList.size(); ii++) {
+            File file = sortFileList.get(ii);
+            String fileName = file.getName();
+            addPathMap(fileName, file.getPath());
         }
 
         // ArrayAdapter<String> fileList = new ArrayAdapter<String>(this,
@@ -175,6 +185,13 @@ public class FileFindActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         String path = (String) pathList.get(position).get("path");
         File file = new File(path);
+
+        //回到跟目錄
+        if (StringUtils.isBlank(path)) {
+            getFileDir("");
+            return;
+        }
+
         if (file.canRead()) {
             if (file.isDirectory()) {
                 getFileDir(path);
@@ -278,6 +295,7 @@ public class FileFindActivity extends ListActivity {
         }
 
         private void addPathMapItems() {
+            addPathMap("回到根目錄", "");
             addPathMap("回到 " + sdCardTitle, sdCard.getAbsolutePath());
             addPathMap("回到 " + externalSdCardTitle, externalSdCard.getAbsolutePath());
 
