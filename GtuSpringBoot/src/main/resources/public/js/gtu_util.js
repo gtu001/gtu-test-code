@@ -86,3 +86,27 @@ $.fn.serializeObject = function() {
 }
 
 //--------------------------------------------------------------------
+
+// url parameter to map
+function queryParameterToMap(){
+	var map = {};
+	var queryStr = window.location.search.substring(1);
+	var vars = queryStr.split("&");
+	for (i = 0; i < vars.length; i++) {
+		var v = vars[i].split("=");
+		map[v[0]] = decodeURIComponent(v[1]);
+	}
+	return map;
+}
+
+//--------------------------------------------------------------------
+
+
+function RandomUtil() {
+	this.rangeInt = function(start, end){
+		end = end + 1;
+		return Math.floor((Math.random() * end) + start);
+	}
+}
+
+//--------------------------------------------------------------------
