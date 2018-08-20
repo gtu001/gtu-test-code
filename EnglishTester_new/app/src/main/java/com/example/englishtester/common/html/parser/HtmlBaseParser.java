@@ -43,12 +43,12 @@ public abstract class HtmlBaseParser {
     }
 
     protected String getFromFile(File file, boolean isPure, String checkStr) {
-        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
+        String content = FileUtilGtu.loadFromFile(file, getEncoding());
         return getFromContent(content, isPure, checkStr);
     }
 
     protected String getFromFileDebug(File file, boolean isPure) {
-        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
+        String content = FileUtilGtu.loadFromFile(file, getEncoding());
         return getFromContent(content, isPure, "");
     }
 
@@ -120,6 +120,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step2_hrefTag", content, checkStr);
         content = _step3_imageProcMaster(content, isPure, checkStr);
         validateContent("_step3_imageProcMaster", content, checkStr);
+        content = _step3_imageProc_4Epub(content, isPure, checkStr);
+        validateContent("_step3_imageProc_4Epub", content, checkStr);
         content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step5_li_check(content, isPure);
@@ -380,7 +382,7 @@ public abstract class HtmlBaseParser {
         // 取得dropbox 目錄名稱
         if (StringUtils.isBlank(picDirForDropbox)) {
             try {
-                String tmpDir = URLDecoder.decode(srcDesc, WORD_HTML_ENCODE);
+                String tmpDir = URLDecoder.decode(srcDesc, getEncoding());
                 if (tmpDir.contains("/")) {
                     tmpDir = tmpDir.substring(0, tmpDir.indexOf("/"));
                 }
@@ -399,7 +401,10 @@ public abstract class HtmlBaseParser {
         }
         try {
             String tmp = StringUtils.trimToEmpty(srcDesc);
-            tmp = URLDecoder.decode(tmp, WORD_HTML_ENCODE);
+            tmp = URLDecoder.decode(tmp, getEncoding());
+            if (!tmp.contains("/")) {
+                return;
+            }
             tmp = tmp.substring(0, tmp.lastIndexOf("/"));
             tmp = org.springframework.web.util.HtmlUtils.htmlUnescape(tmp);
             picDirForDropbox = tmp;
@@ -408,8 +413,12 @@ public abstract class HtmlBaseParser {
         }
     }
 
+    protected String getEncoding(){
+        return WORD_HTML_ENCODE;
+    }
+
     protected String _step3_imageProcMaster(String content, boolean isPure, String checkPic) {
-        Pattern ptn = Pattern.compile("\\<img.*?\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern ptn = Pattern.compile("\\<img(?:.|\n)*?\\>", Pattern.MULTILINE | Pattern.DOTALL);
         Matcher mth = ptn.matcher(content);
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {
@@ -460,6 +469,31 @@ public abstract class HtmlBaseParser {
             }
 
             String repStr = "{{img src:" + "" + ",alt:" + srcDesc + "}}";
+            if (isPure) {
+                repStr = "";
+            }
+
+            mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step3_imageProc_4Epub(String content, boolean isPure, String checkPic) {
+        Pattern titleStylePtn = Pattern.compile("\\<image(?:.|\n)*?xlink\\:href\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\/>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String srcDesc = mth.group(1);
+            String picLink = mth.group(1);
+
+            if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
+                log("!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
+            }
+
+            filterImageDir(srcDesc);
+
+            String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
             if (isPure) {
                 repStr = "";
             }

@@ -12,12 +12,13 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileUtilGtu;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -151,6 +152,15 @@ public class DropboxFileLoadService {
         }, -1L);
     }
 
+    public static boolean isPicFileType(String name) {
+        if (StringUtils.isNotBlank(name) &&
+                name.matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")
+                ) {
+            return true;
+        }
+        return false;
+    }
+
     public File downloadHtmlReferencePicDir(final String dropboxDirName, final long timeout) {
         return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
             @Override
@@ -172,7 +182,7 @@ public class DropboxFileLoadService {
                     List<Callable<File>> downloadTaskLst = new ArrayList<>();
 
                     for (final DropboxUtilV2.DropboxUtilV2_DropboxFile pic : picLst) {
-                        if (!pic.getName().matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")) {
+                        if (!isPicFileType(pic.getName())) {
                             continue;
                         }
 

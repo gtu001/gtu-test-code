@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.widget.TextView;
 
+import com.example.englishtester.DropboxFileLoadService;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
@@ -410,11 +411,20 @@ public class EpubViewerMainHandler {
         public Bitmap getBitmapForEpub(ImageLoaderCandidate4EpubHtml imgLoader) {
             try {
                 ImageLoaderCache cache = (ImageLoaderCache) this.htmlDocument.getDocumentProperties().get(ImageLoaderCache.BITMAP_RESOURCE_KEY);
-                if (StringUtils.isBlank(imgLoader.getAltData()) && StringUtils.isNotBlank(imgLoader.getSrcData())) {
-                    return cache.get(imgLoader.getSrcData());
-                } else if (StringUtils.isBlank(imgLoader.getSrcData()) && StringUtils.isNotBlank(imgLoader.getAltData())) {
-                    return cache.get(imgLoader.getAltData());
+                if (StringUtils.isNotBlank(imgLoader.getAltData()) && StringUtils.isNotBlank(imgLoader.getSrcData())) {
+                    if (DropboxFileLoadService.isPicFileType(imgLoader.getSrcData())) {
+                        return cache.get(imgLoader.getSrcData());
+                    } else {
+                        return cache.get(imgLoader.getAltData());
+                    }
+                } else {
+                    if (StringUtils.isBlank(imgLoader.getAltData()) && StringUtils.isNotBlank(imgLoader.getSrcData())) {
+                        return cache.get(imgLoader.getSrcData());
+                    } else if (StringUtils.isBlank(imgLoader.getSrcData()) && StringUtils.isNotBlank(imgLoader.getAltData())) {
+                        return cache.get(imgLoader.getAltData());
+                    }
                 }
+                throw new Exception("無法判斷的pic : [alt]" + imgLoader.getAltData() + ", [src]" + imgLoader.getSrcData());
             } catch (java.lang.OutOfMemoryError ex) {
                 Log.line(TAG, " !!! OutOfMemoryError : " + this.htmlDocument.getId() + " , " + this.htmlDocument.getTitle() + " , " + this.htmlDocument.getHref(), ex);
             } catch (Throwable ex) {

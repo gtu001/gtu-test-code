@@ -1,31 +1,13 @@
 package com.example.englishtester.common.html.parser;
 
-import com.example.englishtester.common.Log;
-
-import com.example.englishtester.BuildConfig;
-import com.example.englishtester.Constant;
-import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
-import com.example.englishtester.common.TagMatcher;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import gtu.util.StringUtil_;
 
 
 public class HtmlEpubParser extends HtmlBaseParser {
 
-    public static final String WORD_HTML_ENCODE = "UTF8";
+    public static final String EPUB_HTML_ENCODE = "UTF8";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
 
     public static void main(String[] args) {
@@ -55,13 +37,17 @@ public class HtmlEpubParser extends HtmlBaseParser {
     }
 
     public String getFromFile(File file, boolean isPure, String checkStr) {
-        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
+        String content = FileUtilGtu.loadFromFile(file, EPUB_HTML_ENCODE);
         return getFromContent(content, isPure, checkStr);
     }
 
     public String getFromFileDebug(File file, boolean isPure) {
-        String content = FileUtilGtu.loadFromFile(file, WORD_HTML_ENCODE);
+        String content = FileUtilGtu.loadFromFile(file, EPUB_HTML_ENCODE);
         return getFromContent(content, isPure, "");
+    }
+
+    protected String getEncoding(){
+        return EPUB_HTML_ENCODE;
     }
 
     public String getFromContent(String context) {

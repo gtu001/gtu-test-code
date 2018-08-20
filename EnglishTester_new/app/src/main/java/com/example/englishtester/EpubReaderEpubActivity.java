@@ -181,7 +181,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
      */
     private void openFontSizeDialog() {
         DialogFontSizeChange dialog = new DialogFontSizeChange(this);
-        dialog.apply(txtReaderView.getTextSize(), Arrays.asList(txtReaderView, translateView), new DialogFontSizeChange.ApplyFontSize() {
+        dialog.apply(txtReaderView.getTextSize(), Arrays.asList(getTxtReaderView(), getTranslateView()), new DialogFontSizeChange.ApplyFontSize() {
             @Override
             public void applyFontSize(float fontSize) {
                 new ReaderCommonHelper.FontSizeApplyer().setFontSize(EpubReaderEpubActivity.this, fontSize, EpubReaderEpubActivity.class);
@@ -541,6 +541,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 Log.v(TAG, "##### onPageSelected");
                 epubViewerMainHandler.getDto().setPageIndex(position);
 
+                initScrollView1YPos();
+
                 setTitle(epubViewerMainHandler.getCurrentTitle(position));
             }
 
@@ -719,12 +721,26 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         scrollView1 = my.scrollView1;
     }
 
+    private void initScrollView1YPos() {
+        getScrollView1().post(new Runnable() {
+            @Override
+            public void run() {
+                int initY = 0;
+                getScrollView1().scrollTo(0, initY);
+            }
+        });
+    }
+
     private ScrollView getScrollView1() {
         return (ScrollView) viewPager.findViewWithTag("scrollView1-" + viewPager.getCurrentItem());
     }
 
     private TextView getTxtReaderView() {
         return (TextView) viewPager.findViewWithTag("txtReaderView-" + viewPager.getCurrentItem());
+    }
+
+    private TextView getTranslateView() {
+        return (TextView) viewPager.findViewWithTag("translateView-" + viewPager.getCurrentItem());
     }
 
     // --------------------------------------------------------------------
