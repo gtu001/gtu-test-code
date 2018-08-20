@@ -1,7 +1,7 @@
-function JqueryTool(){
-	
-	//用來放 $.get().fail(jqueryTool.ajaxFailFunc);
-	//--------------------------------------------------------------------
+function JqueryTool() {
+
+	// 用來放 $.get().fail(jqueryTool.ajaxFailFunc);
+	// --------------------------------------------------------------------
 	this.ajaxFailFunc = function(jqXHR, textStatus, errorThrown) {//
 		var jqXHRJson = jqXHR['responseJSON'];
 		var msgInJqXHR = "";
@@ -10,18 +10,40 @@ function JqueryTool(){
 		}
 		alert(//
 		msgInJqXHR + //
-		"------------------------------\n" + 
-		"textStatus : " + textStatus + "\n" + //
-		"errorThrown : " + errorThrown //
+		"------------------------------\n" + "textStatus : " + textStatus
+				+ "\n" + //
+				"errorThrown : " + errorThrown //
 		);
 	}
-	//--------------------------------------------------------------------
+	// --------------------------------------------------------------------
+
+	this.loadJson = function(filename, data, isGet, func) {
+		var axync = func == undefined ? false : true;
+		var method = isGet == undefined || isGet ? "GET" : "POST";
+		var jsonContent = $.ajax({
+			url : filename,
+			data : data,
+			dataType : "json",
+			success : function(data) {
+				if (func) {
+					func(data);
+				}
+			},
+			error : this.ajaxFailFunc,
+			async : axync,
+			dataType : 'json',
+			method : method,
+		}).responseJSON;
+		return jsonContent;
+	}
+
+	// --------------------------------------------------------------------
 };
 
 function Information() {
-	
-	//檢查畫面有多少tag
-	//--------------------------------------------------------------------
+
+	// 檢查畫面有多少tag
+	// --------------------------------------------------------------------
 	this.findAllChildren = function(tag, map) {
 		var func = this.findAllChildren;
 		$(tag).children().each(function(d, v) {
@@ -35,40 +57,41 @@ function Information() {
 			}
 
 			var dtl = {};
-			if(name != undefined){
+			if (name != undefined) {
 				dtl['name'] = name;
 			}
-			if(id != undefined){
+			if (id != undefined) {
 				dtl['id'] = id;
 			}
 			arry.push(dtl);
 
 			map[tagName] = arry;
-			if($(v).children().length > 0){
+			if ($(v).children().length > 0) {
 				func(v, map);
 			}
 		});
 	};
-	
+
 	var tagMap = {};
 	this.findAllChildren($("html"), tagMap);
 	this.tagMap = tagMap;
-	
-	this.getTagInfo = function(tagName){
+
+	this.getTagInfo = function(tagName) {
 		tagName = tagName.toUpperCase();
-		if(tagName in this.tagMap){
+		if (tagName in this.tagMap) {
 			return this.tagMap[tagName];
 		}
-		throw Error("tagName 找不到 : " + tagName + " --> all : " + JSON.stringify(this.tagMap));
+		throw Error("tagName 找不到 : " + tagName + " --> all : "
+				+ JSON.stringify(this.tagMap));
 	}
-	
-	//--------------------------------------------------------------------
+
+	// --------------------------------------------------------------------
 }
 
-//var jqueryTool = new JqueryTool();
-//var information = new Information();
+// var jqueryTool = new JqueryTool();
+// var information = new Information();
 
-//--------------------------------------------------------------------
+// --------------------------------------------------------------------
 $.fn.serializeObject = function() {
 	var o = {};
 	var a = this.serializeArray();
@@ -85,10 +108,10 @@ $.fn.serializeObject = function() {
 	return o;
 }
 
-//--------------------------------------------------------------------
+// --------------------------------------------------------------------
 
 // url parameter to map
-function queryParameterToMap(){
+function queryParameterToMap() {
 	var map = {};
 	var queryStr = window.location.search.substring(1);
 	var vars = queryStr.split("&");
@@ -99,14 +122,13 @@ function queryParameterToMap(){
 	return map;
 }
 
-//--------------------------------------------------------------------
-
+// --------------------------------------------------------------------
 
 function RandomUtil() {
-	this.rangeInt = function(start, end){
+	this.rangeInt = function(start, end) {
 		end = end + 1;
 		return Math.floor((Math.random() * end) + start);
 	}
 }
 
-//--------------------------------------------------------------------
+// --------------------------------------------------------------------
