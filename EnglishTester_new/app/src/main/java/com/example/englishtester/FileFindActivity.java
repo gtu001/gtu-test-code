@@ -298,9 +298,14 @@ public class FileFindActivity extends ListActivity {
         private void addPathMapItems() {
             addPathMap("回到根目錄", "");
             addPathMap("回到 " + sdCardTitle, sdCard.getAbsolutePath());
-            addPathMap("回到 " + externalSdCardTitle, externalSdCard.getAbsolutePath());
+            if (externalSdCard != null) {
+                addPathMap("回到 " + externalSdCardTitle, externalSdCard.getAbsolutePath());
+            }
 
             for (int ii = 0; ii < externalSdCardLst.size(); ii++) {
+                if (externalSdCardLst.get(ii) == null) {
+                    continue;
+                }
                 addPathMap("回到 " + externalSdCardTitle + ii, externalSdCardLst.get(ii).getAbsolutePath());
             }
         }
