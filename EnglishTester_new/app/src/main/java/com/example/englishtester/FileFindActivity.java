@@ -128,23 +128,24 @@ public class FileFindActivity extends ListActivity {
 
         File currentDir = new File(filePath);
 
+        boolean ignoreSubdirLst = false;
+
         if (StringUtils.isBlank(filePath)) {
             rootDirHolder.addPathMapItems();
-            return;
+
+            ignoreSubdirLst = true;
         } else {
             addPathMap("回到根目錄", "");
-
-            //跟目錄不回上一層
-            if (!rootDirHolder.isRootDir(currentDir)) {
-                addPathMap("回上一層 ../", currentDir.getParent());
-            }
+            addPathMap("回上一層 ../", currentDir.getParent());
         }
 
-        List<File> sortFileList = getCurrentDirLst(currentDir);
-        for (int ii = 0; ii < sortFileList.size(); ii++) {
-            File file = sortFileList.get(ii);
-            String fileName = file.getName();
-            addPathMap(fileName, file.getPath());
+        if (!ignoreSubdirLst) {
+            List<File> sortFileList = getCurrentDirLst(currentDir);
+            for (int ii = 0; ii < sortFileList.size(); ii++) {
+                File file = sortFileList.get(ii);
+                String fileName = file.getName();
+                addPathMap(fileName, file.getPath());
+            }
         }
 
         // ArrayAdapter<String> fileList = new ArrayAdapter<String>(this,
@@ -170,7 +171,7 @@ public class FileFindActivity extends ListActivity {
         List<Map<String, Object>> propList = new ArrayList<Map<String, Object>>();
         for (Map<String, Object> map : fileList) {
             File f = new File((String) map.get("path"));
-            if (f.isDirectory()) {
+            if (f.isDirectory() || StringUtils.isBlank((String) map.get("path"))) {
                 folderList.add(map);
             } else {
                 propList.add(map);

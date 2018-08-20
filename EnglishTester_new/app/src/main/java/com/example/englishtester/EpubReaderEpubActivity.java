@@ -769,13 +769,13 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.moveToNextBookmark();
             }
         }, //
-        DEBUG_ONLY_002("________Pos", MENU_FIRST++, REQUEST_CODE++, null, true) {
+        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
                 Log.toast(activity, value);
             }
         },//
-        DEBUG_ONLY_003("________Debug", MENU_FIRST++, REQUEST_CODE++, null, true) {
+        DEBUG_ONLY_003("________DebugX", MENU_FIRST++, REQUEST_CODE++, null, true) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 int position = activity.viewPager.getCurrentItem();
                 EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(position);
