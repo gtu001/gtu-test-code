@@ -77,7 +77,7 @@ public class HtmlEpubParser extends HtmlBaseParser {
 //        log(content);
         log("ORIGN end   : =======================================================================");
 
-        saveToFileDebug("before", content);
+//        saveToFileDebug("before", content);
 
         try {
             content = getFromContentMain(content, isPure, checkStr);
@@ -85,7 +85,7 @@ public class HtmlEpubParser extends HtmlBaseParser {
             throw new RuntimeException("getFromContent ERR : " + e.getMessage(), e);
         }
 
-        saveToFileDebug("after", content);
+//        saveToFileDebug("after", content);
         log("RESULT start : =======================================================================");
 //        logContent(content);
         log("RESULT end    : =======================================================================");

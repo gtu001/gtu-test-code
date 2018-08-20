@@ -77,7 +77,7 @@ public class HtmlWordParser extends HtmlBaseParser {
 //        log(content);
         log("ORIGN end   : =======================================================================");
 
-        saveToFileDebug("before", content);
+//        saveToFileDebug("before", content);
 
         try {
             content = getFromContentMain(content, isPure, checkStr);
