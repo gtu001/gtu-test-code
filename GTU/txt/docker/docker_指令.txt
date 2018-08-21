@@ -107,4 +107,15 @@ docker run -d -p 5801:5801 -p 5802:5802 .....
 # 取得 container 的 pid
 
 docker inspect --format='{{.State.Pid}}' <container>
+
+
+--------------------------------------------------------------------------
+# 移除相依性 images
+# 先取得相依的images
+docker image inspect --format='{{.RepoTags}} {{.Id}} {{.Parent}}' $(docker image ls -q --filter since=<image_id>)
+
+#　會出現 sha 一長串 直接 rmi 即可
+docker rmi <sha...>
+
+
 --------------------------------------------------------------------------
