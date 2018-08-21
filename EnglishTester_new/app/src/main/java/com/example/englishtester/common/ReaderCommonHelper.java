@@ -134,6 +134,10 @@ public class ReaderCommonHelper {
         public void restoreY(final String currentTitle, final ScrollView scrollView1) {
             Log.v(TAG, "[restoreY] start ... " + currentTitle);
 
+            if (StringUtils.isBlank(currentTitle)) {
+                return;
+            }
+
             ScrollYService scrollYService = new ScrollYService(currentTitle, context);
             final AtomicReference<Integer> posY = new AtomicReference<>();
             posY.set(scrollYService.getScrollYVO_value());
