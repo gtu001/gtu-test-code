@@ -62,7 +62,18 @@ sudo docker build -t <tag>  .
 
 # 若Dockerfile 在其他目錄
 sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
+
+
 --------------------------------------------------------------------------
+#自訂路徑與檔名 build
+
+docker build -f <fileName> <filePath> -t <tag>]
+
+Ex : docker build -f Dockerfile_OnbuildTest /D/workstuff/gtu-test-code/GTU/txt/docker -t xxxxx_test2
+
+
+--------------------------------------------------------------------------
+
 
 
 # 上傳 image 到 docker repo
@@ -110,7 +121,6 @@ docker inspect --format='{{.State.Pid}}' <container>
 
 
 --------------------------------------------------------------------------
-# 移除相依性 images
 # 先取得相依的images
 docker image inspect --format='{{.RepoTags}} {{.Id}} {{.Parent}}' $(docker image ls -q --filter since=<image_id>)
 
@@ -118,4 +128,18 @@ docker image inspect --format='{{.RepoTags}} {{.Id}} {{.Parent}}' $(docker image
 docker rmi <sha...>
 
 
+# 查詢子 images
+docker inspect --format='{{.Id}} {{.Parent}}' $(docker images --filter since=<image_id> --quiet)
+
+
 --------------------------------------------------------------------------
+
+# 刪除 <none> images 
+
+docker rmi $(docker images -f "dangling=true" -q)
+
+
+--------------------------------------------------------------------------
+
+
+

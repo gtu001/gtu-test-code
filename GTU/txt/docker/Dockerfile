@@ -13,6 +13,7 @@ ARG  SERVICE_JAR_FILE_NAME=services.jar
 # FROM nvidia/cuda:8.0-runtime-ubuntu16.04
 FROM ubuntu
 
+
 #---------------------------------------------------------
 
 ENV variable2 test_var2
@@ -40,6 +41,7 @@ RUN [ "sh", "-c", "echo $HOME" ]
 RUN /bin/bash -c 'source $HOME/.bashrc; \   
 echo $HOME'
 
+
 #---------------------------------------------------------
 
 
@@ -52,6 +54,7 @@ RUN apt-get dist-upgrade -y
 CMD echo "This is a test." | wc -
 CMD ["/usr/bin/wc","--help"]
 
+
 #---------------------------------------------------------
 # LABEL 加入 metadata 給 image 
 
@@ -62,12 +65,14 @@ that label-values can span multiple lines."
 #註記作者
 LABEL maintainer="gtu001@gmail.com" 
 
+
 #---------------------------------------------------------
 # EXPOSE 註記 docker container 運行時 listen 的 port (可被 -p override)
 
 EXPOSE 80/tcp
 EXPOSE 80/udp
 EXPOSE 8080 
+
 
 #---------------------------------------------------------
 # ENV 設定環境變數
@@ -111,6 +116,7 @@ ENTRYPOINT exec top -b
 ### ENTRYPOINT 通常用在可執行黨屬性的 container
 ### CMD 應被設定為 default屬性 , 在執行時可被override
 
+
 #---------------------------------------------------------
 # VOLUMN 指定掛載空間,可掛本機或是其他container的空間
 
@@ -122,6 +128,7 @@ RUN echo "hello world" > /var/gtu001/greeting.txt
 VOLUME /var/gtu001
 
 RUN /bin/sh -c "cd /var/gtu001 && ls -al && pwd" 
+
 
 #---------------------------------------------------------
 # USER 設定執行 user 及所屬 uid , gid
@@ -137,15 +144,49 @@ RUN /bin/sh -c "cd /var/gtu001 && ls -al && pwd"
 # WORKDIR 設定 工作目錄 , 若未指定系統也會替你建一個
 
 ENV DIRPATH /path
-WORKDIR $DIRPATH/$DIRNAME
-RUN pwd
+WORKDIR $DIRPATH/test001
+RUN pwd #當前目錄即是 workdir
+
 
 #---------------------------------------------------------
+# ARG 設定外部參數
+
+ARG x1=abcde
+ARG x2
+RUN echo "x1 = $x1, x2 = $x2"
+
+
 #---------------------------------------------------------
+# ONBUILD 註記一個 trigger 被當base image 才觸發執行
+
+ONBUILD RUN echo "發怒的人,挑起爭端!!!"
+
+
 #---------------------------------------------------------
+# STOPSIGNAL 設定退出訊號
+
+STOPSIGNAL 9
+
+RUN echo "test1"
+
+
 #---------------------------------------------------------
+# HEALTHCHECK 執行指令確定是否有回應
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1
+
+
 #---------------------------------------------------------
+# SHELL --> linux 執行  ["/bin/sh", "-c"] , Windows 執行 ["cmd", "/S", "/C"]
+
+SHELL ["C/Windows/System32/notepad.exe"]
+
+
 #---------------------------------------------------------
+
+
+
 #---------------------------------------------------------
 #---------------------------------------------------------
 #---------------------------------------------------------
