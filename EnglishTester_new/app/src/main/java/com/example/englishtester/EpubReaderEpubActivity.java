@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,9 +113,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         viewPager = findViewById(R.id.viewpager);
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
-        final EpubReaderEpubActivity data = (EpubReaderEpubActivity) getLastNonConfigurationInstance();
+        final EpubReaderEpubActivity data = (EpubReaderEpubActivity) getLastCustomNonConfigurationInstance();
         if (data != null) {// 表示不是由於Configuration改變觸發的onCreate()
             Log.v(TAG, "load old status!");
+
+            this.restoreBackFromOrient(data);
         } else {
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
@@ -737,6 +740,33 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         return (TextView) viewPager.findViewWithTag("translateView-" + viewPager.getCurrentItem());
     }
 
+
+    private void restoreBackFromOrient(EpubReaderEpubActivity activity) {
+        this.mService = activity.mService;
+        this.homeKeyWatcher = activity.homeKeyWatcher;
+        this.paddingAdjuster = activity.paddingAdjuster;
+        this.epubViewerMainHandler = activity.epubViewerMainHandler;
+        this.recentTxtMarkService = activity.recentTxtMarkService;
+        this.appleFontApplyer = activity.appleFontApplyer;
+        this.scrollViewYHolder = activity.scrollViewYHolder;
+        this.pageAdapter = activity.pageAdapter;
+        this.viewPager = activity.viewPager;
+        this.actionBarCustomTitleHandler = activity.actionBarCustomTitleHandler;
+
+        //跳轉至翻轉前頁面
+        int position = this.epubViewerMainHandler.getDto().getPageIndex();
+        Log.v(TAG, "orient current = " + this.viewPager.getCurrentItem());
+        Log.v(TAG, "orient goto = " + position);
+        Log.v(TAG, "bookFile = " + this.epubViewerMainHandler.getDto().getBookFile());
+        Log.v(TAG, "isInitDone = " + this.epubViewerMainHandler.isInitDone());
+//        gotoViewPagerPosition(position);
+        Log.v(TAG, "orient current = " + this.viewPager.getCurrentItem());
+
+        EpubViewerMainHandler.PageContentHolder holder = this.epubViewerMainHandler.gotoPosition(position);
+        this.getTxtReaderView().setText(holder.getCurrentPage());
+        this.getTxtReaderView().invalidate();
+    }
+
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
@@ -911,11 +941,12 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         Log.v(TAG, "onSaveInstanceState");
     }
 
-//    @Override
-//    public Object onRetainNonConfigurationInstance() {
-//        Log.v(TAG, "onRetainNonConfigurationInstance");
-//        return this;
-//    }
+    // ＊ for FragmentActivity ＊
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        Log.v(TAG, "onRetainNonConfigurationInstance");
+        return this;
+    }
 
     // 測試螢幕翻轉 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     @Override
