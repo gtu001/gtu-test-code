@@ -2,7 +2,8 @@ package com.example.englishtester;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.example.englishtester.common.Log;
+
+import com.example.englishtester.common.DtoEnumHelper;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 
@@ -58,7 +59,7 @@ public class MainActivityDTO implements Parcelable, Serializable {
         }
     }
 
-    enum ValueTransfer {
+    enum ValueTransfer implements DtoEnumHelper.IValueTransfer {
         correctBtnNum,
         currentText,
         showAnswerLabel,
@@ -78,47 +79,17 @@ public class MainActivityDTO implements Parcelable, Serializable {
         isAutoChangeQuestion,
         isAutoPronounce,;
 
-        void createFromParcel(MainActivityDTO dto, Parcel paramParcel, ClassLoader loader) {
-            try {
-                Field field = MainActivityDTO.class.getDeclaredField(this.name());
-                field.setAccessible(true);
-                Object val = paramParcel.readValue(loader);
-                field.set(dto, val);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        public void createFromParcel(Object dto, Parcel paramParcel, ClassLoader loader) {
+            DtoEnumHelper._createFromParcel_4enum(MainActivityDTO.class, dto, this.name(), paramParcel, loader);
         }
 
-        void writeToParcel(MainActivityDTO dto, Parcel paramParcel, int paramInt) {
-            try {
-                Field field = MainActivityDTO.class.getDeclaredField(this.name());
-                field.setAccessible(true);
-                Object val = field.get(dto);
-                paramParcel.writeValue(val);
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
+        public void writeToParcel(Object dto, Parcel paramParcel, int paramInt) {
+            DtoEnumHelper._writeToParcel_4enum(MainActivityDTO.class, dto, this.name(), paramParcel, paramInt);
         }
     }
 
     //↓↓↓↓↓↓  實作取得DTO的方式
-    public static final Parcelable.Creator<MainActivityDTO> CREATOR = new Creator<MainActivityDTO>() {
-        @Override
-        public MainActivityDTO createFromParcel(Parcel paramParcel) {
-            ClassLoader loader = this.getClass().getClassLoader();
-            MainActivityDTO dto = new MainActivityDTO();
-            for (ValueTransfer e : ValueTransfer.values()) {
-                e.createFromParcel(dto, paramParcel, loader);
-            }
-
-            return dto;
-        }
-
-        @Override
-        public MainActivityDTO[] newArray(int paramInt) {
-            return new MainActivityDTO[paramInt];
-        }
-    };
+    public static final Parcelable.Creator<MainActivityDTO> CREATOR = DtoEnumHelper.getCreator(MainActivityDTO.class, ValueTransfer.values());
 
     @Override
     public int describeContents() {
@@ -127,9 +98,7 @@ public class MainActivityDTO implements Parcelable, Serializable {
 
     @Override
     public void writeToParcel(Parcel paramParcel, int paramInt) {
-        for (ValueTransfer e : ValueTransfer.values()) {
-            e.writeToParcel(this, paramParcel, paramInt);
-        }
+        DtoEnumHelper.writeToParcel(this, paramParcel, paramInt, ValueTransfer.values());
     }
     //↑↑↑↑↑↑  實作取得DTO的方式
 

@@ -136,7 +136,9 @@ public class FileFindActivity extends ListActivity {
             ignoreSubdirLst = true;
         } else {
             addPathMap("回到根目錄", "");
-            addPathMap("回上一層 ../", currentDir.getParent());
+            if (currentDir.getParent() != null) {
+                addPathMap("回上一層 ../", currentDir.getParent());
+            }
         }
 
         if (!ignoreSubdirLst) {

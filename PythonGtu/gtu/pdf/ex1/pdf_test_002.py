@@ -1,7 +1,7 @@
 import pdftotext
 
 
-file = 'E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/pdf/ex1/RCRP0S102.pdf'
+file = 'C:/Users/wistronits/Desktop/台達/ISA-95/ISA-95.00.02-2010.pdf'
 
 pdf = pdftotext.PDF(file)
 

@@ -1,0 +1,2 @@
+ctrl + alt + ↑↓　垂直編輯
+ctrl + shift + ↑↓　line上下移動

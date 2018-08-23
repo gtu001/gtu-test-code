@@ -12,6 +12,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
@@ -32,6 +34,7 @@ import com.example.englishtester.common.ActionBarSimpleHandler;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
+import com.example.englishtester.common.DtoEnumHelper;
 import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
@@ -51,6 +54,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -107,24 +111,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
         viewPager = findViewById(R.id.viewpager);
 
-        this.initServices();
-
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final EpubReaderEpubActivity data = (EpubReaderEpubActivity) getLastNonConfigurationInstance();
         if (data != null) {// 表示不是由於Configuration改變觸發的onCreate()
             Log.v(TAG, "load old status!");
-//            this.dto = data.dto;
         } else {
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
-            try {
-                if (getIntent().getExtras().containsKey(KEY_CONTENT)) {
-                    String content = getIntent().getExtras().getString(KEY_CONTENT);
-//                    this.pasteFromOutsideLoad(content); //TODO
-                }
-            } catch (Exception ex) {
-                Log.e(TAG, ex.getMessage(), ex);
-            }
+            this.initServices();
         }
     }
 
@@ -181,7 +175,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
      */
     private void openFontSizeDialog() {
         DialogFontSizeChange dialog = new DialogFontSizeChange(this);
-        dialog.apply(txtReaderView.getTextSize(), Arrays.asList(getTxtReaderView(), getTranslateView()), new DialogFontSizeChange.ApplyFontSize() {
+        dialog.apply(getTxtReaderView().getTextSize(), Arrays.asList(getTxtReaderView(), getTranslateView()), new DialogFontSizeChange.ApplyFontSize() {
             @Override
             public void applyFontSize(float fontSize) {
                 new ReaderCommonHelper.FontSizeApplyer().setFontSize(EpubReaderEpubActivity.this, fontSize, EpubReaderEpubActivity.class);

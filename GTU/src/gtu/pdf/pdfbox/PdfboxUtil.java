@@ -2,6 +2,7 @@ package gtu.pdf.pdfbox;
 
 import java.io.File;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
@@ -12,13 +13,15 @@ import gtu.file.FileUtil;
 public class PdfboxUtil {
 
     public static void main(String[] args) {
-//        File fromFile = new File("c:/Users/gtu00/OneDrive/Desktop/秀娟0501/PDF轉EXCEL/RCRP0S104.pdf");
-//        File toFile = new File(FileUtil.DESKTOP_DIR, fromFile.getName() + ".txt");
-//        String content = PdfboxUtil.loadText(fromFile);
-//        FileUtil.saveToFile(toFile, content, "utf8");
-        
+        // File fromFile = new
+        // File("c:/Users/gtu00/OneDrive/Desktop/秀娟0501/PDF轉EXCEL/RCRP0S104.pdf");
+        // File toFile = new File(FileUtil.DESKTOP_DIR, fromFile.getName() +
+        // ".txt");
+        // String content = PdfboxUtil.loadText(fromFile);
+        // FileUtil.saveToFile(toFile, content, "utf8");
+
         File fromDir = new File("C:/Users/gtu00/OneDrive/Desktop/秀娟0501/new_pdf");
-        for(File f : fromDir.listFiles()) {
+        for (File f : fromDir.listFiles()) {
             File toFile = new File(FileUtil.DESKTOP_DIR, f.getName() + ".txt");
             String content = PdfboxUtil.loadText(f);
             FileUtil.saveToFile(toFile, content, "utf8");
@@ -27,6 +30,10 @@ public class PdfboxUtil {
     }
 
     public static String loadText(File file) {
+        return loadText(file, null);
+    }
+
+    public static String loadText(File file, Pair<Integer, Integer> range) {
         try {
             PDDocument doc = PDDocument.load(file);
             int keyLength = 256;
@@ -36,6 +43,10 @@ public class PdfboxUtil {
             spp.setEncryptionKeyLength(keyLength);
             spp.setPermissions(ap);
             PDFTextStripper stripper = new PDFTextStripper();
+            if (range != null) {
+                stripper.setStartPage(range.getLeft());
+                stripper.setEndPage(range.getRight());
+            }
             String text = stripper.getText(doc);
             doc.close();
             return text;

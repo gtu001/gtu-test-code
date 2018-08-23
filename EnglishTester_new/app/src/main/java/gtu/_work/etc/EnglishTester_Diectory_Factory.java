@@ -2,6 +2,7 @@ package gtu._work.etc;
 
 import android.content.Context;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,9 +24,14 @@ public class EnglishTester_Diectory_Factory {
 
         if (StringUtils.isBlank(wordVo.getMeaning()) || !StringUtil_.hasChinese(wordVo.getMeaning())) {
 
-            String meaning2 = this.getMeaningFromEng2(word);
+            String meaning2 = StringUtils.trimToEmpty(this.getMeaningFromEng2(word));
             if (StringUtils.isNotBlank(meaning2) && StringUtil_.hasChinese(meaning2)) {
-                wordVo.setMeaning(meaning2);
+
+                if (meaning2.contains("未收錄此詞條")) {
+                    wordVo.setMeaning("");
+                } else {
+                    wordVo.setMeaning(meaning2);
+                }
             }
         }
 

@@ -2,7 +2,9 @@ package com.example.englishtester.common;
 
 import android.app.Dialog;
 import android.content.Context;
+
 import com.example.englishtester.common.Log;
+
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,8 +34,8 @@ public class DialogFontSizeChange {
     public interface ApplyFontSize {
         void applyFontSize(float fontSize);
     }
-    
-    public static DialogFontSizeChange builder(Context context){
+
+    public static DialogFontSizeChange builder(Context context) {
         return new DialogFontSizeChange(context);
     }
 
@@ -57,7 +59,7 @@ public class DialogFontSizeChange {
                 float size = fontSizeTextView.getTextSize();
                 size += ADD_SIZE;
                 setTextViewFontSize(size);
-                if(applyInterface!=null){
+                if (applyInterface != null) {
                     applyInterface.applyFontSize(size);
                 }
             }
@@ -69,7 +71,7 @@ public class DialogFontSizeChange {
                 float size = fontSizeTextView.getTextSize();
                 size -= ADD_SIZE;
                 setTextViewFontSize(size);
-                if(applyInterface!=null){
+                if (applyInterface != null) {
                     applyInterface.applyFontSize(size);
                 }
             }
@@ -77,20 +79,20 @@ public class DialogFontSizeChange {
         return this;
     }
 
-    private void setTextViewFontSize(float size){
+    private void setTextViewFontSize(float size) {
         fontSizeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
         Log.v(TAG, "currentSize = " + size);
-        if(viewList != null && !viewList.isEmpty()){
-            for(TextView v : viewList){
+        if (viewList != null && !viewList.isEmpty()) {
+            for (TextView v : viewList) {
                 v.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
             }
         }
     }
-    
-    public void show(){
+
+    public void show() {
         dialog.show();
     }
-    
+
     public interface DialogConfirmClickListener {
         public void onClick(View v, Dialog dialog, String inputTextStr);
     }

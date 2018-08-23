@@ -1,0 +1,13 @@
+錯誤訊息如下
+  error: Microsoft Visual C++ 14.0 is required. Get it with "Microsoft Visual C+ + Build Tools": http://landinghub.visualstudio.com/visual-cpp-build-tools
+
+
+參考教學
+https://www.scivision.co/python-windows-visual-c++-14-required/
+
+
+下載網站如下
+https://visualstudio.microsoft.com/zh-hant/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15&rr=https%3A%2F%2Fwww.scivision.co%2Fpython-windows-visual-c%2B%2B-14-required%2F
+
+
+選擇 Visual C++ Builds 安裝即可
