@@ -98,7 +98,7 @@ public class Log {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + message);
+                LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + " : " + message);
             }
         });
     }

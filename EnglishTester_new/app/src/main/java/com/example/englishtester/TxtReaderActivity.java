@@ -47,9 +47,11 @@ import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.ITxtReaderActivity;
+import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -193,23 +195,25 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         //卷軸
         scrollView1 = (ScrollView) this.findViewById(R.id.scrollView1);
 
-        //初始化服務
-        initService();
-
-        initView();
-
-        //顯示第二群組
-        showGroup(2);
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final TxtReaderActivity data = (TxtReaderActivity) getLastNonConfigurationInstance();
         if (data != null) {// 表示不是由於Configuration改變觸發的onCreate()
             Log.v(TAG, "load old status!");
-            this.dto = data.dto;
+
+            this.restoreBackFromOrient(data);
         } else {
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
             try {
+                //初始化服務
+                initService();
+
+                initView();
+
+                //顯示第二群組
+                showGroup(2);
+
                 if (getIntent().getExtras().containsKey(KEY_CONTENT)) {
                     String content = getIntent().getExtras().getString(KEY_CONTENT);
                     this.pasteFromOutsideLoad(content);
@@ -442,6 +446,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 初始化服務
      */
     private void initService() {
+        initServiceConnection();
+
         dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
 
@@ -640,37 +646,42 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
         } else {
+            boolean isRunning = ServiceUtil.isServiceRunning(TxtReaderActivity.this, FloatViewService.class);
             Intent intent = new Intent(TxtReaderActivity.this, FloatViewService.class);
-            if (isOn) {
+            if (isOn && !isRunning) {
                 startService(intent);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            } else {
+            } else if (!isOn && isRunning) {
                 stopService(intent);
                 unbindService(mConnection);
             }
         }
     }
 
-    /**
-     * 設定綁定服務器連線
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.v(TAG, "onServiceConnected called");
+    private void initServiceConnection() {
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName className, IBinder service) {
+                Log.v(TAG, "onServiceConnected called");
 //            FloatViewService.LocalBinder binder = (FloatViewService.LocalBinder) service;
 //            myService = binder.getServiceInstance();
 //            myService.registerClient(TxtReaderActivity.this);
-            mService = IFloatServiceAidlInterface.Stub.asInterface(service);
-        }
+                mService = IFloatServiceAidlInterface.Stub.asInterface(service);
+            }
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.v(TAG, "onServiceDisconnected called");
+            @Override
+            public void onServiceDisconnected(ComponentName arg0) {
+                Log.v(TAG, "onServiceDisconnected called");
 //            myService = null;
-            mService = null;
-        }
-    };
+                mService = null;
+            }
+        };
+    }
+
+    /**
+     * 設定綁定服務器連線
+     */
+    private ServiceConnection mConnection;
 
     private LinearLayout createContentView() {
         LinearLayout layout = new LinearLayout(this);
@@ -722,10 +733,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 this, recentTxtMarkService, mService, dto, txtView //
         );
         if (!isHtmlFromWord) {
-            txtView.setText(appender.getAppendTxt(content));
+            SpannableString spannableHolder = appender.getAppendTxt(content);
+            this.dto.setSpannableHolder(spannableHolder);
+            txtView.setText(spannableHolder);
             this.dto.content = content;
         } else {
-            txtView.setText(appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.getMaxWidth() - 10));
+            SpannableString spannableHolder = appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.getMaxWidth() - 10);
+            this.dto.setSpannableHolder(spannableHolder);
+            txtView.setText(spannableHolder);
             if (dto.currentHtmlFile != null) {
                 this.dto.content = HtmlWordParser.newInstance().getFromFile(dto.currentHtmlFile, true, "");
             } else if (StringUtils.isNotBlank(dto.currentHtmlContent)) {
@@ -1128,6 +1143,43 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
+    private void restoreBackFromOrient(final TxtReaderActivity activity) {
+        final ProgressDialog dlg = LoadingProgressDlg.createSimpleLoadingDlg(this);
+        dlg.show();
+
+        final Handler handler = new Handler();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dto = activity.dto;
+
+                        //初始化服務
+                        initService();
+
+                        initView();
+
+                        dto.txtView = txtView;
+
+                        txtView.setText(dto.getSpannableHolder());
+
+                        int showGroupType = txtView.getText().length() > 0 ? 1 : 2;
+
+                        //顯示第1群組
+                        showGroup(showGroupType);
+
+                        setTitle(dto.getFileName());
+
+                        dlg.dismiss();
+                    }
+                }, 100L);
+            }
+        }).start();
+    }
+
     // --------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
@@ -1299,6 +1351,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private File cacheDir;
 
+        private SpannableString spannableHolder;
+
         public StringBuilder getFileName() {
             return fileName;
         }
@@ -1376,6 +1430,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         public void setCacheDir(File cacheDir) {
             this.cacheDir = cacheDir;
+        }
+
+        public SpannableString getSpannableHolder() {
+            return spannableHolder;
+        }
+
+        public void setSpannableHolder(SpannableString spannableHolder) {
+            this.spannableHolder = spannableHolder;
         }
     }
 
