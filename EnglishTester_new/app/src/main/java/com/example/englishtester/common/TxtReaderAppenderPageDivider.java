@@ -1,6 +1,7 @@
 package com.example.englishtester.common;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +25,22 @@ public class TxtReaderAppenderPageDivider {
         return _INST;
     }
 
-    public List<String> getPages(String txtContent) {
+    public Pair<List<String>, List<String>> getPages(String txtContent) {
         SectionChecker sc = new SectionChecker(txtContent);
         sc.processPages();
-        return sc.pageLst;
+        return Pair.of(sc.pageLst, sc.page4TransalteLst);
+    }
+
+    private String getTranslateText(String text) {
+        TxtReaderAppenderEscaper escaper = new TxtReaderAppenderEscaper(text);
+        return escaper.getResult();
     }
 
     private class SectionChecker {
         private String txtContent;
 
         List<String> pageLst = new ArrayList<>();
+        List<String> page4TransalteLst = new ArrayList<String>();
 
         private SectionChecker(String txtContent) {
             this.txtContent = txtContent;
@@ -52,10 +59,13 @@ public class TxtReaderAppenderPageDivider {
                     }
 
                     pageLst.add(tmpContent);
+                    page4TransalteLst.add(getTranslateText(tmpContent));
+
                     startPos = mth.end();
                 }
             }
             pageLst.add(txtContent.substring(startPos, txtContent.length()));
+            page4TransalteLst.add(getTranslateText(txtContent.substring(startPos, txtContent.length())));
         }
     }
 }

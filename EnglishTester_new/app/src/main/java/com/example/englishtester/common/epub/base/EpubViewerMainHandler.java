@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.example.englishtester.DropboxFileLoadService;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
+import com.example.englishtester.common.interf.EpubActivityInterface;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -20,6 +21,7 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -150,16 +152,6 @@ public class EpubViewerMainHandler {
         }
     }
 
-    public interface EpubActivityInterface extends ITxtReaderActivity {
-        void setTitle(String titleVal);
-
-        IFloatServiceAidlInterface getFloatService();
-
-        RecentTxtMarkService getRecentTxtMarkService();
-
-        int getFixScreenWidth();
-    }
-
     private class EpubSpannableTextHandler implements NavigationEventListener {
         private final String TAG = EpubSpannableTextHandler.class.getSimpleName();
 
@@ -208,9 +200,9 @@ public class EpubViewerMainHandler {
 
                     dto.setFileName(dto.getBookFile().getName());
                     TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, EpubViewerMainHandler.this.dto.textView);
-                    Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
+                    Triple<List<SpannableString>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
-                    pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getRight());
+                    pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
                     pageContentHolder.setSpinePos(navigationEvent.getCurrentSpinePos());
 
                     dto.bookStatusHolder.spineRangeHolder.put(navigationEvent.getCurrentSpinePos(), pageContentHolder, dto.getBookFile());
@@ -259,6 +251,8 @@ public class EpubViewerMainHandler {
         private AtomicInteger spinePos = new AtomicInteger(-1);
         private List<SpannableString> pages;
         private List<String> pages4Debug;
+        private List<String> translateLst;
+        private String[] translateDoneArry;
 
         private int currentPageIndex = 0;
 
@@ -290,10 +284,24 @@ public class EpubViewerMainHandler {
             return pages.get(currentPageIndex);
         }
 
-        public void setPages(List<SpannableString> pages, List<String> pages4Debug) {
+        public void setTranslateDoneText(String text) {
+            this.translateDoneArry[currentPageIndex] = text;
+        }
+
+        public String getTranslateDoneText() {
+            return this.translateDoneArry[currentPageIndex];
+        }
+
+        public String getTranslateOrignText() {
+            return this.translateLst.get(currentPageIndex);
+        }
+
+        public void setPages(List<SpannableString> pages, List<String> pages4Debug, List<String> page4Translate) {
             this.pages = pages;
             this.pages4Debug = pages4Debug;
             this.currentPageIndex = 0;
+            this.translateLst = page4Translate;
+            this.translateDoneArry = new String[pages.size()];
         }
 
         public boolean hasNext() {

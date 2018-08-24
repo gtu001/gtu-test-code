@@ -28,6 +28,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ActionBarSimpleHandler;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
@@ -37,6 +38,7 @@ import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.TxtReaderAppenderEscaper;
+import com.example.englishtester.common.interf.EpubActivityInterface;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
@@ -50,11 +52,16 @@ import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -62,7 +69,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EpubReaderEpubActivity extends FragmentActivity implements FloatViewService.Callbacks, ITxtReaderActivity, EpubViewerMainHandler.EpubActivityInterface {
+public class EpubReaderEpubActivity extends FragmentActivity implements FloatViewService.Callbacks, ITxtReaderActivity, EpubActivityInterface {
 
     private static final String TAG = EpubReaderEpubActivity.class.getSimpleName();
 
@@ -87,6 +94,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     Handler handler = new Handler();
     MyPageAdapter pageAdapter;
     ActionBarSimpleHandler actionBarCustomTitleHandler;
+    Thread translateThread;
 
     TextView txtReaderView;
     TextView translateView;
@@ -152,10 +160,134 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
     private void translateBtnOnClick() {
         try {
-            String text = this.getTxtReaderView().getText().toString();
-            TxtReaderAppenderEscaper escaper = new TxtReaderAppenderEscaper(text);
-            this.getTranslateView().setText(escaper.getResult());
-            escaper.getResult();
+            final EpubViewerMainHandler.PageContentHolder holder = this.epubViewerMainHandler.gotoPosition(this.epubViewerMainHandler.getDto().getPageIndex());
+            final String content = StringUtils.trimToEmpty(holder.getTranslateOrignText());
+            final String translateDoneText = StringUtils.trimToEmpty(holder.getTranslateDoneText());
+
+            Log.v(TAG, "# translateBtn click!");
+            final String appId = BaiduApplicationActivity.getBaiduAppId(EpubReaderEpubActivity.this);
+            final String securityKey = BaiduApplicationActivity.getBaiduSecret(EpubReaderEpubActivity.this);
+            if (StringUtils.isBlank(appId) || StringUtils.isBlank(securityKey)) {
+                Toast.makeText(EpubReaderEpubActivity.this, "尚未申請百度Api!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (StringUtils.isBlank(content)) {
+                Toast.makeText(EpubReaderEpubActivity.this, "文章內容為空!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (StringUtils.isBlank(getTranslateView().getText()) && StringUtils.isNotBlank(translateDoneText)) {
+                getTranslateView().setText(translateDoneText);
+            }
+            if (StringUtils.isNotBlank(getTranslateView().getText())) {
+                Toast.makeText(EpubReaderEpubActivity.this, "已完成翻譯!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            getTranslateBtn().setEnabled(false);
+            final TransApiNew api = new TransApiNew(appId, securityKey);
+
+            final ProgressDialog progressDialog = new ProgressDialog(EpubReaderEpubActivity.this);
+            progressDialog.setMessage("處理中,請稍候...");
+            progressDialog.show();
+
+            final Handler handler = new Handler();
+            if (translateThread == null || translateThread.getState() == Thread.State.TERMINATED) {
+                translateThread = new Thread(new Runnable() {
+                    private Map<String, String> traMap = new LinkedHashMap<String, String>();
+
+                    private void setBackupToPageHolder(String translateDoneText) {
+                        holder.setTranslateDoneText(translateDoneText);
+                    }
+
+                    private String getResultStr(String content) throws JSONException, UnsupportedEncodingException {
+                        Log.v(TAG, "content - " + content);
+                        String jsonString = api.getTransResult(content, "en", "cht");
+                        if (StringUtils.isBlank(jsonString)) {
+                            return "";
+                        }
+                        Log.v(TAG, "jsonString - " + jsonString);
+                        final JSONObject obj = new JSONObject(jsonString);
+                        JSONArray arry = obj.getJSONArray("trans_result");
+                        StringBuilder sb = new StringBuilder();
+                        for (int ii = 0; ii < arry.length(); ii++) {
+                            JSONObject o1 = arry.getJSONObject(ii);
+                            String orgin = o1.getString("src");
+                            String result = o1.getString("dst");
+                            //建立可按的內容
+                            traMap.put(result, orgin);
+                            sb.append(result + "\r\n");
+                        }
+                        return sb.toString();
+                    }
+
+                    private boolean isNeedSearch() {
+                        if (StringUtils.isBlank(translateView.getText())) {
+                            return true;
+                        }
+                        showToast("內容未變更, 無須重新翻譯");
+                        return false;
+                    }
+
+                    private void showToast(final String message) {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(EpubReaderEpubActivity.this, message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    /**
+                     * 拿掉中文(以免跟翻譯後的中文混淆)
+                     */
+                    private String ridOffChinese(String orignStr) {
+                        char[] cs = orignStr.toCharArray();
+                        StringBuilder sb = new StringBuilder();
+                        for (int ii = 0; ii < cs.length; ii++) {
+                            boolean isChinese = new String(new char[]{cs[ii]}).getBytes().length >= 3;
+                            if (!isChinese) {
+                                sb.append(cs[ii]);
+                            }
+                        }
+                        return sb.toString();
+                    }
+
+                    @Override
+                    public void run() {
+                        try {
+                            if (!isNeedSearch()) {
+                                return;
+                            }
+                            final String reulstStr = getResultStr(content);
+                            Log.v(TAG, "reulstStr - " + reulstStr);
+                            if (StringUtils.isBlank(reulstStr)) {
+                                throw new Exception("翻譯結果為空,無法翻譯!");
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //translateView.setText(reulstStr);
+                                    getTranslateView().setText(reulstStr);
+                                    setBackupToPageHolder(reulstStr);
+                                }
+                            });
+                        } catch (Exception e) {
+                            Log.e(TAG, "ERROR : " + e.getMessage(), e);
+                            showToast("翻譯失敗!");
+                        } finally {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getTranslateBtn().setEnabled(true);
+                                    progressDialog.dismiss();
+                                }
+                            });
+                        }
+                    }
+                });
+                translateThread.setDaemon(true);
+                translateThread.start();
+            }
         } catch (Exception ex) {
             Log.e(TAG, "translateBtnOnClick ERR : " + ex.getMessage(), ex);
         }
@@ -669,6 +801,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                         String debugContent = pageHolder.getPageContent4Debug();
                         my.txtReaderView.setText(debugContent);
                     }
+
+                    my.translateView.setText(StringUtils.trimToEmpty(pageHolder.getTranslateDoneText()));
                 }
 
                 @Override
@@ -764,6 +898,10 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
     private TextView getTranslateView() {
         return (TextView) viewPager.findViewWithTag("translateView-" + viewPager.getCurrentItem());
+    }
+
+    private Button getTranslateBtn() {
+        return (Button) viewPager.findViewWithTag("translateBtn-" + viewPager.getCurrentItem());
     }
 
 

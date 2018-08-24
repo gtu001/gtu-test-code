@@ -25,6 +25,7 @@ import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -261,9 +262,11 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Pair<List<SpannableString>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
+    public Triple<List<SpannableString>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
         List<SpannableString> pageDividLst = new ArrayList<>();
-        List<String> pages = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
+        Pair<List<String>, List<String>> pair = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
+        List<String> pages = pair.getLeft();
+        List<String> orign4TranslateLst = pair.getRight();
 
         String fileName = dto.getFileName().toString();
 
@@ -285,7 +288,8 @@ public class TxtReaderAppender {
             TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth);
             pageDividLst.add(appender.getResult());
         }
-        return Pair.of(pageDividLst, pages);
+
+        return Triple.of(pageDividLst, pages, orign4TranslateLst);
     }
 
     public static class SimpleUrlLinkSpan extends ClickableSpan {
