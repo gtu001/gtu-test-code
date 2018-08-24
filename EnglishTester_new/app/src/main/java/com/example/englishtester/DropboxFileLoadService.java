@@ -11,8 +11,12 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileUtilGtu;
+import com.example.englishtester.common.MockServiceMacker;
+import com.example.englishtester.common.interf.IDropboxFileLoadService;
+
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class DropboxFileLoadService {
+public class DropboxFileLoadService implements IDropboxFileLoadService {
 
     private static final String TAG = DropboxFileLoadService.class.getSimpleName();
     private final static String ENGLISH_TXT_FOLDER = "/english_txt";
@@ -37,9 +41,18 @@ public class DropboxFileLoadService {
 
     Handler handler = new Handler();
 
-    public DropboxFileLoadService(Context context, String accessToken) {
+    private DropboxFileLoadService(Context context, String accessToken) {
+        Validate.notBlank(accessToken);
         this.context = context;
         this.accessToken = accessToken;
+    }
+
+    public static IDropboxFileLoadService newInstance(final Context context, final String accessToken) {
+        try {
+            return new DropboxFileLoadService(context, accessToken);
+        } catch (Exception ex) {
+            return MockServiceMacker.getMockStuff("dropbox accessToken未初始化!", context, DropboxFileLoadService.class);
+        }
     }
 
     private void toastShow(final String message) {

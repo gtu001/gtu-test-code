@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.RecentTxtMarkDAO;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;

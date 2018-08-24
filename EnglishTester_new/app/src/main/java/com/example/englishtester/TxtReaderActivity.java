@@ -46,17 +46,17 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
-import com.example.englishtester.common.ITxtReaderActivity;
+import com.example.englishtester.common.interf.IDropboxFileLoadService;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
-import com.example.englishtester.common.ServiceUtil;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.google.android.gms.ads.NativeExpressAdView;
 
@@ -112,7 +112,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 取得dropbox txt服務
      */
-    DropboxFileLoadService dropboxFileLoadService;
+    IDropboxFileLoadService dropboxFileLoadService;
     /**
      * 最近查詢單字
      */
@@ -220,7 +220,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     this.pasteFromOutsideLoad(content);
                 }
             } catch (Exception ex) {
-                Log.e(TAG, ex.getMessage(), ex);
+                throw new RuntimeException("onCreate ERR : " + ex.getMessage(), ex);
             }
         }
     }
@@ -334,6 +334,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      */
     private void loadDropboxList() {
         final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
+        if(fileLst == null || fileLst.isEmpty()){
+            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
             @Override
             public int compare(DropboxUtilV2.DropboxUtilV2_DropboxFile o1, DropboxUtilV2.DropboxUtilV2_DropboxFile o2) {
@@ -453,7 +457,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         //for GIF Span
         dto.txtView = txtView;
 
-        dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
+        dropboxFileLoadService = DropboxFileLoadService.newInstance(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
 
         appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);

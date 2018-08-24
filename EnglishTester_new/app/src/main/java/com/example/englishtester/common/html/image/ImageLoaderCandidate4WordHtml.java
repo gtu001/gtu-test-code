@@ -7,7 +7,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.OnlinePicLoader;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
 
 import org.apache.commons.lang3.StringUtils;

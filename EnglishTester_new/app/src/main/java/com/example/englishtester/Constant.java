@@ -2,6 +2,7 @@ package com.example.englishtester;
 
 import android.content.Context;
 import android.os.Environment;
+
 import com.example.englishtester.common.Log;
 
 import java.io.File;
@@ -149,12 +150,15 @@ public class Constant {
         if (_APP_CONFIG == null) {
             Properties prop = new Properties();
             try {
+                if (!Constant.APP_CONFIG_FILE.exists()) {
+                    return prop;
+                }
                 prop.load(new FileInputStream(Constant.APP_CONFIG_FILE));
                 Log.v(TAG, "appConfig : " + prop);
                 if (prop.isEmpty()) {
                     Log.e(TAG, "appConfig 無設定內容");
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 Log.e(TAG, "appConfig 讀取失敗!", e);
             }
             _APP_CONFIG = prop;

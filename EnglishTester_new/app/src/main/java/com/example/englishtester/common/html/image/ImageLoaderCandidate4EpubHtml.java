@@ -3,7 +3,7 @@ package com.example.englishtester.common.html.image;
 import android.graphics.Bitmap;
 
 import com.example.englishtester.common.OnlinePicLoader;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 
 import java.io.File;

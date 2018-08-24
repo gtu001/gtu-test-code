@@ -1,4 +1,4 @@
-package com.example.englishtester.common.html.interf;
+package com.example.englishtester.common.interf;
 
 import android.widget.TextView;
 

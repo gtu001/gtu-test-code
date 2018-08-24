@@ -8,11 +8,11 @@ import android.widget.TextView;
 import com.example.englishtester.DropboxFileLoadService;
 import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
-import com.example.englishtester.common.ITxtReaderActivity;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlEpubParser;
 
 import junit.framework.Assert;
@@ -590,14 +590,15 @@ public class EpubViewerMainHandler {
         }
 
         final ArrayBlockingQueue<Boolean> blockQueue = new ArrayBlockingQueue<Boolean>(1);
-
-        //觸發取得下個頁面
-        gotoNextSpineSection(new Runnable() {
-            @Override
-            public void run() {
-                blockQueue.add(true);
-            }
-        });
+        synchronized (this) {
+            //觸發取得下個頁面
+            gotoNextSpineSection(new Runnable() {
+                @Override
+                public void run() {
+                    blockQueue.add(true);
+                }
+            });
+        }
 
         try {
 //            Log.line(TAG, "!!取得下個頁面");

@@ -2,21 +2,14 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.RemoteException;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-
-import com.example.englishtester.common.Log;
 
 import android.view.View;
 import android.widget.TextView;
@@ -24,23 +17,17 @@ import android.widget.Toast;
 
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.FloatViewService;
-import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
-import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
-import com.example.englishtester.common.html.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -241,9 +228,11 @@ public class TxtReaderAppender {
         }
 
         private int getFinalSearch2Bookmark(List<RecentTxtMarkDAO.RecentTxtMark> qList) {
-            RecentTxtMarkDAO.RecentTxtMark finalBo = qList.get(qList.size() - 1);
-            if (finalBo.getBookmarkType() != RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
-                return finalBo.getMarkIndex();
+            if (qList != null && !qList.isEmpty()) {
+                RecentTxtMarkDAO.RecentTxtMark finalBo = qList.get(qList.size() - 1);
+                if (finalBo.getBookmarkType() != RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
+                    return finalBo.getMarkIndex();
+                }
             }
             return -1;
         }
