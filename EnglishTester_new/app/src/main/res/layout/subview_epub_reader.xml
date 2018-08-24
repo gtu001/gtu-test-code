@@ -36,6 +36,13 @@
                     android:text=""
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
+                <Button android:id="@+id/translateBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="翻譯本頁"
+                    android:textAppearance="?android:attr/textAppearanceLarge">
+                </Button>
+
                 <TextView
                     android:id="@+id/translateView"
                     android:layout_width="wrap_content"

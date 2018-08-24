@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
+import com.example.englishtester.common.TxtReaderAppenderEscaper;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
@@ -119,7 +121,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         }
     }
 
-    private void initTextViewAfterService(TextView txtReaderView, TextView translateView) {
+    private void initTextViewAfterService(TextView txtReaderView, TextView translateView, Button translateBtn) {
         float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, EpubReaderEpubActivity.class);
 
         txtReaderView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
@@ -139,6 +141,24 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         appleFontApplyer.apply(translateView);
 
         paddingAdjuster.applyPadding(translateView);
+
+        translateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                translateBtnOnClick();
+            }
+        });
+    }
+
+    private void translateBtnOnClick() {
+        try {
+            String text = this.getTxtReaderView().getText().toString();
+            TxtReaderAppenderEscaper escaper = new TxtReaderAppenderEscaper(text);
+            this.getTranslateView().setText(escaper.getResult());
+            escaper.getResult();
+        } catch (Exception ex) {
+            Log.e(TAG, "translateBtnOnClick ERR : " + ex.getMessage(), ex);
+        }
     }
 
     private void initServices() {
@@ -515,9 +535,9 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
     // --------------------------------------------------------------------
 
-    private void initViewpagerChildrenView(TextView txtReaderView, TextView translateView) {
+    private void initViewpagerChildrenView(TextView txtReaderView, TextView translateView, Button translateBtn) {
         epubViewerMainHandler.getDto().setTextView(txtReaderView);
-        initTextViewAfterService(txtReaderView, translateView);
+        initTextViewAfterService(txtReaderView, translateView, translateBtn);
     }
 
     /**
@@ -572,6 +592,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         private ScrollView scrollView1;
         private TextView txtReaderView;
         private TextView translateView;
+        private Button translateBtn;
         private ViewGroup container;
         private boolean isDone = false;
 
@@ -687,10 +708,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             my.txtReaderView.setTag("txtReaderView-" + position);
             my.translateView.setTag("translateView-" + position);
+            my.translateBtn.setTag("translateBtn-" + position);
             my.scrollView1.setTag("scrollView1-" + position);
 
             //init view
-            self.initViewpagerChildrenView(my.txtReaderView, my.translateView);
+            self.initViewpagerChildrenView(my.txtReaderView, my.translateView, my.translateBtn);
 
             final Handler handler = new Handler();
 
@@ -707,6 +729,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             my.scrollView1 = (ScrollView) parentView.findViewById(R.id.scrollView1);
             my.txtReaderView = (TextView) parentView.findViewById(R.id.txtReaderView);
             my.translateView = (TextView) parentView.findViewById(R.id.translateView);
+            my.translateBtn = (Button) parentView.findViewById(R.id.translateBtn);
 
             return my;
         }
