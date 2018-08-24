@@ -58,10 +58,18 @@ public class TxtReaderAppender {
     ITxtReaderActivityDTO dto;
     TextView txtView;
 
-    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, IFloatServiceAidlInterface mService, ITxtReaderActivityDTO dto, TextView txtView) {
+    public TxtReaderAppender(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, ITxtReaderActivityDTO dto, TextView txtView) {
         this.recentTxtMarkService = recentTxtMarkService;
         this.activity = activity;
-        this.mService = mService;
+        this.mService = dto.getIFloatService();
+        this.dto = dto;
+        this.txtView = txtView;
+    }
+
+    public void reset(ITxtReaderActivity activity, RecentTxtMarkService recentTxtMarkService, ITxtReaderActivityDTO dto, TextView txtView) {
+        this.recentTxtMarkService = recentTxtMarkService;
+        this.activity = activity;
+        this.mService = dto.getIFloatService();
         this.dto = dto;
         this.txtView = txtView;
     }
@@ -199,19 +207,27 @@ public class TxtReaderAppender {
                 //設定內文
                 clickableSpan.setWord(txtNow);
 
+                //補上最後一個查詢為bookmark
+                Integer finalSearchIndex = getFinalSearch2Bookmark(qList);
+
                 // 設定單字為以查詢狀態
                 for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
                     if (bo.getMarkIndex() == clickableSpan.id && StringUtils.equals(bo.getMarkEnglish(), txtNow)) {
                         Log.v(TAG, "remark : " + txtNow + " - " + clickableSpan.id);
 
                         //書籤模式
-                        if (bo.getBookmarkType() == 1) {
+                        if (bo.getBookmarkType() == RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
                             clickableSpan.setBookmarking(true);
                             putToBookmarkHolder(clickableSpan);
                         } else {
                             //查詢模式
                             clickableSpan.setMarking(true);
                         }
+                    }
+
+                    //補上最後一個查詢為bookmark
+                    if (finalSearchIndex == bo.getMarkIndex()) {
+                        putToBookmarkHolder(clickableSpan);
                     }
                 }
 
@@ -222,6 +238,14 @@ public class TxtReaderAppender {
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
             }
+        }
+
+        private int getFinalSearch2Bookmark(List<RecentTxtMarkDAO.RecentTxtMark> qList) {
+            RecentTxtMarkDAO.RecentTxtMark finalBo = qList.get(qList.size() - 1);
+            if (finalBo.getBookmarkType() != RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
+                return finalBo.getMarkIndex();
+            }
+            return -1;
         }
 
         private void putToBookmarkHolder(WordSpan clickableSpan) {

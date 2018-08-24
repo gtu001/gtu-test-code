@@ -141,6 +141,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * title自訂
      */
     ActionBarSimpleHandler actionBarCustomTitleHandler;
+    /**
+     * Spannable Handler
+     */
+    TxtReaderAppender appender;
 
     EditText editText1;
     Button clearBtn;
@@ -158,7 +162,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     private NativeExpressAdView mAdView;
 
-    TxtReaderActivityDTO dto = new TxtReaderActivityDTO();
+    TxtReaderActivityDTO dto;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -181,9 +185,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         translateView = (TextView) this.findViewById(R.id.translateView);
         translateBtn = (Button) this.findViewById(R.id.translateBtn);
         linearLayout1 = (LinearLayout) this.findViewById(R.id.linearLayout1);
-
-        //for GIF Span
-        dto.txtView = txtView;
 
         //群組2
         editText1 = (EditText) this.findViewById(R.id.editText1);
@@ -448,6 +449,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     private void initService() {
         initServiceConnection();
 
+        dto = new TxtReaderActivityDTO(this);
+        //for GIF Span
+        dto.txtView = txtView;
+
         dropboxFileLoadService = new DropboxFileLoadService(this, DropboxApplicationActivity.getDropboxAccessToken(this));
         recentTxtMarkService = new RecentTxtMarkService(this);
 
@@ -646,12 +651,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
         } else {
-            boolean isRunning = ServiceUtil.isServiceRunning(TxtReaderActivity.this, FloatViewService.class);
-            Intent intent = new Intent(TxtReaderActivity.this, FloatViewService.class);
-            if (isOn && !isRunning) {
+            Intent intent = new Intent(this, FloatViewService.class);
+            if (isOn) {
                 startService(intent);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            } else if (!isOn && isRunning) {
+            } else {
                 stopService(intent);
                 unbindService(mConnection);
             }
@@ -729,8 +733,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 設定英文內容
      */
     private void setContentText(String content, boolean isHtmlFromWord) {
-        TxtReaderAppender appender = new TxtReaderAppender(
-                this, recentTxtMarkService, mService, dto, txtView //
+        appender = new TxtReaderAppender(
+                this, recentTxtMarkService, dto, txtView //
         );
         if (!isHtmlFromWord) {
             SpannableString spannableHolder = appender.getAppendTxt(content);
@@ -1144,6 +1148,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     private void restoreBackFromOrient(final TxtReaderActivity activity) {
+        //停掉上階段 ↓↓↓↓↓↓
+        try {
+            activity.homeKeyWatcher.stopWatch();
+            activity.unbindService(activity.mConnection);
+        } catch (Exception ex) {
+            Log.e(TAG, "restoreBackFromOrient ERR : " + ex.getMessage(), ex);
+        }
+        //停掉上階段 ↑↑↑↑↑↑
+
+        this.appender = activity.appender;
+        //停掉上階段 ↑↑↑↑↑↑
+
         final ProgressDialog dlg = LoadingProgressDlg.createSimpleLoadingDlg(this);
         dlg.show();
 
@@ -1155,14 +1171,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        dto = activity.dto;
-
                         //初始化服務
                         initService();
 
                         initView();
 
+                        //設定回備份 dto
+                        dto = activity.dto;
                         dto.txtView = txtView;
+
+                        //設定 appender 的 property 否則無法查詢
+                        appender.reset(TxtReaderActivity.this, recentTxtMarkService, dto, txtView);
 
                         txtView.setText(dto.getSpannableHolder());
 
@@ -1333,6 +1352,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         return true;
     }
 
+    public IFloatServiceAidlInterface getmService() {
+        return mService;
+    }
+
     public static class TxtReaderActivityDTO implements ITxtReaderActivityDTO, Serializable {
 
         private final StringBuilder fileName = new StringBuilder();
@@ -1350,8 +1373,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private File cacheDir;
+        private TxtReaderActivity activity;
 
         private SpannableString spannableHolder;
+
+        public TxtReaderActivityDTO(TxtReaderActivity activity) {
+            this.activity = activity;
+        }
 
         public StringBuilder getFileName() {
             return fileName;
@@ -1422,6 +1450,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         public void setFileName(String title) {
             fileName.delete(0, fileName.length());
             fileName.append(title);
+        }
+
+        @Override
+        public IFloatServiceAidlInterface getIFloatService() {
+            return activity.getmService();
         }
 
         public File getCacheDir() {

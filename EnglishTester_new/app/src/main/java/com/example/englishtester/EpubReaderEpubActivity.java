@@ -338,12 +338,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
         } else {
-            boolean isRunning = ServiceUtil.isServiceRunning(EpubReaderEpubActivity.this, FloatViewService.class);
-            Intent intent = new Intent(EpubReaderEpubActivity.this, FloatViewService.class);
-            if (isOn && !isRunning) {
+            Intent intent = new Intent(this, FloatViewService.class);
+            if (isOn) {
                 startService(intent);
                 bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            } else if (!isOn && isRunning) {
+            } else {
                 stopService(intent);
                 unbindService(mConnection);
             }
@@ -755,6 +754,15 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     private void restoreBackFromOrient(EpubReaderEpubActivity activity) {
         final File bookFile = activity.epubViewerMainHandler.getDto().getBookFile();
         final int position = activity.epubViewerMainHandler.getDto().getPageIndex();
+
+        //停掉上階段 ↓↓↓↓↓↓
+        try {
+            activity.homeKeyWatcher.stopWatch();
+            activity.unbindService(activity.mConnection);
+        } catch (Exception ex) {
+            Log.e(TAG, "restoreBackFromOrient ERR : " + ex.getMessage(), ex);
+        }
+        //停掉上階段 ↑↑↑↑↑↑
 
         this.initServices();
 

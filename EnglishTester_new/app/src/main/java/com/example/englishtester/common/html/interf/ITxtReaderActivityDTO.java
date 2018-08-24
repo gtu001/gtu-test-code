@@ -2,6 +2,7 @@ package com.example.englishtester.common.html.interf;
 
 import android.widget.TextView;
 
+import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.TxtReaderAppender;
 
 import java.util.Map;
@@ -23,4 +24,6 @@ public interface ITxtReaderActivityDTO {
     int getPageIndex();
 
     void setFileName(String title);
+
+    IFloatServiceAidlInterface getIFloatService();
 }

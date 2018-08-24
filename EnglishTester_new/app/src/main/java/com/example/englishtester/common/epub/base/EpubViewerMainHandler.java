@@ -74,7 +74,7 @@ public class EpubViewerMainHandler {
         this.epubSpannableTextHandler = new EpubSpannableTextHandler();
         this.self = this;
         this.epubActivityInterface = epubActivityInterface;
-        this.dto = new EpubDTO();
+        this.dto = new EpubDTO(epubActivityInterface);
     }
 
     public void setTextView(TextView textView) {
@@ -207,7 +207,7 @@ public class EpubViewerMainHandler {
                     pageContentHolder.customContent.set($tempResultContent);
 
                     dto.setFileName(dto.getBookFile().getName());
-                    TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), epubActivityInterface.getFloatService(), dto, EpubViewerMainHandler.this.dto.textView);
+                    TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, EpubViewerMainHandler.this.dto.textView);
                     Pair<List<SpannableString>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
                     pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getRight());
@@ -367,10 +367,12 @@ public class EpubViewerMainHandler {
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private PageForwardEnum pageForwardEnum;
         private BookStatusHolder bookStatusHolder;
+        private EpubActivityInterface epubActivityInterface;
 
         private int pageIndex = -1;
 
-        public EpubDTO() {
+        public EpubDTO(EpubActivityInterface epubActivityInterface) {
+            this.epubActivityInterface = epubActivityInterface;
         }
 
         public void setTextView(TextView textView) {
@@ -398,6 +400,11 @@ public class EpubViewerMainHandler {
             }
             this.fileName.delete(0, fileName.length());
             this.fileName.append(fname);
+        }
+
+        @Override
+        public IFloatServiceAidlInterface getIFloatService() {
+            return epubActivityInterface.getFloatService();
         }
 
         @Override
