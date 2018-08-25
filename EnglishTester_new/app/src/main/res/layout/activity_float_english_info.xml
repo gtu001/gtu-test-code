@@ -3,7 +3,7 @@
     android:id="@+id/activity_english_info_ui"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="top" >
+    android:gravity="top">
 
     <!-- windowSoftInputMode=stateUnspecified|adjustResize -->
 
@@ -17,10 +17,9 @@
         android:id="@+id/scrollView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fillViewport="true" >
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/linearLayout1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -28,112 +27,201 @@
             android:layout_margin="0dip"
             android:background="@drawable/layout_background"
             android:orientation="vertical"
-            android:padding="3dp" >
+            android:padding="0dp">
 
             <LinearLayout
-                android:id="@+id/linearLayout_inner"
+                android:id="@+id/linearLayout1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_margin="0dip"
-                android:orientation="horizontal" >
+                android:orientation="vertical"
+                android:padding="0dp">
 
-                <AutoCompleteTextView
-                    android:id="@+id/autoCompleteTextView1"
+                <LinearLayout
+                    android:id="@+id/linearLayout_inner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:ems="10"
-                    android:selectAllOnFocus="true"
-                    android:singleLine="true"
-                    android:dropDownHeight="180dp"
-                    android:completionThreshold="1"
-                    android:popupBackground="@drawable/float_autocomplete"
-                    android:hint="輸入單字"
-                    >
-                    <requestFocus />
-                </AutoCompleteTextView>
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/imageViewConfig"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/icon_config" />
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteTextView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentRight="true"
+                        android:completionThreshold="1"
+                        android:dropDownHeight="180dp"
+                        android:ems="10"
+                        android:hint="輸入單字"
+                        android:popupBackground="@drawable/float_autocomplete"
+                        android:selectAllOnFocus="true"
+                        android:singleLine="true">
 
-                <ImageView
-                    android:id="@+id/imageViewSearch"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/new_search_icon2" />
+                        <requestFocus />
+                    </AutoCompleteTextView>
+
+                    <ImageView
+                        android:id="@+id/imageViewConfig"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_config" />
+
+                    <ImageView
+                        android:id="@+id/imageViewSearch"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/new_search_icon2" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Medium Text"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                    <ImageView
+                        android:id="@+id/imageViewDictionary"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_dictionary" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/editText1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="輸入解釋"></EditText>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/icon_save"
+                        android:text="加入新字" />
+
+                    <Button
+                        android:id="@+id/button3"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/icon_modify"
+                        android:text="修改" />
+
+                    <ImageView
+                        android:id="@+id/imageViewEraser"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_eraser" />
+
+                    <TextView
+                        android:id="@+id/refTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text=""
+                        android:visibility="gone"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_margin="0dip"
-                android:orientation="horizontal" >
+                android:orientation="vertical"
+                android:padding="0dp">
 
-                <TextView
-                    android:id="@+id/textView1"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Medium Text"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/imageViewDictionary"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/icon_dictionary" />
-            </LinearLayout>
+                    <EditText
+                        android:id="@+id/noteText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentRight="true"
+                        android:completionThreshold="1"
+                        android:dropDownHeight="180dp"
+                        android:ems="10"
+                        android:hint="記事本"
+                        android:popupBackground="@drawable/float_autocomplete"
+                        android:selectAllOnFocus="false"
+                        android:singleLine="false">
 
-            <EditText
-                android:id="@+id/editText1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="輸入解釋">
-            </EditText>
+                        <requestFocus />
+                    </EditText>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="0dip"
-                android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/imageViewConfig2"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_config" />
 
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:background="@drawable/icon_save"
-                    android:text="加入新字" />
+                    <ImageView
+                        android:id="@+id/imageViewNoteAction"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_transmit" />
+                </LinearLayout>
 
-                <Button
-                    android:id="@+id/button3"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:background="@drawable/icon_modify"
-                    android:text="修改" />
-
-                <ImageView
-                    android:id="@+id/imageViewEraser"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/icon_eraser" />
-
-                <TextView
-                    android:id="@+id/refTextView"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
-                    android:paddingLeft="5dp"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal"></LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="0dip"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/saveNoteBtn"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/icon_save"
+                        android:text="" />
+
+                    <ImageView
+                        android:id="@+id/imageViewEraser2"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/icon_eraser" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

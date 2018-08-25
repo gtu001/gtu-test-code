@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 
+import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.Log;
 
 import android.view.Display;
@@ -30,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
@@ -61,18 +64,21 @@ import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
 
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,19 +99,28 @@ public class FloatViewService extends Service {
 
     private static final String TAG = FloatViewService.class.getSimpleName();
 
+
     // ----------------------------------------------------------------
     ImageView imageView1;// 放大鏡
     ImageView imageViewSearch;// 查單字
     ImageView imageViewEraser;// 橡皮擦
     ImageView imageViewDictionary;// 線上字典
     ImageView imageViewConfig;// 設定
+
     TextView refTextView;//智慧財產權連結
     AutoCompleteTextView autoCompleteTextView1;// 單字
     EditText editText1;// 解釋
     TextView textView1;// 音標
     Button button2;// 加入單字
     Button button3;// 修改
-    LinearLayout searchLayout;
+    LinearLayout searchLayout;//單字模式
+    // ----------------------------------------------------------------
+    EditText noteText;//記事本內容
+    ImageView imageViewNoteAction;//記事本內容
+    ImageView imageViewConfig2;// 設定
+    LinearLayout searchLayout2;//記事本模式
+    Button saveNoteBtn;//儲存記事本
+    ImageView imageViewEraser2;//清除記事本
     // ----------------------------------------------------------------
     EnglishwordInfoDAO englishwordInfoDAO = new EnglishwordInfoDAO(this);
     RecentSearchService recentSearchService = new RecentSearchService(this);
@@ -118,7 +133,7 @@ public class FloatViewService extends Service {
     ClipboardListenerHandler clipboardListenerHandler;//剪貼簿監聽器
     MagnifierPosHolder magnifierPosHolder = new MagnifierPosHolder(this);
     Handler handler = new Handler();
-
+    ModeHandler modeHandler;
     // ----------------------------------------------------------------
 
     @Override
@@ -178,6 +193,8 @@ public class FloatViewService extends Service {
         initCreateView(contentView);
 
         initEnglishDetail();
+
+        initServices();
 
         mWindowManager.addView(contentView, wmParams);
 
@@ -272,7 +289,11 @@ public class FloatViewService extends Service {
         // 檢查剪貼簿是否有內容
         if (isOpen) {
             //查詢記事本的單字
-            checkClipboardContentForSearchEnglishId();
+            if (modeHandler.isSearchMode()) {
+                checkClipboardContentForSearchEnglishId();
+            } else if (modeHandler.isNotepadMode()) {
+                checkClipboardContentForNoteText();
+            }
         }
 
         //↓↓↓↓↓↓正常邏輯↓↓↓↓↓↓
@@ -295,10 +316,12 @@ public class FloatViewService extends Service {
         if (isOpen) {
             // wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
             wmParams.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            searchLayout.setVisibility(View.VISIBLE);
+//            searchLayout.setVisibility(View.VISIBLE);
+            modeHandler.show(true);
         } else {
             wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            searchLayout.setVisibility(View.GONE);
+//            searchLayout.setVisibility(View.GONE);
+            modeHandler.show(false);
         }
         mWindowManager.updateViewLayout(contentView, wmParams);
     }
@@ -343,6 +366,63 @@ public class FloatViewService extends Service {
     private void initCreateView(RelativeLayout contentView) {
         // 放大鏡圖示
         imageView1 = (ImageView) contentView.findViewById(R.id.imageView1);
+
+        // 模式
+        searchLayout2 = (LinearLayout) contentView.findViewById(R.id.linearLayout2);
+        searchLayout2.setVisibility(View.GONE);
+        {
+            //記事本
+            noteText = (EditText) contentView.findViewById(R.id.noteText);
+
+            //記事本轉發功能
+            imageViewNoteAction = (ImageView) contentView.findViewById(R.id.imageViewNoteAction);
+            imageViewNoteAction.setOnClickListener(new OnClickListener() {
+                private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
+                    Map<String, Object> a1 = new HashMap<String, Object>();
+                    a1.put("ItemImage", icon);
+                    a1.put("ItemTitle", title);
+                    list.add(a1);
+                }
+
+                @Override
+                public void onClick(View v) {
+                    WindowItemListIconDialog win = new WindowItemListIconDialog(mWindowManager, FloatViewService.this.getApplicationContext());
+
+                    List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+                    for (NotepadDialogEnum e : NotepadDialogEnum.values()) {
+                        addItem(e.label, e.getIcon(FloatViewService.this), list);
+                    }
+
+                    win.showItemListDialog("轉發", list, new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            for (NotepadDialogEnum e : NotepadDialogEnum.values()) {
+                                if (e.ordinal() == position) {
+                                    e.process(FloatViewService.this);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            //儲存記事本
+            saveNoteBtn = (Button) contentView.findViewById(R.id.saveNoteBtn);
+            saveNoteBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            });
+
+            //清除記事本
+            imageViewEraser2 = (ImageView) contentView.findViewById(R.id.imageViewEraser2);
+            imageViewEraser2.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    noteText.setText("");
+                }
+            });
+        }
 
         // 編輯panel
         searchLayout = (LinearLayout) contentView.findViewById(R.id.linearLayout1);
@@ -558,9 +638,10 @@ public class FloatViewService extends Service {
 
             // 設定
             imageViewConfig = (ImageView) contentView.findViewById(R.id.imageViewConfig);
+            imageViewConfig2 = (ImageView) contentView.findViewById(R.id.imageViewConfig2);
             // imageViewHistory.setVisibility(View.GONE);
-            imageViewConfig.setOnClickListener(new OnClickListener() {
-                private void addItem(String title, int icon, List<Map<String, Object>> list) {
+            OnClickListener imageViewConfig_OnClickListener = new OnClickListener() {
+                private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
                     Map<String, Object> a1 = new HashMap<String, Object>();
                     a1.put("ItemImage", icon);
                     a1.put("ItemTitle", title);
@@ -587,7 +668,9 @@ public class FloatViewService extends Service {
                         }
                     });
                 }
-            });
+            };
+            imageViewConfig.setOnClickListener(imageViewConfig_OnClickListener);
+            imageViewConfig2.setOnClickListener(imageViewConfig_OnClickListener);
 
             //智慧財產權連結
             refTextView = (TextView) contentView.findViewById(R.id.refTextView);
@@ -595,7 +678,11 @@ public class FloatViewService extends Service {
         }
     }
 
-    private static enum ConfigDialogEnum {
+    private void initServices() {
+        modeHandler = new ModeHandler();
+    }
+
+    private enum ConfigDialogEnum {
         SEARCH_HISTORY("查詢歷史", R.drawable.icon_history) {
             @Override
             void process(FloatViewService self) {
@@ -615,7 +702,7 @@ public class FloatViewService extends Service {
             }
         },//
         LISTENER_CLIPBOARD("監聽記事本", null) {
-            public int getIcon(FloatViewService self) {
+            public Integer getIcon(FloatViewService self) {
                 boolean state = self.clipboardListenerHandler.isCurrentState();
                 return state ? R.drawable.switch_on_icon : R.drawable.switch_off_icon;
             }
@@ -627,6 +714,16 @@ public class FloatViewService extends Service {
                 Toast.makeText(self, "監聽" + (state ? "on" : "off"), Toast.LENGTH_SHORT).show();
             }
         },//
+        MODE_CHANGE("模式切換", null) {
+            public Integer getIcon(FloatViewService self) {
+                return self.modeHandler.getIcon(self);
+            }
+
+            @Override
+            void process(FloatViewService self) {
+                self.modeHandler.changeMode(null, false);
+            }
+        },
         EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app) {
             @Override
             void process(FloatViewService self) {
@@ -643,11 +740,137 @@ public class FloatViewService extends Service {
             this.iconVal = iconVal;
         }
 
-        public int getIcon(FloatViewService self) {
+        public Integer getIcon(FloatViewService self) {
             return this.iconVal;
         }
 
         abstract void process(FloatViewService self);
+    }
+
+    private enum NotepadDialogEnum {
+        LINE_APP("開啟Line", R.drawable.line_app_me) {//
+
+            @Override
+            void process(FloatViewService self) {
+                String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                ClipboardHelper.copyToClipboard(self.getApplicationContext(), inputText);
+                AppOpenHelper.openApp(self.getApplicationContext(), "jp.naver.line.android");
+            }
+        },//
+        SEARCH_IN_BROWSER("以Google搜尋", R.drawable.icon_chrome) {//
+
+            @Override
+            void process(FloatViewService self) {
+                GoogleSearchHandler.search(self.getApplicationContext(), self.noteText.getText().toString());
+            }
+        },//
+        OPEN_BROWSER("以瀏覽器開啟", R.drawable.icon_chrome) {
+            @Override
+            void process(FloatViewService self) {
+                try {
+                    String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                    if (!inputText.matches("^https?\\:\\/.*")) {
+                        inputText = "http://" + inputText;
+                    }
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(inputText));
+                    self.startActivity(browserIntent);
+                } catch (Exception ex) {
+                    Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
+                    Toast.makeText(self, "無法開啟網頁!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        },//
+        ;
+
+        final String label;
+        final Integer iconVal;
+
+        NotepadDialogEnum(String label, Integer iconVal) {
+            this.label = label;
+            this.iconVal = iconVal;
+        }
+
+        public Integer getIcon(FloatViewService self) {
+            return this.iconVal;
+        }
+
+        abstract void process(FloatViewService self);
+    }
+
+    private class ModeHandler {
+        AtomicInteger modeholder = new AtomicInteger(0);
+        int[] modeArry = new int[]{R.drawable.new_search_icon, R.drawable.icon_sticky_note};
+        String[] modeArry2 = new String[]{"英文字典", "記事本"};
+        ViewGroup[] modeArry3 = new ViewGroup[]{searchLayout, searchLayout2};
+
+        public boolean isSearchMode() {
+            return modeholder.get() == 0;
+        }
+
+        public boolean isNotepadMode() {
+            return modeholder.get() == 1;
+        }
+
+        public boolean isSearchModeAndHidden() {
+            if (isSearchMode() && searchLayout.getVisibility() == View.GONE) {
+                return true;
+            }
+            return false;
+        }
+
+        public boolean isNotepadModeAndHidden() {
+            if (isNotepadMode() && searchLayout2.getVisibility() == View.GONE) {
+                return true;
+            }
+            return false;
+        }
+
+        public void show(boolean show) {
+            for (int ii = 0; ii < modeArry3.length; ii++) {
+                if (ii == modeholder.get() && show) {
+                    modeArry3[ii].setVisibility(View.VISIBLE);
+                } else {
+                    modeArry3[ii].setVisibility(View.GONE);
+                }
+            }
+        }
+
+        public ModeHandler() {
+            changeMode(0, true);
+        }
+
+        public int getIcon(FloatViewService self) {
+            return modeArry[modeholder.get()];
+        }
+
+        public void changeMode(Integer useIndicateVal, boolean isInit) {
+            int newVal = 0;
+            if (useIndicateVal != null) {
+                newVal = useIndicateVal;
+            } else {
+                newVal = modeholder.get() + 1;
+                if (newVal >= modeArry2.length) {
+                    newVal = 0;
+                }
+            }
+
+            modeholder.set(newVal);
+            imageView1.setImageResource(modeArry[modeholder.get()]);
+
+            if (clipboardListenerHandler != null) {
+                if (modeholder.get() == 0) {
+                    clipboardListenerHandler.doStart(true);
+                } else {
+                    clipboardListenerHandler.doStart(false);
+                }
+            }
+
+            if (!isInit) {
+                Toast.makeText(getApplicationContext(), modeArry2[modeholder.get()] + "模式", Toast.LENGTH_SHORT).show();
+            }
+
+            show(false);
+        }
     }
 
     /**
@@ -977,6 +1200,26 @@ public class FloatViewService extends Service {
     }
 
     /**
+     * 檢查剪貼簿是否有內容(若有內容貼到記事本視窗)
+     */
+    private void checkClipboardContentForNoteText() {
+        String text = ClipboardHelper.copyFromClipboard(getApplication());
+        try {
+            text = URLDecoder.decode(text, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+        text = StringUtils.trimToEmpty(text);
+        if (StringUtils.isNotBlank(text)) {
+            String currentText = noteText.getText().toString();
+            if (StringUtils.isNotBlank(currentText)) {
+                noteText.setText(currentText + "\r\n" + text);
+            } else {
+                noteText.setText(text);
+            }
+        }
+    }
+
+    /**
      * 建立剪貼簿監聽器
      */
     private class ClipboardListenerHandler implements ClipboardManager.OnPrimaryClipChangedListener {
@@ -1111,12 +1354,16 @@ public class FloatViewService extends Service {
                     return;
                 }
 
-                if (searchLayout.getVisibility() == View.GONE) {
+                if (modeHandler.isSearchModeAndHidden()) {
                     if (isMoreThanSentance(text)) {
                         openTxtReaderProgram();//翻譯本文
                     } else if (!StringUtil_.hasChinese(text)) {
                         doOpenCloseEditPanel(true);//查詢單字
                     }
+                }
+
+                if (modeHandler.isNotepadModeAndHidden()) {
+                    doOpenCloseEditPanel(true);
                 }
             }
         }
