@@ -871,6 +871,10 @@ public class FloatViewService extends Service {
 
             show(false);
         }
+
+        public void openUseNoteMode() {
+            changeMode(1, false);
+        }
     }
 
     /**
@@ -1334,22 +1338,22 @@ public class FloatViewService extends Service {
             Log.v(TAG, "### onPrimaryClipChanged text = " + text);
             if (StringUtils.isNotBlank(text)) {
                 if (isURL(text)) {
-                    if (BuildConfig.DEBUG) {
-                        //不使用剪貼簿設回原值
-                        pasteToClipboard("", text);
-                        AppOpenHelper.openApp(getApplicationContext(), "jp.naver.line.android");
-                    }
+                    //不使用剪貼簿設回原值
+                    modeHandler.openUseNoteMode();
+                    pasteToClipboard("", text);
                     return;
                 }
 
                 if (StringUtil_.hasChinese(text)) {
                     //不使用剪貼簿設回原值
+                    modeHandler.openUseNoteMode();
                     pasteToClipboard("", text);
                     return;
                 }
 
                 if (isNumbers(text) || isEmail(text)) {
                     //不使用剪貼簿設回原值
+                    modeHandler.openUseNoteMode();
                     pasteToClipboard("", text);
                     return;
                 }
