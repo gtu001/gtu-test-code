@@ -788,7 +788,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         final String engContent = txtView.getText().toString();
         final String chnContent = translateView.getText().toString();
         if (StringUtils.isBlank(engContent)) {
-            Toast.makeText(this, "沒有內容無須儲存!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "沒有內文無須儲存!", Toast.LENGTH_SHORT).show();
             return;
         }
 

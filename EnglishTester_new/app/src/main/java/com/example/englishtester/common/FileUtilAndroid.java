@@ -3,6 +3,8 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.os.Environment;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -23,22 +25,22 @@ public class FileUtilAndroid {
     /**
      * 取得內部資料夾
      */
-    public static File getFileDir(Context context){
+    public static File getFileDir(Context context) {
         return context.getFilesDir();
     }
 
     /**
      * 建立公用目錄
      */
-    public static File getExtermalStoragePublicDir(String albumName) {
-        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        if(file.mkdir()){
-            File f = new File(file, albumName);
-            if(f.mkdir()){
-                return f;
-            }
+    public static File getExternalStoragePublicDirectory(String albumName) {
+        if (StringUtils.isBlank(albumName)) {
+            albumName = Environment.DIRECTORY_DOWNLOADS;
         }
-        return new File(file, albumName);
+        File file = Environment.getExternalStoragePublicDirectory(albumName);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return file;
     }
 
     /**
@@ -86,7 +88,7 @@ public class FileUtilAndroid {
     public static String loadFileToString(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
         StringBuffer sb = new StringBuffer();
-        for (String line = null; (line = reader.readLine()) != null;) {
+        for (String line = null; (line = reader.readLine()) != null; ) {
             sb.append(line + "\n");
         }
         reader.close();
@@ -99,7 +101,7 @@ public class FileUtilAndroid {
     public static void saveToFile(File file, String text) throws IOException {
         LineNumberReader reader = new LineNumberReader(new StringReader(text));
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf8"));
-        for (String line = null; (line = reader.readLine()) != null;) {
+        for (String line = null; (line = reader.readLine()) != null; ) {
             writer.write(line);
             writer.newLine();
         }

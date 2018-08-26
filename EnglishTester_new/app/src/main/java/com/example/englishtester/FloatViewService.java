@@ -1,11 +1,13 @@
 package com.example.englishtester;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -21,6 +23,7 @@ import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 
+import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.Log;
 
@@ -63,12 +66,16 @@ import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
+import com.example.englishtester.common.WindowSingleInputDialog;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -411,6 +418,41 @@ public class FloatViewService extends Service {
             saveNoteBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    try {
+                        final String saveContent = StringUtils.trimToEmpty(noteText.getText().toString());
+                        if (StringUtils.isBlank(saveContent)) {
+                            Toast.makeText(FloatViewService.this, "沒有內文無須儲存!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        final Context context = FloatViewService.this.getApplicationContext();
+                        String fileName = String.format("%s_%s.txt", "notepad", DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+                        final File saveToDir = FileUtilAndroid.getExternalStoragePublicDirectory(null);
+
+                        WindowSingleInputDialog win = new WindowSingleInputDialog(mWindowManager, FloatViewService.this.getApplicationContext());
+                        win.showItemListDialog("儲存記事本", "要儲存嗎?", fileName, new WindowSingleInputDialog.WindowSingleInputDialog_DlgConfirm() {
+                            @Override
+                            public void onConfirm(String inputStr, View v, WindowSingleInputDialog dlg) {
+                                String fileName = inputStr;
+                                if (StringUtils.isBlank(fileName)) {
+                                    Toast.makeText(context, "請輸入檔名!", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                try {
+                                    File saveFile = new File(saveToDir, fileName);
+                                    FileUtilAndroid.saveToFile(saveFile, saveContent);
+                                    Toast.makeText(context, "儲存成功 : " + saveFile, Toast.LENGTH_SHORT).show();
+                                } catch (IOException e) {
+                                    Toast.makeText(context, "儲存失敗!", Toast.LENGTH_SHORT).show();
+                                    Log.e(TAG, e.getMessage(), e);
+                                } finally {
+                                    dlg.dismiss();
+                                }
+                            }
+                        });
+                    } catch (Exception ex) {
+                        Log.e(TAG, "saveNoteBtn ERR : " + ex.getMessage(), ex);
+                    }
                 }
             });
 
