@@ -1255,8 +1255,8 @@ public class FloatViewService extends Service {
         } catch (UnsupportedEncodingException e) {
         }
         text = StringUtils.trimToEmpty(text);
-        if (StringUtils.isNotBlank(text)) {
-            String currentText = noteText.getText().toString();
+        String currentText = StringUtils.trimToEmpty(noteText.getText().toString());
+        if (StringUtils.isNotBlank(text) && !currentText.contains(text)) {
             if (StringUtils.isNotBlank(currentText)) {
                 noteText.setText(currentText + "\r\n" + text);
             } else {
