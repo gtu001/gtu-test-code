@@ -430,7 +430,7 @@ public class FloatViewService extends Service {
                         final File saveToDir = FileUtilAndroid.getExternalStoragePublicDirectory(null);
 
                         WindowSingleInputDialog win = new WindowSingleInputDialog(mWindowManager, FloatViewService.this.getApplicationContext());
-                        win.showItemListDialog("儲存記事本", "要儲存嗎?", fileName, new WindowSingleInputDialog.WindowSingleInputDialog_DlgConfirm() {
+                        win.showItemListDialog("儲存記事本", "儲存的檔名為:", fileName, new WindowSingleInputDialog.WindowSingleInputDialog_DlgConfirm() {
                             @Override
                             public void onConfirm(String inputStr, View v, WindowSingleInputDialog dlg) {
                                 String fileName = inputStr;
