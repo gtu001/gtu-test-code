@@ -15,6 +15,10 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -136,11 +140,16 @@ public abstract class HtmlBaseParser {
         content = _stepFinal_customPlus(content, isPure);
         validateContent("_stepFinal_customPlus", content, checkStr);
 
+        content = _stepFinal_escapeTag(content, isPure);
+        validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
+
         content = _stepFinal_removeMultiChangeLine(content, isPure);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
 
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
+
+
         log("# getFromContentMain END...");
         return content;
     }
@@ -443,7 +452,7 @@ public abstract class HtmlBaseParser {
             String preText = mth.group(1);
             preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{pre:" + __replaceChangeLine(preText) + "}}";
+            String repStr = "{{pre:" + preText + "}}";
             if (isPure) {
                 repStr = preText;
             }
@@ -462,34 +471,12 @@ public abstract class HtmlBaseParser {
             String preText = mth.group(1);
             preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{code:" + __replaceChangeLine(preText) + "}}";
+            String repStr = "{{code:" + preText + "}}";
             if (isPure) {
                 repStr = preText;
             }
 
             mth.appendReplacement(sb, repStr);
-        }
-        mth.appendTail(sb);
-        return sb.toString();
-    }
-
-    private String __replaceChangeLine(String orignText) {
-        Pattern ptn = Pattern.compile("(\\{\\{chgLine\\}\\}\n|\n)", Pattern.DOTALL | Pattern.MULTILINE);
-        Matcher mth = ptn.matcher(orignText);
-        StringBuffer sb = new StringBuffer();
-        while (mth.find()) {
-
-            //若換行前剛好是 "{" 會出問題
-            String prefix = "";
-            try {
-                int pos = mth.start();
-                if ("{".equals(orignText.substring(pos - 1, pos))) {
-                    prefix = " ";
-                }
-            } catch (Exception ex) {
-            }
-
-            mth.appendReplacement(sb, prefix + "{{chgLine}}" + "\n");
         }
         mth.appendTail(sb);
         return sb.toString();
@@ -755,5 +742,57 @@ public abstract class HtmlBaseParser {
 
     protected void validateLog(String stepLabel) {
         log("CHECK : " + stepLabel + " OK!!!");
+    }
+
+    protected String _stepFinal_escapeTag(String content, boolean isPure) {
+        CustomTagEscaper escaper = new CustomTagEscaper(content);
+        return escaper.getResult();
+    }
+
+    protected class CustomTagEscaper {
+        String orignContent;
+        String resultContent;
+
+        Pattern startPtn = Pattern.compile("\\{{3,}", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern endPtn = Pattern.compile("\\}{3,}", Pattern.DOTALL | Pattern.MULTILINE);
+
+        protected CustomTagEscaper(String orignContent) {
+            this.orignContent = orignContent;
+            resultContent = orignContent.toString();
+            resultContent = getDivideTag(resultContent, startPtn, true);
+            resultContent = getDivideTag(resultContent, endPtn, false);
+        }
+
+        private String getStartTag(int length, boolean isStartTag) {
+            LinkedList<String> lst = new LinkedList<String>();
+            char tag = isStartTag ? '{' : '}';
+            for (int ii = 0; ii < (length / 2); ii++) {
+                lst.add("" + tag + tag);
+            }
+            if (length % 2 != 0) {
+                if (isStartTag) {
+                    lst.push("" + tag);
+                } else {
+                    lst.add("" + tag);
+                }
+            }
+            return StringUtils.join(lst, " ");
+        }
+
+        private String getDivideTag(String content, Pattern ptn, boolean isStart) {
+            StringBuffer sb = new StringBuffer();
+            Matcher mth = ptn.matcher(content);
+            while (mth.find()) {
+                String tag = mth.group();
+                String repStr = getStartTag(tag.length(), isStart);
+                mth.appendReplacement(sb, repStr);
+            }
+            mth.appendTail(sb);
+            return sb.toString();
+        }
+
+        public String getResult() {
+            return resultContent;
+        }
     }
 }

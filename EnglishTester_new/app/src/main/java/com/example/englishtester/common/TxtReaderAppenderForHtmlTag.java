@@ -10,6 +10,7 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 
 import com.example.englishtester.R;
 import com.example.englishtester.common.html.image.IImageLoaderCandidate;
@@ -48,6 +49,7 @@ public class TxtReaderAppenderForHtmlTag {
     private ITxtReaderActivityDTO dto;
     private OnlinePicLoader onlinePicLoader;
     private ImageLoaderFactory imageLoaderFactory;
+    private Typeface consolasTypeFace;
 
 
     public TxtReaderAppenderForHtmlTag(//
@@ -267,13 +269,7 @@ public class TxtReaderAppenderForHtmlTag {
         PRE("{{pre:", "pre\\:((?:.|\n)*)\\}\\}") {
             @Override
             void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
-                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
-                log(proc);
-
-                self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
-                self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
-
-                self.ss.setSpan(new BackgroundColorSpan(Color.parseColor("#f4f4f5")), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ContentDefineEnum.CODE.apply(pair, mth, self);
             }
         },//
         CODE("{{code:", "code\\:((?:.|\n)*)\\}\\}") {
@@ -285,6 +281,8 @@ public class TxtReaderAppenderForHtmlTag {
                 self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
                 self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
 
+                self.ss.setSpan(self.getConsolasCustomTypefaceSpan(), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                self.ss.setSpan(new RelativeSizeSpan(0.9f), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
                 self.ss.setSpan(new BackgroundColorSpan(Color.parseColor("#f4f4f5")), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
@@ -459,5 +457,12 @@ public class TxtReaderAppenderForHtmlTag {
             changeLineImg = OOMHandler.fixPicScale(b1, 30, 30);
         }
         return new ImageSpan(context, changeLineImg, ImageSpan.ALIGN_BASELINE);//
+    }
+
+    private CustomTypefaceSpan getConsolasCustomTypefaceSpan() {
+        if (consolasTypeFace == null) {
+            consolasTypeFace = Typeface.createFromAsset(context.getAssets(), "fonts/consolas.ttf");
+        }
+        return new CustomTypefaceSpan("", consolasTypeFace);
     }
 }
