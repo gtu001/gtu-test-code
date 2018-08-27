@@ -1,4 +1,4 @@
-package gtu.log.fakeAndroid;
+package gtu.log.line;
 
 import gtu.log.CurrentStackUtil;
 import gtu.log.CurrentStackUtil.StackTraceWatcher;
@@ -13,7 +13,7 @@ public class Log {
         stack2.addClass(Log.class);
         currentStackUtil = CurrentStackUtil.getInstance();
     }
-    
+
     private static String getPrefix() {
         StackTraceElement element = currentStackUtil.apply().currentStack();
         String prefix = "(" + element.getClassName() + ":" + element.getLineNumber() + ") - ";
@@ -24,7 +24,7 @@ public class Log {
         if (!debugMode) {
             return;
         }
-        
+
         System.out.println(getPrefix() + "" + tag + " - " + message);
     }
 

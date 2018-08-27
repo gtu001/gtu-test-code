@@ -22,13 +22,14 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.ebao.foundation.core.RTException;
-import com.ebao.foundation.core.logging.Log;
 import com.ebao.foundation.module.db.data.DBObjectOwner;
 import com.ebao.foundation.module.db.dialect.DialectLocator;
 
 public class DBUtils_eBaotech {
-    private static Log logger = Log.getLogger(DBUtils_eBaotech.class);
+    private static Logger logger = Logger.getLogger(DBUtils_eBaotech.class);
 
     private static final int N_MAX_BUFFER_SIZE = 4 * 1024;
 

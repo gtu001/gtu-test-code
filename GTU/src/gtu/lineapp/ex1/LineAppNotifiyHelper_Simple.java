@@ -62,7 +62,7 @@ public class LineAppNotifiyHelper_Simple {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    System.out.println("#result = " + result);
+//                    System.out.println("#result = " + result);
                     waitQue.add(result);
                 }
             }).start();
@@ -85,7 +85,7 @@ public class LineAppNotifiyHelper_Simple {
         myURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");// or
         // "multipart/form-data"
         myURLConnection.setRequestProperty("User-Agent", DEFAULT_USER_AGENT);
-        System.out.println("Authorization = " + "Bearer " + token);
+//        System.out.println("Authorization = " + "Bearer " + token);
         myURLConnection.setRequestMethod("POST");
         myURLConnection.setUseCaches(false);
     }
