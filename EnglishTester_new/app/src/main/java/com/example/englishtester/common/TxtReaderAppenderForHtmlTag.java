@@ -2,9 +2,11 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -260,6 +262,30 @@ public class TxtReaderAppenderForHtmlTag {
                 } else {
                     log("Intact !");
                 }
+            }
+        },//
+        PRE("{{pre:", "pre\\:((?:.|\n)*)\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
+                log(proc);
+
+                self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
+                self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
+
+                self.ss.setSpan(new BackgroundColorSpan(Color.parseColor("#f4f4f5")), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        },//
+        CODE("{{code:", "code\\:((?:.|\n)*)\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 1);
+                log(proc);
+
+                self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
+                self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
+
+                //TODO
             }
         },//
         ;

@@ -82,6 +82,16 @@ public class TxtReaderAppenderEscaper {
                 return mth.group(2);
             }
         },//
+        PRE("{{pre:", "pre\\:((?:.|\n)*)\\}\\}") {
+            public String replace(String text, Matcher mth) {
+                return mth.group(1);
+            }
+        },//
+        CODE("{{code:", "code\\:((?:.|\n)*)\\}\\}") {
+            public String replace(String text, Matcher mth) {
+                return mth.group(1);
+            }
+        },//
         ;
 
         final String startWith;

@@ -1,15 +1,43 @@
 package gtu.swing.util;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
+import java.io.File;
+import java.util.List;
+
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
 
 public class JTextFieldUtil {
 
-    public static void setText(JTextField textField, String strValue) {
+    public static void setText(final JTextField textField, final String strValue) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 textField.setText(strValue);
+            }
+        });
+    }
+
+    public static void setupDragDropFilePath(final JTextComponent textField) {
+        textField.setDragEnabled(true);
+        textField.setDropTarget(new DropTarget() {
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        System.out.println(">> dropFile : " + file);
+                    }
+                    if (!droppedFiles.isEmpty()) {
+                        textField.setText(droppedFiles.get(0).getAbsolutePath());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }

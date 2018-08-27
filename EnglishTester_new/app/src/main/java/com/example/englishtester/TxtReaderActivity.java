@@ -46,8 +46,6 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
-import com.example.englishtester.common.interf.IDropboxFileLoadService;
-import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
@@ -56,8 +54,10 @@ import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
-import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
+import com.example.englishtester.common.interf.IDropboxFileLoadService;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.collections4.Transformer;
@@ -69,11 +69,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -1125,10 +1124,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     private void debug____dumpFileNameLog() {
-        String name = String.format("tmpFileName%s.txt", DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd"));
-        File fff = new File(Constant.PropertiesFindActivity_PATH + "/" + name);
-        fff = FileConstantAccessUtil.getFile(this, fff);
-
         StringBuffer sb = new StringBuffer();
         sb.append(" select count(file_name) as cnt,                ");
         sb.append("         file_name,                             ");
@@ -1137,21 +1132,20 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         sb.append(" group by file_name                             ");
         sb.append(" order by max_insert_date desc                  ");
         List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sb.toString(), new String[0], this);
-        BufferedWriter writer = null;
+        StringWriter writer = null;
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fff)));
+            writer = new StringWriter();
             for (Map<String, Object> val : lst) {
                 writer.write(val.toString());
-                writer.newLine();
+                writer.write("\n");
             }
             writer.flush();
-
-            Toast.makeText(this, "Debug : " + fff, Toast.LENGTH_SHORT).show();
         } catch (Exception ex) {
             Log.e(TAG, "debug____dumpFileNameLog ERR : " + ex.getMessage(), ex);
         } finally {
             try {
                 writer.close();
+                Log.line(TAG, writer.toString());
             } catch (Exception ex) {
             }
         }
@@ -1269,30 +1263,38 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.loadHtmlFromUrl("http://www.cnn.com");
             }
         }, //
-//        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null) {
-//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-//                activity.debug____dumpFileNameLog();
-//            }
-//        }, //
-//        LOAD_IMAGE_MODE("是否要載入圖片", MENU_FIRST++, REQUEST_CODE++, null) {
-//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-//                boolean isImageLoadMode = !activity.dto.isImageLoadMode.get();
-//                activity.dto.isImageLoadMode.set(isImageLoadMode);
-//                Toast.makeText(activity, "書籤模式" + (isImageLoadMode ? "on" : "off"), Toast.LENGTH_SHORT).show();
-//            }
-//        }, //
+        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.debug____dumpFileNameLog();
+            }
+        }, //
+        LINE_ORIGN_FILE("debug 顯示原始檔", MENU_FIRST++, REQUEST_CODE++, null, true) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                Log.line(TAG, activity.txtView.getText().toString());
+            }
+        }, //
         ;
 
         final String title;
         final int option;
         final int requestCode;
         final Class<?> clz;
+        final boolean debugOnly;
+
+        TaskInfo(String title, int option, int requestCode, Class<?> clz, boolean debugOnly) {
+            this.title = title;
+            this.option = option;
+            this.requestCode = requestCode;
+            this.clz = clz;
+            this.debugOnly = debugOnly;
+        }
 
         TaskInfo(String title, int option, int requestCode, Class<?> clz) {
             this.title = title;
             this.option = option;
             this.requestCode = requestCode;
             this.clz = clz;
+            this.debugOnly = false;
         }
 
         protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {

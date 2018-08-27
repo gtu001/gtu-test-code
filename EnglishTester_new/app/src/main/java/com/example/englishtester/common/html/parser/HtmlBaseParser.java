@@ -126,15 +126,18 @@ public abstract class HtmlBaseParser {
         validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step5_li_check(content, isPure);
         validateContent("_step5_li_check", content, checkStr);
-        content = _step6_hiddenSomething(content, isPure, checkStr);
-        validateContent("_step6_hiddenSomething", content, checkStr);
+        content = _step6_preTag(content, isPure);
+        validateContent("_step6_preTag", content, checkStr);
+        content = _step7_codeTag(content, isPure);
+        validateContent("_step7_codeTag", content, checkStr);
 
+        content = _step999_hiddenSomething(content, isPure, checkStr);
+        validateContent("_step999_hiddenSomething", content, checkStr);
         content = _stepFinal_customPlus(content, isPure);
         validateContent("_stepFinal_customPlus", content, checkStr);
 
         content = _stepFinal_removeMultiChangeLine(content, isPure);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
-
 
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
@@ -413,7 +416,7 @@ public abstract class HtmlBaseParser {
         }
     }
 
-    protected String getEncoding(){
+    protected String getEncoding() {
         return WORD_HTML_ENCODE;
     }
 
@@ -427,6 +430,44 @@ public abstract class HtmlBaseParser {
             spanContent = _step3_imageProc_InternetMode(spanContent, isPure, checkPic);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step6_preTag(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile("\\<pre\\>((?:.|\n)*?)\\<\\/pre\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String preText = mth.group(1);
+            preText = StringUtil_.appendReplacementEscape(preText);
+
+            String repStr = "{{pre:" + preText + "}}";
+            if (isPure) {
+                repStr = preText;
+            }
+
+            mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step7_codeTag(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile("\\<code\\>((?:.|\n)*?)\\<\\/code\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String preText = mth.group(1);
+            preText = StringUtil_.appendReplacementEscape(preText);
+
+            String repStr = "{{code:" + preText + "}}";
+            if (isPure) {
+                repStr = preText;
+            }
+
+            mth.appendReplacement(sb, repStr);
         }
         mth.appendTail(sb);
         return sb.toString();
@@ -539,7 +580,7 @@ public abstract class HtmlBaseParser {
         return rtnVal;
     }
 
-    protected String _step6_hiddenSomething(String content, boolean isPure, String checkStr) {
+    protected String _step999_hiddenSomething(String content, boolean isPure, String checkStr) {
         content = _stepFinal_hidden_tag(content, "\\<body(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 1", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<v\\:imagedata(?:.|\n)*?\\>");
@@ -612,12 +653,6 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag 36", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
-
-        //new 20180719
-        content = _stepFinal_hidden_tag(content, "\\<code\\s(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 37", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<pre\\s(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 38", content, checkStr);
 
         //for Standard Html
         content = hiddenByTagMatcher("<script", "</script>", "\\<script[\r\n\t\\s]{1}", "\\<\\/script\\>", 0, 0, content);

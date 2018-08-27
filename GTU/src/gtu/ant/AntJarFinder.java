@@ -91,6 +91,7 @@ public class AntJarFinder extends Task {
         if (searchdirs.isEmpty()) {
             searchdirs.add(new SearchDir(this.getProject().getProperty("basedir")));
         }
+        
         for (SearchDir s : searchdirs) {
             String filePath = helper.getParseAfterValue(s.text);
             File file = new File(filePath);

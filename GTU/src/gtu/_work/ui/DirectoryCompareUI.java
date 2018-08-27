@@ -1,14 +1,5 @@
 package gtu._work.ui;
 
-import gtu.file.FileUtil;
-import gtu.file.FileUtil.FileZ;
-import gtu.properties.PropertiesUtilBean;
-import gtu.runtime.ProcessWatcher;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.JPopupMenuUtil;
-import gtu.swing.util.JTableUtil;
-
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -65,10 +56,20 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
 import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import gtu.file.FileUtil;
+import gtu.file.FileUtil.FileZ;
+import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.ProcessWatcher;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextFieldUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -155,6 +156,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                                 }
                             }));
                             jPanel2.add(leftDirText);
+                            JTextFieldUtil.setupDragDropFilePath(leftDirText);
                         }
                         {
                             rightDirText = new JTextArea();
@@ -167,6 +169,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                                 }
                             }));
                             jPanel2.add(rightDirText);
+                            JTextFieldUtil.setupDragDropFilePath(rightDirText);
                         }
                         {
                             executeBtn = new JButton();
@@ -278,6 +281,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             }
             pack();
             this.setSize(864, 563);
+            
+            JCommonUtil.setJFrameIcon(getOwner(), "images/ico/file_merge.ico");
 
             initConfigBean();
         } catch (Exception e) {
@@ -706,29 +711,29 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             int[] rows = util.getSelectedRows();
             System.out.println(Arrays.toString(rows));
             if (rows == null || rows.length == 0) {
-               JCommonUtil._jOptionPane_showMessageDialog_error("未選擇檔案!");
-               return;
+                JCommonUtil._jOptionPane_showMessageDialog_error("未選擇檔案!");
+                return;
             }
 
-            File pourDir = new File(leftDirText.getText()); 
-            if(!isLeftPourOut) {
-                pourDir = new File(rightDirText.getText()); 
+            File pourDir = new File(leftDirText.getText());
+            if (!isLeftPourOut) {
+                pourDir = new File(rightDirText.getText());
             }
-            
-            if(!pourDir.exists() || !pourDir.isDirectory()) {
+
+            if (!pourDir.exists() || !pourDir.isDirectory()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("base目錄不存在 : " + pourDir);
                 return;
             }
-            
+
             File pourBaseDir = new File(FileUtil.DESKTOP_DIR + File.separator + //
                     "pourOut_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + //
                     File.separator + pourDir.getName());
-            if(!pourBaseDir.exists()) {
+            if (!pourBaseDir.exists()) {
                 pourBaseDir.mkdirs();
             }
-            
+
             String basePath = pourDir.getAbsolutePath().toString();
-            
+
             List<File> fileList = new ArrayList<File>();
             for (int ii = 0; ii < rows.length; ii++) {
                 InfoObj obj = getInfoObj(rows[ii], util);
@@ -736,37 +741,37 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                 File compareToFile = obj.compareToFile.getFile();
                 System.out.println("mainFile : " + mainFile);
                 System.out.println("compareToFile : " + compareToFile);
-                
+
                 File pourFile = mainFile;
-                if(!isLeftPourOut) {
-                    pourFile = compareToFile; 
+                if (!isLeftPourOut) {
+                    pourFile = compareToFile;
                 }
-                
-                if(!pourFile.getAbsolutePath().toLowerCase().startsWith(basePath.toLowerCase())) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("道出檔案路徑與base目錄不吻合  \nbase : " + basePath + "\n target : "+ pourFile);
+
+                if (!pourFile.getAbsolutePath().toLowerCase().startsWith(basePath.toLowerCase())) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("道出檔案路徑與base目錄不吻合  \nbase : " + basePath + "\n target : " + pourFile);
                     return;
                 }
-                
+
                 String newPath = pourFile.getAbsolutePath().toString().substring(basePath.length());
                 System.out.println("newPath - " + newPath);
-                
+
                 File toFile = new File(pourBaseDir, File.separator + newPath);
-                if(!toFile.getParentFile().exists()) {
+                if (!toFile.getParentFile().exists()) {
                     toFile.getParentFile().mkdirs();
                 }
                 FileUtil.copyFile(pourFile, toFile);
-                
+
                 fileList.add(toFile);
             }
-            
+
             StringBuffer sb = new StringBuffer();
-            for(File v : fileList) {
+            for (File v : fileList) {
                 sb.append(v + "\r\n");
             }
-            
+
             FileUtil.saveToFile(new File(pourBaseDir, "pourFiles.log"), sb.toString(), "UTF8");
             JCommonUtil._jOptionPane_showMessageDialog_info("匯出完成! 檔案數 : " + fileList.size());
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }

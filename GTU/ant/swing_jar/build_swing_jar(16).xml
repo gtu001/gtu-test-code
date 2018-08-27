@@ -11,6 +11,7 @@
 	<property name="main_class_full" value="gtu._work.ui.DirectoryCompareUI" />
 	<property name="main_class" value="DirectoryCompareUI" />
 	<property name="rename_jarname" value="${main_class}" />
+	<property name="icon_name" value="file_merge.ico" />
 	<!--${main_class}-->
 
 
@@ -42,20 +43,31 @@
 	</target>
 	-->
 
+	<target name="jarToExe" if="${enable}">
+		<echo># jarToExe = ${enable}</echo>
+		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
+			<icon enable="true">${src_dir}/resource/images/ico/${icon_name}</icon>
+			<singleton enable="true">${main_class}</singleton>
+		</jarToExe>
+	</target>
+
 	<target name="buildClassSet" if="${enable}">
 		<echo># buildClassSet = ${enable}</echo>
 		<mkdir dir="${jars_dir}" />
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
-			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
 			<packagename mode="small">com.google.common.collect.Multimap</packagename>
-			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
 
 		</jarfinder>
@@ -119,6 +131,10 @@
 
 		<antcall target="clean">
 			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="jarToExe">
 			<param name="enable" value="true" />
 		</antcall>
 
