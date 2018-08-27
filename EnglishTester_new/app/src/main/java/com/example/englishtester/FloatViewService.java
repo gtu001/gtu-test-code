@@ -822,6 +822,27 @@ public class FloatViewService extends Service {
                 }
             }
         },//
+        OPEN_TXT_READER("以閱讀器開啟[beta]", R.drawable.icon_book_stack) {
+            @Override
+            void process(FloatViewService self) {
+                try {
+                    String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                    if (!inputText.matches("^https?\\:\\/.*")) {
+                        inputText = "http://" + inputText;
+                    }
+                    Intent intent = new Intent();
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setClass(self, TxtReaderActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(TxtReaderActivity.LOAD_URL_CONTENT, inputText);
+                    intent.putExtras(bundle);
+                    self.startActivity(intent);
+                } catch (Exception ex) {
+                    Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
+                    Toast.makeText(self, "無法開啟網頁!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        },//
         ;
 
         final String label;

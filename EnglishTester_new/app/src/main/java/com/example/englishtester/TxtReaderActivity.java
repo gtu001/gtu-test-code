@@ -96,7 +96,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     private static final String TAG = TxtReaderActivity.class.getSimpleName();
 
-    public static final String KEY_CONTENT = "TxtReaderActivity_content";
+    public static final String KEY_CONTENT = TxtReaderActivity.class.getSimpleName() + "_content";
+    public static final String LOAD_URL_CONTENT = TxtReaderActivity.class.getSimpleName() + "_loadUrlContent";
 
     private static final Class[] CLICKABLE_SPAN_IMPL_CLZ = new Class[]{//
             TxtReaderAppender.WordSpan.class, //
@@ -219,6 +220,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     String content = getIntent().getExtras().getString(KEY_CONTENT);
                     this.pasteFromOutsideLoad(content);
                 }
+
+                if (getIntent().getExtras().containsKey(LOAD_URL_CONTENT)) {
+                    String loadUrl = getIntent().getExtras().getString(LOAD_URL_CONTENT);
+                    this.loadHtmlFromUrl(loadUrl);
+                }
             } catch (Exception ex) {
                 throw new RuntimeException("onCreate ERR : " + ex.getMessage(), ex);
             }
@@ -334,7 +340,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      */
     private void loadDropboxList() {
         final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
-        if(fileLst == null || fileLst.isEmpty()){
+        if (fileLst == null || fileLst.isEmpty()) {
             Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -828,12 +834,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         builder.show();
     }
 
-    private void loadHtmlFromUrl() {
+    private void loadHtmlFromUrl(String urlAddress) {
         View parentView = LayoutInflater.from(this).inflate(R.layout.subview_single_edittext, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(parentView);
         final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
-        editText.setText("http://www.ign.com");
+        editText.setText(StringUtils.trimToEmpty(urlAddress));
         builder.setTitle("開啟HTML");
         builder.setMessage("開啟HTML : ");
         builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
@@ -1260,7 +1266,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }, //
         LOAD_HTML_FROM_URL("開啟網頁", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.loadHtmlFromUrl();
+                activity.loadHtmlFromUrl("http://www.cnn.com");
             }
         }, //
 //        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null) {

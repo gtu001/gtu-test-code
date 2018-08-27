@@ -59,8 +59,12 @@ public class StringUtil_ {
             char[] arry = StringUtils.trimToEmpty(content).toCharArray();
             for (int ii = 0; ii < arry.length; ii++) {
                 char a = arry[ii];
-                if (a == from && (ii - 1) >= 0 && arry[ii - 1] != '\\') {
-                    sb.append("\\" + a);
+                if (a == from) {
+                    if ((ii - 1) >= 0 && arry[ii - 1] != '\\') {
+                        sb.append("\\" + a);
+                    } else if (ii == 0) {
+                        sb.append("\\" + a);
+                    }
                 } else {
                     sb.append(a);
                 }
