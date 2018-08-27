@@ -34,16 +34,16 @@ public class TxtReaderAppenderForHtmlTag {
 
     private static final String TAG = TxtReaderAppenderForHtmlTag.class.getSimpleName();
 
-    private static final Pattern START = Pattern.compile("\\{\\{", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final Pattern END = Pattern.compile("\\}\\}", Pattern.MULTILINE | Pattern.DOTALL);
-    private static final String START_TAG = "{{";
-    private static final String END_TAG = "}}";
+    private static final Pattern START = Pattern.compile("\\Q{{\\E", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern END = Pattern.compile("\\Q}}\\E", Pattern.MULTILINE | Pattern.DOTALL);
+
 
     private String txtContent;//
     private SpannableString ss;//
     private int maxPicWidth;//
     private List<Pair<Integer, Integer>> normalIgnoreLst;//
     private Bitmap hyperlink;//
+    private Bitmap changeLineImg;//
     private Context context;
     private ITxtReaderActivityDTO dto;
     private OnlinePicLoader onlinePicLoader;
@@ -285,7 +285,17 @@ public class TxtReaderAppenderForHtmlTag {
                 self.hiddenSpan(self.ss, self.getPairStart(pair), proc.getStart());
                 self.hiddenSpan(self.ss, proc.getEnd(), self.getPairEnd(pair));
 
-                //TODO
+                self.ss.setSpan(new BackgroundColorSpan(Color.parseColor("#f4f4f5")), proc.getStart(), proc.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        },//
+        CHANGE_LINE("{{chgLine}}", "chgLine\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 0);
+                log(proc);
+
+                self.hiddenSpan(self.ss, self.getPairStart(pair), self.getPairEnd(pair));
+                self.ss.setSpan(self.createChangeLineImageSpan(), self.getPairStart(pair), self.getPairEnd(pair), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
         ;
@@ -441,5 +451,13 @@ public class TxtReaderAppenderForHtmlTag {
             hyperlink = OOMHandler.fixPicScale(b1, 100, 100);
         }
         return new ImageSpan(context, hyperlink, ImageSpan.ALIGN_BASELINE);//
+    }
+
+    private ImageSpan createChangeLineImageSpan() {
+        if (changeLineImg == null) {
+            Bitmap b1 = OOMHandler.new_decode(context, R.drawable.icon_change_line);//
+            changeLineImg = OOMHandler.fixPicScale(b1, 30, 30);
+        }
+        return new ImageSpan(context, changeLineImg, ImageSpan.ALIGN_BASELINE);//
     }
 }

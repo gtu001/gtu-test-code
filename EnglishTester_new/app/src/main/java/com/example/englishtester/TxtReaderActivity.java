@@ -67,7 +67,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -863,6 +862,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     progDlg.get().setMessage("讀取中...");
                     progDlg.get().show();
 
+                    setFileName(url);
+
                     webViewHtmlFetcher.applyConfig(true, new WebViewHtmlFetcher.HtmlGet() {
                         @Override
                         public void action(final String contentOrign, final Handler handler) {
@@ -870,6 +871,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 dto.currentHtmlFile = null;
                                 dto.dropboxPicDir = null;
                                 dto.currentHtmlUrl = url;
+                                dto.setBookmarkHolder(new HashMap());
 
                                 for (int ii = 0; ii < 10; ii++)
                                     Log.v(TAG, "[HtmlWordParser START]");

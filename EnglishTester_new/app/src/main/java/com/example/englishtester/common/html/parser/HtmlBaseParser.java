@@ -436,14 +436,14 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _step6_preTag(String content, boolean isPure) {
-        Pattern titleStylePtn = Pattern.compile("\\<pre\\>((?:.|\n)*?)\\<\\/pre\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<pre(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/pre\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String preText = mth.group(1);
             preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{pre:" + preText + "}}";
+            String repStr = "{{pre:" + __replaceChangeLine(preText) + "}}";
             if (isPure) {
                 repStr = preText;
             }
@@ -455,19 +455,40 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _step7_codeTag(String content, boolean isPure) {
-        Pattern titleStylePtn = Pattern.compile("\\<code\\>((?:.|\n)*?)\\<\\/code\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<code(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/code\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String preText = mth.group(1);
             preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{code:" + preText + "}}";
+            String repStr = "{{code:" + __replaceChangeLine(preText) + "}}";
             if (isPure) {
                 repStr = preText;
             }
 
             mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    private String __replaceChangeLine(String orignText) {
+        Pattern ptn = Pattern.compile("(\\{\\{chgLine\\}\\}\n|\n)", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = ptn.matcher(orignText);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+
+            //若換行前剛好是 "{" 會出問題
+            String prefix = "";
+            if ("{{chgLine}}".equals(mth.group())) {
+                int pos = mth.start();
+                if ("{".equals(orignText.substring(pos - 1, pos))) {
+                    prefix = " ";
+                }
+            }
+
+            mth.appendReplacement(sb, prefix + "{{chgLine}}" + "\n");
         }
         mth.appendTail(sb);
         return sb.toString();
