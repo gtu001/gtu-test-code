@@ -896,7 +896,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                     public void run() {
                                         //設定標題
                                         setFileName(url);
-                                        TitleTextSetter.setText(TxtReaderActivity.this, getHtmlTitle(content, url));
+                                        //TitleTextSetter.setText(TxtReaderActivity.this, getHtmlTitle(contentOrign, url));
+                                        actionBarCustomTitleHandler.setText(getHtmlTitle(contentOrign, url));
 
                                         setContentText(content, true);
                                         translateView.setText("");
@@ -1010,7 +1011,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             }
                             titleVal = fixName(titleVal);
                             setFileName(titleVal);
-                            TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
+                            //TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
                             actionBarCustomTitleHandler.setText(titleVal);
                         }
                     });
