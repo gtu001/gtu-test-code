@@ -27,6 +27,7 @@
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
