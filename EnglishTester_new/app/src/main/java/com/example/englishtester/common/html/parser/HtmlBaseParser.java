@@ -481,11 +481,12 @@ public abstract class HtmlBaseParser {
 
             //若換行前剛好是 "{" 會出問題
             String prefix = "";
-            if ("{{chgLine}}".equals(mth.group())) {
+            try {
                 int pos = mth.start();
                 if ("{".equals(orignText.substring(pos - 1, pos))) {
                     prefix = " ";
                 }
+            } catch (Exception ex) {
             }
 
             mth.appendReplacement(sb, prefix + "{{chgLine}}" + "\n");

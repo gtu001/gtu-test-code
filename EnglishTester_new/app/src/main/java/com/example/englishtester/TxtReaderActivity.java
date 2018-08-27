@@ -862,9 +862,18 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     progDlg.get().setMessage("讀取中...");
                     progDlg.get().show();
 
-                    setFileName(url);
-
                     webViewHtmlFetcher.applyConfig(true, new WebViewHtmlFetcher.HtmlGet() {
+
+                        Pattern titlePtn = Pattern.compile("\\<title\\>((?:.|\n)*?)\\<\\/title\\>", Pattern.DOTALL | Pattern.MULTILINE);
+
+                        private String getHtmlTitle(String content, String defaultUrl) {
+                            Matcher mth = titlePtn.matcher(content);
+                            if (mth.find()) {
+                                return mth.group(1);
+                            }
+                            return defaultUrl;
+                        }
+
                         @Override
                         public void action(final String contentOrign, final Handler handler) {
                             try {
@@ -885,6 +894,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        //設定標題
+                                        setFileName(url);
+                                        TitleTextSetter.setText(TxtReaderActivity.this, getHtmlTitle(content, url));
+
                                         setContentText(content, true);
                                         translateView.setText("");
                                         progDlg.get().dismiss();
