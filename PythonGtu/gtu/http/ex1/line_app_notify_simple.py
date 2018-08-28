@@ -3,7 +3,7 @@ import urllib.parse
 from gtu.reflect import checkSelf
 
 def formEncode(form):
-    params = urllib.parse.urlencode(form)
+    return urllib.parse.urlencode(form)
     
 
 def main():
