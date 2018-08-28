@@ -1,16 +1,10 @@
 package com.example.englishtester.common;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.util.DisplayMetrics;
-import com.example.englishtester.common.Log;
-import android.view.Display;
-import android.view.WindowManager;
-
-import com.example.englishtester.R;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +13,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -139,7 +132,7 @@ public class OOMHandler {
                     Log.v(TAG, "Bitmap scale = " + ii);
                     return bitmap;
                 } catch (OutOfMemoryError ex) {
-                    Log.v(TAG, "Bitmap scale = " + ii);
+                    Log.v(TAG, "Bitmap rescale = " + ii);
                     bitmap.recycle();
                     System.gc();
                 }
@@ -159,13 +152,29 @@ public class OOMHandler {
                     Log.v(TAG, "Bitmap scale = " + ii);
                     return bitmap;
                 } catch (OutOfMemoryError ex) {
-                    Log.v(TAG, "Bitmap scale = " + ii);
+                    Log.v(TAG, "Bitmap rescale = " + ii);
                     bitmap.recycle();
                     System.gc();
                 }
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+
+    public static Bitmap new_decode(int resourceId) {
+        InputStream inputStream = Resources.getSystem().openRawResource(resourceId);
+        Bitmap bitmap = null;
+        for (int ii = 0; ; ii++) {
+            try {
+                bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
+                Log.v(TAG, "Bitmap scale = " + ii);
+                return bitmap;
+            } catch (OutOfMemoryError ex) {
+                Log.v(TAG, "Bitmap rescale = " + ii);
+                bitmap.recycle();
+                System.gc();
+            }
         }
     }
 
@@ -178,7 +187,7 @@ public class OOMHandler {
                 Log.v(TAG, "Bitmap scale = " + ii);
                 return bitmap;
             } catch (OutOfMemoryError ex) {
-                Log.v(TAG, "Bitmap scale = " + ii);
+                Log.v(TAG, "Bitmap rescale = " + ii);
                 bitmap.recycle();
                 System.gc();
             }
@@ -229,7 +238,7 @@ public class OOMHandler {
                     Log.v(TAG, "Bitmap scale = " + ii);
                     return bitmap;
                 } catch (OutOfMemoryError ex) {
-                    Log.v(TAG, "Bitmap scale = " + ii);
+                    Log.v(TAG, "Bitmap rescale = " + ii);
                     bitmap.recycle();
                     System.gc();
                 }

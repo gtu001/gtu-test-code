@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -61,6 +62,7 @@ import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
 import com.example.englishtester.common.MagnifierPosEnum;
+import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.RepeatMoveListener;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
@@ -386,7 +388,7 @@ public class FloatViewService extends Service {
             imageViewNoteAction.setOnClickListener(new OnClickListener() {
                 private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
                     Map<String, Object> a1 = new HashMap<String, Object>();
-                    a1.put("ItemImage", icon);
+                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon) : null));
                     a1.put("ItemTitle", title);
                     list.add(a1);
                 }
@@ -685,7 +687,7 @@ public class FloatViewService extends Service {
             OnClickListener imageViewConfig_OnClickListener = new OnClickListener() {
                 private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
                     Map<String, Object> a1 = new HashMap<String, Object>();
-                    a1.put("ItemImage", icon);
+                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon) : null));
                     a1.put("ItemTitle", title);
                     list.add(a1);
                 }

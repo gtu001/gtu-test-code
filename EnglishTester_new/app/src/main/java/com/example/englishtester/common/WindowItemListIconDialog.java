@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+
 import com.example.englishtester.common.Log;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -32,13 +35,13 @@ public class WindowItemListIconDialog {
     WindowManager mWindowManager;
     Context context;
     LinearLayout outterLayout;
-    
-    public WindowItemListIconDialog(final WindowManager mWindowManager, Context context){
+
+    public WindowItemListIconDialog(final WindowManager mWindowManager, Context context) {
         this.mWindowManager = mWindowManager;
         this.context = context;
     }
 
-    public void showItemListDialog(String title, final List<Map<String,Object>> listItem, final OnItemClickListener listener) {
+    public void showItemListDialog(String title, final List<Map<String, Object>> listItem, final OnItemClickListener listener) {
         LayoutInflater inflater = LayoutInflater.from(context);
         outterLayout = (LinearLayout) inflater.inflate(R.layout.activity_float_similar_view, null);
 
@@ -61,9 +64,11 @@ public class WindowItemListIconDialog {
 
         SimpleAdapter aryAdapter = new SimpleAdapter(context, listItem,// 資料來源
                 R.layout.subview_propview, //
-                new String[] { "ItemImage", "ItemTitle" }, //
-                new int[] { R.id.ItemImage, R.id.ItemTitle }//
+                new String[]{"ItemImage", "ItemTitle"}, //
+                new int[]{R.id.ItemImage, R.id.ItemTitle}//
         );
+
+        SimpleAdapterDecorator.apply4Bitmap(aryAdapter);
 
         listView.setAdapter(aryAdapter);
 
@@ -94,9 +99,9 @@ public class WindowItemListIconDialog {
         });
         mWindowManager.addView(outterLayout, WindowItemListDialog.getInitLayoutParams());
     }
-    
-    public void dismiss(){
-        if(outterLayout != null){
+
+    public void dismiss() {
+        if (outterLayout != null) {
             mWindowManager.removeViewImmediate(outterLayout);
         }
         outterLayout = null;
