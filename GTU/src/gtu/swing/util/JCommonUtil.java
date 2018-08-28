@@ -383,6 +383,19 @@ public class JCommonUtil {
     /**
      * 顯示alert視窗
      */
+    public static void _jOptionPane_showMessageDialog_InvokeLater(final Object message, final String title, final boolean isError) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int icon = isError ? JOptionPane.ERROR_MESSAGE : JOptionPane.INFORMATION_MESSAGE;
+                JOptionPane.showMessageDialog(null, message, title, icon);
+            }
+        });
+    }
+
+    /**
+     * 顯示alert視窗
+     */
     public static void _jOptionPane_showMessageDialog_error_NonUICompatible(Object message) {
         try {
             JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -534,7 +547,7 @@ public class JCommonUtil {
     /**
      * 錯誤處理
      */
-    public static File handleException(Object message, Throwable ex, boolean writeFile, String dateFormat) {
+    public static File handleException(Object message, final Throwable ex, boolean writeFile, String dateFormat) {
         String title = (ex == null) ? "執行發生錯誤" : ex.getMessage();
         String messageStr = "";
         File writeIfNeed = null;
@@ -562,7 +575,7 @@ public class JCommonUtil {
             }
             if (validateFindOk) {
                 try {
-                    JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), "欄位輸入錯誤");
+                    JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(ex.getMessage(), "欄位輸入錯誤", true);
                 } catch (java.awt.HeadlessException uiError) {
                 }
                 return null;
@@ -625,7 +638,7 @@ public class JCommonUtil {
             }
         }
         try {
-            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(messageStr, title);
+            JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(messageStr, title, true);
         } catch (java.awt.HeadlessException uiError) {
         }
         return writeIfNeed;

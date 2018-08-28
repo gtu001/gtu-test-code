@@ -535,7 +535,7 @@ public class FacebookVideoDownloader extends JFrame {
     }
 
     private void urlTextOnBlur(final boolean throwEx) {
-        BlockingQueue<String> queue = new ArrayBlockingQueue<String>(1);
+        final BlockingQueue<String> queue = new ArrayBlockingQueue<String>(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -564,7 +564,7 @@ public class FacebookVideoDownloader extends JFrame {
                         if (throwEx) {
                             throw new RuntimeException("找步道影片 : " + url);
                         } else {
-                            JCommonUtil._jOptionPane_showMessageDialog_error("找不到影片!");
+                            JCommonUtil._jOptionPane_showMessageDialog_InvokeLater("找不到影片!", "", true);
                         }
                         return;
                     }

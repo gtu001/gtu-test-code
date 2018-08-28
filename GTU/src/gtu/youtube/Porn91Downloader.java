@@ -18,7 +18,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -53,6 +52,7 @@ import org.apache.http.protocol.HttpContext;
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.log.LogbackUtil;
+import gtu.log.line.SystemZ;
 import gtu.swing.util.JCommonUtil;
 import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
 
@@ -76,8 +76,8 @@ public class Porn91Downloader {
         String url = "https://xvideos-im-24e6ee00-31316667-mp4.s.loris.llnwd.net/videos/mp4/4/2/d/xvideos.com_42d3bf243bc1136883a43d1ddcf19676.mp4?e=1524945829&ri=1024&rs=85&h=3258734aeecfc622cfa30c9c994aefb4";
         File testMp4 = new File(FileUtil.DESKTOP_DIR, "xxxxxx.mp4");
         long length = p.getContentLength(DEFAULT_USER_AGENT, url);
-        System.out.println("length = " + length);
-        System.out.println("done...");
+        SystemZ.out.println("length = " + length);
+        SystemZ.out.println("done...");
     }
 
     public static void main_XXXXXX2(String[] args) throws Throwable {
@@ -106,7 +106,7 @@ public class Porn91Downloader {
         StringBuilder msg = new StringBuilder();
         for (int ii = 0; ii < videoLst.size(); ii++) {
             VideoUrlConfig v = videoLst.get(ii);
-            System.out.println("[" + ii + "] " + v);
+            SystemZ.out.println("[" + ii + "] " + v);
             msg.append("[" + ii + "] " + v + "\n");
         }
 
@@ -114,7 +114,7 @@ public class Porn91Downloader {
 
         VideoUrlConfig video = videoLst.get(index);
         p.processDownload(video, null, null);
-        System.out.println("done...v3");
+        SystemZ.out.println("done...v3");
     }
 
     static {
@@ -134,7 +134,7 @@ public class Porn91Downloader {
             long detectSize = getContentLength(DEFAULT_USER_AGENT, url);
             final float MAX_SIZE = 1.5f * 1024 * 1024; // 超過1.5MB
             if (MAX_SIZE < detectSize) {
-                System.out.println("偵測網頁大小太大 : Max : " + MAX_SIZE + " , current len : " + detectSize);
+                SystemZ.out.println("偵測網頁大小太大 : Max : " + MAX_SIZE + " , current len : " + detectSize);
                 return new ArrayList<VideoUrlConfig>();
             }
         } catch (Throwable e) {
@@ -187,19 +187,19 @@ public class Porn91Downloader {
             }
 
             if (!PornVideoUrlDetection.isVideo(conf.fileName)) {
-                System.out.println(conf.getFileName() + " is not video >> ignored!");
+                SystemZ.out.println(conf.getFileName() + " is not video >> ignored!");
                 continue;
             }
 
             if (conf.length <= 0) {
-                System.out.println(conf.getFileName() + " size 0 >>  ignored!");
+                SystemZ.out.println(conf.getFileName() + " size 0 >>  ignored!");
                 continue;
             }
 
             videoLst.add(conf);
         }
 
-        System.out.println("video size = " + videoLst.size());
+        SystemZ.out.println("video size = " + videoLst.size());
         return videoLst;
     }
 
@@ -275,7 +275,7 @@ public class Porn91Downloader {
                     arry[0] = StringUtils.trimToEmpty(arry[0]);
                     arry[1] = StringUtils.trimToEmpty(arry[1]);
                     cookstore.addCookie(new BasicClientCookie(arry[0], arry[1]));
-                    System.out.println("cookie : " + Arrays.toString(arry));
+                    SystemZ.out.println("cookie : " + Arrays.toString(arry));
                 }
             }
             return cookstore;
@@ -303,7 +303,7 @@ public class Porn91Downloader {
                     } else {
                         String key = StringUtils.trimToEmpty(tempKey);
                         String value = StringUtils.trimToEmpty(line);
-                        System.out.format("appendHeader k:[%s] \t v:[%s]\n", key, value);
+                        SystemZ.out.format("appendHeader k:[%s] \t v:[%s]\n", key, value);
                         httpget.setHeader(key, value);
                         tempKey = null;
                     }
@@ -372,7 +372,7 @@ public class Porn91Downloader {
     }
 
     public static long getContentLength(String userAgent, String downloadUrl) throws Throwable {
-        System.out.println("getContentLength URL : " + downloadUrl);
+        SystemZ.out.println("getContentLength URL : " + downloadUrl);
         HttpGet httpget2 = new HttpGet(downloadUrl);
         if (userAgent != null && userAgent.length() > 0) {
             httpget2.setHeader("User-Agent", userAgent);
@@ -384,10 +384,10 @@ public class Porn91Downloader {
         HttpEntity entity2 = response2.getEntity();
         if (entity2 != null && response2.getStatusLine().getStatusCode() == 200) {
             long length = entity2.getContentLength();
-            System.out.println("length : " + length);
+            SystemZ.out.println("length : " + length);
             return length;
         }
-        System.out.println("length : Fail ");
+        SystemZ.out.println("length : Fail ");
         return -1;
     }
 
@@ -402,7 +402,7 @@ public class Porn91Downloader {
     };
 
     private void downloadWithHttpClient(String userAgent, String downloadUrl, File outputfile, Integer percentScale) throws Throwable {
-        System.out.println("Download URL : " + downloadUrl);
+        SystemZ.out.println("Download URL : " + downloadUrl);
         HttpGet httpget2 = new HttpGet(downloadUrl);
         if (userAgent != null && userAgent.length() > 0) {
             httpget2.setHeader("User-Agent", userAgent);
@@ -425,12 +425,12 @@ public class Porn91Downloader {
                 length = 1;
             }
             InputStream instream2 = entity2.getContent();
-            System.out.println("Writing " + commaFormatNoPrecision.format(length) + " bytes to " + outputfile);
+            SystemZ.out.println("Writing " + commaFormatNoPrecision.format(length) + " bytes to " + outputfile);
             if (outputfile.exists()) {
                 outputfile.delete();
             }
             BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(outputfile));
-            System.out.println("outputfile " + outputfile);
+            SystemZ.out.println("outputfile " + outputfile);
 
             DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale);
             if (progressPerformd != null) {
@@ -438,26 +438,26 @@ public class Porn91Downloader {
             }
             downloadHandler.start();
 
-            System.out.println("Done...");
+            SystemZ.out.println("Done...");
         } else {
-            System.out.println("Err : " + response2.getStatusLine().getStatusCode());
+            SystemZ.out.println("Err : " + response2.getStatusLine().getStatusCode());
         }
     }
 
     private String getTitleForFileName(String content) {
         String title = "";
         try {
-            System.out.println("-----------------------------------------------------------------------");
-            // System.out.println(content);
+            SystemZ.out.println("-----------------------------------------------------------------------");
+            // SystemZ.out.println(content);
             Pattern ptn = Pattern.compile("<title>(.*?)</title>", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(content);
             if (mth.find()) {
                 title = mth.group(1);
                 title = StringEscapeUtils.unescapeHtml(title);
                 title = FileUtil.escapeFilename(title, true);
-                System.out.println(title);
+                SystemZ.out.println(title);
             }
-            System.out.println("-----------------------------------------------------------------------");
+            SystemZ.out.println("-----------------------------------------------------------------------");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

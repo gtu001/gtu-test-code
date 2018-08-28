@@ -1,9 +1,5 @@
 package gtu.lineapp.ex1;
 
-import junit.framework.Assert;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,6 +10,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import org.apache.commons.lang3.Validate;
 
 /**
  * https://notify-bot.line.me/my/
@@ -47,8 +45,8 @@ public class LineAppNotifiyHelper_Simple {
 
     public String send(final String lineToken, String message) {
         try {
-            Assert.assertNotNull("必須設定message!", message);
-            Assert.assertTrue("必須設定lineToken", StringUtils.isNotBlank(lineToken));
+            Validate.notBlank(message, "必須設定message!");
+            Validate.notBlank(lineToken, "必須設定lineToken!");
 
             final String postForm = "&message=" + URLEncoder.encode(message, "UTF8");
             final ArrayBlockingQueue<String> waitQue = new ArrayBlockingQueue<String>(1);

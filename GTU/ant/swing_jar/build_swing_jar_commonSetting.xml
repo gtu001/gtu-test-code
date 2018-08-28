@@ -131,11 +131,10 @@
 			<!-- http client 
 			<packagename mode="small">org.apache.http.client.HttpClient</packagename>
 			<packagename mode="small">org.apache.http.HttpEntity</packagename>
-			<packagename mode="pom">org.apache.commons.logging.LogFactory</packagename>
-			<packagename mode="pom">org.slf4j.LoggerFactory</packagename>
-			<packagename mode="pom">org.slf4j.impl.StaticLoggerBinder</packagename>
-			<packagename mode="pom">org.slf4j.spi.LocationAwareLogger</packagename>
-			<packagename mode="pom">ch.qos.logback.core.joran.spi.JoranException</packagename>
+			<packagename mode="exact" name="jcl-over-slf4j-1.7.6.jar">org/apache/commons/logging/LogFactory</packagename>
+			<packagename mode="exact" name="slf4j-api-1.7.5.jar">org.slf4j.Logger</packagename>
+			<packagename mode="exact" name="logback-classic-1.0.13.jar">ch.qos.logback.classic.Logger</packagename>
+			<packagename mode="exact" name="logback-core-1.0.13.jar">ch.qos.logback.core.joran.spi.JoranException</packagename>
 			 -->
 			<!-- keyboard mouse
 			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
@@ -148,3 +147,7 @@
 			<packagename mode="small">org/slf4j/MarkerFactory</packagename>
 			<packagename mode="small">org/slf4j/impl/StaticMarkerBinder</packagename>
 		    -->
+		    <!-- log4j_g8
+		    <packagename mode="exact" name="logback-classic-1.0.13.jar">ch.qos.logback.classic.Logger</packagename>
+		    <packagename mode="exact" name="logback-core-1.0.13.jar">ch.qos.logback.core.joran.spi.JoranException</packagename>
+		     -->

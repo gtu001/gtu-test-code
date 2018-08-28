@@ -69,19 +69,19 @@
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
-			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
-			
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
+
 			<!-- http client -->
 			<packagename mode="small">org.apache.http.client.HttpClient</packagename>
 			<packagename mode="small">org.apache.http.HttpEntity</packagename>
-			<packagename mode="pom">org.apache.commons.logging.LogFactory</packagename>
-			<packagename mode="pom">org.slf4j.LoggerFactory</packagename>
-			<packagename mode="pom">org.slf4j.impl.StaticLoggerBinder</packagename>
-			<packagename mode="pom">org.slf4j.spi.LocationAwareLogger</packagename>
-			<packagename mode="pom">ch.qos.logback.core.joran.spi.JoranException</packagename>
-			
+			<packagename mode="exact" name="jcl-over-slf4j-1.7.6.jar">org/apache/commons/logging/LogFactory</packagename>
+			<packagename mode="exact" name="slf4j-api-1.7.5.jar">org.slf4j.Logger</packagename>
+			<packagename mode="exact" name="logback-classic-1.0.13.jar">ch.qos.logback.classic.Logger</packagename>
+			<packagename mode="exact" name="logback-core-1.0.13.jar">ch.qos.logback.core.joran.spi.JoranException</packagename>
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
