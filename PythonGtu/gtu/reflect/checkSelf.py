@@ -7,12 +7,14 @@ import re
 from gtu.reflect import checkSelf
 '''
 
-def checkMembers(testObj, doc=False, ignoreInherit=False):
+def checkMembers(testObj, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''檢查物件成員'''
     print("testObj ==> ", type(testObj))
     dlist = inspect.getmembers(testObj)
     for i, mem in enumerate(dlist, 0):
         if ignoreInherit and __isInheritMember(mem[0]) :
+            continue
+        if ignorePrivate and __isPrivateMember(mem[0]) :
             continue
         
         print("<<", i, ">>", mem[0], "\t", mem[1])
@@ -22,7 +24,7 @@ def checkMembers(testObj, doc=False, ignoreInherit=False):
             
 
 
-def checkLikeMembers(testObj, name, doc=False, ignoreInherit=False):
+def checkLikeMembers(testObj, name, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''找出接近的成員'''
     print("testObj ==> ", type(testObj))
     findOk = False
@@ -30,6 +32,8 @@ def checkLikeMembers(testObj, name, doc=False, ignoreInherit=False):
     dlist = inspect.getmembers(testObj)
     for i, mem in enumerate(dlist, 0):
         if ignoreInherit and __isInheritMember(mem[0]) :
+            continue
+        if ignorePrivate and __isPrivateMember(mem[0]) :
             continue
         
         if name in mem[0].lower() :
@@ -43,13 +47,15 @@ def checkLikeMembers(testObj, name, doc=False, ignoreInherit=False):
         
         
 
-def checkMatchPtnMembers(testObj, pattern, doc=False, ignoreInherit=False):
+def checkMatchPtnMembers(testObj, pattern, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''找出接近的成員'''
     print("testObj ==> ", type(testObj))
     findOk = False
     dlist = inspect.getmembers(testObj)
     for i, mem in enumerate(dlist, 0):
         if ignoreInherit and __isInheritMember(mem[0]) :
+            continue
+        if ignorePrivate and __isPrivateMember(mem[0]) :
             continue
         
         mth = re.match(pattern, mem[0])
@@ -82,6 +88,14 @@ def __isInheritMember(name):
     if mth :
         return True
     return False
+
+
+def __isPrivateMember(name):
+    mth = re.match(r"^_\w+$", name)
+    if mth :
+        return True
+    return False
+        
         
 
 if __name__ == '__main__':

@@ -664,20 +664,22 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
 
         //for Standard Html
-        content = hiddenByTagMatcher("<script", "</script>", "\\<script[\r\n\t\\s]{1}", "\\<\\/script\\>", 0, 0, content);
+        content = hiddenByTagMatcher("<script", "</script>", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
-        content = hiddenByTagMatcher("<rect", ">", "\\<rect[\n\r\t\\s]{1}", "", 0, 0, content);
+        content = hiddenByTagMatcher("<rect", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 2", content, checkStr);
-        content = hiddenByTagMatcher("<polyline", ">", "\\<polyline[\r\n\t\\s]{1}", "", 0, 0, content);
+        content = hiddenByTagMatcher("<polyline", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 3", content, checkStr);
-        content = hiddenByTagMatcher("<select", "</select>", "\\<select[\r\n\t\\s]{1}", "\\<\\/select\\>", 0, 0, content);
+        content = hiddenByTagMatcher("<select", "</select>", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 4", content, checkStr);
-        content = hiddenByTagMatcher("<circle", ">", "\\<circle[\r\n\t\\s]{1}", "", 0, 0, content);
+        content = hiddenByTagMatcher("<circle", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 5", content, checkStr);
-        content = hiddenByTagMatcher("<input", ">", "\\<input[\r\n\t\\s]{1}", "", 0, 0, content);
+        content = hiddenByTagMatcher("<input", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 6", content, checkStr);
-        content = hiddenByTagMatcher("<nav", ">", "\\<nav[\r\n\t\\s]{1}", "", 0, 0, content);
+        content = hiddenByTagMatcher("<nav", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 7", content, checkStr);
+        content = hiddenByTagMatcher("<!--", "-->", "", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 8", content, checkStr);
 
         return content;
     }
