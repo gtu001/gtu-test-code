@@ -32,5 +32,7 @@ msgpack
 #pdftotext
 PyPDF2
 
-
 ipykernel>=4.5.1
+
+#for url_conn
+retry

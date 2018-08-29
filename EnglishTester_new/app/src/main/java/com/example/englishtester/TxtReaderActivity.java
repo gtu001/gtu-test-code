@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -75,6 +76,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -833,11 +835,20 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     private void loadHtmlFromUrl(String urlAddress) {
+        if (StringUtils.isBlank(urlAddress)) {
+            String tmpUrlAddress = ClipboardHelper.copyFromClipboard(this);
+            if (StringUtils.isNotBlank(tmpUrlAddress)) {
+                urlAddress = tmpUrlAddress;
+            }
+        }
+
+        urlAddress = StringUtils.trimToEmpty(urlAddress).replaceAll("[\r\n]*", "");
+
         View parentView = LayoutInflater.from(this).inflate(R.layout.subview_single_edittext, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(parentView);
         final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
-        editText.setText(StringUtils.trimToEmpty(urlAddress));
+        editText.setText(urlAddress);
         builder.setTitle("開啟HTML");
         builder.setMessage("開啟HTML : ");
         builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
@@ -1274,9 +1285,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.moveToNextBookmark();
             }
         }, //
-        LOAD_HTML_FROM_URL("開啟網頁", MENU_FIRST++, REQUEST_CODE++, null) {
+        LOAD_HTML_FROM_URL("開啟URL", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.loadHtmlFromUrl("http://www.cnn.com");
+                activity.loadHtmlFromUrl(null);
+            }
+        }, //
+        GOOGLE_FREE_TRANSLATE("Google免費翻譯", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                String content = StringUtils.trimToEmpty(activity.dto.content);
+                ReaderCommonHelper.FreeGoogleTranslateHandler handler = new ReaderCommonHelper.FreeGoogleTranslateHandler(activity, content);
+                handler.showDlg();
             }
         }, //
         DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {

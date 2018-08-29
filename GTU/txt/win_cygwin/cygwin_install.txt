@@ -1,0 +1,28 @@
+##安裝 cygwin
+
+http://www.cygwin.com/
+
+下載  setup-x86_64.exe 
+
+
+--------------------------------------------------------------------
+
+##安裝 apt-cyg
+
+https://github.com/transcode-open/apt-cyg
+
+下載 apt-cyg 這個檔案
+
+開啟 cygwin 切到放 apt-cyg 目錄底下
+
+$ install apt-cyg /bin
+
+
+--------------------------------------------------------------------
+
+裝好後 安裝package 
+
+apt-cyg install <package>
+
+
+

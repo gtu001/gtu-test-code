@@ -1,26 +1,43 @@
 package com.example.englishtester.common;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Handler;
 import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
+import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by gtu001 on 2018/8/8.
@@ -287,5 +304,83 @@ public class ReaderCommonHelper {
                 Toast.makeText(context, "移到 : " + spanObject.getWord(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static class FreeGoogleTranslateHandler {
+
+        private static final String TAG = FreeGoogleTranslateHandler.class.getSimpleName();
+
+        private List<String> pageLst = new ArrayList<>();
+        private String content;
+        private Context context;
+
+        private static final int BUFFER_LENGTH = 3500;
+
+        public FreeGoogleTranslateHandler(Context context, String content) {
+            this.context = context;
+            content = StringUtils.trimToEmpty(content);
+
+            this.content = content;
+            Pattern ptn = Pattern.compile("\n", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptn.matcher(content);
+
+            int startPos = 0;
+            while (mth.find()) {
+                if (mth.end() - startPos > BUFFER_LENGTH) {
+                    String tmpContent = content.substring(startPos, mth.end());
+                    pageLst.add(tmpContent);
+                    startPos = mth.end();
+                }
+            }
+
+            pageLst.add(content.substring(startPos, content.length()));
+        }
+
+        private void gotoGoogleTranslate(int pageIdx) {
+            String content = StringUtils.trimToEmpty(pageLst.get(pageIdx));
+            if (StringUtils.isBlank(content)) {
+                Toast.makeText(context, "請先輸入內容!", Toast.LENGTH_SHORT).show();
+            }
+            String url = "https://translate.google.com.tw/?hl=zh-TW#en/zh-TW/";
+            try {
+                content = URLEncoder.encode(content, "UTF8");
+            } catch (UnsupportedEncodingException e) {
+            }
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url + content));
+            context.startActivity(browserIntent);
+        }
+
+        public void showDlg() {
+            View parentView = LayoutInflater.from(context).inflate(R.layout.subview_single_edittext, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(parentView);
+            final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
+            editText.setText(String.valueOf(1));
+            builder.setTitle("輸入頁碼");
+            builder.setMessage("請輸入1-" + (pageLst.size()));
+            builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (pageLst.isEmpty()) {
+                        Toast.makeText(context, "請先輸入內容!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    try {
+                        int pageIdx = Integer.parseInt(editText.getText().toString());
+                        gotoGoogleTranslate(pageIdx - 1);
+                    } catch (Exception e) {
+                        Toast.makeText(context, "讀取失敗!", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "showDlg ERR : " + e.getMessage(), e);
+                    }
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            builder.show();
+        }
     }
 }

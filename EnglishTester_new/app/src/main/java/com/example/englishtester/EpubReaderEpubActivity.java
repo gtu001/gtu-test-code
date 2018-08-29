@@ -1025,6 +1025,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.moveToNextBookmark();
             }
         }, //
+        GOOGLE_FREE_TRANSLATE("Google免費翻譯", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                final EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(activity.epubViewerMainHandler.getDto().getPageIndex());
+                final String content = StringUtils.trimToEmpty(holder.getTranslateOrignText());
+                ReaderCommonHelper.FreeGoogleTranslateHandler handler = new ReaderCommonHelper.FreeGoogleTranslateHandler(activity, content);
+                handler.showDlg();
+            }
+        }, //
         DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();

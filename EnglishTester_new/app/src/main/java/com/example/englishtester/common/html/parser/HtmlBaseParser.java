@@ -612,8 +612,6 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag 10", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<span(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 11", content, checkStr);
-        content = _stepFinal_hidden_tag(content, "\\<\\/(?:.|\n)*?\\>");
-        validateContent("_stepFinal_hidden_tag 12", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<o\\:p>");
         validateContent("_stepFinal_hidden_tag 13", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<\\!\\[(?:.|\n)*?\\]\\>");
@@ -682,6 +680,12 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag STD 8", content, checkStr);
         content = hiddenByTagMatcher("<iframe", ">", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 9", content, checkStr);
+        content = hiddenByTagMatcher("<ins", ">", "<ins[\\s\\>]", "\\>", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 1", content, checkStr);
+
+        //移除結尾tag
+        content = _stepFinal_hidden_tag(content, "\\<\\/(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag <END_TAG>", content, checkStr);
 
         return content;
     }
