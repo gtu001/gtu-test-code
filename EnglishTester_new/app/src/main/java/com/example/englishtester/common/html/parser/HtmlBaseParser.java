@@ -680,6 +680,8 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag STD 7", content, checkStr);
         content = hiddenByTagMatcher("<!--", "-->", "", "", 0, 0, content);
         validateContent("_stepFinal_hidden_tag STD 8", content, checkStr);
+        content = hiddenByTagMatcher("<iframe", ">", "", "", 0, 0, content);
+        validateContent("_stepFinal_hidden_tag STD 9", content, checkStr);
 
         return content;
     }
