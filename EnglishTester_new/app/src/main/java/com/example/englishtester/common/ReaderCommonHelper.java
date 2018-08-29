@@ -351,14 +351,8 @@ public class ReaderCommonHelper {
         }
 
         public void showDlg() {
-            View parentView = LayoutInflater.from(context).inflate(R.layout.subview_single_edittext, null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setView(parentView);
-            final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
-            editText.setText(String.valueOf(1));
-            builder.setTitle("輸入頁碼");
-            builder.setMessage("請輸入1-" + (pageLst.size()));
-            builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
+            final SingleInputDialog dlg = new SingleInputDialog(context, "1", "輸入頁碼", "請輸入1-" + (pageLst.size()));
+            dlg.confirmButton(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (pageLst.isEmpty()) {
@@ -367,7 +361,7 @@ public class ReaderCommonHelper {
                     }
 
                     try {
-                        int pageIdx = Integer.parseInt(editText.getText().toString());
+                        int pageIdx = Integer.parseInt(dlg.getEditText(true, true));
                         gotoGoogleTranslate(pageIdx - 1);
                     } catch (Exception e) {
                         Toast.makeText(context, "讀取失敗!", Toast.LENGTH_SHORT).show();
@@ -375,12 +369,7 @@ public class ReaderCommonHelper {
                     }
                 }
             });
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-            builder.show();
+            dlg.show();
         }
     }
 }

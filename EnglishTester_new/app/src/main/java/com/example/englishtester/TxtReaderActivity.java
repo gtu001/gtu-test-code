@@ -51,6 +51,7 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.SingleInputDialog;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -799,18 +800,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
 
         final File saveToDir = FileConstantAccessUtil.getFileDir(this, new File(Constant.PropertiesFindActivity_Config_PATH));
-        View parentView = LayoutInflater.from(this).inflate(R.layout.subview_single_edittext, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(parentView);
-        final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
+
         String tmpFileName = StringUtils.isNotBlank(dto.fileName) ? dto.fileName.toString() : "txtReaderFile";
-        editText.setText(tmpFileName + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
-        builder.setTitle("儲存內容");
-        builder.setMessage("路徑為 : " + saveToDir);
-        builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
+        tmpFileName = tmpFileName + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt";
+
+        final SingleInputDialog dlg = new SingleInputDialog(this, tmpFileName, "儲存內容", "路徑為 : " + saveToDir);
+
+        dlg.confirmButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String fileName = editText.getText().toString();
+                String fileName = dlg.getEditText(true, true);
                 if (StringUtils.isBlank(fileName)) {
                     Toast.makeText(TxtReaderActivity.this, "請輸入檔名!", Toast.LENGTH_SHORT).show();
                     return;
@@ -826,12 +825,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 }
             }
         });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
+        dlg.show();
     }
 
     private void loadHtmlFromUrl(String urlAddress) {
@@ -842,27 +836,13 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         }
 
-        urlAddress = StringUtils.trimToEmpty(urlAddress).replaceAll("[\r\n]*", "");
-
-        View parentView = LayoutInflater.from(this).inflate(R.layout.subview_single_edittext, null);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(parentView);
-        final EditText editText = (EditText) parentView.findViewById(android.R.id.edit);
-        editText.setText(urlAddress);
-        builder.setTitle("開啟HTML");
-        builder.setMessage("開啟HTML : ");
-        builder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
-
-            private String getURL() {
-                String url = editText.getText().toString();
-                url = StringUtils.trimToEmpty(url).replaceAll("[\r\n]*", "");
-                return url;
-            }
+        urlAddress = SingleInputDialog.getFixText(urlAddress, true, true);
+        final SingleInputDialog dlg = new SingleInputDialog(this, urlAddress, "開啟HTML", "開啟HTML : ");
+        dlg.confirmButton(new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                final String url = getURL();
-                editText.setText(url);
+                final String url = dlg.getEditText(true, true);
                 if (StringUtils.isBlank(url)) {
                     Toast.makeText(TxtReaderActivity.this, "請輸入URL!", Toast.LENGTH_SHORT).show();
                     return;
@@ -935,12 +915,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 }
             }
         });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
+        dlg.show();
     }
 
     /**
