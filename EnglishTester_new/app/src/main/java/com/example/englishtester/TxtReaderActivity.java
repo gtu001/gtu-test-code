@@ -147,6 +147,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * Spannable Handler
      */
     TxtReaderAppender appender;
+    /**
+     * 免費翻譯
+     */
+    ReaderCommonHelper.FreeGoogleTranslateHandler freeGoogleTranslateHandler;
 
     EditText editText1;
     Button clearBtn;
@@ -487,6 +491,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         webViewHtmlFetcher = new WebViewHtmlFetcher(this);
 
         this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
+
+        this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
+
         doOnoffService(true);
     }
 
@@ -1268,8 +1275,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         GOOGLE_FREE_TRANSLATE("Google免費翻譯", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 String content = StringUtils.trimToEmpty(activity.dto.content);
-                ReaderCommonHelper.FreeGoogleTranslateHandler handler = new ReaderCommonHelper.FreeGoogleTranslateHandler(activity, content);
-                handler.showDlg();
+                activity.freeGoogleTranslateHandler.init(content);
+                activity.freeGoogleTranslateHandler.showDlg();
             }
         }, //
         DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {

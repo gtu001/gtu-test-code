@@ -3,6 +3,7 @@ import random
 from gtu.data_science.numpy import numpyUtil
 from gtu.reflect import checkSelf
 import numpy as np
+from gtu.datetime import dateUtil
 
 
 def __test_upper(lst):
@@ -54,6 +55,12 @@ def toLinkedHashSet(arry):
     from collections import OrderedDict
     nums = list(OrderedDict.fromkeys(nums).keys())
     return nums
+
+    
+def _test_strArry_to_dateArry(npArry):
+    xdate = [dateUtil.getDatetimeByJavaFormat(i, "yyyy-MM-dd") for i in npArry]
+    return xdate
+
 
     
 if __name__ == '__main__' :

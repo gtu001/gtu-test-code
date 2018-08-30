@@ -94,6 +94,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     Handler handler = new Handler();
     MyPageAdapter pageAdapter;
     ActionBarSimpleHandler actionBarCustomTitleHandler;
+    ReaderCommonHelper.FreeGoogleTranslateHandler freeGoogleTranslateHandler;
     Thread translateThread;
 
     TextView txtReaderView;
@@ -313,10 +314,9 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
         this.paddingAdjuster = new ReaderCommonHelper.PaddingAdjuster(this.getApplicationContext());
         this.appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);
-
         this.scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
-
         this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
+        this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
 
         this.doOnoffService(true);
     }
@@ -1029,8 +1029,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 final EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(activity.epubViewerMainHandler.getDto().getPageIndex());
                 final String content = StringUtils.trimToEmpty(holder.getTranslateOrignText());
-                ReaderCommonHelper.FreeGoogleTranslateHandler handler = new ReaderCommonHelper.FreeGoogleTranslateHandler(activity, content);
-                handler.showDlg();
+                activity.freeGoogleTranslateHandler.init(content);
+                activity.freeGoogleTranslateHandler.showDlg();
             }
         }, //
         DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {

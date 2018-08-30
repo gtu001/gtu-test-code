@@ -1,4 +1,7 @@
 import os
+import platform
+
+
 
 # ## from gtu.os import envUtil
 
@@ -13,6 +16,10 @@ def getEnv(key, default=""):
 def showAll():
     for k, v in os.environ.items() :
         print("env\t", k, "\t" , v)
+        
+        
+def getOS():
+    return platform.system()
     
     
 if __name__ == '__main__' :

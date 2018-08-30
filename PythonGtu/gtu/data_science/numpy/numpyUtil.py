@@ -102,6 +102,11 @@ def removeNan(x):
     x[np.logical_not(np.isnan(x))]
     
     
+def replaceNan(a, repVal) :
+    where_are_NaNs = np.isnan(a)
+    a[where_are_NaNs] = repVal
+    
+    
 '''取得邊界'''
 
 

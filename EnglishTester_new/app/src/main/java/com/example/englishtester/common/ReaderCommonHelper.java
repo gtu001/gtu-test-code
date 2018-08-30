@@ -313,14 +313,22 @@ public class ReaderCommonHelper {
         private List<String> pageLst = new ArrayList<>();
         private String content;
         private Context context;
+        private int pageIdx = 1;
 
         private static final int BUFFER_LENGTH = 3500;
 
-        public FreeGoogleTranslateHandler(Context context, String content) {
+        public FreeGoogleTranslateHandler(Context context) {
             this.context = context;
-            content = StringUtils.trimToEmpty(content);
+        }
 
-            this.content = content;
+        public void init(String content) {
+            if (StringUtils.equals(content, this.content)) {
+                return;
+            }
+
+            this.pageIdx = 1;
+            this.content = StringUtils.trimToEmpty(content);
+
             Pattern ptn = Pattern.compile("\n", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(content);
 
@@ -332,7 +340,6 @@ public class ReaderCommonHelper {
                     startPos = mth.end();
                 }
             }
-
             pageLst.add(content.substring(startPos, content.length()));
         }
 
@@ -351,7 +358,7 @@ public class ReaderCommonHelper {
         }
 
         public void showDlg() {
-            final SingleInputDialog dlg = new SingleInputDialog(context, "1", "輸入頁碼", "請輸入1-" + (pageLst.size()));
+            final SingleInputDialog dlg = new SingleInputDialog(context, String.valueOf(pageIdx), "輸入頁碼", "請輸入1-" + (pageLst.size()));
             dlg.confirmButton(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -362,6 +369,7 @@ public class ReaderCommonHelper {
 
                     try {
                         int pageIdx = Integer.parseInt(dlg.getEditText(true, true));
+                        FreeGoogleTranslateHandler.this.pageIdx = pageIdx;
                         gotoGoogleTranslate(pageIdx - 1);
                     } catch (Exception e) {
                         Toast.makeText(context, "讀取失敗!", Toast.LENGTH_SHORT).show();

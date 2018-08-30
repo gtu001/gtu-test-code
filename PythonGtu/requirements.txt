@@ -36,3 +36,6 @@ ipykernel>=4.5.1
 
 #for url_conn
 retry
+
+# matplotlib.finance
+mpl_finance
