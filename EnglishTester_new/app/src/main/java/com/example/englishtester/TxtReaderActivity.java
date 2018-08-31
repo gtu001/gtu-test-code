@@ -669,13 +669,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             //申請開啟懸浮視窗權限
             FloatViewChecker.applyPermission(this, FloatViewActivity.FLOATVIEW_REQUESTCODE);
         } else {
-            Intent intent = new Intent(this, FloatViewService.class);
-            if (isOn) {
-                startService(intent);
-                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-            } else {
-                stopService(intent);
-                unbindService(mConnection);
+            try {
+                Intent intent = new Intent(this, FloatViewService.class);
+                if (isOn) {
+                    startService(intent);
+                    bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                } else {
+                    stopService(intent);
+                    unbindService(mConnection);
+                }
+            } catch (Exception ex) {
+                Log.e(TAG, "doOnoffService ERR : " + ex.getMessage(), ex);
             }
         }
     }

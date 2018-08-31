@@ -1595,6 +1595,7 @@ public class FloatViewService extends Service {
                     InterstitialAdActivity.startThisActivity(FloatViewService.this);
                 } else {
                     GodToast.getInstance().show(getApplicationContext());
+                    //InterstitialAdActivity.startThisActivity(FloatViewService.this);
                 }
                 count = 0;
             }
