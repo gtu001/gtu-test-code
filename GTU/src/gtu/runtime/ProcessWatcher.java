@@ -52,22 +52,24 @@ public class ProcessWatcher {
     }
 
     private byte[] getInputStream(final InputStream is) throws IOException, TimeoutException {
-        return ThreadUtil.getFutureResult(new Callable<byte[]>() {
-            @Override
-            public byte[] call() throws Exception {
-                BufferedInputStream bis = new BufferedInputStream(is);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] content = new byte[1024];
-                int pos = -1;
-                while ((pos = bis.read(content)) != -1) {
-                    baos.write(content, 0, pos);
-                }
-                bis.close();
-                baos.flush();
-                baos.close();
-                return baos.toByteArray();
-            }
-        }, timeout);
+        //linux 不work
+//        return ThreadUtil.getFutureResult(new Callable<byte[]>() {
+//            @Override
+//            public byte[] call() throws Exception {
+//            }
+//        }, timeout);
+        
+        BufferedInputStream bis = new BufferedInputStream(is);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] content = new byte[1024];
+        int pos = -1;
+        while ((pos = bis.read(content)) != -1) {
+            baos.write(content, 0, pos);
+        }
+        bis.close();
+        baos.flush();
+        baos.close();
+        return baos.toByteArray();
     }
 
     public Process getProcess() {

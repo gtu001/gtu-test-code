@@ -18,6 +18,16 @@ public class PropertiesUtil {
         System.out.println("done...");
     }
 
+    private static boolean isWindows = false;
+
+    static {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            isWindows = true;
+        } else if ("Linux".equals(System.getProperty("os.name"))) {
+            isWindows = false;
+        }
+    }
+
     private PropertiesUtil() {
     }
 
@@ -72,7 +82,11 @@ public class PropertiesUtil {
             return file;
         }
         if (protocal.equals("file")) {
-            path = filepath.startsWith("/") ? filepath.substring(1) : filepath;
+            if (isWindows) {
+                path = filepath.startsWith("/") ? filepath.substring(1) : filepath;
+            } else {
+                path = filepath;
+            }
             File file = new File(path).getParentFile();
             System.err.println("use file : " + file);
             file = checkFilePath(file);

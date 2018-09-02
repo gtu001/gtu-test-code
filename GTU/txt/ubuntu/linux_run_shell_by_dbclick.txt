@@ -1,0 +1,14 @@
+
+在shell上加入#!/bin/bash
+
+安裝sudo apt-get install dconf-editor
+
+按 Alt+F2, 輸入 dconf-editor 按 Enter.
+
+搜尋路徑 org/gnome/nautilus/preferences
+
+找 executable-text-activation
+
+改設定直從 display -> launch
+
+完成

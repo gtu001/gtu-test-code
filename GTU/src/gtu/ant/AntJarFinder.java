@@ -37,7 +37,7 @@ import gtu.maven.MavenDenpencyJarListLoader;
 public class AntJarFinder extends Task {
 
     private AntConfigHelper helper;
-    
+
     private List<File> pomJarLst;
 
     /** <copyTo=""> */
@@ -69,7 +69,7 @@ public class AntJarFinder extends Task {
             doExecute = false;
         }
 
-        //是否使用pom處理
+        // 是否使用pom處理
         this.pomJarLst = new ArrayList<File>();
         if (!pomConfigs.isEmpty()) {
             PomConfig pomConfig = pomConfigs.iterator().next();
@@ -91,7 +91,7 @@ public class AntJarFinder extends Task {
         if (searchdirs.isEmpty()) {
             searchdirs.add(new SearchDir(this.getProject().getProperty("basedir")));
         }
-        
+
         for (SearchDir s : searchdirs) {
             String filePath = helper.getParseAfterValue(s.text);
             File file = new File(filePath);
@@ -276,7 +276,7 @@ public class AntJarFinder extends Task {
         POM("pom") {
             File apply(List<File> fileList, PackageName pk, AntJarFinder _this) {
                 _this.info("[尋找與POM一致]");
-                if(_this.pomJarLst.isEmpty()) {
+                if (_this.pomJarLst.isEmpty()) {
                     String msg = "請設定PomConfig";
                     _this.info(msg);
                     System.err.println(msg);
@@ -285,7 +285,7 @@ public class AntJarFinder extends Task {
                 File jarFile = null;
                 for (File f : fileList) {
                     _this.debug("檔案 : " + f.getAbsolutePath());
-                    for(File pomJarFile : _this.pomJarLst) {
+                    for (File pomJarFile : _this.pomJarLst) {
                         if (StringUtils.equals(pomJarFile.getName(), f.getName())) {
                             jarFile = f;
                             break;
@@ -303,8 +303,7 @@ public class AntJarFinder extends Task {
             public String toString() {
                 return "與POM一致";
             }
-        },
-        ;
+        },;
         final String mode;
 
         SearchMode(String mode) {
@@ -325,7 +324,7 @@ public class AntJarFinder extends Task {
 
     private void copyFile(File src, File copyToDir) throws IOException {
         if (copyToDir != null && copyToDir.exists() && src != null) {
-            File dest = new File(copyToDir.getAbsolutePath() + "\\" + src.getName());
+            File dest = new File(copyToDir.getAbsolutePath(), src.getName());
             if (dest.isFile() && dest.exists() && dest.length() == src.length()) {
                 debug("目的地已存在檔案(跳過) : " + dest.getName());
                 return;
@@ -360,7 +359,7 @@ public class AntJarFinder extends Task {
         searchdirs.add(sch);
         return sch;
     }
-    
+
     public PomConfig createPomConfig() {
         PomConfig sch = new PomConfig();
         pomConfigs.add(sch);

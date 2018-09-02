@@ -1,0 +1,6 @@
+## 尋找 java 安裝目錄
+
+$ whereis java
+
+$ ls -l /usr/bin/java
+$ ls -l /etc/alternatives/java
