@@ -26,6 +26,15 @@ public class AntJarToExe extends Task {
     private String exePath;
     private String launch4jExe;
 
+    private static boolean isWindows = false;
+    static {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            isWindows = true;
+        } else if ("Linux".equals(System.getProperty("os.name"))) {
+            isWindows = false;
+        }
+    }
+
     public static void main(String[] args) {
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("jarPath", "C:\\Users\\gtu00\\OneDrive\\Desktop/EnglishSearchUI.jar");
@@ -49,6 +58,11 @@ public class AntJarToExe extends Task {
     @Override
     public void execute() throws BuildException {
         try {
+            if (!isWindows) {
+                this.log("非 window 系統, 跳過 AntJarToExe !!");
+                return;
+            }
+
             config = AntConfigHelper.of(this.getProject());
 
             String iconPath = "";

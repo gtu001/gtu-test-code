@@ -1,14 +1,14 @@
 
-¦bshell¤W¥[¤J#!/bin/bash
+åœ¨shellä¸ŠåŠ å…¥#!/bin/bash
 
-¦w¸Ësudo apt-get install dconf-editor
+å®‰è£sudo apt-get install dconf-editor
 
-«ö Alt+F2, ¿é¤J dconf-editor «ö Enter.
+æŒ‰ Alt+F2, è¼¸å…¥ dconf-editor æŒ‰ Enter.
 
-·j´M¸ô®| org/gnome/nautilus/preferences
+æœå°‹è·¯å¾‘ org/gnome/nautilus/preferences
 
-§ä executable-text-activation
+æ‰¾ executable-text-activation
 
-§ï³]©wª½±q display -> launch
+æ”¹è¨­å®šç›´å¾ž display -> launch
 
-§¹¦¨
+å®Œæˆ
