@@ -436,6 +436,14 @@ public class EnglishSearchUI extends JFrame {
     private JButton reviewMemResumeBtn;
     private JCheckBox lostFocusHiddenChk;
     private JButton reviewMemoryMergeBtn;
+    private JPanel panel_5;
+    private JPanel panel_6;
+    private JPanel panel_7;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JTextArea googleTranslateArea;
+    private JButton googleTranslateBtn;
+    private JButton googleTranslateClearBtn;
 
     /**
      * Create the frame.
@@ -777,6 +785,47 @@ public class EnglishSearchUI extends JFrame {
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
         lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
+
+        panel_5 = new JPanel();
+        tabbedPane.addTab("Google翻譯", null, panel_5, null);
+        panel_5.setLayout(new BorderLayout(0, 0));
+
+        panel_6 = new JPanel();
+        panel_5.add(panel_6, BorderLayout.NORTH);
+
+        panel_7 = new JPanel();
+        panel_5.add(panel_7, BorderLayout.WEST);
+
+        panel_8 = new JPanel();
+        panel_5.add(panel_8, BorderLayout.SOUTH);
+
+        googleTranslateBtn = new JButton("翻譯");
+        googleTranslateBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String text = StringUtils.trimToEmpty(googleTranslateArea.getText());
+                    text = URLEncoder.encode(text, "UTF-8");
+                    DesktopUtil.browse("https://translate.google.com.tw/?hl=zh-TW#en/zh-TW/" + text);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_8.add(googleTranslateBtn);
+
+        googleTranslateClearBtn = new JButton("清除");
+        googleTranslateClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                googleTranslateArea.setText("");
+            }
+        });
+        panel_8.add(googleTranslateClearBtn);
+
+        panel_9 = new JPanel();
+        panel_5.add(panel_9, BorderLayout.EAST);
+
+        googleTranslateArea = new JTextArea();
+        panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea), BorderLayout.CENTER);
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {

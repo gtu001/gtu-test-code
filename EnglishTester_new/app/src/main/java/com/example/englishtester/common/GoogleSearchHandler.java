@@ -18,10 +18,10 @@ public class GoogleSearchHandler {
 
     public static void search(Context context, String text) {
         String inputText = StringUtils.trimToEmpty(text);
-        try {
-            inputText = URLEncoder.encode(inputText, "UTF8");
-        } catch (UnsupportedEncodingException e) {
-        }
+//            try {
+//                inputText = URLEncoder.encode(inputText, "UTF8");
+//            } catch (UnsupportedEncodingException e) {
+//            }
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, inputText); // query contains search string
         context.startActivity(intent);

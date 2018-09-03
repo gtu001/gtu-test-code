@@ -890,6 +890,15 @@ public class FloatViewService extends Service {
             return false;
         }
 
+        public boolean isShowing() {
+            for (int ii = 0; ii < modeArry3.length; ii++) {
+                if (ii == modeholder.get()) {
+                    return modeArry3[ii].getVisibility() == View.VISIBLE;
+                }
+            }
+            return false;
+        }
+
         public void show(boolean show) {
             for (int ii = 0; ii < modeArry3.length; ii++) {
                 if (ii == modeholder.get() && show) {
@@ -1030,7 +1039,8 @@ public class FloatViewService extends Service {
                     Html.fromHtml(
                             "<a href=\"http://cdict.net/?q=" + englishId + "\" >Ref.</a> "));
             refTextView.setMovementMethod(LinkMovementMethod.getInstance());
-            refTextView.setVisibility(View.VISIBLE);
+//            refTextView.setVisibility(View.VISIBLE);取消
+            refTextView.setVisibility(View.GONE);
         } else {
             refTextView.setVisibility(View.GONE);
         }
@@ -1069,6 +1079,11 @@ public class FloatViewService extends Service {
                         @Override
                         public void run() {
                             setEnglishInfo(englishId, newWord.getMeaning(), newWord.getPronounce(), newWord);
+
+                            //以查到正確解釋要打開
+                            if (!modeHandler.isShowing()) {
+                                modeHandler.show(true);
+                            }
                         }
                     });
 

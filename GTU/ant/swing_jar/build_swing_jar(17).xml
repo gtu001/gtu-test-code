@@ -64,7 +64,7 @@
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
-			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 
 			<packagename mode="small">com.google.common.collect.Multimap</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
@@ -75,6 +75,8 @@
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			
 			<packagename mode="small">org.json.JSONObject</packagename>
+			
+			<packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
 
 		</jarfinder>
 

@@ -105,7 +105,8 @@ public class FileFindActivity extends ListActivity {
         }
         File[] files = dirFile.listFiles();
         List<File> sortFileList = new ArrayList<File>();
-        sortFileList.addAll(Arrays.asList(files));
+        if (files != null)
+            sortFileList.addAll(Arrays.asList(files));
         Collections.sort(sortFileList, new Comparator<File>() {
             @Override
             public int compare(File lhs, File rhs) {
