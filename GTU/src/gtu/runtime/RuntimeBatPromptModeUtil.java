@@ -90,7 +90,8 @@ public class RuntimeBatPromptModeUtil {
     }
 
     public Process apply() {
-        return this.apply("BIG5");
+        String encoding = isWindows ? "BIG5" : "UTF8";
+        return this.apply(encoding);
     }
 
     public Process apply(String encode) {
