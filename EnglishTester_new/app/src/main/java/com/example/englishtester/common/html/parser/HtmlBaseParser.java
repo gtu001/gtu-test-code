@@ -15,10 +15,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +27,20 @@ import gtu.util.StringUtil_;
  */
 
 public abstract class HtmlBaseParser {
+
+    public static void main(String[] args) {
+        HtmlBaseParser t = new HtmlBaseParser() {
+            @Override
+            protected String _stepFinal_customPlus(String content, boolean isPure) {
+                return content;
+            }
+        };
+        File file = new File("");
+        String content = t.getFromFile(file, false, "");
+        System.out.println("start -------------------------------------------------");
+        System.out.println(content);
+        System.out.println("end   -------------------------------------------------");
+    }
 
 
     public static final String WORD_HTML_ENCODE = "BIG5";
@@ -128,6 +139,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step3_imageProc_4Epub", content, checkStr);
         content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
+        content = _step5_olAndLi(content, isPure);
+        validateContent("_step5_olAndLi", content, checkStr);
         content = _step5_li_check(content, isPure);
         validateContent("_step5_li_check", content, checkStr);
         content = _step6_preTag(content, isPure);
@@ -274,6 +287,34 @@ public abstract class HtmlBaseParser {
         }
         mth.appendTail(sb);
         return sb.toString();
+    }
+
+    protected String _step5_olAndLi(String content, boolean isPure) {
+        StringBuffer tempSb = new StringBuffer();
+        Pattern titleStylePtn = Pattern.compile("\\<(ol|ul).*?\\>((?:.|\n)*?)\\<\\/(?:ol|ul)\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleDtlStylePtn = Pattern.compile("\\<li.*?\\>((?:.|\n)*?)\\<\\/li\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String detailType = mth.group(1);
+            String detailContent = mth.group(2);
+            // ------------------------------------
+            int index = 1;
+            StringBuffer dtlSb = new StringBuffer();
+            Matcher mth2 = titleDtlStylePtn.matcher(detailContent.toString());
+            while (mth2.find()) {
+                String mth2_li_string = mth2.group(1);
+                String indexFix = isPure ? "" + index : String.format("{{b:%d.}}", index);
+                if ("ul".equals(detailType)) {
+                    indexFix = "● ";
+                }
+                mth2.appendReplacement(dtlSb, indexFix + mth2_li_string);
+                index++;
+            }
+            mth2.appendTail(dtlSb);
+            // ------------------------------------
+            mth.appendReplacement(tempSb, dtlSb.toString());
+        }
+        return tempSb.toString();
     }
 
     protected String _step1_replaceTo_NormalPTag(String content, boolean isPure) {
@@ -450,9 +491,11 @@ public abstract class HtmlBaseParser {
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String preText = mth.group(1);
-            preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{pre:" + preText + "}}";
+            String processText = StringUtil_.appendReplacementEscape(preText);
+            processText = _specialCodeChangeLine(processText);
+
+            String repStr = "{{pre:" + processText + "}}";
             if (isPure) {
                 repStr = preText;
             }
@@ -469,14 +512,33 @@ public abstract class HtmlBaseParser {
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
             String preText = mth.group(1);
-            preText = StringUtil_.appendReplacementEscape(preText);
 
-            String repStr = "{{code:" + preText + "}}";
+            String processText = StringUtil_.appendReplacementEscape(preText);
+            processText = _specialCodeChangeLine(processText);
+
+            String repStr = "{{code:" + processText + "}}";
             if (isPure) {
                 repStr = preText;
             }
 
             mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _specialCodeChangeLine(String context) {
+        String tag = "{{chgLine}}";
+        Pattern ptn = Pattern.compile("(\\Q" + tag + "\\E\n|\n)", Pattern.MULTILINE | Pattern.DOTALL);
+        Matcher mth = ptn.matcher(context);
+        StringBuffer sb = new StringBuffer();
+        while (mth.find()) {
+            String tmp = mth.group();
+            if (tmp.contains(tag)) {
+                mth.appendReplacement(sb, tmp);
+            } else {
+                mth.appendReplacement(sb, tag + "\n");
+            }
         }
         mth.appendTail(sb);
         return sb.toString();

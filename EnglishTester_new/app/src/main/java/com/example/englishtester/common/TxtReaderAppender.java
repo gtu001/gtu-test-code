@@ -311,6 +311,7 @@ public class TxtReaderAppender {
         public void onClick(View view) {
             Log.v(TAG, "click " + " - " + url);
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(browserIntent);
         }
     }
