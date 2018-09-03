@@ -123,40 +123,42 @@ public class HideInSystemTrayHelper {
         } else {
             System.out.println("system tray not supported");
         }
-        jframe.addWindowStateListener(new WindowStateListener() {
-            public void windowStateChanged(WindowEvent e) {
-                if (e.getNewState() == JFrame.ICONIFIED) {
-                    try {
-                        tray.add(trayIcon);
-                        jframe.setVisible(false);
-                        System.out.println("added to SystemTray");
-                    } catch (AWTException ex) {
-                        System.out.println("unable to add to tray");
+        if (jframe != null) {
+            jframe.addWindowStateListener(new WindowStateListener() {
+                public void windowStateChanged(WindowEvent e) {
+                    if (e.getNewState() == JFrame.ICONIFIED) {
+                        try {
+                            tray.add(trayIcon);
+                            jframe.setVisible(false);
+                            System.out.println("added to SystemTray");
+                        } catch (AWTException ex) {
+                            System.out.println("unable to add to tray");
+                        }
+                    }
+                    if (e.getNewState() == 7) {
+                        try {
+                            tray.add(trayIcon);
+                            jframe.setVisible(false);
+                            System.out.println("added to SystemTray");
+                        } catch (AWTException ex) {
+                            System.out.println("unable to add to system tray");
+                        }
+                    }
+                    if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
+                        tray.remove(trayIcon);
+                        jframe.setVisible(true);
+                        System.out.println("Tray icon removed");
+                    }
+                    if (e.getNewState() == JFrame.NORMAL) {
+                        tray.remove(trayIcon);
+                        jframe.setVisible(true);
+                        System.out.println("Tray icon removed");
                     }
                 }
-                if (e.getNewState() == 7) {
-                    try {
-                        tray.add(trayIcon);
-                        jframe.setVisible(false);
-                        System.out.println("added to SystemTray");
-                    } catch (AWTException ex) {
-                        System.out.println("unable to add to system tray");
-                    }
-                }
-                if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                    tray.remove(trayIcon);
-                    jframe.setVisible(true);
-                    System.out.println("Tray icon removed");
-                }
-                if (e.getNewState() == JFrame.NORMAL) {
-                    tray.remove(trayIcon);
-                    jframe.setVisible(true);
-                    System.out.println("Tray icon removed");
-                }
-            }
-        });
-        jframe.setIconImage(image);
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            });
+            jframe.setIconImage(image);
+            jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
     }
 
     private class TrayIconHandler {
