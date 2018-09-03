@@ -34,6 +34,10 @@ public class HideInSystemTrayHelper {
     List<MenuItem> items = new ArrayList<MenuItem>();
     private TrayIconHandler trayIconHandler = new TrayIconHandler();
 
+    public void apply() {
+        apply(null, "TEMP", null);
+    }
+
     public void apply(final JFrame jframe) {
         String trayTitle = jframe.getClass().getSimpleName();
         if (StringUtils.isNotBlank(jframe.getTitle())) {
@@ -56,7 +60,7 @@ public class HideInSystemTrayHelper {
         Image image = null;
         if (StringUtils.isNotBlank(imagePath)) {
             image = getSysTrayIcon(imagePath);
-        } else if (jframe.getIconImage() != null) {
+        } else if (jframe != null && jframe.getIconImage() != null) {
             image = jframe.getIconImage();
         } else {
             image = getSysTrayIcon("resource/images/ico/janna.ico");

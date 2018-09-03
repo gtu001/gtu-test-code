@@ -1082,7 +1082,7 @@ public class FloatViewService extends Service {
 
                             //以查到正確解釋要打開
                             if (!modeHandler.isShowing()) {
-                                modeHandler.show(true);
+                                doOpenCloseEditPanel(true);
                             }
                         }
                     });

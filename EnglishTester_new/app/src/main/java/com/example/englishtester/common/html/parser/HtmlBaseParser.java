@@ -113,6 +113,10 @@ public abstract class HtmlBaseParser {
 
     protected String getFromContentMain(String content, boolean isPure, String checkStr) {
         log("# getFromContentMain START...");
+
+        content = _step0_CustomPicDirForDropbox(content, isPure);
+        validateContent("_step0_CustomPicDirForDropbox", content, checkStr);
+
         content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);
         content = _step1_hTitleHandler(content, isPure);
@@ -185,6 +189,16 @@ public abstract class HtmlBaseParser {
                 Log.e(TAG, "logContent ERR : " + e.getMessage(), e);
             }
         }
+    }
+
+    protected String _step0_CustomPicDirForDropbox(String content, boolean isPure) {
+//        <!-- picBaseUrl:https://docs.docker.com -->
+        Pattern ptn = Pattern.compile("\\<\\!\\-\\-\\s*picBaseUrl\\:(.*?)\\s*\\-\\-\\>", Pattern.MULTILINE | Pattern.DOTALL);
+        Matcher mth = ptn.matcher(content);
+        if (mth.find()) {
+            picDirForDropbox = mth.group(1);
+        }
+        return content;
     }
 
     protected String _step1_replaceStrongTag(String content, boolean isPure) {

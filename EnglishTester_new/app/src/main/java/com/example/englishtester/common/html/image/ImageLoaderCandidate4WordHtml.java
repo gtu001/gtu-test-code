@@ -80,7 +80,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
         }
 
         Bitmap tmp = null;
-        if (localFile != null) {
+        if (localFile != null && localFile.isFile()) {
             tmp = OOMHandler.new_decode(localFile);
             if (tmp != null) {
                 return tmp;
