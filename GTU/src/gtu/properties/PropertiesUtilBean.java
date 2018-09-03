@@ -48,6 +48,9 @@ public class PropertiesUtilBean {
             fileChangeHandler = new FileChangeHandler(propFile);
             logger.info("configFile : " + propFile);
             if (!propFile.exists()) {
+                if (!propFile.getParentFile().exists()) {
+                    propFile.getParentFile().mkdirs();
+                }
                 logger.info("!!!!! 設定檔不存在建立新檔 : " + propFile);
                 propFile.createNewFile();
             }

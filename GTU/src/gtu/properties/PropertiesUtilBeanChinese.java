@@ -17,9 +17,9 @@ import org.apache.commons.lang3.StringUtils;
 import gtu.log.JdkLoggerUtil;
 import gtu.properties.PropertiesUtilBean.FileChangeHandler;
 
-public class PropertiesUtilChinese {
+public class PropertiesUtilBeanChinese {
 
-    private static final Logger logger = JdkLoggerUtil.getLogger(PropertiesUtilChinese.class, true);
+    private static final Logger logger = JdkLoggerUtil.getLogger(PropertiesUtilBeanChinese.class, true);
 
     private Properties configProp;
     private File propFile;
@@ -33,6 +33,9 @@ public class PropertiesUtilChinese {
             this.encode = encode;
             logger.info("configFile : " + propFile);
             if (!propFile.exists()) {
+                if (!propFile.getParentFile().exists()) {
+                    propFile.getParentFile().mkdirs();
+                }
                 propFile.createNewFile();
             }
             configProp = loadFileByCoding(propFile, encode);
@@ -46,11 +49,11 @@ public class PropertiesUtilChinese {
         init(propFile, encode);
     }
 
-    public PropertiesUtilChinese(File customFile, String encode) {
+    public PropertiesUtilBeanChinese(File customFile, String encode) {
         init(customFile, encode);
     }
 
-    public PropertiesUtilChinese(Class<?> clz, String encode) {
+    public PropertiesUtilBeanChinese(Class<?> clz, String encode) {
         this(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties"), encode);
     }
 

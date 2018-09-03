@@ -23,6 +23,13 @@ import gtu.image.ImageUtil;
 
 public class HideInSystemTrayHelper {
 
+    public static void main(String[] args) {
+        HideInSystemTrayHelper inst = HideInSystemTrayHelper.newInstance();
+        inst.apply();
+        inst.displayMessage("caption", "message", MessageType.INFO);
+        System.out.println("done...");
+    }
+
     public static HideInSystemTrayHelper newInstance() {
         return new HideInSystemTrayHelper();
     }
@@ -163,10 +170,12 @@ public class HideInSystemTrayHelper {
 
     private class TrayIconHandler {
         private boolean exists() {
-            for (int ii = 0; ii < tray.getTrayIcons().length; ii++) {
-                TrayIcon icon = tray.getTrayIcons()[ii];
-                if (icon == trayIcon) {
-                    return true;
+            if (tray != null) {
+                for (int ii = 0; ii < tray.getTrayIcons().length; ii++) {
+                    TrayIcon icon = tray.getTrayIcons()[ii];
+                    if (icon == trayIcon) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -175,7 +184,8 @@ public class HideInSystemTrayHelper {
         private void addIfNeed() {
             if (!exists()) {
                 try {
-                    tray.add(trayIcon);
+                    if (tray != null)
+                        tray.add(trayIcon);
                 } catch (AWTException e) {
                     e.printStackTrace();
                 }
@@ -185,7 +195,8 @@ public class HideInSystemTrayHelper {
         @Deprecated
         private void removeIfExists() {
             if (exists()) {
-                tray.remove(trayIcon);
+                if (tray != null)
+                    tray.remove(trayIcon);
             }
         }
     }
@@ -193,7 +204,8 @@ public class HideInSystemTrayHelper {
     public void displayMessage(String caption, String text, MessageType messageType) {
         trayIconHandler.addIfNeed();
         System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
-        trayIcon.displayMessage(caption, text, messageType);
+        if (trayIcon != null)
+            trayIcon.displayMessage(caption, text, messageType);
         // trayIconHandler.removeIfExists();
     }
 

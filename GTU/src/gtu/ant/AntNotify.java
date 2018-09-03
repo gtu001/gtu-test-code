@@ -57,11 +57,8 @@ public class AntNotify extends Task {
 
             try {
                 HideInSystemTrayHelper inst = HideInSystemTrayHelper.newInstance();
-                this.log("----1");
                 inst.apply();
-                this.log("----2");
                 inst.displayMessage(title, message, messageType);
-                this.log("----3");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -70,11 +67,12 @@ public class AntNotify extends Task {
                 Runtime.getRuntime().exec("cmd /K " + "[notify]" + title + " : " + message);
                 this.log("# window mode");
             } else {
-                String ubuntuExec = String.format("gnome-terminal -c \"%2$s\" -t \"%1$s\" ", title, message);
-                String mostLinuxExec = String.format("xterm -T \"%1$s\" -e \"%2$s\" ", title, message);
+                String ubuntuExec = String.format("gnome-terminal -- sh -c \"echo %s; sleep 0; exec bash\"", message);
+                String mostLinuxExec = String.format("xterm -e \"echo \"%s\"; bash\" ", message);
                 Runtime.getRuntime().exec(ubuntuExec);
                 Runtime.getRuntime().exec(mostLinuxExec);
                 this.log("# linux mode");
+
             }
         } catch (Exception e) {
             throw new BuildException(e);

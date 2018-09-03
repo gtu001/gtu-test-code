@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,6 +124,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+//    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -834,8 +836,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String url = (String) enu.nextElement();
             String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
 
+            AtomicReference<UrlConfig> dd = new AtomicReference<UrlConfig>();
             System.out.println("<<" + title_tag_remark_time);
-            final UrlConfig d = UrlConfig.parseTo(url, title_tag_remark_time);
+            try {
+                dd.set(UrlConfig.parseTo(url, title_tag_remark_time));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                continue;
+            }
+
+            final UrlConfig d = dd.get();
 
             new Runnable() {
                 private String s2t(String oringStr) {

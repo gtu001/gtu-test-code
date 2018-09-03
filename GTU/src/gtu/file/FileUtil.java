@@ -50,7 +50,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
-        File f1 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\XXXXXXXXXXXXXXXXXXXXXXXXXXXX - 複製");
+        System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
     }
 
     private FileUtil() {
@@ -62,6 +62,7 @@ public class FileUtil {
         if (System.getProperty("os.name").equals("Windows XP")) {
             destopPath = System.getProperty("user.home") + File.separator + "桌面" + File.separator;
             isOsWindowsSystem = true;
+            System.out.println("FileUtil : Windows XP");
         }
         if (System.getProperty("os.name").equals("Windows 10")) {
             String tmpDesktop = System.getProperty("user.home") + File.separator + "OneDrive" + File.separator + "Desktop" + File.separator;
@@ -70,6 +71,13 @@ public class FileUtil {
                 destopPath = tmpDesktop;
             }
             isOsWindowsSystem = true;
+            System.out.println("FileUtil : Windows 10");
+        }
+        if (System.getProperty("os.name").equals("Linux")) {
+            String tmpDesktop = System.getProperty("user.home") + File.separator + "桌面" + File.separator;
+            destopPath = tmpDesktop;
+            isOsWindowsSystem = false;
+            System.out.println("FileUtil : Linux");
         }
 
         DESKTOP_PATH = destopPath;
