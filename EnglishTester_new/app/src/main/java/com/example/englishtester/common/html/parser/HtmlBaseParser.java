@@ -76,9 +76,10 @@ public abstract class HtmlBaseParser {
     }
 
     protected String getFromContent(String content, boolean isPure, String checkStr) {
-        log("ORIGN start : =======================================================================");
+        Log.v(TAG, "ORIGN start : =======================================================================");
 //        log(content);
-        log("ORIGN end   : =======================================================================");
+        Log.v(TAG, "total len : " + StringUtils.length(content));
+        Log.v(TAG, "ORIGN end   : =======================================================================");
 
 //        saveToFileDebug("before", content);
 
@@ -88,9 +89,10 @@ public abstract class HtmlBaseParser {
             throw new RuntimeException("getFromContent ERR : " + e.getMessage(), e);
         }
 
-        log("RESULT start : =======================================================================");
+        Log.v(TAG, "RESULT start : =======================================================================");
 //        logContent(content);
-        log("RESULT end    : =======================================================================");
+        Log.v(TAG, "total len : " + StringUtils.length(content));
+        Log.v(TAG, "RESULT end    : =======================================================================");
         return content;
     }
 
@@ -112,7 +114,7 @@ public abstract class HtmlBaseParser {
 
 
     protected String getFromContentMain(String content, boolean isPure, String checkStr) {
-        log("# getFromContentMain START...");
+        Log.v(TAG, "# getFromContentMain START...");
 
         content = _step0_CustomPicDirForDropbox(content, isPure);
         validateContent("_step0_CustomPicDirForDropbox", content, checkStr);
@@ -167,7 +169,7 @@ public abstract class HtmlBaseParser {
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
 
-        log("# getFromContentMain END...");
+        Log.v(TAG, "# getFromContentMain END...");
         return content;
     }
 
@@ -178,7 +180,7 @@ public abstract class HtmlBaseParser {
         try {
             reader = new BufferedReader(new StringReader(content));
             for (String line = null; (line = reader.readLine()) != null; ) {
-                log(line);
+                Log.v(TAG, line);
             }
         } catch (Exception ex) {
             Log.e(TAG, "logContent ERR : " + ex.getMessage(), ex);
@@ -328,6 +330,7 @@ public abstract class HtmlBaseParser {
             // ------------------------------------
             mth.appendReplacement(tempSb, dtlSb.toString());
         }
+        mth.appendTail(tempSb);
         return tempSb.toString();
     }
 
@@ -567,7 +570,7 @@ public abstract class HtmlBaseParser {
             String picLink = mth.group(2);
 
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
-                log("!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
             }
 
             filterImageDir(srcDesc);
@@ -591,7 +594,7 @@ public abstract class HtmlBaseParser {
             String srcDesc = mth.group(1);
 
             if (StringUtils.isNotBlank(checkPic) && srcDesc.contains(checkPic)) {
-                log("!!!!!!  <<<_step3_imageProc_InternetMode>>> Find Pic : " + checkPic);
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_InternetMode>>> Find Pic : " + checkPic);
             }
 
             String repStr = "{{img src:" + "" + ",alt:" + srcDesc + "}}";
@@ -614,7 +617,7 @@ public abstract class HtmlBaseParser {
             String picLink = mth.group(1);
 
             if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
-                log("!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
             }
 
             filterImageDir(srcDesc);
@@ -801,31 +804,27 @@ public abstract class HtmlBaseParser {
         return picDirForDropbox;
     }
 
-    protected static void log(Object message) {
-        System.out.println(message);
-        try {
-            Log.v(TAG, "" + message);
-        } catch (Exception ex) {
-        }
-    }
 
     protected void validateContent(String stepLabel, String content, String checkStr) {
+        if (StringUtils.length(content) == 0) {
+            throw new RuntimeException(stepLabel + " -> 長度為0");
+        }
         if (checkStr == null) {
             return;
         }
         if (checkStr != null && checkStr.length() == 0) {
-            log("PROC : " + stepLabel + " Done !!!");
+            Log.v(TAG, "PROC : " + stepLabel + " Done !!!");
             return;
         }
         if (!StringUtils.trimToEmpty(content).contains(checkStr)) {
             throw new RuntimeException(stepLabel + " -> 查無 : " + checkStr);
         } else {
-            log("CHECK : " + stepLabel + " OK!!!");
+            Log.v(TAG, "CHECK : " + stepLabel + " OK!!!");
         }
     }
 
     protected void validateLog(String stepLabel) {
-        log("CHECK : " + stepLabel + " OK!!!");
+        Log.v(TAG, "CHECK : " + stepLabel + " OK!!!");
     }
 
     protected String _stepFinal_escapeTag(String content, boolean isPure) {

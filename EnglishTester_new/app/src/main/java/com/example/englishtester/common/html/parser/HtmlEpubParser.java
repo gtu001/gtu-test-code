@@ -1,6 +1,7 @@
 package com.example.englishtester.common.html.parser;
 
 import com.example.englishtester.common.FileUtilGtu;
+import com.example.englishtester.common.Log;
 
 import java.io.File;
 
@@ -46,7 +47,7 @@ public class HtmlEpubParser extends HtmlBaseParser {
         return getFromContent(content, isPure, "");
     }
 
-    protected String getEncoding(){
+    protected String getEncoding() {
         return EPUB_HTML_ENCODE;
     }
 
@@ -59,22 +60,7 @@ public class HtmlEpubParser extends HtmlBaseParser {
     }
 
     public String getFromContent(String content, boolean isPure, String checkStr) {
-        log("ORIGN start : =======================================================================");
-//        log(content);
-        log("ORIGN end   : =======================================================================");
-
-//        saveToFileDebug("before", content);
-
-        try {
-            content = getFromContentMain(content, isPure, checkStr);
-        } catch (Throwable e) {
-            throw new RuntimeException("getFromContent ERR : " + e.getMessage(), e);
-        }
-
-//        saveToFileDebug("after", content);
-        log("RESULT start : =======================================================================");
-//        logContent(content);
-        log("RESULT end    : =======================================================================");
+        content = super.getFromContent(content, isPure, checkStr);
         return content;
     }
 

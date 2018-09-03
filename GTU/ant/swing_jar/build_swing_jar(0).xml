@@ -1,0 +1,237 @@
+<project name="example" default="main">
+
+	<loadproperties srcFile="build_swing_jar.properties" />
+
+	<!--<property name="src_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\src" />
+	<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
+	<property name="build_dir" location="build" />
+	<property name="jars_dir" location="jars" />
+	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
+	<!--<property name="jar_repsitory" location="C:\Users\gtu001\.m2\repository" />-->
+	<property name="main_class_full" value="_temp.Test_forAntBuild" />
+	<property name="main_class" value="Test_forAntBuild" />
+	<property name="rename_jarname" value="${main_class}" />
+	<property name="icon_name" value="janna.ico" />
+	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--${main_class}-->
+
+
+	<!-- ant-contrib -->
+	<!--<taskdef resource="net/sf/antcontrib/antcontrib.properties" />-->
+
+	<path id="my_test_classpath">
+		<pathelement path="${bin_dir}" />
+		<fileset dir="${jar_repsitory}">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
+	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
+	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+
+	<!-- 參考的jar -->
+	<path id="class_path">
+		<fileset dir="${jar_repsitory}">
+			<filename name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!--
+	<target name="buildTest">
+		<echo># buildTest ..</echo>
+		<classLoader clz="${main_class_full}" />
+		<echo># buildTest ..</echo>
+	</target>
+	-->
+
+	<target name="jarToExe" if="${enable}">
+		<echo># jarToExe = ${enable}</echo>
+		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
+			<icon enable="true">${src_dir}/resource/images/ico/${icon_name}</icon>
+			<singleton enable="true">${main_class}</singleton>
+		</jarToExe>
+	</target>
+
+	<target name="buildClassSet" if="${enable}">
+		<echo># buildClassSet = ${enable}</echo>
+		<mkdir dir="${jars_dir}" />
+		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
+			<searchdir>${jar_repsitory}</searchdir>
+			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
+
+		</jarfinder>
+
+		<!-- 特別指定要使用的jar檔 -->
+		<copy todir="${jars_dir}">
+			<fileset dir="${jar_repsitory}">
+				<!--<filename name="**/commons-io-2.0.1.jar" />-->
+				<filename name="**/aaaaaaaaaaaaaaaaaaaaa" />
+				<!--若沒有此行會全部包,很恐怖-->
+			</fileset>
+			<!--Rcdf002eDBUI-->
+			<!--<fileset dir="${jar_repsitory}/hibernate3.6.1.final">
+				<filename name="**/*" />
+			</fileset>-->
+		</copy>
+	</target>
+
+	<!-- 參考的設定檔 -->
+	<path id="config">
+		<fileset dir="${src_dir}">
+			<exclude name="**/*.java" />
+		</fileset>
+	</path>
+
+	<target name="main">
+		<antcall target="clean">
+			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="buildClassSet">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="copyReference">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="compiler" />
+
+		<antcall target="runClass">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="createJar">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="runJar">
+			<param name="enable" value="false" />
+		</antcall>
+
+		<antcall target="moveJarToDesktop">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="renameJar">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="clean">
+			<!--清除-->
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="jarToExe">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
+		<exec executable="cmd">
+			<arg value="/c start echo create ${main_class}.jar complete!!" />
+		</exec>
+		-->
+		<notify type="info" title="build完成" message="echo create ${main_class}.jar complete!!" />
+	</target>
+
+	<target name="compiler">
+		<echo># compiler ...</echo>
+		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+			<include name="**/${main_class}.java" />
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="runClass" if="${enable}">
+		<echo># run ${main_class}.class</echo>
+		<java classname="${main_class_full}" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="createJar" if="${enable}">
+		<echo># create ${main_class}.jar</echo>
+		<!--
+				<jar destfile="${main_class}.jar" basedir="${build_dir}">
+					<manifest>
+						<attribute name="Main-Class" value="${main_class_full}" />
+					</manifest>
+				</jar>
+				-->
+		<jar destfile="${main_class}.jar">
+			<zipfileset dir="${build_dir}">
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
+				<include name="**/*" />
+			</zipfileset>
+			<manifest>
+				<attribute name="Main-Class" value="${main_class_full}" />
+				<attribute name="Class-Path" value="." />
+				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="runJar" if="${enable}">
+		<echo># run ${main_class}.jar</echo>
+		<java jar="${main_class}.jar" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="moveJarToDesktop" if="${enable}">
+		<echo># move Jar : ${main_class}.jar</echo>
+		<move file="${main_class}.jar" todir="${desktop}" />
+	</target>
+
+	<target name="renameJar" if="${enable}">
+		<echo># rename Jar = ${enable}</echo>
+		<rename src="${desktop}/${main_class}.jar" dest="${desktop}/${rename_jarname}.jar" />
+	</target>
+
+	<target name="clean" if="${enable}">
+		<echo># clean = ${enable}</echo>
+		<delete dir="${build_dir}" />
+		<delete dir="${jars_dir}" />
+	</target>
+
+	<target name="copyReference" if="${enable}">
+		<echo># copyReference = ${enable}</echo>
+		<mkdir dir="${build_dir}" />
+		<mkdir dir="${jars_dir}" />
+
+		<copy todir="${build_dir}">
+			<path refid="config" />
+		</copy>
+
+		<mkdir dir="${build_dir}/META-INF" />
+		<copy tofile="${build_dir}/META-INF/persistence.xml">
+			<fileset dir="${src_dir}">
+				<filename name="**/persistence.xml" />
+			</fileset>
+		</copy>
+
+		<unjar dest="${build_dir}">
+			<fileset dir="${jars_dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</unjar>
+	</target>
+</project>

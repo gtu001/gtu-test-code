@@ -73,21 +73,7 @@ public class HtmlWordParser extends HtmlBaseParser {
     }
 
     public String getFromContent(String content, boolean isPure, String checkStr) {
-        log("ORIGN start : =======================================================================");
-//        log(content);
-        log("ORIGN end   : =======================================================================");
-
-//        saveToFileDebug("before", content);
-
-        try {
-            content = getFromContentMain(content, isPure, checkStr);
-        } catch (Throwable e) {
-            throw new RuntimeException("getFromContent ERR : " + e.getMessage(), e);
-        }
-
-        log("RESULT start : =======================================================================");
-//        logContent(content);
-        log("RESULT end    : =======================================================================");
+        content = super.getFromContent(content, isPure, checkStr);
         return content;
     }
 

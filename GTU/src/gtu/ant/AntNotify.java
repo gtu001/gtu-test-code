@@ -68,11 +68,13 @@ public class AntNotify extends Task {
 
             if (isWindows) {
                 Runtime.getRuntime().exec("cmd /K " + "[notify]" + title + " : " + message);
+                this.log("# window mode");
             } else {
                 String ubuntuExec = String.format("gnome-terminal -c \"%2$s\" -t \"%1$s\" ", title, message);
                 String mostLinuxExec = String.format("xterm -T \"%1$s\" -e \"%2$s\" ", title, message);
                 Runtime.getRuntime().exec(ubuntuExec);
                 Runtime.getRuntime().exec(mostLinuxExec);
+                this.log("# linux mode");
             }
         } catch (Exception e) {
             throw new BuildException(e);
