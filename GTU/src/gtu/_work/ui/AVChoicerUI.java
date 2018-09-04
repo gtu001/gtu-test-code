@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -56,6 +57,7 @@ import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.runtime.DesktopUtil;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
@@ -66,6 +68,16 @@ public class AVChoicerUI extends JFrame {
     private static final long serialVersionUID = 1L;
 
     public static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
+
+    private static boolean isWindows = false;
+
+    static {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            isWindows = true;
+        } else if ("Linux".equals(System.getProperty("os.name"))) {
+            isWindows = false;
+        }
+    }
 
     private JPanel contentPane;
     private JTextField avDirText;
@@ -592,10 +604,10 @@ public class AVChoicerUI extends JFrame {
                     });
         }
 
-        if(cacheFileList == null) {
+        if (cacheFileList == null) {
             cacheFileList = new ArrayList<>();
         }
-        
+
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
 
         File choiceFile = null;
@@ -738,7 +750,17 @@ public class AVChoicerUI extends JFrame {
             File avFile = getRandomAvFile();
             currentFileHandler.setFile(avFile);
 
-            Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile));
+            if (isWindows) {
+                String command = String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile);
+                System.out.println(command);
+                Runtime.getRuntime().exec(command);
+            } else {
+                RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
+                String command = String.format("%s \"%s\"", exe, avFile);
+                System.out.println(command);
+                t.command(command);
+                t.apply("tmpVlc_", "UTF8");
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }

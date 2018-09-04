@@ -91,23 +91,24 @@ public class RuntimeBatPromptModeUtil {
 
     public Process apply() {
         String encoding = isWindows ? "BIG5" : "UTF8";
-        return this.apply(encoding);
+        return this.apply("tmp_", encoding);
     }
 
-    public Process apply(String encode) {
+    public Process apply(String prefix, String encode) {
         try {
             if (StringUtils.isBlank(cmd)) {
                 throw new Exception("請設定 bat / sh 內容!");
             }
+            prefix = StringUtils.isBlank(prefix) ? "tmp_" : prefix;
 
             if (isWindows) {
-                File tmpBat = File.createTempFile("tmp_", ".bat");
+                File tmpBat = File.createTempFile(prefix, ".bat");
                 FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
                 System.out.println("tempBat : " + tmpBat);
                 return Runtime.getRuntime().exec(String.format("cmd /c start cmd /k \"%s\" ", tmpBat));
             } else {
                 cmd.insert(0, "#!/bin/bash\r\n");
-                File tmpSh = File.createTempFile("tmp_", ".sh");
+                File tmpSh = File.createTempFile(prefix, ".sh");
                 FileUtil.saveToFile(tmpSh, __fixCommand(cmd.toString()), encode);
                 System.out.println("tmpSh : " + tmpSh);
                 Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));

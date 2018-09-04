@@ -61,7 +61,7 @@ public class AntJarToExe extends Task {
             // \"%s\"", "C:\\Program Files (x86)\\Launch4j\\launch4j.exe",
             // tempFile2));
 
-            Process process = RuntimeBatPromptModeUtil.newInstance().command(String.format("java -jar \"%s\" \"%s\"", "/media/gtu001/OLD_D/apps/launch4j/launch4j.jar", tempFile2)).apply("UTF8");
+            Process process = RuntimeBatPromptModeUtil.newInstance().command(String.format("java -jar \"%s\" \"%s\"", "/media/gtu001/OLD_D/apps/launch4j/launch4j.jar", tempFile2)).apply();
             ProcessWatcher p = ProcessWatcher.newInstance(process);
             p.getStream();
             System.out.println(p.getErrorStreamToString());
