@@ -758,6 +758,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         appender = new TxtReaderAppender(
                 this, recentTxtMarkService, dto, txtView //
         );
+        //init
+        this.dto.setBookmarkHolder(new TreeMap());
         if (!isHtmlFromWord) {
             SpannableString spannableHolder = appender.getAppendTxt(content);
             this.dto.setSpannableHolder(spannableHolder);
@@ -882,7 +884,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                 dto.currentHtmlFile = null;
                                 dto.dropboxPicDir = null;
                                 dto.currentHtmlUrl = url;
-                                dto.setBookmarkHolder(new HashMap());
 
                                 for (int ii = 0; ii < 10; ii++)
                                     Log.v(TAG, "[HtmlWordParser START]");
@@ -1091,10 +1092,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                     });
                 }
 
-                private void initDto() {
-                    dto.setBookmarkHolder(new TreeMap<Integer, TxtReaderAppender.WordSpan>());
-                }
-
                 @Override
                 public void run() {
                     try {
@@ -1103,8 +1100,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
 
                         setTitleNameProcess();
-
-                        initDto();
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
                             htmlProcess();

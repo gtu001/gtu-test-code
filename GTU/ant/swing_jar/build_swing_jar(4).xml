@@ -11,6 +11,8 @@
 	<property name="main_class_full" value="gtu._work.DBSynchronizeToolUI" />
 	<property name="main_class" value="DBSynchronizeToolUI" />
 	<property name="rename_jarname" value="${main_class}" />
+	<property name="icon_name" value="janna.ico" />
+	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--${main_class}-->
 
 
@@ -26,6 +28,8 @@
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -48,7 +52,7 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
-				
+
 			<packagename mode="small">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
@@ -137,9 +141,13 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
+		<antcall target="jarToExe">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
 	</target>
 
 	<target name="compiler">

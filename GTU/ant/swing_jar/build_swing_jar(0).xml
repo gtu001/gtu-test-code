@@ -142,7 +142,7 @@
 			<arg value="/c start echo create ${main_class}.jar complete!!" />
 		</exec>
 		-->
-		<notify type="info" title="build完成" message="echo create ${main_class}.jar complete!!" />
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
 	<target name="compiler">

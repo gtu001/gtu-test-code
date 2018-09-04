@@ -27,6 +27,7 @@ public class HideInSystemTrayHelper {
         HideInSystemTrayHelper inst = HideInSystemTrayHelper.newInstance();
         inst.apply();
         inst.displayMessage("caption", "message", MessageType.INFO);
+        // inst.removeTray();
         System.out.println("done...");
     }
 
@@ -121,7 +122,8 @@ public class HideInSystemTrayHelper {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     tray.remove(trayIcon);
-                    jframe.setVisible(true);
+                    if (jframe != null)
+                        jframe.setVisible(true);
                     if (openAction != null) {
                         openAction.actionPerformed(e);
                     }
@@ -174,6 +176,7 @@ public class HideInSystemTrayHelper {
                 for (int ii = 0; ii < tray.getTrayIcons().length; ii++) {
                     TrayIcon icon = tray.getTrayIcons()[ii];
                     if (icon == trayIcon) {
+                        System.out.println("--findTrayIcon ok!");
                         return true;
                     }
                 }
@@ -195,10 +198,26 @@ public class HideInSystemTrayHelper {
         @Deprecated
         private void removeIfExists() {
             if (exists()) {
-                if (tray != null)
+                if (tray != null){
+                    System.out.println("--removeTrayIcon ok!");
                     tray.remove(trayIcon);
+                }
             }
         }
+    }
+
+    @Deprecated
+    public void removeTray(final long removeTime) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(removeTime);
+                } catch (InterruptedException e) {
+                }
+                trayIconHandler.removeIfExists();
+            }
+        }).start();
     }
 
     public void displayMessage(String caption, String text, MessageType messageType) {

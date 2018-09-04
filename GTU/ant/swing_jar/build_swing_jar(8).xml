@@ -11,6 +11,8 @@
 	<property name="main_class_full" value="gtu._work.ui.DropboxTestUI" />
 	<property name="main_class" value="DropboxTestUI" />
 	<property name="rename_jarname" value="${main_class}" />
+	<property name="icon_name" value="janna.ico" />
+	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--${main_class}-->
 
 
@@ -48,7 +50,7 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
-			
+
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="small">org.apache.commons.lang.StringUtils</packagename>
@@ -128,9 +130,13 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
+		<antcall target="jarToExe">
+			<param name="enable" value="true" />
+		</antcall>
+
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
 	</target>
 
 	<target name="compiler">

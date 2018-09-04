@@ -29,6 +29,7 @@
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -137,9 +138,9 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
 	</target>
 
 	<target name="compiler">

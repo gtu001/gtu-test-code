@@ -32,6 +32,7 @@
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -71,7 +72,7 @@
 			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
-			
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -140,9 +141,9 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
 	</target>
 
 	<target name="compiler">
