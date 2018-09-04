@@ -53,7 +53,7 @@ public class JLabelUtil {
         String lblText = JLabelUtil.getText("XXXXXX", //
                 STAR_MARK_FULLCHAR | STAR_MARK_SIMPLE);
 
-        JFrame frame = JTestFrameCreater.createSimpleFrame(JLabelUtil.class);
+        JFrame frame = JFrameUtil.createSimpleFrame(JLabelUtil.class);
         JLabel lbl = new JLabel();
         lbl.setText(lblText);
         frame.add(lbl);

@@ -100,6 +100,7 @@ import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
@@ -155,6 +156,10 @@ public class EnglishSearchUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(EnglishSearchUI.class)) {
+            return;
+        }
+
         JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         FRAME = new EnglishSearchUI();
         FRAME.keyUtil = FRAME.new GlobalKeyListenerExampleForEnglishUI();

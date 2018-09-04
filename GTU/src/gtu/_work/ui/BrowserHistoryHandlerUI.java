@@ -112,6 +112,7 @@ import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
@@ -124,7 +125,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-//    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -153,6 +155,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(BrowserHistoryHandlerUI.class)) {
+            return;
+        }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
