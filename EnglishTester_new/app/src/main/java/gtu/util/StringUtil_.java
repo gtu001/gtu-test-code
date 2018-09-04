@@ -49,14 +49,14 @@ public class StringUtil_ {
 
         AppendReplacementEscaper(String content) {
             this.content = content;
-            result = StringUtils.trimToEmpty(content).toString();
+            result = StringUtils.defaultString(content).toString();
             result = replaceChar(result, '$');
             result = replaceChar(result, '/');
         }
 
         private String replaceChar(String content, char from) {
             StringBuffer sb = new StringBuffer();
-            char[] arry = StringUtils.trimToEmpty(content).toCharArray();
+            char[] arry = content.toCharArray();
             for (int ii = 0; ii < arry.length; ii++) {
                 char a = arry[ii];
                 if (a == from) {
