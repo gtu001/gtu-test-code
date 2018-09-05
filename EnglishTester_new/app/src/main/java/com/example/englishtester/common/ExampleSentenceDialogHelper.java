@@ -5,7 +5,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
+
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -39,7 +41,7 @@ public class ExampleSentenceDialogHelper {
     Set<Integer> loadedPageList = new HashSet<Integer>();
 
     public void exeute(final String englishId, final Context context, WindowManager mWindowManager) {
-        if(pairList.isEmpty()){
+        if (pairList.isEmpty()) {
             //讀取第一頁
             loadPage(englishId, 1);
 
@@ -95,8 +97,8 @@ public class ExampleSentenceDialogHelper {
         senDialog.showItemListDialog("例句", currentList, new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Pair<String,String> p = pairList.get(position);
-                TextView text = (TextView)view.findViewById(R.id.ItemTitle);
+                Pair<String, String> p = pairList.get(position);
+                TextView text = (TextView) view.findViewById(R.id.ItemTitle);
                 text.setText(p.getKey() + "\n" + p.getValue());
             }
         });
@@ -106,12 +108,12 @@ public class ExampleSentenceDialogHelper {
      * 讀取新page
      */
     private void loadPage(final String englishId, final int page) {
-        if(loadedPageList.contains(page)){
+        if (loadedPageList.contains(page)) {
             return;
         }
 
-        List<Pair<String, String>> pairList_new = new ArrayList<Pair<String,String>>();
-        try{
+        List<Pair<String, String>> pairList_new = new ArrayList<Pair<String, String>>();
+        try {
             pairList_new = DropboxEnglishService.getRunOnUiThread(new Callable<List<Pair<String, String>>>() {
                 @Override
                 public List<Pair<String, String>> call() throws Exception {
@@ -120,7 +122,7 @@ public class ExampleSentenceDialogHelper {
                     return word.getExampleSentanceList();
                 }
             }, 5000);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             Log.e(TAG, "ERROR OCCOR", ex);
         }
 

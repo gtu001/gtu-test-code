@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+
 import com.example.englishtester.common.Log;
+
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -74,7 +77,14 @@ public class WindowItemListDialog {
 
 //        ArrayAdapter<String> aryAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, simList2.toArray(new String[0]));
 //        ArrayAdapter<String> aryAdapter = new ArrayAdapter<String>(context, R.layout.subview_dropdown_simple, android.R.id.text1, simList2.toArray(new String[0]));
-        ArrayAdapter<String> aryAdapter = new ArrayAdapter<String>(context, R.layout.subview_propview_singletext, R.id.ItemTitle, simList2.toArray(new String[0]));
+        ArrayAdapter<String> aryAdapter = new ArrayAdapter<String>(context, R.layout.subview_propview_singletext, R.id.ItemTitle, simList2.toArray(new String[0])) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView tv = (TextView) view.findViewById(R.id.ItemTitle);
+                return view;
+            }
+        };
 //        listView.setAdapter(aryAdapter);
 
         this.myAdapter = new MyAdapter(context, simList2, interfs);
@@ -102,7 +112,7 @@ public class WindowItemListDialog {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 listener.onItemClick(parent, view, position, id);
 
-                if(autoClose){
+                if (autoClose) {
                     mWindowManager.removeView(outterLayout);
                 }
                 Log.v(TAG, "#listView.setOnItemClickListener");
@@ -207,7 +217,7 @@ public class WindowItemListDialog {
         this.scrollListener = scrollListener;
     }
 
-    public MyAdapter getMyAdapter(){
+    public MyAdapter getMyAdapter() {
         return this.myAdapter;
     }
 

@@ -28,6 +28,7 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.Log;
 
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -71,6 +72,7 @@ import com.example.englishtester.common.WindowItemListIconDialog;
 import com.example.englishtester.common.WindowSingleInputDialog;
 
 import org.apache.commons.collections4.map.LRUMap;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -82,6 +84,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -128,6 +131,8 @@ public class FloatViewService extends Service {
     ImageView imageViewNoteAction;//記事本內容
     ImageView imageViewConfig2;// 設定
     LinearLayout searchLayout2;//記事本模式
+    Button redPlusBtn;//儲存記事本
+    Button redPlusListBtn;//儲存記事本
     Button saveNoteBtn;//儲存記事本
     ImageView imageViewEraser2;//清除記事本
     // ----------------------------------------------------------------
@@ -141,6 +146,7 @@ public class FloatViewService extends Service {
     Map<String, EnglishWord> englishMap = new LRUMap<String, EnglishWord>(50);
     ClipboardListenerHandler clipboardListenerHandler;//剪貼簿監聽器
     MagnifierPosHolder magnifierPosHolder = new MagnifierPosHolder(this);
+    RedPlusBtnHandler redPlusBtnHandler = new RedPlusBtnHandler(this);
     Handler handler = new Handler();
     ModeHandler modeHandler;
     // ----------------------------------------------------------------
@@ -415,9 +421,9 @@ public class FloatViewService extends Service {
                 }
             });
 
-            //儲存記事本
-            saveNoteBtn = (Button) contentView.findViewById(R.id.saveNoteBtn);
-            saveNoteBtn.setOnClickListener(new OnClickListener() {
+            //加入記事本
+            redPlusBtn = (Button) contentView.findViewById(R.id.redPlusBtn);
+            redPlusBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
@@ -425,6 +431,61 @@ public class FloatViewService extends Service {
                         if (StringUtils.isBlank(saveContent)) {
                             Toast.makeText(FloatViewService.this, "沒有內文無須儲存!", Toast.LENGTH_SHORT).show();
                             return;
+                        }
+                        boolean result = redPlusBtnHandler.addNote(saveContent);
+                        Toast.makeText(FloatViewService.this, (result ? "加入成功" : "記事已存在"), Toast.LENGTH_SHORT).show();
+                        if (result) {
+                            noteText.setText("");
+                        }
+                    } catch (Exception ex) {
+                        Log.e(TAG, "redPlusBtn ERR : " + ex.getMessage(), ex);
+                    }
+                }
+            });
+
+            //開啟記事本
+            redPlusListBtn = (Button) contentView.findViewById(R.id.redPlusListBtn);
+            redPlusListBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        final List<String> redPlusLst = Arrays.asList(redPlusBtnHandler.getRedPlusBtnArry());
+                        WindowItemListDialog win = new WindowItemListDialog(mWindowManager, getApplicationContext());
+                        win.setItemTextViewStyle(new WindowItemListDialog.WindowItemListDialog_SettingTextView() {
+                            @Override
+                            public void apply(TextView text) {
+                                text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                                text.setSingleLine(false);
+                            }
+                        });
+                        win.showItemListDialog("記事本內容", redPlusLst, new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                String text = redPlusLst.get(position);
+                                noteText.setText(text);
+                                doOpenCloseEditPanel(true);
+                            }
+                        });
+                    } catch (Exception ex) {
+                        Log.e(TAG, "redPlusBtn ERR : " + ex.getMessage(), ex);
+                    }
+                }
+            });
+
+            //儲存記事本
+            saveNoteBtn = (Button) contentView.findViewById(R.id.saveNoteBtn);
+            saveNoteBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        String[] arry = redPlusBtnHandler.getRedPlusBtnArry();
+                        if (arry.length == 0) {
+                            Toast.makeText(FloatViewService.this, "無記事內容!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        final StringBuffer saveSb = new StringBuffer();
+                        for (int ii = 0; ii < arry.length; ii++) {
+                            saveSb.append((ii + 1) + " . " + arry[ii] + "\n");
                         }
 
                         final Context context = FloatViewService.this.getApplicationContext();
@@ -442,8 +503,9 @@ public class FloatViewService extends Service {
                                 }
                                 try {
                                     File saveFile = new File(saveToDir, fileName);
-                                    FileUtilAndroid.saveToFile(saveFile, saveContent);
+                                    FileUtilAndroid.saveToFile(saveFile, saveSb.toString());
                                     Toast.makeText(context, "儲存成功 : " + saveFile, Toast.LENGTH_SHORT).show();
+                                    redPlusBtnHandler.clear();
                                 } catch (IOException e) {
                                     Toast.makeText(context, "儲存失敗!", Toast.LENGTH_SHORT).show();
                                     Log.e(TAG, e.getMessage(), e);
@@ -1682,6 +1744,70 @@ public class FloatViewService extends Service {
                 return true;
             }
             return false;
+        }
+    }
+
+    private class RedPlusBtnHandler {
+        String refKey = FloatViewService.class.getSimpleName();
+        String bundleKey = "plusNote";
+        String delimitPtn = "\\Q#,#\\E";
+        String delimit = "#,#";
+        int maxLength = 10;
+        Context context;
+
+        private RedPlusBtnHandler(Context context) {
+            this.context = context;
+        }
+
+        private boolean isInArry(String[] arry, String text) {
+            for (String str : arry) {
+                if (StringUtils.defaultString(str).contains(text)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private String[] fixLengthArry(String[] arry) {
+            while (arry.length > maxLength) {
+                arry = ArrayUtils.remove(arry, 0);
+            }
+            return arry;
+        }
+
+        public boolean addNote(String text) {
+            text = StringUtils.trimToEmpty(text);
+            if (StringUtils.isBlank(text)) {
+                return false;
+            }
+            boolean result = false;
+            String[] arry = getRedPlusBtnArry();
+            if (!isInArry(arry, text)) {
+                arry = ArrayUtils.add(arry, StringUtils.trimToEmpty(text));
+                arry = fixLengthArry(arry);
+                result = true;
+            }
+            SharedPreferencesUtil.putData(context, refKey, bundleKey, StringUtils.join(arry, delimit));
+            return result;
+        }
+
+        public void clear() {
+            SharedPreferencesUtil.putData(context, refKey, bundleKey, "");
+        }
+
+        public String[] getRedPlusBtnArry() {
+            String currentNote = "";
+            if (SharedPreferencesUtil.hasData(context, refKey, bundleKey)) {
+                currentNote = SharedPreferencesUtil.getData(context, refKey, bundleKey);
+            }
+            String[] arry = currentNote.split(delimitPtn, -1);
+            for (int ii = 0; ii < arry.length; ii++) {
+                if (StringUtils.isBlank(arry[ii])) {
+                    arry = ArrayUtils.remove(arry, ii);
+                    ii--;
+                }
+            }
+            return arry;
         }
     }
 

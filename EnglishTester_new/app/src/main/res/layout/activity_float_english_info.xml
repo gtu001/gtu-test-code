@@ -209,6 +209,21 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="0dip"
                     android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/redPlusBtn"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/icon_red_plus"
+                        android:text="" />
+
+                    <Button
+                        android:id="@+id/redPlusListBtn"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/icon_list"
+                        android:text="" />
+
                     <Button
                         android:id="@+id/saveNoteBtn"
                         android:layout_width="30dp"
