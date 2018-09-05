@@ -199,8 +199,11 @@ public class TxtReaderAppenderForHtmlTag {
                     Bitmap smiley = null;
                     try {
                         smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), self.maxPicWidth);
+//                    } catch (java.lang.OutOfMemoryError ex) {
+//                        Log.e(TAG, "OOM " + ex.getMessage(), ex);
+//                        smiley = self.onlinePicLoader.getNotfound404();
                     } catch (Throwable ex) {
-                        Log.e(TAG, "OOM " + ex.getMessage(), ex);
+                        Log.e(TAG, "OhterErr " + ex.getMessage(), ex);
                         smiley = self.onlinePicLoader.getNotfound404();
                     }
                     self.ss.setSpan(new ImageSpan(self.context, smiley, ImageSpan.ALIGN_BASELINE), altData.getStart(), altData.getEnd(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

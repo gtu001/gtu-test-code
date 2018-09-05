@@ -1,0 +1,17 @@
+
+
+CREATE SEQUENCE phonebook_id_seq;
+
+select  nextval( 'phonebook_id_seq')   ;
+
+select  currval( 'phonebook_id_seq')   ;
+
+select  setval( 'phonebook_id_seq', 1)   ;
+
+select  lastval()  ;
+
+select  setval( 'phonebook_id_seq', 1, true)   ; --next is 2
+select  setval( 'phonebook_id_seq', 1, false)   ; --next is 1
+
+
+insert into  test_table  (id, name) values ( nextval('phonebook_id_seq'), ?)  ;

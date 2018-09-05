@@ -112,6 +112,7 @@ public class OOMHandler {
         int newHeight = (int) (scaleWidth * height);
 
         Bitmap bitmap = null;
+        Log.v(TAG, "changeScale to w : " + newWidth1 + ", h : " + newHeight);
         bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
         if (bm != null && bm != bitmap) {
             bm.recycle();
@@ -149,10 +150,10 @@ public class OOMHandler {
             for (int ii = 0; ; ii++) {
                 try {
                     bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
-                    Log.v(TAG, "Bitmap scale = " + ii);
+                    Log.v(TAG, "Bitmap scale = " + ii + " , Name : " + f.getName() + " , size : " + FileUtilGtu.getSizeDescription(f.length()));
                     return bitmap;
                 } catch (OutOfMemoryError ex) {
-                    Log.v(TAG, "Bitmap rescale = " + ii);
+                    Log.v(TAG, "Bitmap rescale = " + ii + " , Name : " + f.getName() + " , size : " + FileUtilGtu.getSizeDescription(f.length()));
                     bitmap.recycle();
                     System.gc();
                 }

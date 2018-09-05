@@ -45,6 +45,7 @@ public abstract class HtmlBaseParser {
 
     public static final String WORD_HTML_ENCODE = "BIG5";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
+    protected static final String NEW_LINE = "\r\n\r\n";
 
     private static final String TAG = HtmlEpubParser.class.getSimpleName();
 
@@ -133,8 +134,6 @@ public abstract class HtmlBaseParser {
         validateContent("_step1_replaceStrongTag", content, checkStr);
         content = _step1_fontSize_Indicate(content, isPure);
         validateContent("_step1_fontSize_Indicate", content, checkStr);
-        content = _step1_fontSize_Indicate_4PTag(content, isPure);
-        validateContent("_step1_fontSize_Indicate_4PTag", content, checkStr);
         content = _step2_normalContent(content, isPure);
         validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content, isPure);
@@ -145,6 +144,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step3_imageProc_4Epub", content, checkStr);
         content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
+        content = _step4_fontSize_Indicate_4PTag(content, isPure);
+        validateContent("_step4_fontSize_Indicate_4PTag", content, checkStr);
         content = _step5_olAndLi(content, isPure);
         validateContent("_step5_olAndLi", content, checkStr);
         content = _step5_li_check(content, isPure);
@@ -241,7 +242,7 @@ public abstract class HtmlBaseParser {
                 String text = mth.group(2);
                 String tmpVal = "";
                 if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
-                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}\r\n\r\n";
+                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}" + NEW_LINE;
                     if (isPure) {
                         tmpVal = StringUtil_.appendReplacementEscape(text);
                     }
@@ -259,7 +260,7 @@ public abstract class HtmlBaseParser {
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {
             String spanContent = mth.group();
-            spanContent = FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
+            spanContent = HtmlBaseParser.FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
         }
@@ -267,13 +268,13 @@ public abstract class HtmlBaseParser {
         return sb.toString();
     }
 
-    protected String _step1_fontSize_Indicate_4PTag(String content, boolean isPure) {
+    protected String _step4_fontSize_Indicate_4PTag(String content, boolean isPure) {
         Pattern ptn = Pattern.compile("\\<p(?:.|\n)*?\\<\\/p\\>", Pattern.MULTILINE | Pattern.DOTALL);
         Matcher mth = ptn.matcher(content);
         StringBuffer sb = new StringBuffer();
         while (mth.find()) {
             String spanContent = mth.group();
-            spanContent = FontSizeIndicateEnum.P001.apply(spanContent, isPure);
+            spanContent = HtmlBaseParser.FontSizeIndicateEnum.P001.apply(spanContent, isPure);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
         }
@@ -342,7 +343,7 @@ public abstract class HtmlBaseParser {
             String titleStr = mth.group(1);
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
-                title = StringUtil_.appendReplacementEscape(titleStr) + "\r\n\r\n";
+                title = StringUtil_.appendReplacementEscape(titleStr) + NEW_LINE;
                 if (isPure) {
                     title = StringUtil_.appendReplacementEscape(titleStr);
                 }
@@ -634,7 +635,7 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _step4_wordBlockCheck(String content, boolean isPure) {
-        Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=MsoNormal(?:.|\n)*?\\>((?:.|\n)*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<p\\s*?class\\=\"?MsoNormal(?:.|\n)*?\\>((?:.|\n)*?)(?:\\<\\/p\\>)", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -788,7 +789,7 @@ public abstract class HtmlBaseParser {
             Matcher mth = ptn.matcher(content);
             while (mth.find()) {
                 findOk = true;
-                mth.appendReplacement(sb, "\n\n");
+                mth.appendReplacement(sb, NEW_LINE);
             }
             mth.appendTail(sb);
             if (findOk) {
@@ -828,7 +829,7 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _stepFinal_escapeTag(String content, boolean isPure) {
-        CustomTagEscaper escaper = new CustomTagEscaper(content);
+        HtmlBaseParser.CustomTagEscaper escaper = new HtmlBaseParser.CustomTagEscaper(content);
         return escaper.getResult();
     }
 

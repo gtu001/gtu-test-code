@@ -1,10 +1,14 @@
 package gtu.regex.tag;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import gtu.file.FileUtil;
 import gtu.log.line.Log;
@@ -40,6 +44,8 @@ public class TagMatcher {
     public TagMatcher(String startTag, String endTag, String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset, String content) {
         this.startTag = startTag;
         this.endTag = endTag;
+        Validate.notEmpty(this.startTag, "開始標籤不可為空!");
+        Validate.notEmpty(this.endTag, "結束標籤不可為空!");
         this.content = content;
         this.startPtn = null;
         this.endPtn = null;
@@ -122,6 +128,8 @@ public class TagMatcher {
         info.startWithoutTag = startPos + getStartTagLength();
         info.endWithoutTag = endPos;
         info.endWithTag = endPos + getEndTagLength();
+        info.startPtnGroupMap = (Map<Integer, String>) (startPtn != null ? startPtn.groupMap : Collections.emptyMap());
+        info.endPtnGroupMap = (Map<Integer, String>) (endPtn != null ? endPtn.groupMap : Collections.emptyMap());
 
         Log.v(TAG, "[TagMatcherInfo] : " + info);
 
@@ -207,6 +215,9 @@ public class TagMatcher {
         int startWithTag;
         int endWithTag;
 
+        Map<Integer, String> startPtnGroupMap;
+        Map<Integer, String> endPtnGroupMap;
+
         @Override
         public String toString() {
             return "TagMatcherInfo [startWithoutTag=" + startWithoutTag + ", endWithoutTag=" + endWithoutTag + ", startWithTag=" + startWithTag + ", endWithTag=" + endWithTag + ", groupWithoutTag()="
@@ -239,6 +250,14 @@ public class TagMatcher {
 
         public int getEndWithTag() {
             return endWithTag;
+        }
+
+        public Map<Integer, String> getStartGroupMap() {
+            return startPtnGroupMap;
+        }
+
+        public Map<Integer, String> getEndGroupMap() {
+            return endPtnGroupMap;
         }
     }
 
@@ -352,6 +371,14 @@ public class TagMatcher {
 
         private Pattern ptn = null;
         private String group;
+        private Map<Integer, String> groupMap = new TreeMap<Integer, String>();
+
+        private void doGroupMap(Matcher mth) {
+            groupMap.clear();
+            for (int ii = 0; ii <= mth.groupCount(); ii++) {
+                groupMap.put(ii, mth.group(ii));
+            }
+        }
 
         public StringUtilsByPattern(String ptnStr) {
             ptn = Pattern.compile(ptnStr, Pattern.MULTILINE | Pattern.DOTALL);
@@ -377,6 +404,7 @@ public class TagMatcher {
                 idx++;
                 if (idx == token) {
                     group = mth.group();
+                    this.doGroupMap(mth);
                     return mth.start();
                 }
             }
@@ -391,6 +419,7 @@ public class TagMatcher {
             Matcher mth = ptn.matcher(content);
             while (mth.find()) {
                 group = mth.group();
+                this.doGroupMap(mth);
                 return mth.start();
             }
             return -1;
