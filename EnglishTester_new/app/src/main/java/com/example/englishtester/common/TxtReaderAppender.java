@@ -196,7 +196,7 @@ public class TxtReaderAppender {
                 clickableSpan.setWord(txtNow);
 
                 //補上最後一個查詢為bookmark
-                Integer finalSearchIndex = getFinalSearch2Bookmark(qList);
+                int finalSearchIndex = getFinalSearch2Bookmark(qList);
 
                 // 設定單字為以查詢狀態
                 for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
@@ -214,7 +214,7 @@ public class TxtReaderAppender {
                     }
 
                     //補上最後一個查詢為bookmark
-                    if (finalSearchIndex == bo.getMarkIndex()) {
+                    if (finalSearchIndex != -1 && finalSearchIndex == clickableSpan.getId()) {
                         putToBookmarkHolder(clickableSpan);
                     }
                 }
@@ -229,13 +229,13 @@ public class TxtReaderAppender {
         }
 
         private int getFinalSearch2Bookmark(List<RecentTxtMarkDAO.RecentTxtMark> qList) {
+            int maxPos = -1;
             if (qList != null && !qList.isEmpty()) {
-                RecentTxtMarkDAO.RecentTxtMark finalBo = qList.get(qList.size() - 1);
-                if (finalBo.getBookmarkType() != RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType()) {
-                    return finalBo.getMarkIndex();
+                for (RecentTxtMarkDAO.RecentTxtMark finalBo : qList) {
+                    maxPos = Math.max(maxPos, finalBo.getMarkIndex());
                 }
             }
-            return -1;
+            return maxPos;
         }
 
         private void putToBookmarkHolder(WordSpan clickableSpan) {
