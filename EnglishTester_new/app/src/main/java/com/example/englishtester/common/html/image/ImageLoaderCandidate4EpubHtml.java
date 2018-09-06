@@ -2,6 +2,7 @@ package com.example.englishtester.common.html.image;
 
 import android.graphics.Bitmap;
 
+import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.OnlinePicLoader;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
@@ -39,8 +40,8 @@ public class ImageLoaderCandidate4EpubHtml extends ImageLoaderCandidateAbstract 
     }
 
     @Override
-    public Bitmap getResult() {
-        return dto.getBitmapForEpub(this);
+    public Bitmap getResult(int fixWidth) {
+        return OOMHandler.fixPicScaleFixScreenWidth(dto.getBitmapForEpub(this), fixWidth);
     }
 
     @Override

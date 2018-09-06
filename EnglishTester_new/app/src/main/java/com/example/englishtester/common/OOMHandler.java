@@ -252,6 +252,7 @@ public class OOMHandler {
 
     private static BitmapFactory.Options getBitmapOptions(int scale) {
         BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565; //說這個很省
         options.inPurgeable = true;//這樣可以讓java系統記憶體不足時先行回收部分的記憶體
         options.inInputShareable = true;
         options.inSampleSize = scale;//大概設2~4就差不多了

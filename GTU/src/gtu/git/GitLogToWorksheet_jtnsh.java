@@ -19,7 +19,7 @@ public class GitLogToWorksheet_jtnsh {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String baseStartDateStr = "201803";
+        String baseStartDateStr = "201808";
         
         
         for (int jj = 0 ; jj <= 31 ; jj ++) {
@@ -49,20 +49,14 @@ public class GitLogToWorksheet_jtnsh {
             
             StringBuilder sb = new StringBuilder();
 
-            File fileDirs = new File("E:\\workstuff\\workstuff\\workspace_jtnsh");
-            String[] prodArry = new String[] { "CMS", "DBResource", "UserPermission" };
+            File fileDirs = new File("D:/workstuff/workspace_taida");
             File[] files = fileDirs.listFiles();
             for (int ii = 0; ii < files.length; ii++) {
                 File f = files[ii];
                 List<String> lst = new ArrayList<String>();
                 if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().startsWith("__")) {
                     lst.add(FileUtil.replaceSpecialChar("cd " + f));
-                    lst.add("e:");
-//                    if (ArrayUtils.contains(prodArry, f.getName())) {
-//                        lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/ProdModule/" + f.getName() + ".git"));
-//                    } else {
-//                        lst.add(FileUtil.replaceSpecialChar("git remote set-url origin http://gtu001@192.168.93.205:8448/r/SCSB_CCBILL/" + f.getName() + ".git"));
-//                    }
+                    lst.add("d:");
                     lst.add(logCommand);
                 }
 

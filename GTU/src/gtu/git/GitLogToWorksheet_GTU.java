@@ -12,11 +12,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.file.FileUtil;
-import gtu.git.GitLogToWorksheet.GitLog;
 import gtu.runtime.ProcessWatcher;
 
 public class GitLogToWorksheet_GTU {
-    
+
     static class GitLog {
         // git log --since="2018-01-22T00:00:00" --before="2018-01-23T00:00:00"
         // --author=gtu001 --no-merges --encoding=utf8 --all-match
@@ -32,11 +31,23 @@ public class GitLogToWorksheet_GTU {
             return new GitLog();
         }
 
+        /**
+         * 開始時間
+         * 
+         * @param since
+         * @return
+         */
         public GitLog since(Date since) {
             this.since = since;
             return this;
         }
 
+        /**
+         * 結束時間
+         * 
+         * @param before
+         * @return
+         */
         public GitLog before(Date before) {
             this.before = before;
             return this;
@@ -51,7 +62,7 @@ public class GitLogToWorksheet_GTU {
             this.encode = encode;
             return this;
         }
-        
+
         public GitLog nameType(int type) {
             switch (type) {
             case 1:
@@ -66,12 +77,15 @@ public class GitLogToWorksheet_GTU {
                 // For abbreviated pathnames and a diffstat of changed files
                 nameType = " --stat ";
                 break;
+            default:
+                nameType = "";
+                break;
             }
             return this;
         }
-        
+
         public GitLog hasDate(boolean hasDate) {
-            this.hasDate= hasDate;
+            this.hasDate = hasDate;
             return this;
         }
 
@@ -99,9 +113,9 @@ public class GitLogToWorksheet_GTU {
             sb.append(" --no-merges ");
             sb.append(" --all-match ");
             if (hasDate) {
-                sb.append(" --pretty=format:\"%s%b  %ad\" ");//%n <-換行
-            }else {
-                sb.append(" --pretty=format:\"%s%b  \" ");//%n <-換行
+                sb.append(" --pretty=format:\"%s%b  %ad\" ");// %n <-換行
+            } else {
+                sb.append(" --pretty=format:\"%s%b  \" ");// %n <-換行
             }
             sb.append(" --date=iso  ");
             return sb.toString();
@@ -110,7 +124,7 @@ public class GitLogToWorksheet_GTU {
 
     public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d1 = sdf.parse("20180122");
+        Date d1 = sdf.parse("20180801");
         Calendar c1 = Calendar.getInstance();
         c1.setTime(d1);
         c1.set(Calendar.HOUR, 0);
@@ -122,13 +136,14 @@ public class GitLogToWorksheet_GTU {
         c2.setTime(c1.getTime());
         c2.add(Calendar.DATE, 1);
 
-        String logCommand = GitLog.newInstance().since(c1.getTime()).before(c2.getTime()).author("gtu001").nameType(1).build();
+        String logCommand = GitLog.newInstance().since(c1.getTime()).before(c2.getTime()).author("gtu001").nameType(999).build();
 
-        File fileDirs = new File("E:\\workstuff\\workspace\\gtu-test-code");
+        File fileDirs = new File("D:/workstuff/workspace_taida");
         List<String> lst = new ArrayList<String>();
         lst.add(FileUtil.replaceSpecialChar("cd " + fileDirs));
-        lst.add("e:");
-//        lst.add(FileUtil.replaceSpecialChar("git remote set-url origin https://github.com/gtu001/gtu-test-code.git "));
+        lst.add("d:");
+        // lst.add(FileUtil.replaceSpecialChar("git remote set-url origin
+        // https://github.com/gtu001/gtu-test-code.git "));
         lst.add(logCommand);
 
         try {
@@ -137,6 +152,7 @@ public class GitLogToWorksheet_GTU {
             Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
             ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
             newInstance.getStream(30000);
+            newInstance.encode("UTF8");
             System.out.println(newInstance.getErrorStreamToString());
             System.out.println(newInstance.getInputStreamToString());
         } catch (java.util.concurrent.TimeoutException ex) {

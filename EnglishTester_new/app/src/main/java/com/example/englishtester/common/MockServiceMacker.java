@@ -1,8 +1,9 @@
 package com.example.englishtester.common;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
-
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -45,22 +46,29 @@ public class MockServiceMacker {
     }
 
     public static <INTERFACE, SERVICE_CLZ> INTERFACE getMockStuff(final String mockMessage, final Context context, Class<SERVICE_CLZ> clz) {
-        class Handler implements InvocationHandler {
+        class MyHandler implements InvocationHandler {
             Context context;
             String message;
+            Handler handler;
 
-            public Handler(Context context, String message) {
+            public MyHandler(Context context, String message) {
                 this.context = context;
                 this.message = message;
+                this.handler = new Handler(Looper.getMainLooper());
             }
 
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
                 return null;
             }
         }
 
-        return (INTERFACE) Proxy.newProxyInstance(clz.getClassLoader(), clz.getInterfaces(), new Handler(context, mockMessage));
+        return (INTERFACE) Proxy.newProxyInstance(clz.getClassLoader(), clz.getInterfaces(), new MyHandler(context, mockMessage));
     }
 }

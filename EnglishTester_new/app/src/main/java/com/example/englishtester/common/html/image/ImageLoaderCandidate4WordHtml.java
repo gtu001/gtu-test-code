@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.TxtReaderActivity;
-import com.example.englishtester.common.OOMHandler;
+import com.example.englishtester.common.OOMHandler2;
 import com.example.englishtester.common.OnlinePicLoader;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
@@ -46,6 +46,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
             String realName = URLDecoder.decode(filename, HtmlWordParser.WORD_HTML_ENCODE);
             File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
             if (localPicFile.exists() && localPicFile.canRead()) {
+                Log.v(TAG, "[check local pic path]" + localPicFile);
                 return localPicFile;
             }
 
@@ -60,6 +61,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
             }
             File dropboxPic = new File(dto.getDropboxPicDir(), imageFileName);
             if (dropboxPic.exists() && dropboxPic.canRead()) {
+                Log.v(TAG, "[check local pic path]" + localPicFile);
                 return dropboxPic;
             }
 
@@ -74,26 +76,37 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
         return isGifFile;
     }
 
-    public Bitmap getResult() {
+    public Bitmap getResult(int fixWidth) {
         if (!isNeedLoadImage) {
             return onlinePicLoader.getNotfound404();
         }
 
+        //local
         Bitmap tmp = null;
         if (localFile != null && localFile.isFile()) {
-            tmp = OOMHandler.new_decode(localFile);
+            try {
+//            tmp = OOMHandler.new_decode(localFile);
+                tmp = OOMHandler2.decodeSampledBitmapFromResource(localFile.getAbsolutePath(), OOMHandler2.getCustomFixWidth(fixWidth));
+            } catch (Exception ex) {
+                Log.e(TAG, "[localFile | getResult] ERR : " + ex.getMessage(), ex);
+                throw new RuntimeException("getResult ERR : " + ex.getMessage(), ex);
+            }
             if (tmp != null) {
+                Log.v(TAG, "[localFile]" + localFile);
                 return tmp;
             }
         }
 
+        //online
         if (isOnlineImageFromURL(altData)) {
             tmp = getPicFromURL(altData);
             if (tmp != null) {
+                Log.v(TAG, "[UrlFile]" + altData);
                 return tmp;
             }
         }
 
+        //online
         if (StringUtils.isNotBlank(dto.getCurrentHtmlUrl())) {
             String prefixUrl = dto.getCurrentHtmlUrl();
             if (!prefixUrl.endsWith("/")) {
@@ -101,6 +114,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
             }
             tmp = getPicFromURL(prefixUrl + altData);
             if (tmp != null) {
+                Log.v(TAG, "[UrlFile]" + prefixUrl + altData);
                 return tmp;
             }
         }

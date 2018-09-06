@@ -9,7 +9,7 @@ public interface IImageLoaderCandidate {
 
     public boolean isGifFile();
 
-    public Bitmap getResult();
+    public Bitmap getResult(int fixWidth);
 
     public File getLocalFile();
 }

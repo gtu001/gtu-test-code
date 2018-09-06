@@ -66,7 +66,7 @@ public class TxtReaderAppenderForHtmlTag {
         this.normalIgnoreLst = normalIgnoreLst;
         this.context = context;
         this.dto = dto;
-        this.onlinePicLoader = new OnlinePicLoader(context);
+        this.onlinePicLoader = new OnlinePicLoader(context, maxPicWidth);
         this.imageLoaderFactory = ImageLoaderFactory.newInstance(dto.isImageLoadMode(), onlinePicLoader, dto);
     }
 
@@ -198,7 +198,8 @@ public class TxtReaderAppenderForHtmlTag {
                 if (!picProcess.isGifFile()) {
                     Bitmap smiley = null;
                     try {
-                        smiley = OOMHandler.fixPicScaleFixScreenWidth(picProcess.getResult(), self.maxPicWidth);
+                        smiley = picProcess.getResult(self.maxPicWidth);
+
 //                    } catch (java.lang.OutOfMemoryError ex) {
 //                        Log.e(TAG, "OOM " + ex.getMessage(), ex);
 //                        smiley = self.onlinePicLoader.getNotfound404();
