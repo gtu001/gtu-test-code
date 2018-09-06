@@ -25,7 +25,7 @@ public class GitLogToWorksheet_Aelta {
         GitLogToWorksheet_Aelta t = new GitLogToWorksheet_Aelta();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d1 = sdf.parse("20180801");
+        Date d1 = sdf.parse("20180901");
         Calendar c1 = Calendar.getInstance();
         c1.setTime(d1);
         c1.set(Calendar.HOUR, 0);
@@ -33,7 +33,7 @@ public class GitLogToWorksheet_Aelta {
         c1.set(Calendar.SECOND, 0);
         c1.set(Calendar.MILLISECOND, 0);
 
-        Date d2 = sdf.parse("20180831");
+        Date d2 = sdf.parse("20180931");
         Calendar c2 = Calendar.getInstance();
         c2.setTime(d2);
         c2.set(Calendar.HOUR_OF_DAY, 23);

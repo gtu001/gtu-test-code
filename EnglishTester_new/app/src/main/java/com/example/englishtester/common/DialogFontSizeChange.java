@@ -48,7 +48,7 @@ public class DialogFontSizeChange {
         this.viewList = viewList;
 
         fontSizeTextView = (TextView) dialog.findViewById(R.id.fontSizeTextView);
-        fontSizeTextView.setText("模擬文字大小");
+        fontSizeTextView.setText("模擬文字 ABCDE abcde 12345");
 
         fontSizeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, defaultSize);
         Log.v(TAG, "currentSize = " + defaultSize);
