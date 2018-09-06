@@ -138,6 +138,9 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox robotFocusChk;
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
+    // private PropertiesUtilBean propertyBean = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
+
     private static final String NEW_WORD_PATH = "new_word_path";
     private static final String OFFLINE_WORD_PATH = "offline_word_path";
     private static final String MEMORY_BANK_PATH = "memory_bank_path";
@@ -1073,7 +1076,7 @@ public class EnglishSearchUI extends JFrame {
 
     private void appendMemoryBank(String word, String desc) {
         desc = getChs2Big5(desc);
-        if (StringUtils.isNotBlank(desc)) {
+        if (StringUtils.isNotBlank(desc) && memory != null) {
             memory.append(word, desc);
         }
     }

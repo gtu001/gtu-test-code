@@ -137,7 +137,8 @@ public class HideInSystemTrayHelper {
                 public void windowStateChanged(WindowEvent e) {
                     if (e.getNewState() == JFrame.ICONIFIED) {
                         try {
-                            tray.add(trayIcon);
+                            if (tray != null)
+                                tray.add(trayIcon);
                             jframe.setVisible(false);
                             System.out.println("added to SystemTray");
                         } catch (AWTException ex) {
@@ -146,7 +147,8 @@ public class HideInSystemTrayHelper {
                     }
                     if (e.getNewState() == 7) {
                         try {
-                            tray.add(trayIcon);
+                            if (tray != null)
+                                tray.add(trayIcon);
                             jframe.setVisible(false);
                             System.out.println("added to SystemTray");
                         } catch (AWTException ex) {
@@ -154,12 +156,14 @@ public class HideInSystemTrayHelper {
                         }
                     }
                     if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                        tray.remove(trayIcon);
+                        if (tray != null)
+                            tray.remove(trayIcon);
                         jframe.setVisible(true);
                         System.out.println("Tray icon removed");
                     }
                     if (e.getNewState() == JFrame.NORMAL) {
-                        tray.remove(trayIcon);
+                        if (tray != null)
+                            tray.remove(trayIcon);
                         jframe.setVisible(true);
                         System.out.println("Tray icon removed");
                     }
@@ -198,7 +202,7 @@ public class HideInSystemTrayHelper {
         @Deprecated
         private void removeIfExists() {
             if (exists()) {
-                if (tray != null){
+                if (tray != null) {
                     System.out.println("--removeTrayIcon ok!");
                     tray.remove(trayIcon);
                 }

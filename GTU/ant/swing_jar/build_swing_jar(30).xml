@@ -73,6 +73,7 @@
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
 
 		</jarfinder>
 

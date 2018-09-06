@@ -27,7 +27,7 @@ public class OOMHandler {
     public static final Bitmap DEFAULT_EMPTY_BMP = getEmptyBitmap(300, 300);
 
     @Deprecated
-    public static Bitmap new_decode_OLD(File f) {
+    public static Bitmap new_decode_OLD(File f, int customWidth) {
         // decode image size
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;// 再載入時就先縮小
@@ -46,7 +46,7 @@ public class OOMHandler {
         }
 
         // Find the correct scale value. It should be the power of 2.
-        final int REQUIRED_SIZE = 300;
+        final int REQUIRED_SIZE = customWidth;//300
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
         int scale = 1;
         while (true) {
@@ -73,9 +73,19 @@ public class OOMHandler {
 
             // return BitmapFactory.decodeStream(new FileInputStream(f), null,
             // null);
-            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, null);
+            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, null);//opts is null
             System.out.println(" IW " + width_tmp);
             System.out.println("IHH " + height_tmp);
+
+            //自訂縮放寬高 XXX
+            {
+                width_tmp = customWidth;
+                float scaleWidth = ((float) customWidth) / o.outWidth;
+                height_tmp = (int) (scaleWidth * o.outHeight);
+            }
+            //自訂縮放寬高 XXX
+
+
             int iW = width_tmp;
             int iH = height_tmp;
 
@@ -117,7 +127,7 @@ public class OOMHandler {
 
     public static Bitmap fixPicScale(Bitmap bm, int customWidth, int customHeight) {
         Bitmap newBitmap = Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
-        if(bm.getWidth() != customWidth && bm.getHeight() != customHeight){
+        if (bm.getWidth() != customWidth && bm.getHeight() != customHeight) {
             bm.recycle();
         }
         return newBitmap;

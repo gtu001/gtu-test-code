@@ -55,11 +55,13 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 
@@ -105,6 +107,9 @@ public class AVChoicerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(AVChoicerUI.class)) {
+            return;
+        }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -693,7 +698,12 @@ public class AVChoicerUI extends JFrame {
             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除此檔 : " + file, "刪除檔案!");
             if (result) {
                 try {
-                    boolean delResult = RecycleBinUtil_forWin.moveTo(file);
+                    boolean delResult = false;
+                    if (isWindows) {
+                        delResult = RecycleBinUtil_forWin.moveTo(file);
+                    } else {
+                        delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
+                    }
                     trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
