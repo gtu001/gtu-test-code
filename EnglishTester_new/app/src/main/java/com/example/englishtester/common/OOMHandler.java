@@ -111,17 +111,16 @@ public class OOMHandler {
         float scaleWidth = ((float) newWidth1) / width;
         int newHeight = (int) (scaleWidth * height);
 
-        Bitmap bitmap = null;
         Log.v(TAG, "changeScale to w : " + newWidth1 + ", h : " + newHeight);
-        bitmap = Bitmap.createScaledBitmap(bm, newWidth1, newHeight, true);
-        if (bm != null && bm != bitmap) {
-            bm.recycle();
-        }
-        return bitmap;
+        return fixPicScale(bm, newWidth1, newHeight);
     }
 
     public static Bitmap fixPicScale(Bitmap bm, int customWidth, int customHeight) {
-        return Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
+        Bitmap newBitmap = Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
+        if(bm.getWidth() != customWidth && bm.getHeight() != customHeight){
+            bm.recycle();
+        }
+        return newBitmap;
     }
 
     public static Bitmap new_decode(InputStream inputStream) {
