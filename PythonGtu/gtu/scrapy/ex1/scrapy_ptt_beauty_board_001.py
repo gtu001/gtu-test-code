@@ -13,7 +13,7 @@ from gtu.scrapy import scrapy_runner
 from gtu.reflect import checkSelf
 
 
-
+# https://stackoverflow.com/questions/45200710/scrapy-yield-a-request-parse-in-the-callback-but-use-the-info-in-the-original
 
 # <div class="title">
 # <a href="/bbs/Beauty/M.1536306364.A.2E6.html">[神人] 壹電視記者</a>
@@ -41,11 +41,13 @@ class PttBeautyBoardSpider(scrapy.Spider):
             
             print(next_url)
             
-            scrapy.Request(next_url, callback=self.parse_tag,
-                                     meta=response.meta)
+            scrapy.Request(next_url, callback=self.parse_tag, meta=response.meta)
+            
             
             
     def parse_tag(self, response):
+        
+        print("parse_tag-------------------")
 #         <a href="https://i.imgur.com/af03C67.jpg" target="_blank" rel="nofollow">https://i.imgur.com/af03C67.jpg</a>
         picLst = response.xpath("..//a[contains(@href, 'imgur')]").extract()
         
