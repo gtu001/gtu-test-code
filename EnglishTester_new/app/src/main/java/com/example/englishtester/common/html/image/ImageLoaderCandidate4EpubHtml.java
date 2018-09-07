@@ -41,7 +41,7 @@ public class ImageLoaderCandidate4EpubHtml extends ImageLoaderCandidateAbstract 
 
     @Override
     public Bitmap getResult(int fixWidth) {
-        return OOMHandler.fixPicScaleFixScreenWidth(dto.getBitmapForEpub(this), fixWidth);
+        return OOMHandler.fixPicScaleFixScreenWidth_new(dto.getBitmapForEpub(this), fixWidth);
     }
 
     @Override

@@ -30,7 +30,7 @@ public class OnlinePicLoader {
 
     public Bitmap getBitmapFromURL_waiting(final String url, long wattingTime, Integer scale) {
         Bitmap bitmap = OOMHandler.getBitmapFromURL_waiting(url, wattingTime, scale);
-        bitmap = OOMHandler.fixPicScaleFixScreenWidth(bitmap, fixWidth);
+        bitmap = OOMHandler.fixPicScaleFixScreenWidth_new(bitmap, fixWidth);
         if (OOMHandler.DEFAULT_EMPTY_BMP != bitmap) {
             return bitmap;
         }

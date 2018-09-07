@@ -88,7 +88,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
         Bitmap tmp = null;
         if (localFile != null && localFile.isFile()) {
             try {
-                tmp = OOMHandler.fixPicScaleFixScreenWidth(OOMHandler.new_decode(localFile, IMAGE_SIMPLE_SCALE), fixWidth);
+                tmp = OOMHandler.fixPicScaleFixScreenWidth_new(OOMHandler.new_decode(localFile, IMAGE_SIMPLE_SCALE), fixWidth);
             } catch (Exception ex) {
                 Log.e(TAG, "[localFile | getResult] ERR : " + ex.getMessage(), ex);
                 throw new RuntimeException("getResult ERR : " + ex.getMessage(), ex);

@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -266,5 +267,33 @@ public class OOMHandler {
             e.printStackTrace();
         }
         return options;
+    }
+
+    public static Bitmap fixPicScaleFixScreenWidth_new(Bitmap b, int newWidthDp) {
+        try {
+            Float density = Resources.getSystem().getDisplayMetrics().density;
+            int newWidth = newWidthDp * Math.round(density);
+
+            int width = b.getWidth();
+            int height = b.getHeight();
+
+            float scaleWidth = ((float) newWidth) / width;
+            float ratio = (float) width / newWidth;
+            int newHeight = (int) (height / ratio);
+            float scaleHeight = ((float) newHeight) / height;
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+
+            Bitmap resizedBitmap = Bitmap.createBitmap(b, 0, 0,
+                    width, height, matrix, true);
+
+            if (!b.isRecycled()) {
+                b.recycle();
+            }
+            return (resizedBitmap);
+        } catch (java.lang.OutOfMemoryError ex) {
+            return b;
+        }
     }
 }
