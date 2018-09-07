@@ -39,6 +39,8 @@ android {
         exclude 'META-INF/spring.tooling'
         exclude 'META-INF/spring.handlers'
         exclude 'META-INF/spring.schemas'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/notice.txt'
     }
 }
 
@@ -83,6 +85,9 @@ dependencies {
     compile('org.apache.commons:commons-io:1.3.2') {
         exclude group: 'commons-io', module: 'commons-io'
     }
+
+    compile('commons-io:commons-io:2.6')
+
     //https://github.com/nostra13/Android-Universal-Image-Loader
     compile files('libs/universal-image-loader-1.9.5.jar')
 }

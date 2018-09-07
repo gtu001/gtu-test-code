@@ -271,8 +271,9 @@ public class OOMHandler {
 
     public static Bitmap fixPicScaleFixScreenWidth_new(Bitmap b, int newWidthDp) {
         try {
-            Float density = Resources.getSystem().getDisplayMetrics().density;
-            int newWidth = newWidthDp * Math.round(density);
+//            Float density = Resources.getSystem().getDisplayMetrics().density;
+//            int newWidth = newWidthDp * Math.round(density);
+            int newWidth = newWidthDp;
 
             int width = b.getWidth();
             int height = b.getHeight();
