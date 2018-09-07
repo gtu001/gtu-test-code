@@ -287,10 +287,6 @@ public class OOMHandler {
 
             Bitmap resizedBitmap = Bitmap.createBitmap(b, 0, 0,
                     width, height, matrix, true);
-
-            if (!b.isRecycled()) {
-                b.recycle();
-            }
             return (resizedBitmap);
         } catch (java.lang.OutOfMemoryError ex) {
             return b;
