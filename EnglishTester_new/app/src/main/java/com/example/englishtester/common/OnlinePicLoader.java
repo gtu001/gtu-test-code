@@ -28,8 +28,8 @@ public class OnlinePicLoader {
         return NOTFOUND404;
     }
 
-    public Bitmap getBitmapFromURL_waiting(final String url, long wattingTime) {
-        Bitmap bitmap = OOMHandler.getBitmapFromURL_waiting(url, wattingTime);
+    public Bitmap getBitmapFromURL_waiting(final String url, long wattingTime, Integer scale) {
+        Bitmap bitmap = OOMHandler.getBitmapFromURL_waiting(url, wattingTime, scale);
         bitmap = OOMHandler.fixPicScaleFixScreenWidth(bitmap, fixWidth);
         if (OOMHandler.DEFAULT_EMPTY_BMP != bitmap) {
             return bitmap;

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.common.OOMHandler;
+import com.example.englishtester.common.html.image.ImageLoaderCandidate4WordHtml;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -128,7 +129,7 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
     private Bitmap createBitmap(Resource BitmapResource) {
         Bitmap result = null;
         try {
-            result = OOMHandler.new_decode(BitmapResource.getInputStream());
+            result = OOMHandler.new_decode(BitmapResource.getInputStream(), ImageLoaderCandidate4WordHtml.IMAGE_SIMPLE_SCALE);
         } catch (IOException e) {
             Log.e(TAG, "createBitmap ERR : " + e.getMessage(), e);
         }

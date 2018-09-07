@@ -27,7 +27,7 @@ public class OOMHandler {
     public static final Bitmap DEFAULT_EMPTY_BMP = getEmptyBitmap(300, 300);
 
     @Deprecated
-    public static Bitmap new_decode_OLD(File f, int customWidth) {
+    public static Bitmap new_decode_OLD(File f) {
         // decode image size
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;// 再載入時就先縮小
@@ -46,7 +46,7 @@ public class OOMHandler {
         }
 
         // Find the correct scale value. It should be the power of 2.
-        final int REQUIRED_SIZE = customWidth;//300
+        final int REQUIRED_SIZE = 300;//
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
         int scale = 1;
         while (true) {
@@ -76,15 +76,6 @@ public class OOMHandler {
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, null);//opts is null
             System.out.println(" IW " + width_tmp);
             System.out.println("IHH " + height_tmp);
-
-            //自訂縮放寬高 XXX
-            {
-                width_tmp = customWidth;
-                float scaleWidth = ((float) customWidth) / o.outWidth;
-                height_tmp = (int) (scaleWidth * o.outHeight);
-            }
-            //自訂縮放寬高 XXX
-
 
             int iW = width_tmp;
             int iH = height_tmp;
@@ -126,17 +117,21 @@ public class OOMHandler {
     }
 
     public static Bitmap fixPicScale(Bitmap bm, int customWidth, int customHeight) {
-        Bitmap newBitmap = Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
-        if (bm.getWidth() != customWidth && bm.getHeight() != customHeight) {
-            bm.recycle();
+        try {
+            Bitmap newBitmap = Bitmap.createScaledBitmap(bm, customWidth, customHeight, false);
+            if (bm.getWidth() != customWidth && bm.getHeight() != customHeight) {
+                bm.recycle();
+            }
+            return newBitmap;
+        } catch (java.lang.OutOfMemoryError err) {
+            return bm;
         }
-        return newBitmap;
     }
 
-    public static Bitmap new_decode(InputStream inputStream) {
+    public static Bitmap new_decode(InputStream inputStream, Integer scale) {
         try {
             Bitmap bitmap = null;
-            for (int ii = 0; ; ii++) {
+            for (int ii = (scale == null ? 0 : scale); ; ii++) {
                 try {
                     bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                     Log.v(TAG, "Bitmap scale = " + ii);
@@ -152,11 +147,11 @@ public class OOMHandler {
         }
     }
 
-    public static Bitmap new_decode(File f) {
+    public static Bitmap new_decode(File f, Integer scale) {
         try {
             InputStream inputStream = new FileInputStream(f);
             Bitmap bitmap = null;
-            for (int ii = 0; ; ii++) {
+            for (int ii = (scale == null ? 0 : scale); ; ii++) {
                 try {
                     bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                     Log.v(TAG, "Bitmap scale = " + ii + " , Name : " + f.getName() + " , size : " + FileUtilGtu.getSizeDescription(f.length()));
@@ -172,10 +167,10 @@ public class OOMHandler {
         }
     }
 
-    public static Bitmap new_decode(int resourceId) {
+    public static Bitmap new_decode(int resourceId, Integer scale) {
         InputStream inputStream = Resources.getSystem().openRawResource(resourceId);
         Bitmap bitmap = null;
-        for (int ii = 0; ; ii++) {
+        for (int ii = (scale == null ? 0 : scale); ; ii++) {
             try {
                 bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                 Log.v(TAG, "Bitmap scale = " + ii);
@@ -188,10 +183,10 @@ public class OOMHandler {
         }
     }
 
-    public static Bitmap new_decode(Context context, int resourceId) {
+    public static Bitmap new_decode(Context context, int resourceId, Integer scale) {
         InputStream inputStream = context.getResources().openRawResource(resourceId);
         Bitmap bitmap = null;
-        for (int ii = 0; ; ii++) {
+        for (int ii = (scale == null ? 0 : scale); ; ii++) {
             try {
                 bitmap = BitmapFactory.decodeStream(inputStream, null, getBitmapOptions(ii));
                 Log.v(TAG, "Bitmap scale = " + ii);
@@ -211,12 +206,12 @@ public class OOMHandler {
         return bmp;
     }
 
-    public static Bitmap getBitmapFromURL_waiting(final String url, long wattingTime) {
+    public static Bitmap getBitmapFromURL_waiting(final String url, long wattingTime, final Integer scale) {
         final BlockingQueue<Bitmap> queue = new ArrayBlockingQueue<Bitmap>(1);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Bitmap bitmap = getBitmapFromURL(url);
+                Bitmap bitmap = getBitmapFromURL(url, scale);
                 if (bitmap != null) {
                     queue.offer(bitmap);
                 } else {
@@ -231,7 +226,7 @@ public class OOMHandler {
         }
     }
 
-    public static Bitmap getBitmapFromURL(String src) {
+    public static Bitmap getBitmapFromURL(String src, Integer scale) {
         try {
             URL url = new URL(src);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -242,7 +237,7 @@ public class OOMHandler {
 //            return myBitmap;
 
             Bitmap bitmap = null;
-            for (int ii = 0; ; ii++) {
+            for (int ii = (scale == null ? 0 : scale); ; ii++) {
                 try {
                     bitmap = BitmapFactory.decodeStream(input, null, getBitmapOptions(ii));
                     Log.v(TAG, "Bitmap scale = " + ii);
@@ -261,7 +256,7 @@ public class OOMHandler {
 
     private static BitmapFactory.Options getBitmapOptions(int scale) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.RGB_565; //說這個很省
+//        options.inPreferredConfig = Bitmap.Config.RGB_565; //說這個很省 (但渣畫質)
         options.inPurgeable = true;//這樣可以讓java系統記憶體不足時先行回收部分的記憶體
         options.inInputShareable = true;
         options.inSampleSize = scale;//大概設2~4就差不多了

@@ -84,7 +84,7 @@ public class GodToast {
         if (scale != null) {
             return;
         }
-        Bitmap bm1 = OOMHandler.new_decode(context, R.drawable.god1);
+        Bitmap bm1 = OOMHandler.new_decode(context, R.drawable.god1, null);
         Scale scales = scaleImg2(bm1);
         if (scales != null) {
             scale = scales;

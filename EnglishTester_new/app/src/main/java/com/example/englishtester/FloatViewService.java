@@ -394,7 +394,7 @@ public class FloatViewService extends Service {
             imageViewNoteAction.setOnClickListener(new OnClickListener() {
                 private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
                     Map<String, Object> a1 = new HashMap<String, Object>();
-                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon) : null));
+                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon, null) : null));
                     a1.put("ItemTitle", title);
                     list.add(a1);
                 }
@@ -749,7 +749,7 @@ public class FloatViewService extends Service {
             OnClickListener imageViewConfig_OnClickListener = new OnClickListener() {
                 private void addItem(String title, Integer icon, List<Map<String, Object>> list) {
                     Map<String, Object> a1 = new HashMap<String, Object>();
-                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon) : null));
+                    a1.put("ItemImage", (icon != null ? OOMHandler.new_decode(FloatViewService.this, icon, null) : null));
                     a1.put("ItemTitle", title);
                     list.add(a1);
                 }

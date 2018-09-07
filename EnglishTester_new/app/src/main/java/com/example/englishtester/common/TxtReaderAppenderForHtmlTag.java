@@ -449,7 +449,7 @@ public class TxtReaderAppenderForHtmlTag {
 
     private ImageSpan createHyperlinkImageSpan() {
         if (hyperlink == null) {
-            Bitmap b1 = OOMHandler.new_decode(context, R.drawable.hyperlink);
+            Bitmap b1 = OOMHandler.new_decode(context, R.drawable.hyperlink, null);
             hyperlink = OOMHandler.fixPicScale(b1, 100, 100);
         }
         return new ImageSpan(context, hyperlink, ImageSpan.ALIGN_BASELINE);//
@@ -457,7 +457,7 @@ public class TxtReaderAppenderForHtmlTag {
 
     private ImageSpan createChangeLineImageSpan() {
         if (changeLineImg == null) {
-            Bitmap b1 = OOMHandler.new_decode(context, R.drawable.icon_change_line);//
+            Bitmap b1 = OOMHandler.new_decode(context, R.drawable.icon_change_line, null);//
             changeLineImg = OOMHandler.fixPicScale(b1, 30, 30);
         }
         return new ImageSpan(context, changeLineImg, ImageSpan.ALIGN_BASELINE);//

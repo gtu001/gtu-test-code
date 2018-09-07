@@ -155,7 +155,7 @@ public class SwitchPictureService {
 
         // 將這個單字的圖片全部載入快取 ↓↓↓↓↓↓
         for (File file : picList) {
-            scaleImg2(OOMHandler.new_decode(file), file);
+            scaleImg2(OOMHandler.new_decode(file, null), file);
         }
         Log.v(TAG, "快取載入完畢!!" + picList.size());
         // 將這個單字的圖片全部載入快取 ↑↑↑↑↑↑
@@ -326,7 +326,7 @@ public class SwitchPictureService {
             String fileName = file.getAbsolutePath();
             // 最早的寫法
             // Bitmap bm = BitmapFactory.decodeFile(fileName);
-            Bitmap bm = OOMHandler.new_decode(file);
+            Bitmap bm = OOMHandler.new_decode(file, null);
             // imageView.setImageBitmap(scaleImg(bm));//原載圖邏輯
 
             scaleImg2(bm, file);

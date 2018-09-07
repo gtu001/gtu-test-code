@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.OOMHandler2;
 import com.example.englishtester.common.OnlinePicLoader;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
@@ -26,6 +27,8 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
     boolean isNeedLoadImage;
     OnlinePicLoader onlinePicLoader;
     TxtReaderActivity.TxtReaderActivityDTO dto;
+
+    public static final Integer IMAGE_SIMPLE_SCALE = 1;
 
     public ImageLoaderCandidate4WordHtml(String srcData, String altData, boolean isNeedLoadImage, OnlinePicLoader onlinePicLoader, ITxtReaderActivityDTO dto) {
         this.srcData = srcData;
@@ -85,8 +88,7 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
         Bitmap tmp = null;
         if (localFile != null && localFile.isFile()) {
             try {
-//            tmp = OOMHandler.new_decode(localFile);
-                tmp = OOMHandler2.decodeSampledBitmapFromResource(localFile.getAbsolutePath(), OOMHandler2.getCustomFixWidth(fixWidth));
+                tmp = OOMHandler.fixPicScaleFixScreenWidth(OOMHandler.new_decode(localFile, IMAGE_SIMPLE_SCALE), fixWidth);
             } catch (Exception ex) {
                 Log.e(TAG, "[localFile | getResult] ERR : " + ex.getMessage(), ex);
                 throw new RuntimeException("getResult ERR : " + ex.getMessage(), ex);
@@ -137,6 +139,6 @@ public class ImageLoaderCandidate4WordHtml extends ImageLoaderCandidateAbstract 
     }
 
     private Bitmap getPicFromURL(String url) {
-        return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000);
+        return onlinePicLoader.getBitmapFromURL_waiting(url, 10 * 1000, IMAGE_SIMPLE_SCALE);
     }
 }

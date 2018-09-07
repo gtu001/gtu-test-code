@@ -152,7 +152,7 @@ public class SlidePageInstructionActivity extends FragmentActivity {
                 int imagePic = imageList.get(viewPager.getCurrentItem());
 
                 try {
-                    Bitmap bm = OOMHandler.new_decode(SlidePageInstructionActivity.this, imagePic);
+                    Bitmap bm = OOMHandler.new_decode(SlidePageInstructionActivity.this, imagePic, null);
 
                     if(bm != null){
                         Log.v(TAG, String.format("# resize1 = w: %s, h : %s", bm.getWidth(), bm.getHeight()));
