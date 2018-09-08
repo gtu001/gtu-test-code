@@ -11,7 +11,7 @@ android {
         }
     }
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "com.gtu.example.englishtester"
         minSdkVersion 16
@@ -68,7 +68,7 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     //compile 'com.google.android.gms:play-services:6.+'
     //compile 'com.google.android.gms:play-services:10.2.6'
-    compile 'com.opencsv:opencsv:3.9'
+    compile('com.opencsv:opencsv:3.9')
     compile files('libs/baiduTranslate.jar')
     compile files('libs/jcc-bate-0.7.3.jar')
     compile 'com.android.support:percent:26.0.1'
@@ -87,6 +87,7 @@ dependencies {
     }
 
     compile('commons-io:commons-io:2.6')
+    compile 'commons-logging:commons-logging:1.2'
 
     //https://github.com/nostra13/Android-Universal-Image-Loader
     compile files('libs/universal-image-loader-1.9.5.jar')
