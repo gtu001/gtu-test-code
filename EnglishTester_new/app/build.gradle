@@ -16,8 +16,8 @@ android {
         applicationId "com.gtu.example.englishtester"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 37
-        versionName "1.0.7.9"
+        versionCode 38
+        versionName "1.0.7.10"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true //method量超標
@@ -41,6 +41,10 @@ android {
         exclude 'META-INF/spring.schemas'
         exclude 'META-INF/license.txt'
         exclude 'META-INF/notice.txt'
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError true
     }
 }
 
