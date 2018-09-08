@@ -1,27 +1,27 @@
-fetch("https://www.reddit.com/r/gameofthrones/")
 
+安裝 
 
+---> http://linton.tw/2013/10/18/scapy-network-packet-analysis-tool/
 
-response.css(".title::text").extract()
-
-response.css(".title::text").extract_first()
-
-response.css(".title").extract_first()
-
----------------------------------------------------------------------------
-<div class="score unvoted" title="399">399</div>
-
-response.css(".score.unvoted").extract_first()
-
-response.css(".score.unvoted::text").extract()
-
+$ sudo apt-get install python-scapy python-pyx python-gnuplot
 
 ---------------------------------------------------------------------------
 
-<time title="Thu Jul 20 14:03:45 2017 UTC" datetime="2017-07-20T14:03:45+00:00" class="live-timestamp">16 hours ago</time>
+安裝
 
-response.css("time::attr(title)").extract()
+$ pip install scrapy
 
+若發生錯誤要安裝 gcc
+
+$ sudo apt-get install gcc
+
+---------------------------------------------------------------------------
+shell執行
+
+1. 請切到此目錄 /ex2_ptt_beauty/PttBeautyCrawler/>  Ps:有scrapy.cfg那層
+2. scrapy crawl <name>   
+	Ps: name 為 spider 內的 name 變數
+3. 非常重要 : allowed_domains 錯了會導致 yield 無效化 （必須無"/",與"https?://")
 
 ---------------------------------------------------------------------------
 

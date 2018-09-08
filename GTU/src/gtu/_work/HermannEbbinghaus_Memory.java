@@ -196,6 +196,13 @@ public class HermannEbbinghaus_Memory {
         return t;
     }
 
+    public boolean isInitDone() {
+        if (config != null) {
+            return true;
+        }
+        return false;
+    }
+
     public void init(File customFile) {
         if (customFile != null) {
             config = new PropertiesUtilBean(customFile);

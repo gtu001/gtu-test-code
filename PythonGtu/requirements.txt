@@ -1,4 +1,4 @@
-pypiwin32
+#pypiwin32 --> for win
 
 #https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyhook
 #./gtu/keyboard_mouse/pyHook-1.5.1-cp34-cp34m-win32.whl <--use this
@@ -39,3 +39,6 @@ retry
 
 # matplotlib.finance
 mpl_finance
+
+#web crawler
+scrapy
