@@ -6,6 +6,7 @@ from gtu.thread import threadUtil
 from gtu.reflect import checkSelf
 import re
 from gtu.string import stringUtil
+import sys
 
 '''
 from gtu.io import fileUtil
@@ -47,10 +48,14 @@ def getDesktopDir():
 	'''取得桌面路徑'''
 # 	home = str(Path.home())
 	home = expanduser("~")
-	if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
-		return home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep
+	if sys.platform != 'linux' :
+		if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
+			return home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep
+		else :
+			return home + os.sep + "Desktop" + os.sep
 	else :
-		return home + os.sep + "Desktop" + os.sep
+		return "/home/gtu001/桌面"
+	
 	
 	
 def getAbsPath(path):
@@ -225,6 +230,12 @@ def replaceBasePath(orign, from_path, to_path):
 	
 	return os.path.abspath(to_path  + os.sep + orign[orign.find(from_path) + len(from_path) : ])
 
+
+
+def canRead(filepath):
+	from os import access, R_OK
+	from os.path import isfile
+	return isfile(filepath) and access(filepath, R_OK)
 
 
 if __name__ == '__main__':
