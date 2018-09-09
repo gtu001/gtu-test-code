@@ -85,6 +85,14 @@ def getDatetimeByJavaFormat(dateStr, javaFormat, debugLabel=None):
 
 
 
+def formatDatetime(datetimeObj, format):
+    return datetimeObj.strftime(format)
+
+
+def formatDatetimeByJavaFormat(datetimeObj, javaFormat):
+    format = getForamtFromJava(javaFormat)
+    return datetimeObj.strftime(format)
+
 if __name__ == '__main__' :
     dateobj = getDatetimeByJavaFormat("2018/08/30 15:18:30.555555", "yyyy/MM/dd HH:mm:ss.SSSSSS")
     print("dateobj", dateobj)

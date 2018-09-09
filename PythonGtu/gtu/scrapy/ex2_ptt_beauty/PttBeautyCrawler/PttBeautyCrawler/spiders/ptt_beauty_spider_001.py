@@ -50,8 +50,6 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
         for item in self.parseLinkAndTitle(response) :
             yield item
             
-            
-            
     def parseLinkAndTitle(self, response):
         print("### parseLinkAndTitle")
         
@@ -68,9 +66,12 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
                }
             print("scraped_info", scraped_info)
             
-            dateObj = dateUtil.getDatetimeByJavaFormat(PttBeautyCrawlerSpider.FETCH_PREFIX_YEAR + scraped_info['date'], "yyyy/MM/dd", True)
-            if PttBeautyCrawlerSpider.FETCH_SINCE_DATE > dateObj :
-                print("日期不符跳過 ： " + dateObj)
+            if not self.isDatePremit(scraped_info) :
+                print("日期不符跳過")
+                continue
+            
+            if not self.isPicFormatOk(scraped_info) :
+                print("內容不符跳過")
                 continue
             
             yield scrapy.Request(scraped_info['href'], callback=self.parse_detail_page, meta=scraped_info)
@@ -83,8 +84,6 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
                 "pageUrl" : PttBeautyCrawlerSpider.BASE_URL + item[0],
                 }
             yield scrapy.Request(scraped_info['pageUrl'], callback=self.parse, meta=scraped_info)
-            
-            
             
     def parse_detail_page(self, response):
         print("parse_detail_page-------------------")
@@ -102,10 +101,12 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
 #             print("scraped_info", scraped_info)
             yield scraped_info
             yield self.download(scraped_info);
-            
 
     def download(self, scraped_info):
-        fileDir = fileUtil.getDesktopDir() + os.sep + "ptt_beauty_pics" + os.sep + scraped_info['title']
+        dateObj = dateUtil.getDatetimeByJavaFormat("2018/" + scraped_info['date'], "yyyy/MM/dd", True)
+        dateStr = dateUtil.formatDatetimeByJavaFormat(dateObj, "yyyyMMdd")
+        
+        fileDir = fileUtil.getDesktopDir() + os.sep + "ptt_beauty_pics" + os.sep + dateStr + os.sep + scraped_info['title']
         fileUtil.mkdirs(fileDir)
         
         imgName = scraped_info['img']
@@ -119,6 +120,17 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
             return
         
         simple_request_handler_001.doDownload(url, filepath)
+        
+    def isDatePremit(self, scraped_info):
+        dateObj = dateUtil.getDatetimeByJavaFormat(PttBeautyCrawlerSpider.FETCH_PREFIX_YEAR + scraped_info['date'], "yyyy/MM/dd", True)
+        if PttBeautyCrawlerSpider.FETCH_SINCE_DATE > dateObj :
+            return False
+        return True
+    
+    def isPicFormatOk(self, scraped_info):
+        if "帥哥" in scraped_info['title']:
+            return False
+        return True
 
 
 if __name__ == '__main__' :
