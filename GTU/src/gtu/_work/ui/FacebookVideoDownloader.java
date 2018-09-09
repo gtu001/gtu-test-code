@@ -52,6 +52,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
@@ -201,6 +202,9 @@ public class FacebookVideoDownloader extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(FacebookVideoDownloader.class)) {
+            return;
+        }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {

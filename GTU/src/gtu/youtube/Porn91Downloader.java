@@ -373,21 +373,25 @@ public class Porn91Downloader {
 
     public static long getContentLength(String userAgent, String downloadUrl) throws Throwable {
         SystemZ.out.println("getContentLength URL : " + downloadUrl);
-        HttpGet httpget2 = new HttpGet(downloadUrl);
-        if (userAgent != null && userAgent.length() > 0) {
-            httpget2.setHeader("User-Agent", userAgent);
+        try {
+            HttpGet httpget2 = new HttpGet(downloadUrl);
+            if (userAgent != null && userAgent.length() > 0) {
+                httpget2.setHeader("User-Agent", userAgent);
+            }
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
+            HttpClient httpclient2 = new DefaultHttpClient(httpParams);
+            HttpResponse response2 = httpclient2.execute(httpget2);
+            HttpEntity entity2 = response2.getEntity();
+            if (entity2 != null && response2.getStatusLine().getStatusCode() == 200) {
+                long length = entity2.getContentLength();
+                SystemZ.out.println("length : " + length);
+                return length;
+            }
+            SystemZ.out.println("length : Fail ");
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        final HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
-        HttpClient httpclient2 = new DefaultHttpClient(httpParams);
-        HttpResponse response2 = httpclient2.execute(httpget2);
-        HttpEntity entity2 = response2.getEntity();
-        if (entity2 != null && response2.getStatusLine().getStatusCode() == 200) {
-            long length = entity2.getContentLength();
-            SystemZ.out.println("length : " + length);
-            return length;
-        }
-        SystemZ.out.println("length : Fail ");
         return -1;
     }
 

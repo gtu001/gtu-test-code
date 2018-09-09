@@ -1,5 +1,6 @@
 package gtu.recyclebin;
 
+import java.awt.Desktop;
 import java.io.File;
 
 public class RecycleBinTrashcanUtil {
@@ -9,6 +10,8 @@ public class RecycleBinTrashcanUtil {
             com.sun.jna.platform.FileUtils fileUtil = com.sun.jna.platform.FileUtils.getInstance();
             if (fileUtil.hasTrash()) {
                 fileUtil.moveToTrash(files);
+            } else {
+                System.out.println("doesn't have trash can!!");
             }
             for (File f : files) {
                 if (f.exists()) {

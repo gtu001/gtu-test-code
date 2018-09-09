@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,21 @@ import javax.swing.UIManager;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.image.ImageUtil;
+import gtu.javafx.traynotification.NotificationType;
+import gtu.javafx.traynotification.TrayNotificationHelper;
+import gtu.javafx.traynotification.animations.AnimationType;
 
 public class HideInSystemTrayHelper {
+
+    private static boolean isWindows = false;
+
+    static {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            isWindows = true;
+        } else if ("Linux".equals(System.getProperty("os.name"))) {
+            isWindows = false;
+        }
+    }
 
     public static void main(String[] args) {
         HideInSystemTrayHelper inst = HideInSystemTrayHelper.newInstance();
@@ -74,12 +88,15 @@ public class HideInSystemTrayHelper {
             image = getSysTrayIcon("resource/images/ico/janna.ico");
         }
 
-        try {
-            System.out.println("setting look and feel");
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            System.out.println("Unable to set LookAndFeel");
+        if (isWindows) {
+            try {
+                System.out.println("setting look and feel");
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Throwable e) {
+                System.out.println("Unable to set LookAndFeel");
+            }
         }
+
         if (SystemTray.isSupported()) {
             System.out.println("system tray supported");
             tray = SystemTray.getSystemTray();
@@ -137,7 +154,7 @@ public class HideInSystemTrayHelper {
                 public void windowStateChanged(WindowEvent e) {
                     if (e.getNewState() == JFrame.ICONIFIED) {
                         try {
-                            if (tray != null)
+                            if (tray != null && trayIcon != null)
                                 tray.add(trayIcon);
                             jframe.setVisible(false);
                             System.out.println("added to SystemTray");
@@ -147,7 +164,7 @@ public class HideInSystemTrayHelper {
                     }
                     if (e.getNewState() == 7) {
                         try {
-                            if (tray != null)
+                            if (tray != null && trayIcon != null)
                                 tray.add(trayIcon);
                             jframe.setVisible(false);
                             System.out.println("added to SystemTray");
@@ -156,13 +173,13 @@ public class HideInSystemTrayHelper {
                         }
                     }
                     if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                        if (tray != null)
+                        if (tray != null && trayIcon != null)
                             tray.remove(trayIcon);
                         jframe.setVisible(true);
                         System.out.println("Tray icon removed");
                     }
                     if (e.getNewState() == JFrame.NORMAL) {
-                        if (tray != null)
+                        if (tray != null && trayIcon != null)
                             tray.remove(trayIcon);
                         jframe.setVisible(true);
                         System.out.println("Tray icon removed");
@@ -227,9 +244,43 @@ public class HideInSystemTrayHelper {
     public void displayMessage(String caption, String text, MessageType messageType) {
         trayIconHandler.addIfNeed();
         System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
-        if (trayIcon != null)
+
+        try {
             trayIcon.displayMessage(caption, text, messageType);
+        } catch (Exception ex) {
+            displayMessage4Linux(caption, text, messageType);
+        }
         // trayIconHandler.removeIfExists();
+    }
+
+    private void displayMessage4Linux(String caption, String text, MessageType messageType) {
+        NotificationType mappingType = null;
+        switch (messageType) {
+        case ERROR:
+            mappingType = NotificationType.ERROR;
+            break;
+        case WARNING:
+            mappingType = NotificationType.WARNING;
+            break;
+        case INFO:
+            mappingType = NotificationType.INFORMATION;
+            break;
+        case NONE:
+            mappingType = NotificationType.INFORMATION;
+            break;
+        }
+
+        TrayNotificationHelper.newInstance()//
+                .title(caption)//
+                .message(text)//
+                .notificationType(mappingType)//
+                .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
+                .animationType(AnimationType.FADE)//
+                .onPanelClickCallback(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                }).show(1500);
     }
 
     public TrayIcon getTrayIcon() {

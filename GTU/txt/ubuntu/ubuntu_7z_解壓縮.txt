@@ -1,0 +1,10 @@
+
+sudo apt-get install p7zip-full
+
+sudo apt-get install p7zip-rar
+
+已壓縮檔案管理員開啟
+
+或是
+
+$ 7z x <package>.7z

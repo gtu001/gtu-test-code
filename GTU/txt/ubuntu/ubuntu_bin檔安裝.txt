@@ -1,0 +1,9 @@
+
+
+chmod a+x <file>.bin
+./<file>.bin
+
+
+or
+
+sudo ./<file>.bin

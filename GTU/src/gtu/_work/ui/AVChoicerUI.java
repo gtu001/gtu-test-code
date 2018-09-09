@@ -14,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -90,7 +89,10 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
+    // private PropertiesUtilBean config = new
+    // PropertiesUtilBean(AVChoicerUI.class);
+    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
     private List<File> cacheFileList = new ArrayList<File>();
@@ -243,6 +245,15 @@ public class AVChoicerUI extends JFrame {
             public void keyPressed(KeyEvent paramKeyEvent) {
                 resetCacheFileList();
                 JListUtil.newInstance(avDirList).defaultJListKeyPressed(paramKeyEvent);
+            }
+        });
+        avDirList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                    File f = (File) avDirList.getSelectedValue();
+                    DesktopUtil.openDir(f);
+                }
             }
         });
 
@@ -703,6 +714,14 @@ public class AVChoicerUI extends JFrame {
                         delResult = RecycleBinUtil_forWin.moveTo(file);
                     } else {
                         delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
+                        if (!delResult) {
+                            try {
+                                FileUtils.forceDelete(file);
+                                delResult = file.exists();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
                     }
                     trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
