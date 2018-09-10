@@ -1,0 +1,19 @@
+安裝
+
+    $ sudo apt-get update
+    $ sudo apt-get install postgresql postgresql-contrib
+
+
+    
+啟動服務
+    
+    $ sudo service postgresql start
+        
+    
+確認cluster是否有在跑
+
+    $ pg_lsclusters
+    
+        Ver Cluster Port Status Owner    Data directory              Log file
+        10  main    5432 online postgres /var/lib/postgresql/10/main /var/log/postgresql/postgresql-10-main.log
+
