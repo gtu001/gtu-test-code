@@ -18,9 +18,17 @@ public class DesktopUtil {
 
     private static Logger logger = Logger.getLogger(DesktopUtil.class.getSimpleName());
 
+    private static boolean isWindows = false;
+
     static {
         JdkLoggerUtil.setupRootLogLevel(Level.INFO);
         logger.setLevel(Level.ALL);
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            isWindows = true;
+        } else if ("Linux".equals(System.getProperty("os.name"))) {
+            isWindows = false;
+        }
     }
 
     public static void main(String[] args) {
@@ -129,7 +137,13 @@ public class DesktopUtil {
                         throw new Exception("file : " + file + " not exists !!");
                     } else {
                         try {
-                            Desktop.getDesktop().open(file);
+                            if (isWindows) {
+                                Desktop.getDesktop().open(file);
+                            } else {
+                                RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                                inst.command(file.getAbsolutePath());
+                                inst.apply();
+                            }
                         } catch (Exception ex1) {
                             logger.log(Level.WARNING, "browse try 2 : " + ex1.getMessage());
                             Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", file));
