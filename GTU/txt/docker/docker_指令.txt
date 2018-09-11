@@ -25,6 +25,10 @@ Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
 docker run --name <image> -t <container name>
 
 
+## 加入 iptable 權限
+$ winpty docker run -it --cap-add=NET_ADMIN  --cap-add=NET_RAW  <image_id>  bash
+
+
 
 # 刪除image
 $ docker rmi [image id] -f (強制)
