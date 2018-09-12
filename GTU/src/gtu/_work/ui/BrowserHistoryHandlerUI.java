@@ -125,8 +125,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+//    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
