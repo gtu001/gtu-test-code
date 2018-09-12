@@ -8,8 +8,8 @@
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
 	<!--<property name="jar_repsitory" location="C:\Users\gtu001\.m2\repository" />-->
-	<property name="main_class_full" value="_temp.Test_forAntBuild" />
-	<property name="main_class" value="Test_forAntBuild" />
+	<property name="main_class_full" value="gtu._work.ui.FreemarkerReplaceUI" />
+	<property name="main_class" value="FreemarkerReplaceUI" />
 	<property name="rename_jarname" value="${main_class}" />
 	<property name="icon_name" value="janna.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
@@ -70,6 +70,9 @@
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			
+			<packagename mode="small">freemarker.template</packagename>
+			<packagename mode="small">net.sf.json.JSONObject</packagename>
 
 		</jarfinder>
 

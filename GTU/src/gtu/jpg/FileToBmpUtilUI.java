@@ -28,8 +28,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.file.FileUtil;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFrameUtil;
+
 import javax.swing.JCheckBox;
 
 public class FileToBmpUtilUI extends JFrame {
@@ -42,11 +45,15 @@ public class FileToBmpUtilUI extends JFrame {
     private JTextField widthText;
     private JCheckBox usePicNameCheckbox;
     private JTextField indicateSizeText;
+    private HideInSystemTrayHelper hideInSystemTrayHelper;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(FileToBmpUtilUI.class)) {
+            return;
+        }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -222,6 +229,11 @@ public class FileToBmpUtilUI extends JFrame {
         panel_1.add(indicateSizeText, "4, 6, fill, default");
         indicateSizeText.setColumns(10);
         panel_1.add(btnGo_1, "2, 8");
+
+        JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.setJFrameIcon(this, "resource/images/ico/hacker.ico");
+        hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
+        hideInSystemTrayHelper.apply(this);
     }
 
     /*
