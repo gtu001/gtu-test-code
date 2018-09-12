@@ -57,7 +57,6 @@ def getDesktopDir():
 		return "/home/gtu001/桌面"
 	
 	
-	
 def getAbsPath(path):
 	'''取得絕對路徑'''
 	'''return os.path.abspath(path)'''
@@ -159,7 +158,6 @@ def readStringVariableByLine(textData):
 	for line in textData.splitlines():
 	    print(line)
 	    
-	    
 
 def searchFilefind(file, pattern, fileList):
 	if type(pattern).__name__ == 'str':
@@ -179,8 +177,6 @@ def searchFilefind(file, pattern, fileList):
 		
 		if mth is not None :
 			fileList.append(file.resolve())
-			
-			
 
 
 def searchFileMatchs(file, pattern, fileList):
@@ -201,7 +197,6 @@ def searchFileMatchs(file, pattern, fileList):
 		
 		if mth is not None :
 			fileList.append(file.resolve())
-			
 
 
 def sep():
@@ -212,7 +207,6 @@ def sep():
 	else:
 		req_sep = '\/'
 	return req_sep
-
 
 
 def replaceBasePath(orign, from_path, to_path):
@@ -228,8 +222,7 @@ def replaceBasePath(orign, from_path, to_path):
 	if pos == -1:
 		raise Exception(stringUtil.concat("無法取得前置目錄  : ", orign, " 找不到  ", from_path))
 	
-	return os.path.abspath(to_path  + os.sep + orign[orign.find(from_path) + len(from_path) : ])
-
+	return os.path.abspath(to_path + os.sep + orign[orign.find(from_path) + len(from_path) : ])
 
 
 def canRead(filepath):
@@ -238,10 +231,37 @@ def canRead(filepath):
 	return isfile(filepath) and access(filepath, R_OK)
 
 
+def listFileOnly(dirpath):
+	from os import listdir
+	from os.path import isfile, join
+	onlyfiles = [f for f in listdir(dirpath) if isfile(join(dirpath, f))]
+	onlyfiles2 = list()
+	for (i, fname) in enumerate(onlyfiles) :
+		f2 = join(dirpath, fname)
+# 		print(i, type(f2), f2)
+		onlyfiles2.append(f2)
+	return onlyfiles2
+
+
+def listFile_example(dirpath):
+	from os import walk
+	f = list()
+	for (dirpath, dirnames, filenames) in walk(dirpath):
+	    f.extend(filenames)
+	
+
+def listFile_example2():
+	import glob
+	print(glob.glob("/home/adam/*.txt"))
+	
+	
+def deleteDir(dirPath):
+	import shutil
+	shutil.rmtree(dirPath)
+
+
 if __name__ == '__main__':
-	
-	file = "C:/Users/gtu00/OneDrive/Desktop/秀娟0501"
-	print(replaceBasePath(file, "C:/Users/gtu00/OneDrive/DeskXXtop", "C:/Users/gtu00/OneDrive/Desktop/VVV"))
-	
+	dirPath = "D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt"
+	listFileOnly(dirPath)
 	print("done..")
 	

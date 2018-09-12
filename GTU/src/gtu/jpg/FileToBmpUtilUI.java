@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,6 +41,7 @@ public class FileToBmpUtilUI extends JFrame {
     private JTextField toFileText;
     private JTextField widthText;
     private JCheckBox usePicNameCheckbox;
+    private JTextField indicateSizeText;
 
     /**
      * Launch the application.
@@ -156,7 +159,7 @@ public class FileToBmpUtilUI extends JFrame {
         tabbedPane.addTab("bmp->file", null, panel_1, null);
         panel_1.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblSrcBmp = new JLabel("src bmp");
         panel_1.add(lblSrcBmp, "2, 2, right, default");
@@ -172,6 +175,12 @@ public class FileToBmpUtilUI extends JFrame {
                 String toName = FileUtil.getNameNoSubName(f);
                 File destFile = new File(FileUtil.DESKTOP_PATH, toName);
                 toFileText.setText(destFile.getAbsolutePath());
+
+                Pattern ptn = Pattern.compile(".*\\_(\\d+)\\.bmp");
+                Matcher mth = ptn.matcher(srcBmpText.getText());
+                if (mth.find()) {
+                    indicateSizeText.setText(mth.group(1));
+                }
             }
         }));
 
@@ -194,17 +203,25 @@ public class FileToBmpUtilUI extends JFrame {
                 try {
                     File srcBmpFile = JCommonUtil.filePathCheck(srcBmpText.getText(), "BMP檔案來源", "bmp");
                     File toFile = new File(toFileText.getText());
+                    int fileSize = Integer.parseInt(indicateSizeText.getText());
                     if (!toFile.getParentFile().exists()) {
                         toFile.getParentFile().mkdirs();
                     }
-                    FileToBmpUtilVer2.getInstance().getFileFromImage_FixName(srcBmpFile, toFile);
+                    FileToBmpUtilVer2.getInstance().getFileFromImage(srcBmpFile, fileSize, toFile);
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 : " + toFile);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
-        panel_1.add(btnGo_1, "2, 6");
+
+        JLabel lblSize = new JLabel("size");
+        panel_1.add(lblSize, "2, 6, right, default");
+
+        indicateSizeText = new JTextField();
+        panel_1.add(indicateSizeText, "4, 6, fill, default");
+        indicateSizeText.setColumns(10);
+        panel_1.add(btnGo_1, "2, 8");
     }
 
     /*
