@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -48,6 +51,7 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 import net.sf.json.JSONObject;
 
 public class FreemarkerReplaceUI extends JFrame {
@@ -113,10 +117,12 @@ public class FreemarkerReplaceUI extends JFrame {
         executeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    Validate.notNull(keepFile.get(), "請先選擇腳本或儲存");
+
                     JSONObject jsonObj = JSONObject.fromObject(StringUtils.trimToEmpty(jsonArea.getText()));
                     Map<String, Object> root = JSONObject2CollectionUtil2.jsonToMap(jsonObj);
 
-                    File dir = new File(FileUtil.DESKTOP_DIR, "freemarker_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+                    File dir = new File(FileUtil.DESKTOP_DIR, getFileName(keepFile.get()));
                     dir.mkdirs();
 
                     String encoding = StringUtils.trimToEmpty(encodeText.getText());
@@ -218,6 +224,20 @@ public class FreemarkerReplaceUI extends JFrame {
         panel_10.add(panel_14, BorderLayout.EAST);
 
         recentFileList = new JList();
+        recentFileList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        FileZ fileZ = JListUtil.getLeadSelectionObject(recentFileList);
+                        keepFile.set(fileZ.file);
+                        loadFile(false);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
         panel_10.add(JCommonUtil.createScrollComponent(recentFileList), BorderLayout.CENTER);
 
         JPanel panel_15 = new JPanel();
@@ -254,6 +274,7 @@ public class FreemarkerReplaceUI extends JFrame {
                 try {
                     config.reflectSetConfig(FreemarkerReplaceUI.this);
                     config.store();
+                    JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -263,6 +284,7 @@ public class FreemarkerReplaceUI extends JFrame {
 
         {
             config.reflectInit(this);
+            reloadRecentFileList();
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
@@ -286,7 +308,7 @@ public class FreemarkerReplaceUI extends JFrame {
         JMenu mainMenu = JMenuAppender.newInstance("file").addMenuItem("load", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadFile();
+                loadFile(true);
                 appendToRecentFileList("", keepFile.get());
                 reloadRecentFileList();
             }
@@ -308,9 +330,17 @@ public class FreemarkerReplaceUI extends JFrame {
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);
     }
 
-    private void loadFile() {
+    private void loadFile(boolean isOpenDlg) {
         try {
-            File loadFile = JCommonUtil._jFileChooser_selectFileOnly();
+            File loadFile = null;
+            if (isOpenDlg) {
+                loadFile = JCommonUtil._jFileChooser_selectFileOnly();
+            } else {
+                loadFile = keepFile.get();
+                if (loadFile == null) {
+                    loadFile = JCommonUtil._jFileChooser_selectFileOnly();
+                }
+            }
             if (loadFile.exists()) {
                 Properties prop = new Properties();
                 prop.load(new FileInputStream(loadFile));
