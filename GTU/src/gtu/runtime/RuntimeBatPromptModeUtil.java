@@ -3,8 +3,10 @@ package gtu.runtime;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,6 +43,7 @@ public class RuntimeBatPromptModeUtil {
     }
 
     private StringBuffer cmd = new StringBuffer();
+    private boolean runInBatFile = true;
 
     private RuntimeBatPromptModeUtil() {
     }
@@ -62,6 +65,11 @@ public class RuntimeBatPromptModeUtil {
             this.cmd.append(cmd);
             this.cmd.append(chgLine);
         }
+        return this;
+    }
+
+    public RuntimeBatPromptModeUtil runInBatFile(boolean runInBatFile) {
+        this.runInBatFile = runInBatFile;
         return this;
     }
 
@@ -102,10 +110,17 @@ public class RuntimeBatPromptModeUtil {
             prefix = StringUtils.isBlank(prefix) ? "tmp_" : prefix;
 
             if (isWindows) {
-                File tmpBat = File.createTempFile(prefix, ".bat");
-                FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
-                System.out.println("tempBat : " + tmpBat);
-                return Runtime.getRuntime().exec(String.format("cmd /c start cmd /k \"%s\" ", tmpBat));
+                if (runInBatFile) {
+                    File tmpBat = File.createTempFile(prefix, ".bat");
+                    FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
+                    System.out.println("tempBat : " + tmpBat);
+                    return Runtime.getRuntime().exec(String.format("cmd /C start cmd /K \"%s\" ", tmpBat));
+                } else {
+                    File tmpBat = File.createTempFile(prefix, ".bat");
+                    FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
+                    System.out.println("tempBat : " + tmpBat);
+                    return Runtime.getRuntime().exec(String.format("cmd /C \"%s\" ", tmpBat));
+                }
             } else {
                 cmd.insert(0, "#!/bin/bash\r\n");
                 File tmpSh = File.createTempFile(prefix, ".sh");
@@ -117,5 +132,14 @@ public class RuntimeBatPromptModeUtil {
         } catch (Exception ex) {
             throw new RuntimeException("batRun ERR : " + ex.getMessage(), ex);
         }
+    }
+
+    private List<String> getCommandList() {
+        String[] arry = cmd != null ? cmd.toString().split("\n", -1) : new String[0];
+        return new ArrayList<String>(Arrays.asList(arry));
+    }
+
+    public String getCommand() {
+        return this.cmd != null ? this.cmd.toString() : "";
     }
 }

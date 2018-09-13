@@ -11,7 +11,7 @@
 	<property name="main_class_full" value="gtu.jpg.FileToBmpUtilUI" />
 	<property name="main_class" value="FileToBmpUtilUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="tk_aiengine.ico" />
+	<property name="icon_name" value="hacker.ico" />
 	<!--${main_class}-->
 
 
@@ -175,16 +175,16 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-			<jar destfile="${main_class}.jar" basedir="${build_dir}">
-				<manifest>
-					<attribute name="Main-Class" value="${main_class_full}" />
-				</manifest>
-			</jar>
-			-->
+					<jar destfile="${main_class}.jar" basedir="${build_dir}">
+						<manifest>
+							<attribute name="Main-Class" value="${main_class_full}" />
+						</manifest>
+					</jar>
+					-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<include name="**/*" />
 			</zipfileset>
 			<manifest>

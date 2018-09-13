@@ -9,8 +9,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -30,6 +32,7 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.json.JSONObject2CollectionUtil2;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
@@ -43,6 +46,9 @@ public class FreemarkerReplaceUI extends JFrame {
     private JTextArea jsonArea;
     private JTextField filePathText;
     private JList filePathList;
+    private JList recentFileList;
+    private PropertiesUtilBean config = new PropertiesUtilBean(FreemarkerReplaceUI.class);
+    private AtomicReference<File> keepFile = new AtomicReference<File>();
 
     /**
      * Launch the application.
@@ -180,6 +186,25 @@ public class FreemarkerReplaceUI extends JFrame {
 
         panel_1.add(JCommonUtil.createScrollComponent(filePathList), BorderLayout.CENTER);
 
+        JPanel panel_10 = new JPanel();
+        tabbedPane.addTab("最近載入", null, panel_10, null);
+        panel_10.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_11 = new JPanel();
+        panel_10.add(panel_11, BorderLayout.NORTH);
+
+        JPanel panel_12 = new JPanel();
+        panel_10.add(panel_12, BorderLayout.WEST);
+
+        JPanel panel_13 = new JPanel();
+        panel_10.add(panel_13, BorderLayout.SOUTH);
+
+        JPanel panel_14 = new JPanel();
+        panel_10.add(panel_14, BorderLayout.EAST);
+
+        recentFileList = new JList();
+        panel_10.add(JCommonUtil.createScrollComponent(recentFileList), BorderLayout.CENTER);
+
         {
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
@@ -196,58 +221,153 @@ public class FreemarkerReplaceUI extends JFrame {
         JMenu mainMenu = JMenuAppender.newInstance("file").addMenuItem("load", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    File loadFile = JCommonUtil._jFileChooser_selectFileOnly();
-                    if (loadFile.exists()) {
-                        Properties prop = new Properties();
-                        prop.load(new FileInputStream(loadFile));
-                        if (prop.containsKey("json")) {
-                            jsonArea.setText(StringUtils.trimToEmpty(prop.getProperty("json")));
-                        }
-                        StringBuilder errSb = new StringBuilder();
-                        DefaultListModel model = new DefaultListModel();
-                        for (int ii = 0; ii < 1000; ii++) {
-                            if (prop.containsKey("file" + ii)) {
-                                File file = new File(prop.getProperty("file" + ii));
-                                if (!file.exists()) {
-                                    errSb.append(file.getAbsolutePath() + "\n");
-                                } else {
-                                    model.addElement(file);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        filePathList.setModel(model);
-                        JCommonUtil._jOptionPane_showMessageDialog_info("載入成功 \n FileNotFound : " + errSb);
-                    }
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
-                }
+                loadFile();
+                appendToRecentFileList("", keepFile.get());
+                reloadRecentFileList();
             }
         }).addMenuItem("save", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    Properties prop = new Properties();
-                    prop.setProperty("json", StringUtils.trimToEmpty(jsonArea.getText()));
-                    DefaultListModel model = (DefaultListModel) filePathList.getModel();
-                    for (int ii = 0; ii < model.getSize(); ii++) {
-                        File f = (File) model.getElementAt(ii);
-                        prop.setProperty("file" + ii, f.getAbsolutePath());
-                    }
-                    File saveFile = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
-                    if (!prop.isEmpty()) {
-                        prop.store(new FileOutputStream(saveFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
-                        JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
-                    } else {
-                        JCommonUtil._jOptionPane_showMessageDialog_error("儲存失敗！");
-                    }
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
-                }
+                saveFileAs(false);
+                appendToRecentFileList("", keepFile.get());
+                reloadRecentFileList();
+            }
+        }).addMenuItem("save As", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveFileAs(true);
+                appendToRecentFileList("", keepFile.get());
+                reloadRecentFileList();
             }
         }).addChildrenMenu(menu1).getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);
+    }
+
+    private void loadFile() {
+        try {
+            File loadFile = JCommonUtil._jFileChooser_selectFileOnly();
+            if (loadFile.exists()) {
+                Properties prop = new Properties();
+                prop.load(new FileInputStream(loadFile));
+                if (prop.containsKey("json")) {
+                    jsonArea.setText(StringUtils.trimToEmpty(prop.getProperty("json")));
+                }
+                StringBuilder errSb = new StringBuilder();
+                DefaultListModel model = new DefaultListModel();
+                for (int ii = 0; ii < 1000; ii++) {
+                    if (prop.containsKey("file" + ii)) {
+                        File file = new File(prop.getProperty("file" + ii));
+                        if (!file.exists()) {
+                            errSb.append(file.getAbsolutePath() + "\n");
+                        } else {
+                            model.addElement(file);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                filePathList.setModel(model);
+                keepFileSet(loadFile);
+                JCommonUtil._jOptionPane_showMessageDialog_info("載入成功 \n FileNotFound : " + errSb);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void keepFileSet(File file) {
+        keepFile.set(file);
+        setTitle(getFileName(file));
+    }
+
+    private void saveFileAs(boolean saveToTarget) {
+        try {
+            Properties prop = new Properties();
+            prop.setProperty("json", StringUtils.trimToEmpty(jsonArea.getText()));
+            DefaultListModel model = (DefaultListModel) filePathList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                File f = (File) model.getElementAt(ii);
+                prop.setProperty("file" + ii, f.getAbsolutePath());
+            }
+            File saveFile = null;
+            if (saveToTarget) {
+                saveFile = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
+            } else {
+                if (keepFile.get() == null) {
+                    saveFile = JCommonUtil._jFileChooser_selectFileOnly_saveFile();
+                } else {
+                    saveFile = keepFile.get();
+                }
+            }
+            if (!prop.isEmpty()) {
+                prop.store(new FileOutputStream(saveFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
+                keepFileSet(saveFile);
+                JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_error("儲存失敗！");
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void appendToRecentFileList(String title, File configFile) {
+        try {
+            if (!(recentFileList.getModel() instanceof DefaultListModel)) {
+                DefaultListModel model = new DefaultListModel();
+                recentFileList.setModel(model);
+            }
+            if (StringUtils.isBlank(title)) {
+                title = getFileName(configFile);
+            }
+            config.getConfigProp().setProperty(title, configFile.getAbsolutePath());
+            config.store();
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void reloadRecentFileList() {
+        DefaultListModel model = new DefaultListModel();
+        for (Enumeration<?> enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            File file = new File(config.getConfigProp().getProperty(key));
+            if (file.exists()) {
+                String title = getFileName(file);
+                if (!StringUtils.equals(key, title)) {
+                    model.addElement(new FileZ(key, file));
+                } else {
+                    model.addElement(new FileZ(title, file));
+                }
+            }
+        }
+        recentFileList.setModel(model);
+    }
+
+    private String getFileName(File file) {
+        int pos = file.getName().lastIndexOf(".");
+        String name = file.getName();
+        if (pos != -1) {
+            name = name.substring(0, pos);
+        }
+        return name;
+    }
+
+    private class FileZ {
+        String title;
+        File file;
+
+        private FileZ(String title, File file) {
+            this.title = title;
+            if (StringUtils.isBlank(title)) {
+                this.title = getFileName(this.file);
+            }
+            this.file = file;
+        }
+
+        @Override
+        public String toString() {
+            return title;
+        }
     }
 }

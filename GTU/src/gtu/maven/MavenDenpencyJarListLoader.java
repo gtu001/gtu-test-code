@@ -1,5 +1,6 @@
 package gtu.maven;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.IOUtils;
 
 import gtu.file.FileUtil;
 import gtu.runtime.ProcessWatcher;
@@ -24,10 +26,17 @@ public class MavenDenpencyJarListLoader {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        File pomFile = new File("‪/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml");
-        File mavenDir = new File("/media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn"); // System.getenv("M2_HOME")
-
+    public static void main(String[] args) throws IOException, InterruptedException {
+        // File pomFile = new
+        // File("‪/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml");
+        // File mavenDir = new
+        // File("/media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn"); //
+        // System.getenv("M2_HOME")
+        // //-----------------------------------------------------------------
+        File pomFile = new File("‪D:/workstuff/gtu-test-code/GTU/pom.xml");
+        File mavenDir = new File("D:/apps/apache-maven-3.3.9/bin/mvn"); //
+        // System.getenv("M2_HOME")
+        // -----------------------------------------------------------------
         List<String> jarLst = MavenDenpencyJarListLoader.newInstance()//
                 .pomFile(pomFile)//
                 .mavenExePath(mavenDir)//
@@ -35,6 +44,7 @@ public class MavenDenpencyJarListLoader {
         for (String jarPath : jarLst) {
             System.out.println("\t" + jarPath);
         }
+        System.out.println("done...");
     }
 
     private File pomFile;
@@ -72,9 +82,13 @@ public class MavenDenpencyJarListLoader {
             RuntimeBatPromptModeUtil execdo = RuntimeBatPromptModeUtil.newInstance();
             execdo.command(String.format("cd %s", FileUtil.replaceSpecialChar(pomFile.getParent())));
             if (isWindows) {
+                execdo.runInBatFile(false);
                 execdo.command(rootPath);
             }
             execdo.command((isWindows ? "" : "sh ") + FileUtil.replaceSpecialChar(mavenExePath.getAbsolutePath()) + " dependency:build-classpath -DincludeScope=runtime");
+            System.out.println("----------------------------------------");
+            System.out.println(execdo.getCommand());
+            System.out.println("----------------------------------------");
 
             Process exec = execdo.apply();
             ProcessWatcher _inst = ProcessWatcher.newInstance(exec);
