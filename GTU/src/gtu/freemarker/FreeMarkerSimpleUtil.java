@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.URLTemplateLoader;
 import freemarker.template.Configuration;
@@ -120,12 +122,16 @@ public class FreeMarkerSimpleUtil {
         }
     }
 
-    public static void replace(File file, Map<String, Object> root, OutputStream outputStream) {
+    public static void replace(File file, Map<String, Object> root, OutputStream outputStream, String encode) {
         try {
             Configuration cfg = new Configuration();
 
             String defaultEncode = cfg.getEncoding(cfg.getLocale());
             System.out.println("!!!!!defaultEncode == " + defaultEncode);
+            if (StringUtils.isNotBlank(encode)) {
+                defaultEncode = encode;
+            }
+            cfg.setEncoding(cfg.getLocale(), defaultEncode);
 
             if (!file.isFile()) {
                 throw new IllegalArgumentException("not a file! : " + file);
@@ -136,7 +142,7 @@ public class FreeMarkerSimpleUtil {
 
             Template temp = cfg.getTemplate(file.getName());
 
-            Writer out = new OutputStreamWriter(outputStream);
+            Writer out = new OutputStreamWriter(outputStream, encode);
             temp.process(root, out);
             out.flush();
         } catch (Exception ex) {

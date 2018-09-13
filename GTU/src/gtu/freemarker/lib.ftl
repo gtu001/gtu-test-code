@@ -13,9 +13,9 @@
 <#setting date_format="yyyyMMdd">
 <#setting time_format="HHmmss">
 <#setting datetime_format="yyyyMMddHHmmss">
-<#macro mingoDate date>¥Á°ê${date[0..3]?number-1911}¦~${date[4..5]?number}¤ë${date[6..7]?number}¤é</#macro>
+<#macro mingoDate date>æ°‘åœ‹${date[0..3]?number-1911}å¹´${date[4..5]?number}æœˆ${date[6..7]?number}æ—¥</#macro>
 
-<#-- ¥Á°ê¦~ -->
+<#-- æ°‘åœ‹å¹´ -->
 <#function mingoDate1 date>
         <#if date?is_date>
                 <#local nd=date?date>
@@ -27,10 +27,10 @@
         <#local year=nd[0..3]?number-1911>
         <#local month=nd[4..5]?number>
         <#local dddd=nd[6..7]?number>
-        <#return "${year}¦~${month}¤ë${dddd}¤é">
+        <#return "${year}å¹´${month}æœˆ${dddd}æ—¥">
 </#function>
 
-<#-- ¦è¤¸¦~ -->
+<#-- è¥¿å…ƒå¹´ -->
 <#function ciDate1 date>
         <#if date?is_date>
                 <#local nd=date?date>

@@ -9,14 +9,20 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -27,6 +33,11 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
@@ -49,6 +60,8 @@ public class FreemarkerReplaceUI extends JFrame {
     private JList recentFileList;
     private PropertiesUtilBean config = new PropertiesUtilBean(FreemarkerReplaceUI.class);
     private AtomicReference<File> keepFile = new AtomicReference<File>();
+    private JTextField encodeText;
+    private JTextField baseDirText;
 
     /**
      * Launch the application.
@@ -106,10 +119,12 @@ public class FreemarkerReplaceUI extends JFrame {
                     File dir = new File(FileUtil.DESKTOP_DIR, "freemarker_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
                     dir.mkdirs();
 
+                    String encoding = StringUtils.trimToEmpty(encodeText.getText());
+
                     for (int ii = 0; ii < filePathList.getModel().getSize(); ii++) {
                         File tempFile = (File) filePathList.getModel().getElementAt(ii);
                         FileOutputStream fos = new FileOutputStream(new File(dir, tempFile.getName()));
-                        FreeMarkerSimpleUtil.replace(tempFile, root, fos);
+                        FreeMarkerSimpleUtil.replace(tempFile, root, fos, encoding);
                     }
 
                     JCommonUtil._jOptionPane_showMessageDialog_info("done...");
@@ -205,7 +220,49 @@ public class FreemarkerReplaceUI extends JFrame {
         recentFileList = new JList();
         panel_10.add(JCommonUtil.createScrollComponent(recentFileList), BorderLayout.CENTER);
 
+        JPanel panel_15 = new JPanel();
+        tabbedPane.addTab("設定", null, panel_15, null);
+        panel_15.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        RowSpec.decode("default:grow"), }));
+
+        JLabel lblNewLabel_1 = new JLabel("基本目錄");
+        panel_15.add(lblNewLabel_1, "2, 2, right, default");
+
+        baseDirText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(baseDirText, true);
+        panel_15.add(baseDirText, "4, 2, fill, default");
+        baseDirText.setColumns(10);
+
+        JLabel lblNewLabel = new JLabel("編碼");
+        panel_15.add(lblNewLabel, "2, 4, right, default");
+
+        encodeText = new JTextField();
+        panel_15.add(encodeText, "4, 4, fill, default");
+        encodeText.setColumns(10);
+
+        JPanel panel_16 = new JPanel();
+        panel_15.add(panel_16, "4, 26, fill, fill");
+
+        JButton saveConfigBtn = new JButton("儲存設定");
+        saveConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    config.reflectSetConfig(FreemarkerReplaceUI.this);
+                    config.store();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_16.add(saveConfigBtn);
+
         {
+            config.reflectInit(this);
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
@@ -214,6 +271,14 @@ public class FreemarkerReplaceUI extends JFrame {
         }
 
         this.setTitle("You Set My World On Fire");
+    }
+
+    private boolean isIgnoreKey(String key) {
+        List<String> lst = new ArrayList<String>();
+        for (Field f : FreemarkerReplaceUI.class.getDeclaredFields()) {
+            lst.add(f.getName());
+        }
+        return lst.contains(key);
     }
 
     private void applyAppMenu() {
@@ -256,7 +321,7 @@ public class FreemarkerReplaceUI extends JFrame {
                 DefaultListModel model = new DefaultListModel();
                 for (int ii = 0; ii < 1000; ii++) {
                     if (prop.containsKey("file" + ii)) {
-                        File file = new File(prop.getProperty("file" + ii));
+                        File file = this.getConfigFile(prop, "file" + ii);
                         if (!file.exists()) {
                             errSb.append(file.getAbsolutePath() + "\n");
                         } else {
@@ -287,7 +352,7 @@ public class FreemarkerReplaceUI extends JFrame {
             DefaultListModel model = (DefaultListModel) filePathList.getModel();
             for (int ii = 0; ii < model.getSize(); ii++) {
                 File f = (File) model.getElementAt(ii);
-                prop.setProperty("file" + ii, f.getAbsolutePath());
+                prop.setProperty("file" + ii, getRelativePath(f));
             }
             File saveFile = null;
             if (saveToTarget) {
@@ -320,7 +385,7 @@ public class FreemarkerReplaceUI extends JFrame {
             if (StringUtils.isBlank(title)) {
                 title = getFileName(configFile);
             }
-            config.getConfigProp().setProperty(title, configFile.getAbsolutePath());
+            config.getConfigProp().setProperty(title, getRelativePath(configFile));
             config.store();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -331,7 +396,10 @@ public class FreemarkerReplaceUI extends JFrame {
         DefaultListModel model = new DefaultListModel();
         for (Enumeration<?> enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
             String key = (String) enu.nextElement();
-            File file = new File(config.getConfigProp().getProperty(key));
+            if (isIgnoreKey(key)) {
+                continue;
+            }
+            File file = getConfigFile(config.getConfigProp(), key);
             if (file.exists()) {
                 String title = getFileName(file);
                 if (!StringUtils.equals(key, title)) {
@@ -351,6 +419,35 @@ public class FreemarkerReplaceUI extends JFrame {
             name = name.substring(0, pos);
         }
         return name;
+    }
+
+    private File getConfigFile(Properties prop, String key) {
+        String path = prop.getProperty(key);
+        System.out.println("getConfigFile = " + key + " -> " + path);
+        File f1 = new File(path);
+        if (f1.exists()) {
+            return f1;
+        }
+        String baseDirPath = StringUtils.trimToEmpty(baseDirText.getText());
+        f1 = new File(baseDirPath, path);
+        if (f1.exists()) {
+            return f1;
+        }
+        throw new RuntimeException("找不到路徑 : " + f1.getAbsolutePath());
+    }
+
+    private String getRelativePath(File file) {
+        String baseDirPath = StringUtils.trimToEmpty(baseDirText.getText());
+        Pattern ptn = Pattern.compile("\\Q" + baseDirPath + "\\E(.*)");
+        Matcher mth = ptn.matcher(file.getAbsolutePath());
+        if (mth.find()) {
+            String fixPath = FileUtil.fixPath(mth.group(1), true);
+            System.out.println("getRelativePath = " + fixPath);
+            return fixPath;
+        }
+        String fixPath = FileUtil.fixPath(file.getAbsolutePath(), true);
+        System.out.println("getRelativePath = " + fixPath);
+        return fixPath;
     }
 
     private class FileZ {
