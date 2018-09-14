@@ -431,14 +431,18 @@ public class FreemarkerReplaceUI extends JFrame {
             if (isIgnoreKey(key)) {
                 continue;
             }
-            File file = getConfigFile(config.getConfigProp(), key);
-            if (file.exists()) {
-                String title = getFileName(file);
-                if (!StringUtils.equals(key, title)) {
-                    model.addElement(new FileZ(key, file));
-                } else {
-                    model.addElement(new FileZ(title, file));
+            try {
+                File file = getConfigFile(config.getConfigProp(), key);
+                if (file.exists()) {
+                    String title = getFileName(file);
+                    if (!StringUtils.equals(key, title)) {
+                        model.addElement(new FileZ(key, file));
+                    } else {
+                        model.addElement(new FileZ(title, file));
+                    }
                 }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
             }
         }
         recentFileList.setModel(model);

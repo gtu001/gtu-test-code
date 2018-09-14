@@ -1,0 +1,8 @@
+
+ctrl + shift + P 
+
+安裝
+	ConvertToUTF8
+	Codecs33
+	
+重開
