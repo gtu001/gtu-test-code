@@ -70,3 +70,14 @@
 	</#list>
 	<#return lst>
 </#function>
+
+
+<#-- 取得系統日 -->
+<#function sysdate format="">
+        <#if (format?has_content)>
+                <#local rtn = .now?string(format)>
+        <#else>
+                <#local rtn = .now?string('yyyy/MM/dd')>
+        </#if>
+        <#return rtn>
+</#function>
