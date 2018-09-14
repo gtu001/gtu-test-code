@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,8 +33,6 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameUtil;
-
-import javax.swing.JCheckBox;
 
 public class FileToBmpUtilUI extends JFrame {
 
@@ -101,7 +100,7 @@ public class FileToBmpUtilUI extends JFrame {
                 try {
                     File file = JCommonUtil.filePathCheck(srcFileText.getText(), "檔案來源", false);
                     initToBmpText();
-                    widthText.setText(String.valueOf(FileToBmpUtilVer2.getInstance().getWidth(file)));
+                    widthText.setText(String.valueOf(FileToBmpUtilVer3.getInstance().getWidth(file)));
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -134,7 +133,7 @@ public class FileToBmpUtilUI extends JFrame {
                         Validate.isTrue(false, "寬度有誤");
                     }
                     int width = Integer.parseInt(widthText.getText());
-                    FileToBmpUtilVer2.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
+                    FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生圖檔成功 : " + toBmpFile);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -210,11 +209,16 @@ public class FileToBmpUtilUI extends JFrame {
                 try {
                     File srcBmpFile = JCommonUtil.filePathCheck(srcBmpText.getText(), "BMP檔案來源", "bmp");
                     File toFile = new File(toFileText.getText());
-                    int fileSize = Integer.parseInt(indicateSizeText.getText());
+                    int fileSize = 0;
+                    try {
+                        fileSize = Integer.parseInt(indicateSizeText.getText());
+                    } catch (Exception ex) {
+                        System.out.println("fileSize ERR : " + ex.getMessage());
+                    }
                     if (!toFile.getParentFile().exists()) {
                         toFile.getParentFile().mkdirs();
                     }
-                    FileToBmpUtilVer2.getInstance().getFileFromImage(srcBmpFile, fileSize, toFile);
+                    FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 : " + toFile);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);

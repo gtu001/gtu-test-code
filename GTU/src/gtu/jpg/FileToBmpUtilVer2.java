@@ -16,12 +16,21 @@ public class FileToBmpUtilVer2 {
     public static void main(String[] args) throws IOException {
         FileToBmpUtilVer2 t = FileToBmpUtilVer2.getInstance();
 
-        int width = t.getWidth(new File("E:/my_tool/EnglishSearchUI/EnglishSearchUI.exe"));
-        int fileLength = t.buildImageFromFile(new File("E:/my_tool/EnglishSearchUI/EnglishSearchUI.exe"), new File(FileUtil.DESKTOP_DIR, "ttttt.bmp"), true, width);
+        int width = t.getWidth(new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.001"));
+        int fileLength = t.buildImageFromFile(//
+                new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.001"), //
+                new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.001.bmp"), true, width);
         System.out.println(fileLength);
 
-        t.getFileFromImage_FixName(new File(FileUtil.DESKTOP_DIR, "ttttt_7687994.bmp"), //
-                new File("C:/Users/gtu00/OneDrive/Desktop/xxxxx.jar"));
+        int width2 = t.getWidth(new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.002"));
+        int fileLength2 = t.buildImageFromFile(//
+                new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.002"), //
+                new File(FileUtil.DESKTOP_DIR, "FileToBmpUtilUI.7z.002.bmp"), true, width2);
+        System.out.println(fileLength2);
+
+        // t.getFileFromImage_FixName(new File(FileUtil.DESKTOP_DIR,
+        // "ttttt.bmp"), //
+        // new File(FileUtil.DESKTOP_DIR, "AlwaysOpenUI____2.exe"));
 
         System.out.println("done...");
     }
