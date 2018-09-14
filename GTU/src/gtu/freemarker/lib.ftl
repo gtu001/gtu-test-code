@@ -45,3 +45,28 @@
         <#return "${year}/${month}/${dddd}">
 </#function>
 
+<#-- 陣列串接 -->
+<#function listJoin list delimit>
+        <#local rtn = "">
+        <#list list as x>
+                <#if x?is_last>
+                        <#local rtn = rtn + x + ''>
+                <#else>
+                        <#local rtn = rtn + x + delimit>
+                </#if>
+        </#list>
+        <#return rtn>
+</#function>
+
+<#-- 建立新陣列 -->
+<#function fixArry list prefix suffix isCapitalize>
+	<#local lst = []>
+	<#list list as x>
+	        <#local x2 = x>
+	        <#if isCapitalize>
+	                <#local x2 = x?capitalize>
+	        </#if>
+		<#local lst = lst + [prefix + x2 + suffix]>
+	</#list>
+	<#return lst>
+</#function>
