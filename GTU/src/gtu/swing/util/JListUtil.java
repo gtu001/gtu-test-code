@@ -111,6 +111,14 @@ public class JListUtil {
     }
 
     public DefaultListModel getModel() {
+        if (!(jList1.getModel() instanceof DefaultListModel)) {
+            DefaultListModel model = new DefaultListModel();
+            for (int ii = 0; ii < jList1.getModel().getSize(); ii++) {
+                Object val = jList1.getModel().getElementAt(ii);
+                model.addElement(val);
+            }
+            jList1.setModel(model);
+        }
         return (DefaultListModel) jList1.getModel();
     }
 

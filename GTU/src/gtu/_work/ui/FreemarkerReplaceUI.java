@@ -172,11 +172,7 @@ public class FreemarkerReplaceUI extends JFrame {
         addPathBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (!(filePathList.getModel() instanceof DefaultListModel)) {
-                        DefaultListModel model = new DefaultListModel();
-                        filePathList.setModel(model);
-                    }
-                    DefaultListModel model = (DefaultListModel) filePathList.getModel();
+                    DefaultListModel model = (DefaultListModel) JListUtil.newInstance(filePathList).getModel();
                     File f = new File(filePathText.getText());
                     if (f.exists() && f.isFile() && f.canRead()) {
                         boolean findOk = false;
@@ -388,7 +384,7 @@ public class FreemarkerReplaceUI extends JFrame {
         try {
             Properties prop = new Properties();
             prop.setProperty("json", StringUtils.trimToEmpty(jsonArea.getText()));
-            DefaultListModel model = (DefaultListModel) filePathList.getModel();
+            DefaultListModel model = (DefaultListModel) JListUtil.newInstance(filePathList).getModel();
             for (int ii = 0; ii < model.getSize(); ii++) {
                 File f = (File) model.getElementAt(ii);
                 prop.setProperty("file" + ii, getRelativePath(f));
@@ -417,10 +413,7 @@ public class FreemarkerReplaceUI extends JFrame {
 
     private void appendToRecentFileList(String title, File configFile) {
         try {
-            if (!(recentFileList.getModel() instanceof DefaultListModel)) {
-                DefaultListModel model = new DefaultListModel();
-                recentFileList.setModel(model);
-            }
+            DefaultListModel model = (DefaultListModel) JListUtil.newInstance(recentFileList).getModel();
             if (StringUtils.isBlank(title)) {
                 title = getFileName(configFile);
             }
