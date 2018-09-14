@@ -58,6 +58,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JTableUtil;
+import net.sf.json.JSONArray;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -105,6 +106,11 @@ public class FastDBQueryUI extends JFrame {
     private JTextField dbNameIdText;
     private JLabel lblDbName;
     private JTextField sqlQueryText;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JPanel panel_10;
+    private JPanel panel_11;
+    private JTextArea queryResultJsonTextArea;
 
     /**
      * Launch the application.
@@ -237,6 +243,25 @@ public class FastDBQueryUI extends JFrame {
         queryResultTable = new JTable();
         panel_5.add(JTableUtil.getScrollPane(queryResultTable), BorderLayout.CENTER);
 
+        panel_7 = new JPanel();
+        tabbedPane.addTab("JSON", null, panel_7, null);
+        panel_7.setLayout(new BorderLayout(0, 0));
+
+        panel_8 = new JPanel();
+        panel_7.add(panel_8, BorderLayout.NORTH);
+
+        panel_9 = new JPanel();
+        panel_7.add(panel_9, BorderLayout.WEST);
+
+        panel_10 = new JPanel();
+        panel_7.add(panel_10, BorderLayout.SOUTH);
+
+        panel_11 = new JPanel();
+        panel_7.add(panel_11, BorderLayout.EAST);
+
+        queryResultJsonTextArea = new JTextArea();
+        panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
+
         panel_6 = new JPanel();
         tabbedPane.addTab("Connection", null, panel_6, null);
         panel_6.setLayout(new FormLayout(
@@ -298,10 +323,6 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_6.add(nextConnBtn, "6, 22");
-
-        panel_7 = new JPanel();
-        tabbedPane.addTab("New tab", null, panel_7, null);
-        panel_7.setLayout(new FormLayout(new ColumnSpec[] {}, new RowSpec[] {}));
 
         nextParameterBtn = new JButton("下一組設定");
         nextParameterBtn.addActionListener(new ActionListener() {
@@ -511,6 +532,7 @@ public class FastDBQueryUI extends JFrame {
             if (querySqlRadio.isSelected()) {
                 List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
                 this.queryModeProcess(queryList);
+                this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
                 int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
                 JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
@@ -529,6 +551,15 @@ public class FastDBQueryUI extends JFrame {
                 sqlParameterConfigLoad.saveConfig(paramMap2);
             }
         } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void showJsonArry(List<Map<String, Object>> queryList) {
+        try {
+            queryResultJsonTextArea.setText(JSONArray.fromObject(queryList).toString());
+        } catch (Exception ex) {
+            queryResultJsonTextArea.setText("");
             JCommonUtil.handleException(ex);
         }
     }

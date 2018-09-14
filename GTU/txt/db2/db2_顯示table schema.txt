@@ -7,11 +7,12 @@ DESCRIBE TABLE test.bill_user
 
 
 --顯示表結構
-SELECT DISTINCT
-    (t.name),
-    t.ColType,
-    t.Length
-FROM
-    Sysibm.syscolumns t
-WHERE
-    t.tbname = 'BILL_USER';
+SELECT
+	(t.name),
+	t.coltype,
+	t.remarks,
+	t.nulls,
+	t.length
+FROM Sysibm.syscolumns t
+WHERE t.tbname = 'DTXXTP01'
+	and t.TBCREATOR = 'DBXX'

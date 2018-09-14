@@ -109,10 +109,6 @@
 			<!--oracle
 			<packagename mode="small">oracle.jdbc.driver.OracleDriver</packagename>
 			-->
-			<!-- DB conn
-			<packagename mode="small">org.apache.commons.dbcp.BasicDataSource</packagename>
-			<packagename mode="small">org/apache/commons/pool/KeyedObjectPoolFactory</packagename>
-			 -->
 			<!-- spring jdbc  
 			<packagename mode="small">org.springframework.jdbc.support.JdbcUtils</packagename> 
 			<packagename mode="small">org.springframework.dao.DataAccessResourceFailureException</packagename> 
@@ -149,4 +145,12 @@
 		    <!-- log4j_g8
 		    <packagename mode="exact" name="logback-classic-1.0.13.jar">ch.qos.logback.classic.Logger</packagename>
 		    <packagename mode="exact" name="logback-core-1.0.13.jar">ch.qos.logback.core.joran.spi.JoranException</packagename>
-		     -->
+		    -->
+		    <!-- json
+		    <packagename mode="pom">net.sf.json.JSONObject</packagename>
+			<packagename mode="pom">net/sf/ezmorph/Morpher</packagename>
+			<packagename mode="pom">org/apache/commons/logging/LogFactory</packagename>
+			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
+			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
+			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+		    -->

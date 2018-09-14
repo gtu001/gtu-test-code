@@ -145,7 +145,16 @@ public class FreemarkerReplaceUI extends JFrame {
         panel.add(panel_5, BorderLayout.EAST);
 
         jsonArea = new JTextArea();
-        panel.add(jsonArea, BorderLayout.CENTER);
+        jsonArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_S) {
+                    System.out.println("do save");
+                    saveFileAs(false);
+                }
+            }
+        });
+        panel.add(JCommonUtil.createScrollComponent(jsonArea), BorderLayout.CENTER);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("Template", null, panel_1, null);
