@@ -42,7 +42,7 @@ public class KeyboardFocusSwingTest {
         frame.pack();
         frame.setLocation(150, 100);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 
             public boolean dispatchKeyEvent(KeyEvent ke) {

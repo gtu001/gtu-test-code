@@ -45,7 +45,7 @@ public class LogCatFilterUI extends JFrame {
             public void run() {
                 try {
                     LogCatFilterUI frame = new LogCatFilterUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

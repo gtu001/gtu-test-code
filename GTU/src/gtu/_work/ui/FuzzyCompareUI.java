@@ -57,7 +57,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             public void run() {
                 FuzzyCompareUI inst = new FuzzyCompareUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

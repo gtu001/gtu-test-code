@@ -74,7 +74,7 @@ public class EnglishAdd extends javax.swing.JFrame {
             public void run() {
                 EnglishAdd inst = new EnglishAdd();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }
@@ -208,7 +208,7 @@ public class EnglishAdd extends javax.swing.JFrame {
                         FileUtil.saveToFile(currentFile, words, "BIG5");
                     }
                     
-                    EnglishAdd.this.setVisible(false);
+                     gtu.swing.util.JFrameUtil.setVisible(false,EnglishAdd.this);
                     EnglishAdd.this.dispose();
                 }
             }

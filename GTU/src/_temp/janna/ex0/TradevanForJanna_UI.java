@@ -39,7 +39,7 @@ public class TradevanForJanna_UI extends JFrame {
             public void run() {
                 try {
                     TradevanForJanna_UI frame = new TradevanForJanna_UI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

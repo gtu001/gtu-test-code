@@ -181,8 +181,8 @@ public class EnglishSearchUI extends JFrame {
                         }
                     }
 
-                    if (FRAME.isVisible() && FRAME.searchEnglishIdTextController.isFocusOwner()) {
-                        FRAME.setVisible(false);
+                    if (gtu.swing.util.JFrameUtil.isVisible(FRAME) && FRAME.searchEnglishIdTextController.isFocusOwner()) {
+                        gtu.swing.util.JFrameUtil.setVisible(false, FRAME);
                     } else {
                         FRAME.bringToTop();
                     }
@@ -506,8 +506,8 @@ public class EnglishSearchUI extends JFrame {
                     System.out.println("DEL00000000000000000000000000000000");
                     clearAllInput();
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    if (EnglishSearchUI.this.isVisible()) {
-                        EnglishSearchUI.this.setVisible(false);
+                    if (gtu.swing.util.JFrameUtil.isVisible(EnglishSearchUI.this)) {
+                        gtu.swing.util.JFrameUtil.setVisible(false, EnglishSearchUI.this);
                     }
                 }
             }
@@ -685,7 +685,7 @@ public class EnglishSearchUI extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 if (lostFocusHiddenChk.isSelected()) {
-                    EnglishSearchUI.this.setVisible(false);
+                    gtu.swing.util.JFrameUtil.setVisible(false, EnglishSearchUI.this);
                 }
             }
 
@@ -1269,8 +1269,9 @@ public class EnglishSearchUI extends JFrame {
                     e.getKeyCode() == NativeKeyEvent.VC_X) {
                 startNewUI();
             } else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                // if(EnglishSearchUI.this.isVisible()) {
-                // EnglishSearchUI.this.setVisible(false);
+                // if(EnglishSearchUI.gtu.swing.util.JFrameUtil.isVisible(this))
+                // {
+                // gtu.swing.util.JFrameUtil.setVisible(false,EnglishSearchUI.this);
                 // }
             }
         }

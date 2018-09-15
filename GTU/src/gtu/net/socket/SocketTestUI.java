@@ -65,7 +65,7 @@ public class SocketTestUI extends javax.swing.JFrame {
 			public void run() {
 				SocketTestUI inst = new SocketTestUI();
 				inst.setLocationRelativeTo(null);
-				inst.setVisible(true);
+ 				gtu.swing.util.JFrameUtil.setVisible(true,inst);
 			}
 		});
 	}

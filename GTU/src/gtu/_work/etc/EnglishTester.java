@@ -145,7 +145,7 @@ public class EnglishTester extends javax.swing.JFrame {
                 EnglishTester inst = new EnglishTester();
 //                inst.setLocationRelativeTo(null);
                 JCommonUtil.setLocationToRightBottomCorner(inst);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }
@@ -1278,7 +1278,7 @@ public class EnglishTester extends javax.swing.JFrame {
                 // jTabbedPane1.setSelectedIndex(tabSelectedCombo.getSelectedIndex());//
                 // 設定顯示英文還中文
 
-                if(!EnglishTester.this.isVisible()){
+                if(!EnglishTester.gtu.swing.util.JFrameUtil.isVisible(this)){
                     setVisible(true);
                 }
 
@@ -1332,7 +1332,7 @@ public class EnglishTester extends javax.swing.JFrame {
             showPicDialog.setLocation((int) this.getLocation().getX(), (int) this.getLocation().getY());
         }
         if (show == false) {
-            showPicDialog.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,showPicDialog);
             return;
         } else {
             // 設定圖片背景
@@ -1345,11 +1345,11 @@ public class EnglishTester extends javax.swing.JFrame {
                 showPicDialog.getjPanel1().setImage(image);
                 showPicDialog.repaint();
 
-                if (!showPicDialog.isVisible()) {
-                    showPicDialog.setVisible(true);
+                if (!gtu.swing.util.JFrameUtil.isVisible(showPicDialog)) {
+                     gtu.swing.util.JFrameUtil.setVisible(true,showPicDialog);
                 }
             } else {
-                showPicDialog.setVisible(false);
+                 gtu.swing.util.JFrameUtil.setVisible(false,showPicDialog);
             }
         }
     }

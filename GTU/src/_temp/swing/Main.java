@@ -35,7 +35,7 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocation(100, 100);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 
     public static void main(String[] args) {

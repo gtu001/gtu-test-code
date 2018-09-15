@@ -120,7 +120,7 @@ public class FastDBQueryUI extends JFrame {
             public void run() {
                 try {
                     FastDBQueryUI frame = new FastDBQueryUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

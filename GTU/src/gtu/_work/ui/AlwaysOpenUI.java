@@ -47,7 +47,7 @@ public class AlwaysOpenUI extends JFrame {
             public void run() {
                 try {
                     AlwaysOpenUI frame = new AlwaysOpenUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

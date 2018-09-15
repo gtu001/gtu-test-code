@@ -73,7 +73,7 @@ public class ThreadGroupMointerUI extends javax.swing.JFrame {
             public void run() {
                 ThreadGroupMointerUI inst = new ThreadGroupMointerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }
@@ -487,7 +487,7 @@ public class ThreadGroupMointerUI extends javax.swing.JFrame {
                     for (ThreadMointerUI uui : mointerList) {
                         if (uui.getThread() == thread || uui.getReloadThread() == thread) {
                             Log.debug("!!!!! exists thread mointer : " + uui);
-                            uui.setVisible(true);
+                             gtu.swing.util.JFrameUtil.setVisible(true,uui);
                             findExistsUi = true;
                         }
                     }

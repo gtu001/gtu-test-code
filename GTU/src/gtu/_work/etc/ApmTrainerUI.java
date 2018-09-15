@@ -63,7 +63,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             public void run() {
                 ApmTrainerUI inst = new ApmTrainerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

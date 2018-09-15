@@ -247,7 +247,7 @@ public class StoryReaderUI extends JFrame {
             public void run() {
                 try {
                     StoryReaderUI frame = new StoryReaderUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -365,7 +365,7 @@ public class StoryReaderUI extends JFrame {
                     savepoint();
                     loadAndSyncConfigProp();
                 }
-                StoryReaderUI.this.setVisible(false);
+                 gtu.swing.util.JFrameUtil.setVisible(false,StoryReaderUI.this);
                 StoryReaderUI.this.dispose();
                 System.exit(0);
             }

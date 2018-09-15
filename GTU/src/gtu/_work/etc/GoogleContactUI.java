@@ -58,7 +58,7 @@ public class GoogleContactUI extends javax.swing.JFrame {
             public void run() {
                 GoogleContactUI inst = new GoogleContactUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

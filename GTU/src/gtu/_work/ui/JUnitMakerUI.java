@@ -48,7 +48,7 @@ public class JUnitMakerUI extends javax.swing.JFrame {
             public void run() {
                 JUnitMakerUI inst = new JUnitMakerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

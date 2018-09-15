@@ -52,7 +52,7 @@ public class SqlReplacerUI extends javax.swing.JFrame {
             public void run() {
                 SqlReplacerUI inst = new SqlReplacerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

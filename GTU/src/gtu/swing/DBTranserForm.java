@@ -253,7 +253,7 @@ public class DBTranserForm extends javax.swing.JDialog {
                     }
                 });
 
-                dialog.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,dialog);
             }
         });
     }

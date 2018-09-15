@@ -44,7 +44,7 @@ public class FileNameReplacerUI extends JFrame {
             public void run() {
                 try {
                     FileNameReplacerUI frame = new FileNameReplacerUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -39,7 +39,7 @@ public class LookAndFeelUtil extends javax.swing.JFrame {
             public void run() {
                 LookAndFeelUtil inst = new LookAndFeelUtil();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

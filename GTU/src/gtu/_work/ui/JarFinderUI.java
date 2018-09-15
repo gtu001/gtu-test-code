@@ -72,7 +72,7 @@ public class JarFinderUI extends javax.swing.JFrame {
             public void run() {
                 JarFinderUI inst = new JarFinderUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

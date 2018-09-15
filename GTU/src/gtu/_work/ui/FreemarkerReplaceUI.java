@@ -46,6 +46,7 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.json.JSONObject2CollectionUtil2;
+import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -78,7 +79,7 @@ public class FreemarkerReplaceUI extends JFrame {
             public void run() {
                 try {
                     FreemarkerReplaceUI frame = new FreemarkerReplaceUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

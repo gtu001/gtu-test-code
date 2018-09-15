@@ -58,7 +58,7 @@ public class StringArrayMakerUI extends javax.swing.JFrame {
             public void run() {
                 StringArrayMakerUI inst = new StringArrayMakerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

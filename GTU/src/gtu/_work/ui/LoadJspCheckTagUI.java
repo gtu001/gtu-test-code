@@ -65,7 +65,7 @@ public class LoadJspCheckTagUI extends javax.swing.JFrame {
             public void run() {
                 LoadJspCheckTagUI inst = new LoadJspCheckTagUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

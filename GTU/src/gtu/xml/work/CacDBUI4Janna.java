@@ -52,7 +52,7 @@ public class CacDBUI4Janna extends javax.swing.JFrame {
             public void run() {
                 CacDBUI4Janna inst = new CacDBUI4Janna();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

@@ -52,7 +52,7 @@ public class InformixDBTestUI extends javax.swing.JFrame {
             public void run() {
                 InformixDBTestUI inst = new InformixDBTestUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

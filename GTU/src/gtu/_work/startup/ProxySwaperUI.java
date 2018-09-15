@@ -36,7 +36,7 @@ public class ProxySwaperUI extends javax.swing.JFrame {
             public void run() {
                 ProxySwaperUI inst = new ProxySwaperUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

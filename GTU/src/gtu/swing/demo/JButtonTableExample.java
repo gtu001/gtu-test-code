@@ -44,7 +44,7 @@ public class JButtonTableExample {
         frame.add(scroll);
 
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 
     public static void main(String[] args) {

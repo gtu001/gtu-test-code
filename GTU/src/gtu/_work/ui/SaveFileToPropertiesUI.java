@@ -73,7 +73,7 @@ public class SaveFileToPropertiesUI extends javax.swing.JFrame {
             public void run() {
                 SaveFileToPropertiesUI inst = new SaveFileToPropertiesUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

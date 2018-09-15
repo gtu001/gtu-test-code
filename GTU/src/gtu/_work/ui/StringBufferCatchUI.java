@@ -31,7 +31,7 @@ public class StringBufferCatchUI extends JFrame {
             public void run() {
                 try {
                     StringBufferCatchUI frame = new StringBufferCatchUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

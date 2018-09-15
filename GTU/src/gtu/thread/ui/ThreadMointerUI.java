@@ -571,7 +571,7 @@ public class ThreadMointerUI extends JFrame {
 
     public ThreadMointerUI startWatch() {
         Log.debug("startWatch thread : " + thread);
-        this.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,this);
         mointerThread = new Thread(threadGroupReal, new Runnable() {
             public void run() {
                 for (;;) {

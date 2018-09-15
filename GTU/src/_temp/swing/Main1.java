@@ -19,7 +19,7 @@ public class Main1 {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(mainPanelGen.getMainPanel());
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 }
 
@@ -57,7 +57,7 @@ class MainPanelGen {
                     dialog.setLocationRelativeTo(null);
                 }
             }
-            dialog.setVisible(true); // here the modal dialog takes over
+             gtu.swing.util.JFrameUtil.setVisible(true,dialog); // here the modal dialog takes over
             System.out.println(dialogPanel.getFieldText());
             field.setText(dialogPanel.getFieldText());
         }

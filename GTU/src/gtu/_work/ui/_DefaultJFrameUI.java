@@ -50,7 +50,7 @@ public class _DefaultJFrameUI extends javax.swing.JFrame {
             public void run() {
                 _DefaultJFrameUI inst = new _DefaultJFrameUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

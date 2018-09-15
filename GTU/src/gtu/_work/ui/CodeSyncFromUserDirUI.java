@@ -39,7 +39,7 @@ public class CodeSyncFromUserDirUI extends JFrame {
             public void run() {
                 try {
                     CodeSyncFromUserDirUI frame = new CodeSyncFromUserDirUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

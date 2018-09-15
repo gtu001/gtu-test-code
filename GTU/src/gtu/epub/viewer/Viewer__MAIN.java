@@ -106,7 +106,7 @@ public class Viewer__MAIN {
         result.add(mainPanel);
         result.pack();
         setLayout(Layout.TocContentMeta);
-        result.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,result);
         return result;
     }
 

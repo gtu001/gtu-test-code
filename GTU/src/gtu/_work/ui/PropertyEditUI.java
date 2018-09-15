@@ -102,7 +102,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
             public void run() {
                 PropertyEditUI inst = new PropertyEditUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

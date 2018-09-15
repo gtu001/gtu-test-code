@@ -66,7 +66,7 @@ public class RenameUI extends javax.swing.JFrame {
             public void run() {
                 RenameUI inst = new RenameUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

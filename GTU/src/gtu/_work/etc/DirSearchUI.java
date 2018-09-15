@@ -63,7 +63,7 @@ public class DirSearchUI extends JFrame {
             public void run() {
                 try {
                     DirSearchUI frame = new DirSearchUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

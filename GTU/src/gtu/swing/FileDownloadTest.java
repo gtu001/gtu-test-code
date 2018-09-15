@@ -36,7 +36,7 @@ public class FileDownloadTest {
         dw.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // 設置表單為可見
-        dw.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,dw);
     }
 }
 

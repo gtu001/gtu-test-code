@@ -84,7 +84,7 @@ public class SqlCreaterUI extends javax.swing.JFrame {
             public void run() {
                 SqlCreaterUI inst = new SqlCreaterUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

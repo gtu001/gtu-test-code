@@ -62,7 +62,7 @@ public class DimensionUI extends javax.swing.JFrame {
             public void run() {
                 DimensionUI inst = new DimensionUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
         System.out.println("done...");

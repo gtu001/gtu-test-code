@@ -798,7 +798,7 @@ public class WebFileScanUtil implements Serializable {
         log.trace("# openSource ...");
         List<PageInfo> redirectCompleteList = queryPageInfo(redirect);
         if (redirectCompleteList != null) {
-            WebFileScanUtilBrowserUI.getInstance().sourceFileList(redirectCompleteList).setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,WebFileScanUtilBrowserUI.getInstance().sourceFileList(redirectCompleteList));
         }
         return null;
     }

@@ -126,7 +126,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             public void run() {
                 MavenRepositoryUI inst = new MavenRepositoryUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

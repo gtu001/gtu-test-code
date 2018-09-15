@@ -99,7 +99,7 @@ public class SvnLastestCommitInfoUI extends javax.swing.JFrame {
             public void run() {
                 SvnLastestCommitInfoUI inst = new SvnLastestCommitInfoUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

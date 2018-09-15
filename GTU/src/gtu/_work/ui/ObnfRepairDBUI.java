@@ -62,7 +62,7 @@ public class ObnfRepairDBUI extends javax.swing.JFrame {
             public void run() {
                 ObnfRepairDBUI inst = new ObnfRepairDBUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

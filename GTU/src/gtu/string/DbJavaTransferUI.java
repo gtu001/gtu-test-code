@@ -44,7 +44,7 @@ public class DbJavaTransferUI extends javax.swing.JFrame {
             public void run() {
                 DbJavaTransferUI inst = new DbJavaTransferUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

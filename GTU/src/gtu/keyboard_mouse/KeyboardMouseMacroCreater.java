@@ -529,13 +529,13 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
             System.out.println("啟動錄製");
             this.initialize();// 啟動錄製
             trayShowMessage("啟動錄製");
-            KeyboardMouseMacroOperater.PROGRESS_INFO.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,KeyboardMouseMacroOperater.PROGRESS_INFO);
             return;
         }
         System.out.println("結束錄製");
         startTime = -1;
         trayShowMessage("結束錄製");
-        KeyboardMouseMacroOperater.PROGRESS_INFO.setVisible(false);
+         gtu.swing.util.JFrameUtil.setVisible(false,KeyboardMouseMacroOperater.PROGRESS_INFO);
         this.writeMacroData();
 
         if (getAfterWriteMacroData() != null) {

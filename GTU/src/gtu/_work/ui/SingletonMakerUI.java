@@ -44,7 +44,7 @@ public class SingletonMakerUI extends JFrame {
             public void run() {
                 try {
                     SingletonMakerUI frame = new SingletonMakerUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -65,7 +65,7 @@ public class ServletWatcherUI extends javax.swing.JFrame {
      */
     public static void main(String[] args) {
         ServletWatcherUI inst = new ServletWatcherUI();
-        inst.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,inst);
     }
 
     public ServletWatcherUI() {

@@ -37,7 +37,7 @@ public class SCSB_Fetch_Tool_UI extends JFrame {
             public void run() {
                 try {
                     SCSB_Fetch_Tool_UI frame = new SCSB_Fetch_Tool_UI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -30,7 +30,7 @@ public class GoogleTranslateSimpleUI extends JFrame {
             public void run() {
                 try {
                     GoogleTranslateSimpleUI frame = new GoogleTranslateSimpleUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

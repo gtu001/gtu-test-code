@@ -36,7 +36,7 @@ public class TestURLImage {
                     f.getContentPane().add(label);
                     f.pack();
                     f.setLocation(200, 200);
-                    f.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,f);
                 } catch (Exception exp) {
                     exp.printStackTrace();
                 }

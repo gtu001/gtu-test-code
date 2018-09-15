@@ -65,7 +65,7 @@ public class RegexTestUI extends javax.swing.JFrame {
             public void run() {
                 RegexTestUI inst = new RegexTestUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

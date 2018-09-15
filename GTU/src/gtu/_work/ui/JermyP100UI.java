@@ -47,7 +47,7 @@ public class JermyP100UI extends javax.swing.JFrame {
             public void run() {
                 JermyP100UI inst = new JermyP100UI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

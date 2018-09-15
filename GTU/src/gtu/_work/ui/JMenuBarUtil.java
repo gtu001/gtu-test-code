@@ -81,6 +81,6 @@ public class JMenuBarUtil {
         
         JCommonUtil.setJFrameCenter(frame);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 }

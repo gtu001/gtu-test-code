@@ -41,7 +41,7 @@ public class IISI_Report_For_Janna extends JFrame {
             public void run() {
                 try {
                     IISI_Report_For_Janna frame = new IISI_Report_For_Janna();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -129,7 +129,7 @@ public class ImageUtil {
         frame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         frame.setLocationRelativeTo(null);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 
     public void showImage(Icon icon) {
@@ -138,7 +138,7 @@ public class ImageUtil {
         frame.getContentPane().add(new JLabel(icon));
         frame.setLocationRelativeTo(null);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 
     public Icon imageToIcon(Image image) {

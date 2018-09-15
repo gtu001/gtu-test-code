@@ -57,7 +57,7 @@ public class FileToBmpUtilUI extends JFrame {
             public void run() {
                 try {
                     FileToBmpUtilUI frame = new FileToBmpUtilUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

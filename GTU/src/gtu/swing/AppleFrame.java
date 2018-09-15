@@ -36,7 +36,7 @@ public class AppleFrame extends JFrame {
 		this.add(panel);
 		this.add(button);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,this);
 
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

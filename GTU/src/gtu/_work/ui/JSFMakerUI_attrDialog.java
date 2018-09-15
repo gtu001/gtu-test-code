@@ -52,7 +52,7 @@ public class JSFMakerUI_attrDialog extends javax.swing.JDialog {
             public void run() {
                 JFrame frame = new JFrame();
                 JSFMakerUI_attrDialog inst = new JSFMakerUI_attrDialog(frame);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

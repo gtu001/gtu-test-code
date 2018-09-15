@@ -43,7 +43,7 @@ public class SocketClient {
                 }
             }
         });
-        f.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,f);
         try {
 //            Socket s = new Socket("127.0.0.1", 8189);
             Socket s = new Socket("127.0.0.1", 6666);

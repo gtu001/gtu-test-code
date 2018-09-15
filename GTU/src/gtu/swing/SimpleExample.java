@@ -400,7 +400,7 @@ public class SimpleExample extends JPanel {
             }
 
             SimpleExample panel = new SimpleExample();
-            SimpleExample.frame.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,SimpleExample.frame);
             SimpleExample.frame.getContentPane().removeAll();
             SimpleExample.frame.setJMenuBar(panel.createMenuBar());
             SimpleExample.frame.getContentPane().add("Center", panel);
@@ -423,6 +423,6 @@ public class SimpleExample extends JPanel {
         frame.setJMenuBar(panel.createMenuBar());
         frame.getContentPane().add("Center", panel);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
     }
 }

@@ -44,7 +44,7 @@ public class AutocompleteJComboBox extends JComboBox {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.add(v1);
         f.pack();
-        f.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,f);
     }
 
     public static class StringSearchable<T> {

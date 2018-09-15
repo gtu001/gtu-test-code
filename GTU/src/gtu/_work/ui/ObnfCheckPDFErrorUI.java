@@ -48,7 +48,7 @@ public class ObnfCheckPDFErrorUI extends javax.swing.JFrame {
             public void run() {
                 ObnfCheckPDFErrorUI inst = new ObnfCheckPDFErrorUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

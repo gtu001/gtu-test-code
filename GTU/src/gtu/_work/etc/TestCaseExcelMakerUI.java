@@ -64,7 +64,7 @@ public class TestCaseExcelMakerUI extends javax.swing.JFrame {
             public void run() {
                 TestCaseExcelMakerUI inst = new TestCaseExcelMakerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

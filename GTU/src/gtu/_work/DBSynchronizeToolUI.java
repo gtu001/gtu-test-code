@@ -52,7 +52,7 @@ public class DBSynchronizeToolUI extends JFrame {
             public void run() {
                 try {
                     DBSynchronizeToolUI frame = new DBSynchronizeToolUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

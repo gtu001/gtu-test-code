@@ -109,7 +109,7 @@ public class ObnfInsertCreaterUI extends javax.swing.JFrame {
             public void run() {
                 ObnfInsertCreaterUI inst = new ObnfInsertCreaterUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

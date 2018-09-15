@@ -70,7 +70,7 @@ public class ObnfExceptionLogDownloadUI extends javax.swing.JFrame {
             public void run() {
                 ObnfExceptionLogDownloadUI inst = new ObnfExceptionLogDownloadUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

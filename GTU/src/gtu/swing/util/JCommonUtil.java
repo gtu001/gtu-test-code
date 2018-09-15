@@ -289,7 +289,7 @@ public class JCommonUtil {
                         if (action != null) {
                             action.actionPerformed(new ActionEvent(jframe, -1, "close"));
                         }
-                        jframe.setVisible(false);
+                         gtu.swing.util.JFrameUtil.setVisible(false,jframe);
                         jframe.dispose();
                         System.exit(0);
                     }
@@ -297,7 +297,7 @@ public class JCommonUtil {
                     if (action != null) {
                         action.actionPerformed(new ActionEvent(jframe, -1, "close"));
                     }
-                    jframe.setVisible(false);
+                     gtu.swing.util.JFrameUtil.setVisible(false,jframe);
                     jframe.dispose();
                     System.exit(0);
                 }
@@ -350,7 +350,7 @@ public class JCommonUtil {
             jframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
                     // TODO
-                    jframe.setVisible(false);
+                     gtu.swing.util.JFrameUtil.setVisible(false,jframe);
                     jframe.dispose();
                 }
             });

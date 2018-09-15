@@ -60,7 +60,7 @@ public class LoadJavaCheckImportUI extends javax.swing.JFrame {
             public void run() {
                 LoadJavaCheckImportUI inst = new LoadJavaCheckImportUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

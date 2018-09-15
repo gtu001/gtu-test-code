@@ -65,7 +65,7 @@ public class FileFinder extends javax.swing.JFrame {
             public void run() {
                 FileFinder inst = new FileFinder();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

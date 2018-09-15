@@ -84,7 +84,7 @@ public class _3DSMovieRenamer extends javax.swing.JFrame {
             public void run() {
                 _3DSMovieRenamer inst = new _3DSMovieRenamer();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

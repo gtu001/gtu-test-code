@@ -129,7 +129,7 @@ public class UpdateCode extends Frame implements MouseListener, WindowListener, 
         this.addWindowListener(this);
         this.addMouseListener(this);
         this.setTitle("更新程式匯出工具");
-        this.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,this);
     }
 
     public void itemStateChanged(java.awt.event.ItemEvent arg0) {

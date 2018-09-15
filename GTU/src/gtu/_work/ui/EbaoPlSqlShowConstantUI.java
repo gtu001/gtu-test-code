@@ -37,7 +37,7 @@ public class EbaoPlSqlShowConstantUI extends JFrame {
             public void run() {
                 try {
                     EbaoPlSqlShowConstantUI frame = new EbaoPlSqlShowConstantUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -81,7 +81,7 @@ public class ExceptionLogFinderUI extends javax.swing.JFrame {
             public void run() {
                 ExceptionLogFinderUI inst = new ExceptionLogFinderUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

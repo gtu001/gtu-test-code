@@ -67,7 +67,7 @@ public class DownloadMoveUI extends javax.swing.JFrame {
 			public void run() {
 				DownloadMoveUI inst = new DownloadMoveUI();
 				inst.setLocationRelativeTo(null);
-				inst.setVisible(true);
+ 				gtu.swing.util.JFrameUtil.setVisible(true,inst);
 			}
 		});
 	}

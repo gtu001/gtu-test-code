@@ -79,7 +79,7 @@ public class RegexCatchReplacer_Ebao extends javax.swing.JFrame {
             public void run() {
                 RegexCatchReplacer_Ebao inst = new RegexCatchReplacer_Ebao();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

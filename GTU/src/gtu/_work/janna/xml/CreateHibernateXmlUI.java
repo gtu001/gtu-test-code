@@ -63,7 +63,7 @@ public class CreateHibernateXmlUI extends javax.swing.JFrame {
             public void run() {
                 CreateHibernateXmlUI inst = new CreateHibernateXmlUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

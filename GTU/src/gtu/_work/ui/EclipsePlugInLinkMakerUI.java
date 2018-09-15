@@ -55,7 +55,7 @@ public class EclipsePlugInLinkMakerUI extends javax.swing.JFrame {
                 EclipsePlugInLinkMakerUI inst = new EclipsePlugInLinkMakerUI();
                 inst.service = new EclipsePlugInLinkMaker();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

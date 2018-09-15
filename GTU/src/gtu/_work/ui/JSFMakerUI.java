@@ -73,7 +73,7 @@ public class JSFMakerUI extends javax.swing.JFrame {
             public void run() {
                 JSFMakerUI inst = new JSFMakerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }
@@ -220,10 +220,10 @@ public class JSFMakerUI extends javax.swing.JFrame {
                                                 return;
                                             }
                                             final JSFMakerUI_attrDialog dialog = new JSFMakerUI_attrDialog(thisFrame);
-                                            dialog.setVisible(true);
+                                             gtu.swing.util.JFrameUtil.setVisible(true,dialog);
                                             new Thread(new Runnable() {
                                                 public void run() {
-                                                    for (; dialog.isVisible();) {
+                                                    for (;gtu.swing.util.JFrameUtil.isVisible( dialog)) {
                                                         try {
                                                             Thread.sleep(300);
                                                         } catch (InterruptedException e) {

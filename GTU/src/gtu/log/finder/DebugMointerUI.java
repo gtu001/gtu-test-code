@@ -528,7 +528,7 @@ public class DebugMointerUI {
         // 重設mointerObject下拉
         inst.initMointerObjects();
 
-        if ((!inst.uiCarrier.get_ui().isVisible() || inst.isAutoExecute.get()) && inst.isEnabledUI) {
+        if ((!inst.uiCarrier.gtu.swing.util.JFrameUtil.isVisible(get_ui()) || inst.isAutoExecute.get()) && inst.isEnabledUI) {
             inst.uiCarrier.get_ui().setLocationRelativeTo(null);
             inst.setVisible(!inst.isAutoExecute.get());// 有問題
 
@@ -553,7 +553,7 @@ public class DebugMointerUI {
 
     private static void displayStatus() {
         getLogger().debug("## - isEnabledUI = " + inst.isEnabledUI);
-        getLogger().debug("## - inst.isVisible() = " + inst.uiCarrier.get_ui().isVisible());
+        getLogger().debug("## -gtu.swing.util.JFrameUtil.isVisible( inst) = " + inst.uiCarrier.gtu.swing.util.JFrameUtil.isVisible(get_ui()));
         getLogger().debug("## - isAutoExecute = " + inst.isAutoExecute);
         getLogger().debug("## - inst.isExecuteComplete = " + inst.isExecuteComplete);
         getLogger().debug("## - isAutoExecuteMappingMethod = " + inst.isAutoExecuteMappingMethod);
@@ -632,7 +632,7 @@ public class DebugMointerUI {
             inst.importClassBtnActionPerformed(true);
             inst.executeImportClass(true, true);
 
-            inst.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,inst);
 
             if (inst.indicateExecuteConfig != null) {
                 inst.isAutoExecute.set(false);
@@ -642,7 +642,7 @@ public class DebugMointerUI {
             inst.isAutoExecute.set(false);// 有問題
             inst.isExecuteComplete.set(false);
             inst.updateSysTrayPopupMenuLabel();
-            inst.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,inst);
 
             // JCommonUtil.setFrameAtop(inst, false);
 
@@ -835,10 +835,10 @@ public class DebugMointerUI {
             inst.importClassBtnActionPerformed(true);
             inst.executeImportClass(true, false);
 
-            inst.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,inst);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
-            inst.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,inst);
         }
     }
 
@@ -1694,7 +1694,7 @@ public class DebugMointerUI {
                 public void actionPerformed(ActionEvent arg0) {
                     if (inst.isEnabledUI) {
                         inst.isEnabledUI = false;
-                        DebugMointerUI.inst.setVisible(false);
+                         gtu.swing.util.JFrameUtil.setVisible(false,DebugMointerUI.inst);
                     } else {
                         inst.isEnabledUI = true;
                     }
@@ -1718,8 +1718,8 @@ public class DebugMointerUI {
                         inst.isAutoExecute.set(false);
                     } else {
                         inst.isAutoExecute.set(true);
-                        if (uiCarrier.get_ui().isVisible()) {
-                            inst.setVisible(false);
+                        if (uiCarrier.gtu.swing.util.JFrameUtil.isVisible(get_ui())) {
+                             gtu.swing.util.JFrameUtil.setVisible(false,inst);
                             if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("現在是否立即執行?", "自動啟動")) {
                                 autoExecutePlugIn();
                             } else {
@@ -1794,7 +1794,7 @@ public class DebugMointerUI {
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            inst.setVisible(true);
+                             gtu.swing.util.JFrameUtil.setVisible(true,inst);
                         }
                     }, new ActionListener() {
                         @Override

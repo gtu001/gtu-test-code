@@ -45,7 +45,7 @@ public class MQDecodeUI extends javax.swing.JFrame {
             public void run() {
                 MQDecodeUI inst = new MQDecodeUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

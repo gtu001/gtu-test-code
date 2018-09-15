@@ -7,9 +7,36 @@ import java.nio.channels.FileLock;
 
 import javax.swing.JFrame;
 
+import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtil;
 
 public class JFrameUtil {
+
+    public static void setVisible(boolean isShow, JFrame frame) {
+        if (OsInfoUtil.isWindows()) {
+            frame.setVisible(isShow);
+        } else {
+            if (isShow) {
+                frame.setVisible(true);
+                frame.setState(java.awt.Frame.NORMAL);
+            } else {
+                frame.setState(java.awt.Frame.ICONIFIED);
+            }
+        }
+    }
+
+    public static boolean isVisible(JFrame frame) {
+        if (OsInfoUtil.isWindows()) {
+            return frame.isVisible();
+        } else {
+            if (frame.getState() == java.awt.Frame.NORMAL) {
+                return true;
+            } else if (frame.getState() == java.awt.Frame.ICONIFIED) {
+                return false;
+            }
+        }
+        return false;
+    }
 
     public static JFrame createSimpleFrame(Class<?> clz) {
         JFrame frame = new JFrame();

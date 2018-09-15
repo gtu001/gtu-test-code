@@ -2,18 +2,21 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.jpg.FileToBmpUtilUI;
+import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
-import javax.swing.JTabbedPane;
 
 public class SwingTemplateUI extends JFrame {
 
@@ -31,7 +34,7 @@ public class SwingTemplateUI extends JFrame {
             public void run() {
                 try {
                     SwingTemplateUI frame = new SwingTemplateUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

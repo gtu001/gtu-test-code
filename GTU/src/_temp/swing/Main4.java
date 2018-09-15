@@ -19,7 +19,7 @@ public class Main4 {
         frame.add(Box.createRigidArea(new Dimension(400, 300)));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
 
         final JDialog dialog = new JDialog(frame, "Dialog", true);
 
@@ -38,7 +38,7 @@ public class Main4 {
         dialog.add(Box.createRigidArea(new Dimension(200, 200)));
         dialog.pack();
         dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,dialog);
 
     }
 }

@@ -48,7 +48,7 @@ public class ObnfJetDeleteUI extends javax.swing.JFrame {
             public void run() {
                 ObnfJetDeleteUI inst = new ObnfJetDeleteUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

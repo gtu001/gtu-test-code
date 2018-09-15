@@ -61,7 +61,7 @@ public class TradevanForJanna_TableSearchUI extends JFrame {
             public void run() {
                 try {
                     TradevanForJanna_TableSearchUI frame = new TradevanForJanna_TableSearchUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

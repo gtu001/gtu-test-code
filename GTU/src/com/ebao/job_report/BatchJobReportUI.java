@@ -72,7 +72,7 @@ public class BatchJobReportUI extends JFrame {
             public void run() {
                 try {
                     BatchJobReportUI frame = new BatchJobReportUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

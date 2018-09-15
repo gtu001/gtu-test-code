@@ -130,7 +130,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                             creater.startHook();
                         }
                     };
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -229,7 +229,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                                 for (int jj = 0; jj < defineList.size(); jj++) {
                                     totalTime += defineList.get(jj).duringTotalTime;
                                 }
-                                KeyboardMouseMacroOperater.this.setVisible(true);
+                                 gtu.swing.util.JFrameUtil.setVisible(true,KeyboardMouseMacroOperater.this);
                                 KeyboardMouseMacroOperater.this.setExtendedState(JFrame.NORMAL);
                                 sysutil.displayMessage("Macro Operater", "[群組]操作結束! : " + totalTime, MessageType.WARNING);
                             }
@@ -349,7 +349,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
             // dialog.setSize(new Dimension(400, 75));
             // JCommonUtil.setFrameAtop(dialog, true);
             // JCommonUtil.setLocationToRightBottomCorner(dialog);
-            // dialog.setVisible(false);
+             // gtu.swing.util.JFrameUtil.setVisible(false,dialog);
 
             dialog = new JDialog();
             dialog.setModalityType(ModalityType.MODELESS);
@@ -358,7 +358,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
             dialog.setContentPane(textarea);
             dialog.setSize(new Dimension(400, 75));
             JCommonUtil.setLocationToRightBottomCorner(dialog);
-            dialog.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,dialog);
             dialog.pack();
             dialog.addFocusListener(new FocusListener() {
                 @Override
@@ -374,7 +374,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
 
         public void setVisible(boolean visible) {
 //             dialog.setVisible(visible);
-            dialog.setVisible(false);
+             gtu.swing.util.JFrameUtil.setVisible(false,dialog);
         }
 
         public void setText(String text) {
@@ -554,7 +554,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                 }
             };
 
-            PROGRESS_INFO.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,PROGRESS_INFO);
             runner.run();
         }
 
@@ -901,10 +901,10 @@ public class KeyboardMouseMacroOperater extends JFrame {
     }
 
     private void bringToTop() {
-        PROGRESS_INFO.setVisible(false);
+         gtu.swing.util.JFrameUtil.setVisible(false,PROGRESS_INFO);
 
         this.initList();
-        this.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,this);
         this.setState(java.awt.Frame.NORMAL);
         this.toFront();
         this.repaint();

@@ -54,7 +54,7 @@ public class ManyToManyCreaterTest_appenderUI extends JFrame {
             public void run() {
                 try {
                     ManyToManyCreaterTest_appenderUI frame = new ManyToManyCreaterTest_appenderUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                     frame.baseDirText.setText("D:/workstuff/workspace_taida/isa95-model");
                 } catch (Exception e) {
                     e.printStackTrace();

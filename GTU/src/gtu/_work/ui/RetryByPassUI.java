@@ -59,7 +59,7 @@ public class RetryByPassUI extends javax.swing.JFrame {
             public void run() {
                 RetryByPassUI inst = new RetryByPassUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

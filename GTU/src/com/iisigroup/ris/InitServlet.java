@@ -115,8 +115,8 @@ public class InitServlet extends HttpServlet {
             this.request = request;
             this.response = response;
 
-            servletWaterUI.setVisible(true);
-            while (servletWaterUI.isVisible()) {
+             gtu.swing.util.JFrameUtil.setVisible(true,servletWaterUI);
+            while (gtu.swing.util.JFrameUtil.isVisible(servletWaterUI)) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

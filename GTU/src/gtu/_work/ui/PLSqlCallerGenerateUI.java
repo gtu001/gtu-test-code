@@ -37,7 +37,7 @@ public class PLSqlCallerGenerateUI extends JFrame {
             public void run() {
                 try {
                     PLSqlCallerGenerateUI frame = new PLSqlCallerGenerateUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

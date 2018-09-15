@@ -167,7 +167,7 @@ public class JDK6Browser extends JFrame implements HyperlinkListener {
 
     public static void main(String[] args) {
         JDK6Browser browser = new JDK6Browser();
-        browser.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,browser);
     }
 
     protected void radioChange(ActionEvent evt) {
@@ -226,7 +226,7 @@ public class JDK6Browser extends JFrame implements HyperlinkListener {
                 e.printStackTrace();
             }
         }
-        jdk6menu.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,jdk6menu);
     }
 
     private enum BasePath {

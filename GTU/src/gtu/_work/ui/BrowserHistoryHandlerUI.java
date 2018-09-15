@@ -101,6 +101,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.net.https.SimpleHttpsUtil;
+import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
@@ -125,7 +126,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-//    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -161,7 +163,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             public void run() {
                 try {
                     BrowserHistoryHandlerUI frame = new BrowserHistoryHandlerUI();
-                    frame.setVisible(true);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -1804,15 +1806,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         @Override
-        public void nativeKeyPressed(NativeKeyEvent paramNativeKeyEvent) {
+        public void nativeKeyPressed(NativeKeyEvent parazzmNativeKeyEvent) {
         }
 
         private void startNewUI() {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     try {
-                        if (BrowserHistoryHandlerUI.this.isShowing()) {
-                            BrowserHistoryHandlerUI.this.setVisible(false);
+                        if (JFrameUtil.isVisible(BrowserHistoryHandlerUI.this)) {
+                            gtu.swing.util.JFrameUtil.setVisible(false, BrowserHistoryHandlerUI.this);
                         } else {
                             bringToTop();
                         }

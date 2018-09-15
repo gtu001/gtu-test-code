@@ -19,7 +19,7 @@ public class GetColor extends JFrame {
         Colors clr = new Colors("file:///D:/workstuff/workspace/gtu-test-code/GTU/nicePic.JPG");
         this.add(clr);
         this.setSize(220, 120);
-        this.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,this);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

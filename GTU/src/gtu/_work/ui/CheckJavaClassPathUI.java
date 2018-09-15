@@ -78,7 +78,7 @@ public class CheckJavaClassPathUI extends javax.swing.JFrame {
             public void run() {
                 CheckJavaClassPathUI inst = new CheckJavaClassPathUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

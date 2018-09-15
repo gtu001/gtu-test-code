@@ -61,7 +61,7 @@ public class GUIUtil {
 			processOnSwingEventThread(new Runnable() {
 				public void run() {
 					fr.moveToFront();
-					fr.setVisible(true);
+ 					gtu.swing.util.JFrameUtil.setVisible(true,fr);
 					try {
 						fr.setSelected(true);
 						if (fr.isIcon()) {

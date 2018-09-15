@@ -34,7 +34,7 @@ public class HighGuiHelper {
             JFrame frame = new JFrame(title);
             frame.getContentPane().add(new JLabel(new ImageIcon(bufImage)));
             frame.pack();
-            frame.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,frame);
         } catch (Exception e) {
             throw new RuntimeException("imshow ERR : " + e.getMessage(), e);
         }

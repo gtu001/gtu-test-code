@@ -58,7 +58,7 @@ public class JLabelUtil {
         lbl.setText(lblText);
         frame.add(lbl);
         frame.pack();
-        frame.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,frame);
 
         System.out.println("done...");
     }

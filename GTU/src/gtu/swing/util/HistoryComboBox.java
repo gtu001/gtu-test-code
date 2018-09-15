@@ -88,7 +88,7 @@ public class HistoryComboBox extends PlainDocument {
                 frame.setDefaultCloseOperation(3);
                 frame.getContentPane().add(comboBox);
                 frame.pack();
-                frame.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,frame);
             }
         });
     }

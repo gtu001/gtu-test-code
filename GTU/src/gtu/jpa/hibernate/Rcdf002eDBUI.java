@@ -74,7 +74,7 @@ public class Rcdf002eDBUI extends javax.swing.JFrame {
             public void run() {
                 Rcdf002eDBUI inst = new Rcdf002eDBUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

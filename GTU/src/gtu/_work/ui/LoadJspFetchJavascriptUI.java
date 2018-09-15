@@ -62,7 +62,7 @@ public class LoadJspFetchJavascriptUI extends javax.swing.JFrame {
 			public void run() {
 				LoadJspFetchJavascriptUI inst = new LoadJspFetchJavascriptUI();
 				inst.setLocationRelativeTo(null);
-				inst.setVisible(true);
+ 				gtu.swing.util.JFrameUtil.setVisible(true,inst);
 			}
 		});
 	}

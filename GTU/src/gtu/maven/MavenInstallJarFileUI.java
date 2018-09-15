@@ -42,7 +42,7 @@ public class MavenInstallJarFileUI extends JFrame {
             public void run() {
                 try {
                     MavenInstallJarFileUI frame = new MavenInstallJarFileUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

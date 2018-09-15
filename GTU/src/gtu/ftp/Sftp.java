@@ -476,7 +476,7 @@ public class Sftp{
       JPanel p=new JPanel();
       p.add(progressBar);
       frame.getContentPane().add(progressBar);
-      frame.setVisible(true);
+       gtu.swing.util.JFrameUtil.setVisible(true,frame);
       System.out.println("!info:"+info+", max="+max+" "+progressBar);
     }
     public void count(long count){
@@ -487,7 +487,7 @@ public class Sftp{
     public void end(){
       System.out.println("end");
       progressBar.setValue((int)this.max);
-      frame.setVisible(false);
+       gtu.swing.util.JFrameUtil.setVisible(false,frame);
     }
   }
 */

@@ -37,7 +37,7 @@ public class EasyTextButtonSwing extends JFrame {
 
 		this.add(panel1);
 
-		this.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,this);
 	}
 
 	private class ButtonListener implements ActionListener {

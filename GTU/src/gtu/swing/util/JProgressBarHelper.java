@@ -160,7 +160,7 @@ public class JProgressBarHelper {
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                if (parentFrame != null && parentFrame.isVisible()) {
+                if (parentFrame != null &&gtu.swing.util.JFrameUtil.isVisible( parentFrame)) {
                     Point newLoc = dlg.getLocation();
 
                     boolean setBackLoc = false;
@@ -241,6 +241,6 @@ public class JProgressBarHelper {
 
         frame.add(btn);
         frame.pack();
-        frame.setVisible(true);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
     }
 }

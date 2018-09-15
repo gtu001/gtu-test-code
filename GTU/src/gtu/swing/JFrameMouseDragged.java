@@ -36,7 +36,7 @@ public class JFrameMouseDragged extends JPanel {
 		ch.addMouseMotionListener(mml);
 
 		frame.pack();
-		frame.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,frame);
 	}
 }
 

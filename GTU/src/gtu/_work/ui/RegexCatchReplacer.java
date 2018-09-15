@@ -73,7 +73,7 @@ public class RegexCatchReplacer extends javax.swing.JFrame {
             public void run() {
                 RegexCatchReplacer inst = new RegexCatchReplacer();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

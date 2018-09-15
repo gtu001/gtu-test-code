@@ -54,7 +54,7 @@ public class JFrameTest {
 
 		test.setting(f);
 
-		f.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,f);
 
 		test.showExistsFrameInfo();
 
@@ -150,7 +150,7 @@ public class JFrameTest {
 
 			public void windowClosing(WindowEvent e) {
 				if (JOptionPane.showConfirmDialog(null, "確定關閉?") == JOptionPane.YES_OPTION) {
-					frame.setVisible(false);
+ 					gtu.swing.util.JFrameUtil.setVisible(false,frame);
 					frame.dispose();
 				}
 			}

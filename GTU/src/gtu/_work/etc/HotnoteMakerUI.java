@@ -60,7 +60,7 @@ public class HotnoteMakerUI extends javax.swing.JFrame {
             public void run() {
                 HotnoteMakerUI inst = new HotnoteMakerUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

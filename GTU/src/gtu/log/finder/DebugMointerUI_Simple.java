@@ -44,7 +44,7 @@ public class DebugMointerUI_Simple extends JFrame {
             public void run() {
                 try {
                     DebugMointerUI_Simple frame = new DebugMointerUI_Simple();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -166,8 +166,8 @@ public class DebugMointerUI_Simple extends JFrame {
             DebugMointerUI_Simple frame = new DebugMointerUI_Simple();
             frame.checkPropConfigExist();
             frame.lookupArray = lookupArray;
-            frame.setVisible(true);
-            while (frame.isVisible()) {
+             gtu.swing.util.JFrameUtil.setVisible(true,frame);
+            while (gtu.swing.util.JFrameUtil.isVisible(frame)) {
                 Thread.sleep(100);
             }
             return (T) frame.returnObject;

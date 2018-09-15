@@ -142,7 +142,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             public void run() {
                 ExecuteOpener inst = new ExecuteOpener();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

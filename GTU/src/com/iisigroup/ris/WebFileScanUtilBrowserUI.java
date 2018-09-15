@@ -62,7 +62,7 @@ public class WebFileScanUtilBrowserUI extends javax.swing.JFrame {
         //		PageInfo page = new PageInfo(f, f.getName(), f.getAbsolutePath(), f.getAbsolutePath(), f);
         //		list.add(page);
         ui.sourceFileList(list);
-        ui.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,ui);
     }
 
     public static WebFileScanUtilBrowserUI getInstance() {

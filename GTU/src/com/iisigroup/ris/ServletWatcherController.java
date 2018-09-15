@@ -42,9 +42,9 @@ public class ServletWatcherController implements Serializable {
                     .getRequest();
             initServlet.response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext()
                     .getResponse();
-            servletWaterUI.setVisible(true);
+             gtu.swing.util.JFrameUtil.setVisible(true,servletWaterUI);
             long startTime = System.currentTimeMillis();
-            while (servletWaterUI.isVisible()) {
+            while (gtu.swing.util.JFrameUtil.isVisible(servletWaterUI)) {
                 Thread.sleep(500);
                 if (System.currentTimeMillis() - startTime > 60000) {
                     log.debug("!!start swing over 60 sec, exit!!");

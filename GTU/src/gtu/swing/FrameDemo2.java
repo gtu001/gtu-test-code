@@ -108,7 +108,7 @@ public class FrameDemo2 extends WindowAdapter implements ActionListener {
 
 		// Show window.
 		frame.setSize(new Dimension(170, 100));
-		frame.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,frame);
 	}
 
 	// Create the window-creation controls that go in the main window.
@@ -288,7 +288,7 @@ public class FrameDemo2 extends WindowAdapter implements ActionListener {
 		// Display the window.
 		frame.pack();
 		frame.setLocationRelativeTo(null); // center it
-		frame.setVisible(true);
+ 		gtu.swing.util.JFrameUtil.setVisible(true,frame);
 	}
 
 	// Start the demo.

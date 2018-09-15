@@ -29,7 +29,7 @@ public class Main5 extends JPanel {
         Point location = analyzer.getLocation();
         location = new Point(location.x - LOC_SHIFT, location.y - LOC_SHIFT);
         analyzer.setLocation(location);
-        analyzer.setVisible(true);
+        gtu.swing.util.JFrameUtil.setVisible(true, analyzer);
 
         add(new JButton(new AbstractAction(DISABLE_DIALOG_COMPONENTS) {
             @Override
@@ -66,7 +66,7 @@ public class Main5 extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(mainPanel);
         frame.pack();
-        frame.setVisible(true);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
     }
 }
 

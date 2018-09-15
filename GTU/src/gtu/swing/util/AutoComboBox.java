@@ -267,7 +267,7 @@ public class AutoComboBox extends PlainDocument {
                 frame.getContentPane().add(comboBox);
                 JCommonUtil.setJFrameCenter(frame);
                 frame.pack();
-                frame.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,frame);
             }
         });
     }

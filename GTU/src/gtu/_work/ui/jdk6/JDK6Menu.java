@@ -145,6 +145,6 @@ public class JDK6Menu extends JFrame {
 
     public static void main(String[] args) throws IOException {
         JDK6Menu browser = new JDK6Menu();
-        browser.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,browser);
     }
 }

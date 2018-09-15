@@ -224,7 +224,7 @@ public class BaseApplet extends Frame implements MouseListener, WindowListener, 
         this.addWindowListener(this);
         this.addMouseListener(this);
         this.addKeyListener(this);
-        this.setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,this);
     }
 
     /**

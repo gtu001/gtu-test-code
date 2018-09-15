@@ -72,7 +72,7 @@ public class OneToManyCreaterTest__appenderUI extends JFrame {
             public void run() {
                 try {
                     OneToManyCreaterTest__appenderUI frame = new OneToManyCreaterTest__appenderUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                     frame.projectFolderText.setText("D:/workstuff/workspace_taida/isa95-model");// TODO
                 } catch (Exception e) {
                     e.printStackTrace();

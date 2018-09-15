@@ -50,7 +50,7 @@ public class QRCodeMakerUI extends JFrame {
             public void run() {
                 try {
                     QRCodeMakerUI frame = new QRCodeMakerUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

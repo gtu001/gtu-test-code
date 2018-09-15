@@ -57,7 +57,7 @@ public class EstoreDAOCodeGenerateUI extends javax.swing.JFrame {
             public void run() {
                 EstoreDAOCodeGenerateUI inst = new EstoreDAOCodeGenerateUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

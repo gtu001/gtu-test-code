@@ -53,7 +53,7 @@ public class PropertiesMergeUI extends JFrame {
             public void run() {
                 try {
                     PropertiesMergeUI frame = new PropertiesMergeUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

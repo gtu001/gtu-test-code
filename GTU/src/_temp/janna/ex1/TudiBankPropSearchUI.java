@@ -55,7 +55,7 @@ public class TudiBankPropSearchUI extends JFrame {
             public void run() {
                 try {
                     TudiBankPropSearchUI frame = new TudiBankPropSearchUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

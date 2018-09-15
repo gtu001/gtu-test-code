@@ -60,7 +60,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             public void run() {
                 RegexReplacer inst = new RegexReplacer();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

@@ -49,7 +49,7 @@ public class SimpleDAOGenUI extends JFrame {
             public void run() {
                 try {
                     SimpleDAOGenUI frame = new SimpleDAOGenUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

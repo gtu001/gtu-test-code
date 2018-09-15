@@ -59,7 +59,7 @@ public class GenCustomSelectMethodUI extends JFrame {
             public void run() {
                 try {
                     GenCustomSelectMethodUI frame = new GenCustomSelectMethodUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -115,7 +115,7 @@ public class AVChoicerUI extends JFrame {
             public void run() {
                 try {
                     AVChoicerUI frame = new AVChoicerUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

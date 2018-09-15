@@ -30,7 +30,7 @@ public class EnglishTester_showPicDialog extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 EnglishTester_showPicDialog inst = new EnglishTester_showPicDialog();
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

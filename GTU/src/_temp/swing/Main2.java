@@ -55,7 +55,7 @@ public class Main2 extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 blocker.setLocationRelativeTo(Main2.this);
-                blocker.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,blocker);
             }
         });
     }
@@ -63,13 +63,13 @@ public class Main2 extends JFrame {
     private void hideBlocker() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                blocker.setVisible(false);
+                 gtu.swing.util.JFrameUtil.setVisible(false,blocker);
                 timer.restart();
             }
         });
     }
 
     public static void main(String[] args) {
-        new Main2().setVisible(true);
+         gtu.swing.util.JFrameUtil.setVisible(true,new Main2());
     }
 }

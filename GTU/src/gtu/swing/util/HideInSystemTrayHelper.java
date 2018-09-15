@@ -105,7 +105,7 @@ public class HideInSystemTrayHelper {
             MenuItem defaultItem = new MenuItem("Open");
             defaultItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    jframe.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,jframe);
                     jframe.setExtendedState(JFrame.NORMAL);
                     if (openAction != null) {
                         openAction.actionPerformed(e);
@@ -140,7 +140,7 @@ public class HideInSystemTrayHelper {
                 public void actionPerformed(ActionEvent e) {
                     tray.remove(trayIcon);
                     if (jframe != null)
-                        jframe.setVisible(true);
+                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
                     if (openAction != null) {
                         openAction.actionPerformed(e);
                     }
@@ -152,11 +152,14 @@ public class HideInSystemTrayHelper {
         if (jframe != null) {
             jframe.addWindowStateListener(new WindowStateListener() {
                 public void windowStateChanged(WindowEvent e) {
+                    if (tray == null && trayIcon == null) {
+                        System.out.println("[2] system tray not supported");
+                        return;
+                    }
                     if (e.getNewState() == JFrame.ICONIFIED) {
                         try {
-                            if (tray != null && trayIcon != null)
-                                tray.add(trayIcon);
-                            jframe.setVisible(false);
+                            tray.add(trayIcon);
+                             gtu.swing.util.JFrameUtil.setVisible(false,jframe);
                             System.out.println("added to SystemTray");
                         } catch (AWTException ex) {
                             System.out.println("unable to add to tray");
@@ -164,24 +167,21 @@ public class HideInSystemTrayHelper {
                     }
                     if (e.getNewState() == 7) {
                         try {
-                            if (tray != null && trayIcon != null)
-                                tray.add(trayIcon);
-                            jframe.setVisible(false);
+                            tray.add(trayIcon);
+                             gtu.swing.util.JFrameUtil.setVisible(false,jframe);
                             System.out.println("added to SystemTray");
                         } catch (AWTException ex) {
                             System.out.println("unable to add to system tray");
                         }
                     }
                     if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                        if (tray != null && trayIcon != null)
-                            tray.remove(trayIcon);
-                        jframe.setVisible(true);
+                        tray.remove(trayIcon);
+                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
                         System.out.println("Tray icon removed");
                     }
                     if (e.getNewState() == JFrame.NORMAL) {
-                        if (tray != null && trayIcon != null)
-                            tray.remove(trayIcon);
-                        jframe.setVisible(true);
+                        tray.remove(trayIcon);
+                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
                         System.out.println("Tray icon removed");
                     }
                 }

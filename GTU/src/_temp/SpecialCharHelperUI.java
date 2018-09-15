@@ -47,7 +47,7 @@ public class SpecialCharHelperUI extends JFrame {
             public void run() {
                 try {
                     SpecialCharHelperUI frame = new SpecialCharHelperUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

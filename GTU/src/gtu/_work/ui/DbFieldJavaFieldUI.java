@@ -57,7 +57,7 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
             public void run() {
                 DbFieldJavaFieldUI inst = new DbFieldJavaFieldUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

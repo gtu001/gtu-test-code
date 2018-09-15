@@ -46,7 +46,7 @@ public class QuartzCronTestUI extends javax.swing.JFrame {
             public void run() {
                 QuartzCronTestUI inst = new QuartzCronTestUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

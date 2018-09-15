@@ -50,7 +50,7 @@ public class DbSqlCreaterUI extends javax.swing.JFrame {
             public void run() {
                 DbSqlCreaterUI inst = new DbSqlCreaterUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

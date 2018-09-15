@@ -68,7 +68,7 @@ public class EstoreCodeGenerateUI extends javax.swing.JFrame {
             public void run() {
                 EstoreCodeGenerateUI inst = new EstoreCodeGenerateUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
     }

@@ -65,7 +65,7 @@ public class ScreenshotUI extends JFrame {
             public void run() {
                 try {
                     ScreenshotUI frame = new ScreenshotUI();
-                    frame.setVisible(false);
+                     gtu.swing.util.JFrameUtil.setVisible(false,frame);
                     TestKeyListener keyListener = frame.new TestKeyListener();
                 } catch (Exception e) {
                     e.printStackTrace();

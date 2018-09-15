@@ -66,7 +66,7 @@ public class OneToOneCreaterTest__appenderUI extends JFrame {
             public void run() {
                 try {
                     OneToOneCreaterTest__appenderUI frame = new OneToOneCreaterTest__appenderUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                     frame.projectFolderText.setText("D:/workstuff/workspace_taida/isa95-model");// TODO
                 } catch (Exception e) {
                     e.printStackTrace();

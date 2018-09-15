@@ -61,7 +61,7 @@ public class SimpleUI extends javax.swing.JFrame {
             public void run() {
                 SimpleUI inst = new SimpleUI();
                 inst.setLocationRelativeTo(null);
-                inst.setVisible(true);
+                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
             }
         });
         System.out.println("done...");

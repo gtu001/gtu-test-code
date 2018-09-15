@@ -90,7 +90,7 @@ public class DropboxTestUI extends JFrame {
             public void run() {
                 try {
                     DropboxTestUI frame = new DropboxTestUI();
-                    frame.setVisible(true);
+                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
