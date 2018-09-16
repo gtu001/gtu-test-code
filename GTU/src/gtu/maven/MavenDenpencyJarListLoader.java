@@ -92,7 +92,7 @@ public class MavenDenpencyJarListLoader {
 
             Process exec = execdo.apply();
             ProcessWatcher _inst = ProcessWatcher.newInstance(exec);
-            _inst.getStream();
+            _inst.getStreamSync();
 
             boolean buildSuccess = false;
 

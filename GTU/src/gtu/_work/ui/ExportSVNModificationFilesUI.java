@@ -418,7 +418,7 @@ public class ExportSVNModificationFilesUI extends javax.swing.JFrame {
                     String command = String.format(openFileFormat, file);
                     System.out.println(command);
                     try {
-                        ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStream();
+                        ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();
                         System.out.println("do reload...");
                         reloadCompareTable();
                     } catch (IOException e1) {

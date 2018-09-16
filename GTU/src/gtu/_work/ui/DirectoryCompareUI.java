@@ -590,7 +590,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                 DiffMergeCommand diffCommand = (DiffMergeCommand) diffToolComboBox.getSelectedItem();
                 String command = diffCommand.getCommand(this, fileA, fileB);
                 System.out.println(command);
-                ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStream();
+                ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();
             }
             if (evt.getClickCount() == 1 && evt.getButton() == MouseEvent.BUTTON3) {
                 final File mainFile = obj.mainFile.getFile();

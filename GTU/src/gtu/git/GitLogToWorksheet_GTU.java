@@ -151,7 +151,7 @@ public class GitLogToWorksheet_GTU {
             System.out.println(commands);
             Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
             ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-            newInstance.getStream(30000);
+            newInstance.getStreamSync(30000);
             newInstance.encode("UTF8");
             System.out.println(newInstance.getErrorStreamToString());
             System.out.println(newInstance.getInputStreamToString());

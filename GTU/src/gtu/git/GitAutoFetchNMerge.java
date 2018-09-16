@@ -49,7 +49,7 @@ public class GitAutoFetchNMerge {
                 String commands = StringUtils.join(lst, " && ");
                 Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
                 ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-                newInstance.getStream(60000);
+                newInstance.getStreamSync(60000);
                
                 String errorStr = newInstance.getErrorStreamToString();
                 String normalStr = newInstance.getInputStreamToString();

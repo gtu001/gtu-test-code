@@ -1,16 +1,14 @@
 package gtu.runtime;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
-
-import org.apache.commons.io.IOUtils;
 
 import gtu.thread.util.ThreadUtil;
 
@@ -18,7 +16,7 @@ public class ProcessWatcher {
 
     public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
         Process p = Runtime.getRuntime().exec("cmd /c start telnet ptt.cc");
-        ProcessWatcher.newInstance(p).getStream();
+        ProcessWatcher.newInstance(p).getStreamSync();
         System.out.println(p);
         System.out.println(p.waitFor());
         System.out.println(p.exitValue());
@@ -35,15 +33,25 @@ public class ProcessWatcher {
         this.process = process;
     }
 
-    public ProcessWatcher getStream() throws IOException, TimeoutException {
-        getStream(0);
+    public ProcessWatcher getStreamSync() throws IOException, TimeoutException {
+        System.out.println("watcher --- 1");
+        getStreamSync(0);
+        System.out.println("watcher --- 2");
         return this;
     }
-    
-    public ProcessWatcher getStream(long timeout) throws IOException, TimeoutException {
+
+    public ProcessWatcher getStreamSync(long timeout) throws IOException, TimeoutException {
         this.timeout = timeout;
-        inputStreamBytes = getInputStream(process.getInputStream());
-        errorStreamBytes = getInputStream(process.getErrorStream());
+        inputStreamBytes = getInputStream("input", timeout);
+        errorStreamBytes = getInputStream("error", timeout);
+        return this;
+    }
+
+    public ProcessWatcher getStreamAsync() throws IOException, TimeoutException {
+        System.out.println("watcher --- 1");
+        processInputStreamAsync("input");
+        processInputStreamAsync("error");
+        System.out.println("watcher --- 2");
         return this;
     }
 
@@ -51,25 +59,88 @@ public class ProcessWatcher {
         return new ProcessWatcher(process);
     }
 
-    private byte[] getInputStream(final InputStream is) throws IOException, TimeoutException {
-        //linux 不work
-//        return ThreadUtil.getFutureResult(new Callable<byte[]>() {
-//            @Override
-//            public byte[] call() throws Exception {
-//            }
-//        }, timeout);
-        
-        BufferedInputStream bis = new BufferedInputStream(is);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] content = new byte[1024];
-        int pos = -1;
-        while ((pos = bis.read(content)) != -1) {
-            baos.write(content, 0, pos);
-        }
-        bis.close();
-        baos.flush();
-        baos.close();
-        return baos.toByteArray();
+    private void processInputStreamAsync(final String type) throws IOException, TimeoutException {
+        // linux 不work
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    InputStream is = null;
+                    if ("input".equals(type)) {
+                        is = process.getInputStream();
+                    } else if ("error".equals(type)) {
+                        is = process.getErrorStream();
+                    }
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] content = new byte[1024];
+                    int pos = -1;
+                    while ((pos = bis.read(content)) != -1) {
+                        baos.write(content, 0, pos);
+                    }
+                    bis.close();
+                    baos.flush();
+                    baos.close();
+                    byte[] arry = baos.toByteArray();
+                    if ("input".equals(type)) {
+                        inputStreamBytes = arry;
+                        System.out.println("# input stream done!!!");
+                    } else if ("error".equals(type)) {
+                        errorStreamBytes = arry;
+                        System.out.println("# error stream done!!!");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void processAsyncCallback(final ActionListener listener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (inputStreamBytes == null || errorStreamBytes == null) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                ActionEvent e = new ActionEvent(ProcessWatcher.this, -1, "ok");
+                listener.actionPerformed(e);
+            }
+        }).start();
+    }
+
+    private byte[] Thread(Runnable runnable) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private byte[] getInputStream(final String type, long timeout) throws IOException, TimeoutException {
+        // linux 不work
+        return ThreadUtil.getFutureResult(new Callable<byte[]>() {
+            @Override
+            public byte[] call() throws Exception {
+                InputStream is = null;
+                if ("input".equals(type)) {
+                    is = process.getInputStream();
+                } else if ("error".equals(type)) {
+                    is = process.getErrorStream();
+                }
+                BufferedInputStream bis = new BufferedInputStream(is);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] content = new byte[1024];
+                int pos = -1;
+                while ((pos = bis.read(content)) != -1) {
+                    baos.write(content, 0, pos);
+                }
+                bis.close();
+                baos.flush();
+                baos.close();
+                return baos.toByteArray();
+            }
+        }, timeout);
     }
 
     public Process getProcess() {

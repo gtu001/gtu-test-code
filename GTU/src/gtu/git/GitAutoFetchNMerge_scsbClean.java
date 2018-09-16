@@ -45,7 +45,7 @@ public class GitAutoFetchNMerge_scsbClean {
                 String commands = StringUtils.join(lst, " && ");
                 Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
                 ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-                newInstance.getStream(60000);
+                newInstance.getStreamSync(60000);
                 System.out.println(newInstance.getErrorStreamToString());
                 System.out.println(newInstance.getInputStreamToString());
                 System.out.println("processed " + (ii+1) + " -> " + files.length);

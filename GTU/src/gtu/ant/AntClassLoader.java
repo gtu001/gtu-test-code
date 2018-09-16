@@ -110,7 +110,7 @@ public class AntClassLoader extends Task {
         private boolean compile(String javaFile) throws IOException {
             System.out.println("CCL: Compiling " + javaFile + "...");
             Process p = Runtime.getRuntime().exec("javac " + javaFile);
-            ProcessWatcher pp = ProcessWatcher.newInstance(p).getStream();
+            ProcessWatcher pp = ProcessWatcher.newInstance(p).getStreamSync();
             System.out.println("input stream = " + pp.getInputStreamToString());
             System.out.println("error stream = " + pp.getErrorStreamToString());
             try {

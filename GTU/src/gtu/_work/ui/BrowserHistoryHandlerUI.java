@@ -127,9 +127,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
-    private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+    // private PropertiesUtilBean configSelf = new
+    // PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -1802,13 +1802,19 @@ public class BrowserHistoryHandlerUI extends JFrame {
             RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance().command(command);
             if (!isSaveBatFile) {
                 ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
-                watcher.getStream();
-                StringBuilder sb = new StringBuilder();
-                sb.append("[ERR]  \n");
-                sb.append(watcher.getErrorStreamToString());
-                sb.append("\n\n[INFO] \n");
-                sb.append(watcher.getInputStreamToString());
-                batLogArea.setText(sb.toString());
+                watcher.processAsyncCallback(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ProcessWatcher p = (ProcessWatcher) e.getSource();
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("[ERR]  \n");
+                        sb.append(p.getErrorStreamToString());
+                        sb.append("\n\n[INFO] \n");
+                        sb.append(p.getInputStreamToString());
+                        batLogArea.setText(sb.toString());
+                    }
+                });
+                watcher.getStreamAsync();
             } else {
                 String subName = OsInfoUtil.isWindows() ? ".bat" : ".sh";
                 String encoding = OsInfoUtil.isWindows() ? "BIG5" : "UTF8";

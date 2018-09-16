@@ -63,7 +63,7 @@ public class AntJarToExe extends Task {
 
             Process process = RuntimeBatPromptModeUtil.newInstance().command(String.format("java -jar \"%s\" \"%s\"", "/media/gtu001/OLD_D/apps/launch4j/launch4j.jar", tempFile2)).apply();
             ProcessWatcher p = ProcessWatcher.newInstance(process);
-            p.getStream();
+            p.getStreamSync();
             System.out.println(p.getErrorStreamToString());
             System.out.println(p.getInputStreamToString());
 
@@ -121,7 +121,7 @@ public class AntJarToExe extends Task {
             }
 
             ProcessWatcher p = ProcessWatcher.newInstance(process);
-            p.getStream();
+            p.getStreamSync();
             this.log(p.getErrorStreamToString());
             this.log(p.getInputStreamToString());
 

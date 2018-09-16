@@ -38,7 +38,7 @@ public class CheckPlaceStartBat {
 
         String command = String.format("cmd /c start %s %s", "c:\\start.bat", arg);
         System.out.println(command);
-        ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStream();
+        ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();
         System.exit(0);
     }
 }

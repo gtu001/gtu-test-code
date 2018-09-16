@@ -78,7 +78,7 @@ public class GitLogToWorksheet {
                     String commands = StringUtils.join(lst, " && ");
                     Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
                     ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-                    newInstance.getStream(30000);
+                    newInstance.getStreamSync(30000);
                     // System.out.println(newInstance.getErrorStreamToString());
                     // System.out.println(newInstance.getInputStreamToString());
                     String logContent = newInstance.getInputStreamToString();

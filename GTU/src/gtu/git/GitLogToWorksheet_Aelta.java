@@ -54,7 +54,7 @@ public class GitLogToWorksheet_Aelta {
             System.out.println(commands);
             Process exec = Runtime.getRuntime().exec("cmd /c " + commands);
             ProcessWatcher newInstance = ProcessWatcher.newInstance(exec);
-            newInstance.getStream(30000);
+            newInstance.getStreamSync(30000);
             newInstance.encode("UTF8");
 
             String orignLog = newInstance.getInputStreamToString();

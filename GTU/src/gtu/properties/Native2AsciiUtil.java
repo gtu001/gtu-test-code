@@ -84,7 +84,7 @@ public class Native2AsciiUtil {
         File createBat = File.createTempFile("Native2Ascii", ".bat");
         System.out.println("bat : " + createBat);
         FileUtil.saveToFile(createBat, sb.toString().getBytes());
-        ProcessWatcher.newInstance(Runtime.getRuntime().exec("cmd /c start " + createBat.getAbsolutePath())).getStream();
+        ProcessWatcher.newInstance(Runtime.getRuntime().exec("cmd /c start " + createBat.getAbsolutePath())).getStreamSync();
         createBat.deleteOnExit();
         return this;
     }

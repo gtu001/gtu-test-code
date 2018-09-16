@@ -165,7 +165,7 @@ public class ClassCompilerUtil {
             Process process = Runtime.getRuntime().exec(command + argument);
 
             ProcessWatcher watcher = ProcessWatcher.newInstance(process);
-            watcher.getStream();
+            watcher.getStreamSync();
             String errMsg = watcher.getErrorStreamToString();
             if (StringUtils.isNotBlank(errMsg)) {
                 throw new RuntimeException("create class : " + errMsg);
@@ -249,7 +249,7 @@ public class ClassCompilerUtil {
                     + "-Dmdep.outputFile=" + targetClassPathFile + "\"";//
             Process child = Runtime.getRuntime().exec(command);
             ProcessWatcher watcher = ProcessWatcher.newInstance(child);
-            watcher.getStream();
+            watcher.getStreamSync();
             String errMsg = watcher.getErrorStreamToString();
             if (StringUtils.isNotBlank(errMsg)) {
                 throw new Exception("classpath取得錯誤 : " + errMsg);
