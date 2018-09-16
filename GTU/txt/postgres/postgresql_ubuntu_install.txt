@@ -24,6 +24,26 @@
 
 
 -----------------------------------------------------------------------------------
+
+控制cluster 
+
+	$ pg_ctlcluster <cluster_version> <cluster-name> <action>
+	
+	用上上指令可看 參數內容
+	Ps:
+	設定檔位置 /etc/postgresql/<cluster-version>/<cluster-name>/start.conf
+	Ps:
+	可用Action : (start|stop|restart|reload|status|promote)
+	
+-----------------------------------------------------------------------------------
+
+停掉cluster
+	
+	$ sudo -u postgres  pg_ctlcluster 10 main stop
+	or
+	$ sudo  systemctl  stop  postgresql@10-main
+
+-----------------------------------------------------------------------------------
 登入 postgres shell
 
 	$ su postgres

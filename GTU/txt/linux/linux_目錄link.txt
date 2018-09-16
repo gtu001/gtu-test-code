@@ -1,0 +1,5 @@
+
+
+ln -s   /etc/jboss    $JBOSS_HOME/modules/config/main
+
+ln -s  <要連結的目的>    <產生link的位置(含檔名如上main是link黨)>
