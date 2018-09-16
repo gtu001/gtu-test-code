@@ -135,11 +135,14 @@ public class RuntimeBatPromptModeUtil {
     }
 
     private List<String> getCommandList() {
-        String[] arry = cmd != null ? cmd.toString().split("\n", -1) : new String[0];
+        String tmpCmd = __fixCommand(cmd.toString());
+        String[] arry = tmpCmd != null ? tmpCmd.toString().split("\n", -1) : new String[0];
         return new ArrayList<String>(Arrays.asList(arry));
     }
 
     public String getCommand() {
-        return this.cmd != null ? this.cmd.toString() : "";
+        String tmpCmd = __fixCommand(cmd.toString());
+        return tmpCmd != null ? tmpCmd.toString() : "";
     }
+    
 }

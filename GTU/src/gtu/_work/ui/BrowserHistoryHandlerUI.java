@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -62,6 +61,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -98,13 +98,15 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.net.https.SimpleHttpsUtil;
-import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
@@ -151,6 +153,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JCheckBox hiddenChk;
     private JCheckBox showHiddenChk;
     private JButton dropboxMergeBtn;
+    private JTextArea batLogArea;
 
     /**
      * Launch the application.
@@ -231,6 +234,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             remarkArea = new JTextArea();
             scrollPane.setViewportView(remarkArea);
 
+            JTextPane textPane = new JTextPane();
+            scrollPane.setRowHeaderView(textPane);
+
             JLabel lblCommandType = new JLabel("command type");
             panel.add(lblCommandType, "2, 10, right, default");
 
@@ -247,6 +253,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             useRemarkOpenChk = new JCheckBox("使用remark開啟");
             panel_4.add(useRemarkOpenChk);
+
+            JButton saveBatFileBtn = new JButton("儲存bat檔");
+            saveBatFileBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    saveBatFileBtnAction();
+                }
+            });
+            panel_4.add(saveBatFileBtn);
 
             hiddenChk = new JCheckBox("隱藏");
             panel_4.add(hiddenChk);
@@ -443,6 +457,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
             });
             panel_5.add(dropboxMergeBtn);
 
+            JPanel panel_6 = new JPanel();
+            tabbedPane.addTab("bat Log", null, panel_6, null);
+            panel_6.setLayout(new BorderLayout(0, 0));
+
+            JPanel panel_7 = new JPanel();
+            panel_6.add(panel_7, BorderLayout.NORTH);
+
+            JPanel panel_8 = new JPanel();
+            panel_6.add(panel_8, BorderLayout.WEST);
+
+            JPanel panel_9 = new JPanel();
+            panel_6.add(panel_9, BorderLayout.EAST);
+
+            JPanel panel_10 = new JPanel();
+            panel_6.add(panel_10, BorderLayout.SOUTH);
+
+            batLogArea = new JTextArea();
+            panel_6.add(JCommonUtil.createScrollComponent(batLogArea), BorderLayout.CENTER);
+
             pack();
             this.setSize(900, 500);// XXX <---------- 設寬高度
 
@@ -489,7 +522,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                         DesktopUtil.browse(url);
                     } else {
-                        _this.doOpenWithRemark(d);
+                        _this.doOpenWithRemark(d, false);
                     }
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -1492,7 +1525,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                 public void actionPerformed(ActionEvent e) {
                                     String url = StringUtils.trimToEmpty(urlText.getText());
                                     UrlConfig d = UrlConfig.parseTo(url, bookmarkConfig.getConfigProp().getProperty(url));
-                                    doOpenWithRemark(d);
+                                    doOpenWithRemark(d, false);
                                 }
                             })//
                     ;
@@ -1748,7 +1781,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
-    private void doOpenWithRemark(UrlConfig d) {
+    private void doOpenWithRemark(UrlConfig d, boolean isSaveBatFile) {
         try {
             String command = d.remark;
             command = StringUtils.trimToEmpty(command);
@@ -1766,7 +1799,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 // do nothing
             }
 
-            RuntimeBatPromptModeUtil.newInstance().command(command).apply();
+            RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance().command(command);
+            if (!isSaveBatFile) {
+                ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
+                watcher.getStream();
+                StringBuilder sb = new StringBuilder();
+                sb.append("[ERR]  \n");
+                sb.append(watcher.getErrorStreamToString());
+                sb.append("\n\n[INFO] \n");
+                sb.append(watcher.getInputStreamToString());
+                batLogArea.setText(sb.toString());
+            } else {
+                String subName = OsInfoUtil.isWindows() ? ".bat" : ".sh";
+                String encoding = OsInfoUtil.isWindows() ? "BIG5" : "UTF8";
+                String fileName = JCommonUtil._jOptionPane_showInputDialog("輸入檔名", "bat_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + subName);
+                if (StringUtils.isNotBlank(fileName)) {
+                    FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, fileName), inst.getCommand(), encoding);
+                    JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
+                }
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -2039,6 +2090,19 @@ public class BrowserHistoryHandlerUI extends JFrame {
             bookmarkConfig.getConfigProp().putAll(handler.getMergeProperties(dir));
             bookmarkConfig.store();
             JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(handler.mergeFileLst, "\r\n") + "\nMerge完成!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void saveBatFileBtnAction() {
+        try {
+            String url = StringUtils.trimToEmpty(urlText.getText());
+            if (bookmarkConfig.getConfigProp().containsKey(url)) {
+                String propVal = bookmarkConfig.getConfigProp().getProperty(url);
+                UrlConfig d = UrlConfig.parseTo(url, propVal);
+                doOpenWithRemark(d, true);
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
