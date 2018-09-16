@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import gtu.thread.util.ThreadUtil;
 
@@ -25,8 +26,8 @@ public class ProcessWatcher {
 
     private String encode = "big5";
     private Process process;
-    private byte[] inputStreamBytes;
-    private byte[] errorStreamBytes;
+    private AtomicReference<byte[]> inputStreamBytes = new AtomicReference<byte[]>();
+    private AtomicReference<byte[]> errorStreamBytes = new AtomicReference<byte[]>();
     private long timeout = 0;
 
     private ProcessWatcher(Process process) {
@@ -42,8 +43,8 @@ public class ProcessWatcher {
 
     public ProcessWatcher getStreamSync(long timeout) throws IOException, TimeoutException {
         this.timeout = timeout;
-        inputStreamBytes = getInputStream("input", timeout);
-        errorStreamBytes = getInputStream("error", timeout);
+        inputStreamBytes.set(getInputStream("input", timeout));
+        errorStreamBytes.set(getInputStream("error", timeout));
         return this;
     }
 
@@ -83,10 +84,12 @@ public class ProcessWatcher {
                     baos.close();
                     byte[] arry = baos.toByteArray();
                     if ("input".equals(type)) {
-                        inputStreamBytes = arry;
+                        inputStreamBytes.set(arry);
+                        ;
                         System.out.println("# input stream done!!!");
                     } else if ("error".equals(type)) {
-                        errorStreamBytes = arry;
+                        errorStreamBytes.set(arry);
+                        ;
                         System.out.println("# error stream done!!!");
                     }
                 } catch (Exception ex) {
@@ -96,13 +99,19 @@ public class ProcessWatcher {
         }).start();
     }
 
-    public void processAsyncCallback(final ActionListener listener) {
+    public void processAsyncCallback(final ActionListener listener, final long waittimeLimit) {
+        final long LOOP_TIME = 3000L;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (inputStreamBytes == null || errorStreamBytes == null) {
+                long currentWaitSummary = 0;
+                while ((inputStreamBytes.get() == null || errorStreamBytes.get() == null)) {
+                    if ((waittimeLimit > 0 && currentWaitSummary >= waittimeLimit)) {
+                        break;
+                    }
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(LOOP_TIME);
+                        currentWaitSummary += LOOP_TIME;
                     } catch (InterruptedException e) {
                     }
                 }
@@ -177,10 +186,10 @@ public class ProcessWatcher {
     }
 
     public byte[] getInputStreamBytes() {
-        return inputStreamBytes;
+        return inputStreamBytes.get();
     }
 
     public byte[] getErrorStreamBytes() {
-        return errorStreamBytes;
+        return errorStreamBytes.get();
     }
 }

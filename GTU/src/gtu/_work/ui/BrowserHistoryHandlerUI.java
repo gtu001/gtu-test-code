@@ -127,9 +127,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
-    // private PropertiesUtilBean configSelf = new
-    // PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-    private PropertiesUtilBean configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+    private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -1813,7 +1813,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         sb.append(p.getInputStreamToString());
                         batLogArea.setText(sb.toString());
                     }
-                });
+                }, 10 * 1000L);
                 watcher.getStreamAsync();
             } else {
                 String subName = OsInfoUtil.isWindows() ? ".bat" : ".sh";
