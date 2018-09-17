@@ -1,3 +1,13 @@
+-----------------------------------------------------------------------------------
+
+
+啟動container
+
+winpty docker run --privileged  -p 5432:5432 -td  <image_id>  bash
+
+
+-----------------------------------------------------------------------------------
+
 安裝
 
     $ sudo apt-get update
@@ -25,9 +35,30 @@
 
 -----------------------------------------------------------------------------------
 
+建立cluster 
+	
+	$ sudo locale-gen zh_TW.UTF-8
+	$  pg_createcluster <version> <cluster_name>  --locale=zh_TW.UTF-8 -e UTF8 --start --start-conf=manual
+	 
+	 Ex : pg_createcluster 10 main  --locale=zh_TW.UTF-8 -e UTF8 --start --start-conf=manual
+
+	$ sudo -u postgres psql
+	=> show LC_COLLATE;
+
+-----------------------------------------------------------------------------------
+
+停掉cluster
+
+	$ sudo pg_dropcluster --stop <version> <cluster_name>
+
+
+-----------------------------------------------------------------------------------
+
 控制cluster 
 
 	$ pg_ctlcluster <cluster_version> <cluster-name> <action>
+	
+	Ex : pg_ctlcluster 10   main    restart
 	
 	用上上指令可看 參數內容
 	Ps:
@@ -44,6 +75,21 @@
 	$ sudo  systemctl  stop  postgresql@10-main
 
 -----------------------------------------------------------------------------------
+
+修改 cluster port
+	
+	$vim  /etc/postgresql/<cluster-version>/<cluster-name>/postgresql.conf
+	
+	--> 加入 
+		port=5432 
+		重開即可 Ps:參考 控制cluster
+
+	Ex : /etc/postgresql/10/main/postgresql.conf
+
+
+-----------------------------------------------------------------------------------
+
+
 登入 postgres shell
 
 	$ su postgres
@@ -89,6 +135,13 @@
 		
 
 -----------------------------------------------------------------------------------
+顯示資料庫
+	postgres=# 執行底下
+		$ \l
+
+
+-----------------------------------------------------------------------------------
+
 連線測試
 
 	$ psql -h 127.0.0.1 -p 5432 -U test_user -d test
@@ -99,7 +152,47 @@
 			 
 
 -----------------------------------------------------------------------------------
+
+
+root@df74b0cfaf9b:~# netstat  -nlp
+↓↓↓↓↓↓　有通的網路應該長這樣  ↓↓↓↓↓↓
+
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:5432            0.0.0.0:*               LISTEN      156/postgres
+tcp6       0      0 :::5432                 :::*                    LISTEN      156/postgres
+Active UNIX domain sockets (only servers)
+Proto RefCnt Flags       Type       State         I-Node   PID/Program name     Path
+unix  2      [ ACC ]     STREAM     LISTENING     42459    156/postgres         /var/run/postgresql/.s.PGSQL.5432
+
+↑↑↑↑↑↑　有通的網路應該長這樣  ↑↑↑↑↑↑
+
+解法 :
+	$ vim /var/lib/postgresql/10/main/postgresql.auto.conf
+	or
+	$ vim /etc/postgresql/10/main/postgresql.conf
+	把
+	listen_addresses = 'localhost'
+	改成
+	listen_addresses = '*'
+
 -----------------------------------------------------------------------------------
+錯誤
+FATAL: no pg_hba.conf entry for host "192.168.99.1", user "test_user", database "test", SSL off
+
+解法 :
+	$ su postgres
+	$ psql
+	postgres=# 執行底下
+		CREATE USER <user_name> SUPERUSER;
+		CREATE DATABASE <database_name> WITH OWNER <user_name>;
+		\q
+	$ vim /etc/postgresql/10/main/pg_hba.conf
+	加入以下
+		local all <user_name> trust
+		host all <user_name> 0.0.0.0/0 trust
+		host all <user_name> ::/0 trust
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------

@@ -121,15 +121,23 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
+import java.awt.FlowLayout;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private static final long serialVersionUID = 1L;
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
+
+    // Prodction XXX
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    // Test ubuntu XXX
     // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
     // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+    // Test Win10 XXX
+    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
+    // File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/BrowserHistoryHandlerUI_bookmark.properties"));
+
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
     private JTextArea remarkArea;
@@ -154,6 +162,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JCheckBox showHiddenChk;
     private JButton dropboxMergeBtn;
     private JTextArea batLogArea;
+    private JTextField batWaittingTimeText;
 
     /**
      * Launch the application.
@@ -203,6 +212,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel.add(lblUrl, "2, 4, right, default");
 
             urlText = new JTextField();
+            JCommonUtil.jTextFieldSetFilePathMouseEvent(urlText, true);
             urlText.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -463,6 +473,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel_7 = new JPanel();
             panel_6.add(panel_7, BorderLayout.NORTH);
+            panel_7.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+            JLabel lblNewLabel_4 = new JLabel("console等待時間(秒):");
+            panel_7.add(lblNewLabel_4);
+
+            batWaittingTimeText = new JTextField();
+            batWaittingTimeText.setText("60");
+            panel_7.add(batWaittingTimeText);
+            batWaittingTimeText.setColumns(10);
 
             JPanel panel_8 = new JPanel();
             panel_6.add(panel_8, BorderLayout.WEST);
@@ -495,7 +514,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
             JCommonUtil.setLocationToRightBottomCorner(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/file-manager.ico");
             commandTypeSetting = new CommandTypeSetting();
             sysUtil.apply(this);
             keyboardListener.initialize();
@@ -1801,6 +1820,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance().command(command);
             if (!isSaveBatFile) {
+                int waittingTime = 0;
+                try {
+                    waittingTime = Integer.parseInt(batWaittingTimeText.getText());
+                } catch (Exception ex) {
+                }
                 ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
                 watcher.processAsyncCallback(new ActionListener() {
                     @Override
@@ -1813,7 +1837,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         sb.append(p.getInputStreamToString());
                         batLogArea.setText(sb.toString());
                     }
-                }, 10 * 1000L);
+                }, waittingTime * 1000L);
                 watcher.getStreamAsync();
             } else {
                 String subName = OsInfoUtil.isWindows() ? ".bat" : ".sh";
