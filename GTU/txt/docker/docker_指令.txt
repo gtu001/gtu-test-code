@@ -89,7 +89,7 @@ $ docker pull [image name]
 $ docker build [放Dockerfile的目錄路徑]
 
 
-[[image build]]
+[[image build from Dockerfile]]
 
 若Dockerfile 在當前目錄, 且相關檔案也再一起
 $ sudo docker build -t <tag>  .
@@ -98,10 +98,12 @@ $ sudo docker build -t <tag>  .
 $ sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
 
 
---------------------------------------------------------------------------
-自訂路徑與檔名 build
+--------------------------
+[[自訂路徑與檔名 build]]
 
 $ docker build -f <fileName> <filePath> -t <tag>]
+
+??? <filePath> 貌似不work
 
 Ex : docker build -f Dockerfile_OnbuildTest /D/workstuff/gtu-test-code/GTU/txt/docker -t xxxxx_test2
 

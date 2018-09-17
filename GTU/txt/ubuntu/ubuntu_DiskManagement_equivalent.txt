@@ -1,5 +1,5 @@
 
 
-	$  equivalent
+	$  gnome-disks
 	
 	

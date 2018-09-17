@@ -24,7 +24,7 @@ $ sudo rm -r /home/username
 ----------------------------------------------------------------------
 修改使用者帳號
 
-$ usermod -l <new_username> <old_username?
+$ usermod -l <new_username> <old_username>
 
 
 
