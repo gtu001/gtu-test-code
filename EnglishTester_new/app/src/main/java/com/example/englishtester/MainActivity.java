@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
+import com.example.englishtester.common.GodToast;
 import com.example.englishtester.common.Log;
 
 import android.view.Menu;
@@ -138,6 +139,19 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
 
         //----------------------------------------------------------------
+
+        if (BuildConfig.DEBUG) {
+            contentView.addView(createLabel(""));
+            contentView.addView(createButton("God Gif",//
+                    new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            GodToast.getInstance(MainActivity.this).show();
+                        }
+                    }
+            ));
+        }
+
         //----------------------------------------------------------------
         //----------------------------------------------------------------
         //----------------------------------------------------------------

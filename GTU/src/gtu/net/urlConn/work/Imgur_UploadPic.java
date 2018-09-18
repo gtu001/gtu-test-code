@@ -1,13 +1,11 @@
 package gtu.net.urlConn.work;
 
-import gtu.json.ToJsonObject;
-
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,6 +31,9 @@ import org.apache.poi.util.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import gtu.file.FileUtil;
+import gtu.json.ToJsonObject;
+
 public class Imgur_UploadPic {
 
     // {"data":{"id":"XCPYpG2","title":"test","description":"test","datetime":1448872990,"type":"image\/gif","animated":true,"width":460,"height":345,"size":888899,"views":0,"bandwidth":0
@@ -46,13 +47,18 @@ public class Imgur_UploadPic {
         // String client_id = "5386aab829e87c1";
         // String client_secret = "40a5318beed25f9a70dbea0af86aac5c2b66a272";
         String client_id = "a2686b09bad8534";
-        String client_secret = "60c5cc0358429cea1807367381cefd2ce6389209";
+        String client_secret = "ab9162969630a95bbf5093b74f8d1571341e3895";
         File imageFile = new File("D:/gtu001_dropbox/Dropbox/guava/畫圖/強圖/7ccfe786bfd2d3c4efdee919abe6e293.jpg");
-        System.out.println(util.getPictureInformation(client_id, "XCPYpG2"));
-        System.out.println(util.updateImageInformation(client_id, "IX3D9D4qAd9LFYg"));
+        // System.out.println(util.getPictureInformation(client_id, "XCPYpG2"));
+        System.out.println(util.getPictureInformation(client_id, "huJsCtL"));// test
+        // System.out.println(util.updateImageInformation(client_id,
+        // "IX3D9D4qAd9LFYg"));
         // System.out.println(util.deletePicture(client_id, "IX3D9D4qAd9LFYg"));
-         System.out.println(util.uploadPicture1(client_id, imageFile));
-        System.out.println(util.uploadPicture2(client_id, imageFile));
+        // System.out.println(util.uploadPicture1(client_id, imageFile));
+        // System.out.println(util.uploadPicture2(client_id, imageFile));
+
+        long fileLength = util.downloadImage("https://i.imgur.com/huJsCtL.gif", new File(FileUtil.DESKTOP_DIR, "test.gif"));
+        System.out.println("fileLength = " + fileLength);
     }
 
     private Imgur_UploadPic() {
@@ -85,6 +91,7 @@ public class Imgur_UploadPic {
         while ((line = rd.readLine()) != null) {
             stb.append(line).append("\n");
         }
+        System.out.println(stb);
         rd.close();
 
         ImgurData data = parseToBean(stb.toString());
@@ -270,5 +277,56 @@ public class Imgur_UploadPic {
             dataImage = new Base64().encodeAsString(byteImage);
         }
         return dataImage;
+    }
+
+    public static long downloadImage(String urlStr, File outputFile) {
+
+        long startTime = System.currentTimeMillis();
+        URL url = null;
+        HttpURLConnection conn = null;
+        InputStream is = null;
+        FileOutputStream os = null;
+        byte[] buff = new byte[1024 * 4];
+        long size = 0;
+        int r = 0;
+
+        try {
+            url = new URL(urlStr);
+            conn = (HttpURLConnection) url.openConnection();
+            if (conn == null)
+                return -1;
+
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            conn.setDoInput(true);
+
+            is = conn.getInputStream();
+            os = new FileOutputStream(outputFile);
+            while ((r = is.read(buff)) > 0) {
+                os.write(buff, 0, r);
+                size += r;
+            }
+            os.flush();
+            os.close();
+
+            return size;
+        } catch (Exception e) {
+            throw new RuntimeException("downloadImage ERR : " + e.getMessage(), e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e) {
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (Exception e) {
+                }
+            }
+
+            System.out.println("download Cost : " + (System.currentTimeMillis() - startTime));
+        }
     }
 }

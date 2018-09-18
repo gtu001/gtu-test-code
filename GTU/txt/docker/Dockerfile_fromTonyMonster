@@ -1,0 +1,82 @@
+#FROM ubuntu:16.04
+FROM nvidia/cuda:8.0-runtime-ubuntu16.04
+LABEL maintainer="linic@tw.ibm.com"
+
+ENV downloads /downloads
+RUN apt update -y && apt upgrade -y && apt-get install -y \
+    wget \
+    unzip \
+    aufs-tools \
+    automake \
+    build-essential \
+    curl \
+    dpkg-sig \
+    python-pip \
+    python-dev \
+    build-essential \
+    cmake \
+    pkg-config \ 
+    libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev
+
+RUN echo 'alias ll="ls -al --color"' >> ~/.bashrc
+
+RUN mkdir -p $downloads && cd $downloads && curl -O https://repo.continuum.io/archive/Anaconda3-4.3.1-Linux-x86_64.sh
+WORKDIR $downloads
+RUN bash Anaconda3-4.3.1-Linux-x86_64.sh -b -f -p ~/anaconda3 
+ENV PATH "/root/anaconda3/bin:$PATH"
+RUN /root/anaconda3/bin/conda create -f --name aoi_py3 python=3.6 
+
+ARG OPENCV_VERSION="3.4.2"
+WORKDIR /opt
+RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip && \
+    unzip opencv.zip && \
+    mkdir -p /opt/opencv-${OPENCV_VERSION}/build && \
+    cd /opt/opencv-${OPENCV_VERSION}/build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+        -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D INSTALL_PYTHON_EXAMPLES=OFF \
+        -D INSTALL_C_EXAMPLES=OFF \
+        -D PYTHON_EXECUTABLE=/root/anaconda3/bin/python \
+        -D BUILD_EXAMPLES=OFF .. && \
+    make -j2 && \
+    make install && \
+    rm -f /opt/opencv.zip 
+
+RUN pip install --upgrade pip && \
+    pip install protobuf numpy matplotlib pillow && \
+    mkdir -p /root/anaconda3/var/lib/dbus/ && \
+    apt-get install -y libopencv-dev && \
+    apt-get install -y --no-install-recommends libboost-all-dev
+
+#Application Specific Python Libraries
+RUN pip install scikit-image pandas opencv-python gevent python-socketio gevent-websocket 
+
+ENV PYTHONPATH="/app/lib:${PYTHONPATH}"
+ENV LD_LIBRARY_PATH="/app/lib"
+
+
+RUN mkdir -p /app/data/
+VOLUME ["/app/lib"]
+VOLUME ["/training"]
+VOLUME ["/app/aoi-inspection/data"]
+
+# Exposes this port from the docker container to the host machine
+EXPOSE 8081
+
+# Copy App Specific Artifacts - Most frequently fhanged files (such as main program) should go last 
+WORKDIR /app
+COPY requirements.txt /app
+RUN pip install -r requirements.txt
+COPY src/static /app/static
+COPY src/templates /app/templates
+COPY src/lib /app/lib
+COPY src/aoi_inspection_service.py /app
+COPY doc/service-doc/html /app/static/
+
+ENV __FLUSH_LOG 1
+
+ENTRYPOINT "python" "/app/aoi_inspection_service.py"
+
+
+
+

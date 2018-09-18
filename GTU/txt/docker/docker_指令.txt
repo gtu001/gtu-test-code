@@ -101,11 +101,21 @@ $ sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
 --------------------------
 [[自訂路徑與檔名 build]]
 
-$ docker build -f <fileName> <filePath> -t <tag>]
+$ docker build -f <fileName> <fileDirPath> -t <tag>]
 
-??? <filePath> 貌似不work
+PS :  
+	 <fileDirPath>貌似不容易成功 ??原因不明??
+	 (通常你的Dockerfile檔名用預設,-f 不給只給<fileDirPath>又可以了)  
+	    建議最好作法就是切到該目錄下 <fileDirPath> 則用 "."
+	 Ex : docker build -f Dockerfile_template_001  .  -t xxxxx_test2
+	 
+	 
+---------------------------
+[[自訂路徑與檔名 build]]＊＊!終極解法!＊＊
 
-Ex : docker build -f Dockerfile_OnbuildTest /D/workstuff/gtu-test-code/GTU/txt/docker -t xxxxx_test2
+$ docker build -t <tag> -< <fileDirPath>/<Dockerfile>
+
+	Ex: docker build  -t ubuntu-test:latest -< /D/workstuff/gtu-test-code/GTU/txt/docker/Dockerfile_template_001
 
 
 --------------------------------------------------------------------------

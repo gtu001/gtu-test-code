@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -292,5 +294,19 @@ public class OOMHandler {
         } catch (java.lang.OutOfMemoryError ex) {
             return b;
         }
+    }
+
+    public static Pair<Integer, Integer> getImageScale(InputStream inputStream) {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        o.inDither = false;
+        o.inPurgeable = true;
+        o.inInputShareable = true;
+        try {
+            BitmapFactory.decodeStream(inputStream, null, o);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return Pair.of(o.outWidth, o.outHeight);
     }
 }

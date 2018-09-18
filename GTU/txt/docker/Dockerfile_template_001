@@ -1,7 +1,9 @@
 FROM ubuntu 
+LABEL maintainer="gtu001@gmail.com"
 
-RUN apt-get update
-RUN apt-get install -y \ 
+ENV downloads /downloads
+
+RUN apt update -y && apt upgrade -y && apt-get install -y \
 		vim \
 		iptables \
 		less \
@@ -9,5 +11,6 @@ RUN apt-get install -y \
 		curl \
 		netcat-openbsd \
 		net-tools \
-		netcat
+		netcat \
+		wget
 		
