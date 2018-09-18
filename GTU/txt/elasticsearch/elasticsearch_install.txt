@@ -1,8 +1,15 @@
 ------------------------------------------------------------------------------------
-# 安裝 
+安裝 
 
-$ docker pull docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+	$ docker pull docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+	
+	$ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "cluster.name=MyTestCluster" docker.elastic.co/elasticsearch/elasticsearch:6.4.0
 
+------------------------------------------------------------------------------------
+
+系統狀態
+
+	http://192.168.99.100:9200/
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------

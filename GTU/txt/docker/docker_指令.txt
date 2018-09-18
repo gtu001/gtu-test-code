@@ -1,79 +1,82 @@
 ﻿--------------------------------------------------------------------------
 拉 images
-$ docker pull ubuntu:14.04
+	$ docker pull ubuntu:14.04
 
 
 --------------------------------------------------------------------------
 
 重新啟動 docker
 
-$ sudo systemctl restart docker
+	$ sudo systemctl restart docker
 
 --------------------------------------------------------------------------
  看 container list (有on的)
-$ docker ps
+	$ docker ps
 
 看 全部 container list
-$ docker ps -a
+	$ docker ps -a
 
 --------------------------------------------------------------------------
 
 停止container 
-$ docker stop [container name or id]
+	$ docker stop [container name or id]
 
 移除container 
-$ docker rm [container name or id] -f (強制)
+	$ docker rm [container name or id] -f (強制)
 
 --------------------------------------------------------------------------
-
 
 列出images
-$ docker images
+
+	$ docker images
 
 --------------------------------------------------------------------------
 
+啟動 container 
 
-掛載images
-$ docker run -dit --net=host -v [本地位置]  --name=[container name]  [image id]
-Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
+	$ docker run -dit --net=host -v [本地位置]  -h [host_name]  --name=[container name]  [image id]
+	Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
 
 --------------------------------------------------------------------------
 
-執行images 指定 一個container 名子
-docker run --name <image> -t <container name>
+啟動 container 指定 一個container 名子
+
+	$ winpty  docker run --name <container_name> -it <image name>
+	
+	Ex :　　winpty  docker run -it   --name test_busy_box  -v /volume/test  busybox
 
 
 --------------------------------------------------------------------------
 
 加入 iptable 權限
-$ winpty docker run --privileged  -p 5432:5432 -td  <image_id>  bash
-or
-$ winpty docker run -it --cap-add=NET_ADMIN  --cap-add=NET_RAW  <image_id>  bash
+	$ winpty docker run --privileged  -p 5432:5432 -td  <image_id>  bash
+	or
+	$ winpty docker run -it --cap-add=NET_ADMIN  --cap-add=NET_RAW  <image_id>  bash
 
 
 --------------------------------------------------------------------------
 
 刪除image
-$ docker rmi [image id] -f (強制)
+	$ docker rmi [image id] -f (強制)
 
 --------------------------------------------------------------------------
 
 顯示container log
-$ docker logs --follow [container name]
-
+	$ docker logs [options] [container name]
+		--follow(-f) tail效果
 
 --------------------------------------------------------------------------
 
 連線使用container console
-$ docker exec -it [container name] cli
-$ docker exec -it [container name] bash
-$ docker exec -it $CONTAINER_ID /bin/bash
+	$ docker exec -it [container name] cli
+	$ docker exec -it [container name] bash
+	$ docker exec -it $CONTAINER_ID /bin/bash
 
 
 --------------------------------------------------------------------------
 
 下載image or container 去 docker store 或 docker hub
-$ docker pull [image name]
+	$ docker pull [image name]
 
 
 無法pull任何image時
@@ -81,41 +84,41 @@ $ docker pull [image name]
 
 
 查詢container ip組態
- $ docker inspect keen_swanson | findstr IPAddress
+	$ docker inspect keen_swanson | findstr IPAddress
 
 
 --------------------------------------------------------------------------
 安裝image
-$ docker build [放Dockerfile的目錄路徑]
+	$ docker build [放Dockerfile的目錄路徑]
 
 
 [[image build from Dockerfile]]
 
 若Dockerfile 在當前目錄, 且相關檔案也再一起
-$ sudo docker build -t <tag>  .
+	$ sudo docker build -t <tag>  .
 
 若Dockerfile 在其他目錄
-$ sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
+	$ sudo docker build -t <tag> /media/sf_VM_WORK/test_project/build/docker/
 
 
 --------------------------
 [[自訂路徑與檔名 build]]
 
-$ docker build -f <fileName> <fileDirPath> -t <tag>]
-
-PS :  
-	 <fileDirPath>貌似不容易成功 ??原因不明??
-	 (通常你的Dockerfile檔名用預設,-f 不給只給<fileDirPath>又可以了)  
-	    建議最好作法就是切到該目錄下 <fileDirPath> 則用 "."
-	 Ex : docker build -f Dockerfile_template_001  .  -t xxxxx_test2
-	 
+	$ docker build -f <fileName> <fileDirPath> -t <tag>]
+	
+	PS :  
+		 <fileDirPath>貌似不容易成功 ??原因不明??
+		 (通常你的Dockerfile檔名用預設,-f 不給只給<fileDirPath>又可以了)  
+		    建議最好作法就是切到該目錄下 <fileDirPath> 則用 "."
+		 Ex : docker build -f Dockerfile_template_001  .  -t xxxxx_test2
+		 
 	 
 ---------------------------
 [[自訂路徑與檔名 build]]＊＊!終極解法!＊＊
 
-$ docker build -t <tag> -< <fileDirPath>/<Dockerfile>
-
-	Ex: docker build  -t ubuntu-test:latest -< /D/workstuff/gtu-test-code/GTU/txt/docker/Dockerfile_template_001
+	$ docker build -t <tag> -< <fileDirPath>/<Dockerfile>
+	
+		Ex: docker build  -t ubuntu-test:latest -< /D/workstuff/gtu-test-code/GTU/txt/docker/Dockerfile_template_001
 
 
 --------------------------------------------------------------------------
@@ -126,35 +129,35 @@ $ docker build -t <tag> -< <fileDirPath>/<Dockerfile>
 1.先到網站註冊 image --> https://hub.docker.com/
 2.記住image命名 : account/imageName -> imageName
 
-$ docker push imageName[:tag] 
+	$ docker push imageName[:tag] 
 
 --------------------------------------------------------------------------
 
 改變 docker 執行指令 
 
-$ docker commit $CONTAINER_ID user/test_image
-$ docker run -it --entrypoint=sh user/test_image
-$ docker run -it --entrypoint " xxx xxx " user/test_image
-$ docker run -ti --entrypoint=/bin/bash  user/test_image  -s
+	$ docker commit $CONTAINER_ID user/test_image
+	$ docker run -it --entrypoint=sh user/test_image
+	$ docker run -it --entrypoint " xxx xxx " user/test_image
+	$ docker run -ti --entrypoint=/bin/bash  user/test_image  -s
 
 --------------------------------------------------------------------------
 跑 images
 
-docker run -it -d --rm -h 
-	i 可互動 
-	t 假的tty
-	d 背景執行 
-	rm  離開時自動移除container
-	p 本機port : container port , Ex: -p 80:80
-	h 給主機名 Ex: -h www.myhost.net
-	v 給實體空間位置  Ex: -v /var/www/html 
+	docker run -it -d --rm -h 
+		i 可互動 
+		t 假的tty
+		d 背景執行 
+		rm  離開時自動移除container
+		p 本機port : container port , Ex: -p 80:80
+		h 給主機名 Ex: -h www.myhost.net
+		v 給實體空間位置  Ex: -v /var/www/html 
 	
 	
 --------------------------------------------------------------------------
 [[port forward]] 
 
-docker run -d -p 5801:5801 -p 5802:5802 .....
-	-p (本基  port) : (container port)
+	$ docker run -d -p 5801:5801 -p 5802:5802 .....
+		-p (本基  port) : (container port)
 --------------------------------------------------------------------------
 測連線通
     curl ip:port
@@ -163,33 +166,33 @@ docker run -d -p 5801:5801 -p 5802:5802 .....
 --------------------------------------------------------------------------
 取得 container 的 pid
 
-$ docker inspect --format='{{.State.Pid}}' <container>
+	$ docker inspect --format='{{.State.Pid}}' <container>
 
 
 --------------------------------------------------------------------------
 先取得相依的images
-$ docker image inspect --format='{{.RepoTags}} {{.Id}} {{.Parent}}' $(docker image ls -q --filter since=<image_id>)
+	$ docker image inspect --format='{{.RepoTags}} {{.Id}} {{.Parent}}' $(docker image ls -q --filter since=<image_id>)
 
 會出現 sha 一長串 直接 rmi 即可
-$ docker rmi <sha...>
+	$ docker rmi <sha...>
 
 
 查詢子 images
-$ docker inspect --format='{{.Id}} {{.Parent}}' $(docker images --filter since=<image_id> --quiet)
+	$ docker inspect --format='{{.Id}} {{.Parent}}' $(docker images --filter since=<image_id> --quiet)
 
 
 --------------------------------------------------------------------------
 
 刪除 <none> images 
 
-$ docker rmi $(docker images -f "dangling=true" -q)
+	$ docker rmi $(docker images -f "dangling=true" -q)
 
 
 --------------------------------------------------------------------------
 顯示完整 command
 
-$ docker inspect -f "{{.Name}} {{.Config.Cmd}}" $(docker ps -a -q)
-$ docker inspect -f "{{.Name}} {{.Config.Entrypoint}}" $(docker ps -q)
+	$ docker inspect -f "{{.Name}} {{.Config.Cmd}}" $(docker ps -a -q)
+	$ docker inspect -f "{{.Name}} {{.Config.Entrypoint}}" $(docker ps -q)
 
 
 --------------------------------------------------------------------------
@@ -201,16 +204,38 @@ $ docker inspect -f "{{.Name}} {{.Config.Entrypoint}}" $(docker ps -q)
 --------------------------------------------------------------------------
 取得container 內的檔案
 
-$ docker cp <containerId>:/file/path/within/container  /host/path/target
+	$ docker cp  <containerId>:/file/path/within/container  /host/path/target
+
+-----------
+複製檔案到container
+
+	$ docker cp  /host/path/target   <containerId>:/file/path/within/container  
+
+	Ex : $ docker  cp   /C/Users/wistronits/Desktop/190827.jpg    f0c9bbf5700b:/usr/share/elasticsearch/config
 
 
 --------------------------------------------------------------------------
 取得 container 的 pid
 
-$ docker inspect -f '{{.State.Pid}}' container_name_or_id
+	$ docker inspect -f '{{.State.Pid}}' container_name_or_id
+
 
 --------------------------------------------------------------------------
+檢視 volume 位置 
+
+	$ docker inspect -f {{.Volumes}}  <container_id>
+	
+	Ex : docker inspect -f {{.Volumes}} test_busy_box
+
+
 --------------------------------------------------------------------------
+進入 busybox shell的方式
+
+	$ winpty docker exec -it test_busy_box /bin/sh
+	or 
+	$ winpty docker exec -it test_busy_box sh
+
+
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
