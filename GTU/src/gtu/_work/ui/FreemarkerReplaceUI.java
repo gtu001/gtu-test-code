@@ -79,7 +79,7 @@ public class FreemarkerReplaceUI extends JFrame {
             public void run() {
                 try {
                     FreemarkerReplaceUI frame = new FreemarkerReplaceUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -131,7 +131,13 @@ public class FreemarkerReplaceUI extends JFrame {
                     for (int ii = 0; ii < filePathList.getModel().getSize(); ii++) {
                         File tempFile = (File) filePathList.getModel().getElementAt(ii);
                         FileOutputStream fos = new FileOutputStream(new File(dir, tempFile.getName()));
-                        FreeMarkerSimpleUtil.replace(tempFile, root, fos, encoding);
+
+                        File projectBaseDir = new File(StringUtils.trimToEmpty(baseDirText.getText()));
+                        if (!projectBaseDir.exists() || !projectBaseDir.isDirectory()) {
+                            JCommonUtil._jOptionPane_showMessageDialog_info("專案目錄不存在使用當前目錄!");
+                            projectBaseDir = null;
+                        }
+                        FreeMarkerSimpleUtil.replace(projectBaseDir, tempFile, root, fos, encoding);
                     }
 
                     JCommonUtil._jOptionPane_showMessageDialog_info("done...");

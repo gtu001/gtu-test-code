@@ -2,25 +2,25 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
+import android.os.Handler;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.ant.liao.GifView;
-import com.example.englishtester.R;
+import com.example.englishtester.BuildConfig;
+import com.example.englishtester.DropboxApplicationActivity;
+import com.example.englishtester.DropboxFileLoadService;
+import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +28,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import gtu.number.RandomUtil;
 
 /**
  * Created by gtu001 on 2018/1/11.
@@ -39,6 +41,12 @@ public class GodToast {
 
     private static GodToast _INST;
     private Context context;
+    private IDropboxFileLoadService dropboxFileLoadService;
+    private Handler handler = new Handler();
+    private GifView imageView_gif;
+    private Toast toast;
+    private FrameLayout layout;
+    private File godImageConfig;
 
     public static GodToast getInstance(Context context) {
         if (_INST == null) {
@@ -49,7 +57,29 @@ public class GodToast {
 
     private GodToast(Context context) {
         this.context = context;
-        this.godImageHandler = new GodImageHandler(context);
+
+        dropboxFileLoadService = DropboxFileLoadService.newInstance(context, DropboxApplicationActivity.getDropboxAccessToken(context));
+        godImageConfig = dropboxFileLoadService.downloadGodImageFile();
+
+        this.layout = new FrameLayout(context);
+
+        this.godImageHandler = new GodImageHandler(context, godImageConfig);
+
+        this.imageView_gif = new GifView(context);
+
+        this.toast = new Toast(context);
+        this.toast.setDuration(Toast.LENGTH_LONG);
+        this.toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        this.toast.setView(layout);
+
+        layout.addView(imageView_gif,//
+                new FrameLayout.LayoutParams(//
+                        FrameLayout.LayoutParams.WRAP_CONTENT, //
+                        FrameLayout.LayoutParams.WRAP_CONTENT));
+
+        // 設定內部圖片長寬
+        imageView_gif.setLeft(0);
+        imageView_gif.setTop(0);
     }
 
     private Scale scale;
@@ -57,33 +87,15 @@ public class GodToast {
     private static final String TAG = GodToast.class.getSimpleName();
 
     public void show() {
-        File gifFile = this.godImageHandler.getGifImage();
+        File gifFile = godImageHandler.getGifImage();
 
         if (gifFile == null) {
             Log.v(TAG, "圖片資源尚未完成!!", 10);
             return;
         }
 
-        FrameLayout layout = new FrameLayout(context);
-
-        Toast toast = new Toast(context);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-        toast.setView(layout);
-
-        GifView imageView_gif = new GifView(context);
-
-        layout.addView(imageView_gif,//
-                new FrameLayout.LayoutParams(//
-                        FrameLayout.LayoutParams.WRAP_CONTENT, //
-                        FrameLayout.LayoutParams.WRAP_CONTENT));
-
         //取得圖片長寬
         fetchImageSize(gifFile);
-
-        // 設定內部圖片長寬
-        imageView_gif.setLeft(0);
-        imageView_gif.setTop(0);
 
         // 设置显示的大小，拉伸或者压缩
         if (scale != null) {
@@ -92,6 +104,8 @@ public class GodToast {
             // 設定layout長寬
             imageView_gif.getLayoutParams().width = scale.width;
             imageView_gif.getLayoutParams().height = scale.height;
+
+            layout.invalidate();
         }
 
         // 设置加载方式：先加载后显示、边加载边显示、只显示第一帧再显示
@@ -99,18 +113,19 @@ public class GodToast {
 
         // 设置Gif图片源
         try {
-//            imageView_gif.setGifImage(new FileInputStream(file));
+            //            imageView_gif.setGifImage(new FileInputStream(file));
             imageView_gif.setGifImage(new FileInputStream(gifFile));
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
 
-//        if (!file.getName().toLowerCase().endsWith(".gif")) {
-//            // 只秀第一格畫面
-//            imageView_gif.showCover();
-//        }
+        //        if (!file.getName().toLowerCase().endsWith(".gif")) {
+        //            // 只秀第一格畫面
+        //            imageView_gif.showCover();
+        //        }
 
         // 繼續
+
         imageView_gif.showAnimation();
         toast.show();
     }
@@ -152,16 +167,21 @@ public class GodToast {
     }
 
     private static class GodImageHandler {
-        private static Map<String, File> imageMap = new HashMap<String, File>();
-
-        static {
-            imageMap.put("https://i.imgur.com/huJsCtL.gif", null);
-            imageMap.put("https://i.imgur.com/4J4kQG5.gif", null);
-        }
-
         File tempDir;
         Context context;
         Thread downloadThread;
+        List<String> godImageLst;
+        File godImageConfigFile;
+        private Map<String, File> imageMap;
+
+        private List<String> getGodImageList(File godImageConfig) {
+            try {
+                return FileUtils.readLines(godImageConfig, "UTF8");
+            } catch (IOException e) {
+                Log.e(TAG, "getGodImageList ERR : " + e.getMessage(), e);
+                return Collections.emptyList();
+            }
+        }
 
         private String getFileName(String url) {
             Pattern ptn = Pattern.compile("\\w+\\.gif");
@@ -172,24 +192,44 @@ public class GodToast {
             return UUID.randomUUID().toString() + ".gif";
         }
 
-        GodImageHandler(Context context) {
+        GodImageHandler(Context context, File godImageConfigFile) {
             this.context = context;
             this.tempDir = this.context.getCacheDir();
+            this.godImageConfigFile = godImageConfigFile;
             startDownload();
         }
 
         public void startDownload() {
+            if (godImageLst == null || godImageLst.isEmpty()) {
+                godImageLst = getGodImageList(this.godImageConfigFile);
+            }
+
+            if (imageMap == null || imageMap.isEmpty()) {
+                imageMap = new HashMap<String, File>();
+                for (String url : godImageLst) {
+                    imageMap.put(url, null);
+                }
+            }
+
             if (downloadThread == null || downloadThread.getState() == Thread.State.TERMINATED) {
+                Log.v(TAG, "do startDownload !!!");
                 downloadThread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        for (String url : imageMap.keySet()) {
+                        List<String> urlList = new ArrayList<String>(imageMap.keySet());
+                        urlList = RandomUtil.randomList(urlList);
+                        for (String url : urlList) {
                             File gifFile = new File(tempDir, getFileName(url));
                             if (gifFile.exists() && gifFile.canRead()) {
+                                imageMap.put(url, gifFile);
                                 continue;
                             }
                             if (imageMap.get(url) == null) {
-                                SimpleDownloadUtil.downloadFile(url, gifFile);
+                                try {
+                                    SimpleDownloadUtil.downloadFile(url, gifFile);
+                                } catch (Exception ex) {
+                                    Log.e(TAG, "startDownload ERR : " + url + " -> " + ex.getMessage(), ex);
+                                }
                                 imageMap.put(url, gifFile);
                                 Log.v(TAG, "## download success : " + url);
                             }
@@ -200,7 +240,33 @@ public class GodToast {
             }
         }
 
+        private boolean isAllDone() {
+            if (BuildConfig.DEBUG) {
+                Log.v(TAG, "=====================================");
+                for (String url : imageMap.keySet()) {
+                    File f = imageMap.get(url);
+                    boolean ok = f != null && f.exists() && f.canRead();
+                    Log.v(TAG, "isAllDone -> " + url + " : " + (ok ? "SUCCESS" : "FAILED"));
+                }
+                Log.v(TAG, "thread - " + (downloadThread != null ? downloadThread.getState() : "Null"));
+                Log.v(TAG, "=====================================");
+            }
+            for (String url : imageMap.keySet()) {
+                if (imageMap.get(url) == null) {
+                    return false;
+                }
+                File f = imageMap.get(url);
+                if (!f.exists() || !f.canRead() || f.length() == 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public File getGifImage() {
+            if (!isAllDone()) {
+                startDownload();
+            }
             List<File> files = new ArrayList<File>();
             for (String url : imageMap.keySet()) {
                 if (imageMap.get(url) != null && //

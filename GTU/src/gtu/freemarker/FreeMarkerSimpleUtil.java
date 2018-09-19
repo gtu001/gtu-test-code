@@ -10,6 +10,8 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,6 +21,7 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import gtu.file.FileUtil;
 
 public class FreeMarkerSimpleUtil {
 
@@ -122,7 +125,7 @@ public class FreeMarkerSimpleUtil {
         }
     }
 
-    public static void replace(File file, Map<String, Object> root, OutputStream outputStream, String encode) {
+    public static void replace(File projectBaseDir, File ftlFile, Map<String, Object> root, OutputStream outputStream, String encode) {
         try {
             Configuration cfg = new Configuration();
 
@@ -133,14 +136,27 @@ public class FreeMarkerSimpleUtil {
             }
             cfg.setEncoding(cfg.getLocale(), defaultEncode);
 
-            if (!file.isFile()) {
-                throw new IllegalArgumentException("not a file! : " + file);
+            if (!ftlFile.isFile()) {
+                throw new IllegalArgumentException("not a file! : " + ftlFile);
             }
 
-            cfg.setDirectoryForTemplateLoading(file.getParentFile());
+            String ftlTemplateName = "";
+            if (projectBaseDir == null) {
+                projectBaseDir = ftlFile.getParentFile();
+                ftlTemplateName = ftlFile.getName();
+            } else {
+                Pattern pathPtn = Pattern.compile("\\Q" + projectBaseDir.getAbsolutePath() + "\\E(.*)");
+                Matcher mth = pathPtn.matcher(ftlFile.getAbsolutePath());
+                if (mth.find()) {
+                    ftlTemplateName = mth.group(1);
+                    ftlTemplateName = FileUtil.fixPath(ftlTemplateName, true);
+                    System.out.println("fix ftlTemplateName = " + ftlTemplateName);
+                }
+            }
+            cfg.setDirectoryForTemplateLoading(projectBaseDir);
             cfg.setObjectWrapper(new DefaultObjectWrapper());
 
-            Template temp = cfg.getTemplate(file.getName());
+            Template temp = cfg.getTemplate(ftlTemplateName);
 
             Writer out = new OutputStreamWriter(outputStream, encode);
             temp.process(root, out);

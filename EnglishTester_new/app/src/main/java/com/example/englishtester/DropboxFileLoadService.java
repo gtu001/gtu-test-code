@@ -240,6 +240,31 @@ public class DropboxFileLoadService implements IDropboxFileLoadService {
         }, -1L);
     }
 
+    public File downloadGodImageFile() {
+        final String configFileName = "EnglishTester_new_GodImage.txt";
+        final String configDir = "/etc_config";
+        return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                String tmpPath = "";
+                try {
+                    File configFile = new File(context.getCacheDir(), configFileName);
+
+                    final DbxClientV2 client = getClient();
+
+                    FileOutputStream outputStream = new FileOutputStream(configFile);
+                    DropboxUtilV2.download(configDir + File.separator + configFileName, outputStream, client);
+
+                    return configFile;
+                } catch (Exception ex) {
+                    Log.e(TAG, "downloadGodImageFile ERR : " + ex.getMessage() + " --> " + tmpPath);
+                    throw new RuntimeException("downloadGodImageFile ERR : " + ex.getMessage() + " --> " + tmpPath, ex);
+                } finally {
+                }
+            }
+        }, -1L);
+    }
+
     private DbxClientV2 getClient() {
         return DropboxUtilV2.getClient(accessToken);
     }
