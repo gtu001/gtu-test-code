@@ -241,7 +241,7 @@ public class DropboxFileLoadService implements IDropboxFileLoadService {
     }
 
     public File downloadGodImageFile() {
-        final String configFileName = "EnglishTester_new_GodImage.txt";
+        final String configFileName = "EnglishTester_new_GodImage.htm";
         final String configDir = "/etc_config";
         return DropboxEnglishService.getRunOnUiThread(new Callable<File>() {
             @Override

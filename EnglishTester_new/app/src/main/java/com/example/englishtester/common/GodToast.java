@@ -178,12 +178,16 @@ public class GodToast {
 
         private List<String> getGodImageList(File godImageConfig) {
             try {
+                Pattern ptn = Pattern.compile("\\<img\\ssrc\\=\"(.*?)\"\\s*\\/\\>");
                 List<String> lst = FileUtils.readLines(godImageConfig, "UTF8");
                 List<String> lst2 = new ArrayList<String>();
                 for (int ii = 0; ii < lst.size(); ii++) {
-                    String tmp = StringUtils.trimToEmpty(lst.get(ii));
-                    if (StringUtils.isNotBlank(tmp)) {
-                        lst2.add(tmp);
+                    Matcher mth = ptn.matcher(lst.get(ii));
+                    if (mth.find()) {
+                        String tmp = mth.group(1);
+                        if (!lst2.contains(tmp) && tmp.endsWith(".gif")) {
+                            lst2.add(tmp);
+                        }
                     }
                 }
                 return lst2;
