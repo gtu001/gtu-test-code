@@ -362,15 +362,19 @@ public class FreemarkerReplaceUI extends JFrame {
                 StringBuilder errSb = new StringBuilder();
                 DefaultListModel model = new DefaultListModel();
                 for (int ii = 0; ii < 1000; ii++) {
-                    if (prop.containsKey("file" + ii)) {
-                        File file = this.getConfigFile(prop, "file" + ii);
-                        if (!file.exists()) {
-                            errSb.append(file.getAbsolutePath() + "\n");
+                    try {
+                        if (prop.containsKey("file" + ii)) {
+                            File file = this.getConfigFile(prop, "file" + ii);
+                            if (!file.exists()) {
+                                errSb.append(file.getAbsolutePath() + "\n");
+                            } else {
+                                model.addElement(file);
+                            }
                         } else {
-                            model.addElement(file);
+                            break;
                         }
-                    } else {
-                        break;
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
                     }
                 }
                 filePathList.setModel(model);
