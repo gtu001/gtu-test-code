@@ -14,6 +14,7 @@ import com.example.englishtester.DropboxFileLoadService;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -60,6 +61,7 @@ public class GodToast {
 
         dropboxFileLoadService = DropboxFileLoadService.newInstance(context, DropboxApplicationActivity.getDropboxAccessToken(context));
         godImageConfig = dropboxFileLoadService.downloadGodImageFile();
+        Log.line(TAG, "godImageConfig = " + godImageConfig + " -> " + godImageConfig.exists());
 
         this.layout = new FrameLayout(context);
 
@@ -176,7 +178,15 @@ public class GodToast {
 
         private List<String> getGodImageList(File godImageConfig) {
             try {
-                return FileUtils.readLines(godImageConfig, "UTF8");
+                List<String> lst = FileUtils.readLines(godImageConfig, "UTF8");
+                List<String> lst2 = new ArrayList<String>();
+                for (int ii = 0; ii < lst.size(); ii++) {
+                    String tmp = StringUtils.trimToEmpty(lst.get(ii));
+                    if (StringUtils.isNotBlank(tmp)) {
+                        lst2.add(tmp);
+                    }
+                }
+                return lst2;
             } catch (IOException e) {
                 Log.e(TAG, "getGodImageList ERR : " + e.getMessage(), e);
                 return Collections.emptyList();

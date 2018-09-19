@@ -760,7 +760,11 @@ public class FloatViewService extends Service {
 
                     List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
                     for (ConfigDialogEnum e : ConfigDialogEnum.values()) {
-                        addItem(e.label, e.getIcon(FloatViewService.this), list);
+                        if (e.isDebug && BuildConfig.DEBUG) {
+                            addItem(e.label, e.getIcon(FloatViewService.this), list);
+                        } else if (!e.isDebug) {
+                            addItem(e.label, e.getIcon(FloatViewService.this), list);
+                        }
                     }
 
                     win.showItemListDialog("功能設定", list, new OnItemClickListener() {
@@ -789,25 +793,25 @@ public class FloatViewService extends Service {
     }
 
     private enum ConfigDialogEnum {
-        SEARCH_HISTORY("查詢歷史", R.drawable.icon_history) {
+        SEARCH_HISTORY("查詢歷史", R.drawable.icon_history, false) {
             @Override
             void process(FloatViewService self) {
                 self.recentSearchHistory();
             }
         },//
-        OPEN_PROGRAM("開啟主程式", R.drawable.janna) {
+        OPEN_PROGRAM("開啟主程式", R.drawable.janna, false) {
             @Override
             void process(FloatViewService self) {
                 self.openMainProgram();
             }
         },//
-        ICON_MOVE("放大鏡移動", R.drawable.icon_mouse_move) {
+        ICON_MOVE("放大鏡移動", R.drawable.icon_mouse_move, false) {
             @Override
             void process(FloatViewService self) {
                 self.magnifierAlert();
             }
         },//
-        LISTENER_CLIPBOARD("監聽記事本", null) {
+        LISTENER_CLIPBOARD("監聽記事本", null, false) {
             public Integer getIcon(FloatViewService self) {
                 boolean state = self.clipboardListenerHandler.isCurrentState();
                 return state ? R.drawable.switch_on_icon : R.drawable.switch_off_icon;
@@ -820,7 +824,7 @@ public class FloatViewService extends Service {
                 Toast.makeText(self, "監聽" + (state ? "on" : "off"), Toast.LENGTH_SHORT).show();
             }
         },//
-        MODE_CHANGE("模式切換", null) {
+        MODE_CHANGE("模式切換", null, false) {
             public Integer getIcon(FloatViewService self) {
                 return self.modeHandler.getIcon(self);
             }
@@ -830,20 +834,28 @@ public class FloatViewService extends Service {
                 self.modeHandler.changeMode(null, false);
             }
         },
-        EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app) {
+        EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app, false) {
             @Override
             void process(FloatViewService self) {
                 self.stopThisService();
+            }
+        },//
+        ADMOB_TEST("TEST 測試廣告", R.drawable.icon_18_adults_only, true) {
+            @Override
+            void process(FloatViewService self) {
+                self.adCheckShow.showAdForce();
             }
         },//
         ;
 
         final String label;
         final Integer iconVal;
+        final boolean isDebug;
 
-        ConfigDialogEnum(String label, Integer iconVal) {
+        ConfigDialogEnum(String label, Integer iconVal, boolean isDebug) {
             this.label = label;
             this.iconVal = iconVal;
+            this.isDebug = isDebug;
         }
 
         public Integer getIcon(FloatViewService self) {
@@ -1667,14 +1679,18 @@ public class FloatViewService extends Service {
             }
 
             if (count > MAX_COUNT) {
-                //admob.showAd();//目前無法顯示
-                if (!BuildConfig.DEBUG) {
-                    InterstitialAdActivity.startThisActivity(FloatViewService.this);
-                } else {
-                    GodToast.getInstance(getApplicationContext()).show();
-                    //InterstitialAdActivity.startThisActivity(FloatViewService.this);
-                }
+                this.showAdForce();
                 count = 0;
+            }
+        }
+
+        public void showAdForce() {
+            //admob.showAd();//目前無法顯示
+            if (!BuildConfig.DEBUG) {
+                InterstitialAdActivity.startThisActivity(FloatViewService.this);
+            } else {
+                GodToast.getInstance(getApplicationContext()).show();
+                //InterstitialAdActivity.startThisActivity(FloatViewService.this);
             }
         }
 
