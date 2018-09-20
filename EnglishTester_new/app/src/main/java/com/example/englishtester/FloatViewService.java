@@ -24,6 +24,7 @@ import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 
+import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.Log;
@@ -1340,7 +1341,7 @@ public class FloatViewService extends Service {
      */
     private void checkClipboardContentForSearchEnglishId() {
         String text = ClipboardHelper.copyFromClipboard(getApplication());
-        Pattern ptn = Pattern.compile("[a-zA-Z\\s\\-]+");
+        Pattern ptn = Pattern.compile(EnglishSearchRegexConf.getSearchRegex(true, false));
         if (StringUtils.isNotBlank(text)) {
             Matcher mth = ptn.matcher(text);
             StringBuilder sb = new StringBuilder();
@@ -1406,7 +1407,7 @@ public class FloatViewService extends Service {
          * 是文章
          */
         private boolean isMoreThanSentance(String text) {
-            Pattern ptn = Pattern.compile("[a-zA-Z]+");
+            Pattern ptn = Pattern.compile(EnglishSearchRegexConf.getSearchRegex(true, true));
             if (StringUtils.isNotBlank(text)) {
                 Matcher mth = ptn.matcher(text);
                 StringBuilder sb = new StringBuilder();

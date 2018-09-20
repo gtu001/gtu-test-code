@@ -42,3 +42,6 @@ mpl_finance
 
 #web crawler
 scrapy
+selenium
+
+

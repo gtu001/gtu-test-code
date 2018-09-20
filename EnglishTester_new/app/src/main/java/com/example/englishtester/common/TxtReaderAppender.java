@@ -114,7 +114,9 @@ public class TxtReaderAppender {
         }
 
         private void normalTxtProcess() {
-            Pattern ptn = Pattern.compile("([a-zA-Z\\-]+|[\\u4e00-\\u9fa5]+)", Pattern.DOTALL | Pattern.MULTILINE);
+            String franceCharacter = "àâéêèìôùûç";
+            String germanCharacter = "äöüÄÖÜß";
+            Pattern ptn = Pattern.compile("(" + EnglishSearchRegexConf.getSearchRegex(false, false) + "|[\\u4e00-\\u9fa5]+)", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(txtContent);
             final String txtContent_ = txtContent;
 

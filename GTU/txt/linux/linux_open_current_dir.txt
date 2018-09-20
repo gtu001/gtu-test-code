@@ -1,5 +1,0 @@
-用terminal開啟當前目錄
-
-$ nautilus .
-
-

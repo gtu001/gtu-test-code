@@ -10,6 +10,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -674,7 +676,7 @@ public class ReciteMainActivity extends Activity {
         }
 
         // 掃圖 (是英文才掃)
-        Pattern ptn = Pattern.compile("[a-zA-Z]+");
+        Pattern ptn = Pattern.compile(EnglishSearchRegexConf.getSearchRegex(false, false));
         if (ptn.matcher(englishBean.englishWord).find()) {
             switchPictureService.showPicture(englishBean.englishWord);
         }
