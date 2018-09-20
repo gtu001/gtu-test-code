@@ -252,9 +252,9 @@ Volume 掛載測試
 		-v "$(pwd)"/target:/app:ro 
 	
 	Ex : 
-		$ winpty docker run --rm -it --name=test_busy_box --mount "type=bind,source=//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir,target=//test_dir"  busybox
+		$ winpty docker run --rm -it --name=test_busy_box --mount "type=bind,source=//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir,target=/test_dir"  busybox
 		eq
-		$ winpty docker run --rm -it --name=test_busy_box -v "//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir://test_dir"  busybox 
+		$ winpty docker run --rm -it --name=test_busy_box -v "//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir:/test_dir"  busybox 
   
   	Ps : 若在 win7 dockerToolbox 環境 , 需再 kitematic 點 container 再點右邊 volume 的齒輪 再另外設定 mapping location才有用, 在設定完後原來的會失效
 
