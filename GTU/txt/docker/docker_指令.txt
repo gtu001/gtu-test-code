@@ -34,8 +34,14 @@
 
 啟動 container 
 
-	$ docker run -dit --net=host -v [本地位置]  -h [host_name]  --name=[container name]  [image id]
-	Ex: docker run -dit --net=host -v F:/ibm_db2  --name=client  4543213855e2
+	$ docker run  --rm -d -it --net=host -v [建立目錄]  -h [host_name]  --name=[container name]  [image id]
+
+	--rm : 離開自動砍掉
+	-d : 背景執行
+	-it : 進入console
+	-v : 在container建目錄
+	-h : 建立host_name
+	--name : 指定container name
 
 --------------------------------------------------------------------------
 
@@ -71,6 +77,8 @@
 	$ docker exec -it [container name] cli
 	$ docker exec -it [container name] bash
 	$ docker exec -it $CONTAINER_ID /bin/bash
+	$ docker exec -it $CONTAINER_ID /bin/sh
+	$ docker exec -it $CONTAINER_ID sh
 
 
 --------------------------------------------------------------------------
@@ -237,7 +245,26 @@
 
 
 --------------------------------------------------------------------------
+Volume 掛載測試
+
+		--mount "type=bind,source="$(pwd)"/target,target=/app,readonly"
+		eq
+		-v "$(pwd)"/target:/app:ro 
+	
+	Ex : 
+		$ winpty docker run --rm -it --name=test_busy_box --mount "type=bind,source=//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir,target=//test_dir"  busybox
+		eq
+		$ winpty docker run --rm -it --name=test_busy_box -v "//C/Users/wistronits/Documents/Kitematic/gtu001_test_dir://test_dir"  busybox 
+  
+  	Ps : 若在 win7 dockerToolbox 環境 , 需再 kitematic 點 container 再點右邊 volume 的齒輪 再另外設定 mapping location才有用, 在設定完後原來的會失效
+
 --------------------------------------------------------------------------
+簡易版的 docker image
+	
+	<1> busybox
+	<2> alpine
+	
+
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
