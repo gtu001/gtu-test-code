@@ -61,7 +61,6 @@ public class GodToast {
 
         dropboxFileLoadService = DropboxFileLoadService.newInstance(context, DropboxApplicationActivity.getDropboxAccessToken(context));
         godImageConfig = dropboxFileLoadService.downloadGodImageFile();
-        Log.line(TAG, "godImageConfig = " + godImageConfig + " -> " + godImageConfig.exists());
 
         this.layout = new FrameLayout(context);
 
@@ -152,7 +151,14 @@ public class GodToast {
         int width = bm.getLeft();
         int height = bm.getRight();
 
-        int newWidth = sceenWidth / 2;
+        float fixRatio = ((float)width / (float)height) / 4;
+        if (fixRatio > 0.35) {
+            fixRatio = 0.35f;
+        } else if (fixRatio < 0) {
+            fixRatio = 0f;
+        }
+
+        int newWidth = (int) (sceenWidth * (0.5 + fixRatio));
 
         double scale = (double) newWidth / (double) width;
         int newHeight = (int) (height * scale);
