@@ -23,6 +23,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.DisplayMetrics;
+
+import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -232,7 +234,7 @@ public class SwitchPictureService {
         }
     }
 
-    private final static Pattern wordPattern = Pattern.compile("[a-zA-Z]+");
+    private final static Pattern wordPattern = Pattern.compile(EnglishSearchRegexConf.getSearchRegex(false, false));
 
     private Multimap<String, FileZ> createCacheMap(Set<FileZ> allPicFileList) {
         Multimap<String, FileZ> cacheMap = HashMultimap.create();
