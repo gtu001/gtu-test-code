@@ -6,7 +6,7 @@ public class DBDateUtil {
     }
 
     public enum DBDateDateFormat {
-        ORACLE {
+        Oracle {
             @Override
             String date2Varchar(String columnName) {
                 return String.format(" TO_CHAR(%s, 'YYYY/MM/DD') ", columnName);
@@ -46,6 +46,27 @@ public class DBDateUtil {
             @Override
             String varchar2Date(String columnName) {
                 return String.format(" TO_DATE(%s,'YYYY/MM/DD') ", columnName);
+            }
+        }, //
+        Postgres {
+            @Override
+            String date2Varchar(String columnName) {
+                return String.format(" TO_CHAR(%s, 'YYYY-MM-DD') ", columnName);
+            }
+
+            @Override
+            String timestamp2Varchar(String columnName) {
+                return String.format(" TO_CHAR(%s, 'YYYY-MM-DD HH24:MI:SS.MS') ", columnName);
+            }
+
+            @Override
+            String varchar2Timestamp(String columnName) {
+                return String.format(" TO_TIMESTAMP(%s,'YYYY-MM-DD HH24:MI:SS.MS') ", columnName);
+            }
+
+            @Override
+            String varchar2Date(String columnName) {
+                return String.format(" to_date(%s, 'YYYY/MM/DD') ", columnName);
             }
         },//
         ;
