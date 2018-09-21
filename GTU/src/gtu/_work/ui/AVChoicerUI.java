@@ -90,7 +90,8 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_EXE_KEY = "avExeText";
 
     private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
-//    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+    // private PropertiesUtilBean config = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
@@ -115,7 +116,7 @@ public class AVChoicerUI extends JFrame {
             public void run() {
                 try {
                     AVChoicerUI frame = new AVChoicerUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -647,13 +648,18 @@ public class AVChoicerUI extends JFrame {
         private AtomicReference<File> tempDir = new AtomicReference<File>();
 
         private File __findJpgFile(File avFile) {
-            String currentFileName = FileUtil.getNameNoSubName(avFile);
-            Pattern ptn = Pattern.compile(currentFileName, Pattern.CASE_INSENSITIVE);
-            return Stream.of(avFile.getParentFile().listFiles()).filter(f -> f.getName().endsWith(".jpg")).filter(f -> {
-                String jpgName = FileUtil.getNameNoSubName(f);
-                Matcher mth = ptn.matcher(jpgName);
-                return mth.find();
-            }).findAny().orElse(null);
+            try {
+                String currentFileName = FileUtil.getNameNoSubName(avFile);
+                Pattern ptn = Pattern.compile(currentFileName, Pattern.CASE_INSENSITIVE);
+                return Stream.of(avFile.getParentFile().listFiles()).filter(f -> f.getName().endsWith(".jpg")).filter(f -> {
+                    String jpgName = FileUtil.getNameNoSubName(f);
+                    Matcher mth = ptn.matcher(jpgName);
+                    return mth.find();
+                }).findAny().orElse(null);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
+            }
         }
 
         public File getAvFile() {

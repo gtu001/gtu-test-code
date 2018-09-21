@@ -64,9 +64,9 @@ public class FastDBQueryUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    private static final File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
-    // private static final File JAR_PATH_FILE = new
-    // File("D:\\my_tool\\db_tool");
+    // private static final File JAR_PATH_FILE =
+    // PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
+    private static final File JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
     private static Properties sqlIdListProp;
@@ -120,7 +120,7 @@ public class FastDBQueryUI extends JFrame {
             public void run() {
                 try {
                     FastDBQueryUI frame = new FastDBQueryUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
