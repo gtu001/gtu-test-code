@@ -8,11 +8,13 @@ DESCRIBE TABLE test.bill_user
 
 --顯示表結構
 SELECT
+	t.TBCREATOR as schema,
+	t.tbname as table,
 	(t.name),
 	t.coltype,
 	t.remarks,
 	t.nulls,
 	t.length
 FROM Sysibm.syscolumns t
-WHERE t.tbname = 'DTXXTP01'
-	and t.TBCREATOR = 'DBXX'
+WHERE t.tbname = 'DTRDG120'
+	and t.TBCREATOR = 'DBRD';
