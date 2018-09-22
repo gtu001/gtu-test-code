@@ -6,8 +6,6 @@
  */
 package gtu.collection;
 
-import gtu.reflect.ReflectUtil;
-
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,6 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+
+import gtu.reflect.ReflectUtil;
 
 /**
  * @author Troy 2012/1/8
@@ -228,23 +229,23 @@ public class MapUtil {
     }
 
     public static <T> Map<List<String>, List<T>> categoryMapByGetter(List<T> array, String... methodNames) {
-        Map<List<String>, List<T>> map = new LinkedHashMap<List<String>,List<T>>();
+        Map<List<String>, List<T>> map = new LinkedHashMap<List<String>, List<T>>();
         try {
             List<Method> methodList = new ArrayList<Method>();
-            for(String methodName : methodNames){
+            for (String methodName : methodNames) {
                 Method method = array.get(0).getClass().getDeclaredMethod(methodName, new Class[0]);
                 method.setAccessible(true);
                 methodList.add(method);
             }
-            
-            for(T t : array){
+
+            for (T t : array) {
                 List<String> key = new ArrayList<String>();
-                for(Method m : methodList){
+                for (Method m : methodList) {
                     key.add(String.valueOf(m.invoke(t, new Object[0])));
                 }
-                
+
                 List<T> currentValue = new ArrayList<T>();
-                if(map.containsKey(key)){
+                if (map.containsKey(key)) {
                     currentValue = map.get(key);
                 }
                 currentValue.add(t);
@@ -254,5 +255,9 @@ public class MapUtil {
             throw new RuntimeException(e);
         }
         return map;
+    }
+
+    public static Map createIngoreMap() {
+        return new TreeMap(String.CASE_INSENSITIVE_ORDER);
     }
 }

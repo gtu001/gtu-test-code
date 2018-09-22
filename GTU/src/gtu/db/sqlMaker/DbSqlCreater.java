@@ -27,11 +27,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
-import com.sun.jna.platform.win32.Sspi.TimeStamp;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+//import com.thoughtworks.xstream.XStream;
+//import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import gtu.db.DBColumnType;
 import gtu.db.jdbc.util.DBDateUtil;
@@ -96,20 +94,20 @@ public class DbSqlCreater {
                 info.pkColumns = pkSet;// XXX
             }
 
-            XStream xstream = new XStream(new DomDriver());
-            xstream.alias("tableInfo", TableInfo.class);
-            xstream.alias("fieldInfo", FieldInfo4DbSqlCreater.class);
+//            XStream xstream = new XStream(new DomDriver());
+//            xstream.alias("tableInfo", TableInfo.class);
+//            xstream.alias("fieldInfo", FieldInfo4DbSqlCreater.class);
 
             File mkdir = new File(FileUtil.DESKTOP_PATH, "CAC前代DB");
             mkdir.mkdirs();
 
             // table schema xml
-            File schemaFile = new File(mkdir, tableName + "_schema.xml");
-            FileWriter swriter = new FileWriter(schemaFile);
-            ObjectOutputStream out = xstream.createObjectOutputStream(swriter);
-            out.writeObject(info);
-            out.flush();
-            out.close();
+//            File schemaFile = new File(mkdir, tableName + "_schema.xml");
+//            FileWriter swriter = new FileWriter(schemaFile);
+//            ObjectOutputStream out = xstream.createObjectOutputStream(swriter);
+//            out.writeObject(info);
+//            out.flush();
+//            out.close();
 
             // table csv
             File dataFile = new File(mkdir, tableName + "_data.csv");
@@ -154,9 +152,10 @@ public class DbSqlCreater {
                 System.out.println("<<<<<<<" + sql);
                 rs = stmt.executeQuery(sql);
 
-                if (conn instanceof oracle.jdbc.driver.OracleConnection) {
-                    ((oracle.jdbc.driver.OracleConnection) conn).setRemarksReporting(true);
-                }
+                // if (conn instanceof oracle.jdbc.driver.OracleConnection) {
+                // ((oracle.jdbc.driver.OracleConnection)
+                // conn).setRemarksReporting(true);
+                // }
 
                 ResultSetMetaData meta = rs.getMetaData();
                 String colLabel = null;
@@ -880,5 +879,37 @@ public class DbSqlCreater {
             e.printStackTrace();
         }
         return treeMap;
+    }
+
+    public static class JdbcUtils {
+        public static void closeConnection(Connection con) {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                } catch (Throwable ex) {
+                }
+            }
+        }
+
+        public static void closeResultSet(ResultSet rs) {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                } catch (Throwable ex) {
+                }
+            }
+        }
+
+        public static void closeStatement(Statement stmt) {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ex) {
+                } catch (Throwable ex) {
+                }
+            }
+        }
     }
 }

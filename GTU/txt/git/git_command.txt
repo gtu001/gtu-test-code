@@ -1,64 +1,72 @@
 --------------------------------------------------------------------------
 第一次commit要做
 
-git init
-git config user.name "someone"
-git config user.email "someone@someplace.com"
+	git init
+	git config user.name "someone"
+	git config user.email "someone@someplace.com"
 
 --------------------------------------------------------------------------
 與head差異
 
-git diff HEAD
+	git diff HEAD
 
 
 --------------------------------------------------------------------------
 取得異動狀態
 
-git status
+	git status
 
 --------------------------------------------------------------------------
 改變檔案狀態
 
-git add *
-git reset 
+	git add *
+	git reset 
+
+--------------------------------------------------------------------------
+將檔案回覆成未改過狀態
+
+	git checkout HEAD GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java
+	or
+	git checkout <commit_id>  <path>/<file>
+	
 
 --------------------------------------------------------------------------
 交付
 
-git commit -m "some init msg"
+	git commit -m "some init msg"
 
 
 --------------------------------------------------------------------------
 ## 互動stage change ##
 
-git add -i
+	git add -i
 
 選擇->  2: update 4: add untracked
 按數字選檔案
 按兩下回車鍵再按Enter回覆上個狀態
 
-git status 綠色是stage changed
+	git status 綠色是stage changed
 
 
 --------------------------------------------------------------------------
 重設到某版
 
-git reset <commit id>
+	git reset <commit id>
 
 
 --------------------------------------------------------------------------
 拉最新版 
 
-git pull [--rebase]
+	git pull [--rebase]
 
 
 --------------------------------------------------------------------------
 儲存狀態
-git stash
+	git stash
 刪除儲存
-git stash drop
+	git stash drop
 彈出
-git stash pop
+	git stash pop
 
 
 --------------------------------------------------------------------------

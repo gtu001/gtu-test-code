@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -45,6 +44,8 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -56,8 +57,6 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 
 import gtu.clipboard.ClipboardUtil;
 
@@ -435,7 +434,7 @@ public class JTableUtil {
      * 已修正col (記得傳入未修正 pos , 否則反而錯誤)
      */
     public static int getRealColumnPos(int colPos, JTable table) {
-//        System.out.println("getRealColumnPos ==> colPos == " + colPos);
+        // System.out.println("getRealColumnPos ==> colPos == " + colPos);
         return table.convertColumnIndexToModel(colPos);
     }
 
@@ -444,15 +443,16 @@ public class JTableUtil {
      */
     public static int getRealRowPos(int rowPos, JTable table) {
         if (rowPos == -1) {
-//            System.out.println("getRealRowPos => " + rowPos);
+            // System.out.println("getRealRowPos => " + rowPos);
             return rowPos;
         }
         if (table.getRowSorter() == null) {
-//            System.out.println("getRealRowPos[no sort] => " + rowPos);
+            // System.out.println("getRealRowPos[no sort] => " + rowPos);
             return rowPos;
         }
         int fixRowPos = table.getRowSorter().convertRowIndexToModel(rowPos);
-//        System.out.println(String.format("getRealRowPos[fix] => before[%d], after[%d]", rowPos, fixRowPos));
+        // System.out.println(String.format("getRealRowPos[fix] => before[%d],
+        // after[%d]", rowPos, fixRowPos));
         return fixRowPos;
     }
 
@@ -1101,5 +1101,25 @@ public class JTableUtil {
                 }
             }
         }
+    }
+
+    public static void addOnblurCellEvent(DefaultTableModel model, final Runnable runnable, final JTableUtil jTableUtil) {
+        model.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int col = e.getColumn();
+                String valueStr = "<ERR>";
+                try {
+                    Object value = jTableUtil.getRealValueAt(row, col);
+                    valueStr = value != null ? (value + " -> " + value.getClass()) : "null";
+                } catch (Exception ex) {
+                    ex.getMessage();
+                }
+                System.out.println(String.format("## table change -> row[%d], col[%d] -----> %s", row, col, valueStr));
+                // 要處理的event
+                runnable.run();
+            }
+        });
     }
 }

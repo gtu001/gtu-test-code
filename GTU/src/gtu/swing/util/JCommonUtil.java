@@ -1016,6 +1016,7 @@ public class JCommonUtil {
 
     /**
      * 取得底下的 component focus
+     * Ps : 記得拿掉原本JDialog的 default button --> getRootPane().setDefaultButton(okButton);
      */
     public static void setFoucsToChildren(final Component root, final Component target) {
         root.addComponentListener(new ComponentAdapter() {

@@ -197,8 +197,8 @@
 			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<include name="**/*" />
 			</zipfileset>
 			<manifest>

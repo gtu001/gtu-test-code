@@ -56,6 +56,7 @@ import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
 import net.sf.json.JSONArray;
 
@@ -738,17 +739,19 @@ public class FastDBQueryUI extends JFrame {
 
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
-            Validate.isTrue(this.queryList != null && !this.queryList.isEmpty(), "查詢結果為空!");
+            if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                Validate.isTrue(this.queryList != null && !this.queryList.isEmpty(), "查詢結果為空!");
 
-            JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
-            int orignRowPos = queryResultTable.getSelectedRow();
+                JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
+                int orignRowPos = queryResultTable.getSelectedRow();
 
-            System.out.println("orignRowPos " + orignRowPos);
-            int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
-            System.out.println("rowPos " + rowPos);
+                System.out.println("orignRowPos " + orignRowPos);
+                int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
+                System.out.println("rowPos " + rowPos);
 
-            Map<String, Object> rowMap = this.queryList.get(rowPos);
-            FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+                Map<String, Object> rowMap = this.queryList.get(rowPos);
+                FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
