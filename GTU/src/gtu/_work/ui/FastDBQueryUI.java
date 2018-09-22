@@ -53,7 +53,6 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.db.JdbcDBUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
-import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
@@ -111,6 +110,13 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_10;
     private JPanel panel_11;
     private JTextArea queryResultJsonTextArea;
+    private JPanel panel_12;
+    private JPanel panel_13;
+    private JPanel panel_14;
+    private JPanel panel_15;
+    private JPanel panel_16;
+
+    private List<Map<String, Object>> queryList = null;
 
     /**
      * Launch the application.
@@ -241,7 +247,30 @@ public class FastDBQueryUI extends JFrame {
         panel_5.setLayout(new BorderLayout(0, 0));
 
         queryResultTable = new JTable();
-        panel_5.add(JTableUtil.getScrollPane(queryResultTable), BorderLayout.CENTER);
+        queryResultTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                queryResultTableMouseClickAction(e);
+            }
+        });
+        panel_12 = new JPanel();
+
+        panel_5.add(panel_12, BorderLayout.CENTER);
+        panel_12.setLayout(new BorderLayout(0, 0));
+
+        panel_13 = new JPanel();
+        panel_12.add(panel_13, BorderLayout.NORTH);
+
+        panel_14 = new JPanel();
+        panel_12.add(panel_14, BorderLayout.WEST);
+
+        panel_15 = new JPanel();
+        panel_12.add(panel_15, BorderLayout.SOUTH);
+
+        panel_16 = new JPanel();
+        panel_12.add(panel_16, BorderLayout.EAST);
+
+        panel_12.add(JTableUtil.getScrollPane(queryResultTable), BorderLayout.CENTER);
 
         panel_7 = new JPanel();
         tabbedPane.addTab("JSON", null, panel_7, null);
@@ -350,6 +379,8 @@ public class FastDBQueryUI extends JFrame {
 
             // 初始化 sqlList
             initLoadSqlListConfig("");
+
+            JCommonUtil.setJFrameCenter(this);
         }
     }
 
@@ -531,6 +562,7 @@ public class FastDBQueryUI extends JFrame {
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
                 List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
+                this.queryList = queryList;
                 this.queryModeProcess(queryList);
                 this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
@@ -557,7 +589,17 @@ public class FastDBQueryUI extends JFrame {
 
     private void showJsonArry(List<Map<String, Object>> queryList) {
         try {
-            queryResultJsonTextArea.setText(JSONArray.fromObject(queryList).toString());
+            List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
+            for (Map<String, Object> map : queryList) {
+                Map<String, Object> cloneMap = (Map<String, Object>) ((HashMap) map).clone();
+                cloneLst.add(cloneMap);
+                for (String key : cloneMap.keySet()) {
+                    if (cloneMap.get(key) != null && (cloneMap.get(key) instanceof java.sql.Date || cloneMap.get(key) instanceof java.sql.Timestamp)) {
+                        cloneMap.put(key, String.valueOf(cloneMap.get(key)));
+                    }
+                }
+            }
+            queryResultJsonTextArea.setText(JSONArray.fromObject(cloneLst).toString());
         } catch (Exception ex) {
             queryResultJsonTextArea.setText("");
             JCommonUtil.handleException(ex);
@@ -681,7 +723,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 取得dataSource
      */
-    private DataSource getDataSource() {
+    public DataSource getDataSource() {
         String url = dbUrlText.getText();
         String user = dbUserText.getText();
         String pwd = dbPwdText.getText();
@@ -692,5 +734,23 @@ public class FastDBQueryUI extends JFrame {
         bds.setPassword(pwd);
         bds.setDriverClassName(driver);
         return bds;
+    }
+
+    private void queryResultTableMouseClickAction(MouseEvent e) {
+        try {
+            Validate.isTrue(this.queryList != null && !this.queryList.isEmpty(), "查詢結果為空!");
+
+            JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
+            int orignRowPos = queryResultTable.getSelectedRow();
+
+            System.out.println("orignRowPos " + orignRowPos);
+            int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
+            System.out.println("rowPos " + rowPos);
+
+            Map<String, Object> rowMap = this.queryList.get(rowPos);
+            FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 }

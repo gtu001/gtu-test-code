@@ -29,10 +29,13 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 
+import com.sun.jna.platform.win32.Sspi.TimeStamp;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import gtu.db.DBColumnType;
+import gtu.db.jdbc.util.DBDateUtil;
+import gtu.db.tradevan.DBTypeMapping_tradevan.JdbcTypeMappingToJava;
 import gtu.file.FileUtil;
 
 public class DbSqlCreater {
@@ -138,6 +141,8 @@ public class DbSqlCreater {
         String schemaName;
         String catalogName;
 
+        DBDateUtil.DBDateFormat dbDateDateFormat;
+
         /**
          * 取得table格式,可能會有數職欄位或非null欄位
          */
@@ -166,11 +171,11 @@ public class DbSqlCreater {
                     if (catalogName == null) {
                         catalogName = meta.getCatalogName(ii);
                     }
-                    if (ResultSetMetaData.columnNoNulls == meta.isNullable(ii)) {
-                        noNullsCol.add(colLabel);
-                    }
                     if (DBColumnType.isNumber(meta.getColumnType(ii))) {
                         numberCol.add(colLabel);
+                    }
+                    if (ResultSetMetaData.columnNoNulls == meta.isNullable(ii)) {
+                        noNullsCol.add(colLabel);
                     }
 
                     FieldInfo4DbSqlCreater finfo = new FieldInfo4DbSqlCreater();
@@ -179,8 +184,12 @@ public class DbSqlCreater {
                     finfo.setColumnDisplaySize(meta.getColumnDisplaySize(ii));
                     finfo.setColumnLabel(meta.getColumnLabel(ii));
                     finfo.setColumnName(meta.getColumnName(ii));
+                    // db type ↓↓↓↓↓↓
                     finfo.setColumnType(meta.getColumnType(ii));
                     finfo.setColumnTypeName(meta.getColumnTypeName(ii));
+                    finfo.setColumnTypeClz(JdbcTypeMappingToJava.getMappingClass(meta.getColumnType(ii)));
+                    finfo.setColumnTypeZ(DBColumnType.lookup(meta.getColumnType(ii)));
+                    // db type ↑↑↑↑↑↑
                     finfo.setPrecision(meta.getPrecision(ii));
                     finfo.setScale(meta.getScale(ii));
                     finfo.setSchemaName(meta.getSchemaName(ii));
@@ -189,12 +198,14 @@ public class DbSqlCreater {
                     finfo.setCaseSensitive(meta.isCaseSensitive(ii));
                     finfo.setCurrency(meta.isCurrency(ii));
                     finfo.setDefinitelyWritable(meta.isDefinitelyWritable(ii));
+                    // nullable ↓↓↓↓↓↓
                     finfo.setNullable(meta.isNullable(ii));
+                    finfo.setNullableBool(ResultSetMetaData.columnNoNulls == meta.isNullable(ii));
+                    // nullable ↑↑↑↑↑↑
                     finfo.setReadOnly(meta.isReadOnly(ii));
                     finfo.setSearchable(meta.isSearchable(ii));
                     finfo.setSigned(meta.isSigned(ii));
                     finfo.setWritable(meta.isWritable(ii));
-                    finfo.setColumnTypeZ(DBColumnType.lookup(meta.getColumnType(ii)));
                     columnInfo.put(colLabel, finfo);
 
                     columns.add(colLabel);
@@ -270,7 +281,7 @@ public class DbSqlCreater {
             validateData();
             StringBuilder sb = new StringBuilder();
             String value = null;
-            sb.append(String.format("INSERT INTO %s  (", tableName));
+            sb.append(String.format("INSERT INTO %s  (", schemaName + "." + tableName));
             for (String key : columns) {
                 sb.append(key + ",");
             }
@@ -293,7 +304,7 @@ public class DbSqlCreater {
         public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("UPDATE " + tableName + " SET ");
+            sb.append("UPDATE " + schemaName + "." + tableName + " SET ");
             for (String key : columns) {
                 String key_ = key.toUpperCase();
                 if (StringUtils.isBlank(valmap.get(key_)) && ignoreNull) {
@@ -323,7 +334,7 @@ public class DbSqlCreater {
         public String createSelectSql(Map<String, String> valmap) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT * FROM " + tableName + " WHERE ");
+            sb.append("SELECT * FROM " + schemaName + "." + tableName + " WHERE ");
             for (String key : pkColumns) {
                 String key_ = key.toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");
@@ -341,7 +352,7 @@ public class DbSqlCreater {
         public String createDeleteSql(Map<String, String> valmap) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("DELETE FROM " + tableName + " WHERE ");
+            sb.append("DELETE FROM " + schemaName + "." + tableName + " WHERE ");
             for (String key : pkColumns) {
                 String key_ = key.toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");
@@ -361,6 +372,29 @@ public class DbSqlCreater {
                     return "''";
                 } else {
                     return "null";
+                }
+            } else if (columnInfo.containsKey(key_)) {
+                FieldInfo4DbSqlCreater colDef = columnInfo.get(key_);
+                System.out.println("-> use ColDef : " + colDef.columnName + " - " + colDef.columnTypeClz);
+
+                if (dbDateDateFormat != null) {
+                    if (colDef.columnTypeClz == java.sql.Timestamp.class) {
+                        return dbDateDateFormat.varchar2Timestamp(String.format("'%s'", value));
+                    } else if (colDef.columnTypeClz == java.sql.Date.class) {
+                        return dbDateDateFormat.varchar2Date(String.format("'%s'", value));
+                    }
+                }
+
+                if (colDef.columnTypeClz == java.sql.Timestamp.class) {
+                    return String.format("to_date('%s', 'yyyy.mm.dd.HH24.MI.SS')", value);
+                } else if (colDef.columnTypeClz == java.sql.Date.class) {
+                    return String.format("to_date('%s', 'yyyy.mm.dd')", value);
+                }
+
+                if (numberCol.contains(key_)) {
+                    return value;
+                } else {
+                    return String.format("'%s'", value);
                 }
             } else {
                 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -482,6 +516,14 @@ public class DbSqlCreater {
 
         public void setCatalogName(String catalogName) {
             this.catalogName = catalogName;
+        }
+
+        public DBDateUtil.DBDateFormat getDbDateDateFormat() {
+            return dbDateDateFormat;
+        }
+
+        public void setDbDateDateFormat(DBDateUtil.DBDateFormat dbDateDateFormat) {
+            this.dbDateDateFormat = dbDateDateFormat;
         }
     }
 
@@ -616,6 +658,7 @@ public class DbSqlCreater {
         String columnName;
         int columnType;
         String columnTypeName;
+        Class<?> columnTypeClz;
         int precision;
         int scale;
         String schemaName;
@@ -625,6 +668,7 @@ public class DbSqlCreater {
         boolean currency;
         boolean definitelyWritable;
         int nullable;
+        boolean nullableBool;
         boolean readOnly;
         boolean searchable;
         boolean signed;
@@ -759,6 +803,10 @@ public class DbSqlCreater {
             this.nullable = nullable;
         }
 
+        public void setNullableBool(boolean nullableBool) {
+            this.nullableBool = nullableBool;
+        }
+
         public boolean isReadOnly() {
             return readOnly;
         }
@@ -797,6 +845,18 @@ public class DbSqlCreater {
 
         public void setColumnTypeZ(DBColumnType columnTypeZ) {
             this.columnTypeZ = columnTypeZ;
+        }
+
+        public Class<?> getColumnTypeClz() {
+            return columnTypeClz;
+        }
+
+        public void setColumnTypeClz(Class<?> columnTypeClz) {
+            this.columnTypeClz = columnTypeClz;
+        }
+
+        public boolean isNullableBool() {
+            return nullableBool;
         }
 
         @Override

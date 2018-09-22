@@ -64,7 +64,7 @@ public class DBExecuteUpdater_tradevan {
             e.printStackTrace();
             try {
                 conn.rollback();
-            } catch (SQLException e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
             throw new RuntimeException(e);

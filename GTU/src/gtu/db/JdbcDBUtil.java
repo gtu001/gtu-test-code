@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +25,11 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.dbcp.BasicDataSource;
 //import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.commons.lang3.StringUtils;
+
+import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
+import gtu.db.tradevan.DBCommon_tradevan;
+import gtu.db.tradevan.DBSqlCreater_tradevan.SqlPrepareStatementDetail;
 
 public class JdbcDBUtil {
 
@@ -99,7 +106,8 @@ public class JdbcDBUtil {
      * 是否有支援此功能。<br/>
      * 在上面的範例中，就 update 而言，變更的動作是即時的。痞子在這裡使用 JOptionPane.showMessageDialog()
      * 來使程式暫停，<br/>
-     * 可以趁暫停的空檔查看 DB 當中的資料是否也有作對應的改變。至於新增、刪除 row 的功能，ResultSet 也有提供，不過在此暫不介紹。<br/>
+     * 可以趁暫停的空檔查看 DB 當中的資料是否也有作對應的改變。至於新增、刪除 row 的功能，ResultSet
+     * 也有提供，不過在此暫不介紹。<br/>
      * （路人：是因為你懶得測試吧... 痞子：...[逃]）<br/>
      * 這樣子的功能，並不適合應用在 JSP 上（所以之前完全不知道有這樣子的功能... [泣]）。<br/>
      * 而針對一般資料庫應用程式而言，不用組 SQL 語法、直接以目前的操作而對資料庫作變更，實在非常省時省力，<br/>
@@ -121,7 +129,7 @@ public class JdbcDBUtil {
 
             // 在 create statement 的時候，就要指明 ResultSet 的型態，後詳述
             Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE // 重點是這個引數，必須使用這個值
-                    );
+            );
             ResultSet rs = stmt.executeQuery("select BoardID from board");
             // 資料庫連線
 
@@ -223,15 +231,15 @@ public class JdbcDBUtil {
             }
         }
     }
-    
+
     public static List<Map<String, Object>> queryForList(String sql, Object param[], Connection con, boolean isCloseConn) throws Exception {
-        List<Map<String, Object>> rsList = new ArrayList<Map<String,Object>>();
+        List<Map<String, Object>> rsList = new ArrayList<Map<String, Object>>();
         java.sql.ResultSet rs = null;
         System.out.println("sql : " + sql);
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i]!=null ? param[i].getClass() : "NA"));
+                System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
                 ps.setObject(i + 1, param[i]);
             }
 
@@ -242,7 +250,7 @@ public class JdbcDBUtil {
             for (int i = 1; i <= cols; i++) {
                 colList.add(mdata.getColumnName(i));
             }
-            
+
             while (rs.next()) {
                 Map<String, Object> map = new LinkedHashMap<String, Object>();
                 for (String col : colList) {
@@ -256,34 +264,34 @@ public class JdbcDBUtil {
             e.printStackTrace();
             throw e;
         } finally {
-            try{
+            try {
                 rs.close();
-            }catch(Exception ex){
+            } catch (Exception ex) {
             }
-            if(isCloseConn){
-                try{
+            if (isCloseConn) {
+                try {
                     con.close();
-                }catch(Exception ex){
+                } catch (Exception ex) {
                 }
             }
         }
         return rsList;
     }
-    
+
     /**
      * 設定使用者
-     * @throws SQLException 
-    */
+     * 
+     * @throws SQLException
+     */
     private static void callPSetUser(Connection con) throws SQLException {
-        try{
+        try {
             CallableStatement call = con.prepareCall("{call pkg_pub_app_context.P_SET_APP_USER_ID(401)}");
             call.execute();
-        }catch(Throwable ex){
+        } catch (Throwable ex) {
             System.out.println("callPSetUser : " + ex.getMessage());
         }
     }
-    
-    
+
     /**
      * 可以供新增修改刪除使用
      */
@@ -291,10 +299,10 @@ public class JdbcDBUtil {
         int rsCount = 0;
         System.out.println("sql:" + sql);
         try {
-            callPSetUser(con);//全球人壽測試用 FIXME
-            
+            callPSetUser(con);// 全球人壽測試用 FIXME
+
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
-            if(param != null){
+            if (param != null) {
                 for (int i = 0; i < param.length; i++) {
                     System.out.println("param[" + i + "]:" + param[i]);
                     ps.setObject(i + 1, param[i]);
@@ -305,18 +313,17 @@ public class JdbcDBUtil {
             System.out.println(e.getMessage());
             e.printStackTrace();
             throw e;
-        } finally{
-            if(isCloseConn){
-                try{
+        } finally {
+            if (isCloseConn) {
+                try {
                     con.close();
-                }catch(Exception ex){
+                } catch (Exception ex) {
                 }
             }
         }
         return rsCount;
     }
-    
-    
+
     /**
      * 只供新增使用 並回傳回新增後所產生的 key 值
      */
@@ -343,14 +350,14 @@ public class JdbcDBUtil {
             e.printStackTrace();
             throw e;// 為了讓外面的 rollback 機制知道有錯誤發生必須把錯誤物件往外拋
         } finally {
-            try{
+            try {
                 rs.close();
-            }catch(Exception ex){
+            } catch (Exception ex) {
             }
-            if(isCloseConn){
-                try{
+            if (isCloseConn) {
+                try {
                     con.close();
-                }catch(Exception ex){
+                } catch (Exception ex) {
                 }
             }
         }
@@ -418,8 +425,7 @@ public class JdbcDBUtil {
         }
         return rtn;
     }
-    
-    
+
     public static List<Map<String, Object>> queryForMap(String sql, List<Object> paramList, Connection conn) throws SQLException {
         List<Map<String, Object>> rsList = new ArrayList<Map<String, Object>>();
         java.sql.ResultSet rs = null;
@@ -460,5 +466,40 @@ public class JdbcDBUtil {
             }
         }
         return rsList;
+    }
+
+    public static int executeUpdate(String sql, Object[] params, Connection conn) {
+        PreparedStatement stmt = null;
+        try {
+            conn.setAutoCommit(false);
+            System.out.println(sql);
+            stmt = conn.prepareStatement(sql);
+
+            for (int ii = 0; ii < params.length; ii++) {
+                stmt.setObject(ii + 1, params[ii]);
+            }
+
+            int result = stmt.executeUpdate();
+            System.out.println("update rows = " + result);
+
+            conn.commit();
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            DBCommon_tradevan.closeConnection(null, stmt, null);
+        }
     }
 }
