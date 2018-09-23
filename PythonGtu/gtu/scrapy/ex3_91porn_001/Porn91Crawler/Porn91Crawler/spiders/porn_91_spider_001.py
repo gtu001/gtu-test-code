@@ -8,17 +8,33 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.selector.lxmlsel import HtmlXPathSelector
 from scrapy.settings import Settings
 from scrapy.spiders import CrawlSpider, Rule
+from selenium import webdriver
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from twisted.internet import reactor
 
+from gtu.datetime import dateUtil
 from gtu.io import fileUtil
 from gtu.net import simple_request_handler_001
+from gtu.os import envUtil
 from gtu.reflect import checkSelf
 from gtu.scrapy import scrapy_runner
-from gtu.datetime import dateUtil
-
-from selenium import webdriver
 
 
+def getWebDriver():
+    path = envUtil.getEnv("PATH");
+    if path.find("geckodriver") == -1 :
+        path = path + ":" + "/media/gtu001/OLD_D/apps/scrapy/linux/geckodriver"
+        print("set Path = " + path)
+        envUtil.export("PATH", path)
+    
+#     return webdriver.Firefox()
+    firefox = FirefoxBinary(r"/usr/bin/firefox") 
+    return webdriver.Firefox(firefox_binary=firefox) 
+    
+
+    
+       
+         
 
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
 class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
@@ -39,7 +55,7 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
     
     def __init__(self):
         self.test = False
-        self.driver = webdriver.Firefox()
+        self.driver = getWebDriver()
   
     def parse(self, response):  # process_item
         print("### MAIN page : ", response.url)

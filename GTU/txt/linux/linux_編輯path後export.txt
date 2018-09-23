@@ -1,1 +1,1 @@
-vi PATH=$PATH:/opt/tibco/tibrv/8.4/lib; export PATH
+vi PATH=$PATH:/media/gtu001/OLD_D/apps/scrapy/geckodriver_linux; export PATH
