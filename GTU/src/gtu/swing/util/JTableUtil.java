@@ -683,30 +683,64 @@ public class JTableUtil {
     // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // jmenu_item
 
-    public List<JMenuItem> getDefaultJMenuItems_NoAddRemoveColumn() {
-        JMenuItem a3 = jMenuItem_addRow(true, "");
-        JMenuItem a3_1 = jMenuItem_addRow(true, "input row count!");
-        JMenuItem a4 = jMenuItem_removeRow("");
-        JMenuItem a5 = jMenuItem_removeAllRow("");
-        JMenuItem a6 = jMenuItem_clearSelectedCell("");
-        JMenuItem a7 = jMenuItem_pasteFromClipboard_multiRowData(true);
-        JMenuItem a8 = jMenuItem_pasteFromClipboard_singleValueToSelectedCell();
-        a3_1.setText("add multi row");
-        return Arrays.asList(a3, a3_1, a4, a5, a6, a7, a8);
+    public List<JMenuItem> getDefaultJMenuItems() {
+        return getDefaultJMenuItems_Mask(//
+                JTableUtil_DefaultJMenuItems_Mask._加欄 | //
+                        JTableUtil_DefaultJMenuItems_Mask._移除欄 | //
+                        JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                        JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                        JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
+        );
     }
 
-    public List<JMenuItem> getDefaultJMenuItems() {
-        JMenuItem a1 = jMenuItem_addColumn("");
-        JMenuItem a2 = jMenuItem_removeColumn("");
-        JMenuItem a3 = jMenuItem_addRow(true, "");
-        JMenuItem a3_1 = jMenuItem_addRow(true, "input row count!");
-        JMenuItem a4 = jMenuItem_removeRow("");
-        JMenuItem a5 = jMenuItem_removeAllRow("");
-        JMenuItem a6 = jMenuItem_clearSelectedCell("");
-        JMenuItem a7 = jMenuItem_pasteFromClipboard_multiRowData(true);
-        JMenuItem a8 = jMenuItem_pasteFromClipboard_singleValueToSelectedCell();
-        a3_1.setText("add multi row");
-        return Arrays.asList(a1, a2, a3, a3_1, a4, a5, a6, a7, a8);
+    public interface JTableUtil_DefaultJMenuItems_Mask {
+        int _加欄 = 1 << 0;
+        int _移除欄 = 1 << 1;
+        int _加列 = 1 << 2;
+        int _加多筆列 = 1 << 3;
+        int _移除列 = 1 << 4;
+        int _移除所有列 = 1 << 5;
+        int _清除已選儲存格 = 1 << 6;
+        int _貼上多行記事本 = 1 << 7;
+        int _貼上單格記事本 = 1 << 8;
+    }
+
+    public List<JMenuItem> getDefaultJMenuItems_Mask(int flag) {
+        List<JMenuItem> lst = new ArrayList<JMenuItem>();
+        if ((JTableUtil_DefaultJMenuItems_Mask._加欄 & flag) != 0) {
+            lst.add(jMenuItem_addColumn(""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._移除欄 & flag) != 0) {
+            lst.add(jMenuItem_removeColumn(""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._加列 & flag) != 0) {
+            lst.add(jMenuItem_addRow(true, ""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._加多筆列 & flag) != 0) {
+            JMenuItem a3_1 = jMenuItem_addRow(true, "input row count!");
+            a3_1.setText("add multi row");
+            lst.add(a3_1);
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._移除列 & flag) != 0) {
+            lst.add(jMenuItem_removeRow(""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._移除所有列 & flag) != 0) {
+            lst.add(jMenuItem_removeAllRow(""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 & flag) != 0) {
+            lst.add(jMenuItem_clearSelectedCell(""));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 & flag) != 0) {
+            lst.add(jMenuItem_pasteFromClipboard_multiRowData(true));
+        }
+        if ((JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 & flag) != 0) {
+            lst.add(jMenuItem_pasteFromClipboard_singleValueToSelectedCell());
+        }
+        return lst;
     }
 
     public JMenuItem jMenuItem_pasteFromClipboard_multiRowData(final boolean autoRowExtendReadch) {
@@ -800,10 +834,7 @@ public class JTableUtil {
                     }
                 }
                 for (int ii = 0; ii < rowCount; ii++) {
-                    String[] emptyArry = new String[model.getRowCount()];
-                    for (int gg = 0; gg < emptyArry.length; gg++) {
-                        emptyArry[gg] = "";
-                    }
+                    Object[] emptyArry = new Object[model.getRowCount()];
                     if (rowPos == -1) {
                         model.addRow(emptyArry);
                         continue;

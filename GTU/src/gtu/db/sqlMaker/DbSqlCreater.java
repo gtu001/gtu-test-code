@@ -3,8 +3,6 @@ package gtu.db.sqlMaker;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -94,20 +92,21 @@ public class DbSqlCreater {
                 info.pkColumns = pkSet;// XXX
             }
 
-//            XStream xstream = new XStream(new DomDriver());
-//            xstream.alias("tableInfo", TableInfo.class);
-//            xstream.alias("fieldInfo", FieldInfo4DbSqlCreater.class);
+            // XStream xstream = new XStream(new DomDriver());
+            // xstream.alias("tableInfo", TableInfo.class);
+            // xstream.alias("fieldInfo", FieldInfo4DbSqlCreater.class);
 
             File mkdir = new File(FileUtil.DESKTOP_PATH, "CAC前代DB");
             mkdir.mkdirs();
 
             // table schema xml
-//            File schemaFile = new File(mkdir, tableName + "_schema.xml");
-//            FileWriter swriter = new FileWriter(schemaFile);
-//            ObjectOutputStream out = xstream.createObjectOutputStream(swriter);
-//            out.writeObject(info);
-//            out.flush();
-//            out.close();
+            // File schemaFile = new File(mkdir, tableName + "_schema.xml");
+            // FileWriter swriter = new FileWriter(schemaFile);
+            // ObjectOutputStream out =
+            // xstream.createObjectOutputStream(swriter);
+            // out.writeObject(info);
+            // out.flush();
+            // out.close();
 
             // table csv
             File dataFile = new File(mkdir, tableName + "_data.csv");
@@ -134,6 +133,9 @@ public class DbSqlCreater {
         Set<String> numberCol = new HashSet<String>();
         Set<String> columns = new TreeSet<String>();
         Set<String> pkColumns = new TreeSet<String>();
+        Set<String> dateCol = new TreeSet<String>();
+        Set<String> timestampCol = new TreeSet<String>();
+
         Map<String, FieldInfo4DbSqlCreater> columnInfo = new LinkedHashMap<String, FieldInfo4DbSqlCreater>();
         String tableName;
         String schemaName;
@@ -188,6 +190,12 @@ public class DbSqlCreater {
                     finfo.setColumnTypeName(meta.getColumnTypeName(ii));
                     finfo.setColumnTypeClz(JdbcTypeMappingToJava.getMappingClass(meta.getColumnType(ii)));
                     finfo.setColumnTypeZ(DBColumnType.lookup(meta.getColumnType(ii)));
+                    if (finfo.getColumnTypeClz() == java.sql.Date.class) {
+                        dateCol.add(colLabel);
+                    }
+                    if (finfo.getColumnTypeClz() == java.sql.Timestamp.class) {
+                        timestampCol.add(colLabel);
+                    }
                     // db type ↑↑↑↑↑↑
                     finfo.setPrecision(meta.getPrecision(ii));
                     finfo.setScale(meta.getScale(ii));
@@ -205,6 +213,7 @@ public class DbSqlCreater {
                     finfo.setSearchable(meta.isSearchable(ii));
                     finfo.setSigned(meta.isSigned(ii));
                     finfo.setWritable(meta.isWritable(ii));
+
                     columnInfo.put(colLabel, finfo);
 
                     columns.add(colLabel);
@@ -372,63 +381,31 @@ public class DbSqlCreater {
                 } else {
                     return "null";
                 }
-            } else if (columnInfo.containsKey(key_)) {
-                FieldInfo4DbSqlCreater colDef = columnInfo.get(key_);
-                System.out.println("-> use ColDef : " + colDef.columnName + " - " + colDef.columnTypeClz);
-
-                if (dbDateDateFormat != null) {
-                    if (colDef.columnTypeClz == java.sql.Timestamp.class) {
-                        return dbDateDateFormat.varchar2Timestamp(String.format("'%s'", value));
-                    } else if (colDef.columnTypeClz == java.sql.Date.class) {
-                        return dbDateDateFormat.varchar2Date(String.format("'%s'", value));
-                    }
-                }
-
-                if (colDef.columnTypeClz == java.sql.Timestamp.class) {
-                    return String.format("to_date('%s', 'yyyy.mm.dd.HH24.MI.SS')", value);
-                } else if (colDef.columnTypeClz == java.sql.Date.class) {
-                    return String.format("to_date('%s', 'yyyy.mm.dd')", value);
-                }
-
-                if (numberCol.contains(key_)) {
-                    return value;
-                } else {
-                    return String.format("'%s'", value);
-                }
             } else {
-                // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 if (value.equalsIgnoreCase("null")) {
                     return "null";
                 }
-                // 日期格式//2001-03-16 00:00:00.0
-                Pattern dateFormat = Pattern.compile("([12]\\d{3})\\-(\\d{2})\\-(\\d{2})\\s(\\d{2})\\:(\\d{2})\\:(\\d{2})\\.\\d+");
-                Matcher mthDate = dateFormat.matcher(value);
-                if (mthDate.matches()) {
-                    String yyyy = mthDate.group(1);
-                    String mm = mthDate.group(2);
-                    String dd = mthDate.group(3);
-                    String hh = mthDate.group(4);
-                    String MM = mthDate.group(5);
-                    String ss = mthDate.group(6);
-                    String rtnVal = String.format("to_date('%s', 'yyyy.mm.dd.HH24.MI.SS')", yyyy + "." + mm + "." + dd + "." + hh + "." + MM + "." + ss);
-                    return rtnVal;
+
+                if (dbDateDateFormat == null) {
+                    dbDateDateFormat = DBDateUtil.DBDateFormat.Oracle;
                 }
-                if (value.startsWith("#date(")) {
-                    Pattern ptn = Pattern.compile("\\#date\\((\\d+)\\)");
-                    Matcher mth = ptn.matcher(value);
-                    if (mth.matches()) {
-                        String yyyyMMdd = mth.group(1);
-                        return " to_date('" + yyyyMMdd + "', 'yyyymmdd') ";
+                if (timestampCol.contains(key_)) {
+                    return dbDateDateFormat.varchar2Timestamp(String.format("'%s'", value));
+                } else if (dateCol.contains(key_)) {
+                    return dbDateDateFormat.varchar2Date(String.format("'%s'", value));
+                }
+
+                if (numberCol.contains(key_)) {
+                    double numVal = 0;
+                    try {
+                        numVal = Double.parseDouble(String.valueOf(value));
+                    } catch (Exception ex) {
+                        System.out.println("轉型數值失敗 => [" + key_ + "]=[" + value + "]");
+                        throw new RuntimeException(ex);
                     }
+                    return String.valueOf(numVal);
                 }
-                if (value.startsWith("#date(")) {
-                    Pattern ptn = Pattern.compile("\\#date\\((.*)\\)");
-                    Matcher mth = ptn.matcher(value);
-                    if (mth.matches()) {
-                        String sysdate = mth.group(1);
-                        return sysdate;
-                    }
-                }
+
                 if (value.startsWith("#seq(")) {
                     Pattern ptn = Pattern.compile("\\#seq\\((.*)\\)");
                     Matcher mth = ptn.matcher(value);
@@ -437,19 +414,8 @@ public class DbSqlCreater {
                         return seqText;
                     }
                 }
-                // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                if (numberCol.contains(key_)) {
-                    int numVal = 0;
-                    try {
-                        numVal = Integer.parseInt(value);
-                    } catch (Exception ex) {
-                        System.out.println("轉型數值失敗 => [" + key_ + "]=[" + value + "]");
-                        throw new RuntimeException(ex);
-                    }
-                    return String.valueOf(numVal);
-                } else {
-                    return String.format("'%s'", value);
-                }
+
+                return String.format("'%s'", value);
             }
         }
 
@@ -523,6 +489,22 @@ public class DbSqlCreater {
 
         public void setDbDateDateFormat(DBDateUtil.DBDateFormat dbDateDateFormat) {
             this.dbDateDateFormat = dbDateDateFormat;
+        }
+
+        public Set<String> getDateCol() {
+            return dateCol;
+        }
+
+        public void setDateCol(Set<String> dateCol) {
+            this.dateCol = dateCol;
+        }
+
+        public Set<String> getTimestampCol() {
+            return timestampCol;
+        }
+
+        public void setTimestampCol(Set<String> timestampCol) {
+            this.timestampCol = timestampCol;
         }
     }
 

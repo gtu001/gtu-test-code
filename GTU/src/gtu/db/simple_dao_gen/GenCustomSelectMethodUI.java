@@ -41,6 +41,7 @@ import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
 
 public class GenCustomSelectMethodUI extends JFrame {
 
@@ -59,7 +60,7 @@ public class GenCustomSelectMethodUI extends JFrame {
             public void run() {
                 try {
                     GenCustomSelectMethodUI frame = new GenCustomSelectMethodUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -108,7 +109,15 @@ public class GenCustomSelectMethodUI extends JFrame {
         paramTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                List<JMenuItem> menuList = JTableUtil.newInstance(paramTable).getDefaultJMenuItems_NoAddRemoveColumn();
+                List<JMenuItem> menuList = JTableUtil.newInstance(paramTable).getDefaultJMenuItems_Mask(//
+                        JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
+                );
                 JPopupMenuUtil.newInstance(paramTable).addJMenuItem(menuList).applyEvent(e).show();
             }
         });
@@ -153,7 +162,7 @@ public class GenCustomSelectMethodUI extends JFrame {
         JScrollPane jScrollPan3 = new JScrollPane();
         jScrollPan3.setViewportView(resultStrArea);
         panel_2.add(jScrollPan3, BorderLayout.CENTER);
-        
+
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/dao.ico");
     }
@@ -210,7 +219,7 @@ public class GenCustomSelectMethodUI extends JFrame {
                 if (StringUtils.isBlank(key)) {
                     continue;
                 }
-                if(model.getValueAt(ii, 1) instanceof String) {
+                if (model.getValueAt(ii, 1) instanceof String) {
                     Validate.isTrue(false, "請選擇類別下拉");
                 }
                 DbType d = (DbType) model.getValueAt(ii, 1);
@@ -219,19 +228,19 @@ public class GenCustomSelectMethodUI extends JFrame {
 
             GenCustomSelectMethod t1 = new GenCustomSelectMethod();
             GenCustomUpdateMethod t2 = new GenCustomUpdateMethod();
-            
+
             String returnStr = "";
-            JRadioButton choiceRadio = ((JRadioButton)JButtonGroupUtil.getSelectedButton(sqlTypeRadioGroup));
+            JRadioButton choiceRadio = ((JRadioButton) JButtonGroupUtil.getSelectedButton(sqlTypeRadioGroup));
             Validate.isTrue(choiceRadio != null, "請選擇方法類型radio");
-            
-            String sqlType= choiceRadio.getText();
-            
-            if("select".equals(sqlType)) {
+
+            String sqlType = choiceRadio.getText();
+
+            if ("select".equals(sqlType)) {
                 returnStr = t1.execute(methodName, sql, paramMap);
-            }else if("update".equals(sqlType)) {
+            } else if ("update".equals(sqlType)) {
                 returnStr = t2.execute(methodName, sql, paramMap);
             }
-            
+
             resultStrArea.setText(returnStr);
             JCommonUtil._jOptionPane_showMessageDialog_error("完成!");
         } catch (Exception ex) {

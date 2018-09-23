@@ -7,8 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,6 +27,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
@@ -43,7 +48,9 @@ import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
 import gtu.swing.util.JTableUtil;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
@@ -68,7 +75,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         boolean isPk;
 
         Object[] toArry() {
-            return new Object[] { columnName, value, dtype, isPk };
+            Object[] arry = new Object[] { columnName, value, dtype, isPk };
+            System.out.println(Arrays.toString(arry));
+            return arry;
         }
     }
 
@@ -184,9 +193,15 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), dataSource.getConnection());
 
                         Set<String> pkColumns = new HashSet<String>();
+                        Set<String> noNullsCol = new HashSet<String>();
+                        Set<String> numberCol = new HashSet<String>();
+                        Set<String> dateCol = new HashSet<String>();
+                        Set<String> timestampCol = new HashSet<String>();
+
                         Map<String, String> map = new HashMap<String, String>();
 
                         for (String columnName : dialog.rowMap.get().keySet()) {
+                            columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
                             ColumnConf df = dialog.rowMap.get().get(columnName);
                             String value = df.value != null ? String.valueOf(df.value) : null;
                             DataType dtype = df.dtype;
@@ -194,13 +209,27 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             map.put(columnName, value);
                             if (isPk) {
                                 pkColumns.add(columnName);
+                                noNullsCol.add(columnName);
+                            }
+                            if (dtype == DataType.date) {
+                                dateCol.add(columnName);
+                            } else if (dtype == DataType.timestamp) {
+                                timestampCol.add(columnName);
+                            } else if (dtype == DataType.number) {
+                                numberCol.add(columnName);
                             }
                         }
 
+                        // ------------------------------------------------
                         if (pkColumns.isEmpty()) {
                             Validate.isTrue(false, "勾選where pk!!");
                         }
-                        tableInfo.setPkColumns(pkColumns);
+                        tableInfo.getNoNullsCol().addAll(noNullsCol);
+                        tableInfo.getNumberCol().addAll(numberCol);
+                        tableInfo.getPkColumns().addAll(pkColumns);
+                        tableInfo.getDateCol().addAll(dateCol);
+                        tableInfo.getTimestampCol().addAll(timestampCol);
+                        // ------------------------------------------------
 
                         AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
                         String sql = "";
@@ -304,10 +333,18 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         for (int ii = 0; ii < tableUtil.getModel().getRowCount(); ii++) {
             String columnName = (String) tableUtil.getRealValueAt(ii, 0);
+            if (columnName == null || StringUtils.isBlank(columnName)) {
+                columnName = "";
+            }
             String value = String.valueOf(tableUtil.getRealValueAt(ii, 1));
-            boolean isPk = (Boolean) tableUtil.getRealValueAt(ii, 3);
+            boolean isPk = false;
+            try {
+                isPk = (Boolean) tableUtil.getRealValueAt(ii, 3);
+            } catch (Exception ex) {
+                System.out.println("isPk---ERR--" + ex.getMessage());
+            }
 
-            DataType dtype = null;
+            DataType dtype = DataType.varchar;
             try {
                 Object dtypeVal = tableUtil.getRealValueAt(ii, 2);
                 if (dtypeVal instanceof String) {
@@ -316,7 +353,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     dtype = (DataType) dtypeVal;
                 }
             } catch (Exception ex) {
-                throw new RuntimeException("欄位:" + columnName + ",未設定正確！ : " + ex.getMessage(), ex);
+                System.out.println("dtype---ERR--" + ex.getMessage());
             }
 
             ColumnConf df = new ColumnConf();
@@ -426,6 +463,21 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             rowTable = new JTable();
             JTableUtil.defaultSetting(rowTable);
             contentPanel.add(JCommonUtil.createScrollComponent(rowTable), BorderLayout.CENTER);
+            rowTable.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
+                            JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                    JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                    JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
+                    );
+                    JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
+                }
+            });
         }
         {
             JPanel buttonPane = new JPanel();
