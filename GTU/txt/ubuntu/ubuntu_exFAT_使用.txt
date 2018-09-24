@@ -1,0 +1,4 @@
+
+	$ sudo apt-get install exfat-fuse exfat-utils
+	
+	安裝後就可用
