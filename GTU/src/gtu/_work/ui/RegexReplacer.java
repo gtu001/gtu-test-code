@@ -32,8 +32,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -44,6 +47,8 @@ import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JOptionPaneUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -83,6 +88,18 @@ public class RegexReplacer extends javax.swing.JFrame {
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             {
                 jTabbedPane1 = new JTabbedPane();
+                jTabbedPane1.addChangeListener(new ChangeListener() {
+                    public void stateChanged(ChangeEvent e) {
+                        try {
+                            if (configHandler != null && jTabbedPane1.getSelectedIndex() == 2) {
+                                System.out.println("-------ChangeEvent[" + jTabbedPane1.getSelectedIndex() + "]");
+                                configHandler.reloadTemplateList();
+                            }
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });
                 getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
                 {
                     jPanel1 = new JPanel();
@@ -120,7 +137,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         jPanel3.setLayout(
                                 new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                                         new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
                         {
                             lblNewLabel = new JLabel("key");
                             jPanel3.add(lblNewLabel, "2, 2, right, default");
@@ -155,7 +172,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         addToTemplate.setText("add to template");
                         addToTemplate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText());
+                                configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText(), tradeOffArea.getText());
                                 configHandler.reloadTemplateList();
                             }
                         });
@@ -182,6 +199,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 configKeyText.setText(config.configKeyText);
                                 repFromText.setText(config.fromVal);
                                 repToText.setText(config.toVal);
+                                tradeOffArea.setText(config.tradeOff);
                             }
                         });
                         templateList.addKeyListener(new KeyAdapter() {
@@ -204,6 +222,14 @@ public class RegexReplacer extends javax.swing.JFrame {
                 configHandler = new PropConfigHandler(prop, propFile, templateList);
                 JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
+                    lblNewLabel_3 = new JLabel("權重 ");
+                    jPanel3.add(lblNewLabel_3, "2, 8");
+                }
+                {
+                    tradeOffArea = new JTextArea();
+                    jPanel3.add(tradeOffArea, "4, 8, fill, fill");
+                }
+                {
                     jPanel4 = new JPanel();
                     BorderLayout jPanel4Layout = new BorderLayout();
                     jPanel4.setLayout(jPanel4Layout);
@@ -211,7 +237,6 @@ public class RegexReplacer extends javax.swing.JFrame {
                     {
                         jScrollPane2 = new JScrollPane();
                         jPanel4.add(jScrollPane2, BorderLayout.CENTER);
-                        jScrollPane2.setPreferredSize(new java.awt.Dimension(491, 283));
                         {
                             resultArea = new JTextArea();
                             jScrollPane2.setViewportView(resultArea);
@@ -270,6 +295,8 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JLabel lblNewLabel_1;
     private JLabel lblNewLabel_2;
     private JTextField configKeyText;
+    private JLabel lblNewLabel_3;
+    private JTextArea tradeOffArea;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
@@ -339,14 +366,16 @@ public class RegexReplacer extends javax.swing.JFrame {
         Properties prop;
         File configFile;
         JList templateList;
+        JTextArea replaceArea;
 
         private static String delimit = "#^#";
         private static String delimit_Pattern = "\\Q#^#\\E";
 
-        PropConfigHandler(Properties prop, File configFile, JList templateList) {
+        PropConfigHandler(Properties prop, File configFile, JList templateList, JTextArea replaceArea) {
             this.prop = prop;
             this.configFile = configFile;
             this.templateList = templateList;
+            this.replaceArea = replaceArea;
             try {
                 if (!propFile.exists()) {
                     propFile.createNewFile();
@@ -359,24 +388,42 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
         }
 
-        private void put(String configKey, String fromVal, String toVal) {
+        private void put(String configKey, String fromVal, String toVal, String tradeOff) {
             Validate.notEmpty(configKey, "configKey 不可為空!");
             Validate.notEmpty(fromVal, "fromVal 不可為空!");
             Validate.notEmpty(toVal, "toVal 不可為空!");
-            prop.setProperty(configKey, fromVal + delimit + toVal);
+            tradeOff = StringUtils.trimToEmpty(tradeOff);
+            prop.setProperty(configKey, fromVal + delimit + toVal + delimit + tradeOff);
         }
 
         void reloadTemplateList() {
-            DefaultListModel templateListModel = new DefaultListModel();
-            List<Object> keys = new ArrayList(prop.keySet());
-            Collections.sort(keys, new Comparator() {
+            String repAreaText = StringUtils.trimToEmpty(replaceArea.getText());
+
+            List<Config> lst = new ArrayList<Config>();
+            for (Entry<Object, Object> entry : prop.entrySet()) {
+                lst.add(new Config(entry));
+            }
+
+            for (Config conf : lst) {
+                conf.processTradeOff(repAreaText);
+            }
+
+            Collections.sort(lst, new Comparator<Config>() {
                 @Override
-                public int compare(Object o1, Object o2) {
-                    return String.valueOf(o1).compareTo(String.valueOf(o2));
+                public int compare(Config c1, Config c2) {
+                    if (c1.tradeOffScore > c2.tradeOffScore) {
+                        return -1;
+                    } else if (c1.tradeOffScore < c2.tradeOffScore) {
+                        return 1;
+                    } else {
+                        return c1.configKeyText.compareTo(c2.configKeyText);
+                    }
                 }
             });
-            for (Entry<Object, Object> entry : prop.entrySet()) {
-                templateListModel.addElement(new Config(entry));
+
+            DefaultListModel templateListModel = new DefaultListModel();
+            for(Config conf : lst){
+                templateListModel.addElement(conf);
             }
             templateList.setModel(templateListModel);
         }
@@ -386,8 +433,16 @@ public class RegexReplacer extends javax.swing.JFrame {
                 configKeyText = String.valueOf(key);
                 String tmpVal = String.valueOf(value);
                 String[] tmpVals = tmpVal.split(delimit_Pattern, -1);
-                fromVal = tmpVals[0];
-                toVal = tmpVals[1];
+                fromVal = getArry(tmpVals, 0);
+                toVal = getArry(tmpVals, 1);
+                tradeOff = getArry(tmpVals, 2);
+            }
+
+            private String getArry(String[] arry, int pos) {
+                if (arry.length > pos) {
+                    return arry[pos];
+                }
+                return "";
             }
 
             Config(Entry<Object, Object> entry) {
@@ -397,9 +452,41 @@ public class RegexReplacer extends javax.swing.JFrame {
             String configKeyText;
             String fromVal;
             String toVal;
+            String tradeOff;
+            int tradeOffScore = 0;
+            String message;
+
+            public void processTradeOff(String script) {
+                tradeOffScore = 0;
+                message = "";
+
+                if (StringUtils.isBlank(tradeOff)) {
+                    return;
+                }
+                try {
+                    List<String> matchLst = new ArrayList<String>();
+                    script = script.toLowerCase();
+                    JSONObject json = JSONObject.fromObject(script);
+                    if (json.containsKey("arry")) {
+                        JSONArray arry = json.getJSONArray("arry");
+                        for (int ii = 0; ii < arry.size(); ii++) {
+                            String string = arry.getString(ii);
+                            if (script.contains(string.toLowerCase())) {
+                                tradeOffScore++;
+                                matchLst.add(string);
+                            }
+                            if (!matchLst.isEmpty()) {
+                                message = StringUtils.join(message, ",");
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException("錯誤 :" + configKeyText + " -> " + ex.getMessage(), ex);
+                }
+            }
 
             public String toString() {
-                return configKeyText + "     /" + fromVal + "/";
+                return configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/";
             }
         }
     }
