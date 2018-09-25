@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,12 +129,12 @@ public class DbSqlCreater {
 
     public static class TableInfo {
 
-        Set<String> noNullsCol = new HashSet<String>();
-        Set<String> numberCol = new HashSet<String>();
-        Set<String> columns = new TreeSet<String>();
-        Set<String> pkColumns = new TreeSet<String>();
-        Set<String> dateCol = new TreeSet<String>();
-        Set<String> timestampCol = new TreeSet<String>();
+        Set<String> noNullsCol = new LinkedHashSet<String>();
+        Set<String> numberCol = new LinkedHashSet<String>();
+        Set<String> columns = new LinkedHashSet<String>();
+        Set<String> pkColumns = new LinkedHashSet<String>();
+        Set<String> dateCol = new LinkedHashSet<String>();
+        Set<String> timestampCol = new LinkedHashSet<String>();
 
         Map<String, FieldInfo4DbSqlCreater> columnInfo = new LinkedHashMap<String, FieldInfo4DbSqlCreater>();
         String tableName;

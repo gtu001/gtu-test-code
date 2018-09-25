@@ -83,6 +83,9 @@
 			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+			
+			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
+			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
 
 		</jarfinder>
 

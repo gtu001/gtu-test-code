@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -11,10 +13,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -44,6 +50,10 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -51,22 +61,28 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.db.JdbcDBUtil;
+import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
+import gtu.file.FileUtil;
+import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
+import gtu.properties.PropertiesUtil;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import net.sf.json.JSONArray;
 
 public class FastDBQueryUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    // private static final File JAR_PATH_FILE =
-    // PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
-    private static final File JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+    private static final File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
+    // private static final File JAR_PATH_FILE = new
+    // File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
     private static Properties sqlIdListProp;
@@ -118,6 +134,13 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_16;
 
     private List<Map<String, Object>> queryList = null;
+    private JButton excelExportBtn;
+    private JRadioButton radio_import_excel;
+    private JRadioButton radio_export_excel;
+
+    private ButtonGroup btnGroup1;
+    private JLabel label;
+    private JTextField columnFilterText;
 
     /**
      * Launch the application.
@@ -262,11 +285,50 @@ public class FastDBQueryUI extends JFrame {
         panel_13 = new JPanel();
         panel_12.add(panel_13, BorderLayout.NORTH);
 
+        label = new JLabel("欄位過濾");
+        panel_13.add(label);
+
+        columnFilterText = new JTextField();
+        panel_13.add(columnFilterText);
+        columnFilterText.setColumns(30);
+        columnFilterText.addFocusListener(new FocusAdapter() {
+
+            ColumnSearchFilter columnFilter;
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                try {
+                    if (columnFilter == null) {
+                        columnFilter = new ColumnSearchFilter(queryResultTable, ",");
+                    }
+                    columnFilter.filterText(columnFilterText.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
         panel_14 = new JPanel();
         panel_12.add(panel_14, BorderLayout.WEST);
 
         panel_15 = new JPanel();
         panel_12.add(panel_15, BorderLayout.SOUTH);
+
+        radio_import_excel = new JRadioButton("匯入excel");
+        panel_15.add(radio_import_excel);
+
+        radio_export_excel = new JRadioButton("匯出excel");
+        panel_15.add(radio_export_excel);
+
+        btnGroup1 = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel);
+
+        excelExportBtn = new JButton("動作");
+        excelExportBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                excelExportBtnAction();
+            }
+        });
+        panel_15.add(excelExportBtn);
 
         panel_16 = new JPanel();
         panel_12.add(panel_16, BorderLayout.EAST);
@@ -613,7 +675,7 @@ public class FastDBQueryUI extends JFrame {
     private void queryModeProcess(List<Map<String, Object>> queryList) {
         if (queryList.isEmpty()) {
             JCommonUtil._jOptionPane_showMessageDialog_info("查無資料!");
-            queryResultTable.setModel(JTableUtil.createModel(true, new Object[0]));
+            queryResultTable.setModel(getFakeDataModel());
             return;
         } else {
             JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.size());
@@ -629,6 +691,41 @@ public class FastDBQueryUI extends JFrame {
         for (Map<String, Object> map : queryList) {
             createModel.addRow(map.values().toArray());
         }
+    }
+
+    private DefaultTableModel getFakeDataModel() {
+        TableInfo tabInfo = new TableInfo();
+        DefaultTableModel model = JTableUtil.createModel(true, new Object[0]);
+        String sql = sqlTextArea.getText().toString();
+        SqlParam param = parseSqlToParam(sql);
+        List<Map<String, Object>> queryLst = new ArrayList<Map<String, Object>>();
+        try {
+            Map<String, Object> valMap = new LinkedHashMap<String, Object>();
+            tabInfo.execute(param.questionSql, this.getDataSource().getConnection());
+            List<String> columns = new ArrayList<String>(tabInfo.getColumns());
+            model = JTableUtil.createModel(true, columns.toArray());
+            List<Object> arry = new ArrayList<Object>();
+            for (int ii = 0; ii < columns.size(); ii++) {
+                String col = columns.get(ii);
+                Object val = null;
+                if (tabInfo.getNumberCol().contains(col)) {
+                    val = (0);
+                } else if (tabInfo.getDateCol().contains(col)) {
+                    val = (new java.sql.Date(System.currentTimeMillis()));
+                } else if (tabInfo.getTimestampCol().contains(col)) {
+                    val = (new java.sql.Timestamp(System.currentTimeMillis()));
+                } else {
+                    val = ("1");
+                }
+                arry.add(val);
+                valMap.put(col, val);
+            }
+            queryLst.add(valMap);
+            model.addRow(arry.toArray());
+            this.queryList = queryLst;
+        } catch (SQLException e) {
+        }
+        return model;
     }
 
     /**
@@ -751,6 +848,112 @@ public class FastDBQueryUI extends JFrame {
 
                 Map<String, Object> rowMap = this.queryList.get(rowPos);
                 FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void excelExportBtnAction() {
+        try {
+            ExcelUtil exlUtl = ExcelUtil.getInstance();
+            AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnGroup1);
+            if (radio_import_excel == selBtn) {
+                File xlsfile = JCommonUtil._jFileChooser_selectFileOnly();
+                if (!xlsfile.exists() || !xlsfile.getName().endsWith(".xls")) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("檔案錯誤(.xls)!");
+                    return;
+                }
+                HSSFWorkbook wk = exlUtl.readExcel(xlsfile);
+                HSSFSheet sheet = wk.getSheetAt(0);
+
+                DefaultTableModel model = null;
+                for (int ii = 0; ii <= 0; ii++) {
+                    Row row = sheet.getRow(ii);
+                    List<Object> titles = new ArrayList<Object>();
+                    for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                        String value = ExcelUtil.getInstance().readCell(row.getCell(jj));
+                        titles.add(value);
+                    }
+                    model = JTableUtil.createModel(true, titles.toArray());
+                    queryResultTable.setModel(model);
+                }
+
+                for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                    Row row = sheet.getRow(ii);
+                    if (row == null) {
+                        continue;
+                    }
+                    List<Object> rows = new ArrayList<Object>();
+                    for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                        String value = ExcelUtil.getInstance().readCell(row.getCell(jj));
+                        rows.add(value);
+                    }
+                    model.addRow(rows.toArray());
+                }
+
+            } else if (radio_export_excel == selBtn) {
+                if (queryList == null || queryList.isEmpty()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
+                    return;
+                }
+
+                HSSFWorkbook wk = new HSSFWorkbook();
+                HSSFSheet sheet0 = wk.createSheet("string value sheet");
+                HSSFSheet sheet1 = wk.createSheet("orign value sheet");
+                HSSFSheet sheet2 = wk.createSheet("sql");
+
+                // 寫sql
+                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(sqlTextArea.getText()));
+                JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
+                int sqlRowPos = 2;
+                for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
+                    int col1 = JTableUtil.getRealColumnPos(0, parametersTable);
+                    int val1 = JTableUtil.getRealColumnPos(1, parametersTable);
+                    Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
+                    Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
+
+                    exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0).setCellValue(String.valueOf(col));
+                    exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1).setCellValue(String.valueOf(val));
+                    sqlRowPos++;
+                }
+
+                // 寫資料
+                List<String> columns = new ArrayList<String>(queryList.get(0).keySet());
+                HSSFRow titleRow0 = sheet0.createRow(0);
+                for (int ii = 0; ii < columns.size(); ii++) {
+                    exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
+                }
+                HSSFRow titleRow1 = sheet1.createRow(0);
+                for (int ii = 0; ii < columns.size(); ii++) {
+                    exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                }
+
+                for (int ii = 0; ii < queryList.size(); ii++) {
+                    Row row_string = sheet0.createRow(ii + 1);
+                    Row row_orign$ = sheet1.createRow(ii + 1);
+
+                    Map<String, Object> map = queryList.get(ii);
+                    for (int jj = 0; jj < columns.size(); jj++) {
+                        String col = columns.get(jj);
+                        Object value = map.get(col);
+
+                        exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
+                        exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                    }
+                }
+
+                String filename = FastDBQueryUI.class.getSimpleName() + "_Export_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".xls";
+                filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
+                if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
+                    File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
+                    exlUtl.writeExcel(exportFile, wk);
+                    if (exportFile.exists()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_info("匯出成功!");
+                    }
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
+                }
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

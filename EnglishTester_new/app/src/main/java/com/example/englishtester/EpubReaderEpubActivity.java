@@ -634,7 +634,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         @Override
         public void onClick(DialogInterface dialog, int which) {
             final Row row = lst.get(which);
-            Pattern ptn = Pattern.compile("^.*(\\[(.*?)\\])$");
+            Pattern ptn = Pattern.compile("^.*\\[(.*?)\\]$");
             Matcher mth = ptn.matcher(row.file_name);
 
             int pos = 0;

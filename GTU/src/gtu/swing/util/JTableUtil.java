@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -771,7 +770,8 @@ public class JTableUtil {
             public void actionPerformed(ActionEvent e) {
                 String columnName = UUID.randomUUID().toString();
                 if (StringUtils.isNotEmpty(confirmMessage)) {
-                    columnName = JOptionPaneUtil.newInstance().iconPlainMessage().showInputDialog(confirmMessage, "ADD COLUMN");
+                    Object tmpColumnName = JOptionPaneUtil.newInstance().iconPlainMessage().showInputDialog(confirmMessage, "ADD COLUMN", columnName);
+                    columnName = tmpColumnName != null ? String.valueOf(tmpColumnName) : null;
                     if (StringUtils.isEmpty(columnName)) {
                         JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("column title can't be empty!", "ERROR");
                         return;
@@ -1152,5 +1152,77 @@ public class JTableUtil {
                 runnable.run();
             }
         });
+    }
+
+    public List<Object> getColumnTitleArray() {
+        List<Object> titles = new ArrayList<Object>();
+        TableColumnModel titleModel = table.getTableHeader().getColumnModel();
+        for (int ii = 0; ii < titleModel.getColumnCount(); ii++) {
+            TableColumn col = titleModel.getColumn(ii);
+            titles.add(col.getHeaderValue());
+        }
+        return titles;
+    }
+
+    public static class ColumnSearchFilter {
+        JTable table;
+        String delimit;
+
+        public ColumnSearchFilter(JTable table, String delimit) {
+            this.table = table;
+            this.delimit = (delimit == null || StringUtils.isBlank(delimit)) ? "," : delimit;
+            this.initTableColumns();
+        }
+
+        Map<Object, TableColumn> headerDef = new LinkedHashMap<Object, TableColumn>();
+
+        private void initTableColumns() {
+            if (headerDef.isEmpty()) {
+                TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
+                for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
+                    headerDef.put(columnModel.getColumn(ii).getHeaderValue(), columnModel.getColumn(ii));
+                    System.out.println("Def Add : " + columnModel.getColumn(ii).getHeaderValue());
+                }
+            }
+        }
+
+        private void removeAll() {
+            TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
+            for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
+                System.out.println("clear : " + columnModel.getColumn(ii).getHeaderValue());
+                columnModel.removeColumn(columnModel.getColumn(ii));
+                ii--;
+            }
+        }
+
+        private void __filterText(String filterText) {
+            TableColumnModel columnModel = table.getTableHeader().getColumnModel();
+
+            String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(delimit, -1);
+
+            for (Object key : headerDef.keySet()) {
+                String headerColumn = String.valueOf(key).toUpperCase();
+
+                boolean findOk = false;
+                B: for (String param : params) {
+                    param = StringUtils.trimToEmpty(param);
+                    if (headerColumn.contains(param)) {
+                        System.out.println("Match------------" + headerColumn + " --> " + param);
+                        findOk = true;
+                        break B;
+                    }
+                }
+
+                if (findOk) {
+                    System.out.println("Add------------" + key);
+                    columnModel.addColumn(headerDef.get(key));
+                }
+            }
+        }
+
+        public void filterText(String filterText) {
+            removeAll();
+            __filterText(filterText);
+        }
     }
 }
