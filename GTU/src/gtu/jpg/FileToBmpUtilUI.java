@@ -45,6 +45,9 @@ public class FileToBmpUtilUI extends JFrame {
     private JCheckBox usePicNameCheckbox;
     private JTextField indicateSizeText;
     private HideInSystemTrayHelper hideInSystemTrayHelper;
+    private JTextField sevenZipText;
+    private JLabel sevenZipLabel;
+    private JLabel fileSizeDescLabel;
 
     /**
      * Launch the application.
@@ -57,7 +60,7 @@ public class FileToBmpUtilUI extends JFrame {
             public void run() {
                 try {
                     FileToBmpUtilUI frame = new FileToBmpUtilUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -165,7 +168,8 @@ public class FileToBmpUtilUI extends JFrame {
         tabbedPane.addTab("bmp->file", null, panel_1, null);
         panel_1.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblSrcBmp = new JLabel("src bmp");
         panel_1.add(lblSrcBmp, "2, 2, right, default");
@@ -178,6 +182,13 @@ public class FileToBmpUtilUI extends JFrame {
             @Override
             public void process(DocumentEvent event) {
                 File f = new File(srcBmpText.getText());
+
+                try {
+                    fileSizeDescLabel.setText(FileUtil.getSizeDescription(f.length()));
+                } catch (Exception ex) {
+                    fileSizeDescLabel.setText("size[ERR]");
+                }
+
                 String toName = FileUtil.getNameNoSubName(f);
                 File destFile = new File(FileUtil.DESKTOP_PATH, toName);
                 toFileText.setText(destFile.getAbsolutePath());
@@ -209,6 +220,17 @@ public class FileToBmpUtilUI extends JFrame {
                 try {
                     File srcBmpFile = JCommonUtil.filePathCheck(srcBmpText.getText(), "BMP檔案來源", "bmp");
                     File toFile = new File(toFileText.getText());
+
+                    // 用7z來產生檔案
+                    if (StringUtils.isNotBlank(sevenZipLabel.getText())) {
+                        File tmp7zFile = new File(toFile.getParentFile(), sevenZipLabel.getText());
+                        if (tmp7zFile.exists()) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在 : " + tmp7zFile.getName());
+                        } else {
+                            toFile = tmp7zFile;
+                        }
+                    }
+
                     int fileSize = 0;
                     try {
                         fileSize = Integer.parseInt(indicateSizeText.getText());
@@ -226,13 +248,46 @@ public class FileToBmpUtilUI extends JFrame {
             }
         });
 
+        JLabel lblNewLabel_1 = new JLabel("資訊");
+        panel_1.add(lblNewLabel_1, "2, 6");
+
+        JPanel panel_3 = new JPanel();
+        panel_1.add(panel_3, "4, 6, fill, fill");
+
+        fileSizeDescLabel = new JLabel("NA");
+        panel_3.add(fileSizeDescLabel);
+
         JLabel lblSize = new JLabel("size");
-        panel_1.add(lblSize, "2, 6, right, default");
+        panel_1.add(lblSize, "2, 8, right, default");
 
         indicateSizeText = new JTextField();
-        panel_1.add(indicateSizeText, "4, 6, fill, default");
+        panel_1.add(indicateSizeText, "4, 8, fill, default");
         indicateSizeText.setColumns(10);
-        panel_1.add(btnGo_1, "2, 8");
+
+        JLabel lblNewLabel = new JLabel("7z");
+        panel_1.add(lblNewLabel, "2, 10");
+
+        JPanel panel_2 = new JPanel();
+        panel_1.add(panel_2, "4, 10, fill, fill");
+
+        sevenZipText = new JTextField();
+        panel_2.add(sevenZipText);
+        sevenZipText.setColumns(10);
+
+        sevenZipText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                try {
+                    sevenZipLabel.setText(String.format("1.7z.%03d", Integer.parseInt(sevenZipText.getText())));
+                } catch (Exception ex) {
+                    sevenZipLabel.setText("");
+                }
+            }
+        }));
+
+        sevenZipLabel = new JLabel("");
+        panel_2.add(sevenZipLabel);
+        panel_1.add(btnGo_1, "2, 12");
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/hacker.ico");

@@ -1,10 +1,5 @@
 package gtu._work.ui;
 
-import gtu.properties.PropertiesUtil;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JOptionPaneUtil;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,27 +12,38 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import gtu.properties.PropertiesUtil;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JOptionPaneUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -60,7 +66,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             public void run() {
                 RegexReplacer inst = new RegexReplacer();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -72,8 +78,6 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     private void initGUI() {
         try {
-            {
-            }
             BorderLayout thisLayout = new BorderLayout();
             getContentPane().setLayout(thisLayout);
             this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -112,38 +116,38 @@ public class RegexReplacer extends javax.swing.JFrame {
                     }
                     {
                         jPanel3 = new JPanel();
-                        GroupLayout jPanel3Layout = new GroupLayout((JComponent) jPanel3);
-                        jPanel3.setLayout(jPanel3Layout);
                         jPanel2.add(jPanel3, BorderLayout.CENTER);
+                        jPanel3.setLayout(
+                                new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        {
+                            lblNewLabel = new JLabel("key");
+                            jPanel3.add(lblNewLabel, "2, 2, right, default");
+                        }
+                        {
+                            configKeyText = new JTextField();
+                            jPanel3.add(configKeyText, "4, 2, fill, default");
+                            configKeyText.setColumns(10);
+                        }
+                        {
+                            lblNewLabel_1 = new JLabel("from");
+                            jPanel3.add(lblNewLabel_1, "2, 4, right, default");
+                        }
                         {
                             repFromText = new JTextField();
+                            jPanel3.add(repFromText, "4, 4, fill, default");
+                            repFromText.setColumns(10);
+                        }
+                        {
+                            lblNewLabel_2 = new JLabel("to");
+                            jPanel3.add(lblNewLabel_2, "2, 6, right, default");
                         }
                         {
                             repToText = new JTextField();
+                            jPanel3.add(repToText, "4, 6, fill, default");
+                            repToText.setColumns(10);
                         }
-                        jPanel3Layout.setHorizontalGroup(jPanel3Layout
-                                .createSequentialGroup()
-                                .addContainerGap(25, 25)
-                                .addGroup(
-                                        jPanel3Layout
-                                                .createParallelGroup()
-                                                .addGroup(
-                                                        jPanel3Layout.createSequentialGroup().addComponent(repFromText,
-                                                                GroupLayout.PREFERRED_SIZE, 446,
-                                                                GroupLayout.PREFERRED_SIZE))
-                                                .addGroup(
-                                                        jPanel3Layout.createSequentialGroup().addComponent(repToText,
-                                                                GroupLayout.PREFERRED_SIZE, 446,
-                                                                GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(20, Short.MAX_VALUE));
-                        jPanel3Layout.setVerticalGroup(jPanel3Layout
-                                .createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(repFromText, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(repToText, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
                     }
                     {
                         addToTemplate = new JButton();
@@ -151,25 +155,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                         addToTemplate.setText("add to template");
                         addToTemplate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                prop.put(repFromText.getText(), repToText.getText());
-                                reloadTemplateList();
+                                configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText());
+                                configHandler.reloadTemplateList();
                             }
                         });
-                    }
-                }
-                {
-                    jPanel4 = new JPanel();
-                    BorderLayout jPanel4Layout = new BorderLayout();
-                    jPanel4.setLayout(jPanel4Layout);
-                    jTabbedPane1.addTab("result", null, jPanel4, null);
-                    {
-                        jScrollPane2 = new JScrollPane();
-                        jPanel4.add(jScrollPane2, BorderLayout.CENTER);
-                        jScrollPane2.setPreferredSize(new java.awt.Dimension(491, 283));
-                        {
-                            resultArea = new JTextArea();
-                            jScrollPane2.setViewportView(resultArea);
-                        }
                     }
                 }
                 {
@@ -183,17 +172,16 @@ public class RegexReplacer extends javax.swing.JFrame {
                         {
                             templateList = new JList();
                             jScrollPane3.setViewportView(templateList);
-                            reloadTemplateList();
                         }
                         templateList.addMouseListener(new MouseAdapter() {
                             public void mouseClicked(MouseEvent evt) {
                                 if (templateList.getLeadSelectionIndex() == -1) {
                                     return;
                                 }
-                                Entry<Object, Object> entry = (Entry<Object, Object>) JListUtil
-                                        .getLeadSelectionObject(templateList);
-                                repFromText.setText((String) entry.getKey());
-                                repToText.setText((String) entry.getValue());
+                                PropConfigHandler.Config config = (PropConfigHandler.Config) JListUtil.getLeadSelectionObject(templateList);
+                                configKeyText.setText(config.configKeyText);
+                                repFromText.setText(config.fromVal);
+                                repToText.setText(config.toVal);
                             }
                         });
                         templateList.addKeyListener(new KeyAdapter() {
@@ -213,15 +201,34 @@ public class RegexReplacer extends javax.swing.JFrame {
                         });
                     }
                 }
+                configHandler = new PropConfigHandler(prop, propFile, templateList);
+                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
+                {
+                    jPanel4 = new JPanel();
+                    BorderLayout jPanel4Layout = new BorderLayout();
+                    jPanel4.setLayout(jPanel4Layout);
+                    jTabbedPane1.addTab("result", null, jPanel4, null);
+                    {
+                        jScrollPane2 = new JScrollPane();
+                        jPanel4.add(jScrollPane2, BorderLayout.CENTER);
+                        jScrollPane2.setPreferredSize(new java.awt.Dimension(491, 283));
+                        {
+                            resultArea = new JTextArea();
+                            jScrollPane2.setViewportView(resultArea);
+                        }
+                    }
+                }
             }
+
+            {
+                configHandler.reloadTemplateList();
+            }
+
             this.setSize(512, 350);
-            JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
+            JCommonUtil.setJFrameCenter(this);
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
-                    if (StringUtils.isNotBlank(repFromText.getText())) {
-                        prop.put(repFromText.getText(), repToText.getText());
-                    }
                     try {
                         prop.store(new FileOutputStream(propFile), "regexText");
                     } catch (Exception e) {
@@ -254,36 +261,29 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton exeucte;
     private JPanel jPanel2;
 
-    static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class),
-            "RegexReplacer.properties");
+    static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class), "RegexReplacer_NEW.properties");
     static Properties prop = new Properties();
-    static {
-        try {
-            if (!propFile.exists()) {
-                propFile.createNewFile();
-            }
-            System.out.println(propFile + " == " + propFile.exists());
-            prop.load(new FileInputStream(propFile));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
-    void reloadTemplateList() {
-        DefaultListModel templateListModel = new DefaultListModel();
-        for (Entry<Object, Object> entry : prop.entrySet()) {
-            templateListModel.addElement(entry);
-        }
-        templateList.setModel(templateListModel);
-    }
+    private PropConfigHandler configHandler;
+
+    private JLabel lblNewLabel;
+    private JLabel lblNewLabel_1;
+    private JLabel lblNewLabel_2;
+    private JTextField configKeyText;
 
     private void exeucteActionPerformed(ActionEvent evt) {
-        String replaceText = null;
-        String fromPattern = null;
-        String toFormat = repToText.getText();
-        Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
-        Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
-        resultArea.setText(replacer(fromPattern, toFormat, replaceText));
+        try {
+            String replaceText = null;
+            String fromPattern = null;
+            String configkeytext = null;
+            String toFormat = repToText.getText();
+            Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
+            Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
+            Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
+            resultArea.setText(replacer(fromPattern, toFormat, replaceText));
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     private void scheduleExecuteActionPerformed(ActionEvent evt) {
@@ -291,8 +291,8 @@ public class RegexReplacer extends javax.swing.JFrame {
         Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
         DefaultListModel model = (DefaultListModel) templateList.getModel();
         for (int ii = 0; ii < model.getSize(); ii++) {
-            Entry<Object, Object> entry = (Entry<Object, Object>) model.getElementAt(ii);
-            replaceText = replacer((String) entry.getKey(), (String) entry.getValue(), replaceText);
+            PropConfigHandler.Config entry = (PropConfigHandler.Config) model.getElementAt(ii);
+            replaceText = replacer(entry.fromVal, entry.toVal, replaceText);
         }
         resultArea.setText(replaceText);
     }
@@ -332,6 +332,75 @@ public class RegexReplacer extends javax.swing.JFrame {
         } catch (Exception ex) {
             JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
             return errorRtn;
+        }
+    }
+
+    private static class PropConfigHandler {
+        Properties prop;
+        File configFile;
+        JList templateList;
+
+        private static String delimit = "#^#";
+        private static String delimit_Pattern = "\\Q#^#\\E";
+
+        PropConfigHandler(Properties prop, File configFile, JList templateList) {
+            this.prop = prop;
+            this.configFile = configFile;
+            this.templateList = templateList;
+            try {
+                if (!propFile.exists()) {
+                    propFile.createNewFile();
+                }
+                this.configFile = propFile;
+                System.out.println(propFile + " == " + propFile.exists());
+                prop.load(new FileInputStream(propFile));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        private void put(String configKey, String fromVal, String toVal) {
+            Validate.notEmpty(configKey, "configKey 不可為空!");
+            Validate.notEmpty(fromVal, "fromVal 不可為空!");
+            Validate.notEmpty(toVal, "toVal 不可為空!");
+            prop.setProperty(configKey, fromVal + delimit + toVal);
+        }
+
+        void reloadTemplateList() {
+            DefaultListModel templateListModel = new DefaultListModel();
+            List<Object> keys = new ArrayList(prop.keySet());
+            Collections.sort(keys, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return String.valueOf(o1).compareTo(String.valueOf(o2));
+                }
+            });
+            for (Entry<Object, Object> entry : prop.entrySet()) {
+                templateListModel.addElement(new Config(entry));
+            }
+            templateList.setModel(templateListModel);
+        }
+
+        private static class Config {
+            Config(Object key, Object value) {
+                configKeyText = String.valueOf(key);
+                String tmpVal = String.valueOf(value);
+                String[] tmpVals = tmpVal.split(delimit_Pattern, -1);
+                fromVal = tmpVals[0];
+                toVal = tmpVals[1];
+            }
+
+            Config(Entry<Object, Object> entry) {
+                this(entry.getKey(), entry.getValue());
+            }
+
+            String configKeyText;
+            String fromVal;
+            String toVal;
+
+            public String toString() {
+                return configKeyText + "     /" + fromVal + "/";
+            }
         }
     }
 }
