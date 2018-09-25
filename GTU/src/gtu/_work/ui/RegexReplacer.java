@@ -201,6 +201,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 repFromText.setText(config.fromVal);
                                 repToText.setText(config.toVal);
                                 tradeOffArea.setText(config.tradeOff);
+
+                                templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
                             }
                         });
                         templateList.addKeyListener(new KeyAdapter() {
@@ -296,6 +298,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             this.setSize(512, 350);
             JCommonUtil.setJFrameCenter(this);
+            JCommonUtil.defaultToolTipDelay();
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
