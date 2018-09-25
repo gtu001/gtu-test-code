@@ -219,8 +219,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         });
                     }
                 }
-                configHandler = new PropConfigHandler(prop, propFile, templateList);
-                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
+
                 {
                     lblNewLabel_3 = new JLabel("權重 ");
                     jPanel3.add(lblNewLabel_3, "2, 8");
@@ -246,6 +245,8 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
 
             {
+                configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
+                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 configHandler.reloadTemplateList();
             }
 
@@ -422,7 +423,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             });
 
             DefaultListModel templateListModel = new DefaultListModel();
-            for(Config conf : lst){
+            for (Config conf : lst) {
                 templateListModel.addElement(conf);
             }
             templateList.setModel(templateListModel);
