@@ -46,6 +46,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -226,6 +227,49 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
                 {
                     tradeOffArea = new JTextArea();
+                    tradeOffArea.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                                    String tradeOff = StringUtils.trimToEmpty(tradeOffArea.getText());
+                                    JSONObject json = null;
+                                    if (StringUtils.isBlank(tradeOff)) {
+                                        json = new JSONObject();
+                                        json.put("arry", new JSONArray());
+                                        tradeOff = json.toString();
+                                    } else {
+                                        json = JSONObject.fromObject(tradeOff);
+                                    }
+
+                                    // 加入新的
+                                    String string = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入新項目:"));
+
+                                    if (StringUtils.isBlank(string)) {
+                                        tradeOffArea.setText(json.toString());
+                                        return;
+                                    }
+
+                                    JSONArray arry = (JSONArray) json.get("arry");
+                                    boolean findOk = false;
+                                    for (int ii = 0; ii < arry.size(); ii++) {
+                                        if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
+                                            findOk = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!findOk) {
+                                        arry.add(string);
+                                    }
+                                    tradeOffArea.setText(json.toString());
+
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("新增完成!");
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
                     jPanel3.add(tradeOffArea, "4, 8, fill, fill");
                 }
                 {
@@ -424,6 +468,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             DefaultListModel templateListModel = new DefaultListModel();
             for (Config conf : lst) {
+                System.out.println("tradeoff conf : " + conf.configKeyText + "\tscore:" + conf.tradeOffScore);
                 templateListModel.addElement(conf);
             }
             templateList.setModel(templateListModel);
@@ -457,28 +502,49 @@ public class RegexReplacer extends javax.swing.JFrame {
             int tradeOffScore = 0;
             String message;
 
+            Pattern use_ptn = Pattern.compile("^\\/(.*)\\/$");
+
             public void processTradeOff(String script) {
                 tradeOffScore = 0;
                 message = "";
 
-                if (StringUtils.isBlank(tradeOff)) {
+                if (StringUtils.isBlank(script) || StringUtils.isBlank(tradeOff)) {
                     return;
                 }
                 try {
                     List<String> matchLst = new ArrayList<String>();
-                    script = script.toLowerCase();
-                    JSONObject json = JSONObject.fromObject(script);
+                    JSONObject json = JSONObject.fromObject(tradeOff);
+
                     if (json.containsKey("arry")) {
                         JSONArray arry = json.getJSONArray("arry");
+
                         for (int ii = 0; ii < arry.size(); ii++) {
                             String string = arry.getString(ii);
-                            if (script.contains(string.toLowerCase())) {
+
+                            boolean matchOk = false;
+
+                            if (string.matches("^\\/.*\\/$")) {
+                                Matcher mth = use_ptn.matcher(string);
+                                mth.find();
+                                Pattern ptn = Pattern.compile(mth.group(1), Pattern.MULTILINE | Pattern.DOTALL);
+                                mth = ptn.matcher(script);
+                                if (mth.find()) {
+                                    matchOk = true;
+                                }
+                            }
+
+                            if (!matchOk && script.toLowerCase().contains(string.toLowerCase())) {
+                                matchOk = true;
+                            }
+
+                            if (matchOk) {
                                 tradeOffScore++;
                                 matchLst.add(string);
                             }
-                            if (!matchLst.isEmpty()) {
-                                message = StringUtils.join(message, ",");
-                            }
+                        }
+
+                        if (!matchLst.isEmpty()) {
+                            message = StringUtils.join(matchLst, ",");
                         }
                     }
                 } catch (Exception ex) {
