@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -37,6 +38,7 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -46,6 +48,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import net.sf.json.JSONArray;
@@ -210,6 +213,18 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 JListUtil.newInstance(templateList).defaultJListKeyPressed(evt);
                             }
                         });
+
+                        // 改變顏色 ↓↓↓↓↓↓
+                        JListUtil.newInstance(templateList).setItemColorTextProcess(new ItemColorTextHandler() {
+                            public Pair<String, Color> setColorAndText(Object value) {
+                                PropConfigHandler.Config config = (PropConfigHandler.Config) value;
+                                if (config.tradeOffScore != 0) {
+                                    return Pair.of(null, Color.GREEN);
+                                }
+                                return null;
+                            }
+                        });
+                        // 改變顏色 ↑↑↑↑↑↑
                     }
                     {
                         scheduleExecute = new JButton();

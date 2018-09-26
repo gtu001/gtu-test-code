@@ -1,5 +1,7 @@
 package gtu.swing.util;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -7,8 +9,12 @@ import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Iterator;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class JListUtil {
 
@@ -159,6 +165,35 @@ public class JListUtil {
                 break;
             }
         }
+        return this;
+    }
+
+    public interface ItemColorTextHandler {
+        public Pair<String, Color> setColorAndText(Object value);
+    }
+
+    public JListUtil setItemColorTextProcess(final ItemColorTextHandler itemColorHandler) {
+        jList1.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (itemColorHandler != null) {
+                    Pair<String, Color> handler = itemColorHandler.setColorAndText(value);
+                    if (handler != null) {
+                        if (StringUtils.isNotBlank(handler.getLeft())) {
+                            setText(StringUtils.trimToEmpty(handler.getLeft()));
+                        }
+                        if (handler.getRight() != null) {
+                            setBackground(handler.getRight());
+                        }
+                    }
+                    if (isSelected) {
+                        setBackground(getBackground().darker());
+                    }
+                }
+                return c;
+            }
+        });
         return this;
     }
 }
