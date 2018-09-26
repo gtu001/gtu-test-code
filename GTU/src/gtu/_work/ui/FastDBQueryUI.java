@@ -142,6 +142,8 @@ public class FastDBQueryUI extends JFrame {
     private JLabel label;
     private JTextField columnFilterText;
 
+    private boolean isResetQuery = true;// 是否重新查詢
+
     /**
      * Launch the application.
      */
@@ -298,8 +300,9 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 try {
-                    if (columnFilter == null) {
+                    if (columnFilter == null || isResetQuery) {
                         columnFilter = new ColumnSearchFilter(queryResultTable, ",");
+                        isResetQuery = false;
                     }
                     columnFilter.filterText(columnFilterText.getText());
                 } catch (Exception ex) {
@@ -592,6 +595,8 @@ public class FastDBQueryUI extends JFrame {
      */
     private void executeSqlButtonClick() {
         try {
+            isResetQuery = true;
+
             JTableUtil util = JTableUtil.newInstance(parametersTable);
             Map<String, Object> paramMap = new HashMap<String, Object>();
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
