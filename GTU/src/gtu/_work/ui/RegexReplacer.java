@@ -65,6 +65,8 @@ import net.sf.json.JSONObject;
  * ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 public class RegexReplacer extends javax.swing.JFrame {
+    private static final String NOT_CONTAIN_ARRY_KEY = "not_arry";
+    private static final String CONTAIN_ARRY_KEY = "arry";
     private static final long serialVersionUID = 1L;
 
     /**
@@ -253,13 +255,19 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     JSONObject json = null;
                                     if (StringUtils.isBlank(tradeOff)) {
                                         json = new JSONObject();
-                                        json.put("arry", new JSONArray());
+                                        json.put(CONTAIN_ARRY_KEY, new JSONArray());
+                                        json.put(NOT_CONTAIN_ARRY_KEY, new JSONArray());
                                         tradeOff = json.toString();
                                     } else {
                                         json = JSONObject.fromObject(tradeOff);
                                     }
 
                                     // 加入新的
+                                    String selectItem = (String) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", new Object[] { "NA", "equal", "not_equal" }, "NA");
+                                    if ("NA".equals(selectItem)) {
+                                        return;
+                                    }
+
                                     String string = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入新項目:"));
 
                                     if (StringUtils.isBlank(string)) {
@@ -267,7 +275,19 @@ public class RegexReplacer extends javax.swing.JFrame {
                                         return;
                                     }
 
-                                    JSONArray arry = (JSONArray) json.get("arry");
+                                    String arryKey = "";
+                                    if (selectItem.equals("equal")) {
+                                        arryKey = CONTAIN_ARRY_KEY;
+                                    } else if (selectItem.equals("not_equal")) {
+                                        arryKey = NOT_CONTAIN_ARRY_KEY;
+                                    } else {
+                                        throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
+                                    }
+
+                                    if (!json.containsKey(arryKey)) {
+                                        json.put(arryKey, new JSONArray());
+                                    }
+                                    JSONArray arry = (JSONArray) json.get(arryKey);
                                     boolean findOk = false;
                                     for (int ii = 0; ii < arry.size(); ii++) {
                                         if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
@@ -479,7 +499,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                     } else if (c1.tradeOffScore < c2.tradeOffScore) {
                         return 1;
                     } else {
-                        return c1.configKeyText.compareTo(c2.configKeyText);
+                        if (c1.isModify && !c2.isModify) {
+                            return -1;
+                        } else if (!c1.isModify && c2.isModify) {
+                            return 1;
+                        } else {
+                            return c1.configKeyText.compareTo(c2.configKeyText);
+                        }
                     }
                 }
             });
@@ -518,53 +544,61 @@ public class RegexReplacer extends javax.swing.JFrame {
             String toVal;
             String tradeOff;
             int tradeOffScore = 0;
+            boolean isModify = false;
             String message;
 
             Pattern use_ptn = Pattern.compile("^\\/(.*)\\/$");
 
+            private void __tradeOffProcess(String key, int offset, JSONObject json, String script, List<String> messageLst) {
+                if (json.containsKey(key)) {
+                    JSONArray arry = json.getJSONArray(key);
+
+                    for (int ii = 0; ii < arry.size(); ii++) {
+                        String string = arry.getString(ii);
+
+                        boolean matchOk = false;
+
+                        if (string.matches("^\\/.*\\/$")) {
+                            Matcher mth = use_ptn.matcher(string);
+                            mth.find();
+                            Pattern ptn = Pattern.compile(mth.group(1), Pattern.MULTILINE | Pattern.DOTALL);
+                            mth = ptn.matcher(script);
+                            if (mth.find()) {
+                                matchOk = true;
+                            }
+                        }
+
+                        if (!matchOk && script.toLowerCase().contains(string.toLowerCase())) {
+                            matchOk = true;
+                        }
+
+                        if (matchOk) {
+                            tradeOffScore += offset;
+                            String prefix = offset < 0 ? "[扣分項]" : "";
+                            messageLst.add(prefix + string);
+                            isModify = true;
+                        }
+                    }
+                }
+            }
+
             public void processTradeOff(String script) {
                 tradeOffScore = 0;
                 message = "";
+                isModify = false;// 為改過
 
                 if (StringUtils.isBlank(script) || StringUtils.isBlank(tradeOff)) {
                     return;
                 }
                 try {
-                    List<String> matchLst = new ArrayList<String>();
                     JSONObject json = JSONObject.fromObject(tradeOff);
+                    List<String> messageLst = new ArrayList<String>();
 
-                    if (json.containsKey("arry")) {
-                        JSONArray arry = json.getJSONArray("arry");
+                    __tradeOffProcess(CONTAIN_ARRY_KEY, 2, json, script, messageLst);
+                    __tradeOffProcess(NOT_CONTAIN_ARRY_KEY, -1, json, script, messageLst);
 
-                        for (int ii = 0; ii < arry.size(); ii++) {
-                            String string = arry.getString(ii);
+                    message = StringUtils.join(messageLst, ",");
 
-                            boolean matchOk = false;
-
-                            if (string.matches("^\\/.*\\/$")) {
-                                Matcher mth = use_ptn.matcher(string);
-                                mth.find();
-                                Pattern ptn = Pattern.compile(mth.group(1), Pattern.MULTILINE | Pattern.DOTALL);
-                                mth = ptn.matcher(script);
-                                if (mth.find()) {
-                                    matchOk = true;
-                                }
-                            }
-
-                            if (!matchOk && script.toLowerCase().contains(string.toLowerCase())) {
-                                matchOk = true;
-                            }
-
-                            if (matchOk) {
-                                tradeOffScore++;
-                                matchLst.add(string);
-                            }
-                        }
-
-                        if (!matchLst.isEmpty()) {
-                            message = StringUtils.join(matchLst, ",");
-                        }
-                    }
                 } catch (Exception ex) {
                     JCommonUtil.handleException("錯誤 :" + configKeyText + " -> " + ex.getMessage(), ex);
                 }
