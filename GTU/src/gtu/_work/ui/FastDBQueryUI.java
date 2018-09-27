@@ -80,12 +80,16 @@ public class FastDBQueryUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    private static final File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
-    // private static final File JAR_PATH_FILE = new
-    // File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+    private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
+    static {
+        JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+        JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+    }
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
     private static Properties sqlIdListProp;
+    private static final File sqlIdListDSMappingFile = new File(JAR_PATH_FILE, "sqlList_DS_Mapping.properties");
+    private static Properties sqlIdListDSMappingProp;
 
     // private static PropertiesGroupUtils dataSourceConfig = new
     // PropertiesGroupUtils(new File(JAR_PATH_FILE, "dataSource.properties"));
@@ -143,6 +147,8 @@ public class FastDBQueryUI extends JFrame {
     private JTextField columnFilterText;
 
     private boolean isResetQuery = true;// 是否重新查詢
+    private JPanel panel_17;
+    private JButton removeConnectionBtn;
 
     /**
      * Launch the application.
@@ -411,13 +417,24 @@ public class FastDBQueryUI extends JFrame {
         dbDriverText.setColumns(10);
         panel_6.add(saveConnectionBtn, "4, 22");
 
+        panel_17 = new JPanel();
+        panel_6.add(panel_17, "10, 22, fill, fill");
+
         nextConnBtn = new JButton("下一組");
+        panel_17.add(nextConnBtn);
+
+        removeConnectionBtn = new JButton("刪除設定");
+        removeConnectionBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                removeConnectionBtnAction();
+            }
+        });
+        panel_17.add(removeConnectionBtn);
         nextConnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 nextConnBtnClick();
             }
         });
-        panel_6.add(nextConnBtn, "6, 22");
 
         nextParameterBtn = new JButton("下一組設定");
         nextParameterBtn.addActionListener(new ActionListener() {
@@ -445,6 +462,7 @@ public class FastDBQueryUI extends JFrame {
 
             // 初始化 sqlList
             initLoadSqlListConfig("");
+            initLoadSqlIdMappingConfig();
 
             JCommonUtil.setJFrameCenter(this);
         }
@@ -453,7 +471,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 初始化sqlList
      */
-    private void initLoadSqlListConfig(String queryText) throws FileNotFoundException, IOException {
+    private void initLoadSqlListConfig(String queryText) throws IOException {
         if (!sqlIdListFile.exists()) {
             sqlIdListFile.createNewFile();
         }
@@ -477,6 +495,23 @@ public class FastDBQueryUI extends JFrame {
             model.addElement(s);
         }
         sqlList.setModel(model);
+    }
+
+    private void initLoadSqlIdMappingConfig() throws IOException {
+        if (!sqlIdListDSMappingFile.exists()) {
+            sqlIdListDSMappingFile.createNewFile();
+        }
+        Properties prop = new Properties();
+        prop.load(new FileInputStream(sqlIdListDSMappingFile));
+        sqlIdListDSMappingProp = prop;
+    }
+
+    private void storeSqlIdListDsMappingProp() throws IOException {
+        String sqlId = (String) sqlList.getSelectedValue();
+        String dbNameId = dbNameIdText.getText();
+        this.initLoadSqlIdMappingConfig();
+        sqlIdListDSMappingProp.setProperty(sqlId, dbNameId);
+        sqlIdListDSMappingProp.store(new FileOutputStream(sqlIdListDSMappingFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
     }
 
     /**
@@ -560,6 +595,7 @@ public class FastDBQueryUI extends JFrame {
 
             // 刷新sqlList
             initLoadSqlListConfig("");
+            initLoadSqlIdMappingConfig();
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
@@ -649,6 +685,11 @@ public class FastDBQueryUI extends JFrame {
                     paramMap2.put(col, val);
                 }
                 sqlParameterConfigLoad.saveConfig(paramMap2);
+            }
+
+            // 儲存sqlId mapping dataSource 設定
+            if (sqlList.getSelectedIndex() != -1) {
+                storeSqlIdListDsMappingProp();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -785,6 +826,42 @@ public class FastDBQueryUI extends JFrame {
         // 載入參數設定
         sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
         loadParameterTableConfig();
+
+        // 判斷是否要自動切換dataSource
+        loadSqlIdMappingDataSourceConfig();
+    }
+
+    private void loadSqlIdMappingDataSourceConfig() {
+        try {
+            initLoadSqlIdMappingConfig();
+            String sqlId = JListUtil.getLeadSelectionObject(sqlList);
+            if (sqlIdListDSMappingProp.containsKey(sqlId)) {
+                String saveKey = sqlIdListDSMappingProp.getProperty(sqlId);
+                if (!StringUtils.equals(dbNameIdText.getText(), saveKey)) {
+                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("最後一次使用的DataSource為 :" + saveKey + ", 目前為 : " + dbNameIdText.getText() + "是否要切換", "切換dataSource");
+                    if (confirm) {
+                        Map<String, String> param = dataSourceConfig.getConfig(saveKey);
+                        if (param.containsKey(PropertiesGroupUtils_ByKey.SAVE_KEYS) && StringUtils.isNotBlank(param.get(PropertiesGroupUtils_ByKey.SAVE_KEYS))) {
+                            dbNameIdText.setText(param.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
+                        }
+                        if (param.containsKey("url") && StringUtils.isNotBlank(param.get("url"))) {
+                            dbUrlText.setText(param.get("url"));
+                        }
+                        if (param.containsKey("user") && StringUtils.isNotBlank(param.get("user"))) {
+                            dbUserText.setText(param.get("user"));
+                        }
+                        if (param.containsKey("pwd")) {// 密碼可以空
+                            dbPwdText.setText(param.get("pwd"));
+                        }
+                        if (param.containsKey("driver") && StringUtils.isNotBlank(param.get("driver"))) {
+                            dbDriverText.setText(param.get("driver"));
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     /**
@@ -959,6 +1036,19 @@ public class FastDBQueryUI extends JFrame {
                 } else {
                     JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
                 }
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void removeConnectionBtnAction() {
+        try {
+            String dbNameId = dbNameIdText.getText();
+            boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定要刪除:" + dbNameId, "刪除設定");
+            if (confirm) {
+                dataSourceConfig.removeConfig(dbNameId);
+                JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功! : dbNameId");
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
