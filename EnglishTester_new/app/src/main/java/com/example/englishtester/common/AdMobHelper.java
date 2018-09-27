@@ -32,12 +32,12 @@ public class AdMobHelper {
         AdRequest request;
         if (BuildConfig.DEBUG) {
             Log.e(TAG, "Is debug AdRequest!");
-            String ANDROID_ID = Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-            Log.w(TAG, "androidId - " + ANDROID_ID);
+//            String ANDROID_ID = Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+//            Log.w(TAG, "androidId - " + ANDROID_ID);
             request = new AdRequest.Builder()//
                     .addTestDevice("1F1C5D0E8ABC54FD716053C9385C49A4")//
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)//
-                    .addTestDevice(ANDROID_ID)//
+//                    .addTestDevice(ANDROID_ID)//
                     .build();
         } else {
             Log.e(TAG, "Is release AdRequest!");
