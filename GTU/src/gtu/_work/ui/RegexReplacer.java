@@ -87,6 +87,10 @@ public class RegexReplacer extends javax.swing.JFrame {
         initGUI();
     }
 
+    private enum TabIndex {
+        SOURCE, PARAM, TEMPLATE, RESULT
+    }
+
     private void initGUI() {
         try {
             BorderLayout thisLayout = new BorderLayout();
@@ -97,7 +101,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 jTabbedPane1.addChangeListener(new ChangeListener() {
                     public void stateChanged(ChangeEvent e) {
                         try {
-                            if (configHandler != null && jTabbedPane1.getSelectedIndex() == 2) {
+                            if (configHandler != null && jTabbedPane1.getSelectedIndex() == TabIndex.TEMPLATE.ordinal()) {
                                 System.out.println("-------ChangeEvent[" + jTabbedPane1.getSelectedIndex() + "]");
                                 configHandler.reloadTemplateList();
                             }
@@ -208,6 +212,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 tradeOffArea.setText(config.tradeOff);
 
                                 templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
+
+                                if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+                                    String replaceText = StringUtils.defaultString(replaceArea.getText());
+                                    replaceText = replacer(config.fromVal, config.toVal, replaceText);
+                                    resultArea.setText(replaceText);
+                                    jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
+                                }
                             }
                         });
                         templateList.addKeyListener(new KeyAdapter() {

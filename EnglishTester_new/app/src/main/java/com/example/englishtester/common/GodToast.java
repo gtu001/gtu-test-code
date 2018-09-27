@@ -128,7 +128,10 @@ public class GodToast {
         // 繼續
 
         imageView_gif.showAnimation();
-        toast.show();
+
+        //很危險--↓↓↓↓↓↓
+//        toast.show();
+        //很危險--↑↑↑↑↑↑
     }
 
     private void fetchImageSize(File file) {
