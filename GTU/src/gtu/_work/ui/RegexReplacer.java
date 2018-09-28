@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -17,9 +16,12 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
@@ -70,6 +73,7 @@ import net.sf.json.JSONObject;
 public class RegexReplacer extends javax.swing.JFrame {
     private static final String NOT_CONTAIN_ARRY_KEY = "not_arry";
     private static final String CONTAIN_ARRY_KEY = "arry";
+    private static final String FREEMARKER_KEY = "ftl";
     private static final long serialVersionUID = 1L;
 
     /**
@@ -297,12 +301,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     }
 
                                     // 加入新的
-                                    String selectItem = (String) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", new Object[] { "NA", "equal", "not_equal" }, "NA");
+                                    String selectItem = (String) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", new Object[] { "NA", "equal", "not_equal", "ftl" }, "NA");
                                     if ("NA".equals(selectItem)) {
                                         return;
                                     }
 
                                     String string = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入新項目:"));
+                                    string = StringUtils.trimToEmpty(string);
 
                                     if (StringUtils.isBlank(string)) {
                                         tradeOffArea.setText(json.toString());
@@ -310,28 +315,43 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     }
 
                                     String arryKey = "";
+                                    String boolKey = "";
+                                    String strKey = "";
+                                    String intKey = "";
+
                                     if (selectItem.equals("equal")) {
                                         arryKey = CONTAIN_ARRY_KEY;
                                     } else if (selectItem.equals("not_equal")) {
                                         arryKey = NOT_CONTAIN_ARRY_KEY;
+                                    } else if (selectItem.equals("ftl")) {
+                                        strKey = FREEMARKER_KEY;
                                     } else {
                                         throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
                                     }
 
-                                    if (!json.containsKey(arryKey)) {
-                                        json.put(arryKey, new JSONArray());
-                                    }
-                                    JSONArray arry = (JSONArray) json.get(arryKey);
-                                    boolean findOk = false;
-                                    for (int ii = 0; ii < arry.size(); ii++) {
-                                        if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
-                                            findOk = true;
-                                            break;
+                                    if (StringUtils.isNotBlank(arryKey)) {
+                                        if (!json.containsKey(arryKey)) {
+                                            json.put(arryKey, new JSONArray());
                                         }
+                                        JSONArray arry = (JSONArray) json.get(arryKey);
+                                        boolean findOk = false;
+                                        for (int ii = 0; ii < arry.size(); ii++) {
+                                            if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
+                                                findOk = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!findOk) {
+                                            arry.add(string);
+                                        }
+                                    } else if (StringUtils.isNotBlank(strKey)) {
+                                        json.put(strKey, string);
+                                    } else if (StringUtils.isNotBlank(intKey)) {
+                                        json.put(intKey, Integer.parseInt(string));
+                                    } else if (StringUtils.isNotBlank(boolKey)) {
+                                        json.put(boolKey, Boolean.valueOf(string));
                                     }
-                                    if (!findOk) {
-                                        arry.add(string);
-                                    }
+
                                     tradeOffArea.setText(json.toString());
 
                                     JCommonUtil._jOptionPane_showMessageDialog_info("新增完成!");
@@ -475,35 +495,65 @@ public class RegexReplacer extends javax.swing.JFrame {
             StringBuffer sb = new StringBuffer();
             String tempStr = null;
 
-            if (true) {
+            TradeOffConfig config = this.getTradeOffConfig();
+
+            {
                 int startPos = 0;
                 for (; matcher.find();) {
                     tempStr = toFormat.toString();
                     sb.append(replaceText.substring(startPos, matcher.start()));
-                    for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                        System.out.println(ii + " -- " + matcher.group(ii));
-                        tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+
+                    // ----------------------------------------------
+                    if (StringUtils.isBlank(config.fremarkerKey)) {
+                        // regex
+                        for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                            System.out.println(ii + " -- " + matcher.group(ii));
+                            tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                        }
+                    } else if (StringUtils.isNotBlank(config.fremarkerKey)) {
+                        // freemarker
+                        Map<String, Object> root = new HashMap<String, Object>();
+                        TreeMap<Integer, Object> lstMap = new TreeMap<Integer, Object>();
+                        for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                            lstMap.put(ii, matcher.group(ii));
+                        }
+                        root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
+                        System.out.println("template Map : " + root);
+                        tempStr = FreeMarkerSimpleUtil.replace(tempStr, root);
                     }
+                    // ----------------------------------------------
+
                     sb.append(tempStr);
                     startPos = matcher.end();
                 }
                 sb.append(replaceText.substring(startPos));
-            } else {
-                while (matcher.find()) {
-                    tempStr = toFormat.toString();
-                    for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                        System.out.println("<group" + ii + ">" + " -- " + matcher.group(ii));
-                        tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
-                    }
-                    matcher.appendReplacement(sb, tempStr);
-                }
-                matcher.appendTail(sb);
             }
 
             return sb.toString();
         } catch (Exception ex) {
             JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
             return errorRtn;
+        }
+    }
+
+    private class TradeOffConfig {
+        String fremarkerKey;
+        JSONObject json;
+
+        TradeOffConfig(JSONObject json) {
+            this.json = json;
+            if (json.containsKey(FREEMARKER_KEY)) {
+                fremarkerKey = json.getString(FREEMARKER_KEY);
+            }
+        }
+    }
+
+    private TradeOffConfig getTradeOffConfig() {
+        try {
+            return new TradeOffConfig(JSONObject.fromObject(tradeOffArea.getText()));
+        } catch (Exception ex) {
+            JCommonUtil.handleException("getTradeOffObject ERR : " + ex, ex);
+            return new TradeOffConfig(new JSONObject());
         }
     }
 

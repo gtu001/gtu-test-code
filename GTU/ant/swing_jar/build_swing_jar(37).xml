@@ -80,6 +80,8 @@
 			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+				
+			<packagename mode="small">freemarker.template</packagename>
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
