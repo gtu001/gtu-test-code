@@ -707,7 +707,7 @@ public class JCommonUtil {
     }
 
     public static void jTextFieldSetFilePathMouseEvent(final JTextComponent jTextField1, final boolean fileAndDir, final ActionListener callBack) {
-        JTextFieldUtil.setupDragDropFilePath(jTextField1);
+        JTextFieldUtil.setupDragDropFilePath(jTextField1, null);
         jTextField1.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {

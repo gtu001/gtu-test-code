@@ -156,7 +156,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                                 }
                             }));
                             jPanel2.add(leftDirText);
-                            JTextFieldUtil.setupDragDropFilePath(leftDirText);
+                            JTextFieldUtil.setupDragDropFilePath(leftDirText, null);
                         }
                         {
                             rightDirText = new JTextArea();
@@ -169,7 +169,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                                 }
                             }));
                             jPanel2.add(rightDirText);
-                            JTextFieldUtil.setupDragDropFilePath(rightDirText);
+                            JTextFieldUtil.setupDragDropFilePath(rightDirText, null);
                         }
                         {
                             executeBtn = new JButton();

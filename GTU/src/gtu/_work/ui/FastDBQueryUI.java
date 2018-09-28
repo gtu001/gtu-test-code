@@ -67,6 +67,7 @@ import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -82,8 +83,10 @@ public class FastDBQueryUI extends JFrame {
 
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
-        JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
-        JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+        if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+        }
     }
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");

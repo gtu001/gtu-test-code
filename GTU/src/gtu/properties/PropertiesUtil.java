@@ -52,7 +52,9 @@ public class PropertiesUtil {
         URL url = clz.getResource(clz.getSimpleName() + ".class");
         String protocal = url.getProtocol();
         // String filepath = url.getFile();
-        return "jar".equals(protocal);
+        boolean isInJar = "jar".equals(protocal);
+        System.out.println("[isClassInJar] : " + isInJar);
+        return isInJar;
     }
 
     public static File getJarCurrentPath(Class<?> clz) {

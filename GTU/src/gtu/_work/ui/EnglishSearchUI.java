@@ -138,8 +138,12 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox robotFocusChk;
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
-    // private PropertiesUtilBean propertyBean = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
+    {
+        if(!PropertiesUtil.isClassInJar(EnglishSearchUI.class)){
+            propertyBean = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
+            propertyBean = new PropertiesUtilBean(new File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
+        }
+    }
 
     private static final String NEW_WORD_PATH = "new_word_path";
     private static final String OFFLINE_WORD_PATH = "offline_word_path";
@@ -151,7 +155,6 @@ public class EnglishSearchUI extends JFrame {
     private HideInSystemTrayHelper sysutil;
 
     private Properties offlineProp;
-    private static final boolean DEBUG = !PropertiesUtil.isClassInJar(EnglishSearchUI.class);
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
     private DialogTitleUpdaterObervable dialogObervable = new DialogTitleUpdaterObervable();
 

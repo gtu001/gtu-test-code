@@ -4,6 +4,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class JTextFieldUtil {
         });
     }
 
-    public static void setupDragDropFilePath(final JTextComponent textField) {
+    public static void setupDragDropFilePath(final JTextComponent textField, final ActionListener multiFileListener) {
         textField.setDragEnabled(true);
         textField.setDropTarget(new DropTarget() {
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -34,6 +36,12 @@ public class JTextFieldUtil {
                     }
                     if (!droppedFiles.isEmpty()) {
                         textField.setText(droppedFiles.get(0).getAbsolutePath());
+                    }
+                    if (multiFileListener != null) {
+                        if (!droppedFiles.isEmpty() && droppedFiles.size() > 1) {
+                            ActionEvent event = new ActionEvent(droppedFiles, -1, "go multi file");
+                            multiFileListener.actionPerformed(event);
+                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

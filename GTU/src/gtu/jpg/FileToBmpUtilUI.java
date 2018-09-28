@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,7 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JTextFieldUtil;
 
 public class FileToBmpUtilUI extends JFrame {
 
@@ -96,6 +98,25 @@ public class FileToBmpUtilUI extends JFrame {
         panel.add(srcFileText, "4, 2, fill, default");
         srcFileText.setColumns(10);
         JCommonUtil.jTextFieldSetFilePathMouseEvent(srcFileText, false);
+        JTextFieldUtil.setupDragDropFilePath(srcFileText, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<File> srcFileLst = (List<File>) e.getSource();
+                    for (File f : srcFileLst) {
+                        File srcFile = f;
+                        String newFileName = srcFile.getName() + ".bmp";
+                        File destFile = new File(FileUtil.DESKTOP_DIR, newFileName);
+                        int width = FileToBmpUtilVer3.getInstance().getWidth(f);
+                        FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, destFile, true, width);
+                        System.out.println("#-- " + srcFile.getName() + " -> " + destFile.getName());
+                    }
+                    JCommonUtil._jOptionPane_showMessageDialog_info("產生圖檔成功[多檔] " + srcFileLst.size());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
         srcFileText.getDocument().addDocumentListener(null);
         srcFileText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
@@ -178,6 +199,24 @@ public class FileToBmpUtilUI extends JFrame {
         panel_1.add(srcBmpText, "4, 2, fill, default");
         srcBmpText.setColumns(10);
         JCommonUtil.jTextFieldSetFilePathMouseEvent(srcBmpText, false);
+        JTextFieldUtil.setupDragDropFilePath(srcBmpText, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<File> fileLst = (List<File>) e.getSource();
+                    for (File f : fileLst) {
+                        File srcBmpFile = f;
+                        File toFile = new File(FileUtil.DESKTOP_DIR, FileUtil.getNameNoSubName(srcBmpFile));
+                        FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                        System.out.println("#-- " + srcBmpFile.getName() + " -> " + toFile.getName());
+                    }
+                    JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 [多檔] " + fileLst.size());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
         srcBmpText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {

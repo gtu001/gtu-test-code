@@ -129,14 +129,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
 
-    // Prodction XXX
     private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
-    // Test ubuntu XXX
-    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
-    // Test Win10 XXX
-    // private PropertiesUtilBean configSelf = new PropertiesUtilBean(new
-    // File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/BrowserHistoryHandlerUI_bookmark.properties"));
+    {
+        if (!PropertiesUtil.isClassInJar(BrowserHistoryHandlerUI.class)) {
+            configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
+            configSelf = new PropertiesUtilBean(new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/BrowserHistoryHandlerUI_bookmark.properties"));
+        }
+    }
 
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;

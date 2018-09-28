@@ -510,12 +510,20 @@ public class RegexReplacer extends javax.swing.JFrame {
                     } else if (c1.tradeOffScore < c2.tradeOffScore) {
                         return 1;
                     } else {
-                        if (c1.isModify && !c2.isModify) {
+                        int c1Length = new Integer(StringUtils.trimToEmpty(c1.message).length());
+                        int c2Length = new Integer(StringUtils.trimToEmpty(c2.message).length());
+                        if (c1Length > c2Length) {
                             return -1;
-                        } else if (!c1.isModify && c2.isModify) {
+                        } else if (c1Length < c2Length) {
                             return 1;
                         } else {
-                            return c1.configKeyText.compareTo(c2.configKeyText);
+                            if (c1.isModify && !c2.isModify) {
+                                return -1;
+                            } else if (!c1.isModify && c2.isModify) {
+                                return 1;
+                            } else {
+                                return c1.configKeyText.compareTo(c2.configKeyText);
+                            }
                         }
                     }
                 }
