@@ -19,22 +19,19 @@ from gtu.os import envUtil
 from gtu.reflect import checkSelf
 from gtu.scrapy import scrapy_runner
 
+from gtu._tkinter.util import tkinterUtil
+
 
 def getWebDriver():
-    path = envUtil.getEnv("PATH");
-    if path.find("geckodriver") == -1 :
-        path = path + ":" + "/media/gtu001/OLD_D/apps/scrapy/linux/geckodriver"
-        print("set Path = " + path)
-        envUtil.export("PATH", path)
-    
+    path = str(envUtil.getEnv("PATH"))
+    path = path + ":" + "/media/gtu001/OLD_D/apps/scrapy/linux/"
+    print("set Path = " + path)
+    envUtil.export("PATH", path)
+    envUtil.showAll()
 #     return webdriver.Firefox()
     firefox = FirefoxBinary(r"/usr/bin/firefox") 
     return webdriver.Firefox(firefox_binary=firefox) 
-    
 
-    
-       
-         
 
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
 class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
@@ -59,6 +56,47 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
   
     def parse(self, response):  # process_item
         print("### MAIN page : ", response.url)
+        
+        self.driver.get(response.url)
+        
+        ulList = self.driver.find_element_by_xpath("//ul[contains(@class, 'jcarousel-list')]")
+        hrefs = ulList.find_element_by_xpath("./li/a[@href]")
+        print(hrefs)
+        
+        response.xpath("//div[@class='jcarousel-next']")
+        
+        divs = response.css("div.")
+#         jcarousel-next jcarousel-next-horizontal
+
+
+    def doLoginForm(self):
+        self.driver.get("http://91porn.com/login.php")
+        
+#       assert "Title" in driver.title
+        userName = self.driver.find_element_by_xpath('//input[@name="username"]')
+        password = self.driver.find_element_by_xpath('//input[@name="password"]')
+        captcha = self.driver.find_element_by_xpath('//input[@name="captcha_input"]')
+        
+        form = self.driver.find_element_by_xpath('//form[@name="loginForm"]')
+        print("userName ", userName)
+        print("password ", password)
+        print("form ", form)
+        
+        tkinterUtil.createDefaultWin()
+        capthaText = tkinterUtil.prompt("驗證馬", "請輸入驗證馬")
+        
+        print("capthaText ", capthaText)
+        
+        if len(capthaText.strip()) != 4 :
+            raise Exception("未輸入正確驗證馬")
+        
+        userName.send_keys("gtu001")
+        password.send_keys("123474736e")
+        captcha.send_keys(capthaText)
+        
+        form.submit();
+        print("doLoginForm done...")
+        
             
 
 

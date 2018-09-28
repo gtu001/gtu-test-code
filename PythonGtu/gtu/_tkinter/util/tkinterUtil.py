@@ -65,6 +65,12 @@ def centerWin(win):
     y = win.winfo_screenheight() // 2 - win_height // 2
     win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
     win.deiconify()
+    
+    
+def createDefaultWin():
+    import tkinter as tk
+    root = tk.Tk();
+    root.withdraw()
         
         
 if __name__ == '__main__':
