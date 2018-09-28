@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -45,6 +47,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
@@ -134,7 +137,6 @@ public class RegexReplacer extends javax.swing.JFrame {
                         exeucte = new JButton();
                         jPanel2.add(exeucte, BorderLayout.SOUTH);
                         exeucte.setText("exeucte");
-                        exeucte.setPreferredSize(new java.awt.Dimension(491, 125));
                         exeucte.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 exeucteActionPerformed(evt);
@@ -143,11 +145,12 @@ public class RegexReplacer extends javax.swing.JFrame {
                     }
                     {
                         jPanel3 = new JPanel();
-                        jPanel2.add(jPanel3, BorderLayout.CENTER);
+                        jPanel2.add(JCommonUtil.createScrollComponent(jPanel3), BorderLayout.CENTER);
                         jPanel3.setLayout(
                                 new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                                         new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, RowSpec.decode("default:grow"), }));
                         {
                             lblNewLabel = new JLabel("key");
                             jPanel3.add(lblNewLabel, "2, 2, right, default");
@@ -162,8 +165,9 @@ public class RegexReplacer extends javax.swing.JFrame {
                             jPanel3.add(lblNewLabel_1, "2, 4, right, default");
                         }
                         {
-                            repFromText = new JTextField();
-                            jPanel3.add(repFromText, "4, 4, fill, default");
+                            repFromText = new JTextArea();
+                            repFromText.setRows(3);
+                            jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
                             repFromText.setColumns(10);
                         }
                         {
@@ -171,9 +175,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                             jPanel3.add(lblNewLabel_2, "2, 6, right, default");
                         }
                         {
-                            repToText = new JTextField();
-                            jPanel3.add(repToText, "4, 6, fill, default");
-                            repToText.setColumns(10);
+                            repToText = new JTextArea();
+                            repToText.setRows(3);
+                            // repToText.setPreferredSize(new Dimension(0, 50));
+                            jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
                         }
                     }
                     {
@@ -218,6 +223,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     replaceText = replacer(config.fromVal, config.toVal, replaceText);
                                     resultArea.setText(replaceText);
                                     jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
+                                    // 貼到記事本
+                                    pasteTextToClipboard();
                                 }
                             }
                         });
@@ -250,13 +257,29 @@ public class RegexReplacer extends javax.swing.JFrame {
                         });
                     }
                 }
-
                 {
-                    lblNewLabel_3 = new JLabel("權重 ");
-                    jPanel3.add(lblNewLabel_3, "2, 8");
+                    jPanel4 = new JPanel();
+                    BorderLayout jPanel4Layout = new BorderLayout();
+                    jPanel4.setLayout(jPanel4Layout);
+                    jTabbedPane1.addTab("result", null, jPanel4, null);
+                    {
+                        jScrollPane2 = new JScrollPane();
+                        jPanel4.add(jScrollPane2, BorderLayout.CENTER);
+                        {
+                            resultArea = new JTextArea();
+                            jScrollPane2.setViewportView(resultArea);
+                        }
+                    }
                 }
+            }
+
+            {
+                configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
+                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
                     tradeOffArea = new JTextArea();
+                    tradeOffArea.setRows(3);
+                    // tradeOffArea.setPreferredSize(new Dimension(0, 50));
                     tradeOffArea.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -318,27 +341,24 @@ public class RegexReplacer extends javax.swing.JFrame {
                             }
                         }
                     });
-                    jPanel3.add(tradeOffArea, "4, 8, fill, fill");
-                }
-                {
-                    jPanel4 = new JPanel();
-                    BorderLayout jPanel4Layout = new BorderLayout();
-                    jPanel4.setLayout(jPanel4Layout);
-                    jTabbedPane1.addTab("result", null, jPanel4, null);
                     {
-                        jScrollPane2 = new JScrollPane();
-                        jPanel4.add(jScrollPane2, BorderLayout.CENTER);
+                        panel = new JPanel();
+                        jPanel3.add(panel, "4, 8, fill, fill");
                         {
-                            resultArea = new JTextArea();
-                            jScrollPane2.setViewportView(resultArea);
+                            multiLineCheckBox = new JCheckBox("多行");
+                            panel.add(multiLineCheckBox);
+                        }
+                        {
+                            autoPasteToClipboardCheckbox = new JCheckBox("自動貼記事本");
+                            panel.add(autoPasteToClipboardCheckbox);
                         }
                     }
+                    {
+                        lblNewLabel_3 = new JLabel("權重 ");
+                        jPanel3.add(lblNewLabel_3, "2, 10");
+                    }
+                    jPanel3.add(JCommonUtil.createScrollComponent(tradeOffArea), "4, 10, fill, fill");
                 }
-            }
-
-            {
-                configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
-                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 configHandler.reloadTemplateList();
             }
 
@@ -366,7 +386,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JPanel jPanel1;
     private JTextArea replaceArea;
     private JScrollPane jScrollPane1;
-    private JTextField repFromText;
+    private JTextArea repFromText;
     private JScrollPane jScrollPane2;
     private JButton scheduleExecute;
     private JButton addToTemplate;
@@ -375,7 +395,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JPanel jPanel5;
     private JTextArea resultArea;
     private JPanel jPanel4;
-    private JTextField repToText;
+    private JTextArea repToText;
     private JPanel jPanel3;
     private JButton exeucte;
     private JPanel jPanel2;
@@ -391,6 +411,9 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JTextField configKeyText;
     private JLabel lblNewLabel_3;
     private JTextArea tradeOffArea;
+    private JPanel panel;
+    private JCheckBox multiLineCheckBox;
+    private JCheckBox autoPasteToClipboardCheckbox;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
@@ -402,8 +425,18 @@ public class RegexReplacer extends javax.swing.JFrame {
             Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
             Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
             resultArea.setText(replacer(fromPattern, toFormat, replaceText));
+            // 切換到結果
+            jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
+            // 貼到記事本
+            pasteTextToClipboard();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void pasteTextToClipboard() {
+        if (autoPasteToClipboardCheckbox.isSelected()) {
+            ClipboardUtil.getInstance().setContents(resultArea.getText());
         }
     }
 
@@ -429,25 +462,43 @@ public class RegexReplacer extends javax.swing.JFrame {
     String replacer(String fromPattern, String toFormat, String replaceText) {
         String errorRtn = replaceText.toString();
         try {
-            Pattern pattern = Pattern.compile(fromPattern);
-            Matcher matcher = pattern.matcher(replaceText);
+            int patternFlag = 0;
 
-            StringBuilder sb = new StringBuilder();
-            int startPos = 0;
-
-            String tempStr = null;
-            for (; matcher.find();) {
-                tempStr = toFormat.toString();
-                sb.append(replaceText.substring(startPos, matcher.start()));
-                for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                    System.out.println(ii + " -- " + matcher.group(ii));
-                    tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
-                }
-                sb.append(tempStr);
-                startPos = matcher.end();
+            // 多行判斷
+            if (multiLineCheckBox.isSelected()) {
+                patternFlag = Pattern.DOTALL | Pattern.MULTILINE;
             }
 
-            sb.append(replaceText.substring(startPos));
+            Pattern pattern = Pattern.compile(fromPattern, patternFlag);
+            Matcher matcher = pattern.matcher(replaceText);
+
+            StringBuffer sb = new StringBuffer();
+            String tempStr = null;
+
+            if (true) {
+                int startPos = 0;
+                for (; matcher.find();) {
+                    tempStr = toFormat.toString();
+                    sb.append(replaceText.substring(startPos, matcher.start()));
+                    for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                        System.out.println(ii + " -- " + matcher.group(ii));
+                        tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                    }
+                    sb.append(tempStr);
+                    startPos = matcher.end();
+                }
+                sb.append(replaceText.substring(startPos));
+            } else {
+                while (matcher.find()) {
+                    tempStr = toFormat.toString();
+                    for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                        System.out.println("<group" + ii + ">" + " -- " + matcher.group(ii));
+                        tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                    }
+                    matcher.appendReplacement(sb, tempStr);
+                }
+                matcher.appendTail(sb);
+            }
 
             return sb.toString();
         } catch (Exception ex) {
