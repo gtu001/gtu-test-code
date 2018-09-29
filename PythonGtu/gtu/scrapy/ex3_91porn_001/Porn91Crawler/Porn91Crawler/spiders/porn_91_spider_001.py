@@ -9,9 +9,14 @@ from scrapy.selector.lxmlsel import HtmlXPathSelector
 from scrapy.settings import Settings
 from scrapy.spiders import CrawlSpider, Rule
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 from twisted.internet import reactor
 
+from gtu._tkinter.util import tkinterUtil
+from gtu.collection import listUtil
 from gtu.datetime import dateUtil
 from gtu.io import fileUtil
 from gtu.net import simple_request_handler_001
@@ -19,18 +24,21 @@ from gtu.os import envUtil
 from gtu.reflect import checkSelf
 from gtu.scrapy import scrapy_runner
 
-from gtu._tkinter.util import tkinterUtil
-
 
 def getWebDriver():
     path = str(envUtil.getEnv("PATH"))
     path = path + ":" + "/media/gtu001/OLD_D/apps/scrapy/linux/"
     print("set Path = " + path)
     envUtil.export("PATH", path)
-    envUtil.showAll()
-#     return webdriver.Firefox()
-    firefox = FirefoxBinary(r"/usr/bin/firefox") 
-    return webdriver.Firefox(firefox_binary=firefox) 
+#     envUtil.showAll()
+    type = ""
+    if type == 'firefox_linux' :
+        firefox = FirefoxBinary(r"/usr/bin/firefox") 
+        return webdriver.Firefox(firefox_binary=firefox)
+    elif type == 'chrome' :
+        return webdriver.Chrome() 
+    else :
+        return webdriver.Firefox()
 
 
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
@@ -58,15 +66,25 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
         print("### MAIN page : ", response.url)
         
         self.driver.get(response.url)
+        print("-------------------A1")
         
-        ulList = self.driver.find_element_by_xpath("//ul[contains(@class, 'jcarousel-list')]")
-        hrefs = ulList.find_element_by_xpath("./li/a[@href]")
-        print(hrefs)
+        wait = WebDriverWait(self.driver, 5)
         
-        response.xpath("//div[@class='jcarousel-next']")
+        print("-------------------A")
         
-        divs = response.css("div.")
-#         jcarousel-next jcarousel-next-horizontal
+        ulObj = wait.until(ec.presence_of_element_located((By.XPATH, "//ul[contains(@class, 'jcarousel-list')]")) , "failed !!!!")
+        liLst = ulObj.find_elements_by_xpath(".//li[:]")#
+        
+        for i in liLst :
+            print("-----", i)
+            
+        print("liLst ", liLst)
+        print("liLst arry ", listUtil.isArray(liLst))
+        print("testObj ==> ", type(liLst))
+        
+#         selenium.webdriver.firefox.webelement.FirefoxWebElement
+        
+        print("-------------------B")
 
 
     def doLoginForm(self):
