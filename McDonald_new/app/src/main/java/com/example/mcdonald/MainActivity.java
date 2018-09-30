@@ -100,6 +100,8 @@ public class MainActivity extends ActionBarActivity { //
         f_redteaTwo(R.id.item_f_redteaTwo, new int[]{R.drawable.f_redtea_01, R.drawable.f_redtea_02, R.drawable.f_redtea_03, R.drawable.f_redtea_04, R.drawable.f_redtea_05}), //
         f_milkteaTen(R.id.item_f_milkteaTen, new int[]{R.drawable.f_milktea_ten_01, R.drawable.f_milktea_ten_02, R.drawable.f_milktea_ten_03, R.drawable.f_milktea_ten_04, R.drawable.f_milktea_ten_05}), //
         f_chickenWingTwo(R.id.item_f_chickenWingTwo, new int[]{R.drawable.f_chicken_wing_oneone_01, R.drawable.f_chicken_wing_oneone_02, R.drawable.f_chicken_wing_oneone_03, R.drawable.f_chicken_wing_oneone_04, R.drawable.f_chicken_wing_oneone_05}), //
+        f_gpei(R.id.item_f_gpei, new int[]{R.drawable.f_gpie_001, R.drawable.f_gpie_002, R.drawable.f_gpie_003, R.drawable.f_gpie_004, R.drawable.f_gpie_005}), //
+        f_potato(R.id.item_f_potato, new int[]{R.drawable.f_potato_001, R.drawable.f_potato_002, R.drawable.f_potato_003, R.drawable.f_potato_004, R.drawable.f_potato_005}), //
         ;
 
         final int menuId;

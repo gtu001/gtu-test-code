@@ -195,4 +195,13 @@
         android:id="@+id/item_f_chickenWingTwo"
         android:orderInCategory="100"
         android:title="勁辣香雞翅買一送一(new)" />
+
+    <item
+        android:id="@+id/item_f_potato"
+        android:orderInCategory="100"
+        android:title="薯餅買一送一(new)" />
+    <item
+        android:id="@+id/item_f_gpei"
+        android:orderInCategory="100"
+        android:title="雞排(買一送一)(new)" />
 </menu>

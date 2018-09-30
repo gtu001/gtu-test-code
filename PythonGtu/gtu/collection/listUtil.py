@@ -62,6 +62,9 @@ def _test_strArry_to_dateArry(npArry):
     return xdate
 
 
+def isArray(arry):
+    return isinstance(arry, list)
+
     
 if __name__ == '__main__' :
 #     __test_filter()
