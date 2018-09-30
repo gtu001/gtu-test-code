@@ -113,8 +113,8 @@ def copyDir(fromDir, toDir):
 				copyFile(str(f1), str(newToDir))
 
 
-def saveToFile(filePath, content):
-	f = open(filePath, "w", encoding='utf8')
+def saveToFile(filePath, content, encode):
+	f = open(filePath, "w", encoding=encode)
 	f.write(content)
 	f.flush()
 	f.close()

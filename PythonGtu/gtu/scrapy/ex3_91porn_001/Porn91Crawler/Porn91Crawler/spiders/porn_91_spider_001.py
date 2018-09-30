@@ -25,29 +25,7 @@ from gtu.net import simple_request_handler_001
 from gtu.os import envUtil
 from gtu.reflect import checkSelf
 from gtu.scrapy import scrapy_runner
-
-
-def getWebDriver():
-    path = str(envUtil.getEnv("PATH"))
-    path = path + ":" + "/media/gtu001/OLD_D/apps/scrapy/linux/"
-    print("set Path = " + path)
-    envUtil.export("PATH", path)
-#     envUtil.showAll()
-    type = ""
-    if type == 'firefox_linux' :
-        firefox = FirefoxBinary(r"/usr/bin/firefox") 
-        return webdriver.Firefox(firefox_binary=firefox)
-    elif type == 'chrome' :
-        return webdriver.Chrome() 
-    else :
-        binary = FirefoxBinary(r'/usr/lib/firefox/firefox.sh')
-        fireFoxOptions = webdriver.FirefoxOptions()
-        fireFoxOptions.set_headless()
-        firefox_capabilities = DesiredCapabilities.FIREFOX
-        firefox_capabilities['marionette'] = True
-        driver = webdriver.Firefox(capabilities=firefox_capabilities,firefox_binary=binary, firefox_options = fireFoxOptions)
-        return driver
-
+from gtu.scrapy import scrapy_util
 
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
 class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
@@ -68,7 +46,7 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
     
     def __init__(self):
         self.test = False
-        self.driver = getWebDriver()
+        self.driver = scrapy_util.getWebDriver()
   
     def parse(self, response):  # process_item
         print("### MAIN page : ", response.url)
