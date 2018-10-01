@@ -46,12 +46,13 @@ import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
+import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
@@ -67,6 +68,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JRadioButton rdbtnDelete;
     private JComboBox dbTypeComboBox;
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
+    private JRadioButton rdbtnOthers;
 
     private static class ColumnConf {
         String columnName;
@@ -239,6 +241,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             sql = tableInfo.createDeleteSql(map);
                         } else if (btn == dialog.rdbtnUpdate) {
                             sql = tableInfo.createUpdateSql(map, map, false);
+                        } else if (btn == dialog.rdbtnOthers) {
+                            rdbtnOthersAction(tableInfo, map);
+                            return;
                         } else {
                             Validate.isTrue(false, "請選sql類型");
                         }
@@ -252,6 +257,19 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         }
                     } catch (Exception e1) {
                         JCommonUtil.handleException(e1);
+                    }
+                }
+
+                private void rdbtnOthersAction(TableInfo tableInfo, Map<String, String> dataMap) {
+                    OthersDBColumnProcess selecting = (OthersDBColumnProcess) JCommonUtil._JOptionPane_showInputDialog("選擇腳本", "選擇腳本", OthersDBColumnProcess.values(), null);
+                    String resultStr = "";
+                    if (selecting != null) {
+                        resultStr = selecting.apply(tableInfo, dataMap);
+                    }
+                    if (StringUtils.isNotBlank(resultStr)) {
+                        JCommonUtil._jOptionPane_showInputDialog(selecting, resultStr);
+                    } else {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("選擇失敗 : " + selecting);
                     }
                 }
             });
@@ -424,10 +442,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             JPanel panel = new JPanel();
             contentPanel.add(panel, BorderLayout.SOUTH);
             {
-                JLabel label = new JLabel("db Type");
-                panel.add(label);
-            }
-            {
                 dbTypeComboBox = new JComboBox();
                 panel.add(dbTypeComboBox);
                 DefaultComboBoxModel model = new DefaultComboBoxModel();
@@ -442,7 +456,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             {
                 tableAndSchemaText = new JTextField();
-                tableAndSchemaText.setColumns(20);
+                tableAndSchemaText.setColumns(10);
                 panel.add(tableAndSchemaText);
             }
             {
@@ -457,7 +471,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 rdbtnDelete = new JRadioButton("delete");
                 panel.add(rdbtnDelete);
             }
-            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete);
+            {
+                rdbtnOthers = new JRadioButton("其他");
+                panel.add(rdbtnOthers);
+            }
+            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers);
         }
         {
             rowTable = new JTable();
@@ -506,5 +524,160 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
         JCommonUtil.setJFrameCenter(this);
+    }
+
+    private enum OthersDBColumnProcess {
+        VO_SETTER_STR("vo.setter(str)") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("vo.set" + StringUtils.capitalize(param) + "(\"" + dataMap.get(col.toUpperCase()) + "\");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        VO_SETTER_STR_C("vo.setter(str)完整") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("String " + param + " = \"" + dataMap.get(col.toUpperCase()) + "\";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        MAP_PUT_STR("map.put(str)") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("map.put(\"" + col.toUpperCase() + "\", \"" + dataMap.get(col.toUpperCase()) + "\");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        MAP_PUT_STR_C("map.put(str)完整") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("String " + param + " = \"" + dataMap.get(col.toUpperCase()) + "\";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + param + ");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        VO_SETTER("vo.setter(orign)") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append("vo.set" + StringUtils.capitalize(param) + "(" + paramVal + ");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        VO_SETTER_C("vo.setter(orign)完整") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append(paramType + " " + param + " = " + paramVal + ";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        MAP_PUT("map.put(orign)") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + paramVal + ");\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        MAP_PUT_C("map.put(orign)完整") {
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
+                StringBuilder sb = new StringBuilder();
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append(paramType + " " + param + " = " + paramVal + ";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + param + ");\n");
+                }
+                return sb.toString();
+            }
+        },//
+        ;
+        final String label;
+
+        OthersDBColumnProcess(String label) {
+            this.label = label;
+        }
+
+        String getOrignVal(String col, TableInfo tableInfo, Map<String, String> dataMap) {
+            col = col.toUpperCase();
+            if (tableInfo.getDateCol().contains(col)) {
+                return "java.sql.Date.valueOf(\"" + dataMap.get(col) + "\")";
+            } else if (tableInfo.getTimestampCol().contains(col)) {
+                return "java.sql.Timestamp.valueOf(\"" + dataMap.get(col) + "\")";
+            } else if (tableInfo.getNumberCol().contains(col)) {
+                return dataMap.get(col);
+            } else {
+                return "\"" + dataMap.get(col) + "\"";
+            }
+        }
+
+        String getOrignType(String col, TableInfo tableInfo, Map<String, String> dataMap) {
+            col = col.toUpperCase();
+            if (tableInfo.getDateCol().contains(col)) {
+                return "java.sql.Date";
+            } else if (tableInfo.getTimestampCol().contains(col)) {
+                return "java.sql.Timestamp";
+            } else if (tableInfo.getNumberCol().contains(col)) {
+                boolean isDouble = false;
+                if (dataMap.containsKey(col)) {
+                    isDouble = dataMap.get(col).matches("[\\-]?\\d+\\.\\d+");
+                }
+                return isDouble ? "Double" : "Integer";
+            } else {
+                return "String";
+            }
+        }
+
+        abstract String apply(TableInfo tableInfo, Map<String, String> dataMap);
+
+        public String toString() {
+            return this.label;
+        }
     }
 }
