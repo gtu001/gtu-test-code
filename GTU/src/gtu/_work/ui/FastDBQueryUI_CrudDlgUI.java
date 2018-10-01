@@ -41,6 +41,7 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu.binary.StringUtil4FullChar;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
@@ -116,9 +117,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             this.clz = clz;
         }
 
-        protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
-        }
-
         private static DataType isTypeOf(Object value) {
             if (value == null) {
                 return NULL;
@@ -141,7 +139,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static void newInstance(final Map<String, Object> rowMap, final DataSource dataSource) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, final DataSource dataSource) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -273,8 +271,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     }
                 }
             });
+            return dialog;
         } catch (Exception e) {
-            JCommonUtil.handleException(e);
+            throw new RuntimeException("FastDBQueryUI_CrudDlgUI ERR : " + e.getMessage(), e);
         }
     }
 
@@ -389,14 +388,25 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private void searchTextFilter() {
         DefaultTableModel model = initRowTable();
         rowTable.setModel(model);
-        String text = StringUtils.trimToEmpty(searchText.getText()).toLowerCase();
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
-        for (String columnName : rowMap.get().keySet()) {
+
+        FindTextHandler finder = new FindTextHandler(searchText, "^");
+        boolean allMatch = finder.isAllMatch();
+
+        B: for (String columnName : rowMap.get().keySet()) {
             ColumnConf df = rowMap.get().get(columnName);
-            if (StringUtils.isBlank(text) || //
-                    columnName.toLowerCase().contains(text) || //
-                    String.valueOf(df.value).contains(text)) {
+            if (allMatch) {
                 model.addRow(df.toArry());
+                continue;
+            }
+
+            for (String text : finder.getArry()) {
+                if (StringUtils.isBlank(text) || //
+                        columnName.toLowerCase().contains(text) || //
+                        String.valueOf(df.value).contains(text)) {
+                    model.addRow(df.toArry());
+                    continue B;
+                }
             }
         }
         System.out.println("-------------searchTextFilter size = " + rowMap.get().size());
@@ -422,6 +432,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 searchText = new JTextField();
                 panel.add(searchText);
                 searchText.setColumns(25);
+                searchText.setToolTipText("分隔符號為\"^\"");
             }
             {
                 DefaultComboBoxModel model = new DefaultComboBoxModel();
@@ -524,6 +535,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
         JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.defaultToolTipDelay();
     }
 
     private enum OthersDBColumnProcess {

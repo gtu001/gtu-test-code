@@ -67,7 +67,6 @@ import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
-import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -98,6 +97,7 @@ public class FastDBQueryUI extends JFrame {
     // PropertiesGroupUtils(new File(JAR_PATH_FILE, "dataSource.properties"));
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
 
+    private FastDBQueryUI_CrudDlgUI fastDBQueryUI_CrudDlgUI;
     private JPanel contentPane;
     private JList sqlList;
     private JButton sqlSaveButton;
@@ -152,6 +152,8 @@ public class FastDBQueryUI extends JFrame {
     private boolean isResetQuery = true;// 是否重新查詢
     private JPanel panel_17;
     private JButton removeConnectionBtn;
+    private JLabel lblNewLabel_3;
+    private JTextField rowFilterText;
 
     /**
      * Launch the application.
@@ -301,7 +303,8 @@ public class FastDBQueryUI extends JFrame {
 
         columnFilterText = new JTextField();
         panel_13.add(columnFilterText);
-        columnFilterText.setColumns(30);
+        columnFilterText.setColumns(15);
+        columnFilterText.setToolTipText("分隔符號為\"^\"");
         columnFilterText.addFocusListener(new FocusAdapter() {
 
             ColumnSearchFilter columnFilter;
@@ -310,10 +313,56 @@ public class FastDBQueryUI extends JFrame {
             public void focusLost(FocusEvent e) {
                 try {
                     if (columnFilter == null || isResetQuery) {
-                        columnFilter = new ColumnSearchFilter(queryResultTable, ",");
+                        columnFilter = new ColumnSearchFilter(queryResultTable, "^");
                         isResetQuery = false;
                     }
                     columnFilter.filterText(columnFilterText.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
+        lblNewLabel_3 = new JLabel("資料過濾");
+        panel_13.add(lblNewLabel_3);
+
+        rowFilterText = new JTextField();
+        panel_13.add(rowFilterText);
+        rowFilterText.setColumns(15);
+        rowFilterText.setToolTipText("分隔符號為\"^\"");
+        rowFilterText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                try {
+                    if (queryList == null || queryList.isEmpty()) {
+                        return;
+                    }
+
+                    List<Map<String, Object>> qList = new ArrayList<Map<String, Object>>();
+
+                    FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
+                    boolean allMatch = finder.isAllMatch();
+
+                    Set<String> cols = queryList.get(0).keySet();
+                    for (Map<String, Object> map : queryList) {
+                        if (allMatch) {
+                            qList.add(map);
+                            continue;
+                        }
+
+                        B: for (String col : cols) {
+                            String value = finder.valueToString(map.get(col));
+                            for (String text : finder.getArry()) {
+                                if (value.contains(text)) {
+                                    qList.add(map);
+                                    break B;
+                                }
+                            }
+                        }
+                    }
+
+                    System.out.println("qList - " + qList.size());
+                    queryModeProcess(qList, true);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -468,6 +517,36 @@ public class FastDBQueryUI extends JFrame {
             initLoadSqlIdMappingConfig();
 
             JCommonUtil.setJFrameCenter(this);
+            JCommonUtil.defaultToolTipDelay();
+        }
+    }
+
+    static class FindTextHandler {
+        JTextField searchText;
+        String delimit;
+
+        FindTextHandler(JTextField searchText, String delimit) {
+            this.searchText = searchText;
+            this.delimit = delimit;
+        }
+
+        boolean isAllMatch() {
+            return StringUtils.isBlank(searchText.getText());
+        }
+
+        String[] getArry() {
+            String[] arry = StringUtils.trimToEmpty(searchText.getText()).toLowerCase().split(delimit, -1);
+            List<String> rtnLst = new ArrayList<String>();
+            for (int ii = 0; ii < arry.length; ii++) {
+                if (StringUtils.isNotBlank(arry[ii])) {
+                    rtnLst.add(arry[ii]);
+                }
+            }
+            return rtnLst.toArray(new String[0]);
+        }
+
+        String valueToString(Object value) {
+            return value == null ? "" : String.valueOf(value).toLowerCase();
         }
     }
 
@@ -670,7 +749,7 @@ public class FastDBQueryUI extends JFrame {
             if (querySqlRadio.isSelected()) {
                 List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
                 this.queryList = queryList;
-                this.queryModeProcess(queryList);
+                this.queryModeProcess(queryList, false);
                 this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
                 int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
@@ -721,13 +800,21 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 查詢模式
      */
-    private void queryModeProcess(List<Map<String, Object>> queryList) {
+    private void queryModeProcess(List<Map<String, Object>> queryList, boolean silent) {
         if (queryList.isEmpty()) {
-            JCommonUtil._jOptionPane_showMessageDialog_info("查無資料!");
-            queryResultTable.setModel(getFakeDataModel());
+            if (!silent) {
+                System.out.println("fake row----");
+                queryResultTable.setModel(getFakeDataModel());
+                JCommonUtil._jOptionPane_showMessageDialog_info("查無資料!");
+            } else {
+                DefaultTableModel createModel = JTableUtil.createModel(true, "");
+                queryResultTable.setModel(createModel);
+            }
             return;
         } else {
-            JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.size());
+            if (!silent) {
+                JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.size());
+            }
         }
 
         // 取得標題
@@ -932,7 +1019,12 @@ public class FastDBQueryUI extends JFrame {
                 System.out.println("rowPos " + rowPos);
 
                 Map<String, Object> rowMap = this.queryList.get(rowPos);
-                FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+
+                if (fastDBQueryUI_CrudDlgUI != null) {
+                    fastDBQueryUI_CrudDlgUI.isShowing();
+                    fastDBQueryUI_CrudDlgUI.dispose();
+                }
+                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
