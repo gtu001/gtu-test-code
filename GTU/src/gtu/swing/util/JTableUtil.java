@@ -223,14 +223,23 @@ public class JTableUtil {
             @Override
             public Class<?> getColumnClass(int c) {
                 try {
-                    Object value = getValueAt(0, c);
-                    if (value != null) {
-                        return value.getClass();
+
+                    List<Class<?>> lst = new ArrayList<Class<?>>();
+                    for (int ii = 0; ii < this.getRowCount(); ii++) {
+                        Object value = getValueAt(ii, c);
+                        if (value != null) {
+                            if (!lst.contains(value.getClass())) {
+                                lst.add(value.getClass());
+                            }
+                        }
+                    }
+                    if (lst.isEmpty() || lst.size() > 1) {
+                        return Object.class;
                     } else {
-                        return super.getClass();
+                        return lst.get(0);
                     }
                 } catch (Exception ex) {
-                    return super.getClass();
+                    return Object.class;
                 }
             }
 
@@ -254,14 +263,23 @@ public class JTableUtil {
             @Override
             public Class<?> getColumnClass(int c) {
                 try {
-                    Object value = getValueAt(0, c);
-                    if (value != null) {
-                        return value.getClass();
+
+                    List<Class<?>> lst = new ArrayList<Class<?>>();
+                    for (int ii = 0; ii < this.getRowCount(); ii++) {
+                        Object value = getValueAt(ii, c);
+                        if (value != null) {
+                            if (!lst.contains(value.getClass())) {
+                                lst.add(value.getClass());
+                            }
+                        }
+                    }
+                    if (lst.isEmpty() || lst.size() > 1) {
+                        return Object.class;
                     } else {
-                        return super.getClass();
+                        return lst.get(0);
                     }
                 } catch (Exception ex) {
-                    return super.getClass();
+                    return Object.class;
                 }
             }
 

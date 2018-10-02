@@ -1,16 +1,5 @@
 package gtu._work.ui;
 
-import gtu._work.JarFinder;
-import gtu._work.JarFinder.IfMatch;
-import gtu.clipboard.ClipboardUtil;
-import gtu.file.FileUtil;
-import gtu.properties.PropertiesUtil;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JFileChooserUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JOptionPaneUtil;
-import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
-
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
@@ -36,6 +25,7 @@ import java.util.Properties;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -48,6 +38,26 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import gtu._work.JarFinder;
+import gtu._work.JarFinder.IfMatch;
+import gtu.clipboard.ClipboardUtil;
+import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
+import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
+import gtu.runtime.RuntimeBatPromptModeUtil;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFileChooserUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
+
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
  * Builder, which is free for non-commercial use. If Jigloo is being used
@@ -59,6 +69,9 @@ import org.apache.commons.lang.StringUtils;
  * ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 public class JarFinderUI extends javax.swing.JFrame {
+
+    private PropertiesUtilBean configBean = new PropertiesUtilBean(JarFinderUI.class);
+
     /**
      * 
      */
@@ -72,7 +85,7 @@ public class JarFinderUI extends javax.swing.JFrame {
             public void run() {
                 JarFinderUI inst = new JarFinderUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -218,11 +231,9 @@ public class JarFinderUI extends javax.swing.JFrame {
                         copyToBtn.setText("copy to");
                         copyToBtn.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                File file = JFileChooserUtil.newInstance().selectDirectoryOnly().showOpenDialog()
-                                        .getApproveSelectedFile();
+                                File file = JFileChooserUtil.newInstance().selectDirectoryOnly().showOpenDialog().getApproveSelectedFile();
                                 if (file == null) {
-                                    JOptionPaneUtil.newInstance().iconErrorMessage()
-                                            .showMessageDialog("copy to dir undefined!", getTitle());
+                                    JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("copy to dir undefined!", getTitle());
                                     return;
                                 } else {
                                     copyToFile = file;
@@ -238,6 +249,43 @@ public class JarFinderUI extends javax.swing.JFrame {
                             copyToList = new JList();
                             jScrollPane3.setViewportView(copyToList);
                             copyToList.setModel(copyToListModel);
+                            {
+                                panel = new JPanel();
+                                jTabbedPane1.addTab("config", null, panel, null);
+                                panel.setLayout(new FormLayout(
+                                        new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                                {
+                                    lblNewLabel = new JLabel("JD Gui");
+                                    panel.add(lblNewLabel, "2, 2, right, default");
+                                }
+                                {
+                                    jdGuiText = new JTextField();
+                                    JCommonUtil.jTextFieldSetFilePathMouseEvent(jdGuiText, false);
+                                    panel.add(jdGuiText, "4, 2, fill, default");
+                                    jdGuiText.setColumns(10);
+                                }
+                                {
+                                    saveConfigBtn = new JButton("儲存設定");
+                                    saveConfigBtn.addActionListener(new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            try {
+                                                configBean.reflectSetConfig(JarFinderUI.this);
+                                                configBean.store();
+                                                JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+                                            } catch (Exception ex) {
+                                                JCommonUtil.handleException(ex);
+                                            }
+                                        }
+                                    });
+                                    panel.add(saveConfigBtn, "2, 24");
+                                }
+                            }
                             copyToList.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
                                     // copyToFile
@@ -248,8 +296,7 @@ public class JarFinderUI extends javax.swing.JFrame {
                                         return;
                                     }
                                     if (copyToFile == null) {
-                                        JOptionPaneUtil.newInstance().iconErrorMessage()
-                                                .showMessageDialog("copy to dir undefined!", getTitle());
+                                        JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("copy to dir undefined!", getTitle());
                                         return;
                                     }
                                     DefaultListModel model = (DefaultListModel) copyToList.getModel();
@@ -258,12 +305,10 @@ public class JarFinderUI extends javax.swing.JFrame {
                                     sb.append("是否複製檔案\n");
                                     sb.append("file : " + val + "\n");
                                     sb.append("copy to dir : " + copyToFile + "\n");
-                                    ComfirmDialogResult result = JOptionPaneUtil.newInstance().confirmButtonYesNo()
-                                            .showConfirmDialog(sb, getTitle());
+                                    ComfirmDialogResult result = JOptionPaneUtil.newInstance().confirmButtonYesNo().showConfirmDialog(sb, getTitle());
                                     File srcFile = new File((String) val);
                                     if (!srcFile.exists()) {
-                                        JOptionPaneUtil.newInstance().iconErrorMessage()
-                                                .showMessageDialog(srcFile + "  not found!", getTitle());
+                                        JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(srcFile + "  not found!", getTitle());
                                         return;
                                     }
                                     File copyDestFile = new File(copyToFile, srcFile.getName());
@@ -276,13 +321,11 @@ public class JarFinderUI extends javax.swing.JFrame {
                                             JCommonUtil.handleException(e.toString(), e);
                                         }
                                         if (srcFile != null && //
-                                                copyDestFile != null && //
-                                                srcFile.length() == copyDestFile.length()) {
-                                            JOptionPaneUtil.newInstance().iconInformationMessage()
-                                                    .showMessageDialog("success!\n" + copyDestFile, getTitle());
+                                        copyDestFile != null && //
+                                        srcFile.length() == copyDestFile.length()) {
+                                            JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog("success!\n" + copyDestFile, getTitle());
                                         } else {
-                                            JOptionPaneUtil.newInstance().iconErrorMessage()
-                                                    .showMessageDialog("failed!\n" + copyDestFile, getTitle());
+                                            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("failed!\n" + copyDestFile, getTitle());
                                         }
                                         break;
                                     case NO_OPTION:
@@ -321,6 +364,10 @@ public class JarFinderUI extends javax.swing.JFrame {
                     dispose();
                 }
             });
+
+            {
+                configBean.reflectInit(this);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -347,8 +394,7 @@ public class JarFinderUI extends javax.swing.JFrame {
     private JButton copyToBtn;
     private JPanel jPanel4;
     static {
-        CONFIG_FILE = new File(PropertiesUtil.getJarCurrentPath(JarFinderUI.class) + "\\"
-                + JarFinderUI.class.getSimpleName() + ".properties");
+        CONFIG_FILE = new File(PropertiesUtil.getJarCurrentPath(JarFinderUI.class) + "\\" + JarFinderUI.class.getSimpleName() + ".properties");
         if (!CONFIG_FILE.exists()) {
             try {
                 CONFIG_FILE.createNewFile();
@@ -370,6 +416,10 @@ public class JarFinderUI extends javax.swing.JFrame {
             searchResult.setModel(dl);
         }
     });
+    private JPanel panel;
+    private JLabel lblNewLabel;
+    private JTextField jdGuiText;
+    private JButton saveConfigBtn;
 
     // 目錄
     private void jButton1ActionPerformed(ActionEvent evt) {
@@ -400,7 +450,9 @@ public class JarFinderUI extends javax.swing.JFrame {
                 jarfinder.setDir(file).execute();
             }
         } catch (Exception ex) {
-            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), "error");
+            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
+            // "error");
+            JCommonUtil.handleException(ex);
         }
     }
 
@@ -429,21 +481,26 @@ public class JarFinderUI extends javax.swing.JFrame {
                 linecount++;
             }
 
-            ComfirmDialogResult result = JOptionPaneUtil.newInstance().iconInformationMessage()
-                    .confirmButtonYesNoCancel().showConfirmDialog(sb, fileName);
+            ComfirmDialogResult result = JOptionPaneUtil.newInstance().iconInformationMessage().confirmButtonYesNoCancel().showConfirmDialog(sb, fileName);
 
-            String jdGui = "C:\\apps\\jd-gui-0.3.1.windows\\jd-gui.exe";
+            String jdGuiExe = StringUtils.trimToEmpty(jdGuiText.getText());
             if (result == ComfirmDialogResult.YES_OK_OPTION) {
-                Runtime.getRuntime().exec("cmd /c start " + jdGui + " " + new File(fileName).getAbsolutePath());
+                if (OsInfoUtil.isWindows()) {
+                    RuntimeBatPromptModeUtil.newInstance().command(String.format("cmd /c call \"%s\" \"%s\"", jdGuiExe, fileName)).apply();
+                } else {
+                    RuntimeBatPromptModeUtil.newInstance().command(String.format("\"%s\" \"%s\"", jdGuiExe, fileName)).apply();
+                }
             }
 
             if (result == ComfirmDialogResult.NO_OPTION) {
-                Runtime.getRuntime().exec("cmd /c start " + new File(fileName).getParentFile().getAbsolutePath());
+                DesktopUtil.openDir(new File(fileName).getParentFile());
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), "error");
+            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
+            // "error");
+            JCommonUtil.handleException(ex);
         }
     }
 }

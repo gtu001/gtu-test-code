@@ -1,8 +1,11 @@
+
 package gtu._work;
 
-import gtu.collection.MapUtil;
-
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,10 +19,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
+
+import gtu.collection.MapUtil;
 
 public class JarFinder {
 
@@ -29,9 +35,10 @@ public class JarFinder {
      */
     public static void main(String[] args) throws IOException {
         File file = new File("C:/jar");
-//        file = new File("C:/Program Files/Java/activemq-5.10/lib");
-//        file = new File("C:/Users/gtu001/.m2/repository");
-//        file = new File("C:/Oracle/Middleware/user_projects/domains/base_domain/lib");
+        // file = new File("C:/Program Files/Java/activemq-5.10/lib");
+        // file = new File("C:/Users/gtu001/.m2/repository");
+        // file = new
+        // File("C:/Oracle/Middleware/user_projects/domains/base_domain/lib");
         Map<String, Collection<String>> maps = JarFinder.newInstance().setDir(file)//
                 .pattern("org/springframework/dao/DataAccessResourceFailureException").execute();
         for (String key : maps.keySet()) {
@@ -41,7 +48,7 @@ public class JarFinder {
                 System.out.println("\t-->" + val);
             }
         }
-        
+
         List<File> list = new ArrayList<File>();
         for (String key : maps.keySet()) {
             File f = new File(key);
@@ -56,7 +63,7 @@ public class JarFinder {
         for (File f : list) {
             System.out.println(f + "\t" + DateFormatUtils.format(f.lastModified(), "yyyyMMdd") + "\t" + f.length());
         }
-        
+
         Runtime.getRuntime().exec(String.format("cmd call /c \"%s\"", "D:/_桌面/apps/jd-gui-0.3.1.windows/jd-gui.exe"));
         System.out.println("done...");
     }
@@ -101,7 +108,7 @@ public class JarFinder {
         this.dir = file;
         return this;
     }
-    
+
     public JarFinder setFileLst(List<File> fileLst) {
         this.fileLst = fileLst;
         return this;
@@ -115,13 +122,13 @@ public class JarFinder {
 
     public Map<String, Collection<String>> execute() {
         Validate.notNull(pattern);
-        if(dir == null && fileLst == null) {
+        if (dir == null && fileLst == null) {
             throw new RuntimeException("必須輸入dir或fileLst");
         }
-        if(dir != null && dir.exists()) {
+        if (dir != null && dir.exists()) {
             find(this.dir);
         }
-        if(fileLst != null && !fileLst.isEmpty()) {
+        if (fileLst != null && !fileLst.isEmpty()) {
             find(this.fileLst);
         }
         return matchMap;
@@ -133,15 +140,14 @@ public class JarFinder {
                 this.find(f);
             }
         } else {
-            if (file.getName().endsWith(".jar")
-                    && StringUtils.indexOfAny(file.getName(), new String[] { "sources.jar", "javadoc.jar" }) == -1) {
+            if (file.getName().endsWith(".jar") && StringUtils.indexOfAny(file.getName(), new String[] { "sources.jar", "javadoc.jar" }) == -1) {
                 findZip(file.getAbsolutePath());
             }
         }
     }
-    
+
     private void find(List<File> fileLst) {
-        for(File f : fileLst) {
+        for (File f : fileLst) {
             findZip(f.getAbsolutePath());
         }
     }
@@ -165,34 +171,56 @@ public class JarFinder {
             currentSearch.apply(filename);
         }
         boolean done = false;
+
+        FileInputStream fis = null;
+        ZipInputStream zis = null;
+
         ZipFile zf = null;
         try {
             // System.out.println(filename);
-            zf = new ZipFile(filename);
-            ZipEntry target = null;
-            Enumeration<?> enumeration = zf.entries();
-            while (enumeration.hasMoreElements()) {
-                try{
-                    target = (ZipEntry) enumeration.nextElement();
-                }catch(Exception ex){
-                    if(!ex.getMessage().contains("MALFORMED")){
-                        ex.printStackTrace();
-                        throw ex;
+            if (true) {
+                fis = new FileInputStream(filename);
+                zis = new ZipInputStream(new BufferedInputStream(fis));
+                ZipEntry entry;
+                while ((entry = zis.getNextEntry()) != null) {
+//                    System.out.println(entry.getName());
+                    matcher = this.pattern.matcher(entry.getName());
+                    if (matcher.find()) {
+                        MapUtil.putAsCollection(filename, entry.getName(), matchMap);
+                        if (ifMatch != null) {
+                            ifMatch.apply(filename, entry.getName(), matchMap);
+                        }
+                        System.out.println(filename + "\t" + entry.getName());
                     }
                 }
-                // System.out.println("target.name = " + target.getName());
-                matcher = this.pattern.matcher(target.getName());
-                if (matcher.find()) {
-                    MapUtil.putAsCollection(filename, target.getName(), matchMap);
-                    if (ifMatch != null) {
-                        ifMatch.apply(filename, target.getName(), matchMap);
+            } else if (true) {//容易出錯
+                zf = new ZipFile(filename);
+                ZipEntry target = null;
+                Enumeration<?> enumeration = zf.entries();
+                while (enumeration.hasMoreElements()) {
+                    try {
+                        target = (ZipEntry) enumeration.nextElement();
+                    } catch (Exception ex) {
+                        if (!ex.getMessage().contains("MALFORMED")) {
+                            ex.printStackTrace();
+                            throw ex;
+                        }
                     }
-                    // System.out.println(filename + "\t" + target.getName());
+//                    System.out.println("target.name = " + target.getName());
+                    matcher = this.pattern.matcher(target.getName());
+                    if (matcher.find()) {
+                        MapUtil.putAsCollection(filename, target.getName(), matchMap);
+                        if (ifMatch != null) {
+                            ifMatch.apply(filename, target.getName(), matchMap);
+                        }
+                        System.out.println(filename + "\t" + target.getName());
+                    }
                 }
             }
+
             done = true;
-        } catch (java.util.zip.ZipException e){
-            if(e.getMessage().contains("invalid CEN header (bad signature)")){
+        } catch (java.util.zip.ZipException e) {
+            if (e.getMessage().contains("invalid CEN header (bad signature)")) {
                 System.err.println("invalid CEN header (bad signature) , fileName : " + filename);
             }
             e.printStackTrace();
@@ -201,8 +229,15 @@ public class JarFinder {
         } finally {
             try {
                 zf.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+            }
+            try {
+                fis.close();
+            } catch (Exception e) {
+            }
+            try {
+                zis.close();
+            } catch (Exception e) {
             }
         }
         return done;
