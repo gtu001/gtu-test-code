@@ -105,6 +105,8 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import taobe.tec.jcc.JChineseConvertor;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class EnglishSearchUI extends JFrame {
 
@@ -139,7 +141,7 @@ public class EnglishSearchUI extends JFrame {
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
-        if(!PropertiesUtil.isClassInJar(EnglishSearchUI.class)){
+        if (!PropertiesUtil.isClassInJar(EnglishSearchUI.class)) {
             propertyBean = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
             propertyBean = new PropertiesUtilBean(new File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
         }
@@ -484,6 +486,13 @@ public class EnglishSearchUI extends JFrame {
         setContentPane(contentPane);
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (tabbedPane.getSelectedIndex() == TabIndexOrder.googleTranslate.ordinal()) {
+                    googleTranslateArea.setText(searchEnglishIdTextController.getText());
+                }
+            }
+        });
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel_1 = new JPanel();
@@ -1669,5 +1678,9 @@ public class EnglishSearchUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private enum TabIndexOrder {
+        translate, config, googleTranslate;
     }
 }

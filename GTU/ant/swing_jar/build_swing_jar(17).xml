@@ -78,6 +78,7 @@
 			<packagename mode="small">org.json.JSONObject</packagename>
 
 			<packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
+			<packagename mode="small">org/springframework/util/Assert</packagename>
 
 		</jarfinder>
 

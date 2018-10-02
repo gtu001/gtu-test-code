@@ -154,3 +154,7 @@
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
 		    -->
+		    <!-- html Unescape
+		    <packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
+			<packagename mode="small">org/springframework/util/Assert</packagename>
+		     -->
