@@ -463,7 +463,6 @@ public class JarFinderUI extends javax.swing.JFrame {
         }
 
         try {
-
             JList list = (JList) evt.getSource();
 
             StringBuilder sb = new StringBuilder("按'是'開啟jar檔\r\n按'否'開啟所在目錄\r\n");
@@ -488,7 +487,7 @@ public class JarFinderUI extends javax.swing.JFrame {
                 if (OsInfoUtil.isWindows()) {
                     RuntimeBatPromptModeUtil.newInstance().command(String.format("cmd /c call \"%s\" \"%s\"", jdGuiExe, fileName)).apply();
                 } else {
-                    RuntimeBatPromptModeUtil.newInstance().command(String.format("\"%s\" \"%s\"", jdGuiExe, fileName)).apply();
+                    RuntimeBatPromptModeUtil.newInstance().command(String.format("java -jar \"%s\" \"%s\"", jdGuiExe, fileName)).apply();
                 }
             }
 
