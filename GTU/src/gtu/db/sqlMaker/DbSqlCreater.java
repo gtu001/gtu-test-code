@@ -325,11 +325,13 @@ public class DbSqlCreater {
             }
             sb.append(" WHERE ");
             System.out.println("pkValMap == " + pkValMap);
-            for (String key : pkValMap.keySet()) {
+            boolean addOne = false;
+            for (String key : pkColumns) {
                 String key_ = key.toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, pkValMap.get(key_)) + " and");
+                addOne = true;
             }
-            if (pkColumns.size() != 0) {
+            if (addOne) {
                 sb.delete(sb.length() - 4, sb.length());
             }
             // sb.append(";");

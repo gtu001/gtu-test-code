@@ -39,6 +39,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.Validate;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
@@ -381,6 +383,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             df.value = value;
             df.isPk = isPk;
             df.dtype = dtype;
+            System.out.println(">>>>>>>>>>>>>>>>>>>" + ReflectionToStringBuilder.toString(df, ToStringStyle.SHORT_PREFIX_STYLE));
             this.rowMap.get().put(columnName, df);
         }
     }
