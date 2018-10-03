@@ -3,6 +3,7 @@ package gtu.jsf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
@@ -37,7 +38,7 @@ public class Download {
         // 下面兩行要先寫(setContentType, setHeader)，否則檔案名稱可能會隨機變成網址名稱
         response.setContentType("application/octet-stream");
         //response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");//excel
-        response.setHeader("Content-disposition", "attachment; filename=\"" + fileName + "\"");
+        response.setHeader("Content-disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(fileName, "UTF8") + "");
 
         OutputStream out = response.getOutputStream();
         IOUtils.copy(inputStream, out);

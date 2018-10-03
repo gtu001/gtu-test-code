@@ -235,7 +235,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         String sql = "";
                         if (btn == dialog.rdbtnInsert) {
                             sql = tableInfo.createInsertSql(map);
-                        } else if (btn == dialog.rdbtnUpdate) {
+                        } else if (btn == dialog.rdbtnDelete) {
                             sql = tableInfo.createDeleteSql(map);
                         } else if (btn == dialog.rdbtnUpdate) {
                             sql = tableInfo.createUpdateSql(map, map, false);

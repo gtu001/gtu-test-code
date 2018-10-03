@@ -69,6 +69,26 @@ public class DBDateUtil {
                 return String.format(" to_date(%s, 'YYYY/MM/DD') ", columnName);
             }
         },//
+        DERBY {
+            @Override
+            public String date2Varchar(String columnName) {
+                return String.format(" DATE(%s) ", columnName);
+            }
+
+            @Override
+            public String timestamp2Varchar(String columnName) {
+                return String.format(" TIMESTAMP(%s) ", columnName);
+            }
+            @Override
+            public String varchar2Timestamp(String columnName) {
+                return String.format(" TIMESTAMP(%s) ", columnName);
+            }
+
+            @Override
+            public String varchar2Date(String columnName) {
+                return String.format(" DATE(%s) ", columnName);
+            }
+        },//
         ;
 
         public abstract String date2Varchar(String columnName);

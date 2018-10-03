@@ -394,7 +394,7 @@ public class JarFinderUI extends javax.swing.JFrame {
     private JButton copyToBtn;
     private JPanel jPanel4;
     static {
-        CONFIG_FILE = new File(PropertiesUtil.getJarCurrentPath(JarFinderUI.class) + "\\" + JarFinderUI.class.getSimpleName() + ".properties");
+        CONFIG_FILE = new File(PropertiesUtil.getJarCurrentPath(JarFinderUI.class), JarFinderUI.class.getSimpleName() + ".properties");
         if (!CONFIG_FILE.exists()) {
             try {
                 CONFIG_FILE.createNewFile();
