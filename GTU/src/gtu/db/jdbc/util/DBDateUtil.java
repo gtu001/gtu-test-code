@@ -26,6 +26,11 @@ public class DBDateUtil {
             public String varchar2Date(String columnName) {
                 return String.format(" TO_DATE(%s,'YYYY/MM/DD') ", columnName);
             }
+
+            @Override
+            public String sysdate() {
+                return " sysdate ";
+            }
         }, //
         DB2 {
             @Override
@@ -46,6 +51,11 @@ public class DBDateUtil {
             @Override
             public String varchar2Date(String columnName) {
                 return String.format(" TO_DATE(%s,'YYYY/MM/DD') ", columnName);
+            }
+
+            @Override
+            public String sysdate() {
+                return " (current date) "; //(current timestamp)
             }
         }, //
         Postgres {
@@ -68,17 +78,23 @@ public class DBDateUtil {
             public String varchar2Date(String columnName) {
                 return String.format(" to_date(%s, 'YYYY/MM/DD') ", columnName);
             }
-        },//
-        DERBY {
+
+            @Override
+            public String sysdate() {
+                return " NOW() ";
+            }
+        }, //
+        Derby {
             @Override
             public String date2Varchar(String columnName) {
-                return String.format(" DATE(%s) ", columnName);
+                return String.format(" cast(date(%s) as varchar(10)) ", columnName);
             }
 
             @Override
             public String timestamp2Varchar(String columnName) {
-                return String.format(" TIMESTAMP(%s) ", columnName);
+                return String.format(" cast(timestamp(%s) as varchar(23)) ", columnName);
             }
+
             @Override
             public String varchar2Timestamp(String columnName) {
                 return String.format(" TIMESTAMP(%s) ", columnName);
@@ -88,8 +104,38 @@ public class DBDateUtil {
             public String varchar2Date(String columnName) {
                 return String.format(" DATE(%s) ", columnName);
             }
-        },//
-        ;
+            
+            @Override
+            public String sysdate() {
+                return " current_date ";//current_timestamp
+            }
+        }, //
+        SqlServer {
+            @Override
+            public String date2Varchar(String columnName) {
+                return String.format(" FORMAT(%s, 'yyyy/MM/dd') ", columnName);
+            }
+
+            @Override
+            public String timestamp2Varchar(String columnName) {
+                return String.format(" FORMAT(%s, 'yyyy/MM/dd h:mm:ss.tt') ", columnName);
+            }
+
+            @Override
+            public String varchar2Timestamp(String columnName) {
+                return String.format(" convert(datetime, %s, 25) ", columnName);
+            }
+
+            @Override
+            public String varchar2Date(String columnName) {
+                return String.format(" convert(datetime, %s, 23) ", columnName);
+            }
+
+            @Override
+            public String sysdate() {
+                return " GETDATE() ";
+            }
+        };
 
         public abstract String date2Varchar(String columnName);
 
@@ -98,5 +144,7 @@ public class DBDateUtil {
         public abstract String varchar2Timestamp(String columnName);
 
         public abstract String varchar2Date(String columnName);
+        
+        public abstract String sysdate();
     }
 }
