@@ -844,7 +844,7 @@ public class FloatViewService extends Service {
         ADMOB_TEST("TEST 測試廣告", R.drawable.icon_18_adults_only, true) {
             @Override
             void process(FloatViewService self) {
-                self.adCheckShow.showAdForce();
+                self.adCheckShow.count = 21;
             }
         },//
         ;

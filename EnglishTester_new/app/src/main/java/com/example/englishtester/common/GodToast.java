@@ -2,15 +2,18 @@ package com.example.englishtester.common;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.Gravity;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ant.liao.GifView;
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.DropboxApplicationActivity;
 import com.example.englishtester.DropboxFileLoadService;
+import com.example.englishtester.R;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
 import org.apache.commons.io.FileUtils;
@@ -32,6 +35,8 @@ import java.util.regex.Pattern;
 
 import gtu.number.RandomUtil;
 
+import static com.example.englishtester.R.drawable.close_icon;
+
 /**
  * Created by gtu001 on 2018/1/11.
  */
@@ -44,7 +49,9 @@ public class GodToast {
     private Context context;
     private IDropboxFileLoadService dropboxFileLoadService;
     private Handler handler = new Handler();
-    private GifView imageView_gif;
+
+    private GifView imageView_gif;//
+
     private Toast toast;
     private FrameLayout layout;
     private File godImageConfig;
@@ -69,7 +76,7 @@ public class GodToast {
         this.imageView_gif = new GifView(context);
 
         this.toast = new Toast(context);
-        this.toast.setDuration(Toast.LENGTH_LONG);
+        this.toast.setDuration(Toast.LENGTH_SHORT);//LENGTH_LONG
         this.toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         this.toast.setView(layout);
 
@@ -126,11 +133,19 @@ public class GodToast {
         //        }
 
         // 繼續
-
         imageView_gif.showAnimation();
 
         //很危險--↓↓↓↓↓↓
-//        toast.show();
+        new CountDownTimer(9000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                toast.show();
+            }
+
+            public void onFinish() {
+                toast.show();
+            }
+        }.start();
+
         //很危險--↑↑↑↑↑↑
     }
 
@@ -154,7 +169,7 @@ public class GodToast {
         int width = bm.getLeft();
         int height = bm.getRight();
 
-        float fixRatio = ((float)width / (float)height) / 4;
+        float fixRatio = ((float) width / (float) height) / 4;
         if (fixRatio > 0.35) {
             fixRatio = 0.35f;
         } else if (fixRatio < 0) {

@@ -142,11 +142,10 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
         if (BuildConfig.DEBUG) {
             contentView.addView(createLabel(""));
-            contentView.addView(createButton("God Gif",//
+            contentView.addView(createButton("Test",//
                     new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            GodToast.getInstance(MainActivity.this).show();
                         }
                     }
             ));
