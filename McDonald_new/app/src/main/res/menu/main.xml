@@ -204,4 +204,9 @@
         android:id="@+id/item_f_gpei"
         android:orderInCategory="100"
         android:title="雞排(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_blackTea"
+        android:orderInCategory="100"
+        android:title="紅茶(買一送一)(new)" />
+
 </menu>
