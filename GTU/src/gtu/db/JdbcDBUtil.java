@@ -299,7 +299,7 @@ public class JdbcDBUtil {
         int rsCount = 0;
         System.out.println("sql:" + sql);
         try {
-            callPSetUser(con);// 全球人壽測試用 FIXME
+            //callPSetUser(con);// 全球人壽測試用 FIXME
 
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             if (param != null) {

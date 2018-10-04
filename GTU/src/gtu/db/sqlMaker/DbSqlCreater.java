@@ -218,9 +218,9 @@ public class DbSqlCreater {
 
                     columns.add(colLabel);
                 }
-                tableName = StringUtils.defaultIfBlank(tableName, null);
-                schemaName = StringUtils.defaultIfBlank(schemaName, null);
-                catalogName = StringUtils.defaultIfBlank(catalogName, null);
+                tableName = StringUtils.trimToEmpty(tableName);
+                schemaName = StringUtils.trimToEmpty(schemaName);
+                catalogName = StringUtils.trimToEmpty(catalogName);
 
                 DatabaseMetaData dbmd = conn.getMetaData();
                 ResultSet pk = dbmd.getPrimaryKeys(catalogName, schemaName, tableName);
@@ -282,6 +282,16 @@ public class DbSqlCreater {
             Validate.notEmpty(pkColumns, "pkColumns欄位為空");
         }
 
+        public String getTableAndSchema() {
+            schemaName = StringUtils.trimToEmpty(schemaName);
+            tableName = StringUtils.trimToEmpty(tableName);
+            if (StringUtils.isNotBlank(schemaName)) {
+                return schemaName + "." + tableName;
+            } else {
+                return tableName;
+            }
+        }
+
         /**
          * 傳入要建立的新增資料
          */
@@ -289,7 +299,7 @@ public class DbSqlCreater {
             validateData();
             StringBuilder sb = new StringBuilder();
             String value = null;
-            sb.append(String.format("INSERT INTO %s  (", schemaName + "." + tableName));
+            sb.append(String.format("INSERT INTO %s  (", getTableAndSchema()));
             for (String key : columns) {
                 sb.append(key + ",");
             }
@@ -312,7 +322,7 @@ public class DbSqlCreater {
         public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("UPDATE " + schemaName + "." + tableName + " SET ");
+            sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
                 String key_ = key.toUpperCase();
                 if (StringUtils.isBlank(valmap.get(key_)) && ignoreNull) {
@@ -344,7 +354,7 @@ public class DbSqlCreater {
         public String createSelectSql(Map<String, String> valmap) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT * FROM " + schemaName + "." + tableName + " WHERE ");
+            sb.append("SELECT * FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
                 String key_ = key.toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");
@@ -362,7 +372,7 @@ public class DbSqlCreater {
         public String createDeleteSql(Map<String, String> valmap) {
             validateData();
             StringBuilder sb = new StringBuilder();
-            sb.append("DELETE FROM " + schemaName + "." + tableName + " WHERE ");
+            sb.append("DELETE FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
                 String key_ = key.toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");

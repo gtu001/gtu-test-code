@@ -50,6 +50,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -83,8 +84,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -738,16 +739,24 @@ public class FastDBQueryUI extends JFrame {
 
             // 組參數列
             List<Object> parameterList = new ArrayList<Object>();
-            for (String columnName : param.paramList) {
-                if (!paramMap.containsKey(columnName)) {
-                    Validate.isTrue(false, "參數未設定 : " + columnName);
+            if (param.getClass() == SqlParam.class) {
+                for (String columnName : param.paramList) {
+                    if (!paramMap.containsKey(columnName)) {
+                        Validate.isTrue(false, "參數未設定 : " + columnName);
+                    }
+                    parameterList.add(paramMap.get(columnName));
                 }
-                parameterList.add(paramMap.get(columnName));
+            } else if (param.getClass() == SqlParam_IfExists.class) {
+                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap));
+                System.out.println("=====================================================");
+                System.out.println(param.getQuestionSql());
+                System.out.println(parameterList);
+                System.out.println("=====================================================");
             }
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
-                List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
+                List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true);
                 this.queryList = queryList;
                 this.queryModeProcess(queryList, false);
                 this.showJsonArry(queryList);
@@ -859,7 +868,7 @@ public class FastDBQueryUI extends JFrame {
             queryLst.add(valMap);
             model.addRow(arry.toArray());
             this.queryList = queryLst;
-        } catch (SQLException e) {
+        } catch (Exception e) {
         }
         return model;
     }
@@ -868,6 +877,15 @@ public class FastDBQueryUI extends JFrame {
      * parse Sql
      */
     private SqlParam parseSqlToParam(String sql) {
+        // 中括號特殊處理
+        int matchCount = 0;
+        if ((matchCount = StringUtils.countMatches(sql, "[")) == StringUtils.countMatches(sql, "]")) {
+            if (matchCount != 0) {
+                return SqlParam_IfExists.parseToSqlParam(sql);
+            }
+        }
+
+        // 一般處理
         Pattern ptn = Pattern.compile("\\:(\\w+)");
         Matcher mth = ptn.matcher(sql);
 
@@ -897,6 +915,99 @@ public class FastDBQueryUI extends JFrame {
         String questionSql;
         Set<String> paramSet = new LinkedHashSet<String>();
         List<String> paramList = new ArrayList<String>();
+
+        public String getQuestionSql() {
+            return questionSql;
+        }
+    }
+
+    private static class SqlParam_IfExists extends SqlParam {
+        List<Pair<List<String>, int[]>> paramListFix = new ArrayList<Pair<List<String>, int[]>>();
+
+        private boolean isAllOk(List<String> paramLst, Map<String, Object> paramMap) {
+            for (String col : paramLst) {
+                if (paramMap.containsKey(col) && paramMap.get(col) != null) {
+                    String tmpParamVal = StringUtils.trimToEmpty((String) paramMap.get(col));
+                    if (StringUtils.isBlank(tmpParamVal)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static SqlParam_IfExists parseToSqlParam(String sql) {
+            SqlParam_IfExists sqlParam = new SqlParam_IfExists();
+            sqlParam.orginialSql = sql;
+
+            Pattern ptn = Pattern.compile("\\[(.*?)\\]");
+            Matcher mth = ptn.matcher(sql);
+
+            while (mth.find()) {
+                String quoteLine = mth.group(1);
+
+                Pattern ptn2 = Pattern.compile("\\:(\\w+)");
+                Matcher mth2 = ptn2.matcher(quoteLine);
+
+                List<String> params = new ArrayList<String>();
+                while (mth2.find()) {
+                    params.add(mth2.group(1));
+                }
+                sqlParam.paramSet.addAll(params);
+
+                if (!params.isEmpty()) {
+                    sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
+                }
+            }
+            return sqlParam;
+        }
+
+        private String toQuestionMarkSql(String markSql, List<Object> rtnParamLst, Map<String, Object> paramMap) {
+            Pattern ptn = Pattern.compile(":(\\w+)");
+            Matcher mth = ptn.matcher(markSql);
+            StringBuffer sb = new StringBuffer();
+
+            while (mth.find()) {
+                String col = mth.group(1);
+                Object value = paramMap.get(col);
+
+                rtnParamLst.add(value);
+                String replaceVal = StringUtils.rightPad("?", mth.group().length());
+
+                mth.appendReplacement(sb, replaceVal);
+            }
+            mth.appendTail(sb);
+
+            String rtnStr = sb.toString().replaceAll("[\\[\\]]", " ");
+            return rtnStr;
+        }
+
+        public List<Object> processParamMap(Map<String, Object> paramMap) {
+            String orginialSqlBackup = this.orginialSql.toString();
+
+            List<Object> rtnParamLst = new ArrayList<Object>();
+
+            for (Pair<List<String>, int[]> row : paramListFix) {
+                int[] start_end = row.getRight();
+
+                String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
+                String replaceToSql = StringUtils.rightPad("", markSql.length());
+
+                if (isAllOk(row.getLeft(), paramMap)) {
+                    replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap);
+                }
+
+                orginialSqlBackup = orginialSqlBackup.substring(0, start_end[0]) + //
+                        replaceToSql + //
+                        orginialSqlBackup.substring(start_end[1]);
+            }
+
+            this.questionSql = orginialSqlBackup;
+
+            return rtnParamLst;
+        }
     }
 
     /**
