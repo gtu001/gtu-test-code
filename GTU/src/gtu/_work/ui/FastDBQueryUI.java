@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -61,6 +60,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.collection.ListUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
@@ -141,7 +141,7 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_15;
     private JPanel panel_16;
 
-    private List<Map<String, Object>> queryList = null;
+    private Pair<List<String>, List<Object[]>> queryList = null;
     private JButton excelExportBtn;
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
@@ -335,27 +335,27 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 try {
-                    if (queryList == null || queryList.isEmpty()) {
+                    if (queryList == null || queryList.getRight().isEmpty()) {
                         return;
                     }
 
-                    List<Map<String, Object>> qList = new ArrayList<Map<String, Object>>();
+                    List<Object[]> qList = new ArrayList<Object[]>();
 
                     FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
                     boolean allMatch = finder.isAllMatch();
 
-                    Set<String> cols = queryList.get(0).keySet();
-                    for (Map<String, Object> map : queryList) {
+                    List<String> cols = queryList.getLeft();
+                    for (Object[] rows : queryList.getRight()) {
                         if (allMatch) {
-                            qList.add(map);
+                            qList.add(rows);
                             continue;
                         }
 
-                        B: for (String col : cols) {
-                            String value = finder.valueToString(map.get(col));
+                        B: for (int ii = 0; ii < cols.size(); ii++) {
+                            String value = finder.valueToString(rows[ii]);
                             for (String text : finder.getArry()) {
                                 if (value.contains(text)) {
-                                    qList.add(map);
+                                    qList.add(rows);
                                     break B;
                                 }
                             }
@@ -363,7 +363,7 @@ public class FastDBQueryUI extends JFrame {
                     }
 
                     System.out.println("qList - " + qList.size());
-                    queryModeProcess(qList, true);
+                    queryModeProcess(Pair.of(cols, qList), true, null);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -756,9 +756,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
-                List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true);
+                Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true);
                 this.queryList = queryList;
-                this.queryModeProcess(queryList, false);
+                this.queryModeProcess(queryList, false, Pair.of(param, parameterList));
                 this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
                 int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
@@ -787,15 +787,21 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void showJsonArry(List<Map<String, Object>> queryList) {
+    private void showJsonArry(Pair<List<String>, List<Object[]>> queryList) {
         try {
+            List<String> columns = queryList.getLeft();
             List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
-            for (Map<String, Object> map : queryList) {
-                Map<String, Object> cloneMap = (Map<String, Object>) ((HashMap) map).clone();
-                cloneLst.add(cloneMap);
-                for (String key : cloneMap.keySet()) {
-                    if (cloneMap.get(key) != null && (cloneMap.get(key) instanceof java.sql.Date || cloneMap.get(key) instanceof java.sql.Timestamp)) {
-                        cloneMap.put(key, String.valueOf(cloneMap.get(key)));
+            for (Object[] rows : queryList.getRight()) {
+                Map<String, Object> rowMap = new LinkedHashMap<String, Object>();
+                for (int ii = 0; ii < columns.size(); ii++) {
+                    String col = columns.get(ii);
+                    Object val = rows[ii];
+                    rowMap.put(col, val);
+                }
+                cloneLst.add(rowMap);
+                for (String key : queryList.getLeft()) {
+                    if (rowMap.get(key) != null && (rowMap.get(key) instanceof java.sql.Date || rowMap.get(key) instanceof java.sql.Timestamp)) {
+                        rowMap.put(key, String.valueOf(rowMap.get(key)));
                     }
                 }
             }
@@ -808,12 +814,14 @@ public class FastDBQueryUI extends JFrame {
 
     /**
      * 查詢模式
+     * 
+     * @param pair
      */
-    private void queryModeProcess(List<Map<String, Object>> queryList, boolean silent) {
-        if (queryList.isEmpty()) {
+    private void queryModeProcess(Pair<List<String>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair) {
+        if (queryList.getRight().isEmpty()) {
             if (!silent) {
                 System.out.println("fake row----");
-                queryResultTable.setModel(getFakeDataModel());
+                queryResultTable.setModel(getFakeDataModel(pair));
                 JCommonUtil._jOptionPane_showMessageDialog_info("查無資料!");
             } else {
                 DefaultTableModel createModel = JTableUtil.createModel(true, "");
@@ -822,31 +830,29 @@ public class FastDBQueryUI extends JFrame {
             return;
         } else {
             if (!silent) {
-                JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.size());
+                JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.getRight().size());
             }
         }
 
         // 取得標題
-        Object[] titles = queryList.get(0).keySet().toArray();
+        String[] titles = queryList.getLeft().toArray(new String[0]);
 
         // 查詢結果table
         DefaultTableModel createModel = JTableUtil.createModel(true, titles);
         queryResultTable.setModel(createModel);
         JTableUtil.setColumnWidths(queryResultTable, getInsets());
-        for (Map<String, Object> map : queryList) {
-            createModel.addRow(map.values().toArray());
+        for (Object[] rows : queryList.getRight()) {
+            createModel.addRow(rows);
         }
     }
 
-    private DefaultTableModel getFakeDataModel() {
+    private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {
         TableInfo tabInfo = new TableInfo();
         DefaultTableModel model = JTableUtil.createModel(true, new Object[0]);
-        String sql = sqlTextArea.getText().toString();
-        SqlParam param = parseSqlToParam(sql);
-        List<Map<String, Object>> queryLst = new ArrayList<Map<String, Object>>();
+        List<Object[]> queryLst = new ArrayList<Object[]>();
         try {
             Map<String, Object> valMap = new LinkedHashMap<String, Object>();
-            tabInfo.execute(param.questionSql, this.getDataSource().getConnection());
+            tabInfo.execute(pair.getLeft().getQuestionSql(), pair.getRight().toArray(), this.getDataSource().getConnection());
             List<String> columns = new ArrayList<String>(tabInfo.getColumns());
             model = JTableUtil.createModel(true, columns.toArray());
             List<Object> arry = new ArrayList<Object>();
@@ -863,11 +869,10 @@ public class FastDBQueryUI extends JFrame {
                     val = ("1");
                 }
                 arry.add(val);
-                valMap.put(col, val);
             }
-            queryLst.add(valMap);
+            queryLst.add(arry.toArray());
             model.addRow(arry.toArray());
-            this.queryList = queryLst;
+            this.queryList = Pair.of(columns, queryLst);
         } catch (Exception e) {
         }
         return model;
@@ -1120,7 +1125,7 @@ public class FastDBQueryUI extends JFrame {
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                Validate.isTrue(this.queryList != null && !this.queryList.isEmpty(), "查詢結果為空!");
+                Validate.isTrue(this.queryList != null && !this.queryList.getRight().isEmpty(), "查詢結果為空!");
 
                 JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
                 int orignRowPos = queryResultTable.getSelectedRow();
@@ -1129,7 +1134,7 @@ public class FastDBQueryUI extends JFrame {
                 int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                 System.out.println("rowPos " + rowPos);
 
-                Map<String, Object> rowMap = this.queryList.get(rowPos);
+                Map<String, Object> rowMap = getDetailToMap(this.queryList, rowPos);
 
                 if (fastDBQueryUI_CrudDlgUI != null) {
                     fastDBQueryUI_CrudDlgUI.isShowing();
@@ -1140,6 +1145,39 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private Map<String, Object> getDetailToMap(Pair<List<String>, List<Object[]>> queryList2, int rowPos) {
+        List<String> columns = queryList.getLeft();
+        List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
+
+        Object[] row = queryList.getRight().get(rowPos);
+
+        Map<String, List<Object>> multiMap = new HashMap<String, List<Object>>();
+        for (int ii = 0; ii < columns.size(); ii++) {
+            String col = columns.get(ii);
+            Object val = row[ii];
+            List<Object> valueLst = new ArrayList<Object>();
+            if (multiMap.containsKey(col)) {
+                valueLst = multiMap.get(col);
+            }
+            valueLst.add(val);
+            multiMap.put(col, valueLst);
+        }
+
+        Map<String, Object> rtnMap = new LinkedHashMap<String, Object>();
+        for (String col : multiMap.keySet()) {
+            List<Object> valueLst = multiMap.get(col);
+            if (valueLst.size() == 1) {
+                rtnMap.put(col, valueLst.get(0));
+            } else {
+                if (!ListUtil.isAllEquals(valueLst)) {
+                    Object value = JCommonUtil._JOptionPane_showInputDialog("此欄位[" + col + "]顯示多次,請選擇正確的值:", col, valueLst.toArray(), valueLst.get(0));
+                    rtnMap.put(col, value);
+                }
+            }
+        }
+        return rtnMap;
     }
 
     private void excelExportBtnAction() {
@@ -1181,7 +1219,7 @@ public class FastDBQueryUI extends JFrame {
                 }
 
             } else if (radio_export_excel == selBtn) {
-                if (queryList == null || queryList.isEmpty()) {
+                if (queryList == null || queryList.getRight().isEmpty()) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
                     return;
                 }
@@ -1207,7 +1245,7 @@ public class FastDBQueryUI extends JFrame {
                 }
 
                 // 寫資料
-                List<String> columns = new ArrayList<String>(queryList.get(0).keySet());
+                List<String> columns = new ArrayList<String>(queryList.getLeft());
                 HSSFRow titleRow0 = sheet0.createRow(0);
                 for (int ii = 0; ii < columns.size(); ii++) {
                     exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
@@ -1217,14 +1255,14 @@ public class FastDBQueryUI extends JFrame {
                     exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
                 }
 
-                for (int ii = 0; ii < queryList.size(); ii++) {
+                for (int ii = 0; ii < queryList.getRight().size(); ii++) {
                     Row row_string = sheet0.createRow(ii + 1);
                     Row row_orign$ = sheet1.createRow(ii + 1);
 
-                    Map<String, Object> map = queryList.get(ii);
+                    Object[] rows = queryList.getRight().get(ii);
                     for (int jj = 0; jj < columns.size(); jj++) {
                         String col = columns.get(jj);
-                        Object value = map.get(col);
+                        Object value = rows[jj];
 
                         exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
                         exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);

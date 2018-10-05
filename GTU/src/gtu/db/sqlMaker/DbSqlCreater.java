@@ -146,6 +146,31 @@ public class DbSqlCreater {
         /**
          * 取得table格式,可能會有數職欄位或非null欄位
          */
+        public void execute(String sql, Object param[], Connection con) throws Exception {
+            java.sql.ResultSet rs = null;
+            java.sql.PreparedStatement ps = null;
+            System.out.println("sql : " + sql);
+            try {
+                ps = con.prepareStatement(sql);
+                for (int i = 0; i < param.length; i++) {
+                    System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
+                    ps.setObject(i + 1, param[i]);
+                }
+                rs = ps.executeQuery();
+
+                this.execute__innerDo(rs, con);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+                throw e;
+            } finally {
+                close(con, ps, rs);
+            }
+        }
+
+        /**
+         * 取得table格式,可能會有數職欄位或非null欄位
+         */
         public void execute(String sql, Connection conn) {
             Statement stmt = null;
             ResultSet rs = null;
@@ -154,102 +179,7 @@ public class DbSqlCreater {
                 System.out.println("<<<<<<<" + sql);
                 rs = stmt.executeQuery(sql);
 
-                // if (conn instanceof oracle.jdbc.driver.OracleConnection) {
-                // ((oracle.jdbc.driver.OracleConnection)
-                // conn).setRemarksReporting(true);
-                // }
-
-                ResultSetMetaData meta = rs.getMetaData();
-                String colLabel = null;
-                for (int ii = 1; ii <= meta.getColumnCount(); ii++) {
-                    colLabel = meta.getColumnLabel(ii).toLowerCase();
-                    if (tableName == null) {
-                        tableName = meta.getTableName(ii);
-                    }
-                    if (schemaName == null) {
-                        schemaName = meta.getSchemaName(ii);
-                    }
-                    if (catalogName == null) {
-                        catalogName = meta.getCatalogName(ii);
-                    }
-                    if (DBColumnType.isNumber(meta.getColumnType(ii))) {
-                        numberCol.add(colLabel);
-                    }
-                    if (ResultSetMetaData.columnNoNulls == meta.isNullable(ii)) {
-                        noNullsCol.add(colLabel);
-                    }
-
-                    FieldInfo4DbSqlCreater finfo = new FieldInfo4DbSqlCreater();
-                    finfo.setCatalogName(meta.getCatalogName(ii));
-                    finfo.setColumnClassName(meta.getColumnClassName(ii));
-                    finfo.setColumnDisplaySize(meta.getColumnDisplaySize(ii));
-                    finfo.setColumnLabel(meta.getColumnLabel(ii));
-                    finfo.setColumnName(meta.getColumnName(ii));
-                    // db type ↓↓↓↓↓↓
-                    finfo.setColumnType(meta.getColumnType(ii));
-                    finfo.setColumnTypeName(meta.getColumnTypeName(ii));
-                    finfo.setColumnTypeClz(JdbcTypeMappingToJava.getMappingClass(meta.getColumnType(ii)));
-                    finfo.setColumnTypeZ(DBColumnType.lookup(meta.getColumnType(ii)));
-                    if (finfo.getColumnTypeClz() == java.sql.Date.class) {
-                        dateCol.add(colLabel);
-                    }
-                    if (finfo.getColumnTypeClz() == java.sql.Timestamp.class) {
-                        timestampCol.add(colLabel);
-                    }
-                    // db type ↑↑↑↑↑↑
-                    finfo.setPrecision(meta.getPrecision(ii));
-                    finfo.setScale(meta.getScale(ii));
-                    finfo.setSchemaName(meta.getSchemaName(ii));
-                    finfo.setTableName(meta.getTableName(ii));
-                    finfo.setAutoIncrement(meta.isAutoIncrement(ii));
-                    finfo.setCaseSensitive(meta.isCaseSensitive(ii));
-                    finfo.setCurrency(meta.isCurrency(ii));
-                    finfo.setDefinitelyWritable(meta.isDefinitelyWritable(ii));
-                    // nullable ↓↓↓↓↓↓
-                    finfo.setNullable(meta.isNullable(ii));
-                    finfo.setNullableBool(ResultSetMetaData.columnNoNulls == meta.isNullable(ii));
-                    // nullable ↑↑↑↑↑↑
-                    finfo.setReadOnly(meta.isReadOnly(ii));
-                    finfo.setSearchable(meta.isSearchable(ii));
-                    finfo.setSigned(meta.isSigned(ii));
-                    finfo.setWritable(meta.isWritable(ii));
-
-                    columnInfo.put(colLabel, finfo);
-
-                    columns.add(colLabel);
-                }
-                tableName = StringUtils.trimToEmpty(tableName);
-                schemaName = StringUtils.trimToEmpty(schemaName);
-                catalogName = StringUtils.trimToEmpty(catalogName);
-
-                DatabaseMetaData dbmd = conn.getMetaData();
-                ResultSet pk = dbmd.getPrimaryKeys(catalogName, schemaName, tableName);
-                System.out.println("============================================================pk start");
-                while (pk.next()) {
-                    Map<String, String> pkMap = getResultSetToMap(pk);
-                    System.out.println(pkMap);
-                    System.out.println(pkMap);
-                }
-                System.out.println("============================================================pk end");
-                // ResultSet rs2 = dbmd.getIndexInfo(catalogName, schemaName,
-                // tableName, false, true);
-                // // unique - 該參數為 true 時，僅返回唯一值的索引；該參數為 false
-                // 時，返回所有索引，不管它們是否唯一
-                // // approximate - 該參數為 true 時，允許結果是接近的資料值或這些資料值以外的值；該參數為 false
-                // // 時，要求結果是精確結果
-                // System.out.println("============================================================index
-                // start");
-                // while (rs2.next()) {
-                // Map<String, String> indexMap = getResultSetToMap(rs2);
-                // System.out.println(indexMap);
-                // }
-                // System.out.println("============================================================index
-                // end");
-                System.out.println("資料表pk =>" + pkColumns);
-                // ResultSet t = dbmd.getCatalogs();
-                // while (t.next()) {
-                // System.out.println(t.getString(0));
-                // }
+                this.execute__innerDo(rs, conn);
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -259,6 +189,105 @@ public class DbSqlCreater {
                 // JdbcUtils.closeResultSet(rs);
                 this.close(conn, stmt, rs);
             }
+        }
+
+        private void execute__innerDo(ResultSet rs, Connection conn) throws SQLException {
+            // if (conn instanceof oracle.jdbc.driver.OracleConnection) {
+            // ((oracle.jdbc.driver.OracleConnection)
+            // conn).setRemarksReporting(true);
+            // }
+
+            ResultSetMetaData meta = rs.getMetaData();
+            String colLabel = null;
+            for (int ii = 1; ii <= meta.getColumnCount(); ii++) {
+                colLabel = meta.getColumnLabel(ii).toLowerCase();
+                if (tableName == null) {
+                    tableName = meta.getTableName(ii);
+                }
+                if (schemaName == null) {
+                    schemaName = meta.getSchemaName(ii);
+                }
+                if (catalogName == null) {
+                    catalogName = meta.getCatalogName(ii);
+                }
+                if (DBColumnType.isNumber(meta.getColumnType(ii))) {
+                    numberCol.add(colLabel);
+                }
+                if (ResultSetMetaData.columnNoNulls == meta.isNullable(ii)) {
+                    noNullsCol.add(colLabel);
+                }
+
+                FieldInfo4DbSqlCreater finfo = new FieldInfo4DbSqlCreater();
+                finfo.setCatalogName(meta.getCatalogName(ii));
+                finfo.setColumnClassName(meta.getColumnClassName(ii));
+                finfo.setColumnDisplaySize(meta.getColumnDisplaySize(ii));
+                finfo.setColumnLabel(meta.getColumnLabel(ii));
+                finfo.setColumnName(meta.getColumnName(ii));
+                // db type ↓↓↓↓↓↓
+                finfo.setColumnType(meta.getColumnType(ii));
+                finfo.setColumnTypeName(meta.getColumnTypeName(ii));
+                finfo.setColumnTypeClz(JdbcTypeMappingToJava.getMappingClass(meta.getColumnType(ii)));
+                finfo.setColumnTypeZ(DBColumnType.lookup(meta.getColumnType(ii)));
+                if (finfo.getColumnTypeClz() == java.sql.Date.class) {
+                    dateCol.add(colLabel);
+                }
+                if (finfo.getColumnTypeClz() == java.sql.Timestamp.class) {
+                    timestampCol.add(colLabel);
+                }
+                // db type ↑↑↑↑↑↑
+                finfo.setPrecision(meta.getPrecision(ii));
+                finfo.setScale(meta.getScale(ii));
+                finfo.setSchemaName(meta.getSchemaName(ii));
+                finfo.setTableName(meta.getTableName(ii));
+                finfo.setAutoIncrement(meta.isAutoIncrement(ii));
+                finfo.setCaseSensitive(meta.isCaseSensitive(ii));
+                finfo.setCurrency(meta.isCurrency(ii));
+                finfo.setDefinitelyWritable(meta.isDefinitelyWritable(ii));
+                // nullable ↓↓↓↓↓↓
+                finfo.setNullable(meta.isNullable(ii));
+                finfo.setNullableBool(ResultSetMetaData.columnNoNulls == meta.isNullable(ii));
+                // nullable ↑↑↑↑↑↑
+                finfo.setReadOnly(meta.isReadOnly(ii));
+                finfo.setSearchable(meta.isSearchable(ii));
+                finfo.setSigned(meta.isSigned(ii));
+                finfo.setWritable(meta.isWritable(ii));
+
+                columnInfo.put(colLabel, finfo);
+
+                columns.add(colLabel);
+            }
+            tableName = StringUtils.trimToEmpty(tableName);
+            schemaName = StringUtils.trimToEmpty(schemaName);
+            catalogName = StringUtils.trimToEmpty(catalogName);
+
+            DatabaseMetaData dbmd = conn.getMetaData();
+            ResultSet pk = dbmd.getPrimaryKeys(catalogName, schemaName, tableName);
+            System.out.println("============================================================pk start");
+            while (pk.next()) {
+                Map<String, String> pkMap = getResultSetToMap(pk);
+                System.out.println(pkMap);
+                System.out.println(pkMap);
+            }
+            System.out.println("============================================================pk end");
+            // ResultSet rs2 = dbmd.getIndexInfo(catalogName, schemaName,
+            // tableName, false, true);
+            // // unique - 該參數為 true 時，僅返回唯一值的索引；該參數為 false
+            // 時，返回所有索引，不管它們是否唯一
+            // // approximate - 該參數為 true 時，允許結果是接近的資料值或這些資料值以外的值；該參數為 false
+            // // 時，要求結果是精確結果
+            // System.out.println("============================================================index
+            // start");
+            // while (rs2.next()) {
+            // Map<String, String> indexMap = getResultSetToMap(rs2);
+            // System.out.println(indexMap);
+            // }
+            // System.out.println("============================================================index
+            // end");
+            System.out.println("資料表pk =>" + pkColumns);
+            // ResultSet t = dbmd.getCatalogs();
+            // while (t.next()) {
+            // System.out.println(t.getString(0));
+            // }
         }
 
         private void close(Connection conn, Statement stmt, ResultSet rs) {

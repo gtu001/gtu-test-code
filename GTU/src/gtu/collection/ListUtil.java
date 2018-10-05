@@ -24,9 +24,8 @@ public class ListUtil {
     }
 
     /**
-     * 建立一個lazyList當get超出範圍時會動態建立到符合的範圍
-     * Ex : list = [] -> list.get(0) -> [T]
-     *      list = [] -> list.get(2) -> [null, null, T]
+     * 建立一個lazyList當get超出範圍時會動態建立到符合的範圍 Ex : list = [] -> list.get(0) -> [T]
+     * list = [] -> list.get(2) -> [null, null, T]
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> getLazyList(List<T> list, final T clz) {
@@ -188,5 +187,24 @@ public class ListUtil {
             }
         }
         return false;
+    }
+
+    public static boolean isAllEquals(List<Object> valueLst) {
+        if (valueLst.size() <= 1) {
+            return true;
+        } else {
+            for (int ii = 1; ii < valueLst.size(); ii++) {
+                if (valueLst.get(0) != null) {
+                    if (!valueLst.get(0).equals(valueLst.get(ii))) {
+                        return false;
+                    }
+                } else if (valueLst.get(ii) != null) {
+                    if (!valueLst.get(ii).equals(valueLst.get(0))) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

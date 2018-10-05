@@ -56,6 +56,7 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
 
@@ -1192,15 +1193,19 @@ public class JTableUtil {
             this.initTableColumns();
         }
 
-        Map<Object, TableColumn> headerDef = new LinkedHashMap<Object, TableColumn>();
+        Pair<List<Object>, List<TableColumn>> headerDef = null;
 
         private void initTableColumns() {
-            if (headerDef.isEmpty()) {
+            if (headerDef == null) {
                 TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
+                List<Object> headerLst = new ArrayList<Object>();
+                List<TableColumn> headerLst2 = new ArrayList<TableColumn>();
                 for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
-                    headerDef.put(columnModel.getColumn(ii).getHeaderValue(), columnModel.getColumn(ii));
+                    headerLst.add(columnModel.getColumn(ii).getHeaderValue());
+                    headerLst2.add(columnModel.getColumn(ii));
                     System.out.println("Def Add : " + columnModel.getColumn(ii).getHeaderValue());
                 }
+                headerDef = Pair.of(headerLst, headerLst2);
             }
         }
 
@@ -1218,7 +1223,8 @@ public class JTableUtil {
 
             String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(delimit, -1);
 
-            for (Object key : headerDef.keySet()) {
+            for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
+                Object key = headerDef.getLeft().get(ii);
                 String headerColumn = String.valueOf(key).toUpperCase();
 
                 boolean findOk = false;
@@ -1233,7 +1239,7 @@ public class JTableUtil {
 
                 if (findOk) {
                     System.out.println("Add------------" + key);
-                    columnModel.addColumn(headerDef.get(key));
+                    columnModel.addColumn(headerDef.getRight().get(ii));
                 }
             }
         }

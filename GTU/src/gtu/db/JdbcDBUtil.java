@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import org.apache.commons.dbcp.BasicDataSource;
 //import org.springframework.jdbc.core.JdbcTemplate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
 import gtu.db.tradevan.DBCommon_tradevan;
@@ -276,6 +277,51 @@ public class JdbcDBUtil {
             }
         }
         return rsList;
+    }
+    
+    public static Pair<List<String>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn) throws Exception {
+        List<String> colList = new ArrayList<String>();
+        List<Object[]> rsList = new ArrayList<Object[]>();
+        java.sql.ResultSet rs = null;
+        System.out.println("sql : " + sql);
+        try {
+            java.sql.PreparedStatement ps = con.prepareStatement(sql);
+            for (int i = 0; i < param.length; i++) {
+                System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
+                ps.setObject(i + 1, param[i]);
+            }
+
+            rs = ps.executeQuery();
+            java.sql.ResultSetMetaData mdata = rs.getMetaData();
+            int cols = mdata.getColumnCount();
+            for (int i = 1; i <= cols; i++) {
+                colList.add(mdata.getColumnName(i));
+            }
+
+            while (rs.next()) {
+                List<Object> lst = new ArrayList<Object>();
+                for (int ii = 1; ii <= cols; ii++) {
+                    lst.add(rs.getObject(ii));
+                }
+                rsList.add(lst.toArray());
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw e;
+        } finally {
+            try {
+                rs.close();
+            } catch (Exception ex) {
+            }
+            if (isCloseConn) {
+                try {
+                    con.close();
+                } catch (Exception ex) {
+                }
+            }
+        }
+        return Pair.of(colList, rsList);
     }
 
     /**
