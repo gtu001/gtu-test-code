@@ -17,7 +17,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 39
-        versionName "1.0.7.11
+        versionName "1.0.7.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true //method量超標
@@ -91,7 +91,7 @@ dependencies {
     }
 
     compile('commons-io:commons-io:2.6')
-    compile 'commons-logging:commons-logging:1.2'
+    //compile 'commons-logging:commons-logging:1.2'
 
     //https://github.com/nostra13/Android-Universal-Image-Loader
     compile files('libs/universal-image-loader-1.9.5.jar')

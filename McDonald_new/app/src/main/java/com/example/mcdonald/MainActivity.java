@@ -102,6 +102,7 @@ public class MainActivity extends ActionBarActivity { //
         f_chickenWingTwo(R.id.item_f_chickenWingTwo, new int[]{R.drawable.f_chicken_wing_oneone_01, R.drawable.f_chicken_wing_oneone_02, R.drawable.f_chicken_wing_oneone_03, R.drawable.f_chicken_wing_oneone_04, R.drawable.f_chicken_wing_oneone_05}), //
         f_gpei(R.id.item_f_gpei, new int[]{R.drawable.f_gpie_001, R.drawable.f_gpie_002, R.drawable.f_gpie_003, R.drawable.f_gpie_004, R.drawable.f_gpie_005}), //
         f_potato(R.id.item_f_potato, new int[]{R.drawable.f_potato_001, R.drawable.f_potato_002, R.drawable.f_potato_003, R.drawable.f_potato_004, R.drawable.f_potato_005}), //
+        f_blackTea(R.id.item_f_blackTea, new int[]{R.drawable.f_blacktea_001, R.drawable.f_blacktea_002, R.drawable.f_blacktea_003, R.drawable.f_blacktea_004, R.drawable.f_blacktea_005}), //
         ;
 
         final int menuId;
