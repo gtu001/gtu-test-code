@@ -1,0 +1,20 @@
+顯示版本
+
+	$ Get-Host | Select-Object Version
+
+	
+----------------------------------------------------------------------------------
+安裝步驟
+
+	1.安裝 .NET Framework 4.0
+		http://www.microsoft.com/en-us/download/details.aspx?id=17851
+		
+	2.搜尋 "安裝 Windows PowerShell"
+		https://docs.microsoft.com/zh-tw/powershell/scripting/setup/installing-windows-powershell?view=powershell-6
+		
+	3.找 "升級現有的 Windows PowerShell"
+		點 "WMF 5.1"
+	
+	4.灌這個 "Win7AndW2K8R2-KB3191566-x64.msu"
+
+	
