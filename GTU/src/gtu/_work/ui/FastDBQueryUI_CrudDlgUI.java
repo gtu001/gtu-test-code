@@ -563,6 +563,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
                 for (String col : tableInfo.getColumns()) {
                     String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append("String " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
                 }
                 return sb.toString();
@@ -586,6 +592,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 for (String col : tableInfo.getColumns()) {
                     String param = StringUtilForDb.dbFieldToJava(col);
                     sb.append("String " + param + " = \"" + dataMap.get(col.toUpperCase()) + "\";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    sb.append("String " + param + " = " + "(String)map.get(\"" + col.toUpperCase() + "\");\n");
                 }
                 for (String col : tableInfo.getColumns()) {
                     String param = StringUtilForDb.dbFieldToJava(col);
@@ -618,6 +628,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
                 for (String col : tableInfo.getColumns()) {
                     String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append(paramType + " " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
                 }
                 return sb.toString();
@@ -647,34 +663,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
                 for (String col : tableInfo.getColumns()) {
                     String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    sb.append(paramType + " " + param + " = (" + paramType + ")map.get(\"" + col.toUpperCase() + "\");\n");
+                }
+                for (String col : tableInfo.getColumns()) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
                     sb.append("map.put(\"" + col.toUpperCase() + "\", " + param + ");\n");
                 }
                 return sb.toString();
             }
         }, //
-        VO_GET_AND_SET("vo.get&set(orign)完整") {
-            @Override
-            String apply(TableInfo tableInfo, Map<String, String> dataMap) {
-                StringBuilder sb = new StringBuilder();
-                for (String col : tableInfo.getColumns()) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
-                    sb.append(paramType + " " + param + " = " + paramVal + ";\n");
-                }
-                for (String col : tableInfo.getColumns()) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
-                    sb.append(paramType + " " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
-                }
-                for (String col : tableInfo.getColumns()) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
-                }
-                return sb.toString();
-            }
-        },//
         ;
         final String label;
 
