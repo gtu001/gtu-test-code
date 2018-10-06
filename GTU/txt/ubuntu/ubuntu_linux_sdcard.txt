@@ -1,0 +1,20 @@
+
+記憶卡位置
+	
+	$ sudo fdisk -l  
+		--> /dev/mmcblk0
+
+給權限
+	$ sudo chown -hR   gtu001    /dev/mmcblk0
+	
+
+或是用以下作法
+
+	$ sudo nautilus
+	
+	Ps: 缺點是每次都要透過這個指令才能存取
+	
+
+重新mount
+
+	$ sudo mount --options remount,rw    /dev/mmcblk0

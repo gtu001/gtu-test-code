@@ -1,0 +1,4 @@
+
+	gnome-session-quit
+	
+	alias logout-gnome="gnome-session-quit"
