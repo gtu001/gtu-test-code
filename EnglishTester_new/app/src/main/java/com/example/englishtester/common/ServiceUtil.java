@@ -9,6 +9,8 @@ import android.content.Intent;
 import com.example.englishtester.FloatViewActivity;
 import com.example.englishtester.FloatViewService;
 
+import java.util.List;
+
 /**
  * Created by wistronits on 2018/6/27.
  */
@@ -37,5 +39,18 @@ public class ServiceUtil {
             Intent intent = new Intent(context, serviceClz);
             context.stopService(intent);
         }
+    }
+
+    public static boolean isAppRunning(final Context context, final String packageName) {
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+        if (procInfos != null) {
+            for (final ActivityManager.RunningAppProcessInfo processInfo : procInfos) {
+                if (processInfo.processName.equals(packageName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
