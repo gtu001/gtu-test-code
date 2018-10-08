@@ -78,8 +78,8 @@ public class AntNotify extends Task {
             } else {
                 String ubuntuExec = String.format("gnome-terminal -- sh -c \"echo %s; sleep 0; exec bash\"", message);
                 String mostLinuxExec = String.format("xterm -e \"echo \"%s\"; bash\" ", message);
-                Runtime.getRuntime().exec(ubuntuExec);
-                Runtime.getRuntime().exec(mostLinuxExec);
+                runExeCommand(ubuntuExec);
+                runExeCommand(mostLinuxExec);
                 this.log("# linux mode");
 
                 this.getProject().setNewProperty("notify_cmd", "gnome-terminal");
@@ -87,6 +87,14 @@ public class AntNotify extends Task {
             }
         } catch (Exception e) {
             throw new BuildException(e);
+        }
+    }
+
+    private void runExeCommand(String command) {
+        try {
+            Runtime.getRuntime().exec(command);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 

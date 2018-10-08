@@ -1,5 +1,7 @@
 
 
 ln -s   /etc/jboss    $JBOSS_HOME/modules/config/main
+ln -s   /media/gtu001/OLD_D/my_tool/run_BrowserHistoryHandlerUI.sh    run_BrowserHistoryHandlerUI.ln
+
 
 ln -s  <要連結的目的>    <產生link的位置(含檔名如上main是link黨)>

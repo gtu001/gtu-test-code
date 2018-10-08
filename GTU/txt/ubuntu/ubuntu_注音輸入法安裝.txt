@@ -1,0 +1,29 @@
+
+開啟 "設定值"
+
+搜尋 "地區和語言"
+
+點"語言" 安裝 "chinese"
+
+點"Manage Installed Languages"
+
+點"安裝或移除語言" 加入 "中文繁體" 按apply 會要求"登出" (登出才有新選項)
+
+安裝語言選擇器
+	sudo apt-get install language-selector-gnome
+	sudo gnome-language-selector
+
+	sudo ibus-setup
+	
+安裝新酷音
+	sudo apt-get install fcitx fcitx-chewing
+	或是
+	sudo apt install ibus-chewing
+	鍵盤輸入法系統選 fcitx
+
+或是選擇 "Ubuntu Software" (紅色A)
+	搜尋 gcin 並安裝
+	鍵盤輸入法系統選 gcin
+	
+
+

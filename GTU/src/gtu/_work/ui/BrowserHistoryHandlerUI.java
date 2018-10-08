@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -121,7 +122,6 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
-import java.awt.FlowLayout;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -129,12 +129,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
 
-    private PropertiesUtilBean configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class);
+    private PropertiesUtilBean configSelf = null;
     {
-        if (!PropertiesUtil.isClassInJar(BrowserHistoryHandlerUI.class)) {
-            configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/BrowserHistoryHandlerUI_config.properties"));
-            configSelf = new PropertiesUtilBean(new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/BrowserHistoryHandlerUI_bookmark.properties"));
+        if (OsInfoUtil.isWindows()) {
+            configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_win10");
+        } else {
+            configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_linux");
         }
+        System.out.println("configFile : " + configSelf.getPropFile());
     }
 
     private PropertiesUtilBean bookmarkConfig;
