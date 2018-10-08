@@ -388,7 +388,7 @@ public class Porn91Downloader {
                 SystemZ.out.println("length : " + length);
                 return length;
             }
-            SystemZ.out.println("length : Fail ");
+            SystemZ.out.println("length Fail -> status code : " + response2.getStatusLine().getStatusCode());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -433,7 +433,9 @@ public class Porn91Downloader {
             if (outputfile.exists()) {
                 outputfile.delete();
             }
-            BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(outputfile));
+            
+            String fixFilePath = outputfile.getParentFile().toString() + File.separator + FileUtil.escapeFilename_replaceToFullChar(outputfile.getName(), false);
+            BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(fixFilePath));
             SystemZ.out.println("outputfile " + outputfile);
 
             DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale);

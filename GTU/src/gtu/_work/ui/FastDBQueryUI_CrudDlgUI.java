@@ -406,7 +406,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             for (String text : finder.getArry()) {
                 if (StringUtils.isBlank(text) || //
                         columnName.toLowerCase().contains(text) || //
-                        String.valueOf(df.value).contains(text)) {
+                        String.valueOf(df.value).toLowerCase().contains(text)) {
                     model.addRow(df.toArry());
                     continue B;
                 }

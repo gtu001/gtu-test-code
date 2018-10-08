@@ -1,6 +1,9 @@
 package gtu.swing.util;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
@@ -74,5 +77,14 @@ public class JFrameUtil {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static void showBoundSize(Component component) {
+        component.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                JFrame frame = (JFrame) e.getSource();
+                System.out.println("size " + frame.getSize());
+            }
+        });
     }
 }
