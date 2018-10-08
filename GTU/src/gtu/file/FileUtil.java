@@ -1087,53 +1087,61 @@ public class FileUtil {
 
     /**
      * 避掉黨名的特殊符號 \/:*?"<>|
+     * 
+     * @param filename
+     * @param ignoreNotEscapeFileSepator
+     *            false = 要把 \/轉成全形, true = 不把 \/轉成全形
+     * @return
      */
-    public static String escapeFilename_replaceToFullChar(String filename, boolean escapeFileSeparator) {
+    public static String escapeFilename_replaceToFullChar(String filename, boolean ignoreNotEscapeFileSepator) {
         StringBuffer sb = new StringBuffer();
         char[] arry = StringUtils.trimToEmpty(filename).toCharArray();
+        Character cc = null;
         for (char c : arry) {
-
             switch (c) {
             case ':':
-                c = '：';
+                cc = '：';
                 break;//
             case '*':
-                c = '＊';
+                cc = '＊';
                 break;//
             case '?':
-                c = '？';
+                cc = '？';
                 break;//
             case '"':
-                c = '＂';
+                cc = '＂';
                 break;//
             case '<':
-                c = '＜';
+                cc = '＜';
                 break;//
             case '>':
-                c = '＞';
+                cc = '＞';
                 break;//
             case '|':
-                c = '｜';
+                cc = '｜';
                 break;//
             case '\\':
-                c = '＼';
+                cc = '＼';
                 break;//
             case '/':
-                c = '／';
+                cc = '／';
                 break;//
+            default:
+                cc = c;
+                break;
             }
 
             if (c == '\r' || c == '\n') {
                 continue;
             }
-
-            if (escapeFileSeparator) {
+            if (ignoreNotEscapeFileSepator) {
                 if (c == '/' || c == '\\') {
+                    sb.append(c);
                     continue;
                 }
             }
 
-            sb.append(c);
+            sb.append(cc);
         }
         return sb.toString();
     }

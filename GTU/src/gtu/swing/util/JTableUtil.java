@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -1221,7 +1222,7 @@ public class JTableUtil {
         private void __filterText(String filterText) {
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
-            String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(delimit, -1);
+            String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(Pattern.quote(delimit), -1);
 
             for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
                 Object key = headerDef.getLeft().get(ii);

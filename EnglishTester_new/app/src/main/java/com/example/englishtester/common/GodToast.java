@@ -136,16 +136,19 @@ public class GodToast {
         imageView_gif.showAnimation();
 
         //很危險--↓↓↓↓↓↓
-        new CountDownTimer(9000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                toast.show();
-            }
+        if (!ServiceUtil.isAppRunning(context, "com.gtu.example.englishtester")) {
+            new CountDownTimer(9000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    toast.show();
+                }
 
-            public void onFinish() {
-                toast.show();
-            }
-        }.start();
-
+                public void onFinish() {
+                    toast.show();
+                }
+            }.start();
+        } else {
+            toast.show();
+        }
         //很危險--↑↑↑↑↑↑
     }
 

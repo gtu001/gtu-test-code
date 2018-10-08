@@ -549,11 +549,15 @@ public class RegexReplacer extends javax.swing.JFrame {
     }
 
     private TradeOffConfig getTradeOffConfig() {
+        TradeOffConfig EMPTY = new TradeOffConfig(new JSONObject());
         try {
+            if (StringUtils.isBlank(tradeOffArea.getText())) {
+                return EMPTY;
+            }
             return new TradeOffConfig(JSONObject.fromObject(tradeOffArea.getText()));
         } catch (Exception ex) {
             JCommonUtil.handleException("getTradeOffObject ERR : " + ex, ex);
-            return new TradeOffConfig(new JSONObject());
+            return EMPTY;
         }
     }
 

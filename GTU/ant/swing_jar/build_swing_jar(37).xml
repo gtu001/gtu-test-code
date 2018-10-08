@@ -81,7 +81,7 @@
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
 				
-			<packagename mode="small">freemarker.template</packagename>
+			<packagename mode="exact" name="freemarker-2.3.23.jar">freemarker.template</packagename>
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->

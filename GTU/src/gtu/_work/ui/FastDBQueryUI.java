@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -14,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +48,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
@@ -142,6 +147,8 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_16;
 
     private Pair<List<String>, List<Object[]>> queryList = null;
+    private boolean distinctHasClicked = false;// 是否按過distinct btn
+
     private JButton excelExportBtn;
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
@@ -155,6 +162,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton removeConnectionBtn;
     private JLabel lblNewLabel_3;
     private JTextField rowFilterText;
+    private JButton distinctQueryBtn;
 
     /**
      * Launch the application.
@@ -181,7 +189,7 @@ public class FastDBQueryUI extends JFrame {
      */
     public FastDBQueryUI() throws FileNotFoundException, IOException, ClassNotFoundException {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 609, 454);
+        setBounds(100, 100, 910, 550);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
@@ -299,6 +307,14 @@ public class FastDBQueryUI extends JFrame {
         panel_13 = new JPanel();
         panel_12.add(panel_13, BorderLayout.NORTH);
 
+        distinctQueryBtn = new JButton("distinct");
+        distinctQueryBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                distinctQueryBtnAction();
+            }
+        });
+        panel_13.add(distinctQueryBtn);
+
         label = new JLabel("欄位過濾");
         panel_13.add(label);
 
@@ -313,6 +329,10 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 try {
+                    if (distinctHasClicked) {
+                        queryModeProcess(queryList, true, null);
+                        distinctHasClicked = false;
+                    }
                     if (columnFilter == null || isResetQuery) {
                         columnFilter = new ColumnSearchFilter(queryResultTable, "^");
                         isResetQuery = false;
@@ -536,7 +556,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         String[] getArry() {
-            String[] arry = StringUtils.trimToEmpty(searchText.getText()).toLowerCase().split(delimit, -1);
+            String[] arry = StringUtils.trimToEmpty(searchText.getText()).toLowerCase().split(Pattern.quote(delimit), -1);
             List<String> rtnLst = new ArrayList<String>();
             for (int ii = 0; ii < arry.length; ii++) {
                 if (StringUtils.isNotBlank(arry[ii])) {
@@ -1134,7 +1154,8 @@ public class FastDBQueryUI extends JFrame {
                 int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                 System.out.println("rowPos " + rowPos);
 
-                Map<String, Object> rowMap = getDetailToMap(this.queryList, rowPos);
+                int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
+                Map<String, Object> rowMap = getDetailToMap(this.queryList, queryLstIndex);
 
                 if (fastDBQueryUI_CrudDlgUI != null) {
                     fastDBQueryUI_CrudDlgUI.isShowing();
@@ -1147,11 +1168,49 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private Map<String, Object> getDetailToMap(Pair<List<String>, List<Object[]>> queryList2, int rowPos) {
+    private int transRealRowToQuyerLstIndex(int realRow) {
+        TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+
+        for (int ii = 0; ii < queryResultTable.getColumnCount(); ii++) {
+            TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(ii);
+            String columnHeader = (String) column.getHeaderValue();
+
+            for (int jj = 0; jj < this.queryList.getLeft().size(); jj++) {
+                String columnHeader2 = this.queryList.getLeft().get(jj);
+                if (!columnMapping.containsKey(jj) && columnHeader.equalsIgnoreCase(columnHeader2)) {
+                    columnMapping.put(jj, columnHeader2);
+                }
+            }
+        }
+        System.out.println(columnMapping);
+
+        TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
+        for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+            int realCol = util.getRealColumnPos(col, queryResultTable);
+            Object value = util.getModel().getValueAt(realRow, realCol);
+            map.put(realCol, value);
+        }
+
+        // 用來比較取得row index用
+        List<Object[]> newLst = new ArrayList<Object[]>();
+        for (Object[] oldArry : this.queryList.getRight()) {
+            List<Object> newArry = new ArrayList<Object>();
+            for (int columnPos : columnMapping.keySet()) {
+                newArry.add(oldArry[columnPos]);
+            }
+            newLst.add(newArry.toArray());
+        }
+
+        Object[] arry = map.values().toArray();
+        return isContainObjectArray_Index(newLst, arry);
+    }
+
+    private Map<String, Object> getDetailToMap(Pair<List<String>, List<Object[]>> queryList2, int queryListIndex) {
         List<String> columns = queryList.getLeft();
         List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
 
-        Object[] row = queryList.getRight().get(rowPos);
+        Object[] row = queryList.getRight().get(queryListIndex);
 
         Map<String, List<Object>> multiMap = new HashMap<String, List<Object>>();
         for (int ii = 0; ii < columns.size(); ii++) {
@@ -1297,5 +1356,57 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    protected void distinctQueryBtnAction() {
+        try {
+            distinctHasClicked = true;
+
+            TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
+            JTableUtil util = JTableUtil.newInstance(queryResultTable);
+
+            for (int ii = 0; ii < queryResultTable.getColumnCount(); ii++) {
+                TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(ii);
+                int pos2 = util.getRealColumnPos(ii, queryResultTable);
+                // System.out.println(column.getHeaderValue() + " - " + ii + " -
+                // " + pos2);
+                columnMapping.put(pos2, (String) column.getHeaderValue());
+            }
+            System.out.println(columnMapping);
+            List<Object[]> queryLst = new ArrayList<Object[]>();
+            for (int row = 0; row < util.getModel().getRowCount(); row++) {
+                TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
+                for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+                    int realCol = util.getRealColumnPos(col, queryResultTable);
+                    int realRow = util.getRealRowPos(row, queryResultTable);
+                    Object value = util.getModel().getValueAt(realRow, realCol);
+                    map.put(realCol, value);
+                }
+                Object[] arry = map.values().toArray();
+                if (isContainObjectArray_Index(queryLst, arry) == -1) {
+                    queryLst.add(arry);
+                }
+            }
+
+            List<String> matchColumnLst = new ArrayList<String>(columnMapping.values());
+            Pair<List<String>, List<Object[]>> queryResultFinal = Pair.of(matchColumnLst, queryLst);
+            this.queryModeProcess(queryResultFinal, true, null);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private int isContainObjectArray_Index(List<Object[]> allLst, Object[] arry) {
+        String compareTo = Arrays.toString(arry);
+        System.out.println("[isContainObjectArray_Index] compareTo - \t" + compareTo);
+        for (int ii = 0; ii < allLst.size(); ii++) {
+            Object[] arry1 = allLst.get(ii);
+            String compareFrom = Arrays.toString(arry1);
+            if (compareFrom.equals(compareTo)) {
+                System.out.println("[isContainObjectArray_Index] ArryIndex[" + ii + "] - \t" + compareFrom);
+                return ii;
+            }
+        }
+        return -1;
     }
 }
