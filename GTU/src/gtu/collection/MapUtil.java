@@ -257,7 +257,7 @@ public class MapUtil {
         return map;
     }
 
-    public static Map createIngoreMap() {
+    public static Map createIngoreCaseMap() {
         return new TreeMap(String.CASE_INSENSITIVE_ORDER);
     }
 }

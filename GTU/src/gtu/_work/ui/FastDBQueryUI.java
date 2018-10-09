@@ -163,6 +163,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_3;
     private JTextField rowFilterText;
     private JButton distinctQueryBtn;
+    private JLabel queryResultCountLabel;
 
     /**
      * Launch the application.
@@ -313,6 +314,9 @@ public class FastDBQueryUI extends JFrame {
                 distinctQueryBtnAction();
             }
         });
+
+        queryResultCountLabel = new JLabel("          ");
+        panel_13.add(queryResultCountLabel);
         panel_13.add(distinctQueryBtn);
 
         label = new JLabel("欄位過濾");
@@ -847,11 +851,13 @@ public class FastDBQueryUI extends JFrame {
                 DefaultTableModel createModel = JTableUtil.createModel(true, "");
                 queryResultTable.setModel(createModel);
             }
+            queryResultCountLabel.setText("0");
             return;
         } else {
             if (!silent) {
                 JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.getRight().size());
             }
+            queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
         }
 
         // 取得標題

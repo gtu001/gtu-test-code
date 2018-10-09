@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +74,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JComboBox dbTypeComboBox;
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
     private JRadioButton rdbtnOthers;
+    private DataSource dataSource;
 
     private static class ColumnConf {
         String columnName;
@@ -144,6 +147,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, final DataSource dataSource) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
+            dialog.dataSource = dataSource;
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
 
@@ -152,7 +156,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
 
-            Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreMap();
+            Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
             dialog.rowMap.set(rowMapForBackup);
             for (String col : rowMap.keySet()) {
                 Object value = rowMap.get(col);
@@ -348,6 +352,52 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         return tableUtil.getModel();
     }
 
+    //自動設定pk
+    private void tableAndSchemaText_focusLost_action(JTextField tableAndSchemaText) {
+        try {
+            String tableAndSchema = StringUtils.trimToEmpty(tableAndSchemaText.getText());
+            if (StringUtils.isNotBlank(tableAndSchema)) {
+                boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要重設 " + tableAndSchema + " 的 PK", "重設?");
+                if (!confirm) {
+                    return;
+                }
+
+                TableInfo tableInfo = new TableInfo();
+                JCommonUtil.isBlankErrorMsg(tableAndSchema, "輸入表名稱!");
+
+                DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
+                tableInfo.setDbDateDateFormat(dbDateDateFormat);
+                tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), dataSource.getConnection());
+
+                tableInfo.getNoNullsCol();
+
+                List<String> success = new ArrayList<String>();
+                List<String> failed = new ArrayList<String>();
+
+                for (String columnName : rowMap.get().keySet()) {
+                    ColumnConf df = rowMap.get().get(columnName);
+                    df.isPk = false;
+                }
+
+                for (String columnName : tableInfo.getNoNullsCol()) {
+                    if (rowMap.get().containsKey(columnName)) {
+                        rowMap.get().get(columnName).isPk = true;
+                        success.add(columnName);
+                    } else {
+                        failed.add(columnName);
+                    }
+                }
+
+                // 刷新table
+                searchTextFilter();
+
+                JCommonUtil._jOptionPane_showMessageDialog_info("設定完成 \n 已設定:" + success + "\n 找不到 :" + failed);
+            }
+        } catch (SQLException e) {
+            JCommonUtil.handleException(e);
+        }
+    }
+
     private void updateJTableToRowMap() {
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         for (int ii = 0; ii < tableUtil.getModel().getRowCount(); ii++) {
@@ -413,132 +463,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
         System.out.println("-------------searchTextFilter size = " + rowMap.get().size());
-    }
-
-    /**
-     * Create the dialog.
-     */
-    public FastDBQueryUI_CrudDlgUI() {
-        setBounds(100, 100, 583, 409);
-        getContentPane().setLayout(new BorderLayout());
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
-        contentPanel.setLayout(new BorderLayout(0, 0));
-        {
-            JPanel panel = new JPanel();
-            contentPanel.add(panel, BorderLayout.NORTH);
-            {
-                JLabel label = new JLabel("搜尋");
-                panel.add(label);
-            }
-            {
-                searchText = new JTextField();
-                panel.add(searchText);
-                searchText.setColumns(25);
-                searchText.setToolTipText("分隔符號為\"^\"");
-            }
-            {
-                DefaultComboBoxModel model = new DefaultComboBoxModel();
-                for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
-                    model.addElement(e);
-                }
-            }
-        }
-        {
-            JPanel panel = new JPanel();
-            contentPanel.add(panel, BorderLayout.WEST);
-        }
-        {
-            JPanel panel = new JPanel();
-            contentPanel.add(panel, BorderLayout.EAST);
-        }
-        {
-            JPanel panel = new JPanel();
-            contentPanel.add(panel, BorderLayout.SOUTH);
-            {
-                dbTypeComboBox = new JComboBox();
-                panel.add(dbTypeComboBox);
-                DefaultComboBoxModel model = new DefaultComboBoxModel();
-                for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
-                    model.addElement(e);
-                }
-                dbTypeComboBox.setModel(model);
-            }
-            {
-                JLabel label = new JLabel("table");
-                panel.add(label);
-            }
-            {
-                tableAndSchemaText = new JTextField();
-                tableAndSchemaText.setColumns(10);
-                panel.add(tableAndSchemaText);
-            }
-            {
-                rdbtnInsert = new JRadioButton("insert");
-                panel.add(rdbtnInsert);
-            }
-            {
-                rdbtnUpdate = new JRadioButton("update");
-                panel.add(rdbtnUpdate);
-            }
-            {
-                rdbtnDelete = new JRadioButton("delete");
-                panel.add(rdbtnDelete);
-            }
-            {
-                rdbtnOthers = new JRadioButton("其他");
-                panel.add(rdbtnOthers);
-            }
-            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers);
-        }
-        {
-            rowTable = new JTable();
-            JTableUtil.defaultSetting(rowTable);
-            contentPanel.add(JCommonUtil.createScrollComponent(rowTable), BorderLayout.CENTER);
-            rowTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
-                            JTableUtil_DefaultJMenuItems_Mask._加列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._移除列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
-                    JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
-                    JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
-                    );
-                    JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
-                }
-            });
-        }
-        {
-            JPanel buttonPane = new JPanel();
-            buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-            getContentPane().add(buttonPane, BorderLayout.SOUTH);
-            {
-                okButton = new JButton("OK");
-                okButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                    }
-                });
-                okButton.setActionCommand("OK");
-                buttonPane.add(okButton);
-                // getRootPane().setDefaultButton(okButton);
-            }
-            {
-                JButton cancelButton = new JButton("Cancel");
-                cancelButton.setActionCommand("Cancel");
-                buttonPane.add(cancelButton);
-                cancelButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        FastDBQueryUI_CrudDlgUI.this.dispose();
-                    }
-                });
-            }
-        }
-        JCommonUtil.setJFrameCenter(this);
-        JCommonUtil.defaultToolTipDelay();
     }
 
     private enum OthersDBColumnProcess {
@@ -716,5 +640,139 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         public String toString() {
             return this.label;
         }
+    }
+
+    // 邏輯在上=======================================================================================================
+
+    /**
+     * Create the dialog.
+     */
+    public FastDBQueryUI_CrudDlgUI() {
+        setBounds(100, 100, 583, 409);
+        getContentPane().setLayout(new BorderLayout());
+        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        getContentPane().add(contentPanel, BorderLayout.CENTER);
+        contentPanel.setLayout(new BorderLayout(0, 0));
+        {
+            JPanel panel = new JPanel();
+            contentPanel.add(panel, BorderLayout.NORTH);
+            {
+                JLabel label = new JLabel("搜尋");
+                panel.add(label);
+            }
+            {
+                searchText = new JTextField();
+                panel.add(searchText);
+                searchText.setColumns(25);
+                searchText.setToolTipText("分隔符號為\"^\"");
+            }
+            {
+                DefaultComboBoxModel model = new DefaultComboBoxModel();
+                for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
+                    model.addElement(e);
+                }
+            }
+        }
+        {
+            JPanel panel = new JPanel();
+            contentPanel.add(panel, BorderLayout.WEST);
+        }
+        {
+            JPanel panel = new JPanel();
+            contentPanel.add(panel, BorderLayout.EAST);
+        }
+        {
+            JPanel panel = new JPanel();
+            contentPanel.add(panel, BorderLayout.SOUTH);
+            {
+                dbTypeComboBox = new JComboBox();
+                panel.add(dbTypeComboBox);
+                DefaultComboBoxModel model = new DefaultComboBoxModel();
+                for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
+                    model.addElement(e);
+                }
+                dbTypeComboBox.setModel(model);
+            }
+            {
+                JLabel label = new JLabel("table");
+                panel.add(label);
+            }
+            {
+                tableAndSchemaText = new JTextField();
+                tableAndSchemaText.setColumns(10);
+                panel.add(tableAndSchemaText);
+                tableAndSchemaText.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        tableAndSchemaText_focusLost_action(tableAndSchemaText);
+                    }
+                });
+            }
+            {
+                rdbtnInsert = new JRadioButton("insert");
+                panel.add(rdbtnInsert);
+            }
+            {
+                rdbtnUpdate = new JRadioButton("update");
+                panel.add(rdbtnUpdate);
+            }
+            {
+                rdbtnDelete = new JRadioButton("delete");
+                panel.add(rdbtnDelete);
+            }
+            {
+                rdbtnOthers = new JRadioButton("其他");
+                panel.add(rdbtnOthers);
+            }
+            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers);
+        }
+        {
+            rowTable = new JTable();
+            JTableUtil.defaultSetting(rowTable);
+            contentPanel.add(JCommonUtil.createScrollComponent(rowTable), BorderLayout.CENTER);
+            rowTable.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
+                            JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                    JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                    JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                    JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
+                    );
+                    JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
+                }
+            });
+        }
+        {
+            JPanel buttonPane = new JPanel();
+            buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+            getContentPane().add(buttonPane, BorderLayout.SOUTH);
+            {
+                okButton = new JButton("OK");
+                okButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
+                okButton.setActionCommand("OK");
+                buttonPane.add(okButton);
+                // getRootPane().setDefaultButton(okButton);
+            }
+            {
+                JButton cancelButton = new JButton("Cancel");
+                cancelButton.setActionCommand("Cancel");
+                buttonPane.add(cancelButton);
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        FastDBQueryUI_CrudDlgUI.this.dispose();
+                    }
+                });
+            }
+        }
+        JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.defaultToolTipDelay();
     }
 }
