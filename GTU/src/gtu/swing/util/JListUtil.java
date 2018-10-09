@@ -128,13 +128,17 @@ public class JListUtil {
         return (DefaultListModel) jList1.getModel();
     }
 
+    public <T> JListUtil defaultJListKeyPressed(EventObject event) {
+        return defaultJListKeyPressed(event, true);
+    }
+
     /**
      * 清單 - 上移(按上) 下移(按下) 移除(按del)
      * 
      * @param evt
      */
     @SuppressWarnings("unchecked")
-    public <T> JListUtil defaultJListKeyPressed(EventObject event) {
+    public <T> JListUtil defaultJListKeyPressed(EventObject event, boolean isDeleteKeyRemove) {
         T[] objects = (T[]) jList1.getSelectedValues();
         if (objects == null || objects.length == 0) {
             return this;
@@ -161,7 +165,9 @@ public class JListUtil {
                 }
                 break;
             case 127:// del
-                model.removeElementAt(index);
+                if (isDeleteKeyRemove) {
+                    model.removeElementAt(index);
+                }
                 break;
             }
         }

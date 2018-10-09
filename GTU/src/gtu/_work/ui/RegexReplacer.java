@@ -12,7 +12,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -191,8 +193,12 @@ public class RegexReplacer extends javax.swing.JFrame {
                         addToTemplate.setText("add to template");
                         addToTemplate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText(), tradeOffArea.getText());
-                                configHandler.reloadTemplateList();
+                                try {
+                                    configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText(), tradeOffArea.getText());
+                                    configHandler.reloadTemplateList();
+                                } catch (Exception e) {
+                                    JCommonUtil.handleException(e);
+                                }
                             }
                         });
                     }
@@ -234,7 +240,18 @@ public class RegexReplacer extends javax.swing.JFrame {
                         });
                         templateList.addKeyListener(new KeyAdapter() {
                             public void keyPressed(KeyEvent evt) {
-                                JListUtil.newInstance(templateList).defaultJListKeyPressed(evt);
+                                PropConfigHandler.Config config = (PropConfigHandler.Config) JListUtil.getLeadSelectionObject(templateList);
+                                JListUtil.newInstance(templateList).defaultJListKeyPressed(evt, false);
+                                try {
+                                    if (config != null) {
+                                        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+                                            configHandler.deleteConfig(config.configKeyText);
+                                            configHandler.reloadTemplateList();
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    JCommonUtil.handleException(e);
+                                }
                             }
                         });
 
@@ -587,12 +604,37 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
         }
 
-        private void put(String configKey, String fromVal, String toVal, String tradeOff) {
+        private void deleteConfig(String configKey) throws FileNotFoundException, IOException {
+            if (!this.prop.containsKey(configKey)) {
+                Validate.isTrue(false, "找不到:" + configKey);
+            }
+
+            if (prop.containsKey(configKey)) {
+                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("設定:" + configKey + " 是否要刪除!", "刪除確認");
+                if (!deleteConfirm) {
+                    return;
+                }
+            }
+
+            this.prop.remove(configKey);
+            this.prop.store(new FileOutputStream(propFile), "remove - " + configKey);
+        }
+
+        private void put(String configKey, String fromVal, String toVal, String tradeOff) throws FileNotFoundException, IOException {
+            if (prop.containsKey(configKey)) {
+                boolean saveConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("設定:" + configKey + " 已存在,是否要覆蓋!", "儲存確認");
+                if (!saveConfirm) {
+                    return;
+                }
+            }
+
             Validate.notEmpty(configKey, "configKey 不可為空!");
             Validate.notEmpty(fromVal, "fromVal 不可為空!");
             Validate.notEmpty(toVal, "toVal 不可為空!");
             tradeOff = StringUtils.trimToEmpty(tradeOff);
             prop.setProperty(configKey, fromVal + delimit + toVal + delimit + tradeOff);
+
+            this.prop.store(new FileOutputStream(propFile), "remove - " + configKey);
         }
 
         void reloadTemplateList() {
