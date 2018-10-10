@@ -59,8 +59,8 @@
             android:name=".Mp3PlayerActivity"
             android:label="Mp3播放" />
         <activity
-            android:name=".HLSPlayerActivity"
-            android:label="串流播放" />
+            android:name=".YoutubePlayerActivity"
+            android:label="Youtube串流播放" />
     </application>
 
 </manifest>

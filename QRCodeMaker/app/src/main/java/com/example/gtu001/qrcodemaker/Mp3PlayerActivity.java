@@ -85,7 +85,7 @@ public class Mp3PlayerActivity extends Activity {
                 Toast.makeText(Mp3PlayerActivity.this, "START!!!", Toast.LENGTH_SHORT).show();
                 if (intialStage)
                     new Player()
-                            .execute("http://www.virginmegastore.me/Library/Music/CD_001214/Tracks/Track1.mp3");
+                            .execute("https://r1---sn-ipoxu-un5r.googlevideo.com/videoplayback?dur=538.424&id=o-AJQ9ZVckcZ9Dk6fBOr4wdED6DQd9IJXQW-BFQZ2EDby9&pl=21&ms=au%2Crdu&fvip=1&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&source=youtube&initcwndbps=997500&mv=m&mm=31%2C29&ip=114.45.89.19&mt=1539151373&mn=sn-ipoxu-un5r%2Csn-un57sn7s&expire=1539173060&ipbits=0&mime=video%2Fmp4&ratebypass=yes&itag=22&signature=165F7E3E1C498A2E63FABB25D5A165A701490E05.1AC838F521F5F323E100586250B40AB194257484&lmt=1536682821655962&requiressl=yes&ei=ZJa9W6ecJc-TgQOEv6zgBg&key=yt6&c=WEB");
                 else {
                     if (!mediaPlayer.isPlaying())
                         mediaPlayer.start();

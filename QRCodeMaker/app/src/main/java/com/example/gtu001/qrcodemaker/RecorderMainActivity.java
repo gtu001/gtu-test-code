@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.common.AudioFileType;
 import com.example.gtu001.qrcodemaker.common.FileConstantAccessUtil;
 import com.example.gtu001.qrcodemaker.config.Constant;
-import com.example.gtu001.qrcodemaker.custom_dialog.PlayerDialog;
+import com.example.gtu001.qrcodemaker.custom_dialog.FilePlayerDialog;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -57,7 +57,7 @@ public class RecorderMainActivity extends Activity {
                     Toast.makeText(RecorderMainActivity.this, "檔案遺失!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                PlayerDialog dialog = new PlayerDialog(RecorderMainActivity.this);
+                FilePlayerDialog dialog = new FilePlayerDialog(RecorderMainActivity.this);
                 dialog.setFile(file);
                 Dialog mDialog = dialog.build();
                 mDialog.show();

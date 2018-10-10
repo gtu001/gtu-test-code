@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.R;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by gtu001 on 2017/10/28.
@@ -17,6 +19,7 @@ import java.io.File;
 
 public class Mp3PlayerHandler {
 
+    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
     private static final String TAG = Mp3PlayerHandler.class.getSimpleName();
 
     MediaPlayer mediaplayer = new MediaPlayer();
@@ -37,14 +40,15 @@ public class Mp3PlayerHandler {
                 mediaplayer.reset();
             }
 
-            Uri uri = null;
-            if(new File(url).exists()){
-                uri = Uri.fromFile(new File(url));
-            }else{
-                uri = Uri.parse(url);
-            }
+            Uri uri = Uri.parse(url);
 
-            mediaplayer.setDataSource(context, uri);
+            Log.v(TAG, "url = " + url);
+            Log.v(TAG, "uri = " + uri);
+
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put("User-Agent", DEFAULT_USER_AGENT);
+
+            mediaplayer.setDataSource(context, uri, headerMap);
             mediaplayer.prepare();
             mediaplayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override

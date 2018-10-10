@@ -15,9 +15,9 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Mp3撥放器" />
         <item
-            android:id="@+id/nav_hls_player"
+            android:id="@+id/youtube_player"
             android:icon="@drawable/ic_menu_camera"
-            android:title="HLS撥放器" />
+            android:title="Youtube撥放器" />
 
         <!-- no use -->
         <item

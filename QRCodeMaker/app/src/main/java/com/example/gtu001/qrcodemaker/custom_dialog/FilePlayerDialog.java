@@ -19,19 +19,19 @@ import java.io.File;
  * Created by gtu001 on 2017/12/12.
  */
 
-public class PlayerDialog {
+public class FilePlayerDialog {
 
-    private static final String TAG = PlayerDialog.class.getSimpleName();
+    private static final String TAG = FilePlayerDialog.class.getSimpleName();
 
     private Context context;
     private Mp3PlayerHandler mp3Helper;
     private File file;
 
-    public PlayerDialog(Context context) {
+    public FilePlayerDialog(Context context) {
         this.context = context;
     }
 
-    public PlayerDialog setFile(File file) {
+    public FilePlayerDialog setFile(File file) {
         this.file = file;
         return this;
     }
