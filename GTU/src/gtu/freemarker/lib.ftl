@@ -81,3 +81,50 @@
         </#if>
         <#return rtn>
 </#function>
+
+
+<#-- 將字串轉charArray -->
+<#function toCharArray strValue>
+         <#local lst = []>
+         <#list 0..(strValue?length-1) as ii>
+                <#local lst = lst + [ strValue[ii] ]>
+         </#list>
+         <#return lst>
+</#function>
+
+
+<#-- 資料庫欄位轉java屬性 -->
+<#function dbColumnToJava strValue>
+         <#local rtnVal = "">
+         <#local strValue = strValue?lower_case>
+         <#local arry = toCharArray(strValue)>
+         <#local uppercasePos = -1>
+         <#list 0..(arry?size -1) as ii>
+                <#local var = arry[ii]>
+                <#if var == '_' || var == '-'>
+                        <#local uppercasePos = ii + 1>
+                        <#continue>
+                <#elseif ii == uppercasePos>
+                        <#local var = var?upper_case>
+                </#if>
+                <#local rtnVal = rtnVal + var>
+         </#list>
+         <#return rtnVal>
+</#function>
+
+
+<#-- java屬性轉資料庫欄位 -->
+<#function javaToDbColumn strValue>
+         <#local rtnVal = "">
+         <#local arry = toCharArray(strValue)>
+         <#local uppercasePos = -1>
+         <#list 0..(arry?size - 1) as ii>
+                <#local var = arry[ii]>
+                <#if var?matches("[A-Z]{1}") && ii != 0>
+                        <#local var = "_" + var>
+                </#if>
+                <#local rtnVal = rtnVal + var?upper_case>
+         </#list>
+         <#return rtnVal>
+</#function>
+

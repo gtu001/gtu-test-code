@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 import com.jaredrummler.android.processes.models.Stat;
@@ -40,7 +41,7 @@ public class ProcessesActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
         listView = new ListView(this);
         layout.addView(listView, //
@@ -170,16 +171,5 @@ public class ProcessesActivity extends Activity {
                 new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01}//
         );
         return listItemAdapter;
-    }
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
     }
 }

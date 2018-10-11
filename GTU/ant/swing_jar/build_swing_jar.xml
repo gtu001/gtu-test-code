@@ -74,7 +74,7 @@
 			<packagename mode="small">javassist.Modifier</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.FileUtils</packagename>
 			<packagename mode="exact" name="guava-20.0.jar">com.google.common.base.Optional</packagename>
-			<packagename mode="small">freemarker.template</packagename>
+			<packagename mode="pom">freemarker.template</packagename>
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="exact" name="mockito-all-1.8.5.jar">org.mockito.Mockito</packagename>
