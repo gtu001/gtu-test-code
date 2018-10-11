@@ -79,7 +79,7 @@
 			<packagename mode="small">org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet</packagename>
 			<packagename mode="small">org.dom4j.DocumentException</packagename>
 
-			<packagename mode="small">freemarker.template</packagename>
+			<packagename mode="pom">freemarker.template</packagename>
 
 		</jarfinder>
 

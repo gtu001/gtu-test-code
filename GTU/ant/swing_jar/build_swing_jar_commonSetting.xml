@@ -63,7 +63,7 @@
 			<packagename mode="small">org.apache.commons.net.ftp</packagename>
 			-->
 			<!-- freemarker
-			<packagename mode="small">freemarker.template</packagename>
+			<packagename mode="pom">freemarker.template</packagename>
 			-->
 			<!-- excel xlsx
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>

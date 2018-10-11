@@ -3,7 +3,6 @@ package com.example.gtu001.qrcodemaker;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -14,20 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.EmailUtil;
-import com.example.gtu001.qrcodemaker.common.QRCodeUtil;
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import net.glxn.qrgen.android.QRCode;
 import net.glxn.qrgen.core.image.ImageType;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +42,7 @@ public class QRCodeMackerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
         editText = new EditText(this);
         editText.setHint("請輸入網址或內容");
@@ -143,16 +138,5 @@ public class QRCodeMackerActivity extends Activity {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         return display.getWidth();
-    }
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
     }
 }

@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.custom_dialog.BluetoothConnectDeviceDialog;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class TvConnActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
         doStartBroadcastReceiver();
 
@@ -189,16 +190,4 @@ public class TvConnActivity extends Activity {
             }
         }
     };
-
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
-    }
 }

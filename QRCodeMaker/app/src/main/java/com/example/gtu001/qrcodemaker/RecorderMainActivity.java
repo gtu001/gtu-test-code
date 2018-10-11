@@ -8,12 +8,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.AudioFileType;
 import com.example.gtu001.qrcodemaker.common.FileConstantAccessUtil;
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.config.Constant;
 import com.example.gtu001.qrcodemaker.custom_dialog.FilePlayerDialog;
 
@@ -39,7 +39,7 @@ public class RecorderMainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
         listView = new ListView(this);
         layout.addView(listView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
@@ -91,16 +91,5 @@ public class RecorderMainActivity extends Activity {
                 new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01}//
         );
         return listItemAdapter;
-    }
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
     }
 }

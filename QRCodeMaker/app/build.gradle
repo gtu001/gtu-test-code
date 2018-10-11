@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.example.gtu001.qrcodemaker"
         minSdkVersion 16
@@ -17,7 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    useLibrary  'org.apache.http.legacy'//使用httpclient
+    useLibrary 'org.apache.http.legacy'//使用httpclient
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError true
+    }
 }
 
 dependencies {
@@ -25,11 +29,11 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-    compile 'org.apache.commons:commons-lang3:3.0' //lang3
     compile 'com.google.zxing:core:2.0'//qrCode
     compile 'com.google.zxing:javase:2.0'//qrCode
     compile 'com.github.kenglxn.QRGen:android:2.4.0' //https://github.com/kenglxn/QRGen
@@ -38,8 +42,10 @@ dependencies {
     //https://github.com/jaredrummler/AndroidProcesses
 
     compile "com.brightcove.player:exoplayer:4.+" //for HLS 需要額外 repositories
+
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.commons:commons-collections4:4.1'
     compile files('libs/httpclient-4.5.2.jar')
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
 
     testCompile 'junit:junit:4.12'
 }

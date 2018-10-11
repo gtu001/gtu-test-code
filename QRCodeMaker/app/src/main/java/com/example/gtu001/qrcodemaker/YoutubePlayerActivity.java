@@ -1,7 +1,9 @@
 package com.example.gtu001.qrcodemaker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,14 +14,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog;
+import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
 import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
+import com.example.gtu001.qrcodemaker.services.YoutubeVideoService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +43,12 @@ public class YoutubePlayerActivity extends Activity {
     private ListView listView;
     private BaseAdapter baseAdapter;
     private InitListViewHandler initListViewHandler;
+    private YoutubeVideoService youtubeVideoService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
         final EditText youtubeIdText = new EditText(this);
         layout.addView(youtubeIdText);
@@ -62,11 +69,10 @@ public class YoutubePlayerActivity extends Activity {
 
         //初始listView
         listView = new ListView(this);
-        ScrollView scrollView = new ScrollView(this);
-        scrollView.addView(listView, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, // 設定與螢幕同寬
+        layout.addView(listView, //
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
-        layout.addView(scrollView);
+        LayoutViewHelper.setViewHeight(listView, 1000);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -85,6 +91,41 @@ public class YoutubePlayerActivity extends Activity {
             }
         });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
+                final YoutubeItem item2 = (YoutubeItem) item.get("item");
+
+                String[] items = new String[]{"刷新", "刪除"};
+
+                AlertDialog dlg = new AlertDialog.Builder(YoutubePlayerActivity.this)//
+                        .setTitle("選擇操作項目")//
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:
+                                        initListViewHandler.itemReflash(item2);
+                                        break;
+                                    case 1:
+                                        initListViewHandler.delete(item2.id);
+                                        break;
+                                }
+                            }
+                        })//
+                        .create();
+                dlg.show();
+                return true;
+            }
+        });
+
+        initServices();
+    }
+
+
+    private void initServices() {
+        youtubeVideoService = new YoutubeVideoService(this);
         initListViewHandler = new InitListViewHandler();
         initListViewHandler.initListView();
     }
@@ -92,23 +133,65 @@ public class YoutubePlayerActivity extends Activity {
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
 
+        private void delete(String id) {
+            boolean deleteOk = youtubeVideoService.deleteId(id);
+            Toast.makeText(YoutubePlayerActivity.this, "刪除" + (deleteOk ? "成功" : "失敗"), Toast.LENGTH_SHORT).show();
+            if (deleteOk) {
+                baseAdapter.notifyDataSetChanged();
+            }
+        }
+
         private boolean add(String id) {
             if (StringUtils.isBlank(id)) {
                 Toast.makeText(YoutubePlayerActivity.this, "id不可為空!", Toast.LENGTH_SHORT).show();
                 return false;
             }
-            YoutubeItem item = new YoutubeItem(id);
-            boolean result = item.processSelf();
-            if (!result) {
-                Toast.makeText(YoutubePlayerActivity.this, "無法取得url!", Toast.LENGTH_SHORT).show();
-                return false;
+
+            YoutubeVideoDAO.YoutubeVideo vo = youtubeVideoService.findByPk(id);
+            if (vo == null) {
+                YoutubeItem item = new YoutubeItem(id);
+                boolean result = item.processSelf();
+                if (!result) {
+                    Toast.makeText(YoutubePlayerActivity.this, "無法取得url!", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                listItem.add(getItem2Map(item));
+                baseAdapter.notifyDataSetChanged();
+
+                //存置資料庫
+                vo = getVo(item);
+                item.vo = vo;
+                youtubeVideoService.insertData(vo);
+            } else {
+                YoutubeItem item = this.getItemFromVo(vo);
+                item.processSelf();
+                vo.setVideoUrl(item.videoUrl);
+                youtubeVideoService.update(vo);
             }
-            listItem.add(getItem(item));
-            baseAdapter.notifyDataSetChanged();
             return true;
         }
 
-        private Map<String, Object> getItem(YoutubeItem item) {
+        private YoutubeVideoDAO.YoutubeVideo getVo(YoutubeItem item) {
+            YoutubeVideoDAO.YoutubeVideo vo = new YoutubeVideoDAO.YoutubeVideo();
+            vo.setTitle(item.name);
+            vo.setVideoId(item.id);
+            vo.setLatestClickDate(System.currentTimeMillis());
+            vo.setInsertDate(System.currentTimeMillis());
+            vo.setClickTime(1);
+            vo.setVideoUrl(item.videoUrl);
+            return vo;
+        }
+
+        private YoutubeItem getItemFromVo(YoutubeVideoDAO.YoutubeVideo vo) {
+            YoutubeItem item = new YoutubeItem(vo.getVideoId());
+            item.id = vo.getVideoId();
+            item.name = vo.getTitle();
+            item.videoUrl = vo.getVideoUrl();
+            item.vo = vo;
+            return item;
+        }
+
+        private Map<String, Object> getItem2Map(YoutubeItem item) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("item_image", null);// 圖像資源的ID
             map.put("item_title", item.name);
@@ -127,8 +210,28 @@ public class YoutubePlayerActivity extends Activity {
             return listItemAdapter;
         }
 
+        private void reloadDBData() {
+            listItem.clear();
+            List<YoutubeVideoDAO.YoutubeVideo> lst = youtubeVideoService.queryAll();
+            for (YoutubeVideoDAO.YoutubeVideo vo : lst) {
+                Log.v(TAG, "## vo - " + ReflectionToStringBuilder.toString(vo, ToStringStyle.MULTI_LINE_STYLE));
+                listItem.add(getItem2Map(getItemFromVo(vo)));
+            }
+        }
+
+        private void itemReflash(YoutubeItem item) {
+            item.processSelf();
+            YoutubeVideoDAO.YoutubeVideo vo = item.vo;
+            vo.setVideoUrl(item.videoUrl);
+            vo.setTitle(item.name);
+            youtubeVideoService.update(vo);
+            baseAdapter.notifyDataSetChanged();
+            Toast.makeText(YoutubePlayerActivity.this, "已刷新", Toast.LENGTH_SHORT).show();
+        }
+
         private void initListView() {
             baseAdapter = createSimpleAdapter();
+            reloadDBData();
             listView.setAdapter(baseAdapter);
             baseAdapter.notifyDataSetChanged();
         }
@@ -138,6 +241,7 @@ public class YoutubePlayerActivity extends Activity {
         String name;
         String id;
         String videoUrl;
+        YoutubeVideoDAO.YoutubeVideo vo;
 
         public YoutubeItem(String id) {
             this.name = name;
@@ -172,17 +276,6 @@ public class YoutubePlayerActivity extends Activity {
             }
             return true;
         }
-    }
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
     }
 }
 

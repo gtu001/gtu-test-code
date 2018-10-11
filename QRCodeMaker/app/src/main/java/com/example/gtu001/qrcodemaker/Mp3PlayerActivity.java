@@ -9,12 +9,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.view.View.OnClickListener;
 import android.widget.Toast;
+
+import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 
 import java.io.IOException;
 
@@ -39,7 +40,7 @@ public class Mp3PlayerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
-        LinearLayout layout = createContentView();
+        LinearLayout layout = LayoutViewHelper.createContentView(this);
 
 //        btn = (Button) findViewById(R.id.button1);
         Button btn = new Button(this);
@@ -187,16 +188,5 @@ public class Mp3PlayerActivity extends Activity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
-    }
-
-    private LinearLayout createContentView() {
-        LinearLayout layout = new LinearLayout(this);
-        ScrollView scroll = new ScrollView(this);
-        setContentView(scroll);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(layout, //
-                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, // 設定與螢幕同寬
-                        ViewGroup.LayoutParams.WRAP_CONTENT));// 高度隨內容而定
-        return layout;
     }
 }
