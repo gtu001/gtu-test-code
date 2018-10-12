@@ -18,7 +18,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
-import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog;
+import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
 import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
 import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
 import com.example.gtu001.qrcodemaker.services.YoutubeVideoService;
@@ -79,7 +79,8 @@ public class YoutubePlayerActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final YoutubeItem item2 = (YoutubeItem) item.get("item");
-                UrlPlayerDialog dialog = new UrlPlayerDialog(YoutubePlayerActivity.this);
+//                UrlPlayerDialog dialog = new UrlPlayerDialog(YoutubePlayerActivity.this);
+                UrlPlayerDialog_bg dialog = new UrlPlayerDialog_bg(YoutubePlayerActivity.this);
 
                 Log.v(TAG, "====================================================================");
                 Log.v(TAG, "name = " + item2.name);
@@ -110,6 +111,9 @@ public class YoutubePlayerActivity extends Activity {
                                         break;
                                     case 1:
                                         initListViewHandler.delete(item2.id);
+                                        break;
+                                    default:
+                                        Toast.makeText(YoutubePlayerActivity.this, "Unknow choice " + which, Toast.LENGTH_SHORT).show();
                                         break;
                                 }
                             }
