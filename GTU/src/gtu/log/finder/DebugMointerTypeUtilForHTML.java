@@ -1,12 +1,10 @@
 package gtu.log.finder;
 
-import gtu.file.FileUtil;
-import gtu.freemarker.FreeMarkerSimpleUtil;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -33,6 +31,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+
+import gtu.file.FileUtil;
+import gtu.freemarker.FreeMarkerSimpleUtil;
 
 
 public class DebugMointerTypeUtilForHTML {
@@ -155,7 +156,7 @@ public class DebugMointerTypeUtilForHTML {
                 FreeMarkerSimpleUtil.replace(//
                         new File("C:/workspace/workspace/GTU/src/gtu/log/finder/DebugMointerUI_base.html"), //
 //                        new File("D:/workspace/Gtu/src/gtu/log/finder/DebugMointerUI_base.html"), //
-                        root, new FileOutputStream(outputFile));//測試用
+                        root, new FileWriter(outputFile));//測試用
             }
             debug("寫黨完成 >> " + outputFile.exists() + " >> " + outputFile.getName() + " >> " + outputFile + " >> " + rootObject);
         }catch(Exception ex){

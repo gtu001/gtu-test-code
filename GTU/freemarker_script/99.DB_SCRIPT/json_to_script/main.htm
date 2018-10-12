@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+	focused {
+		background: #abcdef;
+	}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#srcArea").blur(function(){
+			var targetObj = {};
+			
+			console.log("srcArea = " + $.trim($("#srcArea").val()));
+			var jsonObj = JSON.parse($.trim($("#srcArea").val()));
+			for(var ii = 0 ; ii < jsonObj.length ; ii ++){
+				var column = jsonObj[ii];
+				var col = $.trim(column['NAME']);
+				var label = $.trim(column['REMARKS']);
+				var isPk = $.trim(column['NULLS']) != 'Y';
+				var isDate = $.trim(column['COLTYPE']) == 'DATE';
+				var isTimestamp = $.trim(column['COLTYPE']) == 'TIMESTMP';
+				
+				if(isDate){
+					appendJsonArry(targetObj, 'column_dateLst', col);
+				}
+				if(isTimestamp){
+					appendJsonArry(targetObj, 'column_timestampLst', col);
+				}
+				
+	                        //query
+                appendJsonArry(targetObj, 'searchColumns', col);
+                //insert
+                appendJsonArry(targetObj, 'insertColumns', col);
+                //update
+                appendJsonArry(targetObj, 'updateColumns', col);
+                if(isPk){
+                	appendJsonArry(targetObj, 'updateColumns_where', col);
+                }
+                //delete
+                if(isPk){
+                	appendJsonArry(targetObj, 'deleteColumns_where', col);
+                }
+            }
+            
+            targetObj['main_schema'] = "DBXX";
+            targetObj['main_table'] = "DTXXTP01";
+            targetObj['searchColumns_like'] = [];
+            
+            $("#targetArea").text(JSON.stringify(targetObj));
+        });
+	});
+	
+	function appendJsonArry(jsonObj, arryKey, appendValue) {
+		var arry = new Array();
+		if(arryKey in jsonObj){
+			arry = jsonObj[arryKey];
+		}else{
+			jsonObj[arryKey] = arry;
+		}
+		arry.push(appendValue);
+	}
+
+	function appendJsonObjct(jsonObj, jsonKey, appendKey, appendValue){
+		var map = {};
+		if(jsonKey in jsonObj){
+			map = jsonObj[jsonKey];
+		}else{
+			jsonObj[jsonKey] = map;
+		}
+		map[appendKey] = appendValue;
+	}
+</script>
+
+</head>
+<body>
+
+
+
+<textarea id="srcArea" cols="100" rows="30">
+</textarea>
+<br/>
+<input type="button" value="go" id="goBtn" />
+<br/>
+<textarea id="targetArea" cols="100" rows="30">
+</textarea>
+
+</body>
+</html>

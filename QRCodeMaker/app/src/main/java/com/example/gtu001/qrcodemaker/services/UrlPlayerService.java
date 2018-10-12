@@ -58,6 +58,7 @@ public class UrlPlayerService extends Service {
     private Mp3PlayerHandler mp3Helper;
 
     private String startPlay(String url) {
+        Log.v(TAG, "#---startPlay : " + url);
         if (StringUtils.isBlank(url)) {
             return "檔案錯誤!";
         }
@@ -71,6 +72,7 @@ public class UrlPlayerService extends Service {
     }
 
     private String stopPlay() {
+        Log.v(TAG, "#---stopPlay");
         if (mp3Helper == null) {
             return "尚未撥放!";
         }

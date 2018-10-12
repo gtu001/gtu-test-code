@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+	focused {
+		background: #abcdef;
+	}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#srcArea").blur(function(){
+			var targetObj = {};
+
+			console.log("srcArea = " + $.trim($("#srcArea").val()));
+			var jsonObj = JSON.parse($.trim($("#srcArea").val()));
+			for(var ii = 0 ; ii < jsonObj.length ; ii ++){
+				var column = jsonObj[ii];
+				var col = $.trim(column['NAME']);
+				var label = $.trim(column['REMARKS']);
+				var isPk = $.trim(column['NULLS']) != 'Y';
+				var isDate = $.trim(column['COLTYPE']) == 'DATE';
+				var isTimestamp = $.trim(column['COLTYPE']) == 'TIMESTMP';
+
+				if(isDate){
+					appendJsonArry(targetObj, 'column_dateLst', col);
+				}
+				if(isTimestamp){
+					appendJsonArry(targetObj, 'column_timestampLst', col);
+				}
+
+                //chinese
+                appendJsonObjct(targetObj, 'columnLabel', col, label);
+
+                //query
+                appendJsonArry(targetObj, 'searchColumns', col);
+                targetObj['searchColumns_like'] = [];
+                //insert
+                appendJsonArry(targetObj, 'insertColumns', col);
+                if(isPk){
+                	appendJsonArry(targetObj, 'insertColumns_pk', col);
+                }
+                //update
+                appendJsonArry(targetObj, 'updateColumns', col);
+                if(isPk){
+                	appendJsonArry(targetObj, 'updateColumns_pk', col);
+                }
+                //delete
+                if(isPk){
+                	appendJsonArry(targetObj, 'deleteColumns_pk', col);
+                }
+                //approve
+                if(isPk){
+                	appendJsonArry(targetObj, 'approveColumns_pk', col);
+                }
+                
+                //form排序 
+                appendJsonArry(targetObj, 'formColumns', col);
+            }
+            
+            targetObj['searchColumns_like'] = [];
+            
+            //修改以下部分 ↓↓↓↓↓↓
+
+            targetObj['model_chinese'] = "員工資料檔";
+            targetObj['model_desc'] = "員工資料檔";
+            
+            targetObj['model_clz'] = "XX_ZX0100";
+            targetObj['main_schema'] = "DBXX";
+            targetObj['model_vo_clz'] = "XX_ZX0100_VO";
+            
+            targetObj['main_action_clz'] = "XXZX_0100";
+            targetObj['edit_action_clz'] = "XXZX_0101";
+            targetObj['main_jsp'] = "XXZX0100";
+            targetObj['edit_jsp'] = "XXZX0101";
+
+            //修改以上部分 ↑↑↑↑↑↑
+            
+            $("#targetArea").text(JSON.stringify(targetObj));
+
+        });
+	});
+
+
+	function appendJsonArry(jsonObj, arryKey, appendValue) {
+		var arry = new Array();
+		if(arryKey in jsonObj){
+			arry = jsonObj[arryKey];
+		}else{
+			jsonObj[arryKey] = arry;
+		}
+		arry.push(appendValue);
+	}
+
+	function appendJsonObjct(jsonObj, jsonKey, appendKey, appendValue){
+		var map = {};
+		if(jsonKey in jsonObj){
+			map = jsonObj[jsonKey];
+		}else{
+			jsonObj[jsonKey] = map;
+		}
+		map[appendKey] = appendValue;
+	}
+</script>
+
+</head>
+<body>
+
+
+
+<textarea id="srcArea" cols="100" rows="30">
+</textarea>
+<br/>
+<input type="button" value="go" id="goBtn" />
+<br/>
+<textarea id="targetArea" cols="100" rows="30">
+</textarea>
+
+</body>
+</html>

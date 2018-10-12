@@ -72,7 +72,7 @@
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 
 			<packagename mode="small">javassist.Modifier</packagename>
-			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.FileUtils</packagename>
+			<packagename mode="exact" name="commons-io-2.6.jar">org.apache.commons.io.FileUtils</packagename>
 			<packagename mode="exact" name="guava-20.0.jar">com.google.common.base.Optional</packagename>
 			<packagename mode="pom">freemarker.template</packagename>
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>

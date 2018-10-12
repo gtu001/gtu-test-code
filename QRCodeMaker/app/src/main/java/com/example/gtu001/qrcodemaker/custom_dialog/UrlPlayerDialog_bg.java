@@ -22,6 +22,8 @@ import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Created by gtu001 on 2017/12/12.
  */
@@ -33,7 +35,7 @@ public class UrlPlayerDialog_bg {
     private Context context;
     private String url;
     private String message;
-    private UrlPlayerServiceHander urlPlayerServiceHander;
+    private static AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
 
     public UrlPlayerDialog_bg(Context context) {
         this.context = context;
@@ -42,8 +44,12 @@ public class UrlPlayerDialog_bg {
     public UrlPlayerDialog_bg setUrl(String message, String url) {
         this.url = url;
         this.message = message;
-        this.urlPlayerServiceHander = new UrlPlayerServiceHander();
-        this.urlPlayerServiceHander.init();
+
+        //只做一次
+        if (this.urlPlayerServiceHander.get() == null || this.urlPlayerServiceHander.get().initNotDone()) {
+            this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
+            this.urlPlayerServiceHander.get().init();
+        }
         return this;
     }
 
@@ -67,8 +73,13 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    String result = urlPlayerServiceHander.mService.startPlay(UrlPlayerDialog_bg.this.url);
-                    Validate.isTrue(StringUtils.isNotBlank(result), result);
+                    String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.url);
+                    if (StringUtils.isNotBlank(result)) {
+                        Validate.isTrue(false, result);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
@@ -80,8 +91,13 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    String result = urlPlayerServiceHander.mService.stopPlay();
-                    Validate.isTrue(StringUtils.isNotBlank(result), result);
+                    String result = urlPlayerServiceHander.get().getMService().stopPlay();
+                    if (StringUtils.isNotBlank(result)) {
+                        Validate.isTrue(false, result);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
@@ -120,6 +136,10 @@ public class UrlPlayerDialog_bg {
         private IUrlPlayerService mService;
         private ServiceConnection mConnection;
 
+        private IUrlPlayerService getMService() {
+            return mService;
+        }
+
         private void init() {
             mConnection = getMConnection();
             startStopService(true);
@@ -130,8 +150,10 @@ public class UrlPlayerDialog_bg {
             if (ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
                 Intent intent = new Intent(context, UrlPlayerService.class);
                 if (isOn) {
+                    Log.v(TAG, "[bindServiceMethod] true");
                     context.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 } else {
+                    Log.v(TAG, "[bindServiceMethod] false");
                     context.unbindService(mConnection);
                 }
             }
@@ -141,14 +163,16 @@ public class UrlPlayerDialog_bg {
             return new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName className, IBinder service) {
-                    Log.v(TAG, "onServiceConnected called");
+                    Log.v(TAG, "[onServiceConnected] called");
                     mService = IUrlPlayerService.Stub.asInterface(service);
+                    Log.v(TAG, "[mService] init " + mService);
                 }
 
                 @Override
                 public void onServiceDisconnected(ComponentName arg0) {
-                    Log.v(TAG, "onServiceDisconnected called");
+                    Log.v(TAG, "[onServiceDisconnected] called");
                     mService = null;
+                    Log.v(TAG, "[mService] setNull ");
                 }
             };
         }
@@ -161,10 +185,22 @@ public class UrlPlayerDialog_bg {
             if (!isRunning && isStart) {
                 Intent intent = new Intent(context, UrlPlayerService.class);
                 context.startService(intent);
+                Log.v(TAG, "[startStopService] start");
             } else {
                 Intent intent = new Intent(context, UrlPlayerService.class);
                 context.stopService(intent);
+                Log.v(TAG, "[startStopService] end");
             }
+        }
+
+        private boolean initNotDone() {
+            if (!ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
+                return true;
+            }
+            if (mService == null || mConnection == null) {
+                return true;
+            }
+            return false;
         }
     }
 }

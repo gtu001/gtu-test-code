@@ -377,6 +377,10 @@ public class FreemarkerReplaceUI extends JFrame {
                         JCommonUtil.handleException(ex);
                     }
                 }
+                // 加入encode
+                if (prop.containsKey("encode")) {
+                    encodeText.setText(prop.getProperty("encode"));
+                }
                 filePathList.setModel(model);
                 keepFileSet(loadFile);
                 JCommonUtil._jOptionPane_showMessageDialog_info("載入成功 \n FileNotFound : " + errSb);
@@ -399,6 +403,10 @@ public class FreemarkerReplaceUI extends JFrame {
             for (int ii = 0; ii < model.getSize(); ii++) {
                 File f = (File) model.getElementAt(ii);
                 prop.setProperty("file" + ii, getRelativePath(f));
+            }
+            // 加入encode
+            if (StringUtils.isNotBlank(encodeText.getText())) {
+                prop.setProperty("encode", encodeText.getText());
             }
             File saveFile = null;
             if (saveToTarget) {
