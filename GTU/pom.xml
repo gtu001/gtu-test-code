@@ -711,6 +711,14 @@
 			<artifactId>epublib-core</artifactId>
 			<version>3.1</version>
 		</dependency>
+
+		<!-- swing form [1.8.0] -->
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-forms</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
 	</dependencies>
 
 
