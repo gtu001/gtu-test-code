@@ -154,9 +154,9 @@ public class YoutubePlayerActivity extends Activity {
             YoutubeVideoDAO.YoutubeVideo vo = youtubeVideoService.findByPk(id);
             if (vo == null) {
                 YoutubeItem item = new YoutubeItem(id);
-                boolean result = item.processSelf();
-                if (!result) {
-                    Toast.makeText(YoutubePlayerActivity.this, "無法取得url!", Toast.LENGTH_SHORT).show();
+                String result = item.processSelf();
+                if (StringUtils.isNotBlank(result)) {
+                    Toast.makeText(YoutubePlayerActivity.this, result, Toast.LENGTH_SHORT).show();
                     return false;
                 }
                 listItem.add(getItem2Map(item));
@@ -168,7 +168,11 @@ public class YoutubePlayerActivity extends Activity {
                 youtubeVideoService.insertData(vo);
             } else {
                 YoutubeItem item = this.getItemFromVo(vo);
-                item.processSelf();
+                String result = item.processSelf();
+                if (StringUtils.isNotBlank(result)) {
+                    Toast.makeText(YoutubePlayerActivity.this, result, Toast.LENGTH_SHORT).show();
+                    return false;
+                }
                 vo.setVideoUrl(item.videoUrl);
                 youtubeVideoService.update(vo);
             }
@@ -253,32 +257,39 @@ public class YoutubePlayerActivity extends Activity {
             this.videoUrl = videoUrl;
         }
 
-        public boolean processSelf() {
-            final ArrayBlockingQueue queue = new ArrayBlockingQueue(1);
+        public String processSelf() {
+            final ArrayBlockingQueue<String> queue = new ArrayBlockingQueue<String>(1);
 
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    JavaYoutubeVideoUrlHandler handler = new JavaYoutubeVideoUrlHandler(id, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
-                    handler.execute();
-                    YoutubeItem.this.name = handler.getTitle();
-                    TreeMap<Long, String> urlMap = new TreeMap<Long, String>();
-                    for (JavaYoutubeVideoUrlHandler.VideoUrlConfig vo : handler.getVideoFor91Lst()) {
-                        urlMap.put(vo.getLength(), vo.getUrl());
+                    try {
+                        JavaYoutubeVideoUrlHandler handler = new JavaYoutubeVideoUrlHandler(id, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
+                        handler.execute();
+                        YoutubeItem.this.name = handler.getTitle();
+                        TreeMap<Long, String> urlMap = new TreeMap<Long, String>();
+                        for (JavaYoutubeVideoUrlHandler.VideoUrlConfig vo : handler.getVideoFor91Lst()) {
+                            urlMap.put(vo.getLength(), vo.getUrl());
+                        }
+                        String url = urlMap.get(urlMap.keySet().iterator().next());
+                        YoutubeItem.this.videoUrl = url;
+                        queue.offer("");
+                    } catch (Exception ex) {
+                        queue.offer(ex.getMessage());
                     }
-                    String url = urlMap.get(urlMap.keySet().iterator().next());
-                    YoutubeItem.this.videoUrl = url;
-                    queue.offer(new Object());
                 }
             }).start();
 
             try {
-                queue.poll(5000, TimeUnit.MILLISECONDS);
+                String errMsg = queue.poll(5000, TimeUnit.MILLISECONDS);
+                if (StringUtils.isNotBlank(errMsg)) {
+                    return errMsg;
+                }
             } catch (InterruptedException e) {
                 Log.e(TAG, "ERROR : " + e.getMessage(), e);
-                return false;
+                return "連線時間逾時!";
             }
-            return true;
+            return "";
         }
     }
 }

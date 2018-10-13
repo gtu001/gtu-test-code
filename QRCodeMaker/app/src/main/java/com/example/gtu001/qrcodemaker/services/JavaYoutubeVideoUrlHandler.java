@@ -162,7 +162,7 @@ public class JavaYoutubeVideoUrlHandler {
                     orignData = val;
                 }
                 if ("fmt_list".equals(key)) {
-                    String[] vals1 = val.split(",", -1);
+                    String[] vals1 = StringUtils.trimToEmpty(val).split(",", -1);
                     for (String v2 : vals1) {
                         String[] kv2 = v2.split("\\/", -1);
                         if (kv2 != null && kv2.length >= 2) {
