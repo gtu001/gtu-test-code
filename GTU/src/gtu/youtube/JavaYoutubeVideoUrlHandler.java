@@ -53,7 +53,7 @@ public class JavaYoutubeVideoUrlHandler {
     public static void main(String[] args) {
 //        https://www.youtube.com/watch?v=UPXSB2gMsfI
 //        https://www.youtube.com/watch?v=kHc4Zj7GbM8
-        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("kHc4Zj7GbM8", "", DEFAULT_USER_AGENT);
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("FrG4TEcSuRg", "", DEFAULT_USER_AGENT);
         t.execute();
         System.out.println("done...");
     }
@@ -160,7 +160,7 @@ public class JavaYoutubeVideoUrlHandler {
                     orignData = val;
                 }
                 if ("fmt_list".equals(key)) {
-                    String[] vals1 = val.split(",", -1);
+                    String[] vals1 = StringUtils.trimToEmpty(val).split(",", -1);
                     for (String v2 : vals1) {
                         String[] kv2 = v2.split("\\/", -1);
                         if (kv2 != null && kv2.length >= 2) {
@@ -198,7 +198,7 @@ public class JavaYoutubeVideoUrlHandler {
                 String paramStr = "";
                 if (f.getName().equals("url")) {
                     paramStr = this.getParamStr(baseUrlString, mth.end() + "=".length(), "\\,");
-                } else if (f.getName(fmt_list).equals("quality")) {
+                } else if (f.getName().equals("quality")) {
                     paramStr = this.getParamStr_forCatch(f.getName(), baseUrlString, mth.end() + "=".length(), "\\w+");
                 } else if (f.getName().equals("type")) {
                     paramStr = this.getParamStr_forCatch(f.getName(), baseUrlString, mth.end() + "=".length(), "video\\/\\w+\\;\\scodecs\\=\".*?\"");

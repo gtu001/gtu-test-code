@@ -58,8 +58,7 @@ public class Mp3PlayerHandler {
                 }
             });
         } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage(), ex);
-            Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+            throw new RuntimeException("mp3讀取錯誤 ex : " + ex.getMessage(), ex);
         }
         return this;
     }

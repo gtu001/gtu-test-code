@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +17,8 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
+import com.example.gtu001.qrcodemaker.common.Log;
+import com.example.gtu001.qrcodemaker.common.PingUtil;
 import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
 import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
 import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
@@ -49,6 +50,10 @@ public class YoutubePlayerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LinearLayout layout = LayoutViewHelper.createContentView(this);
+
+        Log.v(TAG, "#################################################", 3);
+        new PingUtil.NetPing("www.youtube.com").execute();
+        Log.v(TAG, "#################################################", 3);
 
         final EditText youtubeIdText = new EditText(this);
         layout.addView(youtubeIdText);
@@ -95,7 +100,7 @@ public class YoutubePlayerActivity extends Activity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
+                final Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final YoutubeItem item2 = (YoutubeItem) item.get("item");
 
                 String[] items = new String[]{"刷新", "刪除"};
@@ -107,7 +112,7 @@ public class YoutubePlayerActivity extends Activity {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0:
-                                        initListViewHandler.itemReflash(item2);
+                                        initListViewHandler.itemReflash(item2, item);
                                         break;
                                     case 1:
                                         initListViewHandler.delete(item2.id);
@@ -227,11 +232,17 @@ public class YoutubePlayerActivity extends Activity {
             }
         }
 
-        private void itemReflash(YoutubeItem item) {
-            item.processSelf();
+        private void itemReflash(YoutubeItem item, Map<String, Object> map) {
+            String errMsg = item.processSelf();
+            if (StringUtils.isNotBlank(errMsg)) {
+                Toast.makeText(YoutubePlayerActivity.this, "錯誤 : " + errMsg, Toast.LENGTH_SHORT).show();
+                return;
+            }
             YoutubeVideoDAO.YoutubeVideo vo = item.vo;
             vo.setVideoUrl(item.videoUrl);
             vo.setTitle(item.name);
+            map.put("item_title", item.name);
+            map.put("item_text", item.id);
             youtubeVideoService.update(vo);
             baseAdapter.notifyDataSetChanged();
             Toast.makeText(YoutubePlayerActivity.this, "已刷新", Toast.LENGTH_SHORT).show();
@@ -275,6 +286,8 @@ public class YoutubePlayerActivity extends Activity {
                         YoutubeItem.this.videoUrl = url;
                         queue.offer("");
                     } catch (Exception ex) {
+                        ex.printStackTrace();
+                        Log.e(TAG, "processSelf ERR : " + ex.getMessage(), ex);
                         queue.offer(ex.getMessage());
                     }
                 }

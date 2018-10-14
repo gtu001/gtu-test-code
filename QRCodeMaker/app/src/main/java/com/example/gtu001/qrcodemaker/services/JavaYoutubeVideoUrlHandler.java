@@ -55,7 +55,7 @@ public class JavaYoutubeVideoUrlHandler {
     public static void main(String[] args) {
 //        https://www.youtube.com/watch?v=UPXSB2gMsfI
 //        https://www.youtube.com/watch?v=kHc4Zj7GbM8
-        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("kHc4Zj7GbM8", "", DEFAULT_USER_AGENT);
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("FrG4TEcSuRg", "", DEFAULT_USER_AGENT);
         t.execute();
         System.out.println("done...");
     }
