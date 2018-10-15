@@ -9,11 +9,19 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +50,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu.binary.StringUtil4FullChar;
@@ -52,6 +62,7 @@ import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
+import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
@@ -76,6 +87,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
     private JRadioButton rdbtnOthers;
     private DataSource dataSource;
+    private JCheckBox applyAllQueryResultCheckBox;
 
     private static class ColumnConf {
         String columnName;
@@ -145,7 +157,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, String tableNSchema, final DataSource dataSource) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, String tableNSchema, final DataSource dataSource, final Pair<List<String>, List<Object[]>> queryList) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
             dialog.dataSource = dataSource;
@@ -187,10 +199,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             });
 
             dialog.okButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        TableInfo tableInfo = new TableInfo();
+
+                class Process {
+                    TableInfo tableInfo;
+                    Map<String, String> singleRecordMap;
+
+                    Process() throws SQLException {
+                        // 套用此筆資料
+                        tableInfo = new TableInfo();
                         String tableAndSchema = dialog.tableAndSchemaText.getText();
                         JCommonUtil.isBlankErrorMsg(tableAndSchema, "輸入表名稱!");
 
@@ -238,27 +254,128 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         tableInfo.getTimestampCol().addAll(timestampCol);
                         // ------------------------------------------------
 
-                        AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
-                        String sql = "";
-                        if (btn == dialog.rdbtnInsert) {
-                            sql = tableInfo.createInsertSql(map);
-                        } else if (btn == dialog.rdbtnDelete) {
-                            sql = tableInfo.createDeleteSql(map);
-                        } else if (btn == dialog.rdbtnUpdate) {
-                            sql = tableInfo.createUpdateSql(map, map, false);
-                        } else if (btn == dialog.rdbtnOthers) {
-                            rdbtnOthersAction(tableInfo, map);
-                            return;
-                        } else {
-                            Validate.isTrue(false, "請選sql類型");
-                        }
+                        singleRecordMap = map;
+                    }
 
-                        String promptLabel = StringUtils.join(StringUtil4FullChar.fixLength(sql, 50), "\n");
-                        String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
-                        boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
-                        if (confirm) {
-                            int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], dataSource.getConnection());
-                            JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
+                    List<Map<String, String>> getAllRecoreds() {
+                        List<String> cols = queryList.getLeft();
+                        List<Object[]> qlst = queryList.getRight();
+                        List<Map<String, String>> rtnLst = new ArrayList<Map<String, String>>();
+                        for (Object[] row : qlst) {
+                            Map<String, String> map = new LinkedHashMap<String, String>();
+                            for (int ii = 0; ii < cols.size(); ii++) {
+                                String col = cols.get(ii);
+                                String value = row[ii] != null ? String.valueOf(row[ii]) : null;
+                                map.put(col, value);
+                            }
+                            rtnLst.add(map);
+                        }
+                        return rtnLst;
+                    }
+                }
+
+                BufferedWriter writer = null;
+
+                private void createWriter(File outputFile) throws UnsupportedEncodingException, FileNotFoundException {
+                    if (writer == null) {
+                        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "UTF8"));
+                    }
+                }
+
+                private void closeWriter() {
+                    if (writer != null) {
+                        try {
+                            writer.flush();
+                        } catch (Exception e) {
+                        }
+                        try {
+                            writer.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                    writer = null;
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        Process process = new Process();
+                        if (!dialog.applyAllQueryResultCheckBox.isSelected()) {
+                            // 套用單筆資料
+                            AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
+                            String sql = "";
+                            if (btn == dialog.rdbtnInsert) {
+                                sql = process.tableInfo.createInsertSql(process.singleRecordMap);
+                            } else if (btn == dialog.rdbtnDelete) {
+                                sql = process.tableInfo.createDeleteSql(process.singleRecordMap);
+                            } else if (btn == dialog.rdbtnUpdate) {
+                                sql = process.tableInfo.createUpdateSql(process.singleRecordMap, process.singleRecordMap, false);
+                            } else if (btn == dialog.rdbtnOthers) {
+                                rdbtnOthersAction(process.tableInfo, process.singleRecordMap);
+                                return;
+                            } else {
+                                Validate.isTrue(false, "請選sql類型");
+                            }
+
+                            String promptLabel = StringUtils.join(StringUtil4FullChar.fixLength(sql, 50), "\n");
+                            String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
+                            boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
+                            if (confirm) {
+                                int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], dataSource.getConnection());
+                                JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
+                            }
+                        } else {
+                            // 套用所有資料
+                            AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
+                            List<Map<String, String>> qlst = process.getAllRecoreds();
+
+                            String filename = JCommonUtil._jOptionPane_showInputDialog("請輸入匯出檔名",
+                                    FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".sql");
+                            if (StringUtils.isBlank(filename)) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("檔名有誤!");
+                                return;
+                            }
+
+                            File outputFile = new File(FileUtil.DESKTOP_DIR, filename);
+                            if (outputFile.exists()) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在!");
+                                return;
+                            }
+
+                            try {
+                                if (btn == dialog.rdbtnInsert) {
+                                    createWriter(outputFile);
+                                    for (Map<String, String> map : qlst) {
+                                        String sql = process.tableInfo.createInsertSql(map);
+                                        writer.write(sql + ";");
+                                        writer.newLine();
+                                    }
+                                } else if (btn == dialog.rdbtnDelete) {
+                                    createWriter(outputFile);
+                                    for (Map<String, String> map : qlst) {
+                                        String sql = process.tableInfo.createDeleteSql(map);
+                                        writer.write(sql + ";");
+                                        writer.newLine();
+                                    }
+                                } else if (btn == dialog.rdbtnUpdate) {
+                                    createWriter(outputFile);
+                                    for (Map<String, String> map : qlst) {
+                                        String sql = process.tableInfo.createUpdateSql(map, map, false);
+                                        writer.write(sql + ";");
+                                        writer.newLine();
+                                    }
+                                } else if (btn == dialog.rdbtnOthers) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("不支援!");
+                                    return;
+                                } else {
+                                    Validate.isTrue(false, "請選sql類型");
+                                }
+                            } catch (Exception ex) {
+                                throw ex;
+                            } finally {
+                                closeWriter();
+                            }
+                            JCommonUtil._jOptionPane_showMessageDialog_info("匯出完成 : " + outputFile);
                         }
                     } catch (Exception e1) {
                         JCommonUtil.handleException(e1);
@@ -278,12 +395,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     }
                 }
             });
-            
+
             if (StringUtils.isNotBlank(tableNSchema)) {
                 dialog.tableAndSchemaText.setText(StringUtils.trimToEmpty(tableNSchema));
                 dialog.tableAndSchemaText_focusLost_action(dialog.tableAndSchemaText);
             }
-            
+
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException("FastDBQueryUI_CrudDlgUI ERR : " + e.getMessage(), e);
@@ -787,6 +904,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 panel.add(rdbtnOthers);
             }
             btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers);
+            {
+                applyAllQueryResultCheckBox = new JCheckBox("套全部");
+                panel.add(applyAllQueryResultCheckBox);
+            }
         }
         {
             rowTable = new JTable();

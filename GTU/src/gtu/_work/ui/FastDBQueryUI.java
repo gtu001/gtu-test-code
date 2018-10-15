@@ -67,6 +67,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.collection.ListUtil;
 import gtu.db.JdbcDBUtil;
+import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil;
@@ -78,6 +79,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import net.sf.json.JSONArray;
@@ -147,6 +149,8 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_16;
 
     private Pair<List<String>, List<Object[]>> queryList = null;
+    private Pair<List<String>, List<Object[]>> filterRowsQueryList = null;
+
     private boolean distinctHasClicked = false;// 是否按過distinct btn
 
     private JButton excelExportBtn;
@@ -235,7 +239,12 @@ public class FastDBQueryUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
-
+        sqlTextArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                sqlTextAreaMouseClickedAction(e);
+            }
+        });
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
 
@@ -387,7 +396,11 @@ public class FastDBQueryUI extends JFrame {
                     }
 
                     System.out.println("qList - " + qList.size());
-                    queryModeProcess(Pair.of(cols, qList), true, null);
+
+                    // 過濾欄位紀錄
+                    filterRowsQueryList = Pair.of(cols, qList);
+
+                    queryModeProcess(filterRowsQueryList, true, null);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -564,7 +577,7 @@ public class FastDBQueryUI extends JFrame {
             List<String> rtnLst = new ArrayList<String>();
             for (int ii = 0; ii < arry.length; ii++) {
                 if (StringUtils.isNotBlank(arry[ii])) {
-                    rtnLst.add(arry[ii]);
+                    rtnLst.add(StringUtils.trimToEmpty(arry[ii]));
                 }
             }
             return rtnLst.toArray(new String[0]);
@@ -738,7 +751,11 @@ public class FastDBQueryUI extends JFrame {
      */
     private void executeSqlButtonClick() {
         try {
-            isResetQuery = true;
+            // init
+            {
+                isResetQuery = true;
+                filterRowsQueryList = null;// rows 過濾清除
+            }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
             Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -1167,7 +1184,15 @@ public class FastDBQueryUI extends JFrame {
                     fastDBQueryUI_CrudDlgUI.isShowing();
                     fastDBQueryUI_CrudDlgUI.dispose();
                 }
-                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), this.getDataSource());
+
+                Pair<List<String>, List<Object[]>> allRows = null;
+                if (filterRowsQueryList != null) {
+                    allRows = filterRowsQueryList;
+                } else {
+                    allRows = queryList;
+                }
+
+                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), this.getDataSource(), allRows);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -1424,5 +1449,98 @@ public class FastDBQueryUI extends JFrame {
             }
         }
         return -1;
+    }
+
+    private void sqlTextAreaMouseClickedAction(MouseEvent e) {
+        if (JMouseEventUtil.buttonRightClick(1, e)) {
+            JPopupMenuUtil.newInstance(sqlTextArea)//
+                    .addJMenuItem("插入系統日", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String column = sqlTextArea.getSelectedText();
+
+                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                            if (e2 == null) {
+                                return;
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+
+                            column = e2.sysdate();
+
+                            sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .addJMenuItem("Date 改為字串", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String column = sqlTextArea.getSelectedText();
+
+                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                            if (e2 == null) {
+                                return;
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+
+                            column = e2.date2Varchar(column);
+
+                            sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .addJMenuItem("Timestamp 改為字串", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String column = sqlTextArea.getSelectedText();
+
+                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                            if (e2 == null) {
+                                return;
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+
+                            column = e2.timestamp2Varchar(column);
+
+                            sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .addJMenuItem("字串改為 Date", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String column = sqlTextArea.getSelectedText();
+
+                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                            if (e2 == null) {
+                                return;
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+
+                            column = e2.varchar2Date(column);
+
+                            sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .addJMenuItem("字串改為 Timestamp", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String column = sqlTextArea.getSelectedText();
+
+                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                            if (e2 == null) {
+                                return;
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+
+                            column = e2.varchar2Timestamp(column);
+
+                            sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .applyEvent(e)//
+                    .show();
+        }
     }
 }
