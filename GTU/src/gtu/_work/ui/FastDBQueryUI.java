@@ -1167,11 +1167,21 @@ public class FastDBQueryUI extends JFrame {
                     fastDBQueryUI_CrudDlgUI.isShowing();
                     fastDBQueryUI_CrudDlgUI.dispose();
                 }
-                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, this.getDataSource());
+                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), this.getDataSource());
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private String getRandom_TableNSchema() {
+        Pattern ptn = Pattern.compile("from\\s+(\\w+\\.\\w+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+        String sql = StringUtils.trimToEmpty(sqlTextArea.getText());
+        Matcher mth = ptn.matcher(sql);
+        if (mth.find()) {
+            return mth.group(1);
+        }
+        return "";
     }
 
     private int transRealRowToQuyerLstIndex(int realRow) {

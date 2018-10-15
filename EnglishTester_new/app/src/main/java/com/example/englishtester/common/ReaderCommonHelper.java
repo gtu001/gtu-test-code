@@ -332,6 +332,8 @@ public class ReaderCommonHelper {
             Pattern ptn = Pattern.compile("\n", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(content);
 
+            pageLst.clear();
+
             int startPos = 0;
             while (mth.find()) {
                 if (mth.end() - startPos > BUFFER_LENGTH) {

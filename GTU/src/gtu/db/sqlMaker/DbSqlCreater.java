@@ -200,7 +200,7 @@ public class DbSqlCreater {
             ResultSetMetaData meta = rs.getMetaData();
             String colLabel = null;
             for (int ii = 1; ii <= meta.getColumnCount(); ii++) {
-                colLabel = meta.getColumnLabel(ii).toLowerCase();
+                colLabel = meta.getColumnLabel(ii).toUpperCase();
                 if (tableName == null) {
                     tableName = meta.getTableName(ii);
                 }

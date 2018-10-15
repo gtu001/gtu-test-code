@@ -43,6 +43,7 @@ import java.util.concurrent.Callable;
 
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
+import gtu._work.etc.EnglishTester_Diectory_Factory;
 
 public class ShowWordListActivity extends ListActivity {
 
@@ -66,7 +67,7 @@ public class ShowWordListActivity extends ListActivity {
     TextToSpeechComponent talkComponent;
     EnglishwordInfoDAO englishwordInfoDAO;
     RecentSearchService recentSearchService;
-    EnglishTester_Diectory diectory = new EnglishTester_Diectory();
+    EnglishTester_Diectory_Factory diectory = new EnglishTester_Diectory_Factory();
     EnglishDescKeeper englishDescKeeper;
 
     @Override
