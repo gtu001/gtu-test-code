@@ -8,10 +8,10 @@
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
 	<!--<property name="jar_repsitory" location="C:\Users\gtu001\.m2\repository" />-->
-	<property name="main_class_full" value="gtu._work.ui.SwingTemplateUI" />
-	<property name="main_class" value="SwingTemplateUI" />
+	<property name="main_class_full" value="gtu._work.ui.ExecuteOpener" />
+	<property name="main_class" value="ExecuteOpener" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="janna.ico" />
+	<property name="icon_name" value="tk_aiengine.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--${main_class}-->
 
@@ -70,11 +70,7 @@
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
-			
-			<!--
-			<packagename mode="pom">com.jgoodies.forms.layout.FormSpecs</packagename>
-			<packagename mode="pom">com/jgoodies/common/base/Preconditions</packagename>
-			-->
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->

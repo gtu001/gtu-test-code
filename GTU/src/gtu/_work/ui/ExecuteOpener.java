@@ -142,7 +142,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             public void run() {
                 ExecuteOpener inst = new ExecuteOpener();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -820,7 +820,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     JListUtil.newInstance(execList).defaultJListKeyPressed(evt);
                 }
             });
-            //DEFAULT PROP SAVE
+            // DEFAULT PROP SAVE
             swingUtil.addAction("saveList.actionPerformed", new Action() {
                 public void action(EventObject evt) throws Exception {
                     String orignName = JOptionPaneUtil.newInstance().iconPlainMessage().showInputDialog("input properties file name", "SAVE");
@@ -847,8 +847,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
             swingUtil.addAction("clearExecList.actionPerformed", new Action() {
                 public void action(EventObject evt) throws Exception {
-                    //                    prop.clear();
-                    //                    reloadExecListProperties(prop);
+                    // prop.clear();
+                    // reloadExecListProperties(prop);
                     execList.setModel(new DefaultListModel());
                 }
             });
@@ -975,8 +975,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 }).addJMenuItem((execList.getSelectedValues().length == 2) ? "diff compare" : "", (execList.getSelectedValues().length == 2), new ActionListener() {
                                     public void actionPerformed(ActionEvent arg0) {
                                         try {
-                                            Runtime.getRuntime().exec(
-                                                    String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", execList.getSelectedValues()[0], execList.getSelectedValues()[1]));
+                                            Runtime.getRuntime()
+                                                    .exec(String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", execList.getSelectedValues()[0], execList.getSelectedValues()[1]));
                                         } catch (IOException ex) {
                                             JCommonUtil.handleException(ex);
                                         }
@@ -985,7 +985,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 .show();//
                     }
 
-                    // left button double click event 
+                    // left button double click event
                     int pos = execList.getLeadSelectionIndex();
                     if (pos == -1) {
                         return;
@@ -1158,6 +1158,18 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 }
             });
             swingUtil.addAction("scanList.mouseClicked", new Action() {
+
+                private void addModelElement(File file) {
+                    DefaultListModel model = (DefaultListModel) execList.getModel();
+                    for (int ii = 0; ii < model.getSize(); ii++) {
+                        String filePath = (String) model.get(ii);
+                        if (StringUtils.equals(filePath, file.getAbsolutePath())) {
+                            return;
+                        }
+                    }
+                    model.addElement(file.getAbsolutePath());
+                }
+
                 public void action(EventObject evt) throws Exception {
                     System.out.println("index = " + scanList.getLeadSelectionIndex());
                     final Object[] vals = scanList.getSelectedValues();
@@ -1167,10 +1179,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     JPopupMenuUtil.newInstance(scanList).applyEvent(evt).addJMenuItem("add to file list : " + vals.length, new ActionListener() {
                         public void actionPerformed(ActionEvent arg0) {
                             File file = null;
-                            DefaultListModel model = (DefaultListModel) execList.getModel();
                             for (Object v : vals) {
                                 file = (File) v;
-                                model.addElement(file.getAbsolutePath());
+                                addModelElement(file);
                             }
                         }
                     }).show();
