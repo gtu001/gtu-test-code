@@ -9,7 +9,9 @@ import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+
 import com.example.englishtester.common.Log;
+
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -35,7 +37,6 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 public class BaiduApplicationActivity extends Activity {
-
     private static final String TAG = BaiduApplicationActivity.class.getSimpleName();
 
     ViewPager myViewPager;

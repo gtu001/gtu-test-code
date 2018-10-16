@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,7 +18,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,7 +51,6 @@ import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.SingleInputDialog;
 import com.example.englishtester.common.TextView4SpannableString;
-import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
@@ -77,7 +74,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -323,6 +319,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         txtView.setLineSpacing(10, 1.4f);
         appleFontApplyer.apply(txtView);
+
+        txtView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                return true;
+            }
+        });
     }
 
     /**
