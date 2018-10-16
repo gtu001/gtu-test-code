@@ -11,6 +11,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -324,18 +325,25 @@ public class DbSqlCreater {
         /**
          * 傳入要建立的新增資料
          */
-        public String createInsertSql(Map<String, String> valmap) {
+        public String createInsertSql(Map<String, String> valmap, Set<String> ignoreColumns) {
             validateData();
             StringBuilder sb = new StringBuilder();
             String value = null;
             sb.append(String.format("INSERT INTO %s  (", getTableAndSchema()));
             for (String key : columns) {
+                key = key.toUpperCase();
+                if (ignoreColumns.contains(key)) {
+                    continue;
+                }
                 sb.append(key + ",");
             }
             sb.deleteCharAt(sb.length() - 1);
             sb.append(") VALUES ( ");
             for (String key : columns) {
                 String key_ = key.toUpperCase();
+                if (ignoreColumns.contains(key)) {
+                    continue;
+                }
                 value = valmap.get(key_);
                 sb.append(this.getRealValue(key, value) + ",");
             }
@@ -580,7 +588,7 @@ public class DbSqlCreater {
                 String genSql = "";
                 switch (updateType) {
                 case 'i':
-                    genSql = info.createInsertSql(map);
+                    genSql = info.createInsertSql(map, Collections.<String>emptySet());
                     break;
                 case 'u':
                     Map<String, String> pkMap = new HashMap<String, String>();

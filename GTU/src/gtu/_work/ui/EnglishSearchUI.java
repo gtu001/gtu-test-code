@@ -61,6 +61,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -99,14 +101,13 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
+import gtu.swing.util.JColorUtil.LinearGradientColor;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import taobe.tec.jcc.JChineseConvertor;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 
 public class EnglishSearchUI extends JFrame {
 
@@ -211,6 +212,7 @@ public class EnglishSearchUI extends JFrame {
     };
 
     private void startCheckFocusOwnerThread() {
+
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
             checkFocusOwnerThread = new Thread(new Runnable() {
 
@@ -223,6 +225,8 @@ public class EnglishSearchUI extends JFrame {
                     return "";
                 }
 
+                LinearGradientColor linearGradientColor = new LinearGradientColor();
+
                 @Override
                 public void run() {
                     while (true) {
@@ -232,8 +236,7 @@ public class EnglishSearchUI extends JFrame {
                             String title = EnglishSearchUI.this.getTitle();
                             title = getTitle(title) + " " + (isFocus ? "Focused" : "NA");
                             EnglishSearchUI.this.setTitle(title);
-
-                            contentPane.setBackground((isFocus ? Color.YELLOW : Color.LIGHT_GRAY));
+                            contentPane.setBackground((isFocus ? linearGradientColor.get() : Color.LIGHT_GRAY));
 
                             sleep(100L);
                         } catch (Exception e) {

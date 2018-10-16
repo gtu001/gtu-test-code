@@ -13,12 +13,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -94,9 +94,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         Object value;
         DataType dtype;
         boolean isPk;
+        boolean isIgnore;
 
         Object[] toArry() {
-            Object[] arry = new Object[] { columnName, value, dtype, isPk };
+            Object[] arry = new Object[] { columnName, value, dtype, isPk, isIgnore };
             System.out.println(Arrays.toString(arry));
             return arry;
         }
@@ -191,7 +192,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     try {
                         dialog.updateJTableToRowMap();
                         dialog.searchTextFilter();
-                        JTableUtil.setColumnWidths_Percent(dialog.rowTable, new float[] { 25, 25, 25, 25 });
+                        dialog.resetColumnWidth();
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
@@ -203,6 +204,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 class Process {
                     TableInfo tableInfo;
                     Map<String, String> singleRecordMap;
+                    Set<String> ignoreColumns;
 
                     Process() throws SQLException {
                         // 套用此筆資料
@@ -222,6 +224,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         Set<String> timestampCol = new HashSet<String>();
 
                         Map<String, String> map = new HashMap<String, String>();
+                        Set<String> ignoreSet = new HashSet<String>();
 
                         for (String columnName : dialog.rowMap.get().keySet()) {
                             columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
@@ -229,6 +232,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             String value = df.value != null ? String.valueOf(df.value) : null;
                             DataType dtype = df.dtype;
                             boolean isPk = df.isPk;
+                            if (df.isIgnore) {
+                                ignoreSet.add(columnName);
+                            }
                             map.put(columnName, value);
                             if (isPk) {
                                 pkColumns.add(columnName);
@@ -255,6 +261,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         // ------------------------------------------------
 
                         singleRecordMap = map;
+                        ignoreColumns = ignoreSet;
                     }
 
                     List<Map<String, String>> getAllRecoreds() {
@@ -305,7 +312,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
                             String sql = "";
                             if (btn == dialog.rdbtnInsert) {
-                                sql = process.tableInfo.createInsertSql(process.singleRecordMap);
+                                sql = process.tableInfo.createInsertSql(process.singleRecordMap, process.ignoreColumns);
                             } else if (btn == dialog.rdbtnDelete) {
                                 sql = process.tableInfo.createDeleteSql(process.singleRecordMap);
                             } else if (btn == dialog.rdbtnUpdate) {
@@ -346,7 +353,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 if (btn == dialog.rdbtnInsert) {
                                     createWriter(outputFile);
                                     for (Map<String, String> map : qlst) {
-                                        String sql = process.tableInfo.createInsertSql(map);
+                                        String sql = process.tableInfo.createInsertSql(map, process.ignoreColumns);
                                         writer.write(sql + ";");
                                         writer.newLine();
                                     }
@@ -411,10 +418,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         JTableUtil.defaultSetting(rowTable);
 
-        DefaultTableModel model = JTableUtil.createModel(false, "column", "value", "data type", "where condition");
+        DefaultTableModel model = JTableUtil.createModel(false, "column", "value", "data type", "where condition", "insert ignore");
         rowTable.setModel(model);
 
-        JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 25 });
+        resetColumnWidth();
 
         // column = "Data Type"
         TableColumn sportColumn = rowTable.getColumnModel().getColumn(2);
@@ -526,16 +533,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         for (int ii = 0; ii < tableUtil.getModel().getRowCount(); ii++) {
             String columnName = (String) tableUtil.getRealValueAt(ii, 0);
+            columnName = columnName.toUpperCase();
             if (columnName == null || StringUtils.isBlank(columnName)) {
                 columnName = "";
             }
+
             String value = String.valueOf(tableUtil.getRealValueAt(ii, 1));
-            boolean isPk = false;
-            try {
-                isPk = (Boolean) tableUtil.getRealValueAt(ii, 3);
-            } catch (Exception ex) {
-                System.out.println("isPk---ERR--" + ex.getMessage());
-            }
 
             DataType dtype = DataType.varchar;
             try {
@@ -549,6 +552,20 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 System.out.println("dtype---ERR--" + ex.getMessage());
             }
 
+            boolean isPk = false;
+            try {
+                isPk = (Boolean) tableUtil.getRealValueAt(ii, 3);
+            } catch (Exception ex) {
+                System.out.println("isPk---ERR--" + ex.getMessage());
+            }
+
+            boolean isIgnore = false;
+            try {
+                isIgnore = (Boolean) tableUtil.getRealValueAt(ii, 4);
+            } catch (Exception ex) {
+                System.out.println("isIgnore---ERR--" + ex.getMessage());
+            }
+
             ColumnConf df = new ColumnConf();
             if (this.rowMap.get().containsKey(columnName)) {
                 df = this.rowMap.get().get(columnName);
@@ -556,6 +573,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             df.columnName = columnName;
             df.value = value;
             df.isPk = isPk;
+            df.isIgnore = isIgnore;
             df.dtype = dtype;
             System.out.println(">>>>>>>>>>>>>>>>>>>" + ReflectionToStringBuilder.toString(df, ToStringStyle.SHORT_PREFIX_STYLE));
             this.rowMap.get().put(columnName, df);
@@ -957,5 +975,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
+    }
+    
+    private void resetColumnWidth(){
+        JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 20, 5 });
     }
 }
