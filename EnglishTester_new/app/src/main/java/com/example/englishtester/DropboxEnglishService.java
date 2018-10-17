@@ -2,7 +2,9 @@ package com.example.englishtester;
 
 import android.content.Context;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.Toast;
 
 import com.dropbox.core.DbxException;
@@ -113,7 +115,11 @@ public class DropboxEnglishService {
 
     private int addToProperties(List<String> wordList) throws FileNotFoundException, IOException {
         Properties prop = new Properties();
-        prop.load(FileConstantAccessUtil.getInputStream(context, Constant.SEARCHWORD_FILE, true));
+        try {
+            prop.load(FileConstantAccessUtil.getInputStream(context, Constant.SEARCHWORD_FILE, true));
+        } catch (Exception ex) {
+            Log.e(TAG, "[addToProperties]本地檔案不存在!", ex);
+        }
 
         int count = 0;
         for (String word : wordList) {

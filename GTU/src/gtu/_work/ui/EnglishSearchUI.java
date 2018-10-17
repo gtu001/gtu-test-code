@@ -225,7 +225,7 @@ public class EnglishSearchUI extends JFrame {
                     return "";
                 }
 
-                LinearGradientColor linearGradientColor = new LinearGradientColor();
+                LinearGradientColor linearGradientColor = new LinearGradientColor(100);
 
                 @Override
                 public void run() {
@@ -236,9 +236,10 @@ public class EnglishSearchUI extends JFrame {
                             String title = EnglishSearchUI.this.getTitle();
                             title = getTitle(title) + " " + (isFocus ? "Focused" : "NA");
                             EnglishSearchUI.this.setTitle(title);
-                            contentPane.setBackground((isFocus ? linearGradientColor.get() : Color.LIGHT_GRAY));
+                            
+                            contentPane.setBackground(linearGradientColor.get());
 
-                            sleep(100L);
+                            sleep(50L);
                         } catch (Exception e) {
                             JCommonUtil.handleException(e);
                         }
