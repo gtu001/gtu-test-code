@@ -94,6 +94,7 @@ import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.clipboard.ClipboardListener;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtil;
@@ -142,10 +143,12 @@ public class EnglishSearchUI extends JFrame {
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
-        if (!PropertiesUtil.isClassInJar(EnglishSearchUI.class)) {
-            propertyBean = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
-            propertyBean = new PropertiesUtilBean(new File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_config.properties"));
+        if (OsInfoUtil.isWindows()) {
+            propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_win10");
+        } else {
+            propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_linux");
         }
+        System.out.println("configFile : " + propertyBean.getPropFile());
     }
 
     private static final String NEW_WORD_PATH = "new_word_path";
