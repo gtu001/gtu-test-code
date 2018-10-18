@@ -9,11 +9,14 @@ from gtu.datetime import dateUtil
 
 
 def currentDate():
+    return datetime.datetime.now()
+
+def currentDate_str():
     '''現在時間'''
     return time.strftime('%Y%m%d')
 
 
-def currentDatetime():
+def currentDatetime_str():
     '''現在時間'''
     return time.strftime("%Y%m%d%H%M%S")
 
@@ -40,6 +43,10 @@ def dayDiff(yyyyMMdd):
     '''差異天數'''
     return (datetime.datetime.now() - \
     datetime.datetime.strptime(yyyyMMdd, "%Y%m%d")).days
+
+
+def dayAdd(dateObj, days):
+    return dateObj + datetime.timedelta(days = days)
 
 
 def getForamtFromJava(formatStr):
@@ -94,7 +101,7 @@ def formatDatetimeByJavaFormat(datetimeObj, javaFormat):
     return datetimeObj.strftime(format)
 
 if __name__ == '__main__' :
-    dateobj = getDatetimeByJavaFormat("2018/08/30 15:18:30.555555", "yyyy/MM/dd HH:mm:ss.SSSSSS")
-    print("dateobj", dateobj)
+    dateObj = currentDate()
+    print(dayAdd(dateObj, 3))
     print("done...")
 
