@@ -140,6 +140,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
 
         paddingAdjuster.applyPadding(txtReaderView);
+        ReaderCommonHelper.applyCustomSelectionAction(txtReaderView, this);
 
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。

@@ -1,28 +1,26 @@
 package com.example.englishtester.common;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Handler;
+import android.support.v4.content.ContextCompat;
+import android.view.ActionMode;
 import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
-import com.example.englishtester.TxtReaderActivity;
-import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -381,5 +378,51 @@ public class ReaderCommonHelper {
             });
             dlg.show();
         }
+    }
+
+    /**
+     * 這整塊沒啥用,但留下紀錄用
+     */
+    public static void applyCustomSelectionAction(final TextView txtView, final Context context) {
+        txtView.setTextIsSelectable(true);
+
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            txtView.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.selected_state_selector) );
+        } else {
+            txtView.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_state_selector));
+        }
+
+        txtView.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater menuInflater = mode.getMenuInflater();
+                menuInflater.inflate(R.menu.txtview_translation_menu, menu);
+                return true;//返回false则不会显示弹窗
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                String text = StringUtils.substring(txtView.getText().toString(), txtView.getSelectionStart(), txtView.getSelectionEnd());
+                //根据item的ID处理点击事件
+                switch (item.getItemId()) {
+                    case R.id.Informal22:
+                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+                        mode.finish();//收起操作菜单
+                        break;
+                }
+                return false;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+            }
+        });
     }
 }

@@ -17,8 +17,10 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -61,6 +63,7 @@ import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -319,14 +322,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         txtView.setLineSpacing(10, 1.4f);
         appleFontApplyer.apply(txtView);
-
-        txtView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-
-                return true;
-            }
-        });
+        ReaderCommonHelper.applyCustomSelectionAction(txtView, this);
     }
 
     /**
