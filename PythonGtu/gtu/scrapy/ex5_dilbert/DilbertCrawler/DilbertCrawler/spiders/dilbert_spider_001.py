@@ -23,9 +23,36 @@ def getSysdate():
     
 
 
+class InitFolder():
+    def __init__(self):
+        self.dateLst = list()
+        self.fileDir = fileUtil.getDesktopDir() + os.sep + "dilbert_pics" + os.sep
+        fileUtil.mkdirs(self.fileDir)
+        self.checkStartDate()
+    
+    def checkStartDate(self):
+        from os import walk
+        for (dirpath, dirnames, filenames) in walk(self.fileDir):
+            for (i,name) in enumerate(filenames) :
+                chkDate = self.findDate(name)
+                if chkDate :
+                    self.dateLst.append(chkDate)
+                
+    def findDate(self, link):
+        link = link.strip()
+        pattern = re.compile(r"(?P<date_str>\d{4}\-\d{2}\-\d{2})", re.I)
+        mth = pattern.search(link)
+        if mth:
+            return mth.group("date_str")
+        return None
+
+
+
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
 class DilbertCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
     name = 'dilbert'
+    
+    folderConfig = InitFolder()
 
     allowed_domains = ['dilbert.com'] 
     start_urls = ['http://dilbert.com/strip/' + getSysdate() ]
@@ -61,8 +88,11 @@ class DilbertCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpide
         return rtnDateStr;
     
     def getNextUrl(self, date_str):
-        dateStr = self.getBeforeDate(date_str)
-        return DilbertCrawlerSpider.BASE_URL + dateStr
+        while True :
+           date_str = self.getBeforeDate(date_str)
+           if not DilbertCrawlerSpider.folderConfig.dateLst.__contains__(date_str) :
+                break
+        return DilbertCrawlerSpider.BASE_URL + date_str
             
             
     def getPicInfo(self, response):
@@ -100,13 +130,10 @@ class DilbertCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpide
         raise Exception("無法取得date str")
             
     def download(self, scraped_info):
-        fileDir = fileUtil.getDesktopDir() + os.sep + "dilbert_pics" + os.sep
-        fileUtil.mkdirs(fileDir)
-        
         imgName = scraped_info['date_str'] + "_" + scraped_info['alt'] + ".jpg"
         
         url = scraped_info['src']
-        filepath = fileDir + os.sep + imgName;
+        filepath = DilbertCrawlerSpider.folderConfig.fileDir + os.sep + imgName;
         
         if os.path.exists(filepath) and fileUtil.canRead(filepath) :
             print("檔案已存在:", filepath)
