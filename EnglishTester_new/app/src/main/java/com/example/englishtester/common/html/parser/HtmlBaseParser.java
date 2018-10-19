@@ -610,7 +610,7 @@ public abstract class HtmlBaseParser {
     }
 
     protected String _step3_imageProc_4Epub(String content, boolean isPure, String checkPic) {
-        Pattern titleStylePtn = Pattern.compile("\\<image(?:.|\n)*?xlink\\:href\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\/>", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern titleStylePtn = Pattern.compile("\\<image(?:.|\n)*?xlink\\:href\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\/?\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
