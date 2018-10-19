@@ -92,9 +92,9 @@ public class ReaderCommonHelper {
 
     public static class AppleFontApplyer {
         private static enum TypeFaceEnum {
-            T1("consolas.ttf", "consolas"),//
+            T1("consolas.ttf", "Consolas"),//
             T2("Didot-HTF-M24-Medium.otf", "Didot"),//
-            T3("helvetica_45W.ttf", "helvetica"),//
+            T3("helvetica_45W.ttf", "Helvetica"),//
             T4("Myriad Pro Regular.ttf", "Myriad Pro"),//
             T5("PT_FuturaFuturis_Light_Cyrillic.ttf", "Futura"),//
             ;
@@ -150,7 +150,11 @@ public class ReaderCommonHelper {
         }
 
         public void apply(TextView view) {
-            view.setTypeface(typefaceMap.get(currentFace));
+            try {
+                view.setTypeface(typefaceMap.get(currentFace));
+            } catch (Exception ex) {
+                Toast.makeText(context, "使用字型失敗 " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
