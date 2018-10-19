@@ -1,10 +1,10 @@
 package com.example.englishtester.common;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ListAdapter;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,14 +91,66 @@ public class ReaderCommonHelper {
     }
 
     public static class AppleFontApplyer {
-        Typeface myriadProRegular;
+        private static enum TypeFaceEnum {
+            T1("consolas.ttf", "consolas"),//
+            T2("Didot-HTF-M24-Medium.otf", "Didot"),//
+            T3("helvetica_45W.ttf", "helvetica"),//
+            T4("Myriad Pro Regular.ttf", "Myriad Pro"),//
+            T5("PT_FuturaFuturis_Light_Cyrillic.ttf", "Futura"),//
+            ;
+
+            final String fileName;
+            final String label;
+
+            TypeFaceEnum(String fileName, String label) {
+                this.fileName = fileName;
+                this.label = label;
+            }
+
+            @Override
+            public String toString() {
+                return label;
+            }
+        }
+
+        EnumMap<TypeFaceEnum, Typeface> typefaceMap = new EnumMap<>(TypeFaceEnum.class);
+        TypeFaceEnum currentFace = TypeFaceEnum.T4;
+        Context context;
+        String[] items;
 
         public AppleFontApplyer(Context context) {
-            myriadProRegular = Typeface.createFromAsset(context.getAssets(), "fonts/Myriad Pro Regular.ttf");
+            this.context = context;
+            List<String> itemLst = new ArrayList<String>();
+            for (TypeFaceEnum e : TypeFaceEnum.values()) {
+                Typeface face = Typeface.createFromAsset(context.getAssets(), "fonts/" + e.fileName);
+                this.typefaceMap.put(e, face);
+                itemLst.add(e.toString());
+            }
+            this.items = itemLst.toArray(new String[0]);
+        }
+
+        public void choiceTypeface(final TextView... views) {
+            new AlertDialog.Builder(this.context)//
+                    .setTitle("選擇字型")//
+//                    .setMessage("請選擇字型")//
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            for (TypeFaceEnum e : TypeFaceEnum.values()) {
+                                if (e.ordinal() == which) {
+                                    currentFace = e;
+                                    break;
+                                }
+                            }
+                            for (TextView v : views) {
+                                apply(v);
+                            }
+                        }
+                    }).show();
         }
 
         public void apply(TextView view) {
-            view.setTypeface(myriadProRegular);
+            view.setTypeface(typefaceMap.get(currentFace));
         }
     }
 
@@ -387,8 +441,8 @@ public class ReaderCommonHelper {
         txtView.setTextIsSelectable(true);
 
         final int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            txtView.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.selected_state_selector) );
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            txtView.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.selected_state_selector));
         } else {
             txtView.setBackground(ContextCompat.getDrawable(context, R.drawable.selected_state_selector));
         }

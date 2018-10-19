@@ -999,6 +999,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.openFontSizeDialog();
             }
         }, //
+        CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                activity.appleFontApplyer.choiceTypeface(activity.getTxtReaderView(), activity.getTranslateView());
+            }
+        }, //
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(epub檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
@@ -1038,20 +1043,20 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.freeGoogleTranslateHandler.showDlg();
             }
         }, //
-        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
-            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
-                Log.toast(activity, value);
-            }
-        },//
-        DEBUG_ONLY_003("________DebugX", MENU_FIRST++, REQUEST_CODE++, null, true) {
-            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                int position = activity.viewPager.getCurrentItem();
-                EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(position);
-                String debugContent = holder.getPageContent4Debug();
-                Log.line(TAG, debugContent);
-            }
-        },//
+//        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
+//            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+//                String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
+//                Log.toast(activity, value);
+//            }
+//        },//
+//        DEBUG_ONLY_003("________DebugX", MENU_FIRST++, REQUEST_CODE++, null, true) {
+//            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+//                int position = activity.viewPager.getCurrentItem();
+//                EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(position);
+//                String debugContent = holder.getPageContent4Debug();
+//                Log.line(TAG, debugContent);
+//            }
+//        },//
         ;
 
         final String title;

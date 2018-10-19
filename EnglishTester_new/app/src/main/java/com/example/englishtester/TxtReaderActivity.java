@@ -1232,6 +1232,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.openFontSizeDialog();
             }
         }, //
+        CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.appleFontApplyer.choiceTypeface(activity.txtView, activity.translateView);
+            }
+        }, //
         SAVE_CONTENT_TO_FILE("儲存結果", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 activity.saveContentToFile();
@@ -1278,16 +1283,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.freeGoogleTranslateHandler.showDlg();
             }
         }, //
-        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {
-            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.debug____dumpFileNameLog();
-            }
-        }, //
-        LINE_ORIGN_FILE("debug 顯示原始檔", MENU_FIRST++, REQUEST_CODE++, null, true) {
-            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                Log.line(TAG, activity.txtView.getText().toString());
-            }
-        }, //
+//        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                activity.debug____dumpFileNameLog();
+//            }
+//        }, //
+//        LINE_ORIGN_FILE("debug 顯示原始檔", MENU_FIRST++, REQUEST_CODE++, null, true) {
+//            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                Log.line(TAG, activity.txtView.getText().toString());
+//            }
+//        }, //
         ;
 
         final String title;
