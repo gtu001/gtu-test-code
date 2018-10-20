@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -102,8 +101,8 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
-import gtu.swing.util.JColorUtil.LinearGradientColor;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -144,8 +143,10 @@ public class EnglishSearchUI extends JFrame {
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
         if (OsInfoUtil.isWindows()) {
+            System.out.println("[win10]");
             propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_win10");
         } else {
+            System.out.println("[linux]");
             propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_linux");
         }
         System.out.println("configFile : " + propertyBean.getPropFile());
@@ -163,6 +164,7 @@ public class EnglishSearchUI extends JFrame {
     private Properties offlineProp;
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
     private DialogTitleUpdaterObervable dialogObervable = new DialogTitleUpdaterObervable();
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Launch the application.
@@ -215,10 +217,9 @@ public class EnglishSearchUI extends JFrame {
     };
 
     private void startCheckFocusOwnerThread() {
-
-        if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
-            checkFocusOwnerThread = new Thread(new Runnable() {
-
+        if (jFrameRGBColorPanel == null) {
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(contentPane);
+            jFrameRGBColorPanel.setAfterProcessEvent(new ActionListener() {
                 private String getTitle(String title) {
                     Pattern ptn = Pattern.compile("(生字數\\s:\\s\\d+)");
                     Matcher mth = ptn.matcher(title);
@@ -228,29 +229,16 @@ public class EnglishSearchUI extends JFrame {
                     return "";
                 }
 
-                LinearGradientColor linearGradientColor = new LinearGradientColor(100);
-
                 @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            boolean isFocus = searchEnglishIdTextController.isFocusOwner();
-
-                            String title = EnglishSearchUI.this.getTitle();
-                            title = getTitle(title) + " " + (isFocus ? "Focused" : "NA");
-                            EnglishSearchUI.this.setTitle(title);
-                            
-                            contentPane.setBackground(linearGradientColor.get());
-
-                            sleep(50L);
-                        } catch (Exception e) {
-                            JCommonUtil.handleException(e);
-                        }
-                    }
+                public void actionPerformed(ActionEvent e) {
+                    boolean isFocus = searchEnglishIdTextController.isFocusOwner();
+                    String title = EnglishSearchUI.this.getTitle();
+                    title = getTitle(title) + " " + (isFocus ? "Focused" : "NA");
+                    EnglishSearchUI.this.setTitle(title);
                 }
             });
-            checkFocusOwnerThread.setDaemon(true);
-            checkFocusOwnerThread.start();
+
+            jFrameRGBColorPanel.start();
         }
     }
 

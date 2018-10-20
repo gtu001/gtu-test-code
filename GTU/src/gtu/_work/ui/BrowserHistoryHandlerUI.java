@@ -116,6 +116,7 @@ import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -164,6 +165,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JButton dropboxMergeBtn;
     private JTextArea batLogArea;
     private JTextField batWaittingTimeText;
+
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Launch the application.
@@ -522,6 +525,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             bringToTop();
             columnColorHandler = new ColumnColorHandler(urlTable, bookmarkConfig);
             initAddSaveShortcutKeyEvent();
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
+            jFrameRGBColorPanel.start();
 
             // final do
             initLoading();

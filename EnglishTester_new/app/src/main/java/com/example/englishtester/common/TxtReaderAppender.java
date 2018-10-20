@@ -134,6 +134,9 @@ public class TxtReaderAppender {
             }
             //debug ↑↑↑↑↑↑↑↑↑↑
 
+            //補上最後一個查詢為bookmark
+            int finalSearchIndex = getFinalSearch2Bookmark(qList);
+
             int index = 0;
             while (mth.find()) {
                 final int start = mth.start();
@@ -197,9 +200,6 @@ public class TxtReaderAppender {
                 //設定內文
                 clickableSpan.setWord(txtNow);
 
-                //補上最後一個查詢為bookmark
-                int finalSearchIndex = getFinalSearch2Bookmark(qList);
-
                 // 設定單字為以查詢狀態
                 for (RecentTxtMarkDAO.RecentTxtMark bo : qList) {
                     if (bo.getMarkIndex() == clickableSpan.id && StringUtils.equals(bo.getMarkEnglish(), txtNow)) {
@@ -237,6 +237,7 @@ public class TxtReaderAppender {
                     maxPos = Math.max(maxPos, finalBo.getMarkIndex());
                 }
             }
+            Log.line(TAG, "maxPos " + maxPos);
             return maxPos;
         }
 

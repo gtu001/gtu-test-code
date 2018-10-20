@@ -213,6 +213,9 @@ public class ReaderCommonHelper {
             ScrollYService scrollYService = new ScrollYService(currentTitle, context);
             final AtomicReference<Integer> posY = new AtomicReference<>();
             posY.set(scrollYService.getScrollYVO_value());
+
+            Log.line(TAG, "restoreY : " + currentTitle + " , " + posY.get());
+
             if (posY.get() == -1) {
                 posY.set(0);
             }
