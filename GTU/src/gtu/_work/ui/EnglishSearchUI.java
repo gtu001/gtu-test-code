@@ -219,6 +219,8 @@ public class EnglishSearchUI extends JFrame {
     private void startCheckFocusOwnerThread() {
         if (jFrameRGBColorPanel == null) {
             jFrameRGBColorPanel = new JFrameRGBColorPanel(contentPane);
+            jFrameRGBColorPanel.setIgnoreLst(this);
+            jFrameRGBColorPanel.addIgnoreLst(searchEnglishIdText);
             jFrameRGBColorPanel.setAfterProcessEvent(new ActionListener() {
                 private String getTitle(String title) {
                     Pattern ptn = Pattern.compile("(生字數\\s:\\s\\d+)");

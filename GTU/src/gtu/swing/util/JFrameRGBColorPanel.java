@@ -5,6 +5,17 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JList;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import gtu.swing.util.JColorUtil.LinearGradientColor;
 
@@ -13,6 +24,7 @@ public class JFrameRGBColorPanel {
     private boolean isStop = false;
     private final Container container;
     private ActionListener afterProcessEvent;
+    private List<Component> ignoreLst;
 
     public JFrameRGBColorPanel(final Container container) {
         this.container = container;
@@ -43,6 +55,9 @@ public class JFrameRGBColorPanel {
         container.setBackground(background);
         container.setForeground(foreground);
         for (Component com : container.getComponents()) {
+            if (isIgnore(com)) {
+                continue;
+            }
             com.setBackground(background);
             com.setForeground(foreground);
             if (com instanceof Container) {
@@ -84,6 +99,16 @@ public class JFrameRGBColorPanel {
         }
     }
 
+    private boolean isIgnore(Component component) {
+        if (ignoreLst == null || ignoreLst.isEmpty()) {
+            return false;
+        }
+        if (ignoreLst.contains(component)) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isStop() {
         return isStop;
     }
@@ -94,5 +119,42 @@ public class JFrameRGBColorPanel {
 
     public void setAfterProcessEvent(ActionListener afterProcessEvent) {
         this.afterProcessEvent = afterProcessEvent;
+    }
+
+    public void setIgnoreLst(Container container) {
+        List<Component> lst = new ArrayList<Component>();
+        for (Field f : container.getClass().getDeclaredFields()) {
+            try {
+                Object com = FieldUtils.readDeclaredField(container, f.getName(), true);
+                if (com != null && //
+                        com instanceof Component && //
+                        ArrayUtils.contains(new Class[] { //
+                                JTextField.class, //
+                                JTextArea.class, //
+                                JList.class, //
+                                JTable.class,//
+                        }, com.getClass())//
+                ) {
+                    lst.add((Component) com);
+                    System.out.println("add Ignore : " + f.getName());
+                }
+            } catch (Exception e) {
+            }
+        }
+        this.ignoreLst = lst;
+    }
+
+    public void setIgnoreLst(List<Component> ignoreLst) {
+        this.ignoreLst = ignoreLst;
+    }
+
+    public void addIgnoreLst(Component component) {
+        if (ignoreLst == null) {
+            ignoreLst = new ArrayList<Component>();
+        }
+        if (ignoreLst.contains(component)) {
+            return;
+        }
+        ignoreLst.add(component);
     }
 }

@@ -34,6 +34,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -526,6 +527,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             columnColorHandler = new ColumnColorHandler(urlTable, bookmarkConfig);
             initAddSaveShortcutKeyEvent();
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
+            jFrameRGBColorPanel.setIgnoreLst(this);
             jFrameRGBColorPanel.start();
 
             // final do
@@ -543,7 +545,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
                     UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
-                    ;
                     if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                         DesktopUtil.browse(url);
                     } else {
