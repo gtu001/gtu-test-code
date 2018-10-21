@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -132,7 +133,8 @@ public class JFrameRGBColorPanel {
                                 JTextField.class, //
                                 JTextArea.class, //
                                 JList.class, //
-                                JTable.class,//
+                                JTable.class, //
+                                JComboBox.class,//
                         }, com.getClass())//
                 ) {
                     lst.add((Component) com);
