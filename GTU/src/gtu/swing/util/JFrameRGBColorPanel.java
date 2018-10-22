@@ -14,6 +14,7 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -26,23 +27,20 @@ public class JFrameRGBColorPanel {
     private final Container container;
     private ActionListener afterProcessEvent;
     private List<Component> ignoreLst;
+    private LinearGradientColor linearGradientColor = new LinearGradientColor(100);
 
     public JFrameRGBColorPanel(final Container container) {
         this.container = container;
     }
 
-    public void reset() {
-        stop();
+    public void stop() {
+        isStop = true;
         try {
-            Thread.sleep(1000L);
+            Thread.sleep(200L);
         } catch (Exception e) {
         }
         checkFocusOwnerThread = null;
         isStop = false;
-    }
-
-    public void stop() {
-        isStop = true;
     }
 
     private Color getForeground(Color color) {
@@ -77,8 +75,6 @@ public class JFrameRGBColorPanel {
     public void start() {
         if (checkFocusOwnerThread == null || checkFocusOwnerThread.getState() == Thread.State.TERMINATED) {
             checkFocusOwnerThread = new Thread(new Runnable() {
-                LinearGradientColor linearGradientColor = new LinearGradientColor(100);
-
                 @Override
                 public void run() {
                     while (isStop == false) {
@@ -158,5 +154,21 @@ public class JFrameRGBColorPanel {
             return;
         }
         ignoreLst.add(component);
+    }
+
+    public JToggleButton getToggleButton() {
+        final JToggleButton tgBtn = new JToggleButton("變色");
+        tgBtn.setSelected(true);
+        tgBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tgBtn.setText(tgBtn.isSelected() ? "變色啟動" : "變色暫停");
+                if (tgBtn.isSelected()) {
+                    start();
+                } else {
+                    stop();
+                }
+            }
+        });
+        return tgBtn;
     }
 }

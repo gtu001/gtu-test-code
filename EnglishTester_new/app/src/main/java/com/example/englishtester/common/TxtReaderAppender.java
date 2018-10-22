@@ -237,7 +237,7 @@ public class TxtReaderAppender {
                     maxPos = Math.max(maxPos, finalBo.getMarkIndex());
                 }
             }
-            Log.line(TAG, "maxPos " + maxPos);
+            Log.v(TAG, "maxPos " + maxPos);
             return maxPos;
         }
 

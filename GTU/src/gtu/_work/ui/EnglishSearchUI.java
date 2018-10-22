@@ -108,6 +108,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import taobe.tec.jcc.JChineseConvertor;
+import javax.swing.JToggleButton;
 
 public class EnglishSearchUI extends JFrame {
 
@@ -241,6 +242,7 @@ public class EnglishSearchUI extends JFrame {
             });
 
             jFrameRGBColorPanel.start();
+            panel_10.add(jFrameRGBColorPanel.getToggleButton());
         }
     }
 
@@ -454,6 +456,8 @@ public class EnglishSearchUI extends JFrame {
     private JTextArea googleTranslateArea;
     private JButton googleTranslateBtn;
     private JButton googleTranslateClearBtn;
+    private JPanel panel_10;
+    private JToggleButton tglbtnNewToggleButton;
 
     /**
      * Create the frame.
@@ -589,13 +593,44 @@ public class EnglishSearchUI extends JFrame {
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("設定", null, panel, null);
-        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+        panel.setLayout(new FormLayout(new ColumnSpec[] {
+                FormFactory.RELATED_GAP_COLSPEC,
+                FormFactory.DEFAULT_COLSPEC,
+                FormFactory.RELATED_GAP_COLSPEC,
+                ColumnSpec.decode("default:grow"),},
+            new RowSpec[] {
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,
+                FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC,}));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -634,7 +669,6 @@ public class EnglishSearchUI extends JFrame {
         panel.add(label, "2, 4");
 
         panel_3 = new JPanel();
-        panel_3.setPreferredSize(new Dimension(0, 100));
         panel.add(panel_3, "4, 4, fill, fill");
 
         offlineConfigText = new JTextField();
@@ -802,6 +836,9 @@ public class EnglishSearchUI extends JFrame {
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
         lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
+        
+        panel_10 = new JPanel();
+        panel.add(panel_10, "4, 32, fill, fill");
 
         panel_5 = new JPanel();
         tabbedPane.addTab("Google翻譯", null, panel_5, null);

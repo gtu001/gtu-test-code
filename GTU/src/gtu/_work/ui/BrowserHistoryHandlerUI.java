@@ -124,6 +124,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
+import javax.swing.JToggleButton;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -168,6 +169,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField batWaittingTimeText;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private JToggleButton toggleChangeColorBtn;
 
     /**
      * Launch the application.
@@ -529,6 +531,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
             jFrameRGBColorPanel.setIgnoreLst(this);
             jFrameRGBColorPanel.start();
+            
+            panel_3.add(jFrameRGBColorPanel.getToggleButton(), "8, 4");
 
             // final do
             initLoading();
