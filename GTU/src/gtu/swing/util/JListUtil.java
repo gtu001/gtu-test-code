@@ -116,6 +116,10 @@ public class JListUtil {
         return new DefaultListModel();
     }
 
+    public static boolean removeElement(JList jlist, Object value) {
+        return ((DefaultListModel) jlist.getModel()).removeElement(value);
+    }
+
     public DefaultListModel getModel() {
         if (!(jList1.getModel() instanceof DefaultListModel)) {
             DefaultListModel model = new DefaultListModel();

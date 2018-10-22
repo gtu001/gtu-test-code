@@ -3,6 +3,7 @@ package gtu.properties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -20,39 +21,47 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 public class PropertiesGroupUtils {
-    
+
     private static final Pattern PROP_KEY_PATTERN = Pattern.compile("(\\w+)\\_\\d+");
     private static final int MAX_PROP_COUNT = 100;
-    
+
     Properties configProp = new Properties();
     File configFile;
     int currentIndex = 0;
-    
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         File file = new File("C:/workspace/gtu-test-code/GTU/src/gtu/swing/util/PropertiesGroupTest.properties");
         PropertiesGroupUtils test = new PropertiesGroupUtils(file);
         System.out.println(test.loadConfig());
         test.next();
         System.out.println(test.loadConfig());
-        
-        Map<String,String> map = new HashMap<String,String>();
+
+        Map<String, String> map = new HashMap<String, String>();
         map.put("user", "AAA");
         map.put("pwd", "DDD");
         map.put("OK", "DDD");
-        
+
         test.saveConfig(map);
     }
 
     public PropertiesGroupUtils(File configFile) {
         this.configFile = configFile;
+        FileInputStream fis = null;
         try {
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
-            configProp.load(new FileInputStream(configFile));
+            fis = new FileInputStream(configFile);
+            configProp.load(fis);
             System.out.println("paramConfig : " + configProp);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                fis.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -92,10 +101,10 @@ public class PropertiesGroupUtils {
 
     private Set<String> loadParametersColumnNames() {
         Set<String> columnNames = new LinkedHashSet<String>();
-        for(Enumeration enu = configProp.keys();enu.hasMoreElements();){
-            String key = (String)enu.nextElement();
+        for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
             Matcher mth = PROP_KEY_PATTERN.matcher(key);
-            if(mth.find()){
+            if (mth.find()) {
                 String column = mth.group(1);
                 columnNames.add(column);
             }
@@ -143,16 +152,16 @@ public class PropertiesGroupUtils {
             throw new RuntimeException("存parameters設定黨失敗", e);
         }
     }
-    
-    private void validateColumnNameSame(Map<String, String> currentConfig){
+
+    private void validateColumnNameSame(Map<String, String> currentConfig) {
         List<String> currentColumnArry = new ArrayList<String>(loadParametersColumnNames());
-        if(currentColumnArry.isEmpty()){
-            return;//若為空避掉驗證
+        if (currentColumnArry.isEmpty()) {
+            return;// 若為空避掉驗證
         }
         List<String> newColumnArry = new ArrayList<String>(currentConfig.keySet());
         Collections.sort(currentColumnArry);
         Collections.sort(newColumnArry);
-        if(currentColumnArry.size() != newColumnArry.size() || !currentColumnArry.equals(newColumnArry)){
+        if (currentColumnArry.size() != newColumnArry.size() || !currentColumnArry.equals(newColumnArry)) {
             throw new RuntimeException("參數不同 \n 目前 : " + currentColumnArry + "\n新參數 : " + newColumnArry);
         }
     }
@@ -161,9 +170,9 @@ public class PropertiesGroupUtils {
      * 儲存設定
      */
     public void saveConfig(Map<String, String> currentConfig) {
-        //比對新舊是否相同
+        // 比對新舊是否相同
         validateColumnNameSame(currentConfig);
-        
+
         // 判斷要儲存的index
         int saveIndex = findParameterConfigIndex(currentConfig);
         System.out.println("找到的index : " + saveIndex);
@@ -181,7 +190,8 @@ public class PropertiesGroupUtils {
 
     /**
      * 讀取設定黨參數
-     * @return 
+     * 
+     * @return
      */
     public Map<String, String> loadConfig() {
         // 讀欄位
@@ -217,5 +227,9 @@ public class PropertiesGroupUtils {
         if (currentIndex >= getLastNonUseIndex()) {
             currentIndex = 0;
         }
+    }
+
+    public void clear() {
+        configProp.clear();
     }
 }

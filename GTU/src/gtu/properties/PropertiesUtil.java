@@ -3,11 +3,13 @@ package gtu.properties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Properties;
 
 import gtu.log.Log;
 import gtu.swing.util.JCommonUtil;
@@ -127,6 +129,31 @@ public class PropertiesUtil {
             try {
                 reader.close();
             } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * 不會咬住檔案的開檔方式
+     * 
+     * @param inputStream
+     * @return
+     */
+    public static Properties loadProperties(InputStream inputStream, Properties _prop) {
+        Properties prop = new Properties();
+        try {
+            if (_prop != null) {
+                prop = _prop;
+            }
+            prop.load(inputStream);
+            return prop;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

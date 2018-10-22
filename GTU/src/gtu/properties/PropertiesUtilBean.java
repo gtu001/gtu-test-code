@@ -5,8 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -43,6 +43,7 @@ public class PropertiesUtilBean {
     }
 
     public void init(File customFile) {
+        FileInputStream fis = null;
         try {
             propFile = customFile;
             fileChangeHandler = new FileChangeHandler(propFile);
@@ -55,10 +56,17 @@ public class PropertiesUtilBean {
                 propFile.createNewFile();
             }
             configProp = new Properties();
-            configProp.load(new FileInputStream(propFile));
+            fis = new FileInputStream(propFile);
+            configProp.load(fis);
             logger.info("configFile size : " + configProp.size());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        } finally {
+            try {
+                fis.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

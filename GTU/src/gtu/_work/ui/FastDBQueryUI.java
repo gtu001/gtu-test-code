@@ -4,10 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -51,6 +51,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -59,6 +60,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.tools.ant.util.FileUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -93,6 +95,7 @@ public class FastDBQueryUI extends JFrame {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("C:/Users/wistronits/Desktop/FastDBQueryUI");
         }
     }
 
@@ -216,6 +219,43 @@ public class FastDBQueryUI extends JFrame {
                 sqlListMouseClicked(e);
             }
         });
+
+        sqlList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                try {
+                    JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
+                    // 刪除
+                    if (evt.getKeyCode() == 127) {
+                        String sqlId = JListUtil.getLeadSelectionObject(sqlList);
+                        String sql = sqlIdListProp.getProperty(sqlId);
+
+                        boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("SQL : " + sql, "是否刪除?");
+                        if (deleteConfirm) {
+
+                            // 刪除參數黨
+                            File paramFile = new File(JAR_PATH_FILE, "param_" + sqlId + ".properties");
+                            if (paramFile.exists()) {
+                                paramFile.delete();
+                            }
+
+                            // 刪除sqlId
+                            if (!paramFile.exists()) {
+                                sqlIdListProp.remove(sqlId);
+                                saveSqlListProp("", "");
+
+                                JListUtil.removeElement(sqlList, sqlId);
+                            }
+
+                            JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
+                        }
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
         scrollPane.setViewportView(sqlList);
 
         sqlQueryText = new JTextField();
@@ -737,7 +777,9 @@ public class FastDBQueryUI extends JFrame {
      */
     private void saveSqlListProp(String sqlId, String sql) throws IOException {
         Properties prop = sqlIdListProp;
-        prop.put(sqlId, sql);
+        if (StringUtils.isNotBlank(sqlId) && StringUtils.isNotBlank(sql)) {
+            prop.put(sqlId, sql);
+        }
         prop.store(new FileOutputStream(sqlIdListFile), "寫入" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
         System.out.println("儲存檔案路徑 : " + sqlIdListFile);
     }
@@ -816,7 +858,24 @@ public class FastDBQueryUI extends JFrame {
                     String val = (String) util2.getRealValueAt(ii, 1);
                     paramMap2.put(col, val);
                 }
-                sqlParameterConfigLoad.saveConfig(paramMap2);
+                try {
+                    // 一般儲存參數處理
+                    sqlParameterConfigLoad.saveConfig(paramMap2);
+                } catch (Exception ex) {
+                    // 出現異常詢問是否重設
+                    boolean resetOk = false;
+                    if (ex.getMessage().contains("參數不同")) {
+                        boolean resetConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(ex.getMessage(), "是否要重設?");
+                        if (resetConfirm) {
+                            sqlParameterConfigLoad.clear();
+                            sqlParameterConfigLoad.saveConfig(paramMap2);
+                            resetOk = true;
+                        }
+                    }
+                    if (!resetOk) {
+                        throw ex;
+                    }
+                }
             }
 
             // 儲存sqlId mapping dataSource 設定

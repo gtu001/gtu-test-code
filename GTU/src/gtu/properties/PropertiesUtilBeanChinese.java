@@ -42,7 +42,7 @@ public class PropertiesUtilBeanChinese {
             logger.info("configFile size : " + configProp.size());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        }
+        } 
     }
 
     public void reload() {

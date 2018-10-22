@@ -3,6 +3,7 @@ package gtu.properties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,14 +40,22 @@ public class PropertiesGroupUtils_ByKey {
 
     public PropertiesGroupUtils_ByKey(File configFile) {
         this.configFile = configFile;
+        FileInputStream fis = null;
         try {
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
-            configProp.load(new FileInputStream(configFile));
+            fis = new FileInputStream(configFile);
+            configProp.load(fis);
             System.out.println("paramConfig : " + configProp);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                fis.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
