@@ -2,6 +2,7 @@ package gtu.properties;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -164,18 +165,32 @@ public class PropertiesUtil {
      * 
      * @param inputStream
      * @return
+     * @throws Exception
      */
-    public static void storeProperties(Properties prop, OutputStream ouputStream, String comment) {
+    public static void storeProperties(Properties prop, OutputStream ouputStream, String comment) throws Exception {
         try {
             prop.store(ouputStream, comment);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw ex;
         } finally {
+            try {
+                ouputStream.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 ouputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void storeProperties(Properties prop, File configFile, String comment) {
+        try {
+            prop.store(new FileOutputStream(configFile), comment);
+        } catch (Exception ex) {
+            throw new RuntimeException("[storeProperties] 存檔失敗 ,檔案 : " + configFile + " , ERR : " + ex.getMessage(), ex);
         }
     }
 }

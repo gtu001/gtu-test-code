@@ -170,6 +170,7 @@ public class FastDBQueryUI extends JFrame {
     private JTextField rowFilterText;
     private JButton distinctQueryBtn;
     private JLabel queryResultCountLabel;
+    private JButton deleteParameterBtn;
 
     /**
      * Launch the application.
@@ -222,36 +223,7 @@ public class FastDBQueryUI extends JFrame {
         sqlList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent evt) {
-                try {
-                    JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
-                    // 刪除
-                    if (evt.getKeyCode() == 127) {
-                        String sqlId = JListUtil.getLeadSelectionObject(sqlList);
-                        String sql = sqlIdListProp.getProperty(sqlId);
-
-                        boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("SQL : " + sql, "是否刪除?");
-                        if (deleteConfirm) {
-
-                            // 刪除參數黨
-                            File paramFile = new File(JAR_PATH_FILE, "param_" + sqlId + ".properties");
-                            if (paramFile.exists()) {
-                                paramFile.delete();
-                            }
-
-                            // 刪除sqlId
-                            if (!paramFile.exists()) {
-                                sqlIdListProp.remove(sqlId);
-                                saveSqlListProp("", "");
-
-                                JListUtil.removeElement(sqlList, sqlId);
-                            }
-
-                            JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
-                        }
-                    }
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
-                }
+                sqlListKeyPressAction(evt);
             }
         });
 
@@ -587,6 +559,14 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.createRadioButtonGroup(querySqlRadio, updateSqlRadio);
             querySqlRadio.setSelected(true);
 
+            deleteParameterBtn = new JButton("刪除設定");
+            deleteParameterBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    deleteParameterBtnAction();
+                }
+            });
+            panel_4.add(deleteParameterBtn);
+
             // 初始化 sqlList
             initLoadSqlListConfig("");
             initLoadSqlIdMappingConfig();
@@ -723,10 +703,13 @@ public class FastDBQueryUI extends JFrame {
 
     private void storeSqlIdListDsMappingProp() throws IOException {
         String sqlId = (String) sqlList.getSelectedValue();
+        if (StringUtils.isBlank(sqlId)) {
+            sqlId = StringUtils.trimToEmpty(sqlIdText.getText());
+        }
         String dbNameId = dbNameIdText.getText();
         this.initLoadSqlIdMappingConfig();
         sqlIdListDSMappingProp.setProperty(sqlId, dbNameId);
-        sqlIdListDSMappingProp.store(new FileOutputStream(sqlIdListDSMappingFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
+        PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
     }
 
     /**
@@ -835,7 +818,7 @@ public class FastDBQueryUI extends JFrame {
         if (StringUtils.isNotBlank(sqlId) && StringUtils.isNotBlank(sql)) {
             prop.put(sqlId, sql);
         }
-        prop.store(new FileOutputStream(sqlIdListFile), "寫入" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
+        PropertiesUtil.storeProperties(prop, sqlIdListFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
         System.out.println("儲存檔案路徑 : " + sqlIdListFile);
     }
 
@@ -935,9 +918,7 @@ public class FastDBQueryUI extends JFrame {
             }
 
             // 儲存sqlId mapping dataSource 設定
-            if (sqlList.getSelectedIndex() != -1) {
-                storeSqlIdListDsMappingProp();
-            }
+            storeSqlIdListDsMappingProp();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -1673,6 +1654,54 @@ public class FastDBQueryUI extends JFrame {
                     })//
                     .applyEvent(e)//
                     .show();
+        }
+    }
+
+    private void deleteParameterBtnAction() {
+        if (sqlParameterConfigLoad == null) {
+            return;
+        }
+        Map<String, String> configMap = sqlParameterConfigLoad.loadConfig();
+        boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除 :" + configMap, "確認刪除?");
+        if (delConfirm) {
+            sqlParameterConfigLoad.removeConfig();
+        }
+    }
+
+    private void sqlListKeyPressAction(KeyEvent evt) {
+        try {
+            JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
+            // 刪除
+            if (evt.getKeyCode() == 127) {
+                String sqlId = JListUtil.getLeadSelectionObject(sqlList);
+                String sql = sqlIdListProp.getProperty(sqlId);
+
+                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("SQL : " + sql, "是否刪除?");
+                if (deleteConfirm) {
+
+                    // 刪除參數黨
+                    File paramFile = new File(JAR_PATH_FILE, "param_" + sqlId + ".properties");
+                    if (paramFile.exists()) {
+                        paramFile.delete();
+                    }
+
+                    // 刪除sqlId
+                    if (!paramFile.exists()) {
+                        sqlIdListProp.remove(sqlId);
+                        saveSqlListProp("", "");
+
+                        JListUtil.removeElement(sqlList, sqlId);
+
+                        // 移除db config mapping
+                        sqlIdListDSMappingProp.remove(sqlId);
+                        PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
+                    }
+
+                    JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
+                }
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }

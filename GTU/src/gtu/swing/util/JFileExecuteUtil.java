@@ -1,8 +1,4 @@
-package gtu.file;
-
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JFileChooserUtil;
-import gtu.swing.util.JOptionPaneUtil;
+package gtu.swing.util;
 
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
@@ -17,6 +13,8 @@ import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
 
 import org.apache.commons.lang.StringUtils;
+
+import gtu.file.FileUtil;
 
 public class JFileExecuteUtil {
 

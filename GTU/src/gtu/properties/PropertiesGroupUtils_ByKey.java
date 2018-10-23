@@ -130,11 +130,7 @@ public class PropertiesGroupUtils_ByKey {
     }
 
     private void _savePropFile() {
-        try {
-            configProp.store(new FileOutputStream(configFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
-        } catch (Exception e) {
-            throw new RuntimeException("存parameters設定黨失敗", e);
-        }
+        PropertiesUtil.storeProperties(configProp, configFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
     }
 
     private void _saveConfigGroup(Map<String, String> currentConfig) {

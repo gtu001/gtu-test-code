@@ -3,7 +3,6 @@ package gtu.properties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -23,6 +22,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 public class PropertiesGroupUtils {
 
     private static final Pattern PROP_KEY_PATTERN = Pattern.compile("(\\w+)\\_\\d+");
+    private static final Pattern PROP_KEY_AND_INDEX_PATTERN = Pattern.compile("(\\w+)\\_(\\d+)");
     private static final int MAX_PROP_COUNT = 100;
 
     Properties configProp = new Properties();
@@ -146,11 +146,7 @@ public class PropertiesGroupUtils {
     }
 
     private void savePropFile() {
-        try {
-            configProp.store(new FileOutputStream(configFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
-        } catch (Exception e) {
-            throw new RuntimeException("存parameters設定黨失敗", e);
-        }
+        PropertiesUtil.storeProperties(configProp, configFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
     }
 
     private void validateColumnNameSame(Map<String, String> currentConfig) {
@@ -206,6 +202,40 @@ public class PropertiesGroupUtils {
         }
         System.out.println("loadConfig currentIndex : " + currentIndex);
         return param;
+    }
+
+    /**
+     * 移除當前設定
+     * 
+     * @return
+     */
+    public void removeConfig() {
+        // 讀欄位
+        Set<String> columnNames = loadParametersColumnNames();
+
+        Map<String, String> removeMap = new LinkedHashMap<String, String>();
+
+        for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
+            String column = (String) enu.nextElement();
+            String value = configProp.getProperty(column);
+            Matcher mth = PROP_KEY_AND_INDEX_PATTERN.matcher(column);
+            if (mth.find()) {
+                String realColum = mth.group(1);
+                int realIndex = Integer.parseInt(mth.group(2));
+                if (realIndex == currentIndex) {
+                    removeMap.put(column, value);
+                }
+            }
+        }
+
+        for (String key : removeMap.keySet()) {
+            configProp.remove(key);
+        }
+
+        this.savePropFile();
+
+        System.out.println("removeConfig currentIndex : " + currentIndex);
+        System.out.println("removeConfig content : " + removeMap);
     }
 
     private int getLastNonUseIndex() {

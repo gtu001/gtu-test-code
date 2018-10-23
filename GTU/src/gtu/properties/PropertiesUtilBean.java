@@ -120,7 +120,7 @@ public class PropertiesUtilBean {
         try {
             fileChangeHandler.merge(configProp);
             String remark = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS").format(new Date());
-            configProp.store(new FileOutputStream(propFile), "SAVE_TIME : " + remark);
+            PropertiesUtil.storeProperties(configProp, propFile, "SAVE_TIME : " + remark);
             fileChangeHandler.resetLastModifiedUnderControl();
             logger.info("store success!");
         } catch (Exception ex) {

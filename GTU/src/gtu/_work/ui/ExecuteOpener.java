@@ -1,20 +1,5 @@
 package gtu._work.ui;
 
-import gtu.clipboard.ClipboardUtil;
-import gtu.collection.ListUtil;
-import gtu.file.FileUtil;
-import gtu.file.JFileExecuteUtil;
-import gtu.properties.PropertiesUtil;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.JFileChooserUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JMouseEventUtil;
-import gtu.swing.util.JOptionPaneUtil;
-import gtu.swing.util.JPopupMenuUtil;
-import gtu.swing.util.SwingActionUtil;
-import gtu.swing.util.SwingActionUtil.Action;
-
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
@@ -73,6 +58,22 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+
+import gtu.clipboard.ClipboardUtil;
+import gtu.collection.ListUtil;
+import gtu.file.FileUtil;
+import gtu.properties.PropertiesUtil;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFileChooserUtil;
+import gtu.swing.util.JFileExecuteUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.SwingActionUtil;
+import gtu.swing.util.SwingActionUtil.Action;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -488,6 +489,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         jPanel9.setPreferredSize(new java.awt.Dimension(741, 187));
                         {
                             scanDirText = new JTextField();
+                            JCommonUtil.jTextFieldSetFilePathMouseEvent(scanDirText, true);
                             scanDirText.setToolTipText("scan dir");
                             jPanel9.add(scanDirText);
                             scanDirText.setPreferredSize(new java.awt.Dimension(225, 24));
@@ -981,8 +983,64 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                             JCommonUtil.handleException(ex);
                                         }
                                     }
-                                }).addJMenuItem("----------------", false)//
-                                .show();//
+                                }).addJMenuItem("----------------", false);//
+
+                        popupUtil//
+                                .addJMenuItem("copy to", new ActionListener() {
+
+                                    private File getToFile(File dir, String name) {
+                                        int ii = 0;
+                                        File f = null;
+                                        for (f = new File(dir, name); f.exists();) {
+                                            f = new File(dir, name + "." + ii);
+                                            ii++;
+                                        }
+                                        return f;
+                                    }
+
+                                    public void actionPerformed(ActionEvent e) {
+                                        File destDir = new File(FileUtil.DESKTOP_DIR,
+                                                ExecuteOpener.class.getSimpleName() + "_CopyTo_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+                                        destDir.mkdirs();
+                                        BufferedWriter writer = null;
+                                        try {
+                                            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destDir, "CopyTo.log"))));
+                                            int success = 0;
+                                            int fail = 0;
+                                            for (Object v : execList.getSelectedValues()) {
+                                                File fromFile = new File((String) v);
+                                                File toFile = getToFile(destDir, fromFile.getName());
+                                                if (fromFile.exists()) {
+                                                    boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
+                                                    writer.write(String.format("from:%s\tto:%s\t%s", fromFile, toFile, (copyToSuccess ? "Y" : "N")));
+                                                    writer.newLine();
+                                                    if (copyToSuccess) {
+                                                        success++;
+                                                    } else {
+                                                        fail++;
+                                                    }
+                                                } else {
+                                                    writer.write(String.format("from:%s\tto:%s\t%s", fromFile, "NA", "N(來源不存在)"));
+                                                    writer.newLine();
+                                                    fail++;
+                                                }
+                                            }
+                                            JCommonUtil._jOptionPane_showMessageDialog_info("複製完成\n成功:" + success + "\n失敗:" + fail);
+                                        } catch (Exception ex) {
+                                            JCommonUtil.handleException(ex);
+                                        } finally {
+                                            try {
+                                                writer.flush();
+                                            } catch (IOException e1) {
+                                            }
+                                            try {
+                                                writer.close();
+                                            } catch (IOException e1) {
+                                            }
+                                        }
+                                    }
+                                });
+                        popupUtil.show();//
                     }
 
                     // left button double click event
