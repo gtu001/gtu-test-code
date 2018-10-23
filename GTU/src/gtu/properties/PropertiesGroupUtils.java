@@ -2,7 +2,6 @@ package gtu.properties;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -18,12 +17,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class PropertiesGroupUtils {
 
     private static final Pattern PROP_KEY_PATTERN = Pattern.compile("(\\w+)\\_\\d+");
     private static final Pattern PROP_KEY_AND_INDEX_PATTERN = Pattern.compile("(\\w+)\\_(\\d+)");
-    private static final int MAX_PROP_COUNT = 100;
+    private static final int MAX_PROP_COUNT = 1000;
 
     Properties configProp = new Properties();
     File configFile;
@@ -238,24 +238,42 @@ public class PropertiesGroupUtils {
         System.out.println("removeConfig content : " + removeMap);
     }
 
-    private int getLastNonUseIndex() {
-        Set<String> columnNames = loadParametersColumnNames();
-        for (int ii = 0; ii < MAX_PROP_COUNT; ii++) {
-            Map<String, String> param = getParameters(ii, columnNames);
-            if (param.isEmpty()) {
-                return ii;
+    private List<Integer> getIndexRangeLst() {
+        // Set<String> columnNames = loadParametersColumnNames();
+        Matcher mth = null;
+        List<Integer> lst = new ArrayList<Integer>();
+        for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            mth = PROP_KEY_AND_INDEX_PATTERN.matcher(key);
+            if (mth.find()) {
+                int currentIndex = Integer.parseInt(mth.group(2));
+                if (!lst.contains(currentIndex)) {
+                    lst.add(currentIndex);
+                }
             }
         }
-        return -1;
+        Collections.sort(lst);
+        return lst;
     }
 
     /**
      * 設定下乙組
      */
     public void next() {
-        currentIndex++;
-        if (currentIndex >= getLastNonUseIndex()) {
-            currentIndex = 0;
+        // 取得index lst
+        List<Integer> indicesLst = getIndexRangeLst();
+        int start = indicesLst.isEmpty() ? 0 : indicesLst.get(0);
+        int end = indicesLst.isEmpty() ? 0 : indicesLst.get(indicesLst.size() - 1);
+
+        for (;;) {
+            currentIndex++;
+            if (indicesLst.contains(currentIndex)) {
+                break;
+            }
+            if (currentIndex > end) {
+                currentIndex = start;
+                break;
+            }
         }
     }
 

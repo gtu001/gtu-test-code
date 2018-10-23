@@ -93,8 +93,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -1090,14 +1090,14 @@ public class FastDBQueryUI extends JFrame {
             SqlParam_IfExists sqlParam = new SqlParam_IfExists();
             sqlParam.orginialSql = sql;
 
-            Pattern ptn = Pattern.compile("(\\[(.*?)\\]|\\:(\\w+))");
+            Pattern ptn = Pattern.compile("(\\[((?:.|\n)*?)\\]|\\:(\\w+))");
             Matcher mth = ptn.matcher(sql);
 
             while (mth.find()) {
                 String quoteLine = mth.group(1);
 
                 // 非必填檢查
-                if (quoteLine.matches("^\\[.*\\]")) {
+                if (quoteLine.matches("^\\[(.|\n)*\\]")) {
                     String realQuoteLine = mth.group(2);
                     Pattern ptn2 = Pattern.compile("\\:(\\w+)");
                     Matcher mth2 = ptn2.matcher(realQuoteLine);
