@@ -33,8 +33,10 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -51,7 +53,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -60,7 +61,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.tools.ant.util.FileUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -95,7 +95,6 @@ public class FastDBQueryUI extends JFrame {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
-            JAR_PATH_FILE = new File("C:/Users/wistronits/Desktop/FastDBQueryUI");
         }
     }
 
@@ -579,9 +578,7 @@ public class FastDBQueryUI extends JFrame {
             this.initDataSourceProperties();
 
             // 初始化parameterTable
-            JTableUtil.defaultSetting_AutoResize(parametersTable);
-            DefaultTableModel createModel = JTableUtil.createModel(false, new Object[] { "參數", "值" });
-            parametersTable.setModel(createModel);
+            initParametersTable();
 
             // 初始化queryResultTable
             JTableUtil.defaultSetting(queryResultTable);
@@ -596,6 +593,64 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
+        }
+    }
+
+    private void initParametersTable() {
+        JTableUtil.defaultSetting_AutoResize(parametersTable);
+        DefaultTableModel createModel = JTableUtil.createModel(false, new Object[] { "參數", "值", "類型" });
+        parametersTable.setModel(createModel);
+
+        // column = "Data Type"
+        TableColumn sportColumn = parametersTable.getColumnModel().getColumn(2);
+        JComboBox comboBox = new JComboBox();
+        for (DataType e : DataType.values()) {
+            comboBox.addItem(e);
+        }
+        sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
+    }
+
+    private enum DataType {
+        varchar(String.class) {
+        }, //
+        date(java.sql.Date.class) {
+            protected Object applyDataChange(Object value) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+                if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+                    String val = (String) value;
+                    java.sql.Date newVal = java.sql.Date.valueOf(val);
+                    return newVal;
+                }
+                return value;
+            }
+        }, //
+        timestamp(java.sql.Timestamp.class) {
+            protected Object applyDataChange(Object value) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+                if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+                    String val = (String) value;
+                    java.sql.Timestamp newVal = java.sql.Timestamp.valueOf(val);
+                    return newVal;
+                }
+                return value;
+            }
+        }, //
+        number(Number.class) {
+        }, //
+        NULL(void.class) {
+        }, //
+        UNKNOW(void.class) {
+        },//
+        ;
+
+        final Class<?>[] clz;
+
+        DataType(Class<?>... clz) {
+            this.clz = clz;
+        }
+
+        protected Object applyDataChange(Object value) {
+            return value;
         }
     }
 
@@ -636,7 +691,7 @@ public class FastDBQueryUI extends JFrame {
             sqlIdListFile.createNewFile();
         }
         Properties prop = new Properties();
-        prop.load(new FileInputStream(sqlIdListFile));
+        PropertiesUtil.loadProperties(new FileInputStream(sqlIdListFile), prop);
         sqlIdListProp = prop;
 
         List<String> sqlIdList = new ArrayList<String>();
@@ -662,7 +717,7 @@ public class FastDBQueryUI extends JFrame {
             sqlIdListDSMappingFile.createNewFile();
         }
         Properties prop = new Properties();
-        prop.load(new FileInputStream(sqlIdListDSMappingFile));
+        PropertiesUtil.loadProperties(new FileInputStream(sqlIdListDSMappingFile), prop);
         sqlIdListDSMappingProp = prop;
     }
 
@@ -765,10 +820,10 @@ public class FastDBQueryUI extends JFrame {
      * 載入參數
      */
     private void setParameterTable(SqlParam param) {
-        DefaultTableModel createModel = JTableUtil.createModel(false, new Object[] { "參數", "值" });
-        parametersTable.setModel(createModel);
+        initParametersTable();
+        DefaultTableModel createModel = (DefaultTableModel) parametersTable.getModel();
         for (String column : param.paramSet) {
-            createModel.addRow(new Object[] { column, "" });
+            createModel.addRow(new Object[] { column, "", DataType.varchar });
         }
     }
 
@@ -784,8 +839,8 @@ public class FastDBQueryUI extends JFrame {
         System.out.println("儲存檔案路徑 : " + sqlIdListFile);
     }
 
-    private Object getRealValue(String value) {
-        return value;
+    private Object getRealValue(String value, DataType dataType) {
+        return dataType.applyDataChange(value);
     }
 
     /**
@@ -804,7 +859,8 @@ public class FastDBQueryUI extends JFrame {
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
                 String columnName = (String) util.getRealValueAt(ii, 0);
                 String value = (String) util.getRealValueAt(ii, 1);
-                paramMap.put(columnName, getRealValue(value));
+                DataType dataType = (DataType) util.getRealValueAt(ii, 2);
+                paramMap.put(columnName, getRealValue(value, dataType));
             }
 
             String sql = sqlTextArea.getText().toString();
@@ -1034,9 +1090,13 @@ public class FastDBQueryUI extends JFrame {
         private boolean isAllOk(List<String> paramLst, Map<String, Object> paramMap) {
             for (String col : paramLst) {
                 if (paramMap.containsKey(col) && paramMap.get(col) != null) {
-                    String tmpParamVal = StringUtils.trimToEmpty((String) paramMap.get(col));
-                    if (StringUtils.isBlank(tmpParamVal)) {
-                        return false;
+                    if (paramMap.get(col) instanceof String) {
+                        String tmpParamVal = StringUtils.trimToEmpty((String) paramMap.get(col));
+                        if (StringUtils.isBlank(tmpParamVal)) {
+                            return false;
+                        }
+                    } else {
+                        // TODO
                     }
                 } else {
                     return false;
@@ -1049,23 +1109,33 @@ public class FastDBQueryUI extends JFrame {
             SqlParam_IfExists sqlParam = new SqlParam_IfExists();
             sqlParam.orginialSql = sql;
 
-            Pattern ptn = Pattern.compile("\\[(.*?)\\]");
+            Pattern ptn = Pattern.compile("(\\[(.*?)\\]|\\:(\\w+))");
             Matcher mth = ptn.matcher(sql);
 
             while (mth.find()) {
                 String quoteLine = mth.group(1);
 
-                Pattern ptn2 = Pattern.compile("\\:(\\w+)");
-                Matcher mth2 = ptn2.matcher(quoteLine);
+                // 非必填檢查
+                if (quoteLine.matches("^\\[.*\\]")) {
+                    String realQuoteLine = mth.group(2);
+                    Pattern ptn2 = Pattern.compile("\\:(\\w+)");
+                    Matcher mth2 = ptn2.matcher(realQuoteLine);
 
-                List<String> params = new ArrayList<String>();
-                while (mth2.find()) {
-                    params.add(mth2.group(1));
+                    List<String> params = new ArrayList<String>();
+                    while (mth2.find()) {
+                        params.add(mth2.group(1));
+                    }
+                    sqlParam.paramSet.addAll(params);
+
+                    if (!params.isEmpty()) {
+                        sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
+                    }
                 }
-                sqlParam.paramSet.addAll(params);
-
-                if (!params.isEmpty()) {
-                    sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
+                // 必填檢查
+                else {
+                    String realQuoteLine = mth.group(3);
+                    sqlParam.paramSet.add(realQuoteLine);
+                    sqlParam.paramListFix.add(Pair.of(Arrays.asList(realQuoteLine), new int[] { mth.start(1), mth.end(1) }));
                 }
             }
             return sqlParam;
@@ -1102,7 +1172,7 @@ public class FastDBQueryUI extends JFrame {
                 String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
                 String replaceToSql = StringUtils.rightPad("", markSql.length());
 
-                if (isAllOk(row.getLeft(), paramMap)) {
+                if (isAllOk(row.getLeft(), paramMap) || markSql.matches("\\:\\w+")) {
                     replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap);
                 }
 
@@ -1137,6 +1207,9 @@ public class FastDBQueryUI extends JFrame {
 
         // 判斷是否要自動切換dataSource
         loadSqlIdMappingDataSourceConfig();
+
+        // trigger 儲存按鈕
+        JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
     }
 
     private void loadSqlIdMappingDataSourceConfig() {
@@ -1177,11 +1250,11 @@ public class FastDBQueryUI extends JFrame {
      */
     private void loadParameterTableConfig() {
         Map<String, String> paramMap = sqlParameterConfigLoad.loadConfig();
-        DefaultTableModel model = JTableUtil.createModel(false, new Object[] { "參數", "值" });
-        parametersTable.setModel(model);
+        initParametersTable();
+        DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
         for (String col : paramMap.keySet()) {
             String val = paramMap.get(col);
-            model.addRow(new Object[] { col, val });
+            model.addRow(new Object[] { col, val, DataType.varchar });
         }
     }
 

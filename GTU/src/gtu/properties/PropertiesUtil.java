@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -152,6 +153,26 @@ public class PropertiesUtil {
         } finally {
             try {
                 inputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 不會咬住檔案的存檔方式
+     * 
+     * @param inputStream
+     * @return
+     */
+    public static void storeProperties(Properties prop, OutputStream ouputStream, String comment) {
+        try {
+            prop.store(ouputStream, comment);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                ouputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
