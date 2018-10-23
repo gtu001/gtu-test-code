@@ -1011,6 +1011,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             setFileName(titleVal);
                             //TitleTextSetter.setText(TxtReaderActivity.this, titleVal);
                             actionBarCustomTitleHandler.setText(titleVal);
+
+                            //設定修正scroll pos event
+                            final String $titlaVal = titleVal;
+                            dialog.get().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    //回復新的 scrollView Y
+                                    scrollViewYHolder.restoreY($titlaVal, scrollView1);
+                                }
+                            });
                         }
                     });
                 }
