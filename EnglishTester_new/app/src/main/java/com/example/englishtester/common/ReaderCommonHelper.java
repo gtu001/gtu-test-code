@@ -203,6 +203,21 @@ public class ReaderCommonHelper {
             }
         }
 
+        private void scrollToY(final ScrollView scrollView1, final int yPos) {
+            scrollView1.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollView1.scrollTo(0, yPos);
+
+                    if (scrollView1.getScrollY() != yPos) {
+                        scrollToY(scrollView1, yPos);
+                    } else {
+//                        Log.line(TAG, "成功回復Y pos !! : " + yPos);
+                    }
+                }
+            });
+        }
+
         public void restoreY(final String currentTitle, final ScrollView scrollView1) {
             Log.v(TAG, "[restoreY] start ... " + currentTitle);
 
@@ -220,13 +235,8 @@ public class ReaderCommonHelper {
                 posY.set(0);
             }
 
-            scrollView1.post(new Runnable() {
-                @Override
-                public void run() {
-                    scrollView1.scrollTo(0, posY.get());
-                    Log.v(TAG, "[restoreY] : " + currentTitle + " -> " + posY.get());
-                }
-            });
+            //回復scrollY
+            scrollToY(scrollView1, posY.get());
         }
     }
 
