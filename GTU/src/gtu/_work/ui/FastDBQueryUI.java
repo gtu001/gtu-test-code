@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -13,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +76,7 @@ import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
+import gtu.string.StringNumberUtil;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -93,8 +94,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -171,6 +172,8 @@ public class FastDBQueryUI extends JFrame {
     private JButton distinctQueryBtn;
     private JLabel queryResultCountLabel;
     private JButton deleteParameterBtn;
+    private JTextField maxRowsText;
+    private JLabel lblMaxRows;
 
     /**
      * Launch the application.
@@ -301,6 +304,28 @@ public class FastDBQueryUI extends JFrame {
                 executeSqlButtonClick();
             }
         });
+
+        lblMaxRows = new JLabel("max rows :");
+        panel_4.add(lblMaxRows);
+
+        maxRowsText = new JTextField();
+        maxRowsText.addFocusListener(new FocusListener() {
+            int tempNumber = 0;
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                tempNumber = StringNumberUtil.parseInt(maxRowsText.getText(), tempNumber);
+            }
+
+            public void focusLost(FocusEvent e) {
+                maxRowsText.setText("" + StringNumberUtil.parseInt(maxRowsText.getText(), tempNumber));
+            }
+        });
+        maxRowsText.setToolTipText("n <= 0 表示無限制!");
+        maxRowsText.setText("1000");
+
+        panel_4.add(maxRowsText);
+        maxRowsText.setColumns(5);
 
         querySqlRadio = new JRadioButton("查詢模式");
         panel_4.add(querySqlRadio);
@@ -597,9 +622,13 @@ public class FastDBQueryUI extends JFrame {
             protected Object applyDataChange(Object value) {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 if (value instanceof String && StringUtils.isNotBlank((String) value)) {
-                    String val = (String) value;
-                    java.sql.Date newVal = java.sql.Date.valueOf(val);
-                    return newVal;
+                    try {
+                        String val = (String) value;
+                        java.sql.Date newVal = java.sql.Date.valueOf(val);
+                        return newVal;
+                    } catch (Exception ex) {
+                        throw new RuntimeException("請輸入Date格式 yyyy-MM-dd , value : " + value + ", ERR : " + ex.getMessage(), ex);
+                    }
                 }
                 return value;
             }
@@ -608,9 +637,13 @@ public class FastDBQueryUI extends JFrame {
             protected Object applyDataChange(Object value) {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 if (value instanceof String && StringUtils.isNotBlank((String) value)) {
-                    String val = (String) value;
-                    java.sql.Timestamp newVal = java.sql.Timestamp.valueOf(val);
-                    return newVal;
+                    try {
+                        String val = (String) value;
+                        java.sql.Timestamp newVal = java.sql.Timestamp.valueOf(val);
+                        return newVal;
+                    } catch (Exception ex) {
+                        throw new RuntimeException("請輸入Timestamp格式 yyyy-MM-dd HH:mm:ss.SSSSS, value : " + value + ", ERR : " + ex.getMessage(), ex);
+                    }
                 }
                 return value;
             }
@@ -878,7 +911,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
-                Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true);
+                int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
+                Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true,
+                        maxRowsLimit);
                 this.queryList = queryList;
                 this.queryModeProcess(queryList, false, Pair.of(param, parameterList));
                 this.showJsonArry(queryList);
@@ -1200,7 +1235,7 @@ public class FastDBQueryUI extends JFrame {
             if (sqlIdListDSMappingProp.containsKey(sqlId)) {
                 String saveKey = sqlIdListDSMappingProp.getProperty(sqlId);
                 if (!StringUtils.equals(dbNameIdText.getText(), saveKey)) {
-                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("最後一次使用的DataSource為 :" + saveKey + ", 目前為 : " + dbNameIdText.getText() + "是否要切換", "切換dataSource");
+                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("目前DS為 : [" + dbNameIdText.getText() + "] \n 是否要切換為最後一次成功使用的DS :[" + saveKey + "], ", "切換dataSource");
                     if (confirm) {
                         Map<String, String> param = dataSourceConfig.getConfig(saveKey);
                         if (param.containsKey(PropertiesGroupUtils_ByKey.SAVE_KEYS) && StringUtils.isNotBlank(param.get(PropertiesGroupUtils_ByKey.SAVE_KEYS))) {

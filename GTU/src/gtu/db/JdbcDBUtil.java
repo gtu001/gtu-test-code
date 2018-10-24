@@ -278,8 +278,8 @@ public class JdbcDBUtil {
         }
         return rsList;
     }
-    
-    public static Pair<List<String>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn) throws Exception {
+
+    public static Pair<List<String>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn, int maxRowsLimit) throws Exception {
         List<String> colList = new ArrayList<String>();
         List<Object[]> rsList = new ArrayList<Object[]>();
         java.sql.ResultSet rs = null;
@@ -298,12 +298,16 @@ public class JdbcDBUtil {
                 colList.add(mdata.getColumnName(i));
             }
 
-            while (rs.next()) {
+            A: while (rs.next()) {
                 List<Object> lst = new ArrayList<Object>();
                 for (int ii = 1; ii <= cols; ii++) {
                     lst.add(rs.getObject(ii));
                 }
                 rsList.add(lst.toArray());
+
+                if (maxRowsLimit > 0 && rsList.size() >= maxRowsLimit) {
+                    break A;
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -345,7 +349,7 @@ public class JdbcDBUtil {
         int rsCount = 0;
         System.out.println("sql:" + sql);
         try {
-            //callPSetUser(con);// 全球人壽測試用 FIXME
+            // callPSetUser(con);// 全球人壽測試用 FIXME
 
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             if (param != null) {
