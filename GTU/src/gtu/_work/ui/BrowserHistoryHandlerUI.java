@@ -2104,7 +2104,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             for (File f : dropboxDir.listFiles()) {
                 if (f.getName().matches("BrowserHistoryHandlerUI_bookmark.*\\.properties")) {
                     Properties prop = new Properties();
-                    prop.load(new FileInputStream(f));
+                    PropertiesUtil.loadProperties(new FileInputStream(f), prop);
                     __mergeToMap(prop, map);
 
                     mergeFileLst.add(f.getName());

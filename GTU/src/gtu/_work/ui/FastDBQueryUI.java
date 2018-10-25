@@ -824,6 +824,9 @@ public class FastDBQueryUI extends JFrame {
             // 儲存sqlList Prop
             this.saveSqlListProp(sqlId, sql);
 
+            // 載入參數設定
+            sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
+
             // 刷新sqlList
             initLoadSqlListConfig("");
             initLoadSqlIdMappingConfig();

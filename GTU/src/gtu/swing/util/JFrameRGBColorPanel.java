@@ -9,12 +9,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.UIManager;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -59,9 +61,16 @@ public class JFrameRGBColorPanel {
             }
             com.setBackground(background);
             com.setForeground(foreground);
+            __specialProcess(com, background, foreground);
             if (com instanceof Container) {
                 setBackground((Container) com, background, foreground);
             }
+        }
+    }
+
+    private void __specialProcess(Component com, Color background, Color foreground) {
+        if (com instanceof JCheckBox) {
+            ((JCheckBox) com).setOpaque(true);// 目前無作用 但保留
         }
     }
 

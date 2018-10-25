@@ -18,3 +18,21 @@ SELECT t.TBCREATOR AS schema,
  WHERE t.tbname = 'DTRDZ010' AND t.TBCREATOR = 'DBRD'
  order by 3
   fetch first 1000 rows only  ;
+  
+  
+
+--顯示表必填欄位 Ps:錯誤訊息對照用
+SELECT
+	C.TABSCHEMA,
+	C.TABNAME,
+	C.COLNAME,
+	T.TBSPACEID,
+	T.TABLEID,
+	C.COLNO
+FROM SYSCAT.TABLES AS T
+	join SYSCAT.COLUMNS AS C on
+		C.TABSCHEMA = T.TABSCHEMA
+		AND C.TABNAME = T.TABNAME
+WHERE
+	t.tabschema = :tabschema
+	and t.tabname = :tabname
