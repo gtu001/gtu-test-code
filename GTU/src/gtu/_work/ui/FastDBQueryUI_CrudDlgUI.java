@@ -316,7 +316,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             } else if (btn == dialog.rdbtnDelete) {
                                 sql = process.tableInfo.createDeleteSql(process.singleRecordMap);
                             } else if (btn == dialog.rdbtnUpdate) {
-                                sql = process.tableInfo.createUpdateSql(process.singleRecordMap, process.singleRecordMap, false);
+                                sql = process.tableInfo.createUpdateSql(process.singleRecordMap, process.singleRecordMap, false, process.ignoreColumns);
                             } else if (btn == dialog.rdbtnOthers) {
                                 rdbtnOthersAction(process.tableInfo, process.singleRecordMap);
                                 return;
@@ -367,7 +367,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 } else if (btn == dialog.rdbtnUpdate) {
                                     createWriter(outputFile);
                                     for (Map<String, String> map : qlst) {
-                                        String sql = process.tableInfo.createUpdateSql(map, map, false);
+                                        String sql = process.tableInfo.createUpdateSql(map, map, false, process.ignoreColumns);
                                         writer.write(sql + ";");
                                         writer.newLine();
                                     }
@@ -615,7 +615,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("map.put(\"" + col.toUpperCase() + "\", \"" + dataMap.get(col.toUpperCase()) + "\");\n");
+                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + getQuoteStringVal(col, dataMap) + ");\n");
                 }
                 return sb.toString();
             }
@@ -627,7 +627,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("String " + param + " = \"" + dataMap.get(col.toUpperCase()) + "\";\n");
+                    sb.append("String " + param + " = " + getQuoteStringVal(col, dataMap) + ";\n");
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
@@ -684,7 +684,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("vo.set" + StringUtils.capitalize(param) + "(\"" + dataMap.get(col.toUpperCase()) + "\");\n");
+                    sb.append("vo.set" + StringUtils.capitalize(param) + "(" + getQuoteStringVal(col, dataMap) + ");\n");
                 }
                 return sb.toString();
             }
@@ -696,7 +696,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("String " + param + " = \"" + dataMap.get(col.toUpperCase()) + "\";\n");
+                    sb.append("String " + param + " = " + getQuoteStringVal(col, dataMap) + ";\n");
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
@@ -770,7 +770,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("vo.set" + col + "(\"" + dataMap.get(col.toUpperCase()) + "\");\n");
+                    sb.append("vo.set" + col + "(" + getQuoteStringVal(col, dataMap) + ");\n");
                 }
                 return sb.toString();
             }
@@ -802,16 +802,37 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             return newColSet;
         }
 
+        String getQuoteStringVal(String col, Map<String, String> dataMap) {
+            col = col.toLowerCase();
+            String value = dataMap.get(col);
+            if (value == null || "null".equals(value)) {
+                return "null";
+            }
+            return String.format("\"%s\"", value);
+        }
+
         String getOrignVal(String col, TableInfo tableInfo, Map<String, String> dataMap) {
             col = col.toUpperCase();
+            if ("null".equals(dataMap.get(col))) {
+                return "null";
+            }
             if (tableInfo.getDateCol().contains(col)) {
+                if (StringUtils.isBlank(dataMap.get(col))) {
+                    return "null";
+                }
                 return "java.sql.Date.valueOf(\"" + dataMap.get(col) + "\")";
             } else if (tableInfo.getTimestampCol().contains(col)) {
+                if (StringUtils.isBlank(dataMap.get(col))) {
+                    return "null";
+                }
                 return "java.sql.Timestamp.valueOf(\"" + dataMap.get(col) + "\")";
             } else if (tableInfo.getNumberCol().contains(col)) {
+                if (StringUtils.isBlank(dataMap.get(col))) {
+                    return "null";
+                }
                 String suffix = "L";
                 String valuestr = StringUtils.defaultIfBlank(dataMap.get(col), "0");
-                if (valuestr.matches("[\\-]?\\d+\\.\\d+")) {
+                if (valuestr.matches("[\\-]?\\d+\\.\\d+") || valuestr.contains("E")) {
                     suffix = "D";
                 }
                 return String.format("java.math.BigDecimal.valueOf(%s)", valuestr + suffix);

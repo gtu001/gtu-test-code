@@ -8,6 +8,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,19 +32,22 @@ public class DBSynchronizeTool {
     private static final String TAG_DATA = "#data";
 
     public static void main(String[] args) throws Exception {
-//        File file = new File("C:/Users/gtu001/Desktop/test001.xls");
-//        File file = new File("C:/Users/gtu001_5F/Desktop/a090.xls");
-//        File file = new File("C:/Users/gtu001_5F/Desktop/資料案例/dbaC020.xls");
-//        File file = new File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/MktA080.xls");
-//        File file = new File("C:/Users/gtu001_5F/Desktop/資料案例/dbaC025.xls");
-//        File file = new File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/DbaC020.xls");
-//        File file = new File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/MktA080_1.xls");
+        // File file = new File("C:/Users/gtu001/Desktop/test001.xls");
+        // File file = new File("C:/Users/gtu001_5F/Desktop/a090.xls");
+        // File file = new File("C:/Users/gtu001_5F/Desktop/資料案例/dbaC020.xls");
+        // File file = new
+        // File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/MktA080.xls");
+        // File file = new File("C:/Users/gtu001_5F/Desktop/資料案例/dbaC025.xls");
+        // File file = new
+        // File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/DbaC020.xls");
+        // File file = new
+        // File("D:/gtu001Dropbox/Dropbox/guava/秀娟工作/資料案例/MktA080_1.xls");
         File file = new File("C:/Users/gtu001/Dropbox/guava/秀娟工作/資料案例/MktA080_1.xls");
         new DBSynchronizeTool().execute(file);
         System.out.println("done...");
     }
-    
-    public void execute(File file) throws Exception{
+
+    public void execute(File file) throws Exception {
         ExcelUtil util = ExcelUtil.getInstance();
         HSSFWorkbook book = util.readExcel(file);
 
@@ -66,7 +70,7 @@ public class DBSynchronizeTool {
 
                 Map<String, String> param = dataList.get(ii);
                 Map<String, String> pkParam = new HashMap<String, String>();
-                
+
                 if (pkList.size() > ii) {
                     pkParam = pkList.get(ii);
                 }
@@ -79,45 +83,45 @@ public class DBSynchronizeTool {
                 List<Map<String, Object>> queryList = JdbcDBUtil.queryForList(selectSql, getConnection(), true);
                 if (queryList.isEmpty()) {
                     Validate.isTrue(!pkParam.isEmpty(), "pkParam 不可為空");
-                    String updateSql = info.createUpdateSql(param, pkParam, true);
+                    String updateSql = info.createUpdateSql(param, pkParam, true, Collections.<String> emptySet());
                     int result = JdbcDBUtil.modify(updateSql, null, getConnection(), true);
                     System.out.println("更新結果 :" + result);
 
                     if (result == 0) {
-                        String insertSql = info.createInsertSql(param);
+                        String insertSql = info.createInsertSql(param, Collections.<String> emptySet());
                         result = JdbcDBUtil.modify(insertSql, null, getConnection(), true);
                         System.out.println("新增結果 :" + result);
                     }
                 } else {
                     Validate.isTrue(!pkParam.isEmpty(), "pkParam 不可為空");
                     System.out.println("已存在資料!");
-                    String updateSql = info.createUpdateSql(param, pkParam, true);
+                    String updateSql = info.createUpdateSql(param, pkParam, true, Collections.<String> emptySet());
                     int result = JdbcDBUtil.modify(updateSql, null, getConnection(), true);
                     System.out.println("更新結果 :" + result);
                 }
             }
         }
     }
-    
+
     private String url;
     private String userName;
     private String password;
-    
+
     private Connection getConnection() throws SQLException {
-       // DataSource bds = DbConstant.getTestDataSource_Oracle_HP_new();
-        
-         BasicDataSource bds = new BasicDataSource();
-         bds.setUrl(url);
-         bds.setUsername(userName);
-         bds.setPassword(password);
-         bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        
-//        BasicDataSource bds = new BasicDataSource();
-//        bds.setUrl("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=122.116.167.154)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=IBTDCS1)))");
-//        bds.setUsername("sysadm");
-//        bds.setPassword("123456");
-//        bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        
+        // DataSource bds = DbConstant.getTestDataSource_Oracle_HP_new();
+
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl(url);
+        bds.setUsername(userName);
+        bds.setPassword(password);
+        bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+
+        // BasicDataSource bds = new BasicDataSource();
+        // bds.setUrl("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=122.116.167.154)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=IBTDCS1)))");
+        // bds.setUsername("sysadm");
+        // bds.setPassword("123456");
+        // bds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+
         return bds.getConnection();
     }
 
@@ -148,7 +152,7 @@ public class DBSynchronizeTool {
                 for (int jj = COLUMN_START; jj < row.getLastCellNum(); jj++) {
                     HSSFCell cell = row.getCell(jj);
                     String value = ExcelUtil.getInstance().readCell(cell);
-                    if(StringUtils.isBlank(value)){
+                    if (StringUtils.isBlank(value)) {
                         throw new RuntimeException("定義欄位 " + jj + " 為空 ");
                     }
                     tab.columnList.add(value.trim().toLowerCase());
@@ -190,11 +194,11 @@ public class DBSynchronizeTool {
                 for (int ii = 0; ii < columnList.size(); ii++) {
                     String col = columnList.get(ii);
                     String val = "";
-                    try{
+                    try {
                         val = valList.get(ii);
-                    }catch(Exception ex){
+                    } catch (Exception ex) {
                     }
-                    
+
                     // 若定義欄位為#開頭則為pk
                     if (col.startsWith("#")) {
                         pkmap.put(col.replaceFirst("#", ""), val);
@@ -204,10 +208,10 @@ public class DBSynchronizeTool {
                 }
                 list.add(map);
                 pklist.add(pkmap);
-                
-                //若pkmap有但map沒有 就用pkmap
-                for(String key : pkmap.keySet()){
-                    if(StringUtils.isBlank(map.get(key))){
+
+                // 若pkmap有但map沒有 就用pkmap
+                for (String key : pkmap.keySet()) {
+                    if (StringUtils.isBlank(map.get(key))) {
                         map.put(key, pkmap.get(key));
                     }
                 }

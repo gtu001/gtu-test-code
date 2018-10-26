@@ -356,13 +356,16 @@ public class DbSqlCreater {
         /**
          * 傳入要建立的更新資料
          */
-        public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull) {
+        public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns) {
             validateData();
             StringBuilder sb = new StringBuilder();
             sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
                 String key_ = key.toUpperCase();
-                if (StringUtils.isBlank(valmap.get(key_)) && ignoreNull) {
+                if (valmap.get(key_) == null && ignoreNull) {
+                    continue;
+                }
+                if (ignoreColumns.contains(key_)) {
                     continue;
                 }
                 sb.append(key + "=" + getRealValue(key, valmap.get(key_)) + ",");
@@ -450,7 +453,8 @@ public class DbSqlCreater {
                         numVal = Double.parseDouble(String.valueOf(value));
                     } catch (Exception ex) {
                         System.out.println("轉型數值失敗 => [" + key_ + "]=[" + value + "]");
-                        throw new RuntimeException(ex);
+                        //throw new RuntimeException(ex);
+                        return "null";
                     }
                     return String.valueOf(numVal);
                 }
@@ -588,7 +592,7 @@ public class DbSqlCreater {
                 String genSql = "";
                 switch (updateType) {
                 case 'i':
-                    genSql = info.createInsertSql(map, Collections.<String>emptySet());
+                    genSql = info.createInsertSql(map, Collections.<String> emptySet());
                     break;
                 case 'u':
                     Map<String, String> pkMap = new HashMap<String, String>();
@@ -597,7 +601,7 @@ public class DbSqlCreater {
                         String val = map.get(col_);
                         pkMap.put(col_, val);
                     }
-                    genSql = info.createUpdateSql(map, pkMap, false);
+                    genSql = info.createUpdateSql(map, pkMap, false, Collections.<String>emptySet());
                     break;
                 case 'd':
                     genSql = info.createDeleteSql(map);

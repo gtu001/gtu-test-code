@@ -601,6 +601,16 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             innerScannerText.setToolTipText("inner scan query condition");
                             jPanel9.add(innerScannerText);
                             innerScannerText.setPreferredSize(new java.awt.Dimension(164, 24));
+                            {
+                                scanLstShowDetailChk = new JCheckBox("顯示修改時間");
+                                scanLstShowDetailChk.addActionListener(new ActionListener() {
+                                    public void actionPerformed(ActionEvent e) {
+                                        ZFile.is_show_detail = scanLstShowDetailChk.isSelected();
+                                        scanList.updateUI();
+                                    }
+                                });
+                                jPanel9.add(scanLstShowDetailChk);
+                            }
                             innerScannerText.addMouseListener(new MouseAdapter() {
 
                                 Thread innerScanThread = null;
@@ -1310,7 +1320,11 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                             if (scanTp.filter(anyFileMatch, scanVal, scanTextPattern, file, ignoreCheck, igArry)) {
                                                 for (int ii = 0;; ii++) {
                                                     try {
-                                                        model.addElement(file);
+                                                        // xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                                        // new modify Troy
+                                                        // 20181026
+                                                        ZFile newFile = new ZFile(file.getParentFile(), file.getName());
+                                                        model.addElement(newFile);
                                                         matchCount++;
                                                         break;
                                                     } catch (Exception ex) {
@@ -1640,6 +1654,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
     static boolean currentScannerThreadStop = false;
     Object[] arrayBackupForInnerScan;
     static Pattern renameMatchPattern = Pattern.compile("(.+)_R\\d+(\\.\\w+)");
+    private JCheckBox scanLstShowDetailChk;
 
     void reloadCurrentDirPropertiesList() {
         DefaultListModel model = new DefaultListModel();
@@ -1749,6 +1764,28 @@ public class ExecuteOpener extends javax.swing.JFrame {
             Runtime.getRuntime().exec(command);
         } else {
             JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("unknow file :\n" + f, "ERROR");
+        }
+    }
+
+    private static class ZFile extends File {
+
+        private static boolean is_show_detail = false;
+
+        public ZFile(File parent, String child) {
+            super(parent, child);
+        }
+
+        private static final long serialVersionUID = 1L;
+
+        public String toString() {
+            if (is_show_detail) {
+                String createTime = DateFormatUtils.format(FileUtil.getCreateTime(this), "yyyy/MM/dd_HHmm");
+                String modifyTime = DateFormatUtils.format(this.lastModified(), "yyyy/MM/dd_HHmm");
+                String sizeDesc = FileUtil.getSizeDescription(this.length());
+                return String.format("C%s  M%s  %s  \t%s", createTime, modifyTime, sizeDesc, super.toString());
+            } else {
+                return super.toString();
+            }
         }
     }
 }
