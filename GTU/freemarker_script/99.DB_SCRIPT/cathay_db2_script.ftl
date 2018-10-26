@@ -14,6 +14,15 @@
 
 <#function getWhereCol col>
          <#local rtn = "">
+         
+         <#-- 變數不存在給初始值 -->
+         <#if !column_dateLst??>
+                <#assign column_dateLst = []>
+         </#if>
+         <#if !column_timestampLst??>
+                <#assign column_timestampLst = []>
+         </#if>
+         
          <#if column_dateLst?seq_contains(col) || column_timestampLst?seq_contains(col)>
                 <#local rtn = "VARCHAR_FORMAT(T1.${col}, 'YYYY/MM/DD')">
          <#else>

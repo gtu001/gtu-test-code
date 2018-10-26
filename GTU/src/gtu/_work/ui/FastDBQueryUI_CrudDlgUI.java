@@ -15,10 +15,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -809,7 +809,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             } else if (tableInfo.getTimestampCol().contains(col)) {
                 return "java.sql.Timestamp.valueOf(\"" + dataMap.get(col) + "\")";
             } else if (tableInfo.getNumberCol().contains(col)) {
-                return dataMap.get(col);
+                String suffix = "L";
+                String valuestr = StringUtils.defaultIfBlank(dataMap.get(col), "0");
+                if (valuestr.matches("[\\-]?\\d+\\.\\d+")) {
+                    suffix = "D";
+                }
+                return String.format("java.math.BigDecimal.valueOf(%s)", valuestr + suffix);
             } else {
                 return "\"" + dataMap.get(col) + "\"";
             }
@@ -822,11 +827,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             } else if (tableInfo.getTimestampCol().contains(col)) {
                 return "java.sql.Timestamp";
             } else if (tableInfo.getNumberCol().contains(col)) {
-                boolean isDouble = false;
-                if (dataMap.containsKey(col)) {
-                    isDouble = dataMap.get(col).matches("[\\-]?\\d+\\.\\d+");
-                }
-                return isDouble ? "Double" : "Integer";
+                return "java.math.BigDecimal";
             } else {
                 return "String";
             }
@@ -976,8 +977,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
     }
-    
-    private void resetColumnWidth(){
+
+    private void resetColumnWidth() {
         JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 20, 5 });
     }
 }

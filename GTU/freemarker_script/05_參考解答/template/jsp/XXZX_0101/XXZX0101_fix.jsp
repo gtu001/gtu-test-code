@@ -221,9 +221,10 @@ function ${edit_jsp}(){
 		
 	return {
 		initApp : function() {
-			
+                        
 			<#list insertColumns as col>
-			<#if column_dateLst?seq_contains(col) || column_timestampLst?seq_contains(col)>
+			<#if column_dateLst?? && column_timestampLst?? &&
+			        (column_dateLst?seq_contains(col) || column_timestampLst?seq_contains(col))>
 			<cathay:LocaleDisplay sysCode="RG" dateFields="${col}" var="localeDisplay" />
 			</#if>
 			</#list>
