@@ -1043,6 +1043,16 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.freeGoogleTranslateHandler.showDlg();
             }
         }, //
+        MOVE_TO_STARTER("移動到頂部", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
+                activity.getScrollView1().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.getScrollView1().scrollTo(0, 0);
+                    }
+                });
+            }
+        }, //
 //        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
 //            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
 //                String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();

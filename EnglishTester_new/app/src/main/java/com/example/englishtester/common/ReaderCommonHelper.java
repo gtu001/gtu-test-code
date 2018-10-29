@@ -207,12 +207,17 @@ public class ReaderCommonHelper {
             scrollView1.post(new Runnable() {
                 @Override
                 public void run() {
+                    if (yPos > ScrollViewHelper.getMaxHeight(scrollView1)) {
+                        Toast.makeText(context, "Y pos 大過最大值 !! : " + yPos + " / " + ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     scrollView1.scrollTo(0, yPos);
 
                     if (scrollView1.getScrollY() != yPos) {
                         scrollToY(scrollView1, yPos);
                     } else {
-//                        Log.line(TAG, "成功回復Y pos !! : " + yPos);
+                        Toast.makeText(context, "成功回復Y pos !! : " + yPos, Toast.LENGTH_SHORT).show();
                     }
                 }
             });

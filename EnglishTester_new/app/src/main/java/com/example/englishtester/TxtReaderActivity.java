@@ -1099,7 +1099,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             txtFileZ.set(txtFileGetterCall.call());
                         }
 
-                        setTitleNameProcess();
+                        dialog.get().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                setTitleNameProcess();
+                            }
+                        });
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
                             htmlProcess();
@@ -1281,6 +1286,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 String content = StringUtils.trimToEmpty(activity.dto.content);
                 activity.freeGoogleTranslateHandler.init(content);
                 activity.freeGoogleTranslateHandler.showDlg();
+            }
+        }, //
+        MOVE_TO_STARTER("移動到頂部", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.scrollView1.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.scrollView1.scrollTo(0, 0);
+                    }
+                });
             }
         }, //
 //        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {
