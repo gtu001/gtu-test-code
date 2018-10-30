@@ -9,7 +9,7 @@ from gtu.reflect import checkSelf
 
 def checkMembers(testObj, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''檢查物件成員'''
-    print("testObj ==> ", type(testObj))
+    print("testObj ==> ", getClassFullName(testObj))
     dlist = inspect.getmembers(testObj)
     for i, mem in enumerate(dlist, 0):
         if ignoreInherit and __isInheritMember(mem[0]) :
@@ -26,7 +26,7 @@ def checkMembers(testObj, doc=False, ignorePrivate=True, ignoreInherit=True):
 
 def checkLikeMembers(testObj, name, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''找出接近的成員'''
-    print("testObj ==> ", type(testObj))
+    print("testObj ==> ", getClassFullName(testObj))
     findOk = False
     name = name.lower()
     dlist = inspect.getmembers(testObj)
@@ -49,7 +49,7 @@ def checkLikeMembers(testObj, name, doc=False, ignorePrivate=True, ignoreInherit
 
 def checkMatchPtnMembers(testObj, pattern, doc=False, ignorePrivate=True, ignoreInherit=True):
     '''找出接近的成員'''
-    print("testObj ==> ", type(testObj))
+    print("testObj ==> ", getClassFullName(testObj))
     findOk = False
     dlist = inspect.getmembers(testObj)
     for i, mem in enumerate(dlist, 0):
@@ -95,6 +95,10 @@ def __isPrivateMember(name):
     if mth :
         return True
     return False
+        
+        
+def getClassFullName(o):
+    return o.__module__ + "." + o.__class__.__qualname__
         
         
 

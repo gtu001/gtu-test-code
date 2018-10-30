@@ -77,6 +77,22 @@ def getSheetByIndex(wb1, index):
     return wb1[name]
     
     
+
+def getRows(sheet):
+    return list(sheet.rows)
+    
+    
+    
+def getRowRange(sheet):
+    return range(sheet.min_row, sheet.max_row)
+    
+    
+    
+def getCellRange(sheet):
+    return range(sheet.min_col, sheet.max_col)
+    
+    
+    
     
 if __name__ == '__main__' :
     print(cellEnglishToPos_toStr(3333))
