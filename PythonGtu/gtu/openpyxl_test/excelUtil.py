@@ -17,10 +17,11 @@ def cellEnglishToPos_toInt(column):
 #     total -= 1
     return total
 
-
 '''
 columnIndex 從1起算
 '''
+
+
 def cellEnglishToPos_toStr(columnIndex):
     '''取回excel的column名'''
     map = {}
@@ -48,50 +49,47 @@ def cellEnglishToPos_toStr(columnIndex):
     
 
 def debugShowData(sheetName, filePath):
-    wb = openpyxl.load_workbook(filePath, 'r', read_only=True, data_only=True)
+    wb = openpyxl.load_workbook(filePath, read_only=True, data_only=True)
     sheet = wb.get_sheet_by_name(sheetName)
-    for rowNum, row in enumerate(sheet, 0):
+    for rowNum, row in enumerate(sheet, 1):
         str2 = "row" + str(rowNum)
-        for cellNum, cell in enumerate(row, 0):
+        for cellNum, cell in enumerate(row, 1):
             tmpVal = str(cell.value)
             tmpVal = tmpVal.replace('\n', '')
             tmpVal = tmpVal.replace('\r', '')
-            str2 += "[" + str(cellNum) + "] " + tmpVal
+            str2 += "\t[" + str(cellNum) + "|" + cellEnglishToPos_toStr(cellNum) + "] " + tmpVal
         print(str2)
         
 
 def getCellValue(column, row):
     cell = None
-    if not column.isdigit() :
-        cell = row[cellEnglishToPos_toInt(column)]
-    else:
+    if isinstance(column, int) or column.isdigit() :
         cell = row[column]
+    else :
+        cell = row[cellEnglishToPos_toInt(column)]
     if str(type(cell.value)) == "<class 'NoneType'>" :
         return ""
     return str(cell.value)
 
 
-
 def getSheetByIndex(wb1, index):
     name = wb1.sheetnames[index]
     return wb1[name]
-    
-    
+
 
 def getRows(sheet):
+    '''
+    注意index必須從0開始
+    '''
     return list(sheet.rows)
-    
     
     
 def getRowRange(sheet):
     return range(sheet.min_row, sheet.max_row)
     
     
-    
 def getCellRange(sheet):
-    return range(sheet.min_col, sheet.max_col)
-    
-    
+    return range(sheet.min_column, sheet.max_column)
     
     
 if __name__ == '__main__' :
