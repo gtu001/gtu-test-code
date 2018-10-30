@@ -184,26 +184,25 @@ public class EnglishSearchUI extends JFrame {
     private static volatile EnglishSearchUI FRAME;
 
     private static void startNewUI() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    synchronized (EnglishSearchUI.class) {
-                        if (FRAME == null) {
-                            FRAME = new EnglishSearchUI();
-                        }
-                    }
-
-                    if (gtu.swing.util.JFrameUtil.isVisible(FRAME) && FRAME.searchEnglishIdTextController.isFocusOwner()) {
-                        gtu.swing.util.JFrameUtil.setVisible(false, FRAME);
-                    } else {
-                        FRAME.bringToTop();
-                    }
-                    System.out.println("startNewUI done...");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//        EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                try {
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+        synchronized (EnglishSearchUI.class) {
+            if (FRAME == null) {
+                FRAME = new EnglishSearchUI();
             }
-        });
+        }
+        if (gtu.swing.util.JFrameUtil.isVisible(FRAME) && FRAME.searchEnglishIdTextController.isFocusOwner()) {
+            gtu.swing.util.JFrameUtil.setVisible(false, FRAME);
+        } else {
+            FRAME.bringToTop();
+        }
+        System.out.println("startNewUI done...");
     }
 
     FocusListener focusListener = new FocusListener() {

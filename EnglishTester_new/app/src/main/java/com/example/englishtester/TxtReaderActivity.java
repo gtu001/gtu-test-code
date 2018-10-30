@@ -1099,12 +1099,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                             txtFileZ.set(txtFileGetterCall.call());
                         }
 
-                        dialog.get().setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                setTitleNameProcess();
-                            }
-                        });
+                        setTitleNameProcess();
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
                             htmlProcess();
