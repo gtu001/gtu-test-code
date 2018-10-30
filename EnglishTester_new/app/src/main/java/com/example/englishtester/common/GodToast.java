@@ -6,18 +6,15 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.Gravity;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ant.liao.GifView;
 import com.example.englishtester.BuildConfig;
 import com.example.englishtester.DropboxApplicationActivity;
 import com.example.englishtester.DropboxFileLoadService;
-import com.example.englishtester.R;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -34,8 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import gtu.number.RandomUtil;
-
-import static com.example.englishtester.R.drawable.close_icon;
 
 /**
  * Created by gtu001 on 2018/1/11.
@@ -204,6 +199,7 @@ public class GodToast {
         List<String> godImageLst;
         File godImageConfigFile;
         private Map<String, File> imageMap;
+        private List<File> clickDoneFileLst = new ArrayList<>();
 
         private List<String> getGodImageList(File godImageConfig) {
             try {
@@ -310,6 +306,7 @@ public class GodToast {
             if (!isAllDone()) {
                 startDownload();
             }
+
             List<File> files = new ArrayList<File>();
             for (String url : imageMap.keySet()) {
                 if (imageMap.get(url) != null && //
@@ -322,7 +319,16 @@ public class GodToast {
             if (files.isEmpty()) {
                 return null;
             }
-            return files.get(new Random().nextInt(files.size()));
+
+            //點過得不要在顯示------------------------------------------
+            if (clickDoneFileLst.size() >= files.size()) {
+                clickDoneFileLst.clear();
+            }
+            files.removeAll(clickDoneFileLst);
+            File choiceFile = files.get(new Random().nextInt(files.size()));
+            clickDoneFileLst.add(choiceFile);
+            return choiceFile;
+            //點過得不要在顯示------------------------------------------
         }
     }
 }

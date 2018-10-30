@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -53,6 +53,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
+import gtu.jdk8.ex1.StreamUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
@@ -239,7 +240,7 @@ public class AVChoicerUI extends JFrame {
         panel_1.add(panel_6, BorderLayout.SOUTH);
 
         avDirList = new JList();
-        panel_1.add(avDirList, BorderLayout.CENTER);
+        panel_1.add(JCommonUtil.createScrollComponent(avDirList), BorderLayout.CENTER);
         avDirList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent paramKeyEvent) {
@@ -337,7 +338,7 @@ public class AVChoicerUI extends JFrame {
         panel_15.add(moveToChkJpgChkBox);
 
         moveToList = new JList();
-        panel_11.add(moveToList, BorderLayout.CENTER);
+        panel_11.add(JCommonUtil.createScrollComponent(moveToList), BorderLayout.CENTER);
         moveToList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent paramKeyEvent) {
@@ -367,6 +368,8 @@ public class AVChoicerUI extends JFrame {
 
     private class MoveToHandler {
         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(MoveToHandler.class, AVChoicerUI.class.getSimpleName() + "_" + MoveToHandler.class.getSimpleName());
+//         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(new
+//         File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_MoveToHandler_config.properties"));
 
         private void add() {
             try {
@@ -456,11 +459,12 @@ public class AVChoicerUI extends JFrame {
         private void reload() {
             try {
                 DefaultListModel model = JListUtil.createModel();
-                for (Enumeration enu = moveConfig.getConfigProp().keys(); enu.hasMoreElements();) {
-                    String key = (String) enu.nextElement();
-                    String value = moveConfig.getConfigProp().getProperty(key);
-                    model.addElement(key);
-                }
+                List<File> flst = new ArrayList<>();
+                StreamUtil.of(moveConfig.getConfigProp().keys())//
+                        .map(key -> new File(String.valueOf(key)))//
+                        .filter(file -> ((File) file).exists())//
+                        .sorted(Comparator.comparing(File::getAbsolutePath))//
+                        .forEach(file -> model.addElement(((File) file).getAbsolutePath()));
                 moveToList.setModel(model);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);

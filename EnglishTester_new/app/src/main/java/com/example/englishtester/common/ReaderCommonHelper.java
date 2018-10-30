@@ -218,7 +218,8 @@ public class ReaderCommonHelper {
                         Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" +ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
                         scrollToY(scrollView1, yPos);
                     } else {
-                        Toast.makeText(context, "成功回復Y pos !! : " + yPos, Toast.LENGTH_SHORT).show();
+//                        Log.line(TAG, "成功回復Y pos !! : " + yPos);
+                        Toast.makeText(context, "成功回復Y pos !! : " + yPos, Toast.LENGTH_LONG).show();
                     }
                 }
             });

@@ -10,7 +10,7 @@ import java.util.stream.StreamSupport;
 
 public class StreamUtil {
 
-    public <T> Stream of(T[] array) {
+    public static <T> Stream of(T[] array) {
         switch (1) {
         case 1:
             return Arrays.stream(array);
@@ -19,17 +19,17 @@ public class StreamUtil {
         }
     }
 
-    public <T> Stream of(Iterable<T> iter) {
+    public static <T> Stream of(Iterable<T> iter) {
         return StreamSupport.stream(iter.spliterator(), false);
     }
 
-    public <T> Stream of(Iterator<T> iter) {
+    public static <T> Stream of(Iterator<T> iter) {
         return StreamSupport.stream(//
                 Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), //
                 false);
     }
 
-    public <T> Stream of(Enumeration<T> iter) {
+    public static <T> Stream of(Enumeration<T> iter) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<T>() {
             public T next() {
                 return iter.nextElement();
