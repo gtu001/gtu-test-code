@@ -79,20 +79,25 @@ public class RecentTxtMarkDAO {
     }
 
     public List<RecentTxtMark> query(String whereCondition, String[] whereArray) {
-        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
-        Cursor c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, whereCondition, whereArray, null, null, null);
-        c.moveToFirst();
-        List<RecentTxtMark> list = new ArrayList<RecentTxtMark>();
-        int total = c.getCount();
-        if (total == 0) {
+        Cursor c = null;
+        try {
+            SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+            c = db.query(RecentTxtMarkSchmea.TABLE_NAME, RecentTxtMarkSchmea.FROM, whereCondition, whereArray, null, null, null);
+            c.moveToFirst();
+            List<RecentTxtMark> list = new ArrayList<RecentTxtMark>();
+            int total = c.getCount();
+            if (total == 0) {
+                return list;
+            }
+            for (int ii = 0; ii < total; ii++) {
+                list.add(transferWord(c));
+                c.moveToNext();
+            }
+            c.close();
             return list;
+        } finally {
+            DBUtil.closeCursor(c);
         }
-        for (int ii = 0; ii < total; ii++) {
-            list.add(transferWord(c));
-            c.moveToNext();
-        }
-        c.close();
-        return list;
     }
 
     public List<RecentTxtMark> query__NON_CLOSE(String whereCondition, String[] whereArray) {
@@ -115,7 +120,7 @@ public class RecentTxtMarkDAO {
             list.add(transferWord(c));
             c.moveToNext();
         }
-//        c.close();
+        c.close();
         return list;
     }
 

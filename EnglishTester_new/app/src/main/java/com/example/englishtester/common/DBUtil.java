@@ -3,6 +3,7 @@ package com.example.englishtester.common;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
 import com.example.englishtester.common.Log;
 
 import com.example.englishtester.DBConnection;
@@ -143,5 +144,11 @@ public class DBUtil {
         c.close();
         db.close();
         return list;
+    }
+
+    public static void closeCursor(Cursor c) {
+        if (c != null) {
+            c.close();
+        }
     }
 }
