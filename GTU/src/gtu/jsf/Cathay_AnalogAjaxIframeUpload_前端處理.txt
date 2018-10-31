@@ -1,0 +1,33 @@
+
+
+	$('#importFrame').load(function(){
+        var element = window.importFrame.document.getElementById('filedata');
+        if(!element){
+            return;
+        }
+        
+        var obj = element.innerHTML.evalJSON();             
+        //顯示訊息
+        var Msg = obj.ErrMsg.msgDesc.replace('\\n','');
+        if(Msg){
+            alert(Msg);
+        }   
+    } 
+    
+    
+    
+    <%--附件上傳--%>
+	$("#BTN_upload").click(function(){
+		//把檔案匯入
+		document.form1.action= '${dispatcher}/RJV0_0508/upload'; //呼叫  Cathay_AnalogAjaxIframeUpload.doPost()
+		document.form1.submit();
+	});
+	
+	＊注意: form 要有 target="importFrame"　才有用, 還要有 iframe
+	
+	<form name="form1" id="form1" target="importFrame" method="POST" enctype="multipart/form-data">
+		<input type="file" id="Import_File" name = "Import_File" class="button" size="60" fieldName="匯入檔案" title="附件上載" >
+		<iframe id="importFrame" name="importFrame" width="0" height="0" style="display:none"></iframe><%-- 匯入檔案時，模擬Ajax的效果 --%>
+		<button type="button" id="BTN_upload" value="上傳檔案" />	
+	</form>
+			

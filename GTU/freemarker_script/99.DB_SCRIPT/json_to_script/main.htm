@@ -32,26 +32,26 @@
 				}
 				
 	                        //query
-                appendJsonArry(targetObj, 'searchColumns', col);
-                //insert
-                appendJsonArry(targetObj, 'insertColumns', col);
-                //update
-                appendJsonArry(targetObj, 'updateColumns', col);
-                if(isPk){
-                	appendJsonArry(targetObj, 'updateColumns_where', col);
-                }
-                //delete
-                if(isPk){
-                	appendJsonArry(targetObj, 'deleteColumns_where', col);
-                }
-            }
+                                appendJsonArry(targetObj, 'searchColumns', col);
+                                //insert
+                                appendJsonArry(targetObj, 'insertColumns', col);
+                                //update
+                                appendJsonArry(targetObj, 'updateColumns', col);
+                                if(isPk){
+                                        appendJsonArry(targetObj, 'updateColumns_where', col);
+                                }
+                                //delete
+                                if(isPk){
+                                        appendJsonArry(targetObj, 'deleteColumns_where', col);
+                                }
+                        }
             
-            targetObj['main_schema'] = "DBXX";
-            targetObj['main_table'] = "DTXXTP01";
-            targetObj['searchColumns_like'] = [];
+                        targetObj['main_schema'] = "DBXX";
+                        targetObj['main_table'] = "DTXXTP01";
+                        targetObj['searchColumns_like'] = [];
             
-            $("#targetArea").text(JSON.stringify(targetObj));
-        });
+                        $("#targetArea").text(JSON.stringify(targetObj));
+                });
 	});
 	
 	function appendJsonArry(jsonObj, arryKey, appendValue) {

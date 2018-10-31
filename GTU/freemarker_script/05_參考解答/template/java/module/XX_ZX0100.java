@@ -92,7 +92,7 @@ public class ${model_clz} {
      * @throws ParseException 
      * @throws ModuleException 
      */
-    public void insert(Map reqMap, UserObject user) throws ParseException, ModuleException {
+    public void insert(Map reqMap, UserObject user) throws ModuleException {
 		//針對傳入參數進行檢核
         ErrorInputException eie = null;
         if (reqMap == null || reqMap.isEmpty()) {
@@ -110,7 +110,7 @@ public class ${model_clz} {
 		// 若檢核無誤
 		<#list insertColumns_pk as col>
 		String ${col} = MapUtils.getString(reqMap, "${col}");
-        if (StringUtils.isBlank(EMP_ID)) {
+        if (StringUtils.isBlank(${col})) {
             eie = getErrorInputException(eie, "${columnLabel[col]}不可為空");
         }
 		</#list>
@@ -129,6 +129,12 @@ public class ${model_clz} {
         if (StringUtils.isNotEmpty(${col})) {
             ds.setField("${col}", ${col});
         }
+        </#if>
+        </#list>
+		
+		<#list insertColumns as col>
+		<#if insertColumns_pk?seq_contains(col)>
+        ds.setField("${col}", ${col});
         </#if>
         </#list>
 				

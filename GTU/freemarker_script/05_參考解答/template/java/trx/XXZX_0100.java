@@ -110,27 +110,26 @@ public class ${main_action_clz} extends UCBean {
             MessageHelper.setReturnMessage(msg, ReturnCode.OK, "琩高Θ");
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
         } catch (DataNotFoundException dnfe) {
-            log.error("琩礚戈", dnfe);
-            MessageUtil.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "琩礚戈");
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "琩礚戈");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
                 if (me.getRootException() instanceof OverCountLimitException) {
-                    MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "琩高掸计禬╰参叫罽琩高絛瞅");
+                    MessageHelper.setReturnMessage(msg, req, ReturnCode.ERROR_MODULE, "琩高掸计禬╰参叫罽琩高絛瞅");
                 } else {
-                    MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "琩高ア毖");
+                    MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "琩高ア毖", me, req);
                 }
             }
         } catch (Exception e) {
             log.error("琩高ア毖", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "琩高ア毖");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "琩高ア毖", e, req);
         }
-
         return resp;
     }
 
@@ -183,41 +182,6 @@ public class ${main_action_clz} extends UCBean {
             log.error("穝糤ア毖", e);
             //MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "穝糤ア毖");
             MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "穝糤ア毖", e, req);
-        }
-
-        return resp;
-    }
-
-    /**
-     * 琩高
-     * @param req
-     * @return
-     */
-    public ResponseContext doQuery__TEMPLATE(RequestContext req) {
-        try {
-
-            MessageUtil.setMsg(msg, "琩高Θ");
-        } catch (ErrorInputException eie) {
-            log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
-        } catch (DataNotFoundException dnfe) {
-            log.error("琩礚戈", dnfe);
-            MessageUtil.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "琩礚戈");
-        } catch (ModuleException me) {
-            if (me.getRootException() == null) {
-                log.error("琩高ア毖", me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
-            } else {
-                log.error(me.getMessage(), me.getRootException());
-                if (me.getRootException() instanceof OverCountLimitException) {
-                    MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "琩高掸计禬╰参叫罽琩高絛瞅");
-                } else {
-                    MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "琩高ア毖");
-                }
-            }
-        } catch (Exception e) {
-            log.error("琩高ア毖", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "琩高ア毖");
         }
 
         return resp;

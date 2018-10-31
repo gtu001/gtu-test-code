@@ -15,7 +15,7 @@
 <#function getWhereCol col>
          <#local rtn = "">
          
-         <#-- è®Šæ•¸ä¸å­˜åœ¨çµ¦åˆå§‹å€¼ -->
+         <#-- ÅÜ¼Æ¤£¦s¦bµ¹ªì©l­È -->
          <#if !column_dateLst??>
                 <#assign column_dateLst = []>
          </#if>

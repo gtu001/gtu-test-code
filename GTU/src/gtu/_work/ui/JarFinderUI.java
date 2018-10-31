@@ -215,6 +215,7 @@ public class JarFinderUI extends javax.swing.JFrame {
                         resetFinder.setText("reset finder");
                         resetFinder.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
+                                searchResult.setModel(JListUtil.createModel());
                                 jarfinder.clear();
                             }
                         });
@@ -471,6 +472,7 @@ public class JarFinderUI extends javax.swing.JFrame {
             ClipboardUtil.getInstance().setContents(fileName);
 
             int linecount = 0;
+
             for (String clz : jarfinder.getMap().get(fileName)) {
                 if (linecount == 10) {
                     sb.append("...以下省略");

@@ -145,11 +145,13 @@ function ${edit_jsp}(){
 				return; 
 			}
 			// 發送 Ajax 請求
+			ajaxRequest.setSynchronous(true); // 開啟同步
 			ajaxRequest.post('insert', {reqMap : Object.toJSON(actions.getreqMap())},
 				function(resp){
 					actions.btnDisable(resp.rtnMap||{});
 				}
 			);
+			ajaxRequest.setSynchronous(false); // 開啟同步
 		},
 		
 		<%--修改--%>
@@ -158,41 +160,49 @@ function ${edit_jsp}(){
 				return; 
 			}
 			// 發送 Ajax 請求
+			ajaxRequest.setSynchronous(true); // 開啟同步
 			ajaxRequest.post('update', {reqMap : Object.toJSON(actions.getreqMap())},
 				function(resp){
 					actions.btnDisable(resp.rtnMap||{});
 				}
 			);
+			ajaxRequest.setSynchronous(false); // 開啟同步
 		},
 		
 		<%--提交--%>
 		doSubmit : function(){
 			// 發送 Ajax 請求
+			ajaxRequest.setSynchronous(true); // 開啟同步
 			ajaxRequest.post('submit', {reqMap : Object.toJSON(actions.getreqMap())},
 				function(resp){
 					actions.btnDisable(resp.rtnMap||{});
 				}
 			);
+			ajaxRequest.setSynchronous(false); // 開啟同步
 		},
 
 		<%--審核--%>
 		doApprove : function(){
 			// 發送 Ajax 請求
+			ajaxRequest.setSynchronous(true); // 開啟同步
 			ajaxRequest.post('approve', {reqMap : Object.toJSON(actions.getreqMap())},
 				function(resp){
 					actions.btnDisable(resp.rtnMap||{});
 				}
 			);
+			ajaxRequest.setSynchronous(false); // 開啟同步
 		},
 		
 		<%--退回--%>
 		doReject : function(){
 			// 發送 Ajax 請求
+			ajaxRequest.setSynchronous(true); // 開啟同步
 			ajaxRequest.post('reject', {reqMap : Object.toJSON(actions.getreqMap())},
 				function(resp){
 					actions.btnDisable(resp.rtnMap||{});
 				}
 			);
+			ajaxRequest.setSynchronous(false); // 開啟同步
 		},
 		
 		<%--刪除--%>

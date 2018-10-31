@@ -62,6 +62,9 @@ public class ${edit_action_clz} extends UCBean {
 
     /** 此 TxBean 程式碼共用的 UserObject */
     private UserObject user;
+    
+    /** 公司別 */
+    private String DIV;
 
     /** 覆寫父類別的 start() 以強制於每次 Dispatcher 呼叫 method 時都執行程式自定的初始動作 **/
     public ResponseContext start(RequestContext req) throws TxException, ServiceException {
@@ -81,6 +84,9 @@ public class ${edit_action_clz} extends UCBean {
         user = this.getUserObject(req);
         // 先將 ReturnMessage 的 reference 加到 response context
         resp.addOutputData(IConstantMap.ErrMsg, msg);
+        
+        // 取得公司別
+        DIV = user.getCOMP_ID();
 
         // 在 Cathay 通常只有一個 page 在前面 display，所以可以先設定
         resp.setResponseCode("success");
@@ -101,11 +107,11 @@ public class ${edit_action_clz} extends UCBean {
                 query(reqMap, new ${model_clz}(), true);
             } catch (Exception e) {
                 log.error("初始查詢使用者資訊失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "初始查詢使用者資訊失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.OK, "初始查詢使用者資訊失敗");
             }
         } catch (Exception e) {
             log.error("初始失敗", e);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR, "初始失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "初始失敗");
         }
         return resp;
     }
@@ -128,30 +134,32 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "新增完成");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "新增完成");
             reqMap.put("ACTION_TYPE", "U"); // 執行ACTION_TYPE = ‘U’之動作
             try {
                 query(reqMap, the${model_clz}); // 執行初始查詢
             } catch (Exception e) {
                 log.error("新增完成但重查失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "新增完成但重查失敗");
+               MessageHelper.setReturnMessage(msg, ReturnCode.OK, "新增完成但重查失敗");
             }
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error("新增失敗", me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "新增失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "新增失敗", me, req);
             }
         } catch (Exception e) {
             log.error("新增失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "新增失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "新增失敗", e, req);
         }
-
         return resp;
     }
 
@@ -173,30 +181,32 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "修改完成");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "修改完成");
             reqMap.put("ACTION_TYPE", "U");
             try {
                 query(reqMap, the${model_clz}); // 執行初始查詢
             } catch (Exception e) {
                 log.error("修改完成但重查失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "修改完成但重查失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.OK, "修改完成但重查失敗");
             }
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "修改失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "修改失敗", me, req);
             }
         } catch (Exception e) {
             log.error("修改失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "修改失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "修改失敗", e, req);
         }
-
         return resp;
     }
 
@@ -218,23 +228,25 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "完成刪除");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "完成刪除");
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "刪除失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "刪除失敗", me, req);
             }
         } catch (Exception e) {
             log.error("刪除失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "刪除失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "刪除失敗", e, req);
         }
-
         return resp;
     }
 
@@ -261,30 +273,33 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "提交完成");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "提交完成");
             reqMap.put("ACTION_TYPE", "U");
             try {
                 query(reqMap, the${model_clz}); // 重新執行初始動作
             } catch (Exception e) {
                 log.error("提交完成但重查失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "提交完成但重查失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.OK, "提交完成但重查失敗");
             }
+      
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "提交失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "提交失敗", me, req);
             }
         } catch (Exception e) {
             log.error("提交失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "提交失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "提交失敗", e, req);
         }
-
         return resp;
     }
 
@@ -311,30 +326,33 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "審核完成");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "審核完成");
             reqMap.put("ACTION_TYPE", "U");
             try {
                 query(reqMap, the${model_clz}); // 重新執行初始動作
             } catch (Exception e) {
                 log.error("審核完成但重查失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "審核完成但重查失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.OK, "審核完成但重查失敗");
             }
+
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "審核失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "審核失敗", me, req);
             }
         } catch (Exception e) {
             log.error("審核失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "審核失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "審核失敗", e, req);
         }
-
         return resp;
     }
 
@@ -361,30 +379,97 @@ public class ${edit_action_clz} extends UCBean {
                 Transaction.rollback();
                 throw e;
             }
-            MessageUtil.setReturnMessage(msg, ReturnCode.OK, "退回完成");
+            MessageHelper.setReturnMessage(msg, ReturnCode.OK, "退回完成");
             reqMap.put("ACTION_TYPE", "U");
             try {
                 query(reqMap, the${model_clz}); // 重新執行初始動作
             } catch (Exception e) {
                 log.error("退回完成但重查失敗", e);
-                MessageUtil.setReturnMessage(msg, ReturnCode.OK, "退回完成但重查失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.OK, "退回完成但重查失敗");
             }
+        
         } catch (ErrorInputException eie) {
             log.error(eie);
-            MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error(me);
-                MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
-                MessageUtil.setReturnMessage(msg, me, req, ReturnCode.ERROR_MODULE, "退回失敗");
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "退回失敗", me, req);
             }
         } catch (Exception e) {
             log.error("退回失敗", e);
-            MessageUtil.setReturnMessage(msg, e, req, ReturnCode.ERROR, "退回失敗");
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "退回失敗", e, req);
         }
+        return resp;
+    }
+    
+    
+    private Map getFileUploadReqMap(RequestContext req) {
+        Map reqMap = new HashMap();
+        for (Enumeration enu = req.getParameterNames(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String value = req.getParameter(key);
+            reqMap.put(key, value);
+        }
+        return reqMap;
+    }
 
+    /**
+     * 附件上傳
+     * @param req
+     * @return
+     */
+    @CallMethod(action = "upload", name = CallMethod.TYPE_NA)
+    public ResponseContext doUpload(RequestContext req) {
+        try {
+            // 取得上傳路徑的檔案資料
+            FileItem inputFile = FileStoreUtil.parseUploadStream(req); //匯入檔案
+
+            Map reqMap = getFileUploadReqMap(req);
+            resp.addOutputData("updateMap", VOTool.toJSON(reqMap));
+
+            ${model_clz} the${model_clz} = new ${model_clz}();
+            Transaction.begin();
+            try {
+                new RZ_N0Z001().upload(FLOW_NO, "上傳", "", user.getEmpID(), user.getDivNo());
+                the${model_clz}.upload(DTXXTP01vo); // 更新審批流程至待審件 10
+                Transaction.commit();
+            } catch (Exception e) {
+                Transaction.rollback();
+                throw e;
+            }
+        } catch (ErrorInputException eie) {
+            log.error(eie);
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
+        } catch (DataNotFoundException dnfe) {
+            log.error("", dnfe);
+            MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
+        } catch (ModuleException me) {
+            if (me.getRootException() == null) {
+                log.error("", me);
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
+            } else {
+                log.error(me.getMessage(), me.getRootException());
+                MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, "上傳失敗", me, req);
+            }
+        } catch (Exception e) {
+            log.error("修改失敗", e);
+            MessageHelper.setReturnMessage(msg, ReturnCode.ERROR, "上傳失敗", e, req);
+        } finally {
+            try {
+                Map map = new HashMap();
+                map.put(IConstantMap.ErrMsg, msg);
+                EncodingHelper.send2iframe(req, map, msg);
+            } catch (Exception e) {
+                log.error("", e);
+            }
+        }
         return resp;
     }
 
