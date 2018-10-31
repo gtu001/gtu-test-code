@@ -1,14 +1,22 @@
-import math
-
-import openpyxl
-
 '''
 from gtu.openpyxl_test import excelUtil
 '''
 
+import math
+
+import re
+
+import openpyxl
+from openpyxl.styles import PatternFill
+from openpyxl.styles.colors import Color
+from openpyxl.styles import Font, Color
+
 
 def cellEnglishToPos_toInt(column):
     '''用英文欄位取得相對row的index'''
+    '''
+columnIndex 從1起算
+'''
     column = column.upper().strip()
     total = 0;
     _length = len(column)
@@ -17,13 +25,12 @@ def cellEnglishToPos_toInt(column):
 #     total -= 1
     return total
 
-'''
-columnIndex 從1起算
-'''
-
 
 def cellEnglishToPos_toStr(columnIndex):
     '''取回excel的column名'''
+    '''
+columnIndex 從1起算
+'''
     map = {}
     tmpColumn = columnIndex
     while True:
@@ -62,9 +69,14 @@ def debugShowData(sheetName, filePath):
         
 
 def getCellValue(column, row):
+    '''
+    column從 1開始
+    '''
     cell = None
-    if isinstance(column, int) or column.isdigit() :
-        cell = row[column]
+    if isinstance(column, int) :
+        cell = row[column - 1]
+    elif column.isdigit() :
+        cell = row[int(column) - 1]
     else :
         cell = row[cellEnglishToPos_toInt(column)]
     if str(type(cell.value)) == "<class 'NoneType'>" :
@@ -77,11 +89,14 @@ def getSheetByIndex(wb1, index):
     return wb1[name]
 
 
-def getRows(sheet):
-    '''
-    注意index必須從0開始
-    '''
-    return list(sheet.rows)
+def getRows(sheet, startByZero=False):
+    if startByZero :
+        return list(sheet.rows)
+    else :
+        lst = list()
+        lst.append(None)
+        lst.extend(sheet.rows)
+        return lst
     
     
 def getRowRange(sheet):
@@ -90,7 +105,29 @@ def getRowRange(sheet):
     
 def getCellRange(sheet):
     return range(sheet.min_column, sheet.max_column)
+
+
+def setCellColor(xls_cell, fgColor=None, bgColor=None):
+    '''
+        Ex: bgColor = "FFC7CE"
+    '''
+    if bgColor :
+        xls_cell.fill = PatternFill(start_color=bgColor,
+                           end_color=bgColor,
+                           fill_type='solid')
+    if fgColor :
+        xls_cell.font = Font(color=fgColor)
+
     
+    
+def getCellDefine(cell):
+    strVal = str(cell)
+    ptn = re.compile("\<.*\'\.(?P<cellDef>\w+)\>", re.I)
+    mth = ptn.search(strVal)
+    if mth is not None :
+        return mth["cellDef"]
+    return None
+
     
 if __name__ == '__main__' :
     print(cellEnglishToPos_toStr(3333))

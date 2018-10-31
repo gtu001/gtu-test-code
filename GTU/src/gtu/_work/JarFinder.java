@@ -190,7 +190,7 @@ public class JarFinder {
                         if (ifMatch != null) {
                             ifMatch.apply(filename, entry.getName(), matchMap);
                         }
-                        System.out.println(filename + "\t" + entry.getName());
+//                        System.out.println(filename + "\t" + entry.getName());
                     }
                 }
             } else if (true) {//容易出錯
