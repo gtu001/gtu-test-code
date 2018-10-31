@@ -68,18 +68,22 @@ def debugShowData(sheetName, filePath):
         print(str2)
         
 
-def getCellValue(column, row):
+def getCellValue(column, row, startByZero=False):
     '''
-    column從 1開始
+    預設columnIndex 從 1開始 , startByZero=True從0開始
     '''
+    offset = -1
+    if startByZero :
+        offset = 0
     cell = None
     if isinstance(column, int) :
-        cell = row[column - 1]
+        cell = row[column + offset]
     elif column.isdigit() :
-        cell = row[int(column) - 1]
+        cell = row[int(column) + offset]
     else :
-        cell = row[cellEnglishToPos_toInt(column)]
-    if str(type(cell.value)) == "<class 'NoneType'>" :
+        cell = row[cellEnglishToPos_toInt(column)] 
+    if cell.value is None or \
+        str(type(cell.value)) == "<class 'NoneType'>" :
         return ""
     return str(cell.value)
 
@@ -90,6 +94,9 @@ def getSheetByIndex(wb1, index):
 
 
 def getRows(sheet, startByZero=False):
+    '''
+    預設rowIndex 從 1開始 , startByZero=True從0開始
+    '''
     if startByZero :
         return list(sheet.rows)
     else :
