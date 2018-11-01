@@ -473,6 +473,11 @@ public class JarFinderUI extends javax.swing.JFrame {
 
             int linecount = 0;
 
+            if (!jarfinder.getMap().containsKey(fileName)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到檔案 : " + fileName + ", 請重設!");
+                return;
+            }
+
             for (String clz : jarfinder.getMap().get(fileName)) {
                 if (linecount == 10) {
                     sb.append("...以下省略");

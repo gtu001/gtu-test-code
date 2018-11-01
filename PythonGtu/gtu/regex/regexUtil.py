@@ -37,11 +37,26 @@ def __test_pattern_match_group_key():
     pattern = re.compile(r"(?P<match_word>the)", re.I)
     print("Output #39:")
     for word in string_list :
-        if pattern.search(word):
-            print("{:s}".format(pattern.search(word).group("match_word")))
+        mth = pattern.search(word)
+        if mth :
+            print("{:s}".format(mth.group("match_word")))
 
 
 
 if __name__ == '__main__' :
     __test_pattern_match_group_key()
     print("done...")
+
+
+
+
+
+
+
+
+
+
+
+
+
+

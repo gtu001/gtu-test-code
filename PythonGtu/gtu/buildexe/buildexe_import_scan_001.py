@@ -22,6 +22,7 @@ class _ImportFileFilter():
     def readImport(self, file) :
         f = open(file, "r", encoding='utf8')
         for i, line in enumerate(f, 1):
+            line = line.strip()
             if line.startswith("from ") :
                 line = line.replace("\n", "")
                 truePath = self.importToRealPath(line)
@@ -142,9 +143,9 @@ def appendPyFile(projectBase, classpath):
 
 
 if __name__ == '__main__' :
-    projectBase = "E:/workstuff/workspace/gtu-test-code/PythonGtu/"
-    targetPy = "E:/workstuff/workspace/gtu-test-code/PythonGtu/gtu/_tkinter/ex/ex5/kill_port_ui_001.py";
-    newProjectBase = "E:/workstuff/workspace/gtu-test-code/PythonGtuNew/"
+    projectBase = "D:/workstuff/gtu-test-code/PythonGtu"
+    targetPy = "D:/workstuff/gtu-test-code/PythonGtu/gtu/_tkinter/ex/ex7/excel_test_rpt_8110_cellCompare_UI.py";
+    newProjectBase = "D:/workstuff/gtu-test-code/PythonGtuNew/"
     
     print("mkdir", fileUtil.mkdirs(newProjectBase))
     

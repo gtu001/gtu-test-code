@@ -1,7 +1,10 @@
 
+'''
+from gtu.openpyxl_test.ex1.janna import excel_test_rpt_8110_cellCompare
+'''
+
 from _decimal import Decimal
 from collections import OrderedDict
-import csv
 from enum import Enum
 import inspect
 import numbers
@@ -12,6 +15,7 @@ import re
 import openpyxl
 from openpyxl.workbook.workbook import Workbook
 
+from gtu._tkinter.util.tkinterUIUtil import _ProgressBar
 from gtu.collection.orderedClass import OrderedClass
 from gtu.error import errorHandler
 from gtu.io import fileUtil
@@ -61,17 +65,40 @@ def isNumberEqual(val1, val2):
             return False
     except :
         return None
+
+
+class MyProgressHander():
+    def __init__(self, mProgressBar):
+        self.mProgressBar = mProgressBar
     
+    def validateOk(self):
+        return self.mProgressBar is not None and \
+            isinstance(self.mProgressBar, _ProgressBar)
+    
+    def setupValue(self, initVal, maxVal):
+        if self.validateOk():
+            self.mProgressBar.setupValue(initVal, maxVal)
+            
+    def step(self, amount=None):
+        if self.validateOk():
+            print("step ", amount)
+            self.mProgressBar.step(amount)
+
         
-def mainDetail(file1, file2):
+def mainDetail(fileC, fileI, mProgressBar=None):
+    
+    mPBar = MyProgressHander(mProgressBar)
     
     diffLog = _DiffLog()
     
-    wb1 = openpyxl.load_workbook(file1, read_only=True, data_only=True)
-    wb2 = openpyxl.load_workbook(file2, read_only=True, data_only=True)
+    wb1 = openpyxl.load_workbook(fileC, read_only=True, data_only=True)
+    wb2 = openpyxl.load_workbook(fileI, read_only=True, data_only=True)
     
     
     maxSheetRng = getRangeWarpper(len(wb1.get_sheet_names()), len(wb2.get_sheet_names()))
+    
+    #設定進度條基本數值
+    mPBar.setupValue(0, maxSheetRng.left)
     
     for sh_idx in range(0, maxSheetRng.left) :
         s1Name = wb1.get_sheet_names()[sh_idx];
@@ -137,6 +164,9 @@ def mainDetail(file1, file2):
                 if numberCompareResult is not None and numberCompareResult == False : 
                     diffLog.add(diffLogBean)
         
+        #完成一個表
+        mPBar.step(1)
+        
     diffLog.writeExcel()
                 
 #         openpyxl.worksheet.worksheet.Worksheet
@@ -179,7 +209,7 @@ class _DiffLog():
             lst = self.sheetNameCellMap[key]
             for (j, bean) in enumerate(lst) :
                 print("Diff cell : ", bean.cellEng1, bean.cellEng2, bean.cellValue1, bean.cellValue2)
-                sheet1[bean.cellEng1].value = bean.cellValue1 + " <-> " + bean.cellValue2
+                sheet1[bean.cellEng1].value = "[C]" + bean.cellValue1 + " <-> " + "[I]" + bean.cellValue2
                 excelUtil.setCellColor(sheet1[bean.cellEng1], bgColor="FDE6E0")
         
             sheetIdx += 1
@@ -248,7 +278,7 @@ class _ColDiff(Enum):
     
 
 if __name__ == '__main__':
-    file1 = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
-    file2 = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
-    mainDetail(file1, file2)
+    fileC = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
+    fileI = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
+    mainDetail(fileC, fileI)
     print("done...")

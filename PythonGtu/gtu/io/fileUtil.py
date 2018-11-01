@@ -65,11 +65,15 @@ def getAbsPath(path):
 
 def getName(path):
 	'''取得檔名'''
-	if type(path).__name__ == 'str' :
-		path = Path(path)
-	fullName = str(path.resolve())
-	name = fullName[fullName.rfind(os.sep) + 1:]
-	return name
+	if False :
+		if type(path).__name__ == 'str' :
+			path = Path(path)
+		fullName = str(path.resolve())
+		name = fullName[fullName.rfind(os.sep) + 1:]
+		return name
+	elif True :
+		import ntpath
+		return ntpath.basename(path)
 
 
 def getNoSubName(path):
