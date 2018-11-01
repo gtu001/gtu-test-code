@@ -10,7 +10,7 @@ from tkinter.filedialog import askopenfilename
 from gtu._tkinter.util import tkinterUtil, tkinterUIUtil
 from gtu._tkinter.util.tkinterUIUtil import TextSetPathEventHandler 
 from gtu._tkinter.util.tkinterUIUtil import _Label , _ProgressBar
-from gtu._tkinter.util.tkinterUIUtil import _Text , _Button
+from gtu._tkinter.util.tkinterUIUtil import _Text , _Button, _TabFrame
 from gtu.decode import decodeUtil
 from gtu.enum import enumUtil
 from gtu.enum.enumUtil import EnumHelper
@@ -29,38 +29,53 @@ class MainUI():
     def __init__(self):
         win = tk.Tk()
         win.title("8110報表比對")
+        
+        rootTab = _TabFrame(win)
+        tab1 = rootTab.createTab("路徑設定")
+        
         #------------------------------row 1
         
-        l1 = Label(win, text="C表路徑:")
+        l1 = _Label(root=tab1)
+        l1.setText("C表路徑:")
         l1.grid(column=0, row=0)
         
-        self.rptCText = _Text.create(win)
+        self.rptCText = _Text(_Text.create(tab1))
         self.rptCText.grid(column=1, row=0)
-        self._rptCText = _Text(self.rptCText)
-        TextSetPathEventHandler(self._rptCText, True, r".*\.xlsx", True)
+        TextSetPathEventHandler(self.rptCText, True, r".*\.xlsx", True)
         
         #------------------------------row 2
         
-        l2 = Label(win, text="I表路徑:")
+        l2 = _Label(root=tab1)
+        l2.setText("I表路徑:")
         l2.grid(column=0, row=1)
         
-        self.rptIText = _Text.create(win)
+        self.rptIText = _Text(_Text.create(tab1))
         self.rptIText.grid(column=1, row=1)
-        self._rptIText = _Text(self.rptIText)
-        TextSetPathEventHandler(self._rptIText, True, r".*\.xlsx", True)
+        TextSetPathEventHandler(self.rptIText, True, r".*\.xlsx", True)
         
         #------------------------------row 3
         
-        self.pbar = _ProgressBar(win, length=300)
+        self.pbar = _ProgressBar(tab1, length=300)
         self.pbar.grid(column=1, row=2)
         
-        self.b2 = Button(win, text="產生比對表", command=_Button.runInThread(
-                                                            self.executeBtnAction,
-                                                            exceptionFunc=self.executeBtnAction_finally,
-                                                            finallyFunc=self.executeBtnAction_finally
-                                                            )
-                                                        )
-        self.b2.grid(column=2, row=2)
+        self.btn2 = _Button(root=tab1)
+        self.btn2.setText("產生比對表")
+        self.btn2.command(_Button.runInThread(
+                                            self.executeBtnAction,
+                                            exceptionFunc=self.executeBtnAction_finally,
+                                            finallyFunc=self.executeBtnAction_finally
+                                            ))
+        self.btn2.grid(column=2, row=2)
+        
+        #------------------------------row End
+        
+        tab2 = rootTab.createTab("錯誤訊息")
+        
+        #------------------------------row 1
+        
+        self.logText = _Text(root=tab2)
+        self.logText.grid(column=0, row=0)
+        self.logText.place(width=400, height=60)
         
         #------------------------------row End
         
@@ -68,14 +83,14 @@ class MainUI():
         win.mainloop()
     
     def executeBtnAction(self):
-        _Button.disable(self.b2)
+        self.btn2.disable()
         fileC = self._rptCText.getText()
         fileI = self._rptIText.getText()
         excel_test_rpt_8110_cellCompare.mainDetail(fileC, fileI, self.pbar)
         tkinterUtil.message("產生結果", "成功!!")
         
     def executeBtnAction_finally(self):
-        _Button.enable(self.b2)
+        self.btn2.enable()
 
 
 if __name__ == '__main__':

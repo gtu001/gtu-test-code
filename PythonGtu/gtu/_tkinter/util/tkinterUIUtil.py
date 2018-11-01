@@ -1,21 +1,39 @@
 import os
 import re
-from tkinter import Text, StringVar, Checkbutton, IntVar, Radiobutton
+from tkinter import Text, StringVar, Checkbutton, IntVar, Radiobutton, ttk
 from tkinter.constants import W
-from tkinter.ttk import Combobox
+from tkinter.ttk import Combobox, Label, Button
 from tkinter.ttk import Progressbar
+
+from IPython.terminal.pt_inputhooks import tk
 
 from gtu._tkinter.util import tkinterUtil 
 from gtu.io import fileUtil
+from gtu.reflect import checkSelf
 from gtu.string import stringUtil
 import tkinter as tk
 
 
-class _Label():
+class BaseUI():
+
+    def __init__(self, widget):
+        self.widget = widget
+        
+    def grid(self, column, row):
+        self.widget.grid(column=column, row=row)
+        
+    def place(self, x=None, y=None, width=None, height=None):
+        self.widget.place(x=x, y=y, width=width, height=height)
+        
+
+class _Label(BaseUI):
     '''建立Label'''
 
-    def __init__(self, label):
+    def __init__(self, label=None, root=None):
+        if label is None :
+            label = Label(root)
         self.label = label
+        BaseUI.__init__(self, self.label)
 
     def setText(self, value):
         self.label.config(text=value)
@@ -24,11 +42,14 @@ class _Label():
         self.label.bind("<Button-1>", command)
         
         
-class _Text():
+class _Text(BaseUI):
     '''建立Text'''
 
-    def __init__(self, text):
+    def __init__(self, text=None, root=None):
+        if text is None :
+            text = Text(root)
         self.text = text
+        BaseUI.__init__(self, self.text)
 
     def click(self, command):
         self.text.bind("<Button-1>", command)
@@ -54,7 +75,9 @@ class _Text():
 
     @staticmethod
     def create(win):
-        return Text(win, width=30, height=2, font=("Courier", 10))
+        text = Text(win, width=30, height=2)
+        text.config(font=("Courier", 10), undo=True, wrap='word')
+        return text
 
     @staticmethod
     def set_text(widget, value):
@@ -63,17 +86,18 @@ class _Text():
         else :
             widget.delete('1.0', "end")
             widget.insert("end", value)
-            
-        
     
 
-class _Combobox():
+class _Combobox(BaseUI):
     '''下拉選單'''
 
-    def __init__(self, combobox):
+    def __init__(self, combobox=None, root=None):
+        if combobox is None :
+            combobox = Combobox(root)
         self.var = StringVar()
         self.combobox = combobox
         self.combobox.configure(textvariable=self.var)
+        BaseUI.__init__(self, self.combobox)
 
     def click(self, command):
         self.combobox.bind('<<ComboboxSelected>>', command)
@@ -95,13 +119,16 @@ class _Combobox():
         self.var.trace("w", innerOnChange)
         
 
-class _Checkbutton():
+class _Checkbutton(BaseUI):
     '''checkbox'''
 
-    def __init__(self, checkbutton):
+    def __init__(self, checkbutton=None, root=None):
+        if checkbutton is None :
+            checkbutton = Checkbutton(root)
         self.var = IntVar()
         self.checkbutton = checkbutton
         self.checkbutton.configure(variable=self.var)
+        BaseUI.__init__(self, self.checkbutton)
 
     def setText(self, text):
         self.checkbutton.configure(text=text)
@@ -160,6 +187,7 @@ class TextSetPathEventHandler():
     '''
     設定 text 雙擊設路徑的 event
     '''
+
     def __init__(self, textWidget, isFile=True, nameFormat="", ignoreCase=False):
         self.textWidget = textWidget
         self.isFile = isFile
@@ -206,7 +234,7 @@ class TextSetPathEventHandler():
                     tkinterUtil.message("路徑有誤", "路徑非檔目錄:" + path)
                     return;
             
-            #驗證檔名
+            # 驗證檔名
             if stringUtil.isNotBlank(self.nameFormat) and not self.checkPathFormatValid(path) :
                 tkinterUtil.message("路徑有誤", "檔名格式必須為 : " + self.nameFormat)
                 return;
@@ -216,17 +244,16 @@ class TextSetPathEventHandler():
             tkinterUtil.error_ex(ex, ex)
 
 
-class _ProgressBar():
+class _ProgressBar(BaseUI):
+
     def __init__(self, gui, length=200):
         self.progress = Progressbar(gui, orient="horizontal",
                                         length=length, mode="determinate",
                                         style='yellow.Vertical.TProgressbar')
-        
-    def grid(self, **args):
-        self.progress.grid(args)
+        BaseUI.__init__(self, self.progress)
 
     def pack(self):
-        self.progress.pack(fill='both',expand=True,side='top')
+        self.progress.pack(fill='both', expand=True, side='top')
         
     def setupValue(self, initVal, maxVal):
         self.progress["value"] = initVal
@@ -248,18 +275,36 @@ class _ProgressBar():
 
     def stop(self):
         self.progress.stop()
+
+
+class _Button(BaseUI):
     
-
-
-class _Button():
+    def __init__(self, button=None, root=None):
+        if button is None :
+            self.button = Button(root)
+        BaseUI.__init__(self, self.button)
+        
+    def setText(self, text):
+        self.button.configure(text=text)
+    
+    def command(self, func):
+        self.button.configure(command=func)
+        
+    def enable(self):
+        self.button.config(state="normal")
+        
+    def disable(self):
+        self.button.config(state="disable")
     
     @staticmethod
     def runInThread(actionFunc, exceptionFunc=None, finallyFunc=None):
         '''
         開條 thread 執行 處理
         '''
+
         def returnFunc():
             import _thread
+
             def process() :
                 try:
                     actionFunc()
@@ -271,26 +316,47 @@ class _Button():
                     if finallyFunc is not None :
                         finallyFunc()
                     pass
+
             _thread.start_new(process, ())
         
         return returnFunc
+
+
+class _TabFrame():
+
+    def __init__(self, rootUI, height=None):
+        self.nb = ttk.Notebook(rootUI)
+        self.universal_height = height
+        self.nb.grid(column=0)
     
-    @staticmethod
-    def enable(button):
-        button.config(state="normal")
-        
-    @staticmethod
-    def disable(button):
-        button.config(state="disable")
+    def createTab(self, title, width=None):
+        tab = ttk.Frame(self.nb, width=width, height=self.universal_height)
+        self.nb.add(tab, text=title)
+        return tab
 
 
 if __name__ == '__main__' :
     root = tk.Tk()
+
+    root.title("Testing Bot")
     
-    pbar = _ProgressBar(root)
-    pbar.setupValue(0, 100) 
-    pbar.grid(column=0, row=0)
-    pbar.step(25)
+    rTab = _TabFrame(root, 606)
+    
+    page1 = rTab.createTab("one", 800)
+    page2 = rTab.createTab("Two", 800)
+    
+    lbla = _Label(root=page1)
+    lbla.setText("test")
+    lbla.grid(column=0, row=0)
+    
+    def test():
+        print("ddddddd")
+    
+    btn1 = _Button(root=page1)
+    btn1.setText("ddddd")
+    btn1.command(test)
+    btn1.grid(column=2, row=1)
     
     root.mainloop()
+    
     
