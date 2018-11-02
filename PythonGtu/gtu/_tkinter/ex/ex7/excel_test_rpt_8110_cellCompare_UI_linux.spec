@@ -21,9 +21,8 @@ excludes = [
 			]
 
 
-
 a = Analysis(['excel_test_rpt_8110_cellCompare_UI.py'],
-             pathex=['D:\\workstuff\\gtu-test-code\\PythonGtu\\', 'D:\\workstuff\\gtu-test-code\\PythonGtu\\gtu\\_tkinter\\ex\\ex7'],
+             pathex=['/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/PythonGtu/', '/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/PythonGtu/gtu/_tkinter/ex/ex7'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -32,14 +31,17 @@ a = Analysis(['excel_test_rpt_8110_cellCompare_UI.py'],
              excludes=excludes,
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
-             cipher=block_cipher)
+             cipher=block_cipher,
+             noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
+          [],
           exclude_binaries=True,
           name='excel_test_rpt_8110_cellCompare_UI',
           debug=False,
+          bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           console=True )
