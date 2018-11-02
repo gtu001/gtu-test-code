@@ -36,7 +36,7 @@ class MainUI():
         #------------------------------row 1
         
         l1 = _Label(root=tab1)
-        l1.setText("C表路徑:")
+        l1.setText("Cognus表路徑:")
         l1.grid(column=0, row=0)
         
         self.rptCText = _Text(_Text.create(tab1))
@@ -46,7 +46,7 @@ class MainUI():
         #------------------------------row 2
         
         l2 = _Label(root=tab1)
-        l2.setText("I表路徑:")
+        l2.setText("IText表路徑:")
         l2.grid(column=0, row=1)
         
         self.rptIText = _Text(_Text.create(tab1))
