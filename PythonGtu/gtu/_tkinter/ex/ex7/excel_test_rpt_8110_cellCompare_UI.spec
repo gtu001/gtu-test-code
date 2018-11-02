@@ -7,16 +7,18 @@ sys.setrecursionlimit(10000)
 
 
 # ***** please use buildexe_import_scan_001.py  scan ****
-# remove excludes = 'collections' 'openpyxl''calendar', 'time''platform''random', 'socket''datetime''abc''pythoncom''codecs''functools''threading''urllib''inspect''json'
+# remove excludes = 'collections' 'openpyxl''calendar', 'time''platform''random', 'socket''datetime''abc''pythoncom''codecs''functools''threading''urllib''inspect''json''logging''ctypes'
 # ***** please use buildexe_import_scan_001.py  scan ****
 
-excludes = ['win32con', 'multiprocessing', 
+excludes = [
+			'win32con', 'multiprocessing', 
 			'retry', 'scrapy', 
 			'pyHook', 'configparser','csv', 'pyhk', 'pdftotext', 
-			'itertools', 'win32ui', 'pymysql', 'py2exe', 'logging',
-			'pynput', 'win32clipboard', 'ctypes',
+			'itertools', 'win32ui', 'pymysql', 'py2exe',
+			'pynput', 'win32clipboard', 
 			'mpl_finance' , 'requests', 'PyPDF2', 'sqlalchemy', 'matplotlib', 
-			'pandas', 'scipy', 'bge', 'math', 'distutils', 'numpy']
+			'pandas', 'scipy', 'bge', 'math', 'distutils', 'numpy'
+			]
 
 
 
