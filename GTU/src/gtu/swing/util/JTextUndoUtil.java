@@ -20,7 +20,7 @@ public class JTextUndoUtil {
     private static final JTextUndoUtil _INST = new JTextUndoUtil();
 
     public static void applyUndoProcess1(JTextComponent text) {
-        UndoManager um = new UndoManager();
+        final UndoManager um = new UndoManager();
         text.getDocument().addUndoableEditListener(um);
         text.addKeyListener(new KeyAdapter() {
             @Override

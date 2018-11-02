@@ -34,7 +34,6 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -64,6 +63,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -123,8 +123,8 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextUndoUtil;
 import taobe.tec.jcc.JChineseConvertor;
-import javax.swing.JToggleButton;
 
 public class BrowserHistoryHandlerUI extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -250,6 +250,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             remarkArea = new JTextArea();
             scrollPane.setViewportView(remarkArea);
+            JTextUndoUtil.applyUndoProcess1(remarkArea);
 
             JTextPane textPane = new JTextPane();
             scrollPane.setRowHeaderView(textPane);
@@ -531,7 +532,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
             jFrameRGBColorPanel.setIgnoreLst(this);
             jFrameRGBColorPanel.start();
-            
+
             panel_3.add(jFrameRGBColorPanel.getToggleButton(), "8, 4");
 
             // final do

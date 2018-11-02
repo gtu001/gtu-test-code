@@ -9,6 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -85,6 +86,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
+import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 
 public class FastDBQueryUI extends JFrame {
@@ -253,12 +255,23 @@ public class FastDBQueryUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
+        JTextUndoUtil.applyUndoProcess1(sqlTextArea);
         sqlTextArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 sqlTextAreaMouseClickedAction(e);
             }
         });
+        sqlTextArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
+                e.getKeyCode() == KeyEvent.VK_S) {
+                    JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
+                }
+            }
+        });
+
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
 
