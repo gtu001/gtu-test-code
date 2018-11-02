@@ -1,9 +1,10 @@
 from enum import Enum
 import random
+
 from gtu.data_science.numpy import numpyUtil
+from gtu.datetime import dateUtil
 from gtu.reflect import checkSelf
 import numpy as np
-from gtu.datetime import dateUtil
 
 
 def __test_upper(lst):
@@ -31,6 +32,17 @@ def __test_filter_useFunc():
     lst = list(filter(check, lst))
     print(lst)
     
+
+def _test_strArry_to_dateArry(npArry):
+    xdate = [dateUtil.getDatetimeByJavaFormat(i, "yyyy-MM-dd") for i in npArry]
+    return xdate
+
+'''
+--------------------------------------------------------------------------------------------------------
+以上是測試
+--------------------------------------------------------------------------------------------------------
+'''
+    
     
 def arraycopy(src, srcPos, dest, destPos, length):
     fromArry = src[srcPos:srcPos + length]
@@ -56,18 +68,48 @@ def toLinkedHashSet(arry):
     nums = list(OrderedDict.fromkeys(nums).keys())
     return nums
 
-    
-def _test_strArry_to_dateArry(npArry):
-    xdate = [dateUtil.getDatetimeByJavaFormat(i, "yyyy-MM-dd") for i in npArry]
-    return xdate
-
 
 def isArray(arry):
     return isinstance(arry, list)
 
+
+def copy(ary1):
+    if False:
+        return ary1[:]
+    elif False :
+        return list(ary1)
+    elif True :
+        return ary1.copy()
+    
+
+def deepCopy(ary1):
+    from copy import deepcopy
+    return deepcopy(ary1)
+
+
+def toStringList(lst):
+    return map(str, lst)
+    
+    
+    
+def getMinIndex(lst):
+    return min(range(len(lst)), key=lst.__getitem__)
+
+
+def getMaxIndex(lst):
+    return max(range(len(lst)), key=lst.__getitem__)
+    
+    
+def removeDuplicate(lst):
+    '''
+    移除重複並保持原順序
+    '''
+    from collections import OrderedDict
+    return list(OrderedDict.fromkeys(lst).keys())
+    
+    
     
 if __name__ == '__main__' :
-#     __test_filter()
-#     __test_filter_useFunc()
+    print(removeDuplicate([1,3,2,3]))
     print("done...")
     
