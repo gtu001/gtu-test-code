@@ -9,7 +9,7 @@ from tkinter.filedialog import askopenfilename
 
 from gtu._tkinter.util import tkinterUtil, tkinterUIUtil
 from gtu._tkinter.util.tkinterUIUtil import TextSetPathEventHandler 
-from gtu._tkinter.util.tkinterUIUtil import _Label , _ProgressBar
+from gtu._tkinter.util.tkinterUIUtil import _Label , _ProgressBar, _Scrollbar
 from gtu._tkinter.util.tkinterUIUtil import _Text , _Button, _TabFrame
 from gtu.decode import decodeUtil
 from gtu.enum import enumUtil
@@ -75,19 +75,27 @@ class MainUI():
         
         self.logText = _Text(root=tab2)
         self.logText.grid(column=0, row=0)
-        self.logText.place(width=400, height=60)
+#         self.logText.place(width=400, height=60)
+        
+        logTextScroll = _Scrollbar(self.logText.text, tab2)
+        logTextScroll.applyX()
+        logTextScroll.applyY()
+        logTextScroll.grid(0, 0)
         
         #------------------------------row End
         
         tkinterUtil.centerWin(win)
         win.mainloop()
     
+    
     def executeBtnAction(self):
         self.btn2.disable()
-        fileC = self._rptCText.getText()
-        fileI = self._rptIText.getText()
-        excel_test_rpt_8110_cellCompare.mainDetail(fileC, fileI, self.pbar)
+        self.logText.clear()
+        fileC = self.rptCText.getText()
+        fileI = self.rptIText.getText()
+        excel_test_rpt_8110_cellCompare.mainDetail(fileC, fileI, self.pbar, self.logText)
         tkinterUtil.message("產生結果", "成功!!")
+        
         
     def executeBtnAction_finally(self):
         self.btn2.enable()

@@ -2,9 +2,10 @@ import os
 import re
 from tkinter import Text, StringVar, Checkbutton, IntVar, Radiobutton, ttk
 from tkinter.constants import W
-from tkinter.ttk import Combobox, Label, Button
+from tkinter.ttk import Combobox, Label, Button, Scrollbar
 from tkinter.ttk import Progressbar
 
+from tkinter.scrolledtext import ScrolledText
 from IPython.terminal.pt_inputhooks import tk
 
 from gtu._tkinter.util import tkinterUtil 
@@ -19,12 +20,17 @@ class BaseUI():
     def __init__(self, widget):
         self.widget = widget
         
-    def grid(self, column, row):
-        self.widget.grid(column=column, row=row)
+    def grid(self, column, row, **args):
+        self.widget.grid(column=column, row=row, **args)
+        
+    def pack(self, **args):
+        self.widget.pack(**args)
         
     def place(self, x=None, y=None, width=None, height=None):
         self.widget.place(x=x, y=y, width=width, height=height)
         
+    def gridInfo(self):
+        return self.widget.grid_info()
 
 class _Label(BaseUI):
     '''建立Label'''
@@ -74,8 +80,11 @@ class _Text(BaseUI):
         _Text.set_text(self.text, value)
 
     @staticmethod
-    def create(win):
-        text = Text(win, width=30, height=2)
+    def create(win, scrollable=False):
+        if not scrollable :
+            text = Text(win, width=30, height=2)
+        else :
+            text = ScrolledText(win)
         text.config(font=("Courier", 10), undo=True, wrap='word')
         return text
 
@@ -333,6 +342,55 @@ class _TabFrame():
         tab = ttk.Frame(self.nb, width=width, height=self.universal_height)
         self.nb.add(tab, text=title)
         return tab
+    
+    
+class _Scrollbar():
+    
+    def __init__(self, widget, root):
+        self.widget = widget
+        self.root = root
+        self.scrollbarX = None
+        self.scrollbarY = None
+
+    def applyY(self):
+        scrollbar = Scrollbar(self.root, orient='vertical', takefocus='no')
+        self.scrollbarY = scrollbar
+        
+        self.widget.configure(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.widget.yview)
+
+        
+    def applyX(self):
+        scrollbar = Scrollbar(self.root, orient='horizontal', takefocus='no')
+        self.scrollbarX = scrollbar
+        
+        self.widget.configure(xscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.widget.xview)
+        # 取消自動換行
+        if isinstance(self.widget, Text) :
+            self.widget.config(wrap='none')
+        
+    def grid(self, column=None, row=None):
+        if column is None :
+            column = self.widget.grid_info()['column']
+        if row is None :
+            row = self.widget.grid_info()['row']
+
+        print("grid column=", column, ", row=", row)
+        
+        if self.scrollbarX is not None :
+            self.scrollbarX.grid(column=column, row=row+1, sticky='WE')
+            self.widget.grid_columnconfigure(0, weight=1)#沒特別效果
+
+        if self.scrollbarY is not None :
+            self.scrollbarY.grid(column=column+1, row=row, sticky='NS')
+            self.widget.grid_rowconfigure(0, weight=1)#沒特別效果
+    
+    def pack(self):
+        if self.scrollbarX is not None :
+            self.scrollbarX.pack(side='bottom', fill='x', anchor='w')
+        if self.scrollbarY is not None :
+            self.scrollbarY.pack(side='right', fill='y')  
 
 
 if __name__ == '__main__' :
@@ -345,18 +403,7 @@ if __name__ == '__main__' :
     page1 = rTab.createTab("one", 800)
     page2 = rTab.createTab("Two", 800)
     
-    lbla = _Label(root=page1)
-    lbla.setText("test")
-    lbla.grid(column=0, row=0)
-    
-    def test():
-        print("ddddddd")
-    
-    btn1 = _Button(root=page1)
-    btn1.setText("ddddd")
-    btn1.command(test)
-    btn1.grid(column=2, row=1)
+    txt = _Text(root=page1)
     
     root.mainloop()
-    
     

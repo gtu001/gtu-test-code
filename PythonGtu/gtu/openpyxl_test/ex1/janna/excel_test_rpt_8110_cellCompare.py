@@ -84,10 +84,23 @@ class MyProgressHander():
             print("step ", amount)
             self.mProgressBar.step(amount)
 
+
+class LogSb():
+    def __init__(self, logSb):
+        self.logSb = logSb
+        self.isOk = logSb is not None
         
-def mainDetail(fileC, fileI, mProgressBar=None):
+    def println(self, line):
+        if self.isOk :
+            self.logSb.appendText(line + "\n")
+
+        
+def mainDetail(fileC, fileI, mProgressBar=None, logSb=None):
     
     mPBar = MyProgressHander(mProgressBar)
+    
+    global logger
+    logger = LogSb(logSb)
     
     diffLog = _DiffLog()
     
@@ -211,6 +224,7 @@ class _DiffLog():
                 print("Diff cell : ", bean.cellEng1, bean.cellEng2, bean.cellValue1, bean.cellValue2)
                 sheet1[bean.cellEng1].value = "[C]" + bean.cellValue1 + " <-> " + "[I]" + bean.cellValue2
                 excelUtil.setCellColor(sheet1[bean.cellEng1], bgColor="FDE6E0")
+                logger.println("頁簽 :" + key + " 欄位不同 , [C]" + bean.cellEng1 + " = " + bean.cellValue1 + ", [I]" + bean.cellEng2 + " = " + bean.cellValue2)
         
             sheetIdx += 1
         
