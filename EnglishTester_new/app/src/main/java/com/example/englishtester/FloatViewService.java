@@ -1,16 +1,13 @@
 package com.example.englishtester;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -23,12 +20,6 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-
-import com.example.englishtester.common.EnglishSearchRegexConf;
-import com.example.englishtester.common.FileUtilAndroid;
-import com.example.englishtester.common.GoogleSearchHandler;
-import com.example.englishtester.common.Log;
-
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -57,12 +48,16 @@ import android.widget.Toast;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.AppOpenHelper;
 import com.example.englishtester.common.ClipboardHelper;
+import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.FileConstantAccessUtil;
+import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FloatServiceHolderBroadcastReceiver;
 import com.example.englishtester.common.GodToast;
+import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
+import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.RepeatMoveListener;
@@ -83,7 +78,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1464,6 +1458,16 @@ public class FloatViewService extends Service {
             }
         }
 
+        private String specialTxtReaderEscape(String string) {
+            Pattern ptn = Pattern.compile("^value\\:(.*)", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptn.matcher(string);
+            if (mth.find()) {
+                return mth.group(1);
+            } else {
+            }
+            return string;
+        }
+
         private boolean isURL(String text) {
             Pattern ptn = Pattern.compile("^http[s]?\\:[\\/]+.*$");
             Matcher mth = ptn.matcher(StringUtils.trimToEmpty(text));
@@ -1511,6 +1515,12 @@ public class FloatViewService extends Service {
                     modeHandler.openUseNoteMode();
                     pasteToClipboard("", text);
                     return;
+                }
+
+                //如果來自txtReader or epub 需要特殊 escape
+                String escapeText = specialTxtReaderEscape(text);
+                if (!StringUtils.equals(escapeText, text)) {
+                    pasteToClipboard("", escapeText);
                 }
 
                 if (modeHandler.isSearchModeAndHidden()) {
