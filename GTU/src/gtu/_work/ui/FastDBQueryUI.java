@@ -1438,6 +1438,8 @@ public class FastDBQueryUI extends JFrame {
                 if (!ListUtil.isAllEquals(valueLst)) {
                     Object value = JCommonUtil._JOptionPane_showInputDialog("此欄位[" + col + "]顯示多次,請選擇正確的值:", col, valueLst.toArray(), valueLst.get(0));
                     rtnMap.put(col, value);
+                } else {
+                    rtnMap.put(col, valueLst.get(0));
                 }
             }
         }
