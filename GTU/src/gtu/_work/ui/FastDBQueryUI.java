@@ -1356,7 +1356,7 @@ public class FastDBQueryUI extends JFrame {
                     allRows = queryList;
                 }
 
-                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), this.getDataSource(), allRows);
+                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), allRows, this);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

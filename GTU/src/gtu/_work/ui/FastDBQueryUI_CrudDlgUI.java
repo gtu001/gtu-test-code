@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,8 +50,6 @@ import javax.swing.table.TableColumn;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -86,7 +83,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JComboBox dbTypeComboBox;
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
     private JRadioButton rdbtnOthers;
-    private DataSource dataSource;
+    private FastDBQueryUI _parent;
     private JCheckBox applyAllQueryResultCheckBox;
 
     private static class ColumnConf {
@@ -158,10 +155,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, String tableNSchema, final DataSource dataSource, final Pair<List<String>, List<Object[]>> queryList) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, String tableNSchema, final Pair<List<String>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
-            dialog.dataSource = dataSource;
+            dialog._parent = _parent;
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
 
@@ -215,7 +212,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dialog.dbTypeComboBox.getSelectedItem();
                         tableInfo.setDbDateDateFormat(dbDateDateFormat);
 
-                        tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), dataSource.getConnection());
+                        tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
 
                         Set<String> pkColumns = new HashSet<String>();
                         Set<String> noNullsCol = new HashSet<String>();
@@ -328,7 +325,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
                             boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
                             if (confirm) {
-                                int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], dataSource.getConnection());
+                                int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], _parent.getDataSource().getConnection());
                                 JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
                             }
                         } else {
@@ -498,7 +495,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
                 tableInfo.setDbDateDateFormat(dbDateDateFormat);
-                tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), dataSource.getConnection());
+                tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
 
                 tableInfo.getNoNullsCol();
 
@@ -575,7 +572,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             df.isPk = isPk;
             df.isIgnore = isIgnore;
             df.dtype = dtype;
-            System.out.println(">>>>>>>>>>>>>>>>>>>" + ReflectionToStringBuilder.toString(df, ToStringStyle.SHORT_PREFIX_STYLE));
             this.rowMap.get().put(columnName, df);
         }
     }
