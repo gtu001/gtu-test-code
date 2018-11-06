@@ -1,0 +1,20 @@
+WebSphere_找不道classes錯誤
+
+修改此檔
+        D:\workspace_test_IM\.metadata\.plugins\com.ibm.etools.wrd.websphere\looseconfigurations\was.base.v61\RI_EAR\looseconfig.xmi
+確認路徑是否正確
+        --> uri , binariesPath, resourcesPath
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<org.eclipse.jst.j2ee.commonarchivecore.looseconfig:LooseApplication xmi:version="2.0" 
+        xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:org.eclipse.jst.j2ee.commonarchivecore.looseconfig="commonarchive.looseconfig.xmi" 
+        uri="D:\E123474736_view\IM1\source\RI_SRC\RI_EAR" 
+        binariesPath="D:\E123474736_view\IM1\source\RI_SRC\RI_EAR" 
+        resourcesPath="D:\E123474736_view\IM1\source\RI_SRC\RI_EAR">
+  <looseArchives xsi:type="org.eclipse.jst.j2ee.commonarchivecore.looseconfig:LooseWARFile" 
+        uri="RIWeb.war" 
+        binariesPath="D:\E123474736_view\IM1\source\RI_SRC\RIWeb\WebContent" 
+        resourcesPath="D:\E123474736_view\IM1\source\RI_SRC\RIWeb\WebContent"/>
+</org.eclipse.jst.j2ee.commonarchivecore.looseconfig:LooseApplication>
