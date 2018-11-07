@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,7 +10,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -352,6 +352,25 @@ public class FastDBQueryUI extends JFrame {
         panel_5.setLayout(new BorderLayout(0, 0));
 
         queryResultTable = new JTable();
+        queryResultTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println(e.getKeyCode() + "..." + KeyEvent.VK_ENTER);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && queryResultTable.getSelectedRowCount() > 0) {
+                    Component source = queryResultTable;
+                    int id = -1;
+                    long when = System.currentTimeMillis();
+                    int modifiers = 0;
+                    int x = 0;
+                    int y = 0;
+                    int clickCount = 2;
+                    boolean popupTrigger = false;
+                    int button = MouseEvent.BUTTON1;
+                    MouseEvent e2 = new MouseEvent(source, id, when, modifiers, x, y, clickCount, popupTrigger, button);
+                    queryResultTableMouseClickAction(e2);
+                }
+            }
+        });
         queryResultTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -1334,19 +1353,22 @@ public class FastDBQueryUI extends JFrame {
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
                 Validate.isTrue(this.queryList != null && !this.queryList.getRight().isEmpty(), "查詢結果為空!");
 
-                JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
-                int orignRowPos = queryResultTable.getSelectedRow();
-
-                System.out.println("orignRowPos " + orignRowPos);
-                int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
-                System.out.println("rowPos " + rowPos);
-
-                int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
-                Map<String, Object> rowMap = getDetailToMap(this.queryList, queryLstIndex);
-
-                if (fastDBQueryUI_CrudDlgUI != null) {
-                    fastDBQueryUI_CrudDlgUI.isShowing();
+                if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
                     fastDBQueryUI_CrudDlgUI.dispose();
+                }
+
+                JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
+                int[] orignRowPosArry = queryResultTable.getSelectedRows();
+
+                List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
+                for (int orignRowPos : orignRowPosArry) {
+                    System.out.println("orignRowPos " + orignRowPos);
+                    int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
+                    System.out.println("rowPos " + rowPos);
+
+                    int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
+                    Map<String, Object> rowMap = getDetailToMap(this.queryList, queryLstIndex);
+                    rowMapLst.add(rowMap);
                 }
 
                 Pair<List<String>, List<Object[]>> allRows = null;
@@ -1356,7 +1378,7 @@ public class FastDBQueryUI extends JFrame {
                     allRows = queryList;
                 }
 
-                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMap, getRandom_TableNSchema(), allRows, this);
+                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, this);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -1729,7 +1751,7 @@ public class FastDBQueryUI extends JFrame {
                 String sqlId = JListUtil.getLeadSelectionObject(sqlList);
                 String sql = sqlIdListProp.getProperty(sqlId);
 
-                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("SQL : " + sql, "是否刪除?");
+                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("刪除 : " + sqlId + "\nSQL : " + sql, "是否刪除 : " + sqlId);
                 if (deleteConfirm) {
 
                     // 刪除參數黨

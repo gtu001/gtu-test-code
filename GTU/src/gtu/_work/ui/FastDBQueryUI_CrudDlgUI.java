@@ -18,7 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.sql.DataSource;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
@@ -89,9 +87,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private static class ColumnConf {
         String columnName;
         Object value;
+        Object orignValue;// 用來判斷是否改過
         DataType dtype;
         boolean isPk;
         boolean isIgnore;
+        boolean isModify = false;
 
         Object[] toArry() {
             Object[] arry = new Object[] { columnName, value, dtype, isPk, isIgnore };
@@ -155,7 +155,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final Map<String, Object> rowMap, String tableNSchema, final Pair<List<String>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Pair<List<String>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
             dialog._parent = _parent;
@@ -167,6 +167,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
 
+            Map<String, Object> rowMap = rowMapLst.get(0);
+
             Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
             dialog.rowMap.set(rowMapForBackup);
             for (String col : rowMap.keySet()) {
@@ -177,6 +179,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 df.dtype = DataType.isTypeOf(value);
                 df.isPk = false;
                 df.value = value;
+                df.orignValue = value;
                 rowMapForBackup.put(col, df);
 
                 model.addRow(df.toArry());
@@ -200,7 +203,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 class Process {
                     TableInfo tableInfo;
-                    Map<String, String> singleRecordMap;
+                    List<Map<String, String>> maybeMultiRowLst;
                     Set<String> ignoreColumns;
 
                     Process() throws SQLException {
@@ -220,9 +223,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         Set<String> dateCol = new HashSet<String>();
                         Set<String> timestampCol = new HashSet<String>();
 
-                        Map<String, String> map = new HashMap<String, String>();
                         Set<String> ignoreSet = new HashSet<String>();
+                        Set<String> modifyColSet = new HashSet<String>();
 
+                        List<Map<String, String>> maybeMultiRowLst = new ArrayList<Map<String, String>>();
+
+                        // 第一筆的處理
+                        Map<String, String> map = new LinkedHashMap<String, String>();
                         for (String columnName : dialog.rowMap.get().keySet()) {
                             columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
                             ColumnConf df = dialog.rowMap.get().get(columnName);
@@ -244,6 +251,34 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             } else if (dtype == DataType.number) {
                                 numberCol.add(columnName);
                             }
+                            if (df.isModify) {
+                                modifyColSet.add(columnName);
+                            }
+                        }
+                        maybeMultiRowLst.add(map);
+
+                        // 其他筆的處理
+                        if (rowMapLst.size() > 1) {
+                            for (int ii = 1; ii < rowMapLst.size(); ii++) {
+                                Map<String, Object> fromMap = rowMapLst.get(ii);
+                                Map<String, String> toMap = new LinkedHashMap<String, String>();
+
+                                for (String columnName : dialog.rowMap.get().keySet()) {
+                                    columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
+                                    ColumnConf df = dialog.rowMap.get().get(columnName);
+                                    String valueOrign = fromMap.get(columnName) != null ? String.valueOf(fromMap.get(columnName)) : null;
+                                    String valueClone = df.value != null ? String.valueOf(df.value) : null;
+
+                                    // 只覆蓋有改的
+                                    if (modifyColSet.contains(columnName)) {
+                                        toMap.put(columnName, valueClone);
+                                    } else {
+                                        toMap.put(columnName, valueOrign);
+                                    }
+                                }
+
+                                maybeMultiRowLst.add(toMap);
+                            }
                         }
 
                         // ------------------------------------------------
@@ -257,7 +292,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         tableInfo.getTimestampCol().addAll(timestampCol);
                         // ------------------------------------------------
 
-                        singleRecordMap = map;
+                        this.maybeMultiRowLst = maybeMultiRowLst;
                         ignoreColumns = ignoreSet;
                     }
 
@@ -305,28 +340,33 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     try {
                         Process process = new Process();
                         if (!dialog.applyAllQueryResultCheckBox.isSelected()) {
-                            // 套用單筆資料
-                            AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
-                            String sql = "";
-                            if (btn == dialog.rdbtnInsert) {
-                                sql = process.tableInfo.createInsertSql(process.singleRecordMap, process.ignoreColumns);
-                            } else if (btn == dialog.rdbtnDelete) {
-                                sql = process.tableInfo.createDeleteSql(process.singleRecordMap);
-                            } else if (btn == dialog.rdbtnUpdate) {
-                                sql = process.tableInfo.createUpdateSql(process.singleRecordMap, process.singleRecordMap, false, process.ignoreColumns);
-                            } else if (btn == dialog.rdbtnOthers) {
-                                rdbtnOthersAction(process.tableInfo, process.singleRecordMap);
-                                return;
-                            } else {
-                                Validate.isTrue(false, "請選sql類型");
-                            }
+                            for (Map<String, String> singleRecordMap : process.maybeMultiRowLst) {
+                                // 套用單筆資料
+                                AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
+                                String sql = "";
+                                if (btn == dialog.rdbtnInsert) {
+                                    sql = process.tableInfo.createInsertSql(singleRecordMap, process.ignoreColumns);
+                                } else if (btn == dialog.rdbtnDelete) {
+                                    sql = process.tableInfo.createDeleteSql(singleRecordMap);
+                                } else if (btn == dialog.rdbtnUpdate) {
+                                    sql = process.tableInfo.createUpdateSql(singleRecordMap, singleRecordMap, false, process.ignoreColumns);
+                                } else if (btn == dialog.rdbtnOthers) {
+                                    rdbtnOthersAction(process.tableInfo, singleRecordMap);
+                                    return;
+                                } else {
+                                    Validate.isTrue(false, "請選sql類型");
+                                }
 
-                            String promptLabel = StringUtils.join(StringUtil4FullChar.fixLength(sql, 50), "\n");
-                            String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
-                            boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
-                            if (confirm) {
-                                int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], _parent.getDataSource().getConnection());
-                                JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
+                                String promptLabel = StringUtils.join(StringUtil4FullChar.fixLength(sql, 50), "\n");
+                                String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
+                                boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
+                                if (confirm) {
+                                    int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], _parent.getDataSource().getConnection());
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
+                                } else {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("操作中斷");
+                                    return;
+                                }
                             }
                         } else {
                             // 套用所有資料
@@ -567,11 +607,25 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             if (this.rowMap.get().containsKey(columnName)) {
                 df = this.rowMap.get().get(columnName);
             }
+
+            if ("DESCRIPTION".equals(columnName)) {
+                System.out.println("ddddddddd");
+            }
+
+            // 判斷欄位是否修改過
+            if (("null".equals(String.valueOf(value)) && null == df.orignValue) || //
+                    StringUtils.equals(value, String.valueOf(df.orignValue))) {
+                df.isModify = false;
+            } else {
+                df.isModify = true;
+            }
+
             df.columnName = columnName;
             df.value = value;
             df.isPk = isPk;
             df.isIgnore = isIgnore;
             df.dtype = dtype;
+
             this.rowMap.get().put(columnName, df);
         }
     }
@@ -950,6 +1004,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             JTableUtil.defaultSetting(rowTable);
             contentPanel.add(JCommonUtil.createScrollComponent(rowTable), BorderLayout.CENTER);
             rowTable.addMouseListener(new MouseAdapter() {
+
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
@@ -966,8 +1021,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             });
         }
         {
+
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
                 okButton = new JButton("OK");
@@ -984,10 +1041,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
                 cancelButton.addActionListener(new ActionListener() {
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         FastDBQueryUI_CrudDlgUI.this.dispose();
                     }
+
                 });
             }
         }
