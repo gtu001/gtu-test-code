@@ -249,7 +249,7 @@ public class DropboxEnglishService {
             Future<T> future = executor.submit(task);
             System.out.println("future done? " + future.isDone());
             T result = null;
-            if (timeout == -1) {
+            if (timeout <= 0) {
                 result = future.get();
             } else {
                 result = future.get(timeout, TimeUnit.MILLISECONDS);

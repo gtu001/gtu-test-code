@@ -45,9 +45,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.AppOpenHelper;
 import com.example.englishtester.common.ClipboardHelper;
+import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FileUtilAndroid;
@@ -75,6 +77,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -85,6 +89,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -499,8 +504,11 @@ public class FloatViewService extends Service {
                                 try {
                                     File saveFile = new File(saveToDir, fileName);
                                     FileUtilAndroid.saveToFile(saveFile, saveSb.toString());
-                                    Toast.makeText(context, "儲存成功 : " + saveFile, Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(context, "儲存成功 : " + saveFile, Toast.LENGTH_SHORT).show();
                                     redPlusBtnHandler.clear();
+
+                                    //上傳至dropbox
+                                    redPlusBtnHandler.uploadNotePlusToDropbox(saveFile);
                                 } catch (IOException e) {
                                     Toast.makeText(context, "儲存失敗!", Toast.LENGTH_SHORT).show();
                                     Log.e(TAG, e.getMessage(), e);
@@ -1775,12 +1783,14 @@ public class FloatViewService extends Service {
     }
 
     private class RedPlusBtnHandler {
-        String refKey = FloatViewService.class.getSimpleName();
-        String bundleKey = "plusNote";
-        String delimitPtn = "\\Q#,#\\E";
-        String delimit = "#,#";
-        int maxLength = 10;
+        final String refKey = FloatViewService.class.getSimpleName();
+        final String bundleKey = "plusNote";
+        final String delimitPtn = "\\Q#,#\\E";
+        final String delimit = "#,#";
+        final int maxLength = 50;
+        final String uploadDir = "/english_prop/";
         Context context;
+        String dropboxToken;
 
         private RedPlusBtnHandler(Context context) {
             this.context = context;
@@ -1835,6 +1845,45 @@ public class FloatViewService extends Service {
                 }
             }
             return arry;
+        }
+
+        public boolean uploadNotePlusToDropbox(final File file) {
+            if (StringUtils.isBlank(this.dropboxToken)) {
+                this.dropboxToken = DropboxApplicationActivity.getDropboxAccessToken(context);
+            }
+            if (StringUtils.isBlank(this.dropboxToken)) {
+                Toast.makeText(context, "dropbox尚未就緒!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            boolean result = DropboxEnglishService.getRunOnUiThread(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    FileInputStream inputStream = null;
+                    boolean result = false;
+                    try {
+                        inputStream = new FileInputStream(file);
+                        String name = uploadDir + file.getName();
+
+                        DbxClientV2 client = DropboxUtilV2.getClient(dropboxToken);
+                        result = DropboxUtilV2.upload(name, inputStream, client);
+                    } catch (FileNotFoundException e) {
+                        Log.e(TAG, "uploadNotePlusToDropbox ERR : " + e.getMessage(), e);
+                    } finally {
+                        try {
+                            inputStream.close();
+                        } catch (Exception e) {
+                        }
+                        if (result) {
+                            file.delete();
+                        }
+                    }
+                    return result;
+                }
+            }, -1);
+
+            Toast.makeText(context, "上傳" + (result ? "成功" : "失敗") + "! : " + file.getName(), Toast.LENGTH_SHORT).show();
+            return result;
         }
     }
 
