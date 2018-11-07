@@ -52,7 +52,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
-import gtu.binary.StringUtil4FullChar;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
@@ -340,6 +339,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     try {
                         Process process = new Process();
                         if (!dialog.applyAllQueryResultCheckBox.isSelected()) {
+
+                            List<String> updateSqlLst = new ArrayList<String>();
                             for (Map<String, String> singleRecordMap : process.maybeMultiRowLst) {
                                 // 套用單筆資料
                                 AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
@@ -352,22 +353,47 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                     sql = process.tableInfo.createUpdateSql(singleRecordMap, singleRecordMap, false, process.ignoreColumns);
                                 } else if (btn == dialog.rdbtnOthers) {
                                     rdbtnOthersAction(process.tableInfo, singleRecordMap);
-                                    return;
                                 } else {
                                     Validate.isTrue(false, "請選sql類型");
                                 }
-
-                                String promptLabel = StringUtils.join(StringUtil4FullChar.fixLength(sql, 50), "\n");
-                                String realSql = JCommonUtil._jOptionPane_showInputDialog(promptLabel, sql);
-                                boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定執行 ： " + realSql + " ? ", "確認！！！");
-                                if (confirm) {
-                                    int updateResult = JdbcDBUtil.executeUpdate(realSql, new Object[0], _parent.getDataSource().getConnection());
-                                    JCommonUtil._jOptionPane_showMessageDialog_info("update result = " + updateResult);
-                                } else {
-                                    JCommonUtil._jOptionPane_showMessageDialog_error("操作中斷");
-                                    return;
+                                if (StringUtils.isNotBlank(sql)) {
+                                    updateSqlLst.add(sql);
                                 }
                             }
+
+                            if (updateSqlLst.isEmpty()) {
+                                return;
+                            }
+                            final FastDBQueryUI_UpdateSqlArea updateDlg = FastDBQueryUI_UpdateSqlArea.newInstance("確定執行以下SQL:", updateSqlLst);
+                            updateDlg.setConfirmDo(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    Exception ex1 = null;
+                                    List<String> sqlLst = updateDlg.getSqlText();
+                                    int successCount = 0;
+                                    int failCount = 0;
+                                    List<Integer> resultLst = new ArrayList<Integer>();
+                                    for (String sql : sqlLst) {
+                                        int updateResult = 0;
+                                        try {
+                                            updateResult = JdbcDBUtil.executeUpdate(sql, new Object[0], _parent.getDataSource().getConnection());
+                                        } catch (Exception ex) {
+                                            ex1 = ex;
+                                        }
+                                        if (updateResult > 0) {
+                                            successCount++;
+                                        } else {
+                                            failCount++;
+                                        }
+                                        resultLst.add(updateResult);
+                                    }
+                                    JCommonUtil._jOptionPane_showMessageDialog_info(String.format("成功:%d,失敗:%d,共:%d\n", successCount, failCount, (successCount + failCount)) + resultLst);
+                                    if (ex1 != null) {
+                                        ex1.printStackTrace();
+                                        JCommonUtil.handleException(ex1);
+                                    }
+                                }
+                            });
                         } else {
                             // 套用所有資料
                             AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
@@ -1030,23 +1056,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 okButton = new JButton("OK");
                 okButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        dispose();
                     }
                 });
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
-                // getRootPane().setDefaultButton(okButton);
+                // getRootPane().setDefaultButton(okButton);//取消調預設按鈕
             }
             {
                 JButton cancelButton = new JButton("Cancel");
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
                 cancelButton.addActionListener(new ActionListener() {
-
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         FastDBQueryUI_CrudDlgUI.this.dispose();
                     }
-
                 });
             }
         }
