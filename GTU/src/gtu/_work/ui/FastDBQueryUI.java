@@ -630,6 +630,7 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/big_boobs.ico");
         }
     }
 
