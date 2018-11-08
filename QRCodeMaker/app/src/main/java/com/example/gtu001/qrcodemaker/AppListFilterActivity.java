@@ -1,13 +1,11 @@
 package com.example.gtu001.qrcodemaker;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,17 +14,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 
 import com.example.gtu001.qrcodemaker.common.AppListService;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.SimpleAdapterDecorator;
-import com.example.gtu001.qrcodemaker.services.YoutubeVideoService;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +41,7 @@ public class AppListFilterActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout layout = LayoutViewHelper.createContentView(this);
+        LinearLayout layout = LayoutViewHelper.createContentView_simple(this);
 
         final EditText filterText = new EditText(this);
         layout.addView(filterText);
@@ -65,7 +62,7 @@ public class AppListFilterActivity extends Activity {
         layout.addView(listView, //
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
-        LayoutViewHelper.setViewHeight(listView, 2000);
+//        LayoutViewHelper.setViewHeight(listView, 1000);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -142,12 +139,34 @@ public class AppListFilterActivity extends Activity {
         }
 
         public void init() {
-            baseAdapter = createSimpleAdapter(findAll());
-            listView.setAdapter(baseAdapter);
-            baseAdapter.notifyDataSetChanged();
+            final ProgressDialog proc = new ProgressDialog(context);
+            proc.setIndeterminate(true);
+            proc.setMessage("loading");
+            proc.show();
+
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    baseAdapter = createSimpleAdapter(findAll());
+
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listView.setAdapter(baseAdapter);
+                        }
+                    });
+
+                    baseAdapter.notifyDataSetChanged();
+                    proc.dismiss();
+                }
+            }).start();
         }
 
         public void findByText(String text) {
+            text = StringUtils.trimToEmpty(text).replaceAll("[\r\n]", "");
+            text = StringUtils.trimToEmpty(text);
+            Log.v(TAG, "filter text : " + text);
             baseAdapter = createSimpleAdapter(_findByText(text));
             listView.setAdapter(baseAdapter);
             baseAdapter.notifyDataSetChanged();

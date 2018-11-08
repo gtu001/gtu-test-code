@@ -14,6 +14,13 @@ public class LayoutViewHelper {
         view.setLayoutParams(lp);
     }
 
+    public static LinearLayout createContentView_simple(Activity activity) {
+        LinearLayout layout = new LinearLayout(activity);
+        activity.setContentView(layout);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        return layout;
+    }
+
     public static LinearLayout createContentView(Activity activity) {
         LinearLayout layout = new LinearLayout(activity);
         ScrollView scroll = new ScrollView(activity);

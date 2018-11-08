@@ -49,7 +49,7 @@ public class YoutubePlayerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout layout = LayoutViewHelper.createContentView(this);
+        LinearLayout layout = LayoutViewHelper.createContentView_simple(this);
 
         Log.v(TAG, "#################################################", 3);
         new PingUtil.NetPing("www.youtube.com").execute();
@@ -77,7 +77,7 @@ public class YoutubePlayerActivity extends Activity {
         layout.addView(listView, //
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
-        LayoutViewHelper.setViewHeight(listView, 2000);
+//        LayoutViewHelper.setViewHeight(listView, 1000);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
