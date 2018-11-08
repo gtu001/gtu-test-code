@@ -59,7 +59,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
@@ -445,6 +447,15 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         jPanel2.add(openSvnUpdate);
                         openSvnUpdate.setText("list svn new or modify file");
                         openSvnUpdate.setPreferredSize(new java.awt.Dimension(210, 34));
+                        {
+                            restoreBackBtn = new JButton("備份回復");
+                            restoreBackBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    swingUtil.invokeAction("restoreBackBtn.actionPerformed", e);
+                                }
+                            });
+                            jPanel2.add(restoreBackBtn);
+                        }
                         openSvnUpdate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 swingUtil.invokeAction("openSvnUpdate.actionPerformed", evt);
@@ -1582,6 +1593,32 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     thread.start();
                 }
             });
+            swingUtil.addAction("restoreBackBtn.actionPerformed", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    File file = JCommonUtil._jFileChooser_selectFileOnly();
+                    if (!file.getName().equals("CopyTo.log")) {
+                        Validate.isTrue(false, "檔案名稱必須為 : " + "CopyTo.log");
+                    }
+                    List<String> lst = FileUtil.loadFromFile_asList(file, "UTF8");
+                    Pattern ptn = Pattern.compile("from\\:(.*?)\tto\\:(.*?)\t[\\w]");
+
+                    List<Pair<File, File>> fromToLst = new ArrayList<Pair<File, File>>();
+                    for (String line : lst) {
+                        Matcher mth = ptn.matcher(line);
+                        System.out.println("-------------------------------------------------");
+                        if (mth.find()) {
+                            File from = new File(mth.group(1));
+                            File to = new File(mth.group(2));
+                            System.out.println("from : " + from);
+                            System.out.println("to : " + to);
+                            fromToLst.add(Pair.of(from, to));
+                        }
+                        System.out.println("-------------------------------------------------");
+                    }
+
+                    ExecuteOpener_restoreBackProcess.newInstance(fromToLst);
+                }
+            });
             swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
                 public void action(EventObject evt) throws Exception {
                 }
@@ -1651,6 +1688,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
     Object[] arrayBackupForInnerScan;
     static Pattern renameMatchPattern = Pattern.compile("(.+)_R\\d+(\\.\\w+)");
     private JCheckBox scanLstShowDetailChk;
+    private JButton restoreBackBtn;
 
     void reloadCurrentDirPropertiesList() {
         DefaultListModel model = new DefaultListModel();

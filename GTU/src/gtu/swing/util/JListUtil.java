@@ -5,9 +5,11 @@ import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -38,6 +40,18 @@ public class JListUtil {
             return null;
         }
         return (T) jList1.getModel().getElementAt(pos);
+    }
+
+    public static <T> List<T> getLeadSelectionArry(JList jList1) {
+        if (jList1.getLeadSelectionIndex() == -1) {
+            return null;
+        }
+        int[] posArry = jList1.getSelectedIndices();
+        List<T> lst = new ArrayList<T>();
+        for (int pos : posArry) {
+            lst.add((T) jList1.getModel().getElementAt(pos));
+        }
+        return lst;
     }
 
     public boolean isCorrectMouseClick(EventObject event) {

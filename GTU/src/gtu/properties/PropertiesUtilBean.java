@@ -1,11 +1,10 @@
 package gtu.properties;
 
+import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,7 +14,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -148,17 +146,17 @@ public class PropertiesUtilBean {
         return propFile;
     }
 
-    public void reflectInit(JFrame jframe) {
+    public void reflectInit(Window jframe) {
         configReflect.setToUI(jframe);
     }
 
-    public void reflectSetConfig(JFrame jframe) {
+    public void reflectSetConfig(Window jframe) {
         configReflect.setToConfig(jframe);
     }
 
     // swing 自動化設直
     private class _JFrameReflectionToConfig {
-        private void setToUI(JFrame jframe) {
+        private void setToUI(Window jframe) {
             for (Field f : jframe.getClass().getDeclaredFields()) {
                 if (configProp.containsKey(f.getName())) {
                     String value = configProp.getProperty(f.getName());
@@ -188,7 +186,7 @@ public class PropertiesUtilBean {
             }
         }
 
-        private void setToConfig(JFrame jframe) {
+        private void setToConfig(Window jframe) {
             for (Field f : jframe.getClass().getDeclaredFields()) {
                 try {
                     if (f.getType() == JTextField.class) {
