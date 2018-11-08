@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -72,6 +73,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 
@@ -489,7 +491,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         jPanel9.setPreferredSize(new java.awt.Dimension(741, 187));
                         {
                             scanDirText = new JTextField();
-                            JCommonUtil.jTextFieldSetFilePathMouseEvent(scanDirText, true);
+                            JTextFieldUtil.setupDragDropFilePath(scanDirText, null);
                             scanDirText.setToolTipText("scan dir");
                             jPanel9.add(scanDirText);
                             scanDirText.setPreferredSize(new java.awt.Dimension(225, 24));
@@ -607,6 +609,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         ZFile.is_show_detail = scanLstShowDetailChk.isSelected();
                                         scanList.updateUI();
+                                        execList.updateUI();
                                     }
                                 });
                                 jPanel9.add(scanLstShowDetailChk);
@@ -813,7 +816,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     StringTokenizer token = new StringTokenizer(exeArea.getText(), "\t\n\r\f");
                     while (token.hasMoreElements()) {
                         String val = ((String) token.nextElement()).trim();
-                        model.addElement(val);
+                        model.addElement(new ZFile(val));
                         prop.put(val, "");
                     }
                 }
@@ -834,8 +837,19 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
             // DEFAULT PROP SAVE
             swingUtil.addAction("saveList.actionPerformed", new Action() {
+
+                private String getDefaultName() {
+                    String title = getTitle();
+                    Pattern ptn = Pattern.compile("properties\\s*\\:\\s*(.*)");
+                    Matcher mth = ptn.matcher(title);
+                    if (mth.find()) {
+                        return mth.group(1);
+                    }
+                    return "";
+                }
+
                 public void action(EventObject evt) throws Exception {
-                    String orignName = JOptionPaneUtil.newInstance().iconPlainMessage().showInputDialog("input properties file name", "SAVE");
+                    String orignName = (String) JOptionPaneUtil.newInstance().iconPlainMessage().showInputDialog("input properties file name", "SAVE", getDefaultName());
                     File saveFile = null;
                     if (StringUtils.isNotBlank(orignName)) {
                         String fileName = orignName;
@@ -846,8 +860,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         prop.clear();
                         DefaultListModel model = (DefaultListModel) execList.getModel();
                         for (Enumeration<?> enu = model.elements(); enu.hasMoreElements();) {
-                            String val = (String) enu.nextElement();
-                            prop.put(val, "");
+                            ZFile ff = (ZFile) enu.nextElement();
+                            prop.put(ff.getAbsolutePath(), "");
                         }
                         saveFile = new File(jarPositionDir, fileName);
                     } else {
@@ -871,36 +885,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(execList).applyEvent(evt);
 
                         if (execList.getSelectedValues().length == 1) {
-                            popupUtil.addJMenuItem(JFileExecuteUtil.newInstance(new File((String) execList.getSelectedValues()[0])).createDefaultJMenuItems());
+                            popupUtil.addJMenuItem(JFileExecuteUtil.newInstance(((ZFile) execList.getSelectedValues()[0])).createDefaultJMenuItems());
                             popupUtil.addJMenuItem("----------------", false);
                         }
-
-                        popupUtil.addJMenuItem("eclipse home", new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                DefaultListModel model = (DefaultListModel) execList.getModel();
-                                Object[] arry = model.toArray();
-                                for (Object obj : arry) {
-                                    try {
-                                        Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\"", "C:/資拓宏宇相關檔案/eclipse_jee/eclipse.exe", obj));
-                                    } catch (IOException ex) {
-                                        JCommonUtil.handleException(ex);
-                                    }
-                                }
-                            }
-                        });
-                        popupUtil.addJMenuItem("eclipse company", new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                DefaultListModel model = (DefaultListModel) execList.getModel();
-                                Object[] arry = model.toArray();
-                                for (Object obj : arry) {
-                                    try {
-                                        Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\"", "C:/資拓宏宇相關檔案/iisi_eclipse/eclipse.exe", obj));
-                                    } catch (IOException ex) {
-                                        JCommonUtil.handleException(ex);
-                                    }
-                                }
-                            }
-                        });
 
                         popupUtil.addJMenuItem("----------------", false);
 
@@ -909,10 +896,16 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         DefaultListModel model = (DefaultListModel) execList.getModel();
                                         Object[] arry = model.toArray();
-                                        Arrays.sort(arry);
+                                        Arrays.sort(arry, new Comparator<Object>() {
+                                            @Override
+                                            public int compare(Object o1, Object o2) {
+                                                return ((ZFile) o1).getAbsolutePath().compareTo(((ZFile) o2).getAbsolutePath());
+                                            }
+                                        });
                                         DefaultListModel model2 = new DefaultListModel();
                                         for (Object obj : arry) {
-                                            model2.addElement(obj);
+                                            ZFile file = (ZFile) obj;
+                                            model2.addElement(file);
                                         }
                                         execList.setModel(model2);
                                     }
@@ -921,7 +914,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         DefaultListModel model = (DefaultListModel) execList.getModel();
                                         DefaultListModel model2 = new DefaultListModel();
                                         for (Object obj : model.toArray()) {
-                                            if (new File((String) obj).exists()) {
+                                            ZFile file = (ZFile) obj;
+                                            if (file.exists()) {
                                                 model2.addElement(obj);
                                             }
                                         }
@@ -931,11 +925,12 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         DefaultListModel model = (DefaultListModel) execList.getModel();
                                         DefaultListModel model2 = new DefaultListModel();
-                                        Set<String> set = new HashSet<String>();
+                                        Set<ZFile> set = new HashSet<ZFile>();
                                         for (Object obj : model.toArray()) {
-                                            set.add((String) obj);
+                                            ZFile file = (ZFile) obj;
+                                            set.add(file);
                                         }
-                                        for (String val : set) {
+                                        for (ZFile val : set) {
                                             model2.addElement(val);
                                         }
                                         execList.setModel(model2);
@@ -944,7 +939,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                     public void actionPerformed(ActionEvent e) {
                                         DefaultListModel model = (DefaultListModel) execList.getModel();
                                         for (int ii = 0; ii < model.getSize(); ii++) {
-                                            if (new File((String) model.getElementAt(ii)).isDirectory()) {
+                                            if (((ZFile) model.getElementAt(ii)).isDirectory()) {
                                                 model.removeElementAt(ii);
                                                 ii--;
                                             }
@@ -955,7 +950,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         DefaultListModel model = (DefaultListModel) execList.getModel();
                                         File dir = null;
                                         for (int ii = 0; ii < model.getSize(); ii++) {
-                                            dir = new File((String) model.getElementAt(ii));
+                                            dir = ((ZFile) model.getElementAt(ii));
                                             if (dir.isDirectory() && dir.list().length == 0) {
                                                 model.removeElementAt(ii);
                                                 ii--;
@@ -964,14 +959,14 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                     }
                                 }).addJMenuItem("----------------", false).addJMenuItem("diff left : " + (diffLeft != null ? diffLeft.getName() : ""), true, new ActionListener() {
                                     public void actionPerformed(ActionEvent arg0) {
-                                        File value = new File((String) JListUtil.getLeadSelectionObject(execList));
+                                        File value = ((ZFile) JListUtil.getLeadSelectionObject(execList));
                                         if (value != null && value.isFile() && value.exists()) {
                                             diffLeft = value;
                                         }
                                     }
                                 }).addJMenuItem("diff right : " + (diffRight != null ? diffRight.getName() : ""), true, new ActionListener() {
                                     public void actionPerformed(ActionEvent arg0) {
-                                        File value = new File((String) JListUtil.getLeadSelectionObject(execList));
+                                        File value = ((ZFile) JListUtil.getLeadSelectionObject(execList));
                                         if (value != null && value.isFile() && value.exists()) {
                                             diffRight = value;
                                         }
@@ -1018,7 +1013,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                             int success = 0;
                                             int fail = 0;
                                             for (Object v : execList.getSelectedValues()) {
-                                                File fromFile = new File((String) v);
+                                                File fromFile = ((ZFile) v);
                                                 File toFile = getToFile(destDir, fromFile.getName());
                                                 if (fromFile.exists()) {
                                                     boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
@@ -1062,8 +1057,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         return;
                     }
                     DefaultListModel model = (DefaultListModel) execList.getModel();
-                    String val = (String) model.getElementAt(pos);
-                    exec(val);
+                    ZFile val = (ZFile) model.getElementAt(pos);
+                    exec(val.getAbsolutePath());
                 }
             });
             swingUtil.addAction("loadProp.actionPerformed", new Action() {
@@ -1230,12 +1225,12 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 private void addModelElement(File file) {
                     DefaultListModel model = (DefaultListModel) execList.getModel();
                     for (int ii = 0; ii < model.getSize(); ii++) {
-                        String filePath = (String) model.get(ii);
-                        if (StringUtils.equals(filePath, file.getAbsolutePath())) {
+                        ZFile fff = (ZFile) model.get(ii);
+                        if (StringUtils.equals(fff.getAbsolutePath(), file.getAbsolutePath())) {
                             return;
                         }
                     }
-                    model.addElement(file.getAbsolutePath());
+                    model.addElement(new ZFile(file.getParentFile(), file.getName()));
                 }
 
                 public void action(EventObject evt) throws Exception {
@@ -1558,7 +1553,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             File file = null;
                             BufferedReader reader = null;
                             for (int ii = 0; ii < model.getSize(); ii++) {
-                                file = new File((String) model.getElementAt(ii));
+                                file = (ZFile) model.getElementAt(ii);
                                 if (!file.exists()) {
                                     continue;
                                 }
@@ -1592,6 +1587,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 }
             });
 
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
             this.setSize(870, 551);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1683,7 +1679,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
         List<String> keys = ListUtil.getList(prop.keySet(), String.class);
         Collections.sort(keys);
         for (Object obj : keys) {
-            execListModel.addElement((String) obj);
+            execListModel.addElement(new ZFile((String) obj));
         }
         execList.setModel(execListModel);
     }
@@ -1771,6 +1767,10 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
         private static boolean is_show_detail = false;
 
+        public ZFile(String filePath) {
+            super(filePath);
+        }
+
         public ZFile(File parent, String child) {
             super(parent, child);
         }
@@ -1782,7 +1782,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 String createTime = DateFormatUtils.format(FileUtil.getCreateTime(this), "yyyy/MM/dd_HHmm");
                 String modifyTime = DateFormatUtils.format(this.lastModified(), "yyyy/MM/dd_HHmm");
                 String sizeDesc = FileUtil.getSizeDescription(this.length());
-                return String.format("C%s  M%s  %s  \t%s", createTime, modifyTime, sizeDesc, super.toString());
+                String formatStr = "<html><font color='#cc88cc'>建%s</font>&nbsp;&nbsp;<font color='#cccc88'>改%s</font>&nbsp;&nbsp;<font color='#6341a5'>%s</font>&nbsp;&nbsp;&nbsp;&nbsp;%s</html>";
+                return String.format(formatStr, createTime, modifyTime, sizeDesc, super.toString());
             } else {
                 return super.toString();
             }

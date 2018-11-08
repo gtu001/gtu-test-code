@@ -57,9 +57,9 @@ public class ImageUtil {
         return getDefaultImage(imagePath);
     }
 
-    public Image getIcoImage(String imagePath) {
+    public Image getIcoImage(String resourcePath) {
         try {
-            URL imgURL = this.getClass().getClassLoader().getResource(imagePath);
+            URL imgURL = this.getClass().getClassLoader().getResource(resourcePath);
             List<BufferedImage> images = ICODecoder.read(imgURL.openStream());
             for (int ii = 0; ii < images.size(); ii++) {
                 // System.out.println(String.format("%d - h:%d,w:%d", ii,
