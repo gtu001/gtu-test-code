@@ -93,7 +93,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.youtube_player) {
             gotoActivity(YoutubePlayerActivity.class);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.app_list_filter) {
+            gotoActivity(AppListFilterActivity.class);
 
         } else if (id == R.id.nav_send) {
 
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void gotoActivity(Class clz){
+    private void gotoActivity(Class clz) {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);

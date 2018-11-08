@@ -1,6 +1,7 @@
 package com.example.englishtester.common;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
@@ -21,6 +22,10 @@ public class SimpleAdapterDecorator {
                 if (view instanceof ImageView && bitmapData instanceof Bitmap) {
                     ImageView i = (ImageView) view;
                     i.setImageBitmap((Bitmap) bitmapData);
+                    return true;
+                } else if (view instanceof ImageView && bitmapData instanceof Drawable) {
+                    ImageView i = (ImageView) view;
+                    i.setImageDrawable((Drawable) bitmapData);
                     return true;
                 }
                 return false;

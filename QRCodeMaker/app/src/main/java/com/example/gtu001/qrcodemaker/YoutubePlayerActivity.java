@@ -77,7 +77,7 @@ public class YoutubePlayerActivity extends Activity {
         layout.addView(listView, //
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
-        LayoutViewHelper.setViewHeight(listView, 1000);
+        LayoutViewHelper.setViewHeight(listView, 2000);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
