@@ -67,6 +67,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFileChooserUtil;
@@ -138,6 +139,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JPanel jPanel4;
     private JPanel jPanel3;
     private JPanel jPanel2;
+
+    private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
 
     /**
      * Auto-generated main method to display this JFrame
@@ -455,6 +458,15 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 }
                             });
                             jPanel2.add(restoreBackBtn);
+                        }
+                        {
+                            saveConfigBtn = new JButton("儲存設定");
+                            saveConfigBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    swingUtil.invokeAction("saveConfigBtn.actionPerformed", e);
+                                }
+                            });
+                            jPanel2.add(saveConfigBtn);
                         }
                         openSvnUpdate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
@@ -851,7 +863,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                 private String getDefaultName() {
                     String title = getTitle();
-                    Pattern ptn = Pattern.compile("properties\\s*\\:\\s*(.*)");
+                    Pattern ptn = Pattern.compile("properties\\s*\\:\\s*" + ExecuteOpener.class.getSimpleName() + "\\_(.*)\\.properties");
                     Matcher mth = ptn.matcher(title);
                     if (mth.find()) {
                         return mth.group(1);
@@ -878,7 +890,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     } else {
                         saveFile = currentPropFile;
                     }
-                    prop.store(new FileOutputStream(saveFile), orignName);
+                    PropertiesUtil.storeProperties(prop, saveFile, orignName);
+                    setTitle("properties : " + saveFile.getName());
                     JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog(saveFile, "PROPERTIES CREATE");
                 }
             });
@@ -1205,7 +1218,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         return;
                     }
                     prop.clear();
-                    prop.load(new FileInputStream(file));
+                    PropertiesUtil.loadProperties(new FileInputStream(file), prop);
                     currentPropFile = file;
                     reloadExecListProperties(prop);
                     setTitle("properties : " + file.getName());
@@ -1619,11 +1632,18 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     ExecuteOpener_restoreBackProcess.newInstance(fromToLst);
                 }
             });
+            swingUtil.addAction("saveConfigBtn.actionPerformed", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    config.reflectSetConfig(ExecuteOpener.this);
+                    config.store();
+                }
+            });
             swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
                 public void action(EventObject evt) throws Exception {
                 }
             });
 
+            config.reflectInit(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
             this.setSize(870, 551);
         } catch (Exception e) {
@@ -1689,6 +1709,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
     static Pattern renameMatchPattern = Pattern.compile("(.+)_R\\d+(\\.\\w+)");
     private JCheckBox scanLstShowDetailChk;
     private JButton restoreBackBtn;
+    private JButton saveConfigBtn;
 
     void reloadCurrentDirPropertiesList() {
         DefaultListModel model = new DefaultListModel();
@@ -1707,7 +1728,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
     void reloadExecListProperties(File file) throws FileNotFoundException, IOException {
         prop.clear();
-        prop.load(new FileInputStream(file));
+        PropertiesUtil.loadProperties(new FileInputStream(file), prop);
         reloadExecListProperties(prop);
         setTitle(file.getAbsolutePath());
     }

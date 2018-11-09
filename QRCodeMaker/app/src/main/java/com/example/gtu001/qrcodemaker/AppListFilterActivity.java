@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -38,24 +39,29 @@ public class AppListFilterActivity extends Activity {
     private BaseAdapter baseAdapter;
     private InitListViewHandler initListViewHandler;
 
+    private Button btn1;
+    private EditText filterText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LinearLayout layout = LayoutViewHelper.createContentView_simple(this);
 
-        final EditText filterText = new EditText(this);
-        layout.addView(filterText);
-
-        //初始Btn狀態紐
-        Button btn1 = new Button(this);
-        btn1.setText("過濾");
-        layout.addView(btn1);
-        btn1.setOnClickListener(new View.OnClickListener() {
+        filterText = new EditText(this);
+        filterText.setMaxLines(1);
+        filterText.setSingleLine();
+        filterText.setHint("請按Enter鍵");
+        filterText.setOnKeyListener(new View.OnKeyListener() {
             @Override
-            public void onClick(View v) {
-                initListViewHandler.findByText(filterText.getText().toString());
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    initListViewHandler.findByText(filterText.getText().toString());
+                    return true;
+                }
+                return false;
             }
         });
+        layout.addView(filterText);
 
         //初始listView
         listView = new ListView(this);
@@ -164,7 +170,6 @@ public class AppListFilterActivity extends Activity {
         }
 
         public void findByText(String text) {
-            text = StringUtils.trimToEmpty(text).replaceAll("[\r\n]", "");
             text = StringUtils.trimToEmpty(text);
             Log.v(TAG, "filter text : " + text);
             baseAdapter = createSimpleAdapter(_findByText(text));

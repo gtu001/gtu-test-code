@@ -167,11 +167,11 @@ public class PropertiesUtil {
      * @return
      * @throws Exception
      */
-    public static void storeProperties(Properties prop, OutputStream ouputStream, String comment) throws Exception {
+    public static void storeProperties(Properties prop, OutputStream ouputStream, String comment) {
         try {
             prop.store(ouputStream, comment);
         } catch (Exception ex) {
-            throw ex;
+            throw new RuntimeException("[storeProperties] 存檔失敗  , ERR : " + ex.getMessage(), ex);
         } finally {
             try {
                 ouputStream.flush();
