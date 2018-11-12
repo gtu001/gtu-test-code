@@ -1,0 +1,12 @@
+
+安裝
+
+	$sudo apt-get install meld
+	
+
+用命令執行
+
+	$ meld file1 file2 file3
+	$ meld dir1 dir2 dir3
+	
+	

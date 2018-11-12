@@ -1641,28 +1641,11 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
             swingUtil.addAction("restoreBackBtn.actionPerformed", new Action() {
                 public void action(EventObject evt) throws Exception {
-                    File file = JCommonUtil._jFileChooser_selectFileOnly();
-                    if (!file.getName().equals("CopyTo.log")) {
+                    File logFile = JCommonUtil._jFileChooser_selectFileOnly();
+                    if (!logFile.getName().equals("CopyTo.log")) {
                         Validate.isTrue(false, "檔案名稱必須為 : " + "CopyTo.log");
                     }
-                    List<String> lst = FileUtil.loadFromFile_asList(file, "UTF8");
-                    Pattern ptn = Pattern.compile("from\\:(.*?)\tto\\:(.*?)\t[\\w]");
-
-                    List<Pair<File, File>> fromToLst = new ArrayList<Pair<File, File>>();
-                    for (String line : lst) {
-                        Matcher mth = ptn.matcher(line);
-                        System.out.println("-------------------------------------------------");
-                        if (mth.find()) {
-                            File from = new File(mth.group(1));
-                            File to = new File(mth.group(2));
-                            System.out.println("from : " + from);
-                            System.out.println("to : " + to);
-                            fromToLst.add(Pair.of(from, to));
-                        }
-                        System.out.println("-------------------------------------------------");
-                    }
-
-                    ExecuteOpener_restoreBackProcess.newInstance(fromToLst);
+                    ExecuteOpener_restoreBackProcess.newInstance(logFile);
                 }
             });
             swingUtil.addAction("saveConfigBtn.actionPerformed", new Action() {

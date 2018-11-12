@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -25,11 +27,14 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.ProcessWatcher;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -48,23 +53,69 @@ public class ExecuteOpener_restoreBackProcess extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-        List<Pair<File, File>> lst = new ArrayList<Pair<File, File>>();
-        lst.add(Pair.of(new File("D:/eclipse/artifacts.xml"), new File("D:/eclipse/artifacts - 複製.xml")));
-        ExecuteOpener_restoreBackProcess.newInstance(lst);
     }
 
-    public static ExecuteOpener_restoreBackProcess newInstance(List<Pair<File, File>> fromToList) {
+    public static ExecuteOpener_restoreBackProcess newInstance(File logFile) {
         try {
             ExecuteOpener_restoreBackProcess dialog = new ExecuteOpener_restoreBackProcess();
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
 
+            List<Pair<File, File>> fromToList = dialog.transferLogFileToFromToList(logFile);
             dialog.modelHandler.initListModel(fromToList, dialog.restoreLst);
+
+            dialog.showFromChk.setSelected(true);
 
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private File getRealFile(File logFile, File orignFile, List<String> errLogLst) {
+        if (orignFile.exists()) {
+            return orignFile;
+        } else {
+            orignFile = new File(logFile.getParentFile(), orignFile.getName());
+            if (orignFile.exists()) {
+                return orignFile;
+            }
+        }
+        errLogLst.add(orignFile.getAbsolutePath());
+        return null;
+    }
+
+    public List<Pair<File, File>> transferLogFileToFromToList(File logFile) {
+        List<String> lst = FileUtil.loadFromFile_asList(logFile, "UTF8");
+        Pattern ptn = Pattern.compile("from\\:(.*?)\tto\\:(.*?)\t[\\w]");
+
+        List<String> errLogLst = new ArrayList<String>();
+        List<Pair<File, File>> fromToLst = new ArrayList<Pair<File, File>>();
+        for (String line : lst) {
+            Matcher mth = ptn.matcher(line);
+            System.out.println("-------------------------------------------------");
+            if (mth.find()) {
+                File from = new File(mth.group(1));
+                File to = new File(mth.group(2));
+
+                from = getRealFile(logFile, from, errLogLst);
+                to = getRealFile(logFile, to, errLogLst);
+
+                if (from == null || to == null) {
+                    continue;
+                }
+
+                System.out.println("from : " + from);
+                System.out.println("to : " + to);
+                fromToLst.add(Pair.of(from, to));
+            }
+            System.out.println("-------------------------------------------------");
+        }
+
+        if (!errLogLst.isEmpty()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("找不到檔案 : \n" + StringUtils.join(errLogLst, "\n"));
+        }
+        return fromToLst;
     }
 
     private class ModelHandler {
@@ -90,11 +141,31 @@ public class ExecuteOpener_restoreBackProcess extends JDialog {
             to = bean.getRight();
         }
 
-        public String toString() {
-            if (IS_FROM) {
-                return from.getAbsolutePath();
+        private String getColor(int val, Triple arry) {
+            String format = "<font color='%s'>%s</font>";
+            if (val == 0) {
+                return String.format(format, "#C7EDCC", arry.getMiddle());
+            } else if (val == -1) {
+                return String.format(format, "red", arry.getLeft());
             } else {
-                return to.getAbsolutePath();
+                return String.format(format, "blue", arry.getRight());
+            }
+        }
+
+        public String toString() {
+            String format = "<html>%s %s &nbsp;&nbsp; %s</html>";
+
+            int sizeCompare = new Long(from.length()).compareTo(to.length());
+            int modifyCompare = new Long(from.lastModified()).compareTo(to.lastModified());
+
+            if (IS_FROM) {
+                String sizeDesc = getColor(sizeCompare, Triple.of("小", "同", "大"));
+                String timeDesc = getColor(modifyCompare, Triple.of("早", "同", "晚"));
+                return String.format(format, sizeDesc, timeDesc, from.getAbsolutePath());
+            } else {
+                String sizeDesc = getColor(sizeCompare, Triple.of("大", "同", "小"));
+                String timeDesc = getColor(modifyCompare, Triple.of("晚", "同", "早"));
+                return String.format(format, sizeDesc, timeDesc, to.getAbsolutePath());
             }
         }
     }
@@ -164,6 +235,37 @@ public class ExecuteOpener_restoreBackProcess extends JDialog {
             contentPanel.add(JCommonUtil.createScrollComponent(restoreLst), BorderLayout.CENTER);
 
             restoreLst.addMouseListener(new MouseAdapter() {
+                private void compareDiff(final RestoreInfo info) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                String command = "";
+                                if (OsInfoUtil.isWindows()) {
+                                    String tortoiseMergeFormat = "cmd /c call " + txtTortoisegitmergebasestheirss.getText();
+                                    command = String.format(tortoiseMergeFormat, info.from, info.to);
+                                } else {
+                                    String tortoiseMergeFormat = txtTortoisegitmergebasestheirss.getText();
+                                    command = String.format(tortoiseMergeFormat, info.from, info.to);
+                                }
+
+                                RuntimeBatPromptModeUtil shInst = RuntimeBatPromptModeUtil.newInstance();
+                                shInst.command(command);
+
+                                System.out.println(command);
+                                ProcessWatcher watcher = ProcessWatcher.newInstance(shInst.apply());
+                                watcher.getStreamSync();
+                                String errMsg = watcher.getErrorStreamToString();
+                                if (StringUtils.isNotBlank(errMsg)) {
+                                    Validate.isTrue(false, errMsg);
+                                }
+                            } catch (Exception e1) {
+                                JCommonUtil.handleException(e1);
+                            }
+                        }
+                    }).start();
+                }
+
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     try {
@@ -172,37 +274,23 @@ public class ExecuteOpener_restoreBackProcess extends JDialog {
                             System.out.println(ReflectionToStringBuilder.toString(current, ToStringStyle.MULTI_LINE_STYLE));
                         }
 
+                        if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                            final List<RestoreInfo> lst = JListUtil.getLeadSelectionArry(restoreLst);
+                            final RestoreInfo info = lst.get(0);
+                            compareDiff(info);
+                        }
+
                         if (JMouseEventUtil.buttonRightClick(1, e)) {
 
                             JPopupMenuUtil popUtl = JPopupMenuUtil.newInstance(restoreLst);
-
                             final List<RestoreInfo> lst = JListUtil.getLeadSelectionArry(restoreLst);
 
                             if (lst.size() == 1) {
                                 final RestoreInfo info = lst.get(0);
-
                                 popUtl.addJMenuItem("compare git", new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        String tortoiseMergeFormat = "cmd /c call " + txtTortoisegitmergebasestheirss.getText();
-                                        final String command = String.format(tortoiseMergeFormat, info.from, info.to);
-
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    System.out.println(command);
-                                                    ProcessWatcher watcher = ProcessWatcher.newInstance(Runtime.getRuntime().exec(command));
-                                                    watcher.getStreamSync();
-                                                    String errMsg = watcher.getErrorStreamToString();
-                                                    if (StringUtils.isNotBlank(errMsg)) {
-                                                        Validate.isTrue(false, errMsg);
-                                                    }
-                                                } catch (Exception e1) {
-                                                    JCommonUtil.handleException(e1);
-                                                }
-                                            }
-                                        }).start();
+                                        compareDiff(info);
                                     }
                                 });
 

@@ -2,26 +2,30 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.EventObject;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.SwingActionUtil;
+import gtu.swing.util.SwingActionUtil.Action;
+import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
 public class SwingTemplateUI extends JFrame {
 
     private JPanel contentPane;
     private HideInSystemTrayHelper hideInSystemTrayHelper;
+    private SwingActionUtil swingUtil;
+    private JTabbedPane tabbedPane;
 
     /**
      * Launch the application.
@@ -34,7 +38,7 @@ public class SwingTemplateUI extends JFrame {
             public void run() {
                 try {
                     SwingTemplateUI frame = new SwingTemplateUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -46,6 +50,8 @@ public class SwingTemplateUI extends JFrame {
      * Create the frame.
      */
     public SwingTemplateUI() {
+        swingUtil = SwingActionUtil.newInstance(this);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
@@ -53,7 +59,8 @@ public class SwingTemplateUI extends JFrame {
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.addChangeListener(ActionAdapter.ChangeListener.create(ActionDefine.JTabbedPane_ChangeIndex.name(), swingUtil));
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -63,6 +70,9 @@ public class SwingTemplateUI extends JFrame {
         tabbedPane.addTab("New tab", null, panel_1, null);
 
         {
+            // 掛載所有event
+            applyAllEvents();
+
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
@@ -71,9 +81,40 @@ public class SwingTemplateUI extends JFrame {
         }
     }
 
+    private enum ActionDefine {
+        TEST_DEFAULT_EVENT, //
+        JTabbedPane_ChangeIndex, //
+        ;
+    }
+
+    private void applyAllEvents() {
+        swingUtil.addAction(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                System.out.println("====Test Default Event!!====");
+            }
+        });
+        swingUtil.addAction(ActionDefine.JTabbedPane_ChangeIndex.name(), new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());
+            }
+        });
+    }
+
     private void applyAppMenu() {
-        JMenu menu1 = JMenuAppender.newInstance("child_item").addMenuItem("detail1", null).getMenu();
-        JMenu mainMenu = JMenuAppender.newInstance("file").addMenuItem("item1", null).addMenuItem("item2", null).addChildrenMenu(menu1).getMenu();
+        JMenu menu1 = JMenuAppender.newInstance("child_item")//
+                .addMenuItem("detail1", ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .getMenu();
+        JMenu mainMenu = JMenuAppender.newInstance("file")//
+                .addMenuItem("item1", null)//
+                .addMenuItem("item2", ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addChildrenMenu(menu1)//
+                .getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);
+    }
+
+    public SwingActionUtil getSwingUtil() {
+        return swingUtil;
     }
 }

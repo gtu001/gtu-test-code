@@ -1,10 +1,19 @@
 package gtu.swing.util;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.EventListener;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -19,11 +28,11 @@ public class SwingActionUtil {
             System.err.println("!!未定義 action : " + actionName + ", from : " + getRemark(evt) + "[" + evt.getSource().getClass().getSimpleName() + "]");
             boolean findSelf = false;
             String selfName = SwingActionUtil.class.getSimpleName();
-            for(StackTraceElement stack : Thread.currentThread().getStackTrace()){
-                if(!findSelf && stack.toString().contains(selfName)){
+            for (StackTraceElement stack : Thread.currentThread().getStackTrace()) {
+                if (!findSelf && stack.toString().contains(selfName)) {
                     findSelf = true;
                 }
-                if(findSelf && !stack.toString().contains(selfName)){
+                if (findSelf && !stack.toString().contains(selfName)) {
                     System.err.println(stack);
                     break;
                 }
@@ -57,6 +66,55 @@ public class SwingActionUtil {
         return this;
     }
 
+    public enum ActionAdapter {
+        ActionListener() {
+            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+                return (T) new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        swingUtil.invokeAction(actionName, e);
+                    }
+                };
+            }
+        }, //
+        MouseAdapter() {
+            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+                return (T) new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        swingUtil.invokeAction(actionName, e);
+                    }
+                };
+            }
+        }, //
+        KeyAdapter() {
+            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+                return (T) new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        swingUtil.invokeAction(actionName, e);
+                    }
+                };
+            }
+        },//
+        ChangeListener() {
+            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+                return (T) new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        swingUtil.invokeAction(actionName, e);
+                    }
+                };
+            }
+        },//
+        ;
+
+        ActionAdapter() {
+        }
+
+        public abstract <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil);
+    }
+
     public SwingActionUtil invokeAction(final String actionName, EventObject evt) {
         if (registerActionMap.containsKey(actionName)) {
             registerActionMap.get(actionName).execute(evt);
@@ -67,12 +125,12 @@ public class SwingActionUtil {
         return this;
     }
 
-    public SwingActionUtil  addAction(JComponent component, Class<?> eventClass, final Action action) {
+    public SwingActionUtil addAction(JComponent component, Class<?> eventClass, final Action action) {
         String actionName = getActionName(component, eventClass);
         return addAction(actionName, action);
     }
-    
-    String getActionName(Object component, Class<?> eventClass){
+
+    String getActionName(Object component, Class<?> eventClass) {
         return component.getClass().getSimpleName() + "_" + component.hashCode() + "_" + eventClass.getSimpleName();
     }
 
