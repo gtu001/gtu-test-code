@@ -2,9 +2,12 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -116,7 +119,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JPanel jPanel9;
     private JPanel jPanel8;
     private JScrollPane jScrollPane3;
-    private JList propertiesList;
     private JPanel jPanel7;
     private JButton reloadList;
     private JButton clearExecList;
@@ -157,6 +159,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
     static Properties prop = new Properties();
     static File jarPositionDir = PropertiesUtil.getJarCurrentPath(ExecuteOpener.class);
+    static {
+        System.out.println("jarPositionDir : " + jarPositionDir);
+    }
 
     public ExecuteOpener() {
         super();
@@ -481,15 +486,42 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     jPanel7.setLayout(jPanel7Layout);
                     jTabbedPane1.addTab("properties", null, jPanel7, null);
                     {
-                        jScrollPane3 = new JScrollPane();
-                        jPanel7.add(jScrollPane3, BorderLayout.CENTER);
-                        jScrollPane3.setPreferredSize(new java.awt.Dimension(741, 415));
                         {
-                            DefaultListModel propertiesListModel = new DefaultListModel();
+                            panel_4 = new JPanel();
+                            jPanel7.add(panel_4, BorderLayout.NORTH);
+                            {
+                                lblFilter = new JLabel("filter");
+                                panel_4.add(lblFilter);
+                            }
+                            {
+                                propertiesListFilterText = new JTextField();
+                                propertiesListFilterText.addFocusListener(new FocusAdapter() {
+                                    @Override
+                                    public void focusLost(FocusEvent e) {
+                                        swingUtil.invokeAction("propertiesListFilterText.focusLost", e);
+                                    }
+                                });
+                                panel_4.add(propertiesListFilterText);
+                                propertiesListFilterText.setColumns(30);
+                            }
+                        }
+                        {
+                            panel_5 = new JPanel();
+                            jPanel7.add(panel_5, BorderLayout.WEST);
+                        }
+                        {
+                            panel_6 = new JPanel();
+                            jPanel7.add(panel_6, BorderLayout.EAST);
+                        }
+                        {
+                            panel_7 = new JPanel();
+                            jPanel7.add(panel_7, BorderLayout.SOUTH);
+                        }
+                        {
                             propertiesList = new JList();
+                            JScrollPane scroll = JCommonUtil.createScrollComponent(propertiesList);
+                            jPanel7.add(scroll, BorderLayout.CENTER);
                             reloadCurrentDirPropertiesList();
-                            jScrollPane3.setViewportView(propertiesList);
-                            propertiesList.setModel(propertiesListModel);
                             propertiesList.addKeyListener(new KeyAdapter() {
                                 public void keyPressed(KeyEvent evt) {
                                     swingUtil.invokeAction("propertiesList.keyPressed", evt);
@@ -888,7 +920,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         }
                         saveFile = new File(jarPositionDir, fileName);
                     } else {
-                        saveFile = currentPropFile;
+                        JCommonUtil._jOptionPane_showMessageDialog_error("未輸入檔名!");
+                        return;
                     }
                     PropertiesUtil.storeProperties(prop, saveFile, orignName);
                     setTitle("properties : " + saveFile.getName());
@@ -1638,6 +1671,11 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     config.store();
                 }
             });
+            swingUtil.addAction("propertiesListFilterText.focusLost", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    reloadCurrentDirPropertiesList();
+                }
+            });
             swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
                 public void action(EventObject evt) throws Exception {
                 }
@@ -1710,17 +1748,46 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JCheckBox scanLstShowDetailChk;
     private JButton restoreBackBtn;
     private JButton saveConfigBtn;
+    private JPanel panel;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JPanel panel_4;
+    private JPanel panel_5;
+    private JPanel panel_6;
+    private JPanel panel_7;
+    private JList propertiesList;
+    private JLabel lblFilter;
+    private JTextField propertiesListFilterText;
 
     void reloadCurrentDirPropertiesList() {
-        DefaultListModel model = new DefaultListModel();
+        final String $filterText = StringUtils.trimToEmpty(propertiesListFilterText.getText()).toLowerCase();
+        List<File> lst = new ArrayList<File>();
         for (File file : jarPositionDir.listFiles(new FileFilter() {
             public boolean accept(File paramFile) {
-                if (paramFile.getName().toLowerCase().endsWith(".properties")) {
-                    return true;
+                boolean isPropFile = paramFile.getName().toLowerCase().endsWith(".properties");
+                if (StringUtils.isBlank($filterText)) {
+                    if (isPropFile) {
+                        return true;
+                    }
+                } else {
+                    Pattern ptn = Pattern.compile("(.*)\\.properties");
+                    Matcher mth = ptn.matcher(paramFile.getName());
+                    if (mth.find()) {
+                        String name = mth.group(0);
+                        if (name.toLowerCase().contains($filterText)) {
+                            return true;
+                        }
+                    }
                 }
                 return false;
             }
         })) {
+            lst.add(file);
+        }
+        Collections.sort(lst);
+        DefaultListModel model = new DefaultListModel();
+        for (File file : lst) {
             model.addElement(file);
         }
         propertiesList.setModel(model);
