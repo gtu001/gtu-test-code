@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -222,7 +223,7 @@ public class JCommonUtil {
     /**
      * textField 的事件處理
      */
-    public static abstract class HandleDocumentEvent {
+    public static abstract class HandleDocumentEvent implements EventListener {
         public abstract void process(DocumentEvent event);
 
         public String getDocText(DocumentEvent doc) {

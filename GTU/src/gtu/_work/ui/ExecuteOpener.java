@@ -58,6 +58,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -83,6 +84,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
+import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -142,7 +144,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JPanel jPanel4;
     private JPanel jPanel3;
     private JPanel jPanel2;
-    
+
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
 
     private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
@@ -239,28 +241,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         {
                             queryText = new JTextField();
                             jPanel4.add(queryText, BorderLayout.NORTH);
-                            queryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-                                public void process(DocumentEvent event) {
-                                    try {
-                                        String query = JCommonUtil.getDocumentText(event);
-                                        Pattern ptn = Pattern.compile(query);
-                                        DefaultListModel model = new DefaultListModel();
-                                        for (Object key : prop.keySet()) {
-                                            String val = key.toString();
-                                            if (val.contains(query)) {
-                                                model.addElement(key);
-                                                continue;
-                                            }
-                                            if (ptn.matcher(val).find()) {
-                                                model.addElement(key);
-                                                continue;
-                                            }
-                                        }
-                                        execList.setModel(model);
-                                    } catch (Exception ex) {
-                                    }
-                                }
-                            }));
+                            queryText.getDocument().addDocumentListener((DocumentListener) SwingActionUtil.ActionAdapter.DocumentListener.create("queryText.addDocumentListener", swingUtil));
                         }
                     }
                     {
@@ -705,9 +686,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         scannerStatus.setPreferredSize(new java.awt.Dimension(741, 27));
                     }
 
-                     jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-                     jFrameRGBColorPanel.start();
-                     jPanel2.add(jFrameRGBColorPanel.getToggleButton());
+                    jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+                    jFrameRGBColorPanel.start();
+                    jPanel2.add(jFrameRGBColorPanel.getToggleButton());
                 }
             }
 
@@ -1666,6 +1647,29 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         }, "innerScanner_" + System.currentTimeMillis());
                         innerScanThread.setDaemon(true);
                         innerScanThread.start();
+                    }
+                }
+            });
+            swingUtil.addAction("queryText.addDocumentListener", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    try {
+                        String query = JCommonUtil.getDocumentText((DocumentEvent) ActionAdapter.DocumentListener.getOrignEvent(evt));
+                        Pattern ptn = Pattern.compile(query);
+                        DefaultListModel model = new DefaultListModel();
+                        for (Object key : prop.keySet()) {
+                            String val = key.toString();
+                            if (val.contains(query)) {
+                                model.addElement(key);
+                                continue;
+                            }
+                            if (ptn.matcher(val).find()) {
+                                model.addElement(key);
+                                continue;
+                            }
+                        }
+                        execList.setModel(model);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             });

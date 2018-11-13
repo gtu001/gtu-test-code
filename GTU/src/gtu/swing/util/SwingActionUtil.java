@@ -2,6 +2,8 @@ package gtu.swing.util;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -14,8 +16,11 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.StringUtils;
+
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 
 public class SwingActionUtil {
 
@@ -66,9 +71,10 @@ public class SwingActionUtil {
         return this;
     }
 
+    @SuppressWarnings({ "unchecked" })
     public enum ActionAdapter {
         ActionListener() {
-            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
                 return (T) new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -78,7 +84,7 @@ public class SwingActionUtil {
             }
         }, //
         MouseAdapter() {
-            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
                 return (T) new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -88,7 +94,7 @@ public class SwingActionUtil {
             }
         }, //
         KeyAdapter() {
-            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
                 return (T) new KeyAdapter() {
                     @Override
                     public void keyPressed(KeyEvent e) {
@@ -96,9 +102,9 @@ public class SwingActionUtil {
                     }
                 };
             }
-        },//
+        }, //
         ChangeListener() {
-            public <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil) {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
                 return (T) new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
@@ -106,13 +112,43 @@ public class SwingActionUtil {
                     }
                 };
             }
+        }, //
+        DocumentListener() {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
+                return (T) JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                    @Override
+                    public void process(DocumentEvent event) {
+                        ActionEvent evt = new ActionEvent(event, -1, "rewarped");
+                        swingUtil.invokeAction(actionName, evt);
+                    }
+                });
+            }
+
+            public DocumentEvent getOrignEvent(EventObject evt) {
+                Object orignEvt = ((ActionEvent) evt).getSource();
+                return (DocumentEvent) orignEvt;
+            }
+        }, //
+        FocusLostAdapter() {
+            public <T extends EventListener> T create(final String actionName, final SwingActionUtil swingUtil) {
+                return (T) new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent evt) {
+                        swingUtil.invokeAction(actionName, evt);
+                    }
+                };
+            }
         },//
-        ;
+        ;//
 
         ActionAdapter() {
         }
 
         public abstract <T extends EventListener> T create(String actionName, SwingActionUtil swingUtil);
+
+        public <T> T getOrignEvent(EventObject evt) {
+            return (T) evt;
+        }
     }
 
     public SwingActionUtil invokeAction(final String actionName, EventObject evt) {
