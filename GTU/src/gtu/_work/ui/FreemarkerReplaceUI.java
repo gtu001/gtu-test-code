@@ -298,7 +298,7 @@ public class FreemarkerReplaceUI extends JFrame {
             config.reflectInit(this);
             reloadRecentFileList();
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/monster.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             this.applyAppMenu();

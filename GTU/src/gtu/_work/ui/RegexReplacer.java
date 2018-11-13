@@ -59,6 +59,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -163,6 +164,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             configKeyText = new JTextField();
+                            JTextUndoUtil.applyUndoProcess1(configKeyText);
                             jPanel3.add(configKeyText, "4, 2, fill, default");
                             configKeyText.setColumns(10);
                         }
@@ -172,6 +174,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             repFromText = new JTextArea();
+                            JTextUndoUtil.applyUndoProcess1(repFromText);
                             repFromText.setRows(3);
                             jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
                             repFromText.setColumns(10);
@@ -182,6 +185,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             repToText = new JTextArea();
+                            JTextUndoUtil.applyUndoProcess1(repToText);
                             repToText.setRows(3);
                             // repToText.setPreferredSize(new Dimension(0, 50));
                             jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
@@ -299,6 +303,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
                     tradeOffArea = new JTextArea();
+                    JTextUndoUtil.applyUndoProcess1(tradeOffArea);
                     tradeOffArea.setRows(3);
                     // tradeOffArea.setPreferredSize(new Dimension(0, 50));
                     tradeOffArea.addMouseListener(new MouseAdapter() {
@@ -402,6 +407,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             this.setSize(512, 350);
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
