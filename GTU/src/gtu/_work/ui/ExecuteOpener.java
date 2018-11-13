@@ -75,6 +75,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JFileExecuteUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
@@ -141,6 +142,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JPanel jPanel4;
     private JPanel jPanel3;
     private JPanel jPanel2;
+    
+    private JFrameRGBColorPanel jFrameRGBColorPanel = null;
 
     private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
 
@@ -670,43 +673,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 jPanel9.add(scanLstShowDetailChk);
                             }
                             innerScannerText.addMouseListener(new MouseAdapter() {
-
-                                Thread innerScanThread = null;
-                                boolean innerScanStop = false;
-
                                 public void mouseClicked(MouseEvent evt) {
-                                    if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
-                                        return;
-                                    }
-                                    final String innerText = innerScannerText.getText();
-                                    if (arrayBackupForInnerScan == null) {
-                                        return;
-                                    }
-
-                                    innerScanStop = true;
-
-                                    if (innerScanThread == null || innerScanThread.getState() == Thread.State.TERMINATED) {
-                                        innerScanThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
-                                            public void run() {
-                                                innerScanStop = false;
-                                                System.out.println(toString() + " ... start!! ==> " + innerScanStop);
-                                                DefaultListModel model = new DefaultListModel();
-                                                scanList.setModel(model);
-                                                for (int ii = 0; ii < arrayBackupForInnerScan.length; ii++) {
-                                                    if (arrayBackupForInnerScan[ii].toString().contains(innerText)) {
-                                                        model.addElement(arrayBackupForInnerScan[ii]);
-                                                    }
-                                                    if (innerScanStop) {
-                                                        System.out.println(toString() + " ... over!! ==> " + innerScanStop);
-                                                        break;
-                                                    }
-                                                }
-                                                System.out.println(toString() + " ... run over!! ==> " + innerScanStop);
-                                            }
-                                        }, "innerScanner_" + System.currentTimeMillis());
-                                        innerScanThread.setDaemon(true);
-                                        innerScanThread.start();
-                                    }
+                                    swingUtil.invokeAction("innerScannerText.addMouseListener", evt);
                                 }
                             });
                         }
@@ -736,6 +704,10 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         jPanel8.add(scannerStatus, BorderLayout.SOUTH);
                         scannerStatus.setPreferredSize(new java.awt.Dimension(741, 27));
                     }
+
+                     jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+                     jFrameRGBColorPanel.start();
+                     jPanel2.add(jFrameRGBColorPanel.getToggleButton());
                 }
             }
 
@@ -1414,8 +1386,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                                     addElement(file);
                                                     break;
                                                 }
-                                            }
-                                            if (file.isFile()) {
+                                            } else if (file.isFile()) {
                                                 switch (fileOrDirType) {
                                                 case FILE_ONLY:
                                                     addElement(file);
@@ -1657,6 +1628,45 @@ public class ExecuteOpener extends javax.swing.JFrame {
             swingUtil.addAction("propertiesListFilterText.focusLost", new Action() {
                 public void action(EventObject evt) throws Exception {
                     reloadCurrentDirPropertiesList();
+                }
+            });
+            swingUtil.addAction("innerScannerText.addMouseListener", new Action() {
+                Thread innerScanThread = null;
+                boolean innerScanStop = false;
+
+                public void action(EventObject evt) throws Exception {
+                    if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
+                        return;
+                    }
+                    final String innerText = innerScannerText.getText();
+                    if (arrayBackupForInnerScan == null) {
+                        return;
+                    }
+
+                    innerScanStop = true;
+
+                    if (innerScanThread == null || innerScanThread.getState() == Thread.State.TERMINATED) {
+                        innerScanThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+                            public void run() {
+                                innerScanStop = false;
+                                System.out.println(toString() + " ... start!! ==> " + innerScanStop);
+                                DefaultListModel model = new DefaultListModel();
+                                scanList.setModel(model);
+                                for (int ii = 0; ii < arrayBackupForInnerScan.length; ii++) {
+                                    if (arrayBackupForInnerScan[ii].toString().contains(innerText)) {
+                                        model.addElement(arrayBackupForInnerScan[ii]);
+                                    }
+                                    if (innerScanStop) {
+                                        System.out.println(toString() + " ... over!! ==> " + innerScanStop);
+                                        break;
+                                    }
+                                }
+                                System.out.println(toString() + " ... run over!! ==> " + innerScanStop);
+                            }
+                        }, "innerScanner_" + System.currentTimeMillis());
+                        innerScanThread.setDaemon(true);
+                        innerScanThread.start();
+                    }
                 }
             });
             swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
