@@ -60,6 +60,7 @@ import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
@@ -82,6 +83,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JRadioButton rdbtnOthers;
     private FastDBQueryUI _parent;
     private JCheckBox applyAllQueryResultCheckBox;
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     private static class ColumnConf {
         String columnName;
@@ -1077,6 +1079,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+        jFrameRGBColorPanel.start();
     }
 
     private void resetColumnWidth() {

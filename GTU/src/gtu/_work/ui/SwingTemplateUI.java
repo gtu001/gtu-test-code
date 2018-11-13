@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionListener;
 import java.util.EventObject;
 
 import javax.swing.JFrame;
@@ -9,7 +10,6 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
@@ -60,7 +60,7 @@ public class SwingTemplateUI extends JFrame {
         setContentPane(contentPane);
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addChangeListener(ActionAdapter.ChangeListener.create(ActionDefine.JTabbedPane_ChangeIndex.name(), swingUtil));
+        tabbedPane.addChangeListener((ChangeListener) ActionAdapter.ChangeListener.create(ActionDefine.JTabbedPane_ChangeIndex.name(), swingUtil));
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -78,6 +78,7 @@ public class SwingTemplateUI extends JFrame {
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             this.applyAppMenu();
+            JCommonUtil.defaultToolTipDelay();
         }
     }
 
@@ -104,11 +105,11 @@ public class SwingTemplateUI extends JFrame {
 
     private void applyAppMenu() {
         JMenu menu1 = JMenuAppender.newInstance("child_item")//
-                .addMenuItem("detail1", ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addMenuItem("detail1", (ActionListener) ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
                 .getMenu();
         JMenu mainMenu = JMenuAppender.newInstance("file")//
                 .addMenuItem("item1", null)//
-                .addMenuItem("item2", ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addMenuItem("item2", (ActionListener) ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
                 .addChildrenMenu(menu1)//
                 .getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);

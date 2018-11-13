@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import org.apache.commons.lang.StringUtils;
 
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 
 public class FastDBQueryUI_UpdateSqlArea extends JDialog {
 
@@ -28,6 +29,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
     private static final String DELIMIT_SPLIT_PTN = Pattern.quote(DELIMIT);
     private SqlAreaHandler sqlAreaHandler = new SqlAreaHandler();
     private ActionListener confirmDo;
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Launch the application.
@@ -133,6 +135,8 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         }
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+        jFrameRGBColorPanel.start();
     }
 
 }

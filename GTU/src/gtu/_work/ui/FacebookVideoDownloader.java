@@ -52,6 +52,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -82,6 +83,8 @@ public class FacebookVideoDownloader extends JFrame {
     private JTextArea headerTextArea;
 
     private DownloadLogKeeper downloadLog = new DownloadLogKeeper();
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private JPanel panel_23;
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
@@ -209,7 +212,7 @@ public class FacebookVideoDownloader extends JFrame {
             public void run() {
                 try {
                     FacebookVideoDownloader frame = new FacebookVideoDownloader();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -369,12 +372,12 @@ public class FacebookVideoDownloader extends JFrame {
         tabbedPane.addTab("其他設定", null, panel_15, null);
         panel_15.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        RowSpec.decode("default:grow"), }));
 
         JLabel label_2 = new JLabel("下載位置");
         panel_15.add(label_2, "2, 2, right, default");
@@ -410,6 +413,9 @@ public class FacebookVideoDownloader extends JFrame {
             }
         });
         panel_17.add(continueLastestDownloadBtn);
+
+        panel_23 = new JPanel();
+        panel_15.add(panel_23, "4, 6, fill, fill");
 
         JPanel panel_16 = new JPanel();
         panel_15.add(panel_16, "4, 34, fill, fill");
@@ -496,6 +502,10 @@ public class FacebookVideoDownloader extends JFrame {
         sysutil = HideInSystemTrayHelper.newInstance();
         sysutil.apply(this, "Facebook下載", "resource/images/ico/facebook.ico");
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
+
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+        jFrameRGBColorPanel.start();
+        panel_23.add(jFrameRGBColorPanel.getToggleButton());
     }
 
     private enum DownloadTableConfig {

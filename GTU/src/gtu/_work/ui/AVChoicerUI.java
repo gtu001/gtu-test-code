@@ -61,6 +61,7 @@ import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -105,6 +106,8 @@ public class AVChoicerUI extends JFrame {
     private MoveToHandler moveToHandler = new MoveToHandler();
     private JCheckBox moveToChkJpgChkBox;
     private HideInSystemTrayHelper trayUtil;
+    
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Launch the application.
@@ -339,6 +342,9 @@ public class AVChoicerUI extends JFrame {
 
         moveToList = new JList();
         panel_11.add(JCommonUtil.createScrollComponent(moveToList), BorderLayout.CENTER);
+        
+        JPanel panel_16 = new JPanel();
+        tabbedPane.addTab("Config", null, panel_16, null);
         moveToList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent paramKeyEvent) {
@@ -364,6 +370,10 @@ public class AVChoicerUI extends JFrame {
 
         trayUtil = HideInSystemTrayHelper.newInstance();
         trayUtil.apply(this);
+        
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+        jFrameRGBColorPanel.start();
+        panel_16.add(jFrameRGBColorPanel.getToggleButton());
     }
 
     private class MoveToHandler {

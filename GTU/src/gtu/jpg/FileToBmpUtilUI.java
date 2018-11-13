@@ -33,6 +33,7 @@ import gtu.file.FileUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JTextFieldUtil;
 
@@ -50,6 +51,8 @@ public class FileToBmpUtilUI extends JFrame {
     private JTextField sevenZipText;
     private JLabel sevenZipLabel;
     private JLabel fileSizeDescLabel;
+    
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Launch the application.
@@ -327,11 +330,18 @@ public class FileToBmpUtilUI extends JFrame {
         sevenZipLabel = new JLabel("");
         panel_2.add(sevenZipLabel);
         panel_1.add(btnGo_1, "2, 12");
+        
+        JPanel panel_4 = new JPanel();
+        tabbedPane.addTab("Config", null, panel_4, null);
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/hacker.ico");
         hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
         hideInSystemTrayHelper.apply(this);
+        
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+        jFrameRGBColorPanel.start();
+        panel_4.add(jFrameRGBColorPanel.getToggleButton());
     }
 
     /*
