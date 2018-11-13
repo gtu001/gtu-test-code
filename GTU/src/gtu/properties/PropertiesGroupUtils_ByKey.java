@@ -188,7 +188,9 @@ public class PropertiesGroupUtils_ByKey {
                 return mapList.get(currentIndex);
             }
         }
-        if (currentIndex < 0 || currentIndex >= mapList.size()) {
+        if (currentIndex < 0) {
+            currentIndex = mapList.size() - 1;
+        } else if (currentIndex >= mapList.size()) {
             currentIndex = 0;
         }
         if (mapList.isEmpty()) {
@@ -203,5 +205,12 @@ public class PropertiesGroupUtils_ByKey {
      */
     public void next() {
         currentIndex++;
+    }
+
+    /**
+     * 設定下上乙組
+     */
+    public void previous() {
+        currentIndex--;
     }
 }

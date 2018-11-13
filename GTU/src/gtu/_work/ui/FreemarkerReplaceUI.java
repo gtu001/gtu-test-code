@@ -50,12 +50,15 @@ import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import net.sf.json.JSONObject;
 
 public class FreemarkerReplaceUI extends JFrame {
+    
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     private JPanel contentPane;
     private HideInSystemTrayHelper hideInSystemTrayHelper;
@@ -293,7 +296,6 @@ public class FreemarkerReplaceUI extends JFrame {
             }
         });
         panel_16.add(saveConfigBtn);
-
         {
             config.reflectInit(this);
             reloadRecentFileList();
@@ -302,9 +304,12 @@ public class FreemarkerReplaceUI extends JFrame {
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             this.applyAppMenu();
+            
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            jFrameRGBColorPanel.start();
+            panel_16.add(jFrameRGBColorPanel.getToggleButton());
+            this.setTitle("You Set My World On Fire");
         }
-
-        this.setTitle("You Set My World On Fire");
     }
 
     private boolean isIgnoreKey(String key) {

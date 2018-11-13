@@ -55,6 +55,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
@@ -62,6 +63,7 @@ import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import java.awt.FlowLayout;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -78,6 +80,8 @@ public class RegexReplacer extends javax.swing.JFrame {
     private static final String CONTAIN_ARRY_KEY = "arry";
     private static final String FREEMARKER_KEY = "ftl";
     private static final long serialVersionUID = 1L;
+    
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -302,6 +306,11 @@ public class RegexReplacer extends javax.swing.JFrame {
                 configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
                 JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
+                    panel_1 = new JPanel();
+                    jTabbedPane1.addTab("config", null, panel_1, null);
+                    panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+                }
+                {
                     tradeOffArea = new JTextArea();
                     JTextUndoUtil.applyUndoProcess1(tradeOffArea);
                     tradeOffArea.setRows(3);
@@ -408,6 +417,11 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
+            
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            jFrameRGBColorPanel.start();
+            panel_1.add(jFrameRGBColorPanel.getToggleButton());
+            this.setTitle("You Set My World On Fire");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
@@ -457,6 +471,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JPanel panel;
     private JCheckBox multiLineCheckBox;
     private JCheckBox autoPasteToClipboardCheckbox;
+    private JPanel panel_1;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {

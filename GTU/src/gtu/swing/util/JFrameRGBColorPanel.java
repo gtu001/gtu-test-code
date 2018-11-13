@@ -11,12 +11,13 @@ import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.UIManager;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -30,6 +31,8 @@ public class JFrameRGBColorPanel {
     private ActionListener afterProcessEvent;
     private List<Component> ignoreLst;
     private LinearGradientColor linearGradientColor = new LinearGradientColor(100);
+    private Color background;
+    private Color foreground;
 
     public JFrameRGBColorPanel(final Container container) {
         this.container = container;
@@ -46,10 +49,17 @@ public class JFrameRGBColorPanel {
     }
 
     private Color getForeground(Color color) {
-        int r = Math.abs(255 - color.getRed());
-        int g = Math.abs(255 - color.getGreen());
-        int b = Math.abs(255 - color.getBlue());
-        return new Color(r, g, b);
+        {
+            int r = Math.abs(255 - color.getRed());
+            int g = Math.abs(255 - color.getGreen());
+            int b = Math.abs(255 - color.getBlue());
+            // return new Color(r, g, b);
+        }
+        if (((color.getRed() + color.getGreen() + color.getBlue()) / 3) > 128) {
+            return new Color(0, 0, 0);
+        } else {
+            return new Color(255, 255, 255);
+        }
     }
 
     private void setBackground(Container container, Color background, Color foreground) {
@@ -88,8 +98,8 @@ public class JFrameRGBColorPanel {
                 public void run() {
                     while (isStop == false) {
                         try {
-                            Color background = linearGradientColor.get();
-                            Color foreground = getForeground(background);
+                            background = linearGradientColor.get();
+                            foreground = getForeground(background);
                             setBackground(container, background, foreground);
 
                             triggerAfterEvent();
@@ -179,5 +189,25 @@ public class JFrameRGBColorPanel {
             }
         });
         return tgBtn;
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = JFrameUtil.createSimpleFrame(JFrameRGBColorPanel.class);
+        final JFrameRGBColorPanel jFrameRGBColorPanel = new JFrameRGBColorPanel(frame);
+        final JLabel lbl = new JLabel();
+        frame.add(lbl);
+        final JLabel lbl2 = new JLabel();
+        frame.add(lbl2);
+        jFrameRGBColorPanel.setAfterProcessEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lbl.setText("bg : " + String.valueOf(jFrameRGBColorPanel.background));
+                lbl2.setText("fg : " + String.valueOf(jFrameRGBColorPanel.foreground));
+            }
+        });
+        jFrameRGBColorPanel.start();
+        frame.add(jFrameRGBColorPanel.getToggleButton());
+        frame.pack();
+        frame.setVisible(true);
     }
 }

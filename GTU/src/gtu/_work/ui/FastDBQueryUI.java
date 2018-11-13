@@ -81,6 +81,7 @@ import gtu.string.StringNumberUtil;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -177,6 +178,9 @@ public class FastDBQueryUI extends JFrame {
     private JTextField maxRowsText;
     private JLabel lblMaxRows;
 
+    private JFrameRGBColorPanel jFrameRGBColorPanel = null;
+    private JButton prevConnBtn;
+
     /**
      * Launch the application.
      */
@@ -235,6 +239,18 @@ public class FastDBQueryUI extends JFrame {
         scrollPane.setViewportView(sqlList);
 
         sqlQueryText = new JTextField();
+        sqlQueryText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                String txt = sqlQueryText.getText();
+                try {
+                    // 初始化 sqlList
+                    initLoadSqlListConfig(txt);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
         panel.add(sqlQueryText, BorderLayout.NORTH);
         sqlQueryText.setColumns(10);
         sqlQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
@@ -577,6 +593,14 @@ public class FastDBQueryUI extends JFrame {
 
         panel_17 = new JPanel();
         panel_6.add(panel_17, "10, 22, fill, fill");
+        
+        prevConnBtn = new JButton("上一組");
+        prevConnBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                previousConnBtnClick();
+            }
+        });
+        panel_17.add(prevConnBtn);
 
         nextConnBtn = new JButton("下一組");
         panel_17.add(nextConnBtn);
@@ -588,6 +612,7 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_17.add(removeConnectionBtn);
+        
         nextConnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 nextConnBtnClick();
@@ -631,6 +656,11 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/big_boobs.ico");
+            this.setTitle("You Set My World On Fire");
+
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            jFrameRGBColorPanel.start();
+            panel_17.add(jFrameRGBColorPanel.getToggleButton());
         }
     }
 
@@ -1327,6 +1357,18 @@ public class FastDBQueryUI extends JFrame {
     private void nextConnBtnClick() {
         try {
             dataSourceConfig.next();
+            initDataSourceProperties();
+        } catch (IOException e) {
+            JCommonUtil.handleException(e);
+        }
+    }
+
+    /**
+     * 上一組連線設定
+     */
+    private void previousConnBtnClick() {
+        try {
+            dataSourceConfig.previous();
             initDataSourceProperties();
         } catch (IOException e) {
             JCommonUtil.handleException(e);
