@@ -2,7 +2,9 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -35,6 +37,8 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ScheduleBatRunnerUI extends JFrame {
 
@@ -62,6 +66,8 @@ public class ScheduleBatRunnerUI extends JFrame {
     private PrintStream logPrinter;
     private LinkedBlockingQueue<CommandBean> allList = new LinkedBlockingQueue<CommandBean>();
     private JButton clearLogBtn;
+    private JPanel panel_10;
+    private JButton swingJarBuilderBtn;
 
     /**
      * Launch the application.
@@ -89,14 +95,14 @@ public class ScheduleBatRunnerUI extends JFrame {
         swingUtil = SwingActionUtil.newInstance(this);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 500, 367);
+        setBounds(100, 100, 669, 454);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addChangeListener((ChangeListener)ActionAdapter.ChangeListener.create(ActionDefine.JTabbedPane_ChangeIndex.name(), swingUtil));
+        tabbedPane.addChangeListener((ChangeListener) ActionAdapter.ChangeListener.create(ActionDefine.JTabbedPane_ChangeIndex.name(), swingUtil));
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -110,7 +116,7 @@ public class ScheduleBatRunnerUI extends JFrame {
         panel_2.add(lblNewLabel);
 
         addBatBtn = new JButton("加入");
-        addBatBtn.addActionListener((ActionListener)SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.addBatBtn_Click.name(), swingUtil));
+        addBatBtn.addActionListener((ActionListener) SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.addBatBtn_Click.name(), swingUtil));
 
         batTextArea = new JTextArea();
         batTextArea.setColumns(30);
@@ -120,10 +126,10 @@ public class ScheduleBatRunnerUI extends JFrame {
         panel_2.add(addBatBtn);
 
         goBtn = new JButton("Go");
-        goBtn.addActionListener((ActionListener)SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.goBtn_Click.name(), swingUtil));
+        goBtn.addActionListener((ActionListener) SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.goBtn_Click.name(), swingUtil));
 
         cleanBtn = new JButton("清空");
-        cleanBtn.addActionListener((ActionListener)SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.cleanBtn_Click.name(), swingUtil));
+        cleanBtn.addActionListener((ActionListener) SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.cleanBtn_Click.name(), swingUtil));
         panel_2.add(cleanBtn);
         panel_2.add(goBtn);
 
@@ -137,7 +143,15 @@ public class ScheduleBatRunnerUI extends JFrame {
         panel.add(panel_5, BorderLayout.SOUTH);
 
         batList = new JList();
+        batList.addKeyListener((KeyAdapter) SwingActionUtil.ActionAdapter.KeyAdapter.create(ActionDefine.batList_KeyEvent.name(), swingUtil));
         panel.add(JCommonUtil.createScrollComponent(batList), BorderLayout.CENTER);
+
+        panel_10 = new JPanel();
+        tabbedPane.addTab("Custom", null, panel_10, null);
+
+        swingJarBuilderBtn = new JButton("swing jar build");
+        swingJarBuilderBtn.addActionListener((ActionListener) SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.swingJarBuilderBtn_Click.name(), swingUtil));
+        panel_10.add(swingJarBuilderBtn);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("Log", null, panel_1, null);
@@ -156,7 +170,7 @@ public class ScheduleBatRunnerUI extends JFrame {
         panel_1.add(panel_9, BorderLayout.SOUTH);
 
         clearLogBtn = new JButton("clear log");
-        clearLogBtn.addActionListener((ActionListener)SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.clearLogBtn_Click.name(), swingUtil));
+        clearLogBtn.addActionListener((ActionListener) SwingActionUtil.ActionAdapter.ActionListener.create(ActionDefine.clearLogBtn_Click.name(), swingUtil));
         panel_9.add(clearLogBtn);
 
         logArea = new JTextArea();
@@ -186,6 +200,8 @@ public class ScheduleBatRunnerUI extends JFrame {
         goBtn_Click, //
         cleanBtn_Click, //
         clearLogBtn_Click, //
+        swingJarBuilderBtn_Click, //
+        batList_KeyEvent, //
         ;
     }
 
@@ -205,27 +221,7 @@ public class ScheduleBatRunnerUI extends JFrame {
         swingUtil.addAction(ActionDefine.addBatBtn_Click.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                CommandBean bean = new CommandBean();
-                bean.command.setLength(0);
-                bean.command.append(batTextArea.getText());
-                batTextArea.setText("");
-
-                boolean findOk = false;
-                for (int ii = 0; ii < listModel.getSize(); ii++) {
-                    CommandBean comm = (CommandBean) listModel.getElementAt(ii);
-                    if (comm.equals(bean)) {
-                        findOk = true;
-                        break;
-                    }
-                }
-
-                if (findOk) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("此指令以存在");
-                    return;
-                }
-
-                listModel.addElement(bean);
-                batList.updateUI();
+                addCommand(batTextArea.getText());
             }
         });
         swingUtil.addAction(ActionDefine.goBtn_Click.name(), new Action() {
@@ -274,6 +270,7 @@ public class ScheduleBatRunnerUI extends JFrame {
                                 CommandBean bean = allList.poll();
                                 try {
                                     RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                                    inst.runInBatFile(false);
                                     inst.command(bean.command);
                                     ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
                                     bean.commandBeanStatue = CommandBeanStatue.RUNNING;
@@ -327,6 +324,58 @@ public class ScheduleBatRunnerUI extends JFrame {
                 logArea.setText("");
             }
         });
+        swingUtil.addAction(ActionDefine.swingJarBuilderBtn_Click.name(), new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                ScheduleBatRunnerUI_SwingAntDlg.newInstance(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String cmd = (String) e.getSource();
+                        addCommand(cmd);
+                    }
+                });
+            }
+        });
+        swingUtil.addAction(ActionDefine.batList_KeyEvent.name(), new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                JListUtil.newInstance(batList).defaultJListKeyPressed(evt);
+            }
+        });
+        swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+            }
+        });
+    }
+
+    private void addCommand(String textCommand) {
+        if (StringUtils.isBlank(textCommand)) {
+            return;
+        }
+
+        CommandBean bean = new CommandBean();
+        bean.command.setLength(0);
+        bean.command.append(textCommand);
+        batTextArea.setText("");
+
+        boolean findOk = false;
+        for (int ii = 0; ii < listModel.getSize(); ii++) {
+            CommandBean comm = (CommandBean) listModel.getElementAt(ii);
+            if (comm.equals(bean)) {
+                findOk = true;
+                break;
+            }
+        }
+
+        if (findOk) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("此指令以存在");
+            return;
+        }
+
+        listModel.addElement(bean);
+        batList.updateUI();
     }
 
     private enum CommandBeanStatue {
@@ -384,7 +433,7 @@ public class ScheduleBatRunnerUI extends JFrame {
             String color = "";
             String label = "";
             String message = command.toString();
-            String format = "<html><font color='%s'>%s</font>&nbsp;&nbsp;&nbsp;%s</html>";
+            String format = "<html><font color='%s'>%s</font>    &nbsp;&nbsp;&nbsp;%s</html>";
             return String.format(format, commandBeanStatue.color, commandBeanStatue.label, message);
         }
 
@@ -395,11 +444,11 @@ public class ScheduleBatRunnerUI extends JFrame {
 
     private void applyAppMenu() {
         JMenu menu1 = JMenuAppender.newInstance("child_item")//
-                .addMenuItem("detail1", (ActionListener)ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addMenuItem("detail1", (ActionListener) ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
                 .getMenu();
         JMenu mainMenu = JMenuAppender.newInstance("file")//
                 .addMenuItem("item1", null)//
-                .addMenuItem("item2", (ActionListener)ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addMenuItem("item2", (ActionListener) ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
                 .addChildrenMenu(menu1)//
                 .getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);

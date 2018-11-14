@@ -151,6 +151,10 @@ public class SwingActionUtil {
         }
     }
 
+    public SwingActionUtil invokeActionByComponent(final String actionName, JComponent comm) {
+        return invokeAction(actionName, new ActionEvent(comm, -1, "fake event"));
+    }
+
     public SwingActionUtil invokeAction(final String actionName, EventObject evt) {
         if (registerActionMap.containsKey(actionName)) {
             registerActionMap.get(actionName).execute(evt);

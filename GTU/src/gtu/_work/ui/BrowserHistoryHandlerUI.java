@@ -252,9 +252,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             scrollPane.setViewportView(remarkArea);
             JTextUndoUtil.applyUndoProcess1(remarkArea);
 
-            JTextPane textPane = new JTextPane();
-            scrollPane.setRowHeaderView(textPane);
-
             JLabel lblCommandType = new JLabel("command type");
             panel.add(lblCommandType, "2, 10, right, default");
 
