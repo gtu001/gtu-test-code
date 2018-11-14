@@ -252,11 +252,25 @@ def listFile_example(dirpath):
 	f = list()
 	for (dirpath, dirnames, filenames) in walk(dirpath):
 	    f.extend(filenames)
-	
 
-def listFile_example2():
+
+def listFile_example2(dirpath):
+	'''
+	推薦這個
+	'''
+	from os import walk
+	import os
+	for (dirpath, dirnames, filenames) in walk(dirpath):
+		for (i, name) in enumerate(filenames) :
+			old_file = os.path.join(dirpath, name)
+			print(i, old_file)
+                
+                
+def listFile_example3():
 	import glob
 	print(glob.glob("/home/adam/*.txt"))
+	
+	
 	
 	
 def deleteDir(dirPath):
