@@ -54,6 +54,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.clipboard.ClipboardUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
@@ -80,7 +81,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private static final String CONTAIN_ARRY_KEY = "arry";
     private static final String FREEMARKER_KEY = "ftl";
     private static final long serialVersionUID = 1L;
-    
+
     private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
@@ -235,6 +236,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 tradeOffArea.setText(config.tradeOff);
 
                                 templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
+                                
+                                //放入執行紀錄  並  載入預設
+                                simpleConfigHandler.put(configKeyText.getText());
+                                simpleConfigHandler.load(configKeyText.getText());
 
                                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                                     String replaceText = StringUtils.defaultString(replaceArea.getText());
@@ -255,6 +260,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                                         if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
                                             configHandler.deleteConfig(config.configKeyText);
                                             configHandler.reloadTemplateList();
+
+                                            simpleConfigHandler.delete(config.configKeyText);
                                         }
                                     }
                                 } catch (Exception e) {
@@ -302,8 +309,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
 
+            // config init
             {
                 configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
+                simpleConfigHandler = new SimpleConfigHandler();
+            }
+
+            {
                 JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
                     panel_1 = new JPanel();
@@ -417,7 +429,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
-            
+
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
             jFrameRGBColorPanel.start();
             panel_1.add(jFrameRGBColorPanel.getToggleButton());
@@ -461,6 +473,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     static Properties prop = new Properties();
 
     private PropConfigHandler configHandler;
+    private SimpleConfigHandler simpleConfigHandler;
 
     private JLabel lblNewLabel;
     private JLabel lblNewLabel_1;
@@ -487,6 +500,9 @@ public class RegexReplacer extends javax.swing.JFrame {
             jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
             // 貼到記事本
             pasteTextToClipboard();
+            
+            //放入執行紀錄
+            simpleConfigHandler.put(configKeyText.getText());
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -793,6 +809,31 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             public String toString() {
                 return configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/";
+            }
+        }
+    }
+
+    private class SimpleConfigHandler {
+
+        private PropertiesUtilBean config = new PropertiesUtilBean(RegexReplacer.class, RegexReplacer.class.getSimpleName() + "_" + SimpleConfigHandler.class.getSimpleName());
+
+        public void load(String key) {
+            String value = config.getConfigProp().getProperty(key);
+            if (StringUtils.isBlank(replaceArea.getText()) && StringUtils.isNotBlank(value)) {
+                replaceArea.setText(value);
+            }
+        }
+
+        public void delete(String configKeyText) {
+            if (config.getConfigProp().containsKey(configKeyText)) {
+                config.getConfigProp().remove(configKeyText);
+                config.store();
+            }
+        }
+
+        public void put(String key) {
+            if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(replaceArea.getText())) {
+                config.getConfigProp().setProperty(key, replaceArea.getText());
             }
         }
     }

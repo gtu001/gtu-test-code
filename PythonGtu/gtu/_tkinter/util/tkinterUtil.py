@@ -34,9 +34,14 @@ def error(title, message):
     
 
 def error_ex(title, exception):
-    message = errorHandler.getStackTraceToStr(exception)
-    print(message)
-    messagebox.showerror(title, message)
+    # 自訂檢核錯誤     
+    if type(exception) == ValidateException :
+        messagebox.showerror(title=exception.title, message=exception.args[0])
+    # 意外錯誤
+    else :
+        message = errorHandler.getStackTraceToStr(exception)
+        print(message)
+        messagebox.showerror(title, message)
     
     
 def warning(title, message):
@@ -45,7 +50,7 @@ def warning(title, message):
     
 def prompt(title, message, defaultVal=None):
 #     answer = simpledialog.askstring(title, message)
-    answer = simpledialog.askstring(title = title, prompt = message, initialvalue=defaultVal)
+    answer = simpledialog.askstring(title=title, prompt=message, initialvalue=defaultVal)
     return answer
 
     
@@ -71,6 +76,16 @@ def createDefaultWin():
     import tkinter as tk
     root = tk.Tk();
     root.withdraw()
+    
+    
+class ValidateException(Exception):
+    def __init__(self, message, title=None):
+        if title is None :
+            self.title = "錯誤"
+        else : 
+            self.title = title 
+        self.args = (message, self.title)
+        
         
         
 if __name__ == '__main__':

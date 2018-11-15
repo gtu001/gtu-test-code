@@ -276,6 +276,14 @@ def listFile_example3():
 def deleteDir(dirPath):
 	import shutil
 	shutil.rmtree(dirPath)
+	
+	
+	
+def rename(fromDir, fromName, toDir, toName):
+	old_file = os.path.join(fromDir, fromName)
+	new_file = os.path.join(toDir, toName)
+	os.rename(old_file, new_file)
+
 
 
 if __name__ == '__main__':

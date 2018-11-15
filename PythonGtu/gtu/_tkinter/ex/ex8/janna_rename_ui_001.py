@@ -8,6 +8,7 @@ from tkinter import Text, Button, Label
 from tkinter.filedialog import askopenfilename
 
 from gtu._tkinter.util import tkinterUtil, tkinterUIUtil
+from gtu._tkinter.util.tkinterUtil import ValidateException 
 from gtu._tkinter.util.tkinterUIUtil import TextSetPathEventHandler 
 from gtu._tkinter.util.tkinterUIUtil import _Label , _ProgressBar, _Scrollbar
 from gtu._tkinter.util.tkinterUIUtil import _Text , _Button, _TabFrame
@@ -33,7 +34,17 @@ class MainUI():
         
         self.dirText = _Text(_Text.create(tab1))
         self.dirText.grid(column=1, row=0)
+        self.dirText.setText("C:/Users/janna/Downloads")
         TextSetPathEventHandler(self.dirText, False, r"", True)
+        
+         #------------------------------row 2
+        
+        l2 = _Label(root=tab1)
+        l2.setText("設定表號:")
+        l2.grid(column=0, row=1)
+        
+        self.tableNumText = _Text(_Text.create(tab1))
+        self.tableNumText.grid(column=1, row=1)
         
         #------------------------------row 3
         
@@ -69,12 +80,18 @@ class MainUI():
         tkinterUtil.centerWin(win)
         win.mainloop()
     
-    
     def executeBtnAction(self):
+        tableNum = self.tableNumText.getText();
+        dirPath = self.dirText.getText();
+        
+        if stringUtil.isBlank(tableNum) or stringUtil.isBlank(dirPath) :
+            tkinterUtil.message("錯誤!!", "請輸入完整內容")
+            return
+        
         self.btn2.disable()
         self.logText.clear()
         
-        rename = RenameHandler(self.dirText.getText())
+        RenameHandler(dirPath, tableNum, self.pbar)
         
         tkinterUtil.message("產生結果", "成功!!")
         
@@ -86,23 +103,39 @@ class RenameHandler():
     
     ptn1 = re.compile(r"TX\w+\_(?P<rptName>R\w+?)\_\d+\-(?P<type>[ic])", re.I)
     
-    def __init__(self, dirpath):
-        from os import walk
-        import os
-        for (dirpath, dirnames, filenames) in walk(dirpath):
-            for (i, name) in enumerate(filenames) :
-                old_file = os.path.join(dirpath, name)
-                print(i, old_file)
+    def __init__(self, dirpath, tableNum, pbar):
+        fileLst = list()
+        fileUtil.searchFilefind(dirpath, r".*\.pdf", fileLst)
+        
+        pbar.setupValue(0, len(fileLst))
+        
+        for (i, old_file) in enumerate(fileLst):
+            dirpath = os.path.dirname(old_file)
+            name = os.path.basename(old_file)
+            
+            mth = RenameHandler.ptn1.search(name)
+            if mth :
+                rptName = mth.group("rptName")
+                type = mth.group("type") 
                 
-                mth = RenameHandler.ptn1.search(name)
-                if mth :
-                    rptName = mth.group("rptName")
-                    type = mth.group("type") 
+                suffix = ""
+                if type == 'i' or type == 'I' :
+                    suffix = "I"
+                elif type == 'c' or type == 'C' :
+                    suffix = 'C'
                     
-                    print("rptName", rptName, type)
-#             old_file = os.path.join("directory", "a.txt")
-#             new_file = os.path.join("directory", "b.kml")
-#             os.rename(old_file, new_file)
+                newName = rptName + "_" + suffix + tableNum + ".PDF"
+                
+                new_file = os.path.join(dirpath, newName)
+                
+                if os.path.exists(new_file) :
+                    raise ValidateException("檔案重複 : " + str(old_file) + "<->" + str(new_file))
+                
+                os.rename(old_file, new_file)
+                
+                print("rptName", rptName, type, newName)
+                
+                pbar.step(1)
 
 
 if __name__ == '__main__':

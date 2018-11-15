@@ -98,7 +98,10 @@ def __isPrivateMember(name):
         
         
 def getClassFullName(o):
-    return o.__module__ + "." + o.__class__.__qualname__
+    module = "<module not found>"
+    if hasattr(o, "__module__") : 
+        module = o.__module__
+    return module + "." + o.__class__.__qualname__
         
         
 

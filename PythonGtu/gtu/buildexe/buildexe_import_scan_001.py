@@ -144,7 +144,7 @@ def appendPyFile(projectBase, classpath):
 
 if __name__ == '__main__' :
     projectBase = "D:/workstuff/gtu-test-code/PythonGtu"
-    targetPy = "D:/workstuff/gtu-test-code/PythonGtu/gtu/_tkinter/ex/ex7/excel_test_rpt_8110_cellCompare_UI.py";
+    targetPy = "D:/workstuff/gtu-test-code/PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.py";
     newProjectBase = "D:/workstuff/gtu-test-code/PythonGtuNew/"
     
     print("mkdir", fileUtil.mkdirs(newProjectBase))
