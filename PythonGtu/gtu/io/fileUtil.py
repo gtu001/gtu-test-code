@@ -163,7 +163,7 @@ def readStringVariableByLine(textData):
 	    print(line)
 	    
 
-def searchFilefind(file, pattern, fileList):
+def searchFilefind(file, pattern, fileList, debug=False):
 	if type(pattern).__name__ == 'str':
 		pattern = re.compile(pattern, re.IGNORECASE)
 	
@@ -174,16 +174,20 @@ def searchFilefind(file, pattern, fileList):
 		listFile = os.listdir(file)
 		for i, f in enumerate(listFile, 0):
 			f = Path(currentDir , f)
-			searchFilefind(f, pattern, fileList)
+			searchFilefind(f, pattern, fileList, debug)
 	elif file.is_file() :
 		name = getName(file)
 		mth = pattern.search(name)
 		
 		if mth is not None :
+			if debug :
+				print("符合 :", file)
 			fileList.append(file.resolve())
+		elif debug :
+			print("不符合 :", file)
 
 
-def searchFileMatchs(file, pattern, fileList):
+def searchFileMatchs(file, pattern, fileList, debug=False):
 	if type(pattern).__name__ == 'str':
 		pattern = re.compile(pattern, re.IGNORECASE)
 	
@@ -194,13 +198,17 @@ def searchFileMatchs(file, pattern, fileList):
 		listFile = os.listdir(file)
 		for i, f in enumerate(listFile, 0):
 			f = Path(currentDir , f)
-			searchFilefind(f, pattern, fileList)
+			searchFileMatchs(f, pattern, fileList, debug)
 	elif file.is_file() :
 		name = getName(file)
 		mth = pattern.match(name)
 		
 		if mth is not None :
+			if debug :
+				print("符合 :", file)
 			fileList.append(file.resolve())
+		elif debug :
+			print("不符合 :", file)
 
 
 def sep():

@@ -43,6 +43,16 @@ def trimSpace(chs):
     return chs
 
 
+def trimToEmpty(chs):
+    if chs is None :
+        return ""
+    elif type(chs) == str :
+        return chs.strip()
+    else :
+        return str(chs).strip()
+    
+
+
 def isBlank(chs):
     if chs == None :
         return True

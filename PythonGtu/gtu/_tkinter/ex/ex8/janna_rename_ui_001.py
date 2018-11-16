@@ -40,16 +40,25 @@ class MainUI():
          #------------------------------row 2
         
         l2 = _Label(root=tab1)
-        l2.setText("設定表號:")
+        l2.setText("報表名稱:")
         l2.grid(column=0, row=1)
         
+        self.tableNameText = _Text(_Text.create(tab1))
+        self.tableNameText.grid(column=1, row=1)
+        
+         #------------------------------row 2
+        
+        l3 = _Label(root=tab1)
+        l3.setText("設定表號:")
+        l3.grid(column=0, row=2)
+        
         self.tableNumText = _Text(_Text.create(tab1))
-        self.tableNumText.grid(column=1, row=1)
+        self.tableNumText.grid(column=1, row=2)
         
         #------------------------------row 3
         
         self.pbar = _ProgressBar(tab1, length=300)
-        self.pbar.grid(column=1, row=2)
+        self.pbar.grid(column=1, row=3)
         
         self.btn2 = _Button(root=tab1)
         self.btn2.setText("修改檔名")
@@ -58,7 +67,7 @@ class MainUI():
                                             exceptionFunc=self.executeBtnAction_finally,
                                             finallyFunc=self.executeBtnAction_finally
                                             ))
-        self.btn2.grid(column=2, row=2)
+        self.btn2.grid(column=2, row=3)
         
         #------------------------------row End
         
@@ -82,6 +91,7 @@ class MainUI():
     
     def executeBtnAction(self):
         tableNum = self.tableNumText.getText();
+        tableName = self.tableNameText.getText();
         dirPath = self.dirText.getText();
         
         if stringUtil.isBlank(tableNum) or stringUtil.isBlank(dirPath) :
@@ -91,9 +101,9 @@ class MainUI():
         self.btn2.disable()
         self.logText.clear()
         
-        RenameHandler(dirPath, tableNum, self.pbar)
+        n1 = RenameHandler(dirPath, tableNum, tableName, self.pbar)
         
-        tkinterUtil.message("產生結果", "成功!!")
+        tkinterUtil.message("產生結果", "成功, 筆數 : " + n1.count)
         
     def executeBtnAction_finally(self):
         self.btn2.enable()
@@ -103,11 +113,18 @@ class RenameHandler():
     
     ptn1 = re.compile(r"TX\w+\_(?P<rptName>R\w+?)\_\d+\-(?P<type>[ic])", re.I)
     
-    def __init__(self, dirpath, tableNum, pbar):
+    def __init__(self, dirpath, tableNum, tableName, pbar):
         fileLst = list()
-        fileUtil.searchFilefind(dirpath, r".*\.pdf", fileLst)
+        
+        scanPtn = r"TX.*" + stringUtil.trimToEmpty(tableName) + ".*\.(pdf|PDF)"
+        print(scanPtn)
+        fileUtil.searchFilefind(dirpath, scanPtn, fileLst, debug=True)
+        
+        print("fileLst size = " + str(len(fileLst)))
         
         pbar.setupValue(0, len(fileLst))
+        
+        self.count = 0
         
         for (i, old_file) in enumerate(fileLst):
             dirpath = os.path.dirname(old_file)
@@ -132,6 +149,7 @@ class RenameHandler():
                     raise ValidateException("檔案重複 : " + str(old_file) + "<->" + str(new_file))
                 
                 os.rename(old_file, new_file)
+                self.count += 1
                 
                 print("rptName", rptName, type, newName)
                 
