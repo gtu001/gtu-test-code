@@ -62,7 +62,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
@@ -2060,7 +2059,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private class DropboxBookmarkConfigMergeHandler {
+        private List<File> removeLst = new ArrayList<File>();
         private List<String> mergeFileLst = new ArrayList<String>();
+
+        private void cleanFiles() {
+            for (File f : removeLst) {
+                if (!f.getName().equals("BrowserHistoryHandlerUI_bookmark.properties")) {
+                    f.delete();
+                }
+            }
+        }
 
         private UrlConfig __getNewConfig_for_Merge(UrlConfig d1, UrlConfig d2) throws ParseException {
             if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
@@ -2106,6 +2114,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     __mergeToMap(prop, map);
 
                     mergeFileLst.add(f.getName());
+
+                    if (!f.equals(bookmarkConfig.getPropFile())) {
+                        removeLst.add(f);
+                    }
                 }
             }
             __mergeToMap(bookmarkConfig.getConfigProp(), map);
@@ -2120,14 +2132,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void dropboxMergeBtnAction() {
         try {
-            File dir = JCommonUtil._jFileChooser_selectFileAndDirectory();
-            if (!dir.isDirectory()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("必須是dropbox目錄!");
-                return;
-            }
+            File dir = bookmarkConfig.getPropFile().getParentFile();
             DropboxBookmarkConfigMergeHandler handler = new DropboxBookmarkConfigMergeHandler();
             bookmarkConfig.getConfigProp().putAll(handler.getMergeProperties(dir));
             bookmarkConfig.store();
+            handler.cleanFiles();
             JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(handler.mergeFileLst, "\r\n") + "\nMerge完成!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
