@@ -78,6 +78,7 @@ import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.string.StringNumberUtil;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -97,8 +98,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -180,6 +181,7 @@ public class FastDBQueryUI extends JFrame {
 
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
     private JButton prevConnBtn;
+    private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
 
     /**
      * Launch the application.
@@ -593,7 +595,7 @@ public class FastDBQueryUI extends JFrame {
 
         panel_17 = new JPanel();
         panel_6.add(panel_17, "10, 22, fill, fill");
-        
+
         prevConnBtn = new JButton("上一組");
         prevConnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -612,7 +614,7 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_17.add(removeConnectionBtn);
-        
+
         nextConnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 nextConnBtnClick();
@@ -661,6 +663,9 @@ public class FastDBQueryUI extends JFrame {
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
             jFrameRGBColorPanel.start();
             panel_17.add(jFrameRGBColorPanel.getToggleButton());
+
+            hideInSystemTrayHelper.apply(this);
+            panel_17.add(hideInSystemTrayHelper.getToggleButton());
         }
     }
 

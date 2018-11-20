@@ -1,0 +1,15 @@
+	function showObjFunction(testObj){
+		var funLst = new Array();
+		for(var ii in testObj){
+			if(typeof(testObj[ii]) == 'function'){
+				var ret = testObj[ii].toString();
+				ret = ret.substr('function '.length);
+				ret = ret.substr(0, ret.indexOf(')') + 1);
+				if(/\w+\(.*?\)/.test(ret)){
+					funLst.push(ret);
+				}
+			}
+		}
+		funLst.sort();
+		console(funLst.join("\n"));
+	}

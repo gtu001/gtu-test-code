@@ -11,11 +11,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JToggleButton;
 import javax.swing.UIManager;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +54,8 @@ public class HideInSystemTrayHelper {
     ActionListener openAction;
     ActionListener closeAction;
     List<MenuItem> items = new ArrayList<MenuItem>();
+    HideToTrayListener hideToTrayListener;
+    JFrame jframe;
     private TrayIconHandler trayIconHandler = new TrayIconHandler();
 
     public void apply() {
@@ -77,6 +79,8 @@ public class HideInSystemTrayHelper {
 
     public void apply(final JFrame jframe, String sysTrayTitle, String imagePath) {
         System.out.println("creating instance");
+
+        this.jframe = jframe;
 
         // 決定icon
         Image image = null;
@@ -105,7 +109,7 @@ public class HideInSystemTrayHelper {
             MenuItem defaultItem = new MenuItem("Open");
             defaultItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                     gtu.swing.util.JFrameUtil.setVisible(true,jframe);
+                    gtu.swing.util.JFrameUtil.setVisible(true, jframe);
                     jframe.setExtendedState(JFrame.NORMAL);
                     if (openAction != null) {
                         openAction.actionPerformed(e);
@@ -140,7 +144,7 @@ public class HideInSystemTrayHelper {
                 public void actionPerformed(ActionEvent e) {
                     tray.remove(trayIcon);
                     if (jframe != null)
-                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
+                        gtu.swing.util.JFrameUtil.setVisible(true, jframe);
                     if (openAction != null) {
                         openAction.actionPerformed(e);
                     }
@@ -150,44 +154,131 @@ public class HideInSystemTrayHelper {
             System.out.println("system tray not supported");
         }
         if (jframe != null) {
-            jframe.addWindowStateListener(new WindowStateListener() {
-                public void windowStateChanged(WindowEvent e) {
-                    if (tray == null && trayIcon == null) {
-                        System.out.println("[2] system tray not supported");
-                        return;
-                    }
-                    if (e.getNewState() == JFrame.ICONIFIED) {
-                        try {
-                            tray.add(trayIcon);
-                             gtu.swing.util.JFrameUtil.setVisible(false,jframe);
-                            System.out.println("added to SystemTray");
-                        } catch (AWTException ex) {
-                            System.out.println("unable to add to tray");
-                        }
-                    }
-                    if (e.getNewState() == 7) {
-                        try {
-                            tray.add(trayIcon);
-                             gtu.swing.util.JFrameUtil.setVisible(false,jframe);
-                            System.out.println("added to SystemTray");
-                        } catch (AWTException ex) {
-                            System.out.println("unable to add to system tray");
-                        }
-                    }
-                    if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
-                        tray.remove(trayIcon);
-                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
-                        System.out.println("Tray icon removed");
-                    }
-                    if (e.getNewState() == JFrame.NORMAL) {
-                        tray.remove(trayIcon);
-                         gtu.swing.util.JFrameUtil.setVisible(true,jframe);
-                        System.out.println("Tray icon removed");
-                    }
-                }
-            });
+
+            // 啟動Hide in tray
+            this.setHideEventOnOff(true);
+
+            jframe.addWindowStateListener(hideToTrayListener);
             jframe.setIconImage(image);
             jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
+    }
+
+    /**
+     * 啟動 hide in tray
+     * 
+     * @param isOn
+     */
+    public void setHideEventOnOff(boolean isOn) {
+        if (jframe == null) {
+            return;
+        }
+        if (hideToTrayListener == null) {
+            hideToTrayListener = new HideToTrayListener(jframe);
+        }
+        if (isOn) {
+            if (!hideToTrayListener.hasEvent()) {
+                hideToTrayListener.addEvent();
+                System.out.println("----add hideToTrayListener");
+            }
+        } else {
+            if (hideToTrayListener.hasEvent()) {
+                hideToTrayListener.removeEvent();
+                System.out.println("----remove hideToTrayListener");
+            }
+        }
+    }
+
+    /**
+     * 加入是否隱藏道系統列
+     * 
+     * @return
+     */
+    public JToggleButton getToggleButton() {
+        final JToggleButton tgBtn = new JToggleButton("縮小至系統列");
+        tgBtn.setSelected(true);
+        tgBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tgBtn.setText(tgBtn.isSelected() ? "縮小至系統列" : "縮小至工作列");
+                if (tgBtn.isSelected()) {
+                    setHideEventOnOff(true);
+                } else {
+                    setHideEventOnOff(false);
+                }
+            }
+        });
+        return tgBtn;
+    }
+
+    private class HideToTrayListener implements WindowStateListener {
+        JFrame jframe;
+
+        HideToTrayListener(JFrame jframe) {
+            this.jframe = jframe;
+        }
+
+        public boolean removeEvent() {
+            boolean findOk = false;
+            if (jframe.getWindowStateListeners() != null) {
+                for (int ii = 0; ii < jframe.getWindowStateListeners().length; ii++) {
+                    if (jframe.getWindowStateListeners()[ii] == this) {
+                        jframe.removeWindowStateListener(this);
+                        findOk = true;
+                        ii--;
+                    }
+                }
+            }
+            return findOk;
+        }
+
+        public boolean hasEvent() {
+            if (jframe.getWindowStateListeners() != null) {
+                for (int ii = 0; ii < jframe.getWindowStateListeners().length; ii++) {
+                    if (jframe.getWindowStateListeners()[ii] == this) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void addEvent() {
+            jframe.addWindowStateListener(this);
+        }
+
+        public void windowStateChanged(WindowEvent e) {
+            if (tray == null && trayIcon == null) {
+                System.out.println("[2] system tray not supported");
+                return;
+            }
+            if (e.getNewState() == JFrame.ICONIFIED) {
+                try {
+                    tray.add(trayIcon);
+                    gtu.swing.util.JFrameUtil.setVisible(false, jframe);
+                    System.out.println("added to SystemTray");
+                } catch (AWTException ex) {
+                    System.out.println("unable to add to tray");
+                }
+            }
+            if (e.getNewState() == 7) {
+                try {
+                    tray.add(trayIcon);
+                    gtu.swing.util.JFrameUtil.setVisible(false, jframe);
+                    System.out.println("added to SystemTray");
+                } catch (AWTException ex) {
+                    System.out.println("unable to add to system tray");
+                }
+            }
+            if (e.getNewState() == JFrame.MAXIMIZED_BOTH) {
+                tray.remove(trayIcon);
+                gtu.swing.util.JFrameUtil.setVisible(true, jframe);
+                System.out.println("Tray icon removed");
+            }
+            if (e.getNewState() == JFrame.NORMAL) {
+                tray.remove(trayIcon);
+                gtu.swing.util.JFrameUtil.setVisible(true, jframe);
+                System.out.println("Tray icon removed");
+            }
         }
     }
 

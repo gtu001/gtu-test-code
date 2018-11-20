@@ -1,0 +1,85 @@
+
+<select id='TRADER' name='TRADER' class='textBox2 validate-selection'>
+        <%--下拉--%>
+        <option value="">請選擇</option>
+        <c:forEach var='map' items='${TRADER_List}'>
+                <option value='${map.FELD_CONT}'
+                        <c:if test="${ username eq map.FELD_CONT}">selected</c:if>>${map.FELD_NAME}</option>
+        </c:forEach>
+</select>
+
+
+
+	function SelectElementCreater(lst, valueKey, textKey, defaultVal, name, func) {
+		this.lst = lst;
+		this.valueKey = valueKey;
+		this.textKey = textKey;
+		this.defaultVal = defaultVal;
+		this.name = name;
+		this.func = func;
+		
+		this.select = document.createElement("select");
+		this.select.setAttribute("name", this.name);
+		
+		if(this.defaultVal != null && this.defaultVal.length != 0){
+			this.select.setAttribute("value", this.defaultVal);
+		}
+		if(this.func){
+			this.select.addEventListener("change", this.func);
+		}
+		
+		this.createOption = function(value, text){
+			var option = document.createElement("option");
+			option.setAttribute("value", value);
+			var plzSelect = document.createTextNode(text);
+			option.appendChild(plzSelect); 
+			if(this.defaultVal == value){
+				option.setAttribute("selected", "");
+			}
+			return option;
+		}
+		
+		this.select.appendChild(this.createOption("", "請選擇")); 
+		for(var ii = 0 ; ii < this.lst.length; ii ++){
+			var val = lst[ii][this.valueKey];
+			var txt = lst[ii][this.textKey];
+			var opt = this.createOption(val, txt);
+			this.select.appendChild(opt); 
+		}
+		
+		this.get = function(){
+			return this.select;
+		}
+	}
+	
+	
+	
+		mappingMADE_PRICE_List : function(rec, val, sn){
+			var lst = new Array();
+			var map = {};
+			<c:forEach var="item" items="${MADE_PRICE_List}">
+				map = {};
+				map['value'] = '${item.FELD_CONT}';
+				map['text'] = '${item.FELD_NAME}';
+				lst.push(map);
+			</c:forEach>
+			
+			var selectCt = new SelectElementCreater(lst, "value", "text", "03");
+			return selectCt.get();
+		},
+		
+		
+		mappingMADE_PRICE_List : function(obj, value) {
+			var defaultVal = ""; 
+			<c:forEach var="item" items="${MADE_PRICE_List}">
+				<c:if test="${item.FELD_CONT eq '03'}">
+					defaultVal = "${item.FELD_NAME}";
+				</c:if>
+			</c:forEach>
+			switch( value ) {
+				<c:forEach var="item" items="${MADE_PRICE_List}">
+					case '${item.FELD_CONT}' : return '${item.FELD_NAME}' ;
+				</c:forEach>
+	      		default: return defaultVal;	//value	
+			}
+		},

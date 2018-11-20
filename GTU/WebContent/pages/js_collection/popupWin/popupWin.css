@@ -1,0 +1,172 @@
+body.popupWinActive{
+   overflow: hidden;
+ }
+
+.popupWin{
+	top:0px;
+	left:0px;
+	width:100%;
+	height: 100%;
+	overflow: auto;
+	z-index: 200;
+    background: rgba(0,0,0,0.3);
+    background: url('../../../../images/CM/ui/CSRUtil.coverPage.bg.png');
+    position: fixed;
+    _position: absolute;
+
+}
+
+.popupWin-table {
+	position: absolute;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	padding: 0px;
+	margin: 0px auto;
+	vertical-align: middle;
+}
+
+.popupWin-table td{
+	padding: 0px;
+	margin: 0px;
+	border: none;
+}
+
+td.popupWin-resize{
+	width: 3px;
+	height: 3px;
+	background-color: transparent;
+}
+
+td#popupWin-resizeTop, td#popupWin-resizeBottom{
+	width: auto;
+}
+
+td#popupWin-resizeRight, td#popupWin-resizeLeft{
+	height: auto;
+}
+
+div#popupWin-title{
+	background-color: lightgray;
+	border: 1px solid black;
+	border-bottom-style: none;
+	border-radius: 5px 5px 0px 0px;	
+	cursor: move;
+}
+
+div#popupWin-title button.popupWin-CloseBtn{
+	padding: 2px 10px 0px 10px;
+	margin: 0px 10px;
+	line-height: 14px;
+	font-size: 16px;
+	vertical-align: middle;
+	float: right;
+	border: 1px solid black;
+	border-top:0px;
+	border-radius: 0px 0px 3px 3px;	
+	color: #FFF;
+	font-weight: bolder;
+	background: #B84638;
+	cursor: pointer;
+	+padding-top: 0px;
+	+font-size: 10px;
+	+line-height: 6px;
+}
+
+div#popupWin-title button.popupWin-CloseBtn:hover{
+	background-color: red;
+}
+
+div#popupWin-title span{
+	font-size:12px;
+	line-height: 12px;
+	letter-spacing: 2px;
+	padding: 2px 10px;
+	line-height: 20px;
+}
+
+td#popupWin-resizeTopLeft{
+	cursor: nw-resize;
+}
+td#popupWin-resizeTop{
+	cursor: n-resize;
+}
+td#popupWin-resizeTopRight{
+	cursor: ne-resize;
+}
+td#popupWin-resizeLeft{
+	cursor: w-resize;
+}
+td#popupWin-resizeRight{
+	cursor: e-resize;
+}
+td#popupWin-resizeBottomLeft{
+	cursor: sw-resize;
+}
+td#popupWin-resizeBottom{
+	cursor: s-resize;
+}
+td#popupWin-resizeBottomRight{
+	cursor: se-resize;
+}
+
+div#popupWin-main{
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 0px 0px 5px 5px;	
+	padding: 0px !important;
+}
+
+div#popupWin-main iframe{
+	margin:0px !important;
+}
+
+div#popupWin-main form{
+	display: hidden;
+}
+
+div#popupWin-adj-cover{
+	position: absolute;
+	top:0px;
+	left:0px;
+	width: 100%;
+	height: 100%;
+	display: none;
+}
+
+div#popupWin-adj-window{
+	border: 2px dashed #FFF;
+	border-radius: 5px;
+	background-color: #444; 
+	background-color: rgba(0,0,0,0.2); 
+	position: absolute;
+	display: 'block';
+	box-shadow:  #000 0px 0px 10px 2px;
+}
+
+.popupWin.no-resize td.popupWin-resize{
+	display: none;
+}
+
+.popupWin.no-move div#popupWin-title{
+	cursor: default;
+}
+
+.popupWin.no-close button.popupWin-CloseBtn{
+	display: none;
+}
+
+.popupWin.fullPop td.popupWin-header{
+	display: none;
+}
+
+.popupWin.fullPop .popupWin-table{
+	top: 0px !important;
+	left: 0px !important;
+}
+
+.popupWin.fullPop div#popupWin-main{
+	border: none;
+	border-radius: 0px;
+	border-bottom: 1px dotted lightgray;
+}
+	

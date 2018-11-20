@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,15 +64,14 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JFileExecuteUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -146,8 +144,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JPanel jPanel2;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
-
     private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
+    private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
 
     /**
      * Auto-generated main method to display this JFrame
@@ -686,9 +684,12 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         scannerStatus.setPreferredSize(new java.awt.Dimension(741, 27));
                     }
 
+                    JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
                     jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
                     jFrameRGBColorPanel.start();
                     jPanel2.add(jFrameRGBColorPanel.getToggleButton());
+                    jPanel2.add(hideInSystemTrayHelper.getToggleButton());
+                    hideInSystemTrayHelper.apply(this);
                 }
             }
 
@@ -1679,7 +1680,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
 
             config.reflectInit(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
             this.setSize(870, 551);
         } catch (Exception e) {
             e.printStackTrace();

@@ -55,6 +55,7 @@ import gtu.clipboard.ClipboardUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
@@ -83,6 +84,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private static final long serialVersionUID = 1L;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
 
     /**
      * Auto-generated main method to display this JFrame
@@ -136,6 +138,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         jPanel1.add(jScrollPane1, BorderLayout.CENTER);
                         {
                             replaceArea = new JTextArea();
+                            JTextUndoUtil.applyUndoProcess1(replaceArea);
                             jScrollPane1.setViewportView(replaceArea);
                         }
                     }
@@ -236,8 +239,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 tradeOffArea.setText(config.tradeOff);
 
                                 templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
-                                
-                                //放入執行紀錄  並  載入預設
+
+                                // 放入執行紀錄 並 載入預設
                                 simpleConfigHandler.put(configKeyText.getText());
                                 simpleConfigHandler.load(configKeyText.getText());
 
@@ -303,6 +306,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         jPanel4.add(jScrollPane2, BorderLayout.CENTER);
                         {
                             resultArea = new JTextArea();
+                            JTextUndoUtil.applyUndoProcess1(resultArea);
                             jScrollPane2.setViewportView(resultArea);
                         }
                     }
@@ -429,10 +433,12 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
+            hideInSystemTrayHelper.apply(this);
 
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
             jFrameRGBColorPanel.start();
             panel_1.add(jFrameRGBColorPanel.getToggleButton());
+            panel_1.add(hideInSystemTrayHelper.getToggleButton());
             this.setTitle("You Set My World On Fire");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -500,8 +506,8 @@ public class RegexReplacer extends javax.swing.JFrame {
             jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
             // 貼到記事本
             pasteTextToClipboard();
-            
-            //放入執行紀錄
+
+            // 放入執行紀錄
             simpleConfigHandler.put(configKeyText.getText());
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -832,6 +838,9 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public void put(String key) {
+            if (StringUtils.equals(resultArea.getText(), replaceArea.getText())) {
+                return;
+            }
             if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(replaceArea.getText())) {
                 config.getConfigProp().setProperty(key, replaceArea.getText());
             }
