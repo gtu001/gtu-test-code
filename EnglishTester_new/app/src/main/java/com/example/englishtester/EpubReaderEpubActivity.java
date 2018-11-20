@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
+import android.text.method.MovementMethod;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,9 +38,6 @@ import com.example.englishtester.common.FloatViewChecker;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.HomeKeyWatcher;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
-import com.example.englishtester.common.TxtReaderAppenderEscaper;
-import com.example.englishtester.common.interf.EpubActivityInterface;
-import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.ReaderCommonHelper;
@@ -49,6 +47,8 @@ import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
+import com.example.englishtester.common.interf.EpubActivityInterface;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -140,11 +140,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
 
         paddingAdjuster.applyPadding(txtReaderView);
-        ReaderCommonHelper.applyCustomSelectionAction(txtReaderView, this);
 
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
         txtReaderView.setLineSpacing(10, 1.4f);
+
         translateView.setLineSpacing(10, 1.4f);
 
         appleFontApplyer.apply(txtReaderView);
@@ -1053,7 +1053,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 });
             }
         }, //
-//        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
+        //        DEBUG_ONLY_002("________PosX", MENU_FIRST++, REQUEST_CODE++, null, true) {
 //            protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
 //                String value = activity.epubViewerMainHandler.getCurrentSpinePos() + " - " + activity.viewPager.getCurrentItem();
 //                Log.toast(activity, value);
