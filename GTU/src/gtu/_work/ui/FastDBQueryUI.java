@@ -98,8 +98,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -661,11 +661,11 @@ public class FastDBQueryUI extends JFrame {
             this.setTitle("You Set My World On Fire");
 
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-            jFrameRGBColorPanel.start();
-            panel_17.add(jFrameRGBColorPanel.getToggleButton());
+            //
+            panel_17.add(jFrameRGBColorPanel.getToggleButton(false));
 
             hideInSystemTrayHelper.apply(this);
-            panel_17.add(hideInSystemTrayHelper.getToggleButton());
+            panel_17.add(hideInSystemTrayHelper.getToggleButton(false));
         }
     }
 

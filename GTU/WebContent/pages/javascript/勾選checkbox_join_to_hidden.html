@@ -1,0 +1,73 @@
+        function triggerEvent(element, eventName) {
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent(eventName, false, true);
+			element.dispatchEvent(event);
+		}
+        
+        
+        
+        
+        IMPACT_CB_CheckBox_OnChange : function(){
+        	var checkboxArry = document.getElementsByName("IMPACT_CB");
+        	var joinText = document.getElementById("IMPACT");
+        	
+        	for(var ii = 0 ; ii < checkboxArry.length; ii ++){
+        		checkboxArry[ii].addEventListener('change', function(event) {
+        			var chkArry = joinText.value.split(",");
+					if (event.target.checked) {
+						chkArry = chkArry.distinctAdd(event.target.value);
+					} else {
+						chkArry = chkArry.remove(event.target.value);
+					}
+					joinText.value = chkArry.join(",");
+				});
+				
+				triggerEvent(checkboxArry[ii], "onchange");
+        	}
+        },
+        
+        
+        
+        
+
+        Array.prototype.clean = function(){
+                var arry = this.filter(function (el) {
+                        return el != '' && el != undefined;
+                });
+                return arry;
+        };
+        Array.prototype.distinctAdd = function(v) {
+                for(var ii = 0 ; ii < this.length; ii ++){
+                        if(this[ii] == v){
+                                return this;
+                        }
+                }
+                this.push(v);
+                return this.clean();
+        };
+        Array.prototype.remove = function(v){
+                delete this[this.indexOf(v)];
+                return this.clean();
+        };
+
+
+
+
+
+			<c:forEach var="data" items="${IMPACT_LIST}" varStatus="status">
+       			<input type="checkbox" name="IMPACT_CB" id="IMPACT_CB_<c:out value='${data.key}'/>" 
+       				value="<c:out value='${data.key}'/>" />
+       			<c:out value='${data.value}' />
+			</c:forEach>
+			<input type="hidden" id="IMPACT" name="IMPACT" value="${mapX120.IMPACT}"/>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

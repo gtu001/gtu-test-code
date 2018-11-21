@@ -436,9 +436,9 @@ public class RegexReplacer extends javax.swing.JFrame {
             hideInSystemTrayHelper.apply(this);
 
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-            jFrameRGBColorPanel.start();
-            panel_1.add(jFrameRGBColorPanel.getToggleButton());
-            panel_1.add(hideInSystemTrayHelper.getToggleButton());
+            
+            panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
+            panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
             this.setTitle("You Set My World On Fire");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {

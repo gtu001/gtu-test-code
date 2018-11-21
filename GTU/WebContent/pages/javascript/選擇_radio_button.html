@@ -1,0 +1,34 @@
+        function triggerEvent(element, eventName) {
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent(eventName, false, true);
+			element.dispatchEvent(event);
+		}
+
+        
+        init_EXEC_TP_OnChange : function(){
+        	var radios = document.getElementsByName("EXEC_TP");
+        	for(var ii = 0 ; ii < radios.length ; ii ++){
+        		radios[ii].addEventListener("click", function(event){
+        			var selectVal = "";
+        			if (event.target.checked) {
+        				selectVal = event.target.value;
+        			}
+        			if(selectVal == ""){
+        				return;
+        			}else{
+        				//TODO
+        			}
+        		});
+        		
+        		triggerEvent(radios[ii], "onclick");
+        	}
+        },
+        
+        
+        
+        <td class="tbYellow" width="10%">執行條件</td>
+		<td class="tbYellow2" width="10%">
+			<input type="radio" id="EXEC_TP_1" name="EXEC_TP" value="1" />不限時間<br/>
+			<input type="radio" id="EXEC_TP_2" name="EXEC_TP" value="2" />下班後<br/>
+			<input type="radio" id="EXEC_TP_3" name="EXEC_TP" value="3" />指定時間<br/>
+		</td>

@@ -306,8 +306,8 @@ public class FreemarkerReplaceUI extends JFrame {
             this.applyAppMenu();
             
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-            jFrameRGBColorPanel.start();
-            panel_16.add(jFrameRGBColorPanel.getToggleButton());
+            
+            panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
             this.setTitle("You Set My World On Fire");
         }
     }

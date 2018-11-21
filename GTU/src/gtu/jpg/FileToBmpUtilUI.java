@@ -340,8 +340,8 @@ public class FileToBmpUtilUI extends JFrame {
         hideInSystemTrayHelper.apply(this);
         
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        jFrameRGBColorPanel.start();
-        panel_4.add(jFrameRGBColorPanel.getToggleButton());
+        
+        panel_4.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 
     /*

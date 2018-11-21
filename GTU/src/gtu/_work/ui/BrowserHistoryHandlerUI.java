@@ -527,9 +527,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             initAddSaveShortcutKeyEvent();
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
             jFrameRGBColorPanel.setIgnoreLst(this);
-            jFrameRGBColorPanel.start();
+            
 
-            panel_3.add(jFrameRGBColorPanel.getToggleButton(), "8, 4");
+            panel_3.add(jFrameRGBColorPanel.getToggleButton(false), "8, 4");
 
             // final do
             initLoading();

@@ -1,0 +1,33 @@
+		function triggerEvent(element, eventName) {
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent(eventName, false, true);
+			element.dispatchEvent(event);
+		}
+
+
+
+		init_MEMO_OnChange : function() {
+        	var textarea = document.getElementById("MEMO");
+        	var lbl = document.getElementById("MEMO_lbl");
+        	textarea.addEventListener('keyup', function(event){
+        		var text = event.target.innerText;
+        		if(event.target.innerText.length > 200){
+        			text = text.substring(0,200);
+        			event.target.innerText = text;
+        		}
+        		lbl.innerText = event.target.innerText.length;
+        	});
+        	
+        	triggerEvent(textarea, "onkeyup");
+        },
+        
+        
+        
+        
+        <td class="tbYellow2" width="10%" rowspan="2" colspan="5">
+			<textarea id="MEMO" name="MEMO" cols="90" rows="5" title="修正說明">${mapX120.MEMO}</textarea>
+			<br/>
+			<label id="MEMO_lbl"></label>/200(字元)
+			<br/>
+			<font color="red">※執行筆數超過10,000筆需部室主管審核;超過100,000筆需會辦DBA</font>
+		</td>

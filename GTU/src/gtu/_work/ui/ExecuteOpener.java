@@ -686,9 +686,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                     JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
                     jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-                    jFrameRGBColorPanel.start();
-                    jPanel2.add(jFrameRGBColorPanel.getToggleButton());
-                    jPanel2.add(hideInSystemTrayHelper.getToggleButton());
+                    
+                    jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
+                    jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
                     hideInSystemTrayHelper.apply(this);
                 }
             }

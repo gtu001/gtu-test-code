@@ -136,7 +136,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        jFrameRGBColorPanel.start();
+        
     }
 
 }

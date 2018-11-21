@@ -194,8 +194,8 @@ public class HideInSystemTrayHelper {
      * 
      * @return
      */
-    public JToggleButton getToggleButton() {
-        final JToggleButton tgBtn = new JToggleButton("縮小至系統列");
+    public JToggleButton getToggleButton(boolean isSelected) {
+        final JToggleButton tgBtn = new JToggleButton();
         tgBtn.setSelected(true);
         tgBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -207,6 +207,8 @@ public class HideInSystemTrayHelper {
                 }
             }
         });
+        tgBtn.setSelected(isSelected);
+        JCommonUtil.triggerButtonActionPerformed(tgBtn);
         return tgBtn;
     }
 

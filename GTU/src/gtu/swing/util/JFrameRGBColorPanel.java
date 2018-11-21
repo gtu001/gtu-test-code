@@ -175,9 +175,8 @@ public class JFrameRGBColorPanel {
         ignoreLst.add(component);
     }
 
-    public JToggleButton getToggleButton() {
-        final JToggleButton tgBtn = new JToggleButton("變色");
-        tgBtn.setSelected(true);
+    public JToggleButton getToggleButton(boolean isSelected) {
+        final JToggleButton tgBtn = new JToggleButton();
         tgBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 tgBtn.setText(tgBtn.isSelected() ? "變色啟動" : "變色暫停");
@@ -188,6 +187,8 @@ public class JFrameRGBColorPanel {
                 }
             }
         });
+        tgBtn.setSelected(isSelected);
+        JCommonUtil.triggerButtonActionPerformed(tgBtn);
         return tgBtn;
     }
 
@@ -205,8 +206,8 @@ public class JFrameRGBColorPanel {
                 lbl2.setText("fg : " + String.valueOf(jFrameRGBColorPanel.foreground));
             }
         });
-        jFrameRGBColorPanel.start();
-        frame.add(jFrameRGBColorPanel.getToggleButton());
+        // 
+        frame.add(jFrameRGBColorPanel.getToggleButton(true));
         frame.pack();
         frame.setVisible(true);
     }

@@ -504,8 +504,8 @@ public class FacebookVideoDownloader extends JFrame {
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
 
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        jFrameRGBColorPanel.start();
-        panel_23.add(jFrameRGBColorPanel.getToggleButton());
+        
+        panel_23.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 
     private enum DownloadTableConfig {

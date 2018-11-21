@@ -240,8 +240,8 @@ public class EnglishSearchUI extends JFrame {
                 }
             });
 
-            jFrameRGBColorPanel.start();
-            panel_10.add(jFrameRGBColorPanel.getToggleButton());
+            
+            panel_10.add(jFrameRGBColorPanel.getToggleButton(false));
         }
     }
 

@@ -1,0 +1,35 @@
+		function triggerEvent(element, eventName) {
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent(eventName, false, true);
+			element.dispatchEvent(event);
+		}
+
+
+		init_TIME_input_Onblur : function() {
+			var text = document.getElementById("EXEC_TIME");
+			text.addEventListener("blur", function(event){
+        		var val = parseInt(event.target.value);
+        		if(isNaN(val)){
+        			text.value = "";
+        		}
+        		if(("" + val).length < 4){
+        			text.value = "";
+        		}
+        		//數值需>= 1730 OR < 0825
+        		if( !(val >= 1730 || val < 825) ){
+					alert("必須為 >= 1730 OR < 0825");
+        			text.value = "";        			
+        		}else {
+        			text.disabled = true;
+        		}
+        	});
+        	
+        	triggerEvent(text, "onblur");
+		},
+		
+		
+		
+		<td class="tbYellow2" width="10%">
+			<input type="text" id="EXEC_TIME" name="EXEC_TIME" value="${mapX120.EXEC_TIME}" class="textBox2" maxlength="4"" title="執行時間" />
+		</td>
+		

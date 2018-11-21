@@ -372,8 +372,8 @@ public class AVChoicerUI extends JFrame {
         trayUtil.apply(this);
         
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        jFrameRGBColorPanel.start();
-        panel_16.add(jFrameRGBColorPanel.getToggleButton());
+        
+        panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 
     private class MoveToHandler {

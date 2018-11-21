@@ -1,4 +1,8 @@
 
+
+
+
+<!-- Bean 版本 -->
 <select id='TRADER' name='TRADER' class='textBox2 validate-selection'>
         <%--下拉--%>
         <option value="">請選擇</option>
@@ -8,6 +12,16 @@
         </c:forEach>
 </select>
 
+
+<!-- Map 版本 -->
+<select id='RLT_TP' name='RLT_TP' class='textBox2 validate-selection' title="表單類型">
+        <%--下拉--%>
+        <option value="">請選擇</option>
+        <c:forEach var='map' items='${RLT_TPs}'>
+        <option value='${map.key}'
+                <c:if test="${ RLT_TP eq map.key}">selected</c:if>>${map.value}</option>
+        </c:forEach>
+</select>
 
 
 	function SelectElementCreater(lst, valueKey, textKey, defaultVal, name, func) {
