@@ -47,6 +47,7 @@ import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.json.JSONObject2CollectionUtil2;
 import gtu.net.socket.ex1.SocketUtilForSwing;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -424,7 +425,7 @@ public class FreemarkerReplaceUI extends JFrame {
                 }
             }
             if (!prop.isEmpty()) {
-                prop.store(new FileOutputStream(saveFile), DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
+                PropertiesUtil.storeProperties(prop, saveFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
                 keepFileSet(saveFile);
                 JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
             } else {
