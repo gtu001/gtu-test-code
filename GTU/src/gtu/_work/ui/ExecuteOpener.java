@@ -637,7 +637,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         }
                         {
                             innerScannerText = new JTextField();
-                            innerScannerText.setToolTipText("inner scan query condition");
+                            innerScannerText.setToolTipText("檔名再過濾");
                             jPanel9.add(innerScannerText);
                             innerScannerText.setPreferredSize(new java.awt.Dimension(164, 24));
                             {
@@ -649,6 +649,18 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         execList.updateUI();
                                     }
                                 });
+                                {
+                                    innerContentFilterText = new JTextField();
+                                    innerContentFilterText.setToolTipText("內文查詢!");
+                                    innerContentFilterText.addMouseListener(new MouseAdapter() {
+                                        @Override
+                                        public void mouseClicked(MouseEvent e) {
+                                            swingUtil.invokeAction("innerContentFilterText.addMouseListener", e);
+                                        }
+                                    });
+                                    jPanel9.add(innerContentFilterText);
+                                    innerContentFilterText.setColumns(10);
+                                }
                                 jPanel9.add(scanLstShowDetailChk);
                             }
                             innerScannerText.addMouseListener(new MouseAdapter() {
@@ -686,7 +698,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                     JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
                     jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-                    
+
                     jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
                     jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
                     hideInSystemTrayHelper.apply(this);
@@ -1633,7 +1645,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 innerScanStop = false;
                                 System.out.println(toString() + " ... start!! ==> " + innerScanStop);
                                 DefaultListModel model = new DefaultListModel();
-                                scanList.setModel(model);
                                 for (int ii = 0; ii < arrayBackupForInnerScan.length; ii++) {
                                     if (arrayBackupForInnerScan[ii].toString().contains(innerText)) {
                                         model.addElement(arrayBackupForInnerScan[ii]);
@@ -1643,6 +1654,48 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         break;
                                     }
                                 }
+                                scanList.setModel(model);
+                                System.out.println(toString() + " ... run over!! ==> " + innerScanStop);
+                            }
+                        }, "innerScanner_" + System.currentTimeMillis());
+                        innerScanThread.setDaemon(true);
+                        innerScanThread.start();
+                    }
+                }
+            });
+            swingUtil.addAction("innerContentFilterText.addMouseListener", new Action() {
+                Thread innerScanThread = null;
+                boolean innerScanStop = false;
+
+                public void action(EventObject evt) throws Exception {
+                    if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
+                        return;
+                    }
+                    final String innerText = innerContentFilterText.getText();
+                    if (arrayBackupForInnerScan == null) {
+                        return;
+                    }
+
+                    innerScanStop = true;
+
+                    if (innerScanThread == null || innerScanThread.getState() == Thread.State.TERMINATED) {
+                        innerScanThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+                            public void run() {
+                                innerScanStop = false;
+                                System.out.println(toString() + " ... start!! ==> " + innerScanStop);
+                                DefaultListModel model = new DefaultListModel();
+                                for (int ii = 0; ii < arrayBackupForInnerScan.length; ii++) {
+                                    File file = (File) arrayBackupForInnerScan[ii];
+                                    String content = FileUtil.loadFromFile(file, "UTF8");
+                                    if (StringUtils.contains(content, innerText)) {
+                                        model.addElement(arrayBackupForInnerScan[ii]);
+                                    }
+                                    if (innerScanStop) {
+                                        System.out.println(toString() + " ... over!! ==> " + innerScanStop);
+                                        break;
+                                    }
+                                }
+                                scanList.setModel(model);
                                 System.out.println(toString() + " ... run over!! ==> " + innerScanStop);
                             }
                         }, "innerScanner_" + System.currentTimeMillis());
@@ -1756,6 +1809,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JList propertiesList;
     private JLabel lblFilter;
     private JTextField propertiesListFilterText;
+    private JTextField innerContentFilterText;
 
     void reloadCurrentDirPropertiesList() {
         final String $filterText = StringUtils.trimToEmpty(propertiesListFilterText.getText()).toLowerCase();

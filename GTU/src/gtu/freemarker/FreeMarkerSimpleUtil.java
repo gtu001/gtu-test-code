@@ -48,6 +48,7 @@ public class FreeMarkerSimpleUtil {
     }
 
     public static void replace(File outputFile, final URL srcUrl, Map<String, Object> root) {
+        FileWriter out = null;
         try {
             Configuration cfg = new Configuration();
             URLTemplateLoader urlTemplate = new URLTemplateLoader() {
@@ -60,15 +61,22 @@ public class FreeMarkerSimpleUtil {
             cfg.setObjectWrapper(new DefaultObjectWrapper());
             Template temp = cfg.getTemplate("aaa");
 
-            FileWriter out = new FileWriter(outputFile);
+            out = new FileWriter(outputFile);
             temp.process(root, out);
             out.flush();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static String replace(String templateSource, Map<String, Object> root) {
+        StringWriter out = null;
         try {
             Configuration cfg = new Configuration();
 
@@ -79,12 +87,18 @@ public class FreeMarkerSimpleUtil {
             cfg.setObjectWrapper(new DefaultObjectWrapper());
             Template temp = cfg.getTemplate("aaa");
 
-            StringWriter out = new StringWriter();
+            out = new StringWriter();
             temp.process(root, out);
             out.flush();
             return out.getBuffer().toString();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -104,6 +118,12 @@ public class FreeMarkerSimpleUtil {
             out.flush();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -122,10 +142,17 @@ public class FreeMarkerSimpleUtil {
             out.flush();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static void replace(File projectBaseDir, File ftlFile, Map<String, Object> root, OutputStream outputStream, String encode) {
+        Writer out = null;
         try {
             Configuration cfg = new Configuration();
 
@@ -158,11 +185,17 @@ public class FreeMarkerSimpleUtil {
 
             Template temp = cfg.getTemplate(ftlTemplateName);
 
-            Writer out = new OutputStreamWriter(outputStream, encode);
+            out = new OutputStreamWriter(outputStream, encode);
             temp.process(root, out);
             out.flush();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -183,6 +216,12 @@ public class FreeMarkerSimpleUtil {
             out.flush();
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
