@@ -30,21 +30,23 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
     private SqlAreaHandler sqlAreaHandler = new SqlAreaHandler();
     private ActionListener confirmDo;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private boolean jFrameRGBColorPanel_isStop;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        FastDBQueryUI_UpdateSqlArea.newInstance("XXXX", Arrays.asList("1111", "eeeee"));
+        FastDBQueryUI_UpdateSqlArea.newInstance("XXXX", Arrays.asList("1111", "eeeee"), false);
     }
 
-    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText) {
+    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText, boolean jFrameRGBColorPanel_isStop) {
         FastDBQueryUI_UpdateSqlArea dialog = new FastDBQueryUI_UpdateSqlArea();
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
 
         dialog.lblForMessage.setText(title);
         dialog.updateSqlArea.setText(dialog.sqlAreaHandler.convert(sqlText));
+        dialog.jFrameRGBColorPanel_isStop = jFrameRGBColorPanel_isStop;
         return dialog;
     }
 
@@ -136,7 +138,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        
+        jFrameRGBColorPanel.setStop(jFrameRGBColorPanel_isStop);
     }
 
 }

@@ -366,7 +366,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             if (updateSqlLst.isEmpty()) {
                                 return;
                             }
-                            final FastDBQueryUI_UpdateSqlArea updateDlg = FastDBQueryUI_UpdateSqlArea.newInstance("確定執行以下SQL:", updateSqlLst);
+                            final FastDBQueryUI_UpdateSqlArea updateDlg = FastDBQueryUI_UpdateSqlArea.newInstance("確定執行以下SQL:", updateSqlLst, _parent.getjFrameRGBColorPanel().isStop());
                             updateDlg.setConfirmDo(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -1080,7 +1080,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        
+        jFrameRGBColorPanel.setStop(_parent.getjFrameRGBColorPanel().isStop());
     }
 
     private void resetColumnWidth() {

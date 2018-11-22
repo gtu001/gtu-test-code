@@ -212,6 +212,10 @@ public class HideInSystemTrayHelper {
         return tgBtn;
     }
 
+    public boolean isStop() {
+        return hideToTrayListener.hasEvent();
+    }
+
     private class HideToTrayListener implements WindowStateListener {
         JFrame jframe;
 

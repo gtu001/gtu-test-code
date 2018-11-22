@@ -1827,4 +1827,8 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
+
+    public JFrameRGBColorPanel getjFrameRGBColorPanel() {
+        return jFrameRGBColorPanel;
+    }
 }
