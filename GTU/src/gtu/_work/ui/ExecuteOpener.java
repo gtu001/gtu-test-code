@@ -145,6 +145,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
     private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
+    private PropertiesUtilBean remarkConfig = new PropertiesUtilBean(ExecuteOpener.class, ExecuteOpener.class.getSimpleName() + "_Remark");
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
 
     /**
@@ -840,6 +841,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         model.addElement(new ZFile(val));
                         prop.put(val, "");
                     }
+                    exeArea.setText("");
                 }
             });
             swingUtil.addAction("execute.actionPerformed", new Action() {
@@ -1204,23 +1206,40 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
             swingUtil.addAction("propertiesList.mouseClicked", new Action() {
                 public void action(EventObject evt) throws Exception {
-                    File file = (File) propertiesList.getSelectedValue();
-                    JPopupMenuUtil.newInstance(propertiesList).applyEvent(evt).addJMenuItem("reload list", new ActionListener() {
-                        public void actionPerformed(ActionEvent paramActionEvent) {
-                            reloadCurrentDirPropertiesList();
-                        }
-                    }).addJMenuItem(JFileExecuteUtil.newInstance(file).createDefaultJMenuItems()).show();
+                    final File file = (File) propertiesList.getSelectedValue();
                     if (file == null) {
                         return;
                     }
-                    if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
-                        return;
+
+                    if (remarkConfig.getConfigProp().containsKey(file.getName())) {
+                        String remark = remarkConfig.getConfigProp().getProperty(file.getName());
+                        propertiesList.setToolTipText(remark);
+                    } else {
+                        propertiesList.setToolTipText("");
                     }
-                    prop.clear();
-                    PropertiesUtil.loadProperties(new FileInputStream(file), prop);
-                    currentPropFile = file;
-                    reloadExecListProperties(prop);
-                    setTitle("properties : " + file.getName());
+
+                    if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                        JPopupMenuUtil.newInstance(propertiesList).applyEvent(evt)//
+                                .addJMenuItem("reload list", new ActionListener() {
+                                    public void actionPerformed(ActionEvent paramActionEvent) {
+                                        reloadCurrentDirPropertiesList();
+                                    }
+                                })//
+                                .addJMenuItem(JFileExecuteUtil.newInstance(file).createDefaultJMenuItems())//
+                                .addJMenuItem("編輯註解", new ActionListener() {
+                                    public void actionPerformed(ActionEvent paramActionEvent) {
+                                        ExecuteOpener_RemarkDlg.newInstance(file.getName(), remarkConfig);
+                                    }
+                                }).show();
+                    }
+
+                    if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+                        prop.clear();
+                        PropertiesUtil.loadProperties(new FileInputStream(file), prop);
+                        currentPropFile = file;
+                        reloadExecListProperties(prop);
+                        setTitle("properties : " + file.getName());
+                    }
                 }
             });
             swingUtil.addAction("propertiesList.keyPressed", new Action() {

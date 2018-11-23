@@ -158,8 +158,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Pair<List<String>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
         try {
-            final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI();
-            dialog._parent = _parent;
+            final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
 
@@ -944,7 +943,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     /**
      * Create the dialog.
      */
-    public FastDBQueryUI_CrudDlgUI() {
+    public FastDBQueryUI_CrudDlgUI(FastDBQueryUI _parent) {
+        this._parent = _parent;
         setBounds(100, 100, 583, 409);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -1058,7 +1058,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 okButton = new JButton("OK");
                 okButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        dispose();
                     }
                 });
                 okButton.setActionCommand("OK");
