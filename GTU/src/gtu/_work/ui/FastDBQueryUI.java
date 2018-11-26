@@ -99,8 +99,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -834,15 +834,18 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(queryText) && StringUtils.isBlank(contentFilterText)) {
                 findOk = true;
             } else {
-                if (StringUtils.isNotBlank(queryText) && sqlIdCompare.contains(queryText)) {
+                if (StringUtils.isNotBlank(queryText) && StringUtils.isNotBlank(contentFilterText)) {
+                    if (sqlIdCompare.contains(queryText) && content.contains(contentFilterText)) {
+                        findOk = true;
+                    }
+                } else if (StringUtils.isNotBlank(queryText) && sqlIdCompare.contains(queryText)) {
                     findOk = true;
-                }
-                if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
+                } else if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
                     findOk = true;
                 }
             }
 
-            if(findOk){
+            if (findOk) {
                 sqlIdList.add(sqlId);
             }
         }

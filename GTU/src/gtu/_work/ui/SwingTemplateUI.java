@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
 
@@ -15,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
@@ -22,10 +24,13 @@ import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
 public class SwingTemplateUI extends JFrame {
 
+    private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private HideInSystemTrayHelper hideInSystemTrayHelper;
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
     private SwingActionUtil swingUtil;
     private JTabbedPane tabbedPane;
+    private JPanel panel_2;
 
     /**
      * Launch the application.
@@ -68,6 +73,10 @@ public class SwingTemplateUI extends JFrame {
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("New tab", null, panel_1, null);
+        
+        panel_2 = new JPanel();
+        tabbedPane.addTab("其他設定", null, panel_2, null);
+        panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         {
             // 掛載所有event
@@ -77,6 +86,9 @@ public class SwingTemplateUI extends JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            panel_2.add(jFrameRGBColorPanel.getToggleButton(false));
+            panel_2.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
         }
