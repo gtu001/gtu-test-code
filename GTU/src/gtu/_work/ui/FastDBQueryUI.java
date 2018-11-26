@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -154,6 +155,7 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_14;
     private JPanel panel_15;
     private JPanel panel_16;
+    private JPanel newPanel1;
 
     private Pair<List<String>, List<Object[]>> queryList = null;
     private Pair<List<String>, List<Object[]>> filterRowsQueryList = null;
@@ -182,6 +184,9 @@ public class FastDBQueryUI extends JFrame {
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
     private JButton prevConnBtn;
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
+    private JLabel lblNewLabel_4;
+    private JTextField sqlContentFilterText;
+    private JLabel lblNewLabel_5;
 
     /**
      * Launch the application.
@@ -240,6 +245,7 @@ public class FastDBQueryUI extends JFrame {
 
         scrollPane.setViewportView(sqlList);
 
+        newPanel1 = new JPanel();
         sqlQueryText = new JTextField();
         sqlQueryText.addFocusListener(new FocusAdapter() {
             @Override
@@ -247,27 +253,66 @@ public class FastDBQueryUI extends JFrame {
                 String txt = sqlQueryText.getText();
                 try {
                     // 初始化 sqlList
-                    initLoadSqlListConfig(txt);
+                    initLoadSqlListConfig(txt, false);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
-        panel.add(sqlQueryText, BorderLayout.NORTH);
-        sqlQueryText.setColumns(10);
+        sqlQueryText.setColumns(30);
         sqlQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
                 String txt = JCommonUtil.getDocumentText(event);
                 try {
                     // 初始化 sqlList
-                    initLoadSqlListConfig(txt);
+                    initLoadSqlListConfig(txt, false);
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
                 }
             }
         }));
 
+        lblNewLabel_4 = new JLabel("sqlKey filter");
+        newPanel1.add(lblNewLabel_4);
+
+        newPanel1.add(sqlQueryText);
+
+        panel.add(newPanel1, BorderLayout.NORTH);
+
+        lblNewLabel_5 = new JLabel("content filter");
+        newPanel1.add(lblNewLabel_5);
+
+        sqlContentFilterText = new JTextField();
+        sqlContentFilterText.setColumns(30);
+
+        sqlContentFilterText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                String txt = sqlContentFilterText.getText();
+                try {
+                    // 初始化 sqlList
+                    initLoadSqlListConfig(txt, true);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        sqlContentFilterText.setColumns(30);
+        sqlContentFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                String txt = JCommonUtil.getDocumentText(event);
+                try {
+                    // 初始化 sqlList
+                    initLoadSqlListConfig(txt, true);
+                } catch (Exception e) {
+                    JCommonUtil.handleException(e);
+                }
+            }
+        }));
+
+        newPanel1.add(sqlContentFilterText);
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("Sql", null, panel_2, null);
         panel_2.setLayout(new BorderLayout(0, 0));
@@ -652,7 +697,7 @@ public class FastDBQueryUI extends JFrame {
             panel_4.add(deleteParameterBtn);
 
             // 初始化 sqlList
-            initLoadSqlListConfig("");
+            initLoadSqlListConfig("", false);
             initLoadSqlIdMappingConfig();
 
             JCommonUtil.setJFrameCenter(this);
@@ -767,7 +812,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 初始化sqlList
      */
-    private void initLoadSqlListConfig(String queryText) throws IOException {
+    private void initLoadSqlListConfig(String queryText, boolean isContentFilter) throws IOException {
         if (!sqlIdListFile.exists()) {
             sqlIdListFile.createNewFile();
         }
@@ -775,16 +820,22 @@ public class FastDBQueryUI extends JFrame {
         PropertiesUtil.loadProperties(new FileInputStream(sqlIdListFile), prop);
         sqlIdListProp = prop;
 
+        queryText = queryText.toLowerCase();
+
         List<String> sqlIdList = new ArrayList<String>();
         for (Enumeration enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
-            String sqlId = (String) enu.nextElement();
+            String sqlId = StringUtils.defaultString((String) enu.nextElement());
+            String sqlIdCompare = sqlId.toLowerCase().toLowerCase();
+            String content = StringUtils.trimToEmpty((String) sqlIdListProp.getProperty(sqlId)).toLowerCase();
             if (StringUtils.isBlank(queryText)) {
                 sqlIdList.add(sqlId);
-            } else if (StringUtils.isNotBlank(queryText) && sqlId.contains(queryText)) {
+            } else if (StringUtils.isNotBlank(queryText) && isContentFilter && content.contains(queryText)) {
+                sqlIdList.add(sqlId);
+            } else if (StringUtils.isNotBlank(queryText) && sqlIdCompare.contains(queryText)) {
                 sqlIdList.add(sqlId);
             }
         }
-        Collections.sort(sqlIdList);
+        ListUtil.sortIgnoreCase(sqlIdList);
 
         DefaultListModel model = JListUtil.createModel();
         for (String s : sqlIdList) {
@@ -896,7 +947,7 @@ public class FastDBQueryUI extends JFrame {
             sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
 
             // 刷新sqlList
-            initLoadSqlListConfig("");
+            initLoadSqlListConfig("", false);
             initLoadSqlIdMappingConfig();
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);

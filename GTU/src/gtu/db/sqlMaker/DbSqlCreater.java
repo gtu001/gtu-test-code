@@ -453,7 +453,7 @@ public class DbSqlCreater {
                         numVal = Double.parseDouble(String.valueOf(value));
                     } catch (Exception ex) {
                         System.out.println("轉型數值失敗 => [" + key_ + "]=[" + value + "]");
-                        //throw new RuntimeException(ex);
+                        // throw new RuntimeException(ex);
                         return "null";
                     }
                     return String.valueOf(numVal);
@@ -468,8 +468,16 @@ public class DbSqlCreater {
                     }
                 }
 
-                return String.format("'%s'", value);
+                return String.format("'%s'", replaceEscapeValue(value));
             }
+        }
+
+        public static String replaceEscapeValue(String value) {
+            if (value == null) {
+                return value;
+            }
+            value = value.replaceAll("'", "''");
+            return value;
         }
 
         public Set<String> getNoNullsCol() {
@@ -601,7 +609,7 @@ public class DbSqlCreater {
                         String val = map.get(col_);
                         pkMap.put(col_, val);
                     }
-                    genSql = info.createUpdateSql(map, pkMap, false, Collections.<String>emptySet());
+                    genSql = info.createUpdateSql(map, pkMap, false, Collections.<String> emptySet());
                     break;
                 case 'd':
                     genSql = info.createDeleteSql(map);

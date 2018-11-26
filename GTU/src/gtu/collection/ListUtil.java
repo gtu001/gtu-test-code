@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -206,5 +207,17 @@ public class ListUtil {
             }
             return true;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void sortIgnoreCase(List<T> lst) {
+        Collections.sort(lst, new Comparator<T>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                String o1s = StringUtils.defaultString((String) o1, "").toLowerCase();
+                String o2s = StringUtils.defaultString((String) o2, "").toLowerCase();
+                return o1s.compareTo(o2s);
+            }
+        });
     }
 }

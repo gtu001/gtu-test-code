@@ -52,8 +52,10 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
@@ -71,6 +73,8 @@ import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
 public class JarFinderUI extends javax.swing.JFrame {
 
     private PropertiesUtilBean configBean = new PropertiesUtilBean(JarFinderUI.class);
+    private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
+    private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
      * 
@@ -260,7 +264,7 @@ public class JarFinderUI extends javax.swing.JFrame {
                                                 FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                                                 FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                                                 FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
                                 {
                                     lblNewLabel = new JLabel("JD Gui");
                                     panel.add(lblNewLabel, "2, 2, right, default");
@@ -285,6 +289,10 @@ public class JarFinderUI extends javax.swing.JFrame {
                                         }
                                     });
                                     panel.add(saveConfigBtn, "2, 24");
+                                }
+                                {
+                                    panel_1 = new JPanel();
+                                    panel.add(panel_1, "4, 24, fill, fill");
                                 }
                             }
                             copyToList.addMouseListener(new MouseAdapter() {
@@ -368,6 +376,11 @@ public class JarFinderUI extends javax.swing.JFrame {
 
             {
                 configBean.reflectInit(this);
+                JCommonUtil.setJFrameIcon(this, "resource/images/ico/jar.ico");
+                hideInSystemTrayHelper.apply(this);
+                panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
+                jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+                panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -421,6 +434,7 @@ public class JarFinderUI extends javax.swing.JFrame {
     private JLabel lblNewLabel;
     private JTextField jdGuiText;
     private JButton saveConfigBtn;
+    private JPanel panel_1;
 
     // 目錄
     private void jButton1ActionPerformed(ActionEvent evt) {
