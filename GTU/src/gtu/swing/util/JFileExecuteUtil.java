@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,7 @@ import javax.swing.JMenuItem;
 import org.apache.commons.lang.StringUtils;
 
 import gtu.file.FileUtil;
+import gtu.properties.PropertiesUtilBean;
 
 public class JFileExecuteUtil {
 
@@ -35,7 +37,7 @@ public class JFileExecuteUtil {
 
     public List<JMenuItem> createDefaultJMenuItems() {
         List<JMenuItem> list = new ArrayList<JMenuItem>();
-        if(file == null){
+        if (file == null) {
             return list;
         }
         if (!file.exists()) {
@@ -141,7 +143,7 @@ public class JFileExecuteUtil {
             }
             {
                 item = new JMenuItem();
-                item.setText("file exec : " + Openner.DEFAULT.desc);
+                item.setText("file exec : " + " 預設開啟方式 ");
                 item.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         try {
@@ -307,18 +309,39 @@ public class JFileExecuteUtil {
             return null;
         }
     }
+
+    public static PropertiesUtilBean executeConfig = new PropertiesUtilBean(JFileExecuteUtil.class);
+    private static final String Path_MAD_EDIT;
+    private static final String Path_WINWORD;
+    private static final String Path_EXCEL;
+    private static final String Path_FIREFOX;
+    private static final String Path_JD_GUI;
+    private static final String Path_ECLIPSE;
+    private static final String Path_ECLIPSE_COMPANY;
+    private static final String Path_7Z;
     
+    static {
+        Properties prop = executeConfig.getConfigProp();
+        Path_MAD_EDIT = prop.getProperty("MAD_EDIT");
+        Path_WINWORD = prop.getProperty("WINWORD");
+        Path_7Z = prop.getProperty("7Z");
+        Path_EXCEL = prop.getProperty("EXCEL");
+        Path_FIREFOX = prop.getProperty("FIREFOX");
+        Path_JD_GUI = prop.getProperty("JD_GUI");
+        Path_ECLIPSE = prop.getProperty("ECLIPSE");
+        Path_ECLIPSE_COMPANY = prop.getProperty("ECLIPSE_COMPANY");
+    }
 
     enum Openner {
-        MAD_EDIT("madEdit", "C:/apps/notepad/MadEdit-0.2.9.1/MadEdit.exe"), //
-        _7Z_ZIP("7z", "C:/Program Files/7-Zip/7zFM.exe"), //
-        OFFICE_WORD("word", "C:/Program Files (x86)/Microsoft Office/Office12/WINWORD.EXE"), //
-        OFFICE_EXCEL("excel", "C:/Program Files (x86)/Microsoft Office/Office12/EXCEL.EXE"), //
-        FIREFOX("firefox", "C:/apps/MozillaFirefox7/firefox.exe"), //
-        JD_JAR("jdGui", "C:/apps/jd-gui-0.3.1.windows/jd-gui.exe"), //
-        DEFAULT("default", ""), //
-        ECLIPSE_HOME("eclipse home", "C:/資拓宏宇相關檔案/eclipse_jee/eclipse.exe"),//
-        ECLIPSE_COMPANY("eclipse company", "C:/資拓宏宇相關檔案/iisi_eclipse/eclipse.exe"),//
+        MAD_EDIT("madEdit", Path_MAD_EDIT), //
+        _7Z_ZIP("7z", Path_7Z), //
+        OFFICE_WORD("word", Path_WINWORD), //
+        OFFICE_EXCEL("excel", Path_EXCEL), //
+        FIREFOX("firefox", Path_FIREFOX), //
+        JD_JAR("jdGui", Path_JD_GUI), //
+        DEFAULT("default", " notepad "), //
+        ECLIPSE_HOME("eclipse home", Path_ECLIPSE), //
+        ECLIPSE_COMPANY("eclipse company", Path_ECLIPSE_COMPANY),//
         ;
 
         final String desc;
@@ -327,6 +350,14 @@ public class JFileExecuteUtil {
         Openner(String desc, String executer) {
             this.desc = desc;
             this.executer = executer;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public String getExecuter() {
+            return executer;
         }
     }
 }

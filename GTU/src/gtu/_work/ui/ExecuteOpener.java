@@ -74,6 +74,7 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JFileExecuteUtil;
+import gtu.swing.util.JFileExecuteUtil_ConfigDlg;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -83,6 +84,10 @@ import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import com.jgoodies.forms.factories.FormFactory;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -447,15 +452,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             });
                             jPanel2.add(restoreBackBtn);
                         }
-                        {
-                            saveConfigBtn = new JButton("儲存設定");
-                            saveConfigBtn.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    swingUtil.invokeAction("saveConfigBtn.actionPerformed", e);
-                                }
-                            });
-                            jPanel2.add(saveConfigBtn);
-                        }
                         openSvnUpdate.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 swingUtil.invokeAction("openSvnUpdate.actionPerformed", evt);
@@ -702,6 +698,37 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                     jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
                     jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
+                    {
+                        button = new JButton("儲存設定");
+                        jPanel2.add(button);
+                    }
+                    {
+                        setExeConfigBtn = new JButton("設定exe路徑");
+                        setExeConfigBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                swingUtil.invokeAction("setExeConfigBtn.mouseClick", e);
+                            }
+                        });
+                        jPanel2.add(setExeConfigBtn);
+                    }
+                    {
+                        panel_8 = new JPanel();
+                        jTabbedPane1.addTab("設定", null, panel_8, null);
+                        panel_8.setLayout(new FormLayout(
+                                new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        {
+                            panel_9 = new JPanel();
+                            panel_8.add(panel_9, "4, 38, fill, fill");
+                        }
+                    }
                     hideInSystemTrayHelper.apply(this);
                 }
             }
@@ -906,172 +933,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             swingUtil.addAction("execList.mouseClicked", new Action() {
                 public void action(EventObject evt) throws Exception {
                     // right button single click event
-                    if (JMouseEventUtil.buttonRightClick(1, evt)) {
-                        JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(execList).applyEvent(evt);
-
-                        if (execList.getSelectedValues().length == 1) {
-                            popupUtil.addJMenuItem(JFileExecuteUtil.newInstance(((ZFile) execList.getSelectedValues()[0])).createDefaultJMenuItems());
-                            popupUtil.addJMenuItem("----------------", false);
-                        }
-
-                        popupUtil.addJMenuItem("----------------", false);
-
-                        popupUtil//
-                                .addJMenuItem("sort list", new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        DefaultListModel model = (DefaultListModel) execList.getModel();
-                                        Object[] arry = model.toArray();
-                                        Arrays.sort(arry, new Comparator<Object>() {
-                                            @Override
-                                            public int compare(Object o1, Object o2) {
-                                                return ((ZFile) o1).getAbsolutePath().compareTo(((ZFile) o2).getAbsolutePath());
-                                            }
-                                        });
-                                        DefaultListModel model2 = new DefaultListModel();
-                                        for (Object obj : arry) {
-                                            ZFile file = (ZFile) obj;
-                                            model2.addElement(file);
-                                        }
-                                        execList.setModel(model2);
-                                    }
-                                }).addJMenuItem("keep exists", new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        DefaultListModel model = (DefaultListModel) execList.getModel();
-                                        DefaultListModel model2 = new DefaultListModel();
-                                        for (Object obj : model.toArray()) {
-                                            ZFile file = (ZFile) obj;
-                                            if (file.exists()) {
-                                                model2.addElement(obj);
-                                            }
-                                        }
-                                        execList.setModel(model2);
-                                    }
-                                }).addJMenuItem("remove duplicate", new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        DefaultListModel model = (DefaultListModel) execList.getModel();
-                                        DefaultListModel model2 = new DefaultListModel();
-                                        Set<ZFile> set = new HashSet<ZFile>();
-                                        for (Object obj : model.toArray()) {
-                                            ZFile file = (ZFile) obj;
-                                            set.add(file);
-                                        }
-                                        for (ZFile val : set) {
-                                            model2.addElement(val);
-                                        }
-                                        execList.setModel(model2);
-                                    }
-                                }).addJMenuItem("remove folder", new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        DefaultListModel model = (DefaultListModel) execList.getModel();
-                                        for (int ii = 0; ii < model.getSize(); ii++) {
-                                            if (((ZFile) model.getElementAt(ii)).isDirectory()) {
-                                                model.removeElementAt(ii);
-                                                ii--;
-                                            }
-                                        }
-                                    }
-                                }).addJMenuItem("remove empty folder", new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        DefaultListModel model = (DefaultListModel) execList.getModel();
-                                        File dir = null;
-                                        for (int ii = 0; ii < model.getSize(); ii++) {
-                                            dir = ((ZFile) model.getElementAt(ii));
-                                            if (dir.isDirectory() && dir.list().length == 0) {
-                                                model.removeElementAt(ii);
-                                                ii--;
-                                            }
-                                        }
-                                    }
-                                }).addJMenuItem("----------------", false).addJMenuItem("diff left : " + (diffLeft != null ? diffLeft.getName() : ""), true, new ActionListener() {
-                                    public void actionPerformed(ActionEvent arg0) {
-                                        File value = ((ZFile) JListUtil.getLeadSelectionObject(execList));
-                                        if (value != null && value.isFile() && value.exists()) {
-                                            diffLeft = value;
-                                        }
-                                    }
-                                }).addJMenuItem("diff right : " + (diffRight != null ? diffRight.getName() : ""), true, new ActionListener() {
-                                    public void actionPerformed(ActionEvent arg0) {
-                                        File value = ((ZFile) JListUtil.getLeadSelectionObject(execList));
-                                        if (value != null && value.isFile() && value.exists()) {
-                                            diffRight = value;
-                                        }
-                                    }
-                                }).addJMenuItem((diffLeft != null && diffRight != null) ? "diff compare" : "", (diffLeft != null && diffRight != null), new ActionListener() {
-                                    public void actionPerformed(ActionEvent arg0) {
-                                        try {
-                                            Runtime.getRuntime().exec(String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", diffLeft, diffRight));
-                                        } catch (IOException ex) {
-                                            JCommonUtil.handleException(ex);
-                                        }
-                                    }
-                                }).addJMenuItem((execList.getSelectedValues().length == 2) ? "diff compare" : "", (execList.getSelectedValues().length == 2), new ActionListener() {
-                                    public void actionPerformed(ActionEvent arg0) {
-                                        try {
-                                            Runtime.getRuntime()
-                                                    .exec(String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", execList.getSelectedValues()[0], execList.getSelectedValues()[1]));
-                                        } catch (IOException ex) {
-                                            JCommonUtil.handleException(ex);
-                                        }
-                                    }
-                                }).addJMenuItem("----------------", false);//
-
-                        popupUtil//
-                                .addJMenuItem("copy to", new ActionListener() {
-
-                                    private File getToFile(File dir, String name) {
-                                        int ii = 0;
-                                        File f = null;
-                                        for (f = new File(dir, name); f.exists();) {
-                                            f = new File(dir, name + "." + ii);
-                                            ii++;
-                                        }
-                                        return f;
-                                    }
-
-                                    public void actionPerformed(ActionEvent e) {
-                                        File destDir = new File(FileUtil.DESKTOP_DIR,
-                                                ExecuteOpener.class.getSimpleName() + "_CopyTo_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
-                                        destDir.mkdirs();
-                                        BufferedWriter writer = null;
-                                        try {
-                                            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destDir, "CopyTo.log"))));
-                                            int success = 0;
-                                            int fail = 0;
-                                            for (Object v : execList.getSelectedValues()) {
-                                                File fromFile = ((ZFile) v);
-                                                File toFile = getToFile(destDir, fromFile.getName());
-                                                if (fromFile.exists()) {
-                                                    boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
-                                                    writer.write(String.format("from:%s\tto:%s\t%s", fromFile, toFile, (copyToSuccess ? "Y" : "N")));
-                                                    writer.newLine();
-                                                    if (copyToSuccess) {
-                                                        success++;
-                                                    } else {
-                                                        fail++;
-                                                    }
-                                                } else {
-                                                    writer.write(String.format("from:%s\tto:%s\t%s", fromFile, "NA", "N(來源不存在)"));
-                                                    writer.newLine();
-                                                    fail++;
-                                                }
-                                            }
-                                            JCommonUtil._jOptionPane_showMessageDialog_info("複製完成\n成功:" + success + "\n失敗:" + fail);
-                                        } catch (Exception ex) {
-                                            JCommonUtil.handleException(ex);
-                                        } finally {
-                                            try {
-                                                writer.flush();
-                                            } catch (IOException e1) {
-                                            }
-                                            try {
-                                                writer.close();
-                                            } catch (IOException e1) {
-                                            }
-                                        }
-                                    }
-                                });
-                        popupUtil.show();//
-                    }
+                    jlistMouseRightClickEvent(execList, false, evt);
 
                     // left button double click event
                     int pos = execList.getLeadSelectionIndex();
@@ -1264,32 +1126,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
             swingUtil.addAction("scanList.mouseClicked", new Action() {
 
-                private void addModelElement(File file) {
-                    DefaultListModel model = (DefaultListModel) execList.getModel();
-                    for (int ii = 0; ii < model.getSize(); ii++) {
-                        ZFile fff = (ZFile) model.get(ii);
-                        if (StringUtils.equals(fff.getAbsolutePath(), file.getAbsolutePath())) {
-                            return;
-                        }
-                    }
-                    model.addElement(new ZFile(file.getParentFile(), file.getName()));
-                }
-
                 public void action(EventObject evt) throws Exception {
                     System.out.println("index = " + scanList.getLeadSelectionIndex());
-                    final Object[] vals = scanList.getSelectedValues();
-                    if (vals == null || vals.length == 0) {
-                        return;
-                    }
-                    JPopupMenuUtil.newInstance(scanList).applyEvent(evt).addJMenuItem("add to file list : " + vals.length, new ActionListener() {
-                        public void actionPerformed(ActionEvent arg0) {
-                            File file = null;
-                            for (Object v : vals) {
-                                file = (File) v;
-                                addModelElement(file);
-                            }
-                        }
-                    }).show();
+                    jlistMouseRightClickEvent(scanList, true, evt);
                 }
             });
             swingUtil.addAction("fileScan.actionPerformed", new Action() {
@@ -1746,13 +1585,18 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     }
                 }
             });
+            swingUtil.addAction("setExeConfigBtn.mouseClick", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    JFileExecuteUtil_ConfigDlg.newInstance();
+                }
+            });
             swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
                 public void action(EventObject evt) throws Exception {
                 }
             });
 
             config.reflectInit(this);
-            this.setSize(870, 551);
+            this.setSize(870, 561);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1816,7 +1660,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
     static Pattern renameMatchPattern = Pattern.compile("(.+)_R\\d+(\\.\\w+)");
     private JCheckBox scanLstShowDetailChk;
     private JButton restoreBackBtn;
-    private JButton saveConfigBtn;
     private JPanel panel;
     private JPanel panel_1;
     private JPanel panel_2;
@@ -1829,6 +1672,10 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JLabel lblFilter;
     private JTextField propertiesListFilterText;
     private JTextField innerContentFilterText;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JButton button;
+    private JButton setExeConfigBtn;
 
     void reloadCurrentDirPropertiesList() {
         final String $filterText = StringUtils.trimToEmpty(propertiesListFilterText.getText()).toLowerCase();
@@ -1956,6 +1803,201 @@ public class ExecuteOpener extends javax.swing.JFrame {
             Runtime.getRuntime().exec(command);
         } else {
             JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog("unknow file :\n" + f, "ERROR");
+        }
+    }
+
+    private void jlistMouseRightClickEvent(final JList scanList, boolean isScanList, EventObject evt) {
+        if (JMouseEventUtil.buttonRightClick(1, evt)) {
+            JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(scanList).applyEvent(evt);
+
+            if (scanList.getSelectedValues().length == 1) {
+                popupUtil.addJMenuItem(JFileExecuteUtil.newInstance(((ZFile) scanList.getSelectedValues()[0])).createDefaultJMenuItems());
+                popupUtil.addJMenuItem("----------------", false);
+            }
+
+            final Object[] vals = scanList.getSelectedValues();
+            if (vals == null || vals.length == 0) {
+                return;
+            }
+
+            if (isScanList) {
+                popupUtil.addJMenuItem("+ 加到維護清單 : " + vals.length, new ActionListener() {
+                    private void addModelElement(File file) {
+                        DefaultListModel model = (DefaultListModel) execList.getModel();
+                        for (int ii = 0; ii < model.getSize(); ii++) {
+                            ZFile fff = (ZFile) model.get(ii);
+                            if (StringUtils.equals(fff.getAbsolutePath(), file.getAbsolutePath())) {
+                                return;
+                            }
+                        }
+                        model.addElement(new ZFile(file.getParentFile(), file.getName()));
+                    }
+
+                    public void actionPerformed(ActionEvent arg0) {
+                        File file = null;
+                        for (Object v : vals) {
+                            file = (File) v;
+                            addModelElement(file);
+                        }
+                    }
+                });
+            }
+
+            popupUtil.addJMenuItem("----------------", false);
+
+            popupUtil//
+                    .addJMenuItem("sort list", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            DefaultListModel model = (DefaultListModel) scanList.getModel();
+                            Object[] arry = model.toArray();
+                            Arrays.sort(arry, new Comparator<Object>() {
+                                @Override
+                                public int compare(Object o1, Object o2) {
+                                    return ((ZFile) o1).getAbsolutePath().compareTo(((ZFile) o2).getAbsolutePath());
+                                }
+                            });
+                            DefaultListModel model2 = new DefaultListModel();
+                            for (Object obj : arry) {
+                                ZFile file = (ZFile) obj;
+                                model2.addElement(file);
+                            }
+                            scanList.setModel(model2);
+                        }
+                    }).addJMenuItem("keep exists", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            DefaultListModel model = (DefaultListModel) scanList.getModel();
+                            DefaultListModel model2 = new DefaultListModel();
+                            for (Object obj : model.toArray()) {
+                                ZFile file = (ZFile) obj;
+                                if (file.exists()) {
+                                    model2.addElement(obj);
+                                }
+                            }
+                            scanList.setModel(model2);
+                        }
+                    }).addJMenuItem("remove duplicate", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            DefaultListModel model = (DefaultListModel) scanList.getModel();
+                            DefaultListModel model2 = new DefaultListModel();
+                            Set<ZFile> set = new HashSet<ZFile>();
+                            for (Object obj : model.toArray()) {
+                                ZFile file = (ZFile) obj;
+                                set.add(file);
+                            }
+                            for (ZFile val : set) {
+                                model2.addElement(val);
+                            }
+                            scanList.setModel(model2);
+                        }
+                    }).addJMenuItem("remove folder", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            DefaultListModel model = (DefaultListModel) scanList.getModel();
+                            for (int ii = 0; ii < model.getSize(); ii++) {
+                                if (((ZFile) model.getElementAt(ii)).isDirectory()) {
+                                    model.removeElementAt(ii);
+                                    ii--;
+                                }
+                            }
+                        }
+                    }).addJMenuItem("remove empty folder", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            DefaultListModel model = (DefaultListModel) scanList.getModel();
+                            File dir = null;
+                            for (int ii = 0; ii < model.getSize(); ii++) {
+                                dir = ((ZFile) model.getElementAt(ii));
+                                if (dir.isDirectory() && dir.list().length == 0) {
+                                    model.removeElementAt(ii);
+                                    ii--;
+                                }
+                            }
+                        }
+                    }).addJMenuItem("----------------", false).addJMenuItem("diff left : " + (diffLeft != null ? diffLeft.getName() : ""), true, new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
+                            if (value != null && value.isFile() && value.exists()) {
+                                diffLeft = value;
+                            }
+                        }
+                    }).addJMenuItem("diff right : " + (diffRight != null ? diffRight.getName() : ""), true, new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
+                            if (value != null && value.isFile() && value.exists()) {
+                                diffRight = value;
+                            }
+                        }
+                    }).addJMenuItem((diffLeft != null && diffRight != null) ? "diff compare" : "", (diffLeft != null && diffRight != null), new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            try {
+                                Runtime.getRuntime().exec(String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", diffLeft, diffRight));
+                            } catch (IOException ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    }).addJMenuItem((scanList.getSelectedValues().length == 2) ? "diff compare" : "", (scanList.getSelectedValues().length == 2), new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            try {
+                                Runtime.getRuntime().exec(String.format("cmd /c call TortoiseMerge.exe /base:\"%s\" /theirs:\"%s\"", scanList.getSelectedValues()[0], scanList.getSelectedValues()[1]));
+                            } catch (IOException ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    }).addJMenuItem("----------------", false);//
+
+            popupUtil//
+                    .addJMenuItem("copy to", new ActionListener() {
+
+                        private File getToFile(File dir, String name) {
+                            int ii = 0;
+                            File f = null;
+                            for (f = new File(dir, name); f.exists();) {
+                                f = new File(dir, name + "." + ii);
+                                ii++;
+                            }
+                            return f;
+                        }
+
+                        public void actionPerformed(ActionEvent e) {
+                            File destDir = new File(FileUtil.DESKTOP_DIR, ExecuteOpener.class.getSimpleName() + "_CopyTo_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+                            destDir.mkdirs();
+                            BufferedWriter writer = null;
+                            try {
+                                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destDir, "CopyTo.log"))));
+                                int success = 0;
+                                int fail = 0;
+                                for (Object v : scanList.getSelectedValues()) {
+                                    File fromFile = ((ZFile) v);
+                                    File toFile = getToFile(destDir, fromFile.getName());
+                                    if (fromFile.exists()) {
+                                        boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
+                                        writer.write(String.format("from:%s\tto:%s\t%s", fromFile, toFile, (copyToSuccess ? "Y" : "N")));
+                                        writer.newLine();
+                                        if (copyToSuccess) {
+                                            success++;
+                                        } else {
+                                            fail++;
+                                        }
+                                    } else {
+                                        writer.write(String.format("from:%s\tto:%s\t%s", fromFile, "NA", "N(來源不存在)"));
+                                        writer.newLine();
+                                        fail++;
+                                    }
+                                }
+                                JCommonUtil._jOptionPane_showMessageDialog_info("複製完成\n成功:" + success + "\n失敗:" + fail);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            } finally {
+                                try {
+                                    writer.flush();
+                                } catch (IOException e1) {
+                                }
+                                try {
+                                    writer.close();
+                                } catch (IOException e1) {
+                                }
+                            }
+                        }
+                    });
+            popupUtil.show();//
         }
     }
 
