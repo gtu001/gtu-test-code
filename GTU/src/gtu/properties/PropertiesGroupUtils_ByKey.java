@@ -2,8 +2,6 @@ package gtu.properties;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -85,6 +83,21 @@ public class PropertiesGroupUtils_ByKey {
         }
         map.put(SAVE_KEYS, saveKey);
         return map;
+    }
+
+    public List<String> getSaveKeys() {
+        if (!configProp.containsKey(SAVE_KEYS)) {
+            throw new RuntimeException("檔案 : " + configFile + " , 缺少  " + SAVE_KEYS);
+        }
+        List<String> lst = new ArrayList<String>();
+        String keystr = configProp.getProperty(SAVE_KEYS);
+        String[] keys = keystr.split(",", -1);
+        for (String k : keys) {
+            if (!lst.contains(k)) {
+                lst.add(k);
+            }
+        }
+        return lst;
     }
 
     /**
