@@ -693,11 +693,6 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         scannerStatus.setPreferredSize(new java.awt.Dimension(741, 27));
                     }
 
-                    JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
-                    jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-
-                    jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
-                    jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
                     {
                         button = new JButton("儲存設定");
                         jPanel2.add(button);
@@ -729,7 +724,12 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             panel_8.add(panel_9, "4, 38, fill, fill");
                         }
                     }
+                    JCommonUtil.setJFrameIcon(this, "resource/images/ico/gtu001.ico");
+                    jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
                     hideInSystemTrayHelper.apply(this);
+
+                    jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
+                    jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
                 }
             }
 

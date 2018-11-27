@@ -33,6 +33,14 @@ public class AutoComboBox extends PlainDocument {
 
     private RemoveLinisterController removeLinisterController = new RemoveLinisterController();
 
+    private MatchType matchType = MatchType.StartWith;
+
+    public enum MatchType {
+        StartWith(), //
+        Contains(),//
+        ;
+    }
+
     // 輸入不符合項目時要做的處理
     ActionListener addNewChoiceListener = new ActionListener() {
         @Override
@@ -71,12 +79,12 @@ public class AutoComboBox extends PlainDocument {
         editor.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-//                    runInIgnoreListener(new Runnable() {
-//                        @Override
-//                        public void run() {
-                            triggerComboxBoxActionPerformed();
-//                        }
-//                    });
+                    // runInIgnoreListener(new Runnable() {
+                    // @Override
+                    // public void run() {
+                    triggerComboxBoxActionPerformed();
+                    // }
+                    // });
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                 }
             }
@@ -173,7 +181,13 @@ public class AutoComboBox extends PlainDocument {
 
     // checks if str1 starts with str2 - ignores case
     private boolean startsWithIgnoreCase(String str1, String str2) {
-        return str1.toUpperCase().startsWith(str2.toUpperCase());
+        if (this.matchType == MatchType.StartWith) {
+            return str1.toUpperCase().startsWith(str2.toUpperCase());
+        } else if (this.matchType == MatchType.Contains) {
+            return str1.toUpperCase().contains(str2.toUpperCase());
+        } else {
+            return str1.toUpperCase().startsWith(str2.toUpperCase());
+        }
     }
 
     private class RemoveLinisterController {
@@ -207,7 +221,7 @@ public class AutoComboBox extends PlainDocument {
                 ii--;
             }
         }
-        cloneLst.push("");//塞個空的放第一個
+        cloneLst.push("");// 塞個空的放第一個
 
         Collections.sort(cloneLst);
         final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
@@ -243,6 +257,11 @@ public class AutoComboBox extends PlainDocument {
         return autoComboBox;
     }
 
+    public AutoComboBox setMatchType(MatchType matchType) {
+        this.matchType = matchType;
+        return this;
+    }
+
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -267,7 +286,7 @@ public class AutoComboBox extends PlainDocument {
                 frame.getContentPane().add(comboBox);
                 JCommonUtil.setJFrameCenter(frame);
                 frame.pack();
-                 gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                gtu.swing.util.JFrameUtil.setVisible(true, frame);
             }
         });
     }

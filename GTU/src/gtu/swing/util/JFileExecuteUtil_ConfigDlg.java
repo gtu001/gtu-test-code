@@ -24,6 +24,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class JFileExecuteUtil_ConfigDlg extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTextField madEditText;
     private JTextField wordText;
@@ -38,7 +39,7 @@ public class JFileExecuteUtil_ConfigDlg extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-
+        JFileExecuteUtil_ConfigDlg.newInstance();
     }
 
     public static void newInstance() {
@@ -49,6 +50,18 @@ public class JFileExecuteUtil_ConfigDlg extends JDialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void initSetText() {
+        Properties prop = JFileExecuteUtil.executeConfig.getConfigProp();
+        madEditText.setText(StringUtils.trimToEmpty(prop.getProperty("MAD_EDIT")));
+        wordText.setText(StringUtils.trimToEmpty(prop.getProperty("WINWORD")));
+        _7zText.setText(StringUtils.trimToEmpty(prop.getProperty("7Z")));
+        excelText.setText(StringUtils.trimToEmpty(prop.getProperty("EXCEL")));
+        firefoxText.setText(StringUtils.trimToEmpty(prop.getProperty("FIREFOX")));
+        jdGuiText.setText(StringUtils.trimToEmpty(prop.getProperty("JD_GUI")));
+        eclipseText.setText(StringUtils.trimToEmpty(prop.getProperty("ECLIPSE")));
+        eclipseCompanyText.setText(StringUtils.trimToEmpty(prop.getProperty("ECLIPSE_COMPANY")));
     }
 
     /**
@@ -213,6 +226,7 @@ public class JFileExecuteUtil_ConfigDlg extends JDialog {
                 });
             }
             {
+                this.initSetText();
                 JCommonUtil.setJFrameCenter(this);
             }
         }

@@ -80,6 +80,7 @@ import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.string.StringNumberUtil;
 import gtu.swing.util.AutoComboBox;
+import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
@@ -610,6 +611,7 @@ public class FastDBQueryUI extends JFrame {
         dbNameIdText = new JComboBox();
         // dbNameIdText.setColumns(10);
         dbNameIdText_Auto = AutoComboBox.applyAutoComboBox(dbNameIdText);
+        dbNameIdText_Auto.setMatchType(MatchType.Contains);
         reload_DataSourceConfig_autoComplete();
         panel_6.add(dbNameIdText, "10, 2, fill, default");
         dbNameIdText.addItemListener(new ItemListener() {
@@ -1499,7 +1501,20 @@ public class FastDBQueryUI extends JFrame {
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                Validate.isTrue(this.queryList != null && !this.queryList.getRight().isEmpty(), "查詢結果為空!");
+                boolean isExcelImport = false;
+                if (this.queryList != null && !this.queryList.getRight().isEmpty()) {
+                    // ok
+                } else {
+                    // 如果是用 excel 匯入 使用excel資料開啟
+                    String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸入 schema.table 名稱");
+                    if (StringUtils.isBlank(shemaTable)) {
+                        Validate.isTrue(false, "查詢結果為空!");
+                    }
+                    queryList = JdbcDBUtil.queryForList_customColumns(//
+                            String.format(" select * from %s where 1=1 ", shemaTable), //
+                            new Object[0], this.getDataSource().getConnection(), true, 1);
+                    isExcelImport = true;
+                }
 
                 if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
                     fastDBQueryUI_CrudDlgUI.dispose();
@@ -1514,8 +1529,8 @@ public class FastDBQueryUI extends JFrame {
                     int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                     System.out.println("rowPos " + rowPos);
 
-                    int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
-                    Map<String, Object> rowMap = getDetailToMap(this.queryList, queryLstIndex);
+                    int queryLstIndex = transRealRowToQuyerLstIndex(rowPos, isExcelImport);
+                    Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
                     rowMapLst.add(rowMap);
                 }
 
@@ -1543,7 +1558,7 @@ public class FastDBQueryUI extends JFrame {
         return "";
     }
 
-    private int transRealRowToQuyerLstIndex(int realRow) {
+    private int transRealRowToQuyerLstIndex(int realRow, boolean isExcelImport) {
         TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
 
@@ -1559,6 +1574,21 @@ public class FastDBQueryUI extends JFrame {
             }
         }
         System.out.println(columnMapping);
+
+        // 如果是使用 excel 匯入 需要重組 資料
+        if (isExcelImport) {
+            List<Object[]> rightRowsLit = new ArrayList<Object[]>();
+            for (int row = 0; row < queryResultTable.getRowCount(); row++) {
+                TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
+                for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+                    int realCol = util.getRealColumnPos(col, queryResultTable);
+                    Object value = util.getModel().getValueAt(realRow, realCol);
+                    map.put(realCol, value);
+                }
+                rightRowsLit.add(map.values().toArray());
+            }
+            queryList = Pair.of(queryList.getLeft(), rightRowsLit);
+        }
 
         TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
         for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
@@ -1581,7 +1611,7 @@ public class FastDBQueryUI extends JFrame {
         return isContainObjectArray_Index(newLst, arry);
     }
 
-    private Map<String, Object> getDetailToMap(Pair<List<String>, List<Object[]>> queryList2, int queryListIndex) {
+    private Map<String, Object> getDetailToMap(int queryListIndex) {
         List<String> columns = queryList.getLeft();
         List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
 
