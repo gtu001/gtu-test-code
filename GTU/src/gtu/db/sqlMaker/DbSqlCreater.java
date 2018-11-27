@@ -362,10 +362,13 @@ public class DbSqlCreater {
             sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
                 String key_ = key.toUpperCase();
+                if (!valmap.containsKey(key_)) {
+                    continue;
+                }
                 if (valmap.get(key_) == null && ignoreNull) {
                     continue;
                 }
-                if (ignoreColumns.contains(key_)) {
+                if (ignoreColumns != null && ignoreColumns.contains(key_)) {
                     continue;
                 }
                 sb.append(key + "=" + getRealValue(key, valmap.get(key_)) + ",");

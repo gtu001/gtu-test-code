@@ -84,8 +84,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private FastDBQueryUI _parent;
     private JCheckBox applyAllQueryResultCheckBox;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private JRadioButton rdbtnSelect;
 
-    private static class ColumnConf {
+    static class ColumnConf {
         String columnName;
         Object value;
         Object orignValue;// 用來判斷是否改過
@@ -101,7 +102,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    private enum DataType {
+    enum DataType {
         varchar(String.class) {
         }, //
         date(java.sql.Date.class) {
@@ -134,7 +135,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             this.clz = clz;
         }
 
-        private static DataType isTypeOf(Object value) {
+        static DataType isTypeOf(Object value) {
             if (value == null) {
                 return NULL;
             }
@@ -352,6 +353,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                     sql = process.tableInfo.createDeleteSql(singleRecordMap);
                                 } else if (btn == dialog.rdbtnUpdate) {
                                     sql = process.tableInfo.createUpdateSql(singleRecordMap, singleRecordMap, false, process.ignoreColumns);
+                                } else if (btn == dialog.rdbtnSelect) {
+                                    sql = process.tableInfo.createSelectSql(singleRecordMap);
                                 } else if (btn == dialog.rdbtnOthers) {
                                     rdbtnOthersAction(process.tableInfo, singleRecordMap);
                                 } else {
@@ -432,6 +435,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                     createWriter(outputFile);
                                     for (Map<String, String> map : qlst) {
                                         String sql = process.tableInfo.createUpdateSql(map, map, false, process.ignoreColumns);
+                                        writer.write(sql + ";");
+                                        writer.newLine();
+                                    }
+                                } else if (btn == dialog.rdbtnSelect) {
+                                    createWriter(outputFile);
+                                    for (Map<String, String> map : qlst) {
+                                        String sql = process.tableInfo.createSelectSql(map);
                                         writer.write(sql + ";");
                                         writer.newLine();
                                     }
@@ -945,7 +955,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
      */
     public FastDBQueryUI_CrudDlgUI(FastDBQueryUI _parent) {
         this._parent = _parent;
-        setBounds(100, 100, 583, 409);
+        setBounds(100, 100, 680, 463);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -1018,10 +1028,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 panel.add(rdbtnDelete);
             }
             {
+                rdbtnSelect = new JRadioButton("select");
+                panel.add(rdbtnSelect);
+            }
+            {
                 rdbtnOthers = new JRadioButton("其他");
                 panel.add(rdbtnOthers);
             }
-            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers);
+            btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers, rdbtnSelect);
             {
                 applyAllQueryResultCheckBox = new JCheckBox("套全部");
                 panel.add(applyAllQueryResultCheckBox);

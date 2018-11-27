@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -190,6 +191,8 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_4;
     private JTextField sqlContentFilterText;
     private JLabel lblNewLabel_5;
+
+    private boolean isExcelImport = false;
 
     /**
      * Launch the application.
@@ -1501,47 +1504,66 @@ public class FastDBQueryUI extends JFrame {
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                boolean isExcelImport = false;
+                if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
+                    fastDBQueryUI_CrudDlgUI.dispose();
+                }
+
+                // 一般查詢
                 if (this.queryList != null && !this.queryList.getRight().isEmpty()) {
-                    // ok
+
+                    JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
+                    int[] orignRowPosArry = queryResultTable.getSelectedRows();
+
+                    List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
+                    for (int orignRowPos : orignRowPosArry) {
+                        System.out.println("orignRowPos " + orignRowPos);
+                        int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
+                        System.out.println("rowPos " + rowPos);
+
+                        int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
+                        Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
+                        rowMapLst.add(rowMap);
+                    }
+
+                    Pair<List<String>, List<Object[]>> allRows = null;
+                    if (filterRowsQueryList != null) {
+                        allRows = filterRowsQueryList;
+                    } else {
+                        allRows = queryList;
+                    }
+
+                    fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, this);
                 } else {
                     // 如果是用 excel 匯入 使用excel資料開啟
                     String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸入 schema.table 名稱");
                     if (StringUtils.isBlank(shemaTable)) {
                         Validate.isTrue(false, "查詢結果為空!");
                     }
-                    queryList = JdbcDBUtil.queryForList_customColumns(//
+                    Pair<List<String>, List<Object[]>> excelImportLst = JdbcDBUtil.queryForList_customColumns(//
                             String.format(" select * from %s where 1=1 ", shemaTable), //
-                            new Object[0], this.getDataSource().getConnection(), true, 1);
-                    isExcelImport = true;
+                            new Object[0], getDataSource().getConnection(), true, 1);
+
+                    excelImportLst = transRealRowToQuyerLstIndex(excelImportLst);
+                    int selectRowIndex = queryResultTable.getSelectedRow();
+
+                    FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
                 }
+            }
 
-                if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
-                    fastDBQueryUI_CrudDlgUI.dispose();
-                }
+            if (JMouseEventUtil.buttonRightClick(1, e)) {
+                JPopupMenuUtil.newInstance(queryResultTable)//
+                        .addJMenuItem("TODO", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
 
-                JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
-                int[] orignRowPosArry = queryResultTable.getSelectedRows();
-
-                List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
-                for (int orignRowPos : orignRowPosArry) {
-                    System.out.println("orignRowPos " + orignRowPos);
-                    int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
-                    System.out.println("rowPos " + rowPos);
-
-                    int queryLstIndex = transRealRowToQuyerLstIndex(rowPos, isExcelImport);
-                    Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
-                    rowMapLst.add(rowMap);
-                }
-
-                Pair<List<String>, List<Object[]>> allRows = null;
-                if (filterRowsQueryList != null) {
-                    allRows = filterRowsQueryList;
-                } else {
-                    allRows = queryList;
-                }
-
-                fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, this);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
+                            }
+                        })//
+                        .applyEvent(e)//
+                        .show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -1558,7 +1580,28 @@ public class FastDBQueryUI extends JFrame {
         return "";
     }
 
-    private int transRealRowToQuyerLstIndex(int realRow, boolean isExcelImport) {
+    private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex(Pair<List<String>, List<Object[]>> excelImportLst) {
+        TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
+        List<String> leftLst = new ArrayList<String>(columnMapping.values());
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+
+        // 如果是使用 excel 匯入 需要重組 資料
+        List<Object[]> rightRowsLit = new ArrayList<Object[]>();
+        for (int row = 0; row < queryResultTable.getRowCount(); row++) {
+            TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
+            for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+                int realCol = util.getRealColumnPos(col, queryResultTable);
+                int realRow = util.getRealRowPos(row, queryResultTable);
+                Object value = util.getModel().getValueAt(realRow, realCol);
+                map.put(realCol, value);
+            }
+            rightRowsLit.add(map.values().toArray());
+        }
+        excelImportLst = Pair.of(leftLst, rightRowsLit);
+        return excelImportLst;
+    }
+
+    private TreeMap<Integer, String> getQueryResult_ColumnDefine() {
         TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
 
@@ -1566,30 +1609,26 @@ public class FastDBQueryUI extends JFrame {
             TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(ii);
             String columnHeader = (String) column.getHeaderValue();
 
-            for (int jj = 0; jj < this.queryList.getLeft().size(); jj++) {
-                String columnHeader2 = this.queryList.getLeft().get(jj);
-                if (!columnMapping.containsKey(jj) && columnHeader.equalsIgnoreCase(columnHeader2)) {
-                    columnMapping.put(jj, columnHeader2);
+            if (this.queryList != null && !this.queryList.getLeft().isEmpty()) {
+                for (int jj = 0; jj < this.queryList.getLeft().size(); jj++) {
+                    String columnHeader2 = this.queryList.getLeft().get(jj);
+                    if (!columnMapping.containsKey(jj) && columnHeader.equalsIgnoreCase(columnHeader2)) {
+                        columnMapping.put(jj, columnHeader2);
+                    }
                 }
+            } else {
+                columnMapping.put(ii, columnHeader);
             }
         }
         System.out.println(columnMapping);
+        return columnMapping;
+    }
+
+    private int transRealRowToQuyerLstIndex(int realRow) {
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+        TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
 
         // 如果是使用 excel 匯入 需要重組 資料
-        if (isExcelImport) {
-            List<Object[]> rightRowsLit = new ArrayList<Object[]>();
-            for (int row = 0; row < queryResultTable.getRowCount(); row++) {
-                TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
-                for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
-                    int realCol = util.getRealColumnPos(col, queryResultTable);
-                    Object value = util.getModel().getValueAt(realRow, realCol);
-                    map.put(realCol, value);
-                }
-                rightRowsLit.add(map.values().toArray());
-            }
-            queryList = Pair.of(queryList.getLeft(), rightRowsLit);
-        }
-
         TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
         for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
             int realCol = util.getRealColumnPos(col, queryResultTable);
@@ -1613,8 +1652,6 @@ public class FastDBQueryUI extends JFrame {
 
     private Map<String, Object> getDetailToMap(int queryListIndex) {
         List<String> columns = queryList.getLeft();
-        List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
-
         Object[] row = queryList.getRight().get(queryListIndex);
 
         Map<String, List<Object>> multiMap = new HashMap<String, List<Object>>();
@@ -1684,6 +1721,7 @@ public class FastDBQueryUI extends JFrame {
                     model.addRow(rows.toArray());
                 }
 
+                isExcelImport = true;
             } else if (radio_export_excel == selBtn) {
                 if (queryList == null || queryList.getRight().isEmpty()) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
