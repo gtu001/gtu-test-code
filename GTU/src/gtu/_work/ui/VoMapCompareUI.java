@@ -226,12 +226,23 @@ public class VoMapCompareUI extends JFrame {
 
             private Map<String, String> parse(String text) {
                 Map<String, String> treeMap = new TreeMap<String, String>();
-                Pattern ptn = Pattern.compile("(\\w+)\\=([\u4e00-\u9fa5\\w]*)");
-                Matcher mth = ptn.matcher(text);
-                while (mth.find()) {
-                    String key = mth.group(1);
-                    String val = mth.group(2);
-                    treeMap.put(key, val);
+                {
+                    Pattern ptn = Pattern.compile("(\\w+)\\=([\u4e00-\u9fa5\\w\\.○\\-\\_\\:\\s]*)");
+                    Matcher mth = ptn.matcher(text);
+                    while (mth.find()) {
+                        String key = mth.group(1);
+                        String val = mth.group(2);
+                        treeMap.put(key, val);
+                    }
+                }
+                {
+                    Pattern ptn = Pattern.compile("(\\w+)\\=((?:.|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
+                    Matcher mth = ptn.matcher(text);
+                    while (mth.find()) {
+                        String key = mth.group(1);
+                        String val = mth.group(2);
+                        treeMap.put(key, val);
+                    }
                 }
                 return treeMap;
             }
