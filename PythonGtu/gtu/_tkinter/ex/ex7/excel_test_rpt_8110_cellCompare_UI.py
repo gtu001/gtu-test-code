@@ -33,30 +33,40 @@ class MainUI():
         rootTab = _TabFrame(win)
         tab1 = rootTab.createTab("路徑設定")
         
+        #------------------------------row 0
+        
+        l0 = _Label(root=tab1)
+        l0.setText("設定預設目錄:")
+        l0.grid(column=0, row=0)
+        
+        self.defText = _Text(_Text.create(tab1))
+        self.defText.grid(column=1, row=0)
+        self.defTextHandler = TextSetPathEventHandler(self.defText, isFile=False, nameFormat=r"", ignoreCase=True)
+        
         #------------------------------row 1
         
         l1 = _Label(root=tab1)
         l1.setText("Cognus表路徑:")
-        l1.grid(column=0, row=0)
+        l1.grid(column=0, row=1)
         
         self.rptCText = _Text(_Text.create(tab1))
-        self.rptCText.grid(column=1, row=0)
-        TextSetPathEventHandler(self.rptCText, True, r".*\.xlsx", True)
+        self.rptCText.grid(column=1, row=1)
+        self.rptCTextHandler = TextSetPathEventHandler(self.rptCText, True, r".*\.xlsx", True)
         
         #------------------------------row 2
         
         l2 = _Label(root=tab1)
         l2.setText("IText表路徑:")
-        l2.grid(column=0, row=1)
+        l2.grid(column=0, row=2)
         
         self.rptIText = _Text(_Text.create(tab1))
-        self.rptIText.grid(column=1, row=1)
-        TextSetPathEventHandler(self.rptIText, True, r".*\.xlsx", True)
+        self.rptIText.grid(column=1, row=2)
+        self.rptITextHandler = TextSetPathEventHandler(self.rptIText, True, r".*\.xlsx", True)
         
         #------------------------------row 3
         
         self.pbar = _ProgressBar(tab1, length=300)
-        self.pbar.grid(column=1, row=2)
+        self.pbar.grid(column=1, row=3)
         
         self.btn2 = _Button(root=tab1)
         self.btn2.setText("產生比對表")
@@ -65,7 +75,7 @@ class MainUI():
                                             exceptionFunc=self.executeBtnAction_finally,
                                             finallyFunc=self.executeBtnAction_finally
                                             ))
-        self.btn2.grid(column=2, row=2)
+        self.btn2.grid(column=2, row=3)
         
         #------------------------------row End
         
@@ -83,6 +93,16 @@ class MainUI():
         logTextScroll.grid(0, 0)
         
         #------------------------------row End
+        
+        #------------------------------------common setting
+        def func1(path):
+            print("----", path)
+            self.rptITextHandler.args['initialdir'] = path
+            self.rptITextHandler.resetEvent()
+            self.rptCTextHandler.args['initialdir'] = path
+            self.rptCTextHandler.resetEvent()
+        self.defTextHandler.func = func1
+        #------------------------------------common setting
         
         tkinterUtil.centerWin(win)
         win.mainloop()

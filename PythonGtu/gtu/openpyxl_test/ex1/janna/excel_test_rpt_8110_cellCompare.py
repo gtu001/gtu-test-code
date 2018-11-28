@@ -4,7 +4,6 @@ from gtu.openpyxl_test.ex1.janna import excel_test_rpt_8110_cellCompare
 '''
 
 from _decimal import Decimal
-from collections import OrderedDict
 from enum import Enum
 import inspect
 import numbers
@@ -104,14 +103,17 @@ def mainDetail(fileC, fileI, mProgressBar=None, logSb=None):
     
     diffLog = _DiffLog()
     
-    wb1 = openpyxl.load_workbook(fileC, read_only=True, data_only=True)
-    wb2 = openpyxl.load_workbook(fileI, read_only=True, data_only=True)
+    wb1 = openpyxl.load_workbook(fileC, read_only=False, data_only=True)
+    wb2 = openpyxl.load_workbook(fileI, read_only=False, data_only=True)
     
     
     maxSheetRng = getRangeWarpper(len(wb1.get_sheet_names()), len(wb2.get_sheet_names()))
     
     #設定進度條基本數值
     mPBar.setupValue(0, maxSheetRng.left)
+    
+    sameCount = 0
+    diffCount = 0
     
     for sh_idx in range(0, maxSheetRng.left) :
         s1Name = wb1.get_sheet_names()[sh_idx];
@@ -176,11 +178,17 @@ def mainDetail(fileC, fileI, mProgressBar=None, logSb=None):
                 
                 if numberCompareResult is not None and numberCompareResult == False : 
                     diffLog.add(diffLogBean)
+                    diffCount += 1
+                else :
+                    sameCount += 1
         
         #完成一個表
         mPBar.step(1)
         
     diffLog.writeExcel()
+    
+    print("sameCount", sameCount)
+    print("diffCount", diffCount)
                 
 #         openpyxl.worksheet.worksheet.Worksheet
 
@@ -292,7 +300,23 @@ class _ColDiff(Enum):
     
 
 if __name__ == '__main__':
-    fileC = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
-    fileI = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
+#     fileC = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
+#     fileI = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
+    fileC = fileUtil.getDesktopDir() + os.sep + "/RCRP0C210/A0/RCRP0C210_1027-cognos.XLSX"
+    fileI = fileUtil.getDesktopDir() + os.sep + "/RCRP0C210/A0/RCRP0C210_1027-itext.XLSX"
     mainDetail(fileC, fileI)
     print("done...")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

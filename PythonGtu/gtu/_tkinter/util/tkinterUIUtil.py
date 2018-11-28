@@ -32,6 +32,7 @@ class BaseUI():
     def gridInfo(self):
         return self.widget.grid_info()
 
+
 class _Label(BaseUI):
     '''建立Label'''
 
@@ -197,12 +198,20 @@ class TextSetPathEventHandler():
     設定 text 雙擊設路徑的 event
     '''
 
-    def __init__(self, textWidget, isFile=True, nameFormat="", ignoreCase=False):
+    def __init__(self, textWidget, isFile=True, nameFormat="", ignoreCase=False, initialdir=None, initialfile=None, filetypes=None, func=None):
         self.textWidget = textWidget
         self.isFile = isFile
         self.nameFormat = nameFormat
         self.ignoreCase = ignoreCase
-        
+        self.args = {
+            "initialdir" : initialdir,
+            "initialfile" : initialfile,
+            "filetypes" : filetypes,
+            }
+        self.func = func
+        self.resetEvent()
+    
+    def resetEvent(self):
         if isinstance(self.textWidget, _Text) :
             self.textWidget.dbclick(self.setPathEvent)
         else :
@@ -226,29 +235,33 @@ class TextSetPathEventHandler():
         try:
             path = None
             if self.isFile :
-                path = tkinterUtil.askopenfilename()
+                print("**self.args", self.args)
+                path = tkinterUtil.askopenfilename(**self.args)
             else :
-                path = tkinterUtil.askdirectory()
+                print("**self.args", self.args)
+                path = tkinterUtil.askdirectory(**self.args)
                 
             if not path or not os.path.exists(path) :
-                tkinterUtil.message("路徑有誤", "路徑不存在 :" + path)
+                tkinterUtil.message("路徑有誤", "路徑不存在 :" + str(path))
                 return;
             
             if self.isFile :
                 if not os.path.isfile(path) :
-                    tkinterUtil.message("路徑有誤", "路徑非檔案 :" + path)
+                    tkinterUtil.message("路徑有誤", "路徑非檔案 :" + str(path))
                     return;
             else :
                 if not os.path.isdir(path) :
-                    tkinterUtil.message("路徑有誤", "路徑非檔目錄:" + path)
+                    tkinterUtil.message("路徑有誤", "路徑非檔目錄:" + str(path))
                     return;
             
             # 驗證檔名
             if stringUtil.isNotBlank(self.nameFormat) and not self.checkPathFormatValid(path) :
-                tkinterUtil.message("路徑有誤", "檔名格式必須為 : " + self.nameFormat)
+                tkinterUtil.message("路徑有誤", "檔名格式必須為 : " + str(self.nameFormat))
                 return;
             
             _Text.set_text(event.widget, path)
+            if self.func :
+                self.func(path)
         except Exception as ex:
             tkinterUtil.error_ex(ex, ex)
 
@@ -358,7 +371,6 @@ class _Scrollbar():
         
         self.widget.configure(yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.widget.yview)
-
         
     def applyX(self):
         scrollbar = Scrollbar(self.root, orient='horizontal', takefocus='no')
@@ -379,12 +391,12 @@ class _Scrollbar():
         print("grid column=", column, ", row=", row)
         
         if self.scrollbarX is not None :
-            self.scrollbarX.grid(column=column, row=row+1, sticky='WE')
-            self.widget.grid_columnconfigure(0, weight=1)#沒特別效果
+            self.scrollbarX.grid(column=column, row=row + 1, sticky='WE')
+            self.widget.grid_columnconfigure(0, weight=1)  # 沒特別效果
 
         if self.scrollbarY is not None :
-            self.scrollbarY.grid(column=column+1, row=row, sticky='NS')
-            self.widget.grid_rowconfigure(0, weight=1)#沒特別效果
+            self.scrollbarY.grid(column=column + 1, row=row, sticky='NS')
+            self.widget.grid_rowconfigure(0, weight=1)  # 沒特別效果
     
     def pack(self):
         if self.scrollbarX is not None :

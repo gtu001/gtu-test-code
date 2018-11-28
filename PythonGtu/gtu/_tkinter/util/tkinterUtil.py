@@ -7,14 +7,39 @@ from gtu._tkinter.util import tkinterUtil
 '''
 from gtu.reflect import checkSelf
 from gtu.error import errorHandler
+from gtu.io import fileUtil
+import os
 
 
-def askopenfilename():
-    return filedialog.askopenfilename()
+def _defaultArgs(args, isDir=True, exists=None):
+    if 'title' not in args  :
+        args['title'] = "開啟檔案"
+    if 'filetypes' not in args or \
+        ('filetypes' in args or args['filetypes'] is None ) :
+        args['filetypes'] = [("all", "*.*")]
+    if 'initialdir' not in args or \
+        ('initialdir' in args and args['initialdir'] is None ) or \
+        ('initialdir' in args and not os.path.isdir(args['initialdir'])) :
+        args['initialdir'] = fileUtil.getDesktopDir()
+    if 'initialfile' not in args or \
+        ('initialfile' in args and args['initialfile'] is None ) or \
+        ('initialfile' in args and not os.path.exists(args['initialfile'])) :
+        args['initialfile'] = fileUtil.getDesktopDir()
+    if isDir :
+        if 'filetypes' in args : del args['filetypes']
+        if 'initialfile' in args : del args['initialfile']
+    args['mustexist'] = exists
+    print(args)
+    return args
+
+def askopenfilename(**args):
+    args = _defaultArgs(args, isDir=False)
+    return filedialog.askopenfilename(**args)
 
 
-def askdirectory():
-    return filedialog.askdirectory()
+def askdirectory(**args):
+    args = _defaultArgs(args, isDir=True)
+    return filedialog.askdirectory(**args)
 
 
 def confirm(title, message):
@@ -90,4 +115,5 @@ class ValidateException(Exception):
         
 if __name__ == '__main__':
     '''test'''
-    message("title", "message")
+#     message("title", "message")
+    askdirectory(initialdir = '/home/gtu001/桌面', initialfile = '/home/gtu001/桌面')
