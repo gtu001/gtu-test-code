@@ -46,9 +46,11 @@ import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextAreaUtil;
 
 public class FastDBQueryUI_RowCompareDlg extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTable importRowTable;
 
@@ -97,7 +99,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                         queryConditionArea.setRows(2);
                         queryConditionArea.setColumns(50);
                         JCommonUtil.createScrollComponent(queryConditionArea);
-                        panel_1.add(queryConditionArea);
+                        panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
                     }
                     {
                         JButton syncQueryConditionBtn = new JButton("同步SQL");
@@ -193,13 +195,14 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 }
                 {
                     queryResultTable = new JTable();
+                    JTableUtil.defaultSetting(queryResultTable);
                     queryResultTable.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             queryResultTableAction();
                         }
                     });
-                    panel.add(JCommonUtil.createScrollComponent(queryResultTable), BorderLayout.CENTER);
+                    panel.add(JTableUtil.getScrollPane(queryResultTable), BorderLayout.CENTER);
                 }
             }
         }
@@ -305,12 +308,14 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    private Object getImportValue(String column, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst) {
+    private String getImportValue(String column, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst) {
         Object[] rowArry = excelImportLst.getRight().get(selectRowIndex);
         for (int ii = 0; ii < excelImportLst.getLeft().size(); ii++) {
             String col = excelImportLst.getLeft().get(ii);
             if (StringUtils.equalsIgnoreCase(column, col)) {
-                return rowArry[ii];
+                String val = rowArry[ii] == null ? null : String.valueOf(rowArry[ii]);
+                val = "null".equals(val) ? null : val;
+                return val;
             }
         }
         throw new RuntimeException("資料建立錯誤  colum : " + column + " -> " + excelImportLst.getLeft() + " , " + Arrays.toString(rowArry));
@@ -402,9 +407,8 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             for (int row = 0; row < util.getModel().getRowCount(); row++) {
                 String column = (String) util.getRealValueAt(row, 0);
                 int colPos = util.getRealColumnPos(2, importRowTable);
-                Object value = getImportValue(column, selectRow, queryList);
-                String realVal = value != null ? String.valueOf(value) : null;
-                importRowTable.setValueAt(realVal, row, colPos);
+                String value = getImportValue(column, selectRow, queryList);
+                importRowTable.setValueAt(value, row, colPos);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

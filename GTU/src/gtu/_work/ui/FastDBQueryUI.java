@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -192,7 +191,7 @@ public class FastDBQueryUI extends JFrame {
     private JTextField sqlContentFilterText;
     private JLabel lblNewLabel_5;
 
-    private boolean isExcelImport = false;
+    private String importExcelSheetName;// 匯入目前的sheet name
 
     /**
      * Launch the application.
@@ -1044,6 +1043,7 @@ public class FastDBQueryUI extends JFrame {
             {
                 isResetQuery = true;
                 filterRowsQueryList = null;// rows 過濾清除
+                importExcelSheetName = null; // 清除匯入黨名
             }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
@@ -1509,7 +1509,7 @@ public class FastDBQueryUI extends JFrame {
                 }
 
                 // 一般查詢
-                if (this.queryList != null && !this.queryList.getRight().isEmpty()) {
+                if (this.queryList != null && !this.queryList.getRight().isEmpty() && StringUtils.isBlank(importExcelSheetName)) {
 
                     JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
                     int[] orignRowPosArry = queryResultTable.getSelectedRows();
@@ -1535,7 +1535,7 @@ public class FastDBQueryUI extends JFrame {
                     fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, this);
                 } else {
                     // 如果是用 excel 匯入 使用excel資料開啟
-                    String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸入 schema.table 名稱");
+                    String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸入 schema.table 名稱", importExcelSheetName);
                     if (StringUtils.isBlank(shemaTable)) {
                         Validate.isTrue(false, "查詢結果為空!");
                     }
@@ -1693,8 +1693,22 @@ public class FastDBQueryUI extends JFrame {
                     JCommonUtil._jOptionPane_showMessageDialog_info("檔案錯誤(.xls)!");
                     return;
                 }
+
+                // 選擇sheet
                 HSSFWorkbook wk = exlUtl.readExcel(xlsfile);
-                HSSFSheet sheet = wk.getSheetAt(0);
+                List<String> shLst = new ArrayList<String>();
+                for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
+                    HSSFSheet sh = wk.getSheetAt(ii);
+                    shLst.add(sh.getSheetName());
+                }
+                importExcelSheetName = (String) JCommonUtil._JOptionPane_showInputDialog(//
+                        "請選擇sheet,共[" + shLst.size() + "]個", "選擇sheet", shLst.toArray(), shLst.get(0));
+                if (StringUtils.isBlank(importExcelSheetName)) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("sheetname 錯誤!");
+                    return;
+                }
+
+                HSSFSheet sheet = wk.getSheet(importExcelSheetName);
 
                 DefaultTableModel model = null;
                 for (int ii = 0; ii <= 0; ii++) {
@@ -1720,8 +1734,6 @@ public class FastDBQueryUI extends JFrame {
                     }
                     model.addRow(rows.toArray());
                 }
-
-                isExcelImport = true;
             } else if (radio_export_excel == selBtn) {
                 if (queryList == null || queryList.getRight().isEmpty()) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");

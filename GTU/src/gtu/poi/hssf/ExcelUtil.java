@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
@@ -131,10 +132,11 @@ public class ExcelUtil {
      * 讀取檔案成Workbook物件
      */
     public HSSFWorkbook readExcel(File file) {
+        InputStream inputFile = null;
         try {
             int size = (int) (file.length() - file.length() % 512);
             byte[] buffer = new byte[size];
-            InputStream inputFile = new FileInputStream(file);
+            inputFile = new FileInputStream(file);
             inputFile.read(buffer, 0, size);
             inputFile.close();
             InputStream byteIS = new ByteArrayInputStream(buffer);
@@ -142,6 +144,11 @@ public class ExcelUtil {
             return new HSSFWorkbook(byteIS);
         } catch (Exception ex) {
             throw new RuntimeException("readExcel ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputFile.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -149,8 +156,9 @@ public class ExcelUtil {
      * 讀取檔案成Workbook物件
      */
     public HSSFWorkbook readExcel2(File file) {
+        InputStream inputFile = null;
         try {
-            InputStream inputFile = new FileInputStream(file);
+            inputFile = new FileInputStream(file);
 
             // read entire stream into byte array:
             ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
@@ -167,6 +175,11 @@ public class ExcelUtil {
             return workBook;
         } catch (Exception ex) {
             throw new RuntimeException("readExcel2 ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputFile.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -174,10 +187,11 @@ public class ExcelUtil {
      * 讀取檔案成Workbook物件
      */
     public XSSFWorkbook readExcel_xlsx(File file) {
+        InputStream inputFile = null;
         try {
             int size = (int) (file.length() - file.length() % 512);
             byte[] buffer = new byte[size];
-            InputStream inputFile = new FileInputStream(file);
+            inputFile = new FileInputStream(file);
             inputFile.read(buffer, 0, size);
             inputFile.close();
             InputStream byteIS = new ByteArrayInputStream(buffer);
@@ -185,6 +199,11 @@ public class ExcelUtil {
             return new XSSFWorkbook(byteIS);
         } catch (Exception ex) {
             throw new RuntimeException("readExcel_xlsx ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputFile.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -192,8 +211,9 @@ public class ExcelUtil {
      * 讀取檔案成Workbook物件
      */
     public XSSFWorkbook readExcel2_xlsx(File file) {
+        InputStream inputFile = null;
         try {
-            InputStream inputFile = new FileInputStream(file);
+            inputFile = new FileInputStream(file);
 
             // read entire stream into byte array:
             ByteArrayOutputStream byteOS = new ByteArrayOutputStream();
@@ -210,6 +230,11 @@ public class ExcelUtil {
             return workBook;
         } catch (Exception ex) {
             throw new RuntimeException("readExcel2_xlsx ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputFile.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -221,6 +246,11 @@ public class ExcelUtil {
             return new HSSFWorkbook(inputStream);
         } catch (Exception ex) {
             throw new RuntimeException("readExcel ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -244,6 +274,11 @@ public class ExcelUtil {
             return workBook;
         } catch (Exception ex) {
             throw new RuntimeException("readExcel2 ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -255,6 +290,11 @@ public class ExcelUtil {
             return new XSSFWorkbook(inputStream);
         } catch (Exception ex) {
             throw new RuntimeException("readExcel_xlsx ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -278,6 +318,11 @@ public class ExcelUtil {
             return workBook;
         } catch (Exception ex) {
             throw new RuntimeException("readExcel2_xlsx ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -285,13 +330,20 @@ public class ExcelUtil {
      * 寫檔
      */
     public void writeExcel(File file, Workbook workbook) {
+        FileOutputStream out = null;
         try {
             if (workbook.getNumberOfSheets() == 0) {
                 workbook.createSheet();
             }
-            workbook.write(new FileOutputStream(file));
+            out = new FileOutputStream(file);
+            workbook.write(out);
         } catch (Exception ex) {
             throw new RuntimeException("writeExcel ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -299,13 +351,20 @@ public class ExcelUtil {
      * 寫檔
      */
     public void writeExcel(String filename, Workbook workbook) {
+        FileOutputStream out = null;
         try {
             if (workbook.getNumberOfSheets() == 0) {
                 workbook.createSheet();
             }
-            workbook.write(new FileOutputStream(filename));
+            out = new FileOutputStream(filename);
+            workbook.write(out);
         } catch (Exception ex) {
             throw new RuntimeException("writeExcel ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException e) {
+            }
         }
     }
 
