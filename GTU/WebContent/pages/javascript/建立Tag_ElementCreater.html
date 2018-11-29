@@ -1,0 +1,140 @@
+		
+	function ElementCreater(elem, tagName, attrMap){
+		this.constructor.name = "ElementCreater";
+		this.isDom = function(obj) {
+			try {
+				return obj instanceof HTMLElement;
+			} catch(e){
+				return (typeof obj==="object") &&
+			      (obj.nodeType===1) && (typeof obj.style === "object") &&
+			      (typeof obj.ownerDocument ==="object");
+			}
+		};
+		this.self = this;
+		this.afterLst = new Array();
+		if(elem) {
+			if(this.isDom(elem)){
+				this.tag = elem;
+			} else if(typeof(elem) == 'string'){
+				this.tag = document.querySelector(elem);
+				if(!this.tag){
+					throw new Error("找不到" + elem);
+				}
+			} else {
+				throw new Error("無法判斷來源 : " + elem);
+			}
+		}else{
+			this.tag = document.createElement(tagName);
+			for(var ii in attrMap) {
+				if(ii == "innerText"){
+					this.tag.innerText = attrMap[ii];
+					continue;
+				}
+				this.tag.setAttribute(ii, attrMap[ii]);
+			}
+		}
+		this.get = function(){
+			return this.tag;
+		};
+		this.append = function(element){
+			var afterLst = [];
+			if(element.constructor.name == "ElementCreater"){
+				afterLst = element.afterLst;
+				element = element.get();
+			}
+			this.tag.appendChild(element);
+			for(var i = 0 ; i < afterLst.length ; i ++){
+				this.append(afterLst[i]);
+			}
+			return this.self;
+		};
+		this.func = function(eventId, func1){
+			this.tag.addEventListener(eventId, func1);
+			return this.self;
+		};
+		this.find = function(queryText) {
+			var el = this.tag.querySelector(queryText);
+			return new ElementCreater(el);
+		};
+		this.attr = function(name, val) {
+			if( arguments.length == 2 ){
+				this.tag.setAttribute(name, val);
+				return this.self;
+			}else if( arguments.length == 1 && typeof(arguments[0]) != 'string' ) {
+				var map = name;
+				for(var k in map){
+					this.tag.setAttribute(k, map[k]);
+				}
+				return this.self;
+			} else if( arguments.length == 1 && typeof(arguments[0]) == 'string' ) {
+				return this.tag.getAttribute(name);
+			}
+		};
+		this.val = function(value) {
+			if(arguments.length == 0){
+				return this.tag.getAttribute("value");
+			}else if(arguments.length == 1 && typeof(arguments[0]) == 'string'){
+				this.tag.setAttribute("value", value);
+			}else{
+				throw new Error("無法處理的變數:" + text);
+			}
+		};
+		this.after = function(element){
+			this.afterLst.push(element);
+			return this.self;
+		};
+		this.position = function(){
+			var rect = this.tag.getBoundingClientRect();
+			var width = this.tag.width || this.tag.style.width || 100;
+			var height = this.tag.height || this.tag.style.height || 50;
+			return {left : rect.left, top : rect.top, right : rect.right, bottom : rect.bottom, 
+				width : width, height : height};
+		};
+		this.next = function(){
+			return this.tag.nextSibling;
+		};
+		this.previous = function(){
+			return this.tag.previousSibling;
+		};
+		this.text = function(text){
+			if(arguments.length == 0){
+				return this.tag.innerText;
+			}else if(arguments.length == 1 && typeof(arguments[0]) == 'string'){
+				this.tag.innerText = text;
+			}else{
+				throw new Error("無法處理的變數:" + text);
+			}
+		};
+		this.html = function(value){
+			if(arguments.length == 0){
+				return this.tag.innerHTML;
+			}else if(arguments.length == 1 && typeof(arguments[0]) == 'string'){
+				this.tag.innerHTML = value;
+			}else{
+				throw new Error("無法處理的變數:" + value);
+			}
+		}
+		return this;
+	}
+	
+	
+	
+	var util = {
+		hide : function(id){
+			document.getElementById(id).style.display = "none";
+		},
+		show : function(id){
+			alert(document.getElementById(id).tagName);
+			document.getElementById(id).style.display = "visible";
+		},
+		empty : function(id){
+			debugger
+			var myNode = document.getElementById(id);
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+		},
+		emptyText : function(id){
+			document.getElementById(id).innerText = "";
+		}
+	};

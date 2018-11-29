@@ -124,7 +124,6 @@ def mainDetail(fileC, fileI, mProgressBar=None, logSb=None):
         sheet1 = wb1.get_sheet_by_name(s1Name)
         sheet2 = wb2.get_sheet_by_name(s2Name)
         
-        
         if diffLog.templateDefineLst is None :
             diffLog.initTemplateDefineLst(sheet1)
             
@@ -132,13 +131,16 @@ def mainDetail(fileC, fileI, mProgressBar=None, logSb=None):
         maxRowRng = getRangeWarpper(sheet1.max_row, sheet2.max_row)
         maxColRng = getRangeWarpper(sheet1.max_column, sheet2.max_column)
         
-        for row_idx in range(1, 43) :  # maxRowRng.left <-- RCRP0C210_C8_1 最多到 row:43
+        print("rowLeft ", maxRowRng.left)
+        
+        for row_idx in range(1, maxRowRng.left) :  # maxRowRng.left <-- RCRP0C210_C8_1 最多到 row:43
             row_idx_1 = row_idx
             row_idx_2 = row_idx
             
             diff = _ColDiff.findRowFrom(row_idx)
             if diff :
                 row_idx_2 = diff.rowTo
+            
                     
             row1 = excelUtil.getRows(sheet1)[row_idx_1]
             row2 = excelUtil.getRows(sheet2)[row_idx_2]
@@ -235,8 +237,11 @@ class _DiffLog():
                 logger.println("頁簽 :" + key + " 欄位不同 , [C]" + bean.cellEng1 + " = " + bean.cellValue1 + ", [I]" + bean.cellEng2 + " = " + bean.cellValue2)
         
             sheetIdx += 1
+            
+        logFile = fileUtil.getDesktopDir() + os.sep + "diff_RCRP0C210_C8_1.xlsx"
+        print("log file ", logFile)
         
-        wb.save(fileUtil.getDesktopDir() + os.sep + "diff_RCRP0C210_C8_1.xlsx")
+        wb.save(logFile)
         
         
     def initTemplateDefineLst(self, sheet1):
@@ -302,8 +307,10 @@ class _ColDiff(Enum):
 if __name__ == '__main__':
 #     fileC = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
 #     fileI = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
-    fileC = fileUtil.getDesktopDir() + os.sep + "/RCRP0C210/A0/RCRP0C210_1027-cognos.XLSX"
-    fileI = fileUtil.getDesktopDir() + os.sep + "/RCRP0C210/A0/RCRP0C210_1027-itext.XLSX"
+    
+    fileC = 'C:/Users/wistronits/Desktop/RCRP0C210/RCRP0C210/A0/RCRP0C210_1027-cognos.XLSX'
+    fileI = 'C:/Users/wistronits/Desktop/RCRP0C210/RCRP0C210/A0/RCRP0C210_1027-itext.XLSX'
+
     mainDetail(fileC, fileI)
     print("done...")
     
