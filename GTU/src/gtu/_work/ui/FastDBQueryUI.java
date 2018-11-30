@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -192,6 +194,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_5;
 
     private String importExcelSheetName;// 匯入目前的sheet name
+    private JButton connTestBtn;
 
     /**
      * Launch the application.
@@ -598,7 +601,7 @@ public class FastDBQueryUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         saveConnectionBtn = new JButton("儲存");
         saveConnectionBtn.addActionListener(new ActionListener() {
@@ -697,6 +700,14 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_4.add(nextParameterBtn);
+
+        connTestBtn = new JButton("測試連線");
+        connTestBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                connTestBtnAction();
+            }
+        });
+        panel_6.add(connTestBtn, "4, 24");
 
         {
             // 初始化datasource
@@ -1050,19 +1061,19 @@ public class FastDBQueryUI extends JFrame {
             }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
-            
+
             Map<String, Object> paramMap = new HashMap<String, Object>();
-            Map<String,String> sqlInjectMap = new LinkedHashMap<String,String>();
-            
+            Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
+
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
                 String columnName = (String) util.getRealValueAt(ii, 0);
                 String value = (String) util.getRealValueAt(ii, 1);
-                
-                if(SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()){
-                    //sql Injection
+
+                if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
+                    // sql Injection
                     sqlInjectMap.put(columnName, value);
-                }else{
-                    //一般處理
+                } else {
+                    // 一般處理
                     DataType dataType = (DataType) util.getRealValueAt(ii, 2);
                     paramMap.put(columnName, getRealValue(value, dataType));
                 }
@@ -1092,14 +1103,17 @@ public class FastDBQueryUI extends JFrame {
                 }
             } else if (param.getClass() == SqlParam_IfExists.class) {
                 parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap));
-                System.out.println("=====================================================");
-                System.out.println(param.getQuestionSql());
-                System.out.println(parameterList);
-                System.out.println("=====================================================");
             }
-            
-            //設定 sqlInjectionMap
+
+            // 設定 sqlInjectionMap
             param.sqlInjectionMap.putAll(sqlInjectMap);
+
+            System.out.println("尚未執行=====================================================");
+            System.out.println(param.getQuestionSql());
+            for (int ii = 0; ii < parameterList.size(); ii++) {
+                System.out.println(String.format("\tparam [%d] : %s", (ii + 1), parameterList.get(ii)));
+            }
+            System.out.println("尚未執行=====================================================");
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
@@ -2052,5 +2066,20 @@ public class FastDBQueryUI extends JFrame {
 
     public JFrameRGBColorPanel getjFrameRGBColorPanel() {
         return jFrameRGBColorPanel;
+    }
+
+    private void connTestBtnAction() {
+        Connection conn = null;
+        try {
+            conn = this.getDataSource().getConnection();
+            JCommonUtil._jOptionPane_showMessageDialog_info("連線成功!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException("測試連線失敗 : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+            }
+        }
     }
 }
