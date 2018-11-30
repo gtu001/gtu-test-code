@@ -21,8 +21,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class PropertiesGroupUtils {
 
-    private static final Pattern PROP_KEY_PATTERN = Pattern.compile("(\\w+)\\_\\d+");
-    private static final Pattern PROP_KEY_AND_INDEX_PATTERN = Pattern.compile("(\\w+)\\_(\\d+)");
+    private static final Pattern PROP_KEY_PATTERN = Pattern.compile("(.*?)\\_\\d+");
+    private static final Pattern PROP_KEY_AND_INDEX_PATTERN = Pattern.compile("(.*?)\\_(\\d+)");
     private static final int MAX_PROP_COUNT = 1000;
 
     Properties configProp = new Properties();

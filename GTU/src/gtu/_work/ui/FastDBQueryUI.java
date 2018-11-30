@@ -1016,6 +1016,9 @@ public class FastDBQueryUI extends JFrame {
         for (String column : param.paramSet) {
             createModel.addRow(new Object[] { column, "", DataType.varchar });
         }
+        for (String key : param.sqlInjectionMap.keySet()) {
+            createModel.addRow(new Object[] { key, "", DataType.varchar });
+        }
     }
 
     /**
@@ -1047,12 +1050,22 @@ public class FastDBQueryUI extends JFrame {
             }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
+            
             Map<String, Object> paramMap = new HashMap<String, Object>();
+            Map<String,String> sqlInjectMap = new LinkedHashMap<String,String>();
+            
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
                 String columnName = (String) util.getRealValueAt(ii, 0);
                 String value = (String) util.getRealValueAt(ii, 1);
-                DataType dataType = (DataType) util.getRealValueAt(ii, 2);
-                paramMap.put(columnName, getRealValue(value, dataType));
+                
+                if(SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()){
+                    //sql Injection
+                    sqlInjectMap.put(columnName, value);
+                }else{
+                    //一般處理
+                    DataType dataType = (DataType) util.getRealValueAt(ii, 2);
+                    paramMap.put(columnName, getRealValue(value, dataType));
+                }
             }
 
             String sql = sqlTextArea.getText().toString();
@@ -1084,6 +1097,9 @@ public class FastDBQueryUI extends JFrame {
                 System.out.println(parameterList);
                 System.out.println("=====================================================");
             }
+            
+            //設定 sqlInjectionMap
+            param.sqlInjectionMap.putAll(sqlInjectMap);
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
@@ -1236,7 +1252,9 @@ public class FastDBQueryUI extends JFrame {
         int matchCount = 0;
         if ((matchCount = StringUtils.countMatches(sql, "[")) == StringUtils.countMatches(sql, "]")) {
             if (matchCount != 0) {
-                return SqlParam_IfExists.parseToSqlParam(sql);
+                SqlParam_IfExists sqlParam = SqlParam_IfExists.parseToSqlParam(sql);
+                sqlParam.parseToSqlInjectionMap(sql);
+                return sqlParam;
             }
         }
 
@@ -1257,12 +1275,13 @@ public class FastDBQueryUI extends JFrame {
         }
         mth.appendTail(sb2);
 
-        SqlParam out = new SqlParam();
-        out.orginialSql = sql;
-        out.paramSet = paramSet;
-        out.questionSql = sb2.toString();
-        out.paramList = paramList;
-        return out;
+        SqlParam sqlParam = new SqlParam();
+        sqlParam.orginialSql = sql;
+        sqlParam.paramSet = paramSet;
+        sqlParam.questionSql = sb2.toString();
+        sqlParam.paramList = paramList;
+        sqlParam.parseToSqlInjectionMap(sql);
+        return sqlParam;
     }
 
     private static class SqlParam {
@@ -1271,8 +1290,31 @@ public class FastDBQueryUI extends JFrame {
         Set<String> paramSet = new LinkedHashSet<String>();
         List<String> paramList = new ArrayList<String>();
 
+        private static Pattern sqlInjectionPATTERN = Pattern.compile("\\_\\#\\w+\\#\\_");
+        Map<String, String> sqlInjectionMap = new LinkedHashMap<String, String>();
+
+        private String sqlInjectionReplace() {
+            Matcher mth = sqlInjectionPATTERN.matcher(questionSql);
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                String key = mth.group();
+                String replaceStr = StringUtils.trimToEmpty(sqlInjectionMap.get(key));
+                mth.appendReplacement(sb, replaceStr);
+            }
+            mth.appendTail(sb);
+            return sb.toString();
+        }
+
         public String getQuestionSql() {
-            return questionSql;
+            return sqlInjectionReplace();
+        }
+
+        public void parseToSqlInjectionMap(String sql) {
+            Matcher mth = sqlInjectionPATTERN.matcher(sql);
+            while (mth.find()) {
+                String key = mth.group();
+                sqlInjectionMap.put(key, "");
+            }
         }
     }
 
