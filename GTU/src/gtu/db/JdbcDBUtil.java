@@ -288,7 +288,16 @@ public class JdbcDBUtil {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             for (int i = 0; i < param.length; i++) {
                 System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
-                ps.setObject(i + 1, param[i]);
+                try {
+                    ps.setObject(i + 1, param[i]);
+                } catch (Exception ex) {
+                    System.out.println("\t param[" + i + "] - error ertry : " + ex.getMessage());
+                    if (param[i] != null) {
+                        ps.setString(i + 1, String.valueOf(param[i]));
+                    } else {
+                        ps.setNull(i + 1, java.sql.Types.VARCHAR);
+                    }
+                }
             }
 
             rs = ps.executeQuery();
