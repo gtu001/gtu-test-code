@@ -1,0 +1,25 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="popupWin.css" />
+<script src="popupWin.js"></script>
+<script type="text/javascript">
+	function popupWinBtnAction() {
+		popupWin.popup({									
+			src : '/RBB3_0200/prompt' ,
+			scrolling : 'yes',	
+			parameters : { 
+				LINK_FROM : document.querySelector("#test_input").value,
+			},  	
+			cb : function(obj){	
+				//接子視窗回傳值
+				alert(JSON.stringify(obj));
+			}
+		});	
+	}
+</script>
+</head>
+<body>
+	<input type="text" id="test_input" value="test" />
+	<input type="button" value="open" onclick="javascript:popupWinBtnAction()" />
+</body>
+</html>

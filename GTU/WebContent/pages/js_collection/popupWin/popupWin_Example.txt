@@ -2,30 +2,40 @@
 					src : '${dispatcher}/RBB3_0200/prompt' ,
 					scrolling : 'yes',	
 					parameters : { 
-						LINK_FROM : "RBB3_0100" , //µe­±¨Ó·½ <RBA0_0100>
-						PPL_NO : ($("PPL_NO") == undefined ? "" : $("PPL_NO").value) , //«ØÄ³³æ§Ç¸¹
-						TRD_ID : ($("TRD_ID") == undefined ? "" : $("TRD_ID").value) , //¥æ©ö³æ¸¹
-						PPL_NO : ($("PPL_NO") == undefined ? "" : $("PPL_NO").value) , //«ØÄ³³æ§Ç¸¹
-						TRD_CTR_TP : ($("TRD_CTR_TP") == undefined ? "" : $("TRD_CTR_TP").value) , //¥æ©ö¹ï¤â
-						IS_UPDATE : ($("IS_UPDATE") == undefined ? "" : $("IS_UPDATE").value) , //¥i§_­×§ï
-						SPOT_RT : ($("SPOT_RT") == undefined ? "" : $("SPOT_RT").value) , //¶×²v
-						SYS_NO : ($("SYS_NO") == undefined ? "" : $("SYS_NO").value) , //°Ó«~§O
-						DIV : ($("DIV") == undefined ? "" : $("DIV").value) , //¤½¥q§O
+						LINK_FROM : "RBB3_0100" , //ç•«é¢ä¾†æº <RBA0_0100>
+						PPL_NO : ($("PPL_NO") == undefined ? "" : $("PPL_NO").value) , //å»ºè­°å–®åºè™Ÿ
+						TRD_ID : ($("TRD_ID") == undefined ? "" : $("TRD_ID").value) , //äº¤æ˜“å–®è™Ÿ
+						PPL_NO : ($("PPL_NO") == undefined ? "" : $("PPL_NO").value) , //å»ºè­°å–®åºè™Ÿ
+						TRD_CTR_TP : ($("TRD_CTR_TP") == undefined ? "" : $("TRD_CTR_TP").value) , //äº¤æ˜“å°æ‰‹
+						IS_UPDATE : ($("IS_UPDATE") == undefined ? "" : $("IS_UPDATE").value) , //å¯å¦ä¿®æ”¹
+						SPOT_RT : ($("SPOT_RT") == undefined ? "" : $("SPOT_RT").value) , //åŒ¯ç‡
+						SYS_NO : ($("SYS_NO") == undefined ? "" : $("SYS_NO").value) , //å•†å“åˆ¥
+						DIV : ($("DIV") == undefined ? "" : $("DIV").value) , //å…¬å¸åˆ¥
 						CRC : ($("CRC") == undefined ? "" : $("CRC").value) , //
 					},  	
 					cb : function(obj){	
-						//alert(obj);
+						//æ¥å­è¦–çª—å›å‚³å€¼
+						alert(JSON.stringify(obj));
 					}
 				});	
 				
 				
+				//åœ¨å­è¦–çª—å…§çš„ close
+				function closeWin(){
 					var queryObj = {"LOAN_ID":LOAN_ID, "LATEST_PAY_TERM":LATEST_PAY_TERM};
-                                        if( parent.popupWin ){
-                                                if ( parent.popupWin.callbackHandler){
-                                                        parent.popupWin.callbackHandler(queryObj);
-                                                }
-                                                parent.popupWin.close();
-                                        } else if(window['callbackHandler']){
-                                                callbackHandler(queryObj);
-                                                close();
-                                        }
+                    if( parent.popupWin ){
+                            if ( parent.popupWin.callbackHandler){
+                                    parent.popupWin.callbackHandler(queryObj);
+                            }
+                            parent.popupWin.close();
+                    } else if(window['callbackHandler']){
+                            callbackHandler(queryObj);
+                            close();
+                    }
+				}
+					
+                                        
+                                        
+                                        
+                                        
+                                        
