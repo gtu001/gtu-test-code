@@ -166,7 +166,7 @@ class _Radiobutton():
         self.var = StringVar()
         self.radios = []
         self.gridLst = []
-
+        
     def addRadio(self, text, value, win, row=None, column=None):
         r1 = Radiobutton(win, text=text, value=value, variable=self.var)
         self._validateGrid(row, column)
@@ -356,6 +356,9 @@ class _TabFrame():
         self.nb.add(tab, text=title)
         return tab
     
+    def selectTab(self, tabIndex):
+        self.nb.select(tabIndex)
+    
     
 class _Scrollbar():
     
@@ -414,6 +417,14 @@ if __name__ == '__main__' :
     
     page1 = rTab.createTab("one", 800)
     page2 = rTab.createTab("Two", 800)
+    
+    b1 = _Button(root=page1)
+    def func():
+        rTab.selectTab(1)
+        
+    b1.command(func)
+    b1.grid(column=0,row=0)
+    
     
     txt = _Text(root=page1)
     

@@ -30,8 +30,8 @@ class MainUI():
         win = tk.Tk()
         win.title("8110報表比對")
         
-        rootTab = _TabFrame(win)
-        tab1 = rootTab.createTab("路徑設定")
+        self.rootTab = _TabFrame(win)
+        tab1 = self.rootTab.createTab("路徑設定")
         
         #------------------------------row 0
         
@@ -79,7 +79,7 @@ class MainUI():
         
         #------------------------------row End
         
-        tab2 = rootTab.createTab("錯誤訊息")
+        tab2 = self.rootTab.createTab("錯誤訊息")
         
         #------------------------------row 1
         
@@ -118,6 +118,7 @@ class MainUI():
         
         
     def executeBtnAction_finally(self):
+        self.rootTab.selectTab(1)
         self.btn2.enable()
 
 
