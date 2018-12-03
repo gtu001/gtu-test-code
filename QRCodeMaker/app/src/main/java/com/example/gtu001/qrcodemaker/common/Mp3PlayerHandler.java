@@ -63,6 +63,20 @@ public class Mp3PlayerHandler {
         return this;
     }
 
+    public boolean isPlaying() {
+        return mediaplayer.isPlaying();
+    }
+
+    public void pauseAndResume() {
+        if (mediaplayer.isPlaying()) {
+            mediaplayer.pause();
+        } else {
+            int length = mediaplayer.getCurrentPosition();
+            mediaplayer.seekTo(length);
+            mediaplayer.start();
+        }
+    }
+
     public void play() {
         mediaplayer.start();
     }

@@ -81,7 +81,26 @@ public class UrlPlayerService extends Service {
         return "";
     }
 
+    public boolean isPlaying() {
+        return mp3Helper.isPlaying();
+    }
+
+    public void pauseAndResume() {
+        mp3Helper.pauseAndResume();
+    }
+
+
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
+        @Override
+        public boolean isPlaying() throws RemoteException {
+            return UrlPlayerService.this.isPlaying();
+        }
+
+        @Override
+        public void pauseAndResume() throws RemoteException {
+            UrlPlayerService.this.pauseAndResume();
+        }
+
         @Override
         public String startPlay(String url) throws RemoteException {
             return UrlPlayerService.this.startPlay(url);

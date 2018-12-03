@@ -49,8 +49,8 @@ public class FilePlayerDialog {
         text_title.setText("播放");
         text_content.setText(file.getName());
 
-        new ImageButtonImageHelper(R.drawable.play_icon_unpressed, R.drawable.going_icon, btn_img_play);
-        new ImageButtonImageHelper(R.drawable.stop_icon_unpressed, R.drawable.going_icon, btn_img_cancel);
+        new ImageButtonImageHelper(R.drawable.mp3_play_unpressed, R.drawable.going_icon, btn_img_play);
+        new ImageButtonImageHelper(R.drawable.mp3_stop_unpressed, R.drawable.going_icon, btn_img_cancel);
 
         btn_img_play.setOnClickListener(new View.OnClickListener() {
             @Override

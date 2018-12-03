@@ -77,6 +77,13 @@
                 android:layout_weight="0.21" />
 
             <ImageView
+                android:id="@+id/btn_img_pause"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.21" />
+
+            <ImageView
                 android:id="@+id/btn_img_cancel"
                 android:layout_width="30dp"
                 android:layout_height="30dp"

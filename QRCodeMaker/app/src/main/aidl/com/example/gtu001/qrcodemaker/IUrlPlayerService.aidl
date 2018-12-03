@@ -7,5 +7,9 @@ interface IUrlPlayerService {
 
     String startPlay(String url);
 
+    boolean isPlaying();
+
+    void pauseAndResume();
+
     String stopPlay();
 }
