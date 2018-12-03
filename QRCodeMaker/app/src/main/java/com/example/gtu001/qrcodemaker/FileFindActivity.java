@@ -6,16 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.englishtester.common.Log;
-
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.example.englishtester.common.ExternalStorage;
-import com.example.englishtester.common.ExternalStorageV2;
-import com.example.gtu001.qrcodemaker.common.ExternalStorage;
 import com.example.gtu001.qrcodemaker.common.ExternalStorageV2;
 import com.example.gtu001.qrcodemaker.common.Log;
 
@@ -279,13 +274,13 @@ public class FileFindActivity extends ListActivity {
             Map<String, File> externalLocations = ExternalStorageV2.getAllStorageLocations(FileFindActivity.this);
             Pair<Integer, Integer> pair = ExternalStorageV2.getExternalSdCardRange(FileFindActivity.this);
 
-            sdCard = externalLocations.get(ExternalStorage.SD_CARD);
-            externalSdCard = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD);
+            sdCard = externalLocations.get(ExternalStorageV2.SD_CARD);
+            externalSdCard = externalLocations.get(ExternalStorageV2.EXTERNAL_SD_CARD);
 
             externalSdCardLst = new ArrayList<>();
             if (ExternalStorageV2.isRangeValid(pair)) {
                 for (int ii = pair.getLeft(); ii <= pair.getRight(); ii++) {
-                    File f = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD + ii);
+                    File f = externalLocations.get(ExternalStorageV2.EXTERNAL_SD_CARD + ii);
                     externalSdCardLst.add(f);
                 }
             }

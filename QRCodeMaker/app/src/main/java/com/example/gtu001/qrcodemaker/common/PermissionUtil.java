@@ -25,7 +25,7 @@ public class PermissionUtil {
     public static boolean checkPermissionWriteExternalStorage(Context context) {
         PackageManager pm = context.getPackageManager();
         int hasPerm = pm.checkPermission(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 context.getPackageName());
         if (hasPerm == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -42,21 +42,14 @@ public class PermissionUtil {
      */
     public static boolean verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
-        int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO);
-        int permission3 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAPTURE_AUDIO_OUTPUT);
         int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
         int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         String[] PERMISSIONS_STORAGE = {
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.CAPTURE_AUDIO_OUTPUT,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         int REQUEST_EXTERNAL_STORAGE = 1;
-        if (permission0 != PackageManager.PERMISSION_GRANTED || //
-                permission3 != PackageManager.PERMISSION_GRANTED || //
-                permission1 != PackageManager.PERMISSION_GRANTED || //
-                permission2 != PackageManager.PERMISSION_GRANTED) {
+        if (permission1 != PackageManager.PERMISSION_GRANTED || permission2 != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                     activity,

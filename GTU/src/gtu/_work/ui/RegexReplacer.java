@@ -78,9 +78,6 @@ import java.awt.FlowLayout;
  * ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 public class RegexReplacer extends javax.swing.JFrame {
-    private static final String NOT_CONTAIN_ARRY_KEY = "not_arry";
-    private static final String CONTAIN_ARRY_KEY = "arry";
-    private static final String FREEMARKER_KEY = "ftl";
     private static final long serialVersionUID = 1L;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
@@ -183,7 +180,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         {
                             repFromText = new JTextArea();
                             JTextUndoUtil.applyUndoProcess1(repFromText);
-                            repFromText.setRows(3);
+                            repFromText.setRows(4);
                             jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
                             repFromText.setColumns(10);
                         }
@@ -194,7 +191,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         {
                             repToText = new JTextArea();
                             JTextUndoUtil.applyUndoProcess1(repToText);
-                            repToText.setRows(3);
+                            repToText.setRows(10);
                             // repToText.setPreferredSize(new Dimension(0, 50));
                             jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
                         }
@@ -340,16 +337,16 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     JSONObject json = null;
                                     if (StringUtils.isBlank(tradeOff)) {
                                         json = new JSONObject();
-                                        json.put(CONTAIN_ARRY_KEY, new JSONArray());
-                                        json.put(NOT_CONTAIN_ARRY_KEY, new JSONArray());
+                                        json.put(SelectionObj.equal.key, new JSONArray());
+                                        json.put(SelectionObj.not_equal.key, new JSONArray());
                                         tradeOff = json.toString();
                                     } else {
                                         json = JSONObject.fromObject(tradeOff);
                                     }
 
                                     // 加入新的
-                                    String selectItem = (String) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", new Object[] { "NA", "equal", "not_equal", "ftl" }, "NA");
-                                    if ("NA".equals(selectItem)) {
+                                    SelectionObj selectItem = (SelectionObj) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", SelectionObj.values(), SelectionObj.NA);
+                                    if (selectItem == null || selectItem == selectItem.NA) {
                                         return;
                                     }
 
@@ -366,13 +363,20 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     String strKey = "";
                                     String intKey = "";
 
-                                    if (selectItem.equals("equal")) {
-                                        arryKey = CONTAIN_ARRY_KEY;
-                                    } else if (selectItem.equals("not_equal")) {
-                                        arryKey = NOT_CONTAIN_ARRY_KEY;
-                                    } else if (selectItem.equals("ftl")) {
-                                        strKey = FREEMARKER_KEY;
-                                    } else {
+                                    switch (selectItem) {
+                                    case equal:
+                                        arryKey = SelectionObj.equal.key;
+                                        break;
+                                    case not_equal:
+                                        arryKey = SelectionObj.not_equal.key;
+                                        break;
+                                    case ftl:
+                                        strKey = SelectionObj.ftl.key;
+                                        break;
+                                    case only_match:
+                                        boolKey = SelectionObj.only_match.key;
+                                        break;
+                                    default:
                                         throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
                                     }
 
@@ -429,14 +433,14 @@ public class RegexReplacer extends javax.swing.JFrame {
                 configHandler.reloadTemplateList();
             }
 
-            this.setSize(512, 350);
+            this.setSize(672, 506);
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
             hideInSystemTrayHelper.apply(this);
 
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-            
+
             panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
             panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
             this.setTitle("You Set My World On Fire");
@@ -561,7 +565,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                 int startPos = 0;
                 for (; matcher.find();) {
                     tempStr = toFormat.toString();
-                    sb.append(replaceText.substring(startPos, matcher.start()));
+
+                    if (!config.isOnlyMatch) {
+                        sb.append(replaceText.substring(startPos, matcher.start()));
+                    }
 
                     // ----------------------------------------------
                     if (StringUtils.isBlank(config.fremarkerKey)) {
@@ -585,8 +592,15 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                     sb.append(tempStr);
                     startPos = matcher.end();
+
+                    if (config.isOnlyMatch) {
+                        sb.append("\r\n");
+                    }
                 }
-                sb.append(replaceText.substring(startPos));
+
+                if (!config.isOnlyMatch) {
+                    sb.append(replaceText.substring(startPos));
+                }
             }
 
             return sb.toString();
@@ -598,12 +612,16 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     private class TradeOffConfig {
         String fremarkerKey;
+        boolean isOnlyMatch = false;
         JSONObject json;
 
         TradeOffConfig(JSONObject json) {
             this.json = json;
-            if (json.containsKey(FREEMARKER_KEY)) {
-                fremarkerKey = json.getString(FREEMARKER_KEY);
+            if (json.containsKey(SelectionObj.ftl.key)) {
+                fremarkerKey = json.getString(SelectionObj.ftl.key);
+            }
+            if (json.containsKey(SelectionObj.only_match.key)) {
+                isOnlyMatch = json.getBoolean(SelectionObj.only_match.key);
             }
         }
     }
@@ -803,8 +821,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                     JSONObject json = JSONObject.fromObject(tradeOff);
                     List<String> messageLst = new ArrayList<String>();
 
-                    __tradeOffProcess(CONTAIN_ARRY_KEY, 2, json, script, messageLst);
-                    __tradeOffProcess(NOT_CONTAIN_ARRY_KEY, -1, json, script, messageLst);
+                    __tradeOffProcess(SelectionObj.equal.key, 2, json, script, messageLst);
+                    __tradeOffProcess(SelectionObj.not_equal.key, -1, json, script, messageLst);
 
                     message = StringUtils.join(messageLst, ",");
 
@@ -844,6 +862,26 @@ public class RegexReplacer extends javax.swing.JFrame {
             if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(replaceArea.getText())) {
                 config.getConfigProp().setProperty(key, replaceArea.getText());
             }
+        }
+    }
+
+    private enum SelectionObj {
+        NA("na", "NA"), //
+        equal("arry", "equal (含有的字串  ,正則加//)"), //
+        not_equal("not_arry", "not_equal (不含有的字串  ,正則加//)"), //
+        ftl("ftl", "ftl (設定ftl變數 , ex:arry)"), //
+        only_match("only_match", "only_match (是否只抓group, true|false)"),//
+        ;
+        final String key;
+        final String label;
+
+        SelectionObj(String key, String label) {
+            this.key = key;
+            this.label = label;
+        }
+
+        public String toString() {
+            return label;
         }
     }
 }
