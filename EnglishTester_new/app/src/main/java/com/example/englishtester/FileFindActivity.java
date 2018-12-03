@@ -231,7 +231,7 @@ public class FileFindActivity extends ListActivity {
     public static class FileFindActivityStarter {
         public static File getFile(Intent data) {
             try {
-                return (File) data.getExtras().get(PropertiesFindActivity.BUNDLE_FILE);
+                return (File) data.getExtras().get(BUNDLE_FILE);
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
                 return null;
@@ -240,7 +240,7 @@ public class FileFindActivity extends ListActivity {
 
         public static File getFile(Bundle bundle) {
             try {
-                return (File) bundle.get(PropertiesFindActivity.BUNDLE_FILE);
+                return (File) bundle.get(BUNDLE_FILE);
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
                 return null;

@@ -64,7 +64,8 @@ public class Mp3PlayerActivity extends Activity {
 
     private class BtnConfig {
         Button btn;
-        private BtnConfig(Button btn){
+
+        private BtnConfig(Button btn) {
             this.btn = btn;
         }
 
@@ -113,16 +114,13 @@ public class Mp3PlayerActivity extends Activity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            // TODO Auto-generated method stub
             Boolean prepared;
             try {
 
                 mediaPlayer.setDataSource(params[0]);
-
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        // TODO Auto-generated method stub
                         intialStage = true;
                         playPause = false;
                         btnConfig.btn_setPlay();
@@ -133,20 +131,16 @@ public class Mp3PlayerActivity extends Activity {
                 mediaPlayer.prepare();
                 prepared = true;
             } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
                 Log.d("IllegarArgument", e.getMessage());
                 prepared = false;
                 e.printStackTrace();
             } catch (SecurityException e) {
-                // TODO Auto-generated catch block
                 prepared = false;
                 e.printStackTrace();
             } catch (IllegalStateException e) {
-                // TODO Auto-generated catch block
                 prepared = false;
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 prepared = false;
                 e.printStackTrace();
             }
@@ -155,7 +149,6 @@ public class Mp3PlayerActivity extends Activity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-            // TODO Auto-generated method stub
             super.onPostExecute(result);
             if (progress.isShowing()) {
                 progress.cancel();
@@ -172,7 +165,6 @@ public class Mp3PlayerActivity extends Activity {
 
         @Override
         protected void onPreExecute() {
-            // TODO Auto-generated method stub
             super.onPreExecute();
             this.progress.setMessage("Buffering...");
             this.progress.show();
@@ -181,7 +173,6 @@ public class Mp3PlayerActivity extends Activity {
 
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
         if (mediaPlayer != null) {
             mediaPlayer.reset();
