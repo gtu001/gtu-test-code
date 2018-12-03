@@ -1,0 +1,3 @@
+SELECT service_level, fixpack_num FROM TABLE
+  (sysproc.env_get_inst_info())
+  as INSTANCEINFO

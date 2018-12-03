@@ -290,7 +290,7 @@ public class JCommonUtil {
                         if (action != null) {
                             action.actionPerformed(new ActionEvent(jframe, -1, "close"));
                         }
-                         gtu.swing.util.JFrameUtil.setVisible(false,jframe);
+                        gtu.swing.util.JFrameUtil.setVisible(false, jframe);
                         jframe.dispose();
                         System.exit(0);
                     }
@@ -298,7 +298,7 @@ public class JCommonUtil {
                     if (action != null) {
                         action.actionPerformed(new ActionEvent(jframe, -1, "close"));
                     }
-                     gtu.swing.util.JFrameUtil.setVisible(false,jframe);
+                    gtu.swing.util.JFrameUtil.setVisible(false, jframe);
                     jframe.dispose();
                     System.exit(0);
                 }
@@ -351,7 +351,7 @@ public class JCommonUtil {
             jframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
                     // TODO
-                     gtu.swing.util.JFrameUtil.setVisible(false,jframe);
+                    gtu.swing.util.JFrameUtil.setVisible(false, jframe);
                     jframe.dispose();
                 }
             });
@@ -514,41 +514,41 @@ public class JCommonUtil {
      * 錯誤處理
      */
     public static File handleException(Throwable ex, boolean writeFile) {
-        return JCommonUtil.handleException(ex.getMessage(), ex, writeFile, "yyyyMMdd");// true寫檔
+        return JCommonUtil.handleException(ex.getMessage(), ex, writeFile, "", "yyyyMMdd", false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Throwable ex) {
-        return JCommonUtil.handleException(ex.getMessage(), ex, true, "yyyyMMdd");// true寫檔
+        return JCommonUtil.handleException(ex.getMessage(), ex, true, "", "yyyyMMdd", false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Object message, Throwable ex) {
-        return JCommonUtil.handleException(message, ex, true, "yyyyMMdd");// true寫檔
+        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd", false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleExceptionDetails(Object message, Throwable ex) {
-        return JCommonUtil.handleException(message, ex, true, "yyyyMMdd.HHmmss.SSS");// true寫檔
+        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd.HHmmss.SSS", false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Object message, Throwable ex, boolean writeFile) {
-        return handleException(message, ex, writeFile, "yyyyMMdd");
+        return handleException(message, ex, writeFile, "", "yyyyMMdd", false);
     }
 
     /**
      * 錯誤處理
      */
-    public static File handleException(Object message, final Throwable ex, boolean writeFile, String dateFormat) {
+    public static File handleException(Object message, final Throwable ex, boolean writeFile, String fileNameSuffix, String dateFormat, boolean silent) {
         String title = (ex == null) ? "執行發生錯誤" : ex.getMessage();
         String messageStr = "";
         File writeIfNeed = null;
@@ -576,7 +576,9 @@ public class JCommonUtil {
             }
             if (validateFindOk) {
                 try {
-                    JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(ex.getMessage(), "欄位輸入錯誤", true);
+                    if (!silent) {
+                        JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(ex.getMessage(), "欄位輸入錯誤", true);
+                    }
                 } catch (java.awt.HeadlessException uiError) {
                 }
                 return null;
@@ -610,12 +612,14 @@ public class JCommonUtil {
                         }
                     }
 
+                    fileNameSuffix = StringUtils.trimToEmpty(fileNameSuffix);
+
                     if (GraphicsEnvironment.isHeadless() == false) {
                         // 使用ui模式
-                        writeIfNeed = new File(FileUtil.DESKTOP_DIR, "swing_error_" + dateStr + ".log");
+                        writeIfNeed = new File(FileUtil.DESKTOP_DIR, "swing_error_" + fileNameSuffix + dateStr + ".log");
                     } else {
                         // 使用非ui模式
-                        writeIfNeed = new File(System.getProperty("user.dir"), "swing_error_" + dateStr + ".log");
+                        writeIfNeed = new File(System.getProperty("user.dir"), "swing_error_" + fileNameSuffix + dateStr + ".log");
                         System.out.println("Error log File Position : " + writeIfNeed);
                     }
 
@@ -639,7 +643,9 @@ public class JCommonUtil {
             }
         }
         try {
-            JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(messageStr, title, true);
+            if (!silent) {
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(messageStr, title, true);
+            }
         } catch (java.awt.HeadlessException uiError) {
         }
         return writeIfNeed;
@@ -1016,8 +1022,8 @@ public class JCommonUtil {
     }
 
     /**
-     * 取得底下的 component focus
-     * Ps : 記得拿掉原本JDialog的 default button --> getRootPane().setDefaultButton(okButton);
+     * 取得底下的 component focus Ps : 記得拿掉原本JDialog的 default button -->
+     * getRootPane().setDefaultButton(okButton);
      */
     public static void setFoucsToChildren(final Component root, final Component target) {
         root.addComponentListener(new ComponentAdapter() {

@@ -1,0 +1,73 @@
+
+			
+			
+			
+			
+	/*
+	*	{title : "", value : "", querySelector : ""}
+	*/
+	function TabConfig(tabArry, defaultValue){
+		var arry = new Array();
+		var titleMap = {};
+		var funcMap = {};
+		for(var ii = 0 ; ii < tabArry.length; ii ++){
+			var tab = document.querySelector(tabArry[ii]['querySelector']);
+			tab.innerText = tabArry[ii]['title'];
+			var value = tabArry[ii]['value'];
+			tab.setAttribute("value", value);
+			arry.push(tab);
+			
+			titleMap[value] = tabArry[ii]['title'];
+			funcMap[value] = tabArry[ii]['func'];
+		}
+		
+		var clickEvent = function(event){
+			var clickId = event.target.getAttribute("value");
+			for(var jj = 0 ; jj < arry.length; jj ++){
+				var value = arry[jj].getAttribute("value");
+				if(jj != (clickId - 1)){
+					arry[jj].style.backgroundColor = "#ddd";
+					arry[jj].innerText = "   " + titleMap[value] + "   ";
+				}else{
+					arry[jj].style.backgroundColor = "#ff0000";
+					arry[jj].innerText = "   " + "+" + "   ";
+					
+					//trigger click event
+					if(funcMap[value]){
+						funcMap[value](value, arry[jj]);
+					}
+				}
+			}
+		};
+		
+		for(var ii = 0 ; ii < arry.length; ii ++){
+			arry[ii].addEventListener("click", clickEvent);
+		}
+		
+		for(var ii = 0 ; ii < arry.length; ii ++){
+			if(defaultValue == arry[ii].getAttribute("value")){
+				$(arry[ii]).simulate("click");
+			}
+		}
+	}
+	
+	
+	
+		init_tabConfig : function(rtnMap) {
+			rtnMap = rtnMap || {};
+			var clickId = rtnMap.selectTab || '3';//設定預設 active tab
+			var arry = new Array();
+			arry.push({querySelector : "span[id=tab_1]", title : "1", value : "1" });
+			arry.push({querySelector : "span[id=tab_2]", title : "2", value : "2" });
+			arry.push({querySelector : "span[id=tab_3]", title : "3", value : "3" });
+			new TabConfig(arry, clickId);
+		}, 
+		
+		
+		
+		
+		
+
+			<span id="tab_1"></span>
+			<span id="tab_2"></span>
+			<span id="tab_3"></span>

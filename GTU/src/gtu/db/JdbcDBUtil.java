@@ -2,11 +2,11 @@ package gtu.db;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +14,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,13 +23,10 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.dbcp.BasicDataSource;
-//import org.springframework.jdbc.core.JdbcTemplate;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
 import gtu.db.tradevan.DBCommon_tradevan;
-import gtu.db.tradevan.DBSqlCreater_tradevan.SqlPrepareStatementDetail;
+import gtu.swing.util.JCommonUtil;
 
 public class JdbcDBUtil {
 
@@ -279,6 +275,25 @@ public class JdbcDBUtil {
         return rsList;
     }
 
+    private static String getCharStream(java.io.Reader reader1) {
+        BufferedReader reader = null;
+        try {
+            StringBuffer sb = new StringBuffer();
+            reader = new BufferedReader(reader1);
+            for (String line = null; (line = reader.readLine()) != null;) {
+                sb.append(line + "\n");
+            }
+            return sb.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("getCharStream", ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
     public static Pair<List<String>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn, int maxRowsLimit) throws Exception {
         List<String> colList = new ArrayList<String>();
         List<Object[]> rsList = new ArrayList<Object[]>();
@@ -310,7 +325,20 @@ public class JdbcDBUtil {
             A: while (rs.next()) {
                 List<Object> lst = new ArrayList<Object>();
                 for (int ii = 1; ii <= cols; ii++) {
-                    lst.add(rs.getObject(ii));
+                    try {
+                        lst.add(rs.getObject(ii));
+                    } catch (Exception ex) {
+                        String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, colList.get(ii - 1)) + ex.getMessage();
+                        System.out.println(errorMsg);
+                        ex.printStackTrace();
+                        JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true);
+                        try {
+                            lst.add(getCharStream(rs.getCharacterStream(ii)));
+                        } catch (Exception ex2) {
+                            lst.add("__#ERROR#__ : " + ex.getMessage());
+                            JCommonUtil.handleException(errorMsg, ex2, true, "_getCharacterStream_", "yyyyMMdd.HHmm", true);
+                        }
+                    }
                 }
                 rsList.add(lst.toArray());
 

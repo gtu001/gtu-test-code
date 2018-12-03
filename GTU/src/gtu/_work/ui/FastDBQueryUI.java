@@ -107,6 +107,10 @@ public class FastDBQueryUI extends JFrame {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
+    
+    static {
+        System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
+    }
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
     private static Properties sqlIdListProp;
