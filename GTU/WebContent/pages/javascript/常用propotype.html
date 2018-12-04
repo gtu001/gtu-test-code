@@ -61,9 +61,47 @@
 	});
 })(HTMLElement.prototype);
 
+HTMLElement.prototype.toggle = function(){
+	if(!(this.style.visibility == "visible" || this.style.display == "block" || 
+		this.style.visibility == "" || this.style.display == "")){
+		this.style.visibility = "visible";
+		this.style.display = "block";
+	}else{
+		this.style.visibility = "hidden";
+     	this.style.display = "none";
+	}
+}
+
+HTMLElement.prototype.cleanChildren = function(){
+	var myNode = this;
+	while (myNode.firstChild) {
+	    myNode.removeChild(myNode.firstChild);
+	}
+}
+
+function toggleAction(){
+	document.querySelector("#testDiv").toggle();
+}
+function cleanChildrenAction(){
+	document.querySelector("#testTableBody").cleanChildren();
+}
+
 </script>
 
 <html>
 <body onload="">
+	<input type="button" value="toggle" onclick="javascript:toggleAction();" />
+	<input type="button" value="cleanChildren" onclick="javascript:cleanChildrenAction();" />
+	<div id="testDiv">
+		TEST CONTENT
+	</div>
+	<table id="testTable" border="1">
+		<tr><th>Col1</th><th>Col2</th><th>Col3</th></tr>
+		<tbody id="testTableBody">
+			<tr><td>Data1</td><td>Data2</td><td>Data3</td></tr>
+			<tr><td>Data1</td><td>Data2</td><td>Data3</td></tr>
+			<tr><td>Data1</td><td>Data2</td><td>Data3</td></tr>
+		</tbody>
+	</table>
 </body>
 <html>

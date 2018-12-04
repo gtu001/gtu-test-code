@@ -11,5 +11,7 @@ interface IUrlPlayerService {
 
     void pauseAndResume();
 
+    void backwardOrBackward(int second);
+
     String stopPlay();
 }

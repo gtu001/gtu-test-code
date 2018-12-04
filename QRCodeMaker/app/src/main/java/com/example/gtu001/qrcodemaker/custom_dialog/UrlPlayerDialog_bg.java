@@ -63,6 +63,8 @@ public class UrlPlayerDialog_bg {
         final ImageView btn_img_play = (ImageView) dialog.findViewById(R.id.btn_img_play);
         final ImageView btn_img_cancel = (ImageView) dialog.findViewById(R.id.btn_img_cancel);
         final ImageView btn_img_pause = (ImageView) dialog.findViewById(R.id.btn_img_pause);
+        final ImageView btn_img_backward = (ImageView) dialog.findViewById(R.id.btn_img_backward);
+        final ImageView btn_img_forward = (ImageView) dialog.findViewById(R.id.btn_img_forward);
 
         text_title.setText("播放");
         text_content.setText(UrlPlayerDialog_bg.this.message);
@@ -70,6 +72,8 @@ public class UrlPlayerDialog_bg {
         new ImageButtonImageHelper(R.drawable.mp3_play_unpressed, R.drawable.going_icon, btn_img_play);
         new ImageButtonImageHelper(R.drawable.mp3_stop_unpressed, R.drawable.going_icon, btn_img_cancel);
         new ImageButtonImageHelper(R.drawable.mp3_pause_unpressed, R.drawable.going_icon, btn_img_pause);
+        new ImageButtonImageHelper(R.drawable.mp3_backward_unpressed, R.drawable.going_icon, btn_img_backward);
+        new ImageButtonImageHelper(R.drawable.mp3_forward_unpressed, R.drawable.going_icon, btn_img_forward);
 
         btn_img_play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +116,36 @@ public class UrlPlayerDialog_bg {
             public void onClick(View v) {
                 try {
                     urlPlayerServiceHander.get().getMService().pauseAndResume();
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btn_img_backward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    urlPlayerServiceHander.get().getMService().backwardOrBackward(-20);
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btn_img_forward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    urlPlayerServiceHander.get().getMService().backwardOrBackward(20);
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();

@@ -85,4 +85,14 @@ public class Mp3PlayerHandler {
         mediaplayer.stop();
         mediaplayer.release();
     }
+
+    public void backwardOrBackward(int second) {
+        int length = mediaplayer.getCurrentPosition();
+        mediaplayer.seekTo(length + (second * 1000));
+        if (mediaplayer.isPlaying()) {
+            mediaplayer.start();
+        } else {
+            mediaplayer.pause();
+        }
+    }
 }
