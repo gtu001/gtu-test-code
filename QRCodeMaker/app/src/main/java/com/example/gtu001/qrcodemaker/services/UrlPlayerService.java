@@ -89,10 +89,13 @@ public class UrlPlayerService extends Service {
         mp3Helper.pauseAndResume();
     }
 
-    public void backwardOrBackward(int second){
+    public void backwardOrBackward(int second) {
         mp3Helper.backwardOrBackward(second);
     }
 
+    public boolean isInitDone() {
+        return mp3Helper != null;
+    }
 
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
         @Override
@@ -118,6 +121,11 @@ public class UrlPlayerService extends Service {
         @Override
         public String stopPlay() throws RemoteException {
             return UrlPlayerService.this.stopPlay();
+        }
+
+        @Override
+        public boolean isInitDone() throws RemoteException {
+            return UrlPlayerService.this.isInitDone();
         }
     };
 

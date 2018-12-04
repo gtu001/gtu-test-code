@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
+import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceUtil;
 import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 
@@ -62,16 +63,14 @@ public class UrlPlayerDialog_bg {
         final TextView text_content = (TextView) dialog.findViewById(R.id.text_content);
         final ImageView btn_img_play = (ImageView) dialog.findViewById(R.id.btn_img_play);
         final ImageView btn_img_cancel = (ImageView) dialog.findViewById(R.id.btn_img_cancel);
-        final ImageView btn_img_pause = (ImageView) dialog.findViewById(R.id.btn_img_pause);
         final ImageView btn_img_backward = (ImageView) dialog.findViewById(R.id.btn_img_backward);
         final ImageView btn_img_forward = (ImageView) dialog.findViewById(R.id.btn_img_forward);
 
         text_title.setText("播放");
         text_content.setText(UrlPlayerDialog_bg.this.message);
 
-        new ImageButtonImageHelper(R.drawable.mp3_play_unpressed, R.drawable.going_icon, btn_img_play);
+        new ImageButtonImageHelper(R.drawable.mp3_play_unpressed, R.drawable.mp3_pause_unpressed, btn_img_play);
         new ImageButtonImageHelper(R.drawable.mp3_stop_unpressed, R.drawable.going_icon, btn_img_cancel);
-        new ImageButtonImageHelper(R.drawable.mp3_pause_unpressed, R.drawable.going_icon, btn_img_pause);
         new ImageButtonImageHelper(R.drawable.mp3_backward_unpressed, R.drawable.going_icon, btn_img_backward);
         new ImageButtonImageHelper(R.drawable.mp3_forward_unpressed, R.drawable.going_icon, btn_img_forward);
 
@@ -79,9 +78,13 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.url);
-                    if (StringUtils.isNotBlank(result)) {
-                        Validate.isTrue(false, result);
+                    if (!urlPlayerServiceHander.get().getMService().isInitDone()) {
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.url);
+                        if (StringUtils.isNotBlank(result)) {
+                            Validate.isTrue(false, result);
+                        }
+                    } else {
+                        urlPlayerServiceHander.get().getMService().pauseAndResume();
                     }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -101,21 +104,6 @@ public class UrlPlayerDialog_bg {
                     if (StringUtils.isNotBlank(result)) {
                         Validate.isTrue(false, result);
                     }
-                } catch (IllegalArgumentException ex) {
-                    Log.e(TAG, ex.getMessage(), ex);
-                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
-                } catch (Exception ex) {
-                    Log.e(TAG, ex.getMessage(), ex);
-                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        btn_img_pause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    urlPlayerServiceHander.get().getMService().pauseAndResume();
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();

@@ -14,4 +14,6 @@ interface IUrlPlayerService {
     void backwardOrBackward(int second);
 
     String stopPlay();
+
+    boolean isInitDone();
 }
