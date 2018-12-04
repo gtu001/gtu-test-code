@@ -1,0 +1,14 @@
+SELECT 
+       TBCREATOR,
+       TBNAME,
+       NAME,
+       REMARKS,
+       COLTYPE,
+       LENGTH,
+       NULLS 
+from SYSIBM.SYSCOLUMNS 
+where 1=1 
+        [ and TBCREATOR =:SPACE ] 
+        [ AND  upper(TBNAME) =:TBNAME  ]
+order by TBCREATOR,  TBNAME,  COLNO 
+with ur 

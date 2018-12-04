@@ -1,0 +1,65 @@
+<script type='text/javascript'>
+
+
+(function (arr) {
+	arr.forEach(function (item) {
+		if (item.hasOwnProperty('after')) {
+			return;
+		}
+		Object.defineProperty(item, 'after', {
+			configurable: true,
+			enumerable: true,
+			writable: true,
+			value: function after() {
+				var argArr = Array.prototype.slice.call(arguments),
+				docFrag = document.createDocumentFragment();
+	        
+				argArr.forEach(function (argItem) {
+				var isNode = argItem instanceof Node;
+				docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+				});
+	        
+				this.parentNode.insertBefore(docFrag, this.nextSibling);
+			}
+		});
+	});
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+function init(){
+        var td1 = document.querySelector("td[id=tdTest]");
+        
+        var em1 = document.createElement("em");
+	em1.setAttribute("style", "width:auto;");
+        var txt1 = document.createTextNode("XXXXXXXXXXXX");
+        em1.appendChild(txt1);
+        
+        td1.after(em1);
+        
+        td1.addEventListener("mouseover", function(e){
+                //debugger
+                var rect = td1.getBoundingClientRect();
+        
+   	        em1.style.left = (rect.left + rect.width);
+   	        em1.style.top = (rect.top + rect.height);
+                
+                em1.style.visibility = "visible";
+	        em1.style.display = "block";
+        });
+        td1.addEventListener("mouseout", function(e){
+                em1.style.visibility = "hidden";
+	       	em1.style.display = "none";
+        });
+}
+
+
+</script>
+
+<html>
+        <body onload="javascript:init();">
+                <table id="testTable" border="1">
+                        <tbody>
+                                <tr><td id="tdTest">test content</td></tr>
+                        </tbody>
+                </table>
+        </body>
+</html>

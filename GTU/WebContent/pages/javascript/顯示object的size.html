@@ -1,0 +1,10 @@
+<script type='text/javascript'>
+        function getLength(myObj){
+                //alert(Object.toJSON(myObj));
+                if(Array.isArray(myObj)){
+                        return myObj.length;
+                }
+                //Map
+		return Object.keys(myObj).length;
+	}
+</script>

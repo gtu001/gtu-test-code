@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -65,7 +66,6 @@ import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import java.awt.FlowLayout;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -127,9 +127,33 @@ public class RegexReplacer extends javax.swing.JFrame {
                 getContentPane().add(jTabbedPane1, BorderLayout.CENTER);
                 {
                     jPanel1 = new JPanel();
-                    BorderLayout jPanel1Layout = new BorderLayout();
-                    jPanel1.setLayout(jPanel1Layout);
                     jTabbedPane1.addTab("source", null, jPanel1, null);
+                    jPanel1.setLayout(new BorderLayout(0, 0));
+                    {
+                        panel_2 = new JPanel();
+                        jPanel1.add(panel_2, BorderLayout.NORTH);
+                    }
+                    {
+                        panel_3 = new JPanel();
+                        jPanel1.add(panel_3, BorderLayout.WEST);
+                    }
+                    {
+                        panel_4 = new JPanel();
+                        jPanel1.add(panel_4, BorderLayout.EAST);
+                    }
+                    {
+                        panel_5 = new JPanel();
+                        jPanel1.add(panel_5, BorderLayout.SOUTH);
+                        {
+                            clearReplaceAreaBtn = new JButton("清除");
+                            clearReplaceAreaBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    replaceArea.setText("");
+                                }
+                            });
+                            panel_5.add(clearReplaceAreaBtn);
+                        }
+                    }
                     {
                         jScrollPane1 = new JScrollPane();
                         jPanel1.add(jScrollPane1, BorderLayout.CENTER);
@@ -146,14 +170,25 @@ public class RegexReplacer extends javax.swing.JFrame {
                     jPanel2.setLayout(jPanel2Layout);
                     jTabbedPane1.addTab("param", null, jPanel2, null);
                     {
+                        JPanel pppPanel = new JPanel();
+                        jPanel2.add(pppPanel, BorderLayout.SOUTH);
                         exeucte = new JButton();
-                        jPanel2.add(exeucte, BorderLayout.SOUTH);
                         exeucte.setText("exeucte");
                         exeucte.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 exeucteActionPerformed(evt);
                             }
                         });
+                        pppPanel.add(exeucte);
+
+                        JButton clearTemplateBtn = new JButton();
+                        clearTemplateBtn.setText("清除");
+                        clearTemplateBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                clearTemplateBtnAction();
+                            }
+                        });
+                        pppPanel.add(clearTemplateBtn);
                     }
                     {
                         jPanel3 = new JPanel();
@@ -358,29 +393,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                                         return;
                                     }
 
-                                    String arryKey = "";
-                                    String boolKey = "";
-                                    String strKey = "";
-                                    String intKey = "";
-
-                                    switch (selectItem) {
-                                    case equal:
-                                        arryKey = SelectionObj.equal.key;
-                                        break;
-                                    case not_equal:
-                                        arryKey = SelectionObj.not_equal.key;
-                                        break;
-                                    case ftl:
-                                        strKey = SelectionObj.ftl.key;
-                                        break;
-                                    case only_match:
-                                        boolKey = SelectionObj.only_match.key;
-                                        break;
-                                    default:
-                                        throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
-                                    }
-
-                                    if (StringUtils.isNotBlank(arryKey)) {
+                                    if (StringUtils.equals(selectItem.type, "arryKey")) {
+                                        String arryKey = selectItem.key;
                                         if (!json.containsKey(arryKey)) {
                                             json.put(arryKey, new JSONArray());
                                         }
@@ -395,12 +409,17 @@ public class RegexReplacer extends javax.swing.JFrame {
                                         if (!findOk) {
                                             arry.add(string);
                                         }
-                                    } else if (StringUtils.isNotBlank(strKey)) {
-                                        json.put(strKey, string);
-                                    } else if (StringUtils.isNotBlank(intKey)) {
-                                        json.put(intKey, Integer.parseInt(string));
-                                    } else if (StringUtils.isNotBlank(boolKey)) {
+                                    } else if (StringUtils.equals(selectItem.type, "boolKey")) {
+                                        String boolKey = selectItem.key;
                                         json.put(boolKey, Boolean.valueOf(string));
+                                    } else if (StringUtils.equals(selectItem.type, "strKey")) {
+                                        String strKey = selectItem.key;
+                                        json.put(strKey, string);
+                                    } else if (StringUtils.equals(selectItem.type, "intKey")) {
+                                        String intKey = selectItem.key;
+                                        json.put(intKey, Integer.parseInt(string));
+                                    } else {
+                                        throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
                                     }
 
                                     tradeOffArea.setText(json.toString());
@@ -495,6 +514,11 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JCheckBox multiLineCheckBox;
     private JCheckBox autoPasteToClipboardCheckbox;
     private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JPanel panel_4;
+    private JPanel panel_5;
+    private JButton clearReplaceAreaBtn;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
@@ -562,6 +586,10 @@ public class RegexReplacer extends javax.swing.JFrame {
             TradeOffConfig config = this.getTradeOffConfig();
 
             {
+                if (StringUtils.isNotBlank(config.prefix)) {
+                    sb.append(config.prefix + "\r\n");
+                }
+
                 int startPos = 0;
                 for (; matcher.find();) {
                     tempStr = toFormat.toString();
@@ -601,6 +629,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                 if (!config.isOnlyMatch) {
                     sb.append(replaceText.substring(startPos));
                 }
+
+                if (StringUtils.isNotBlank(config.suffix)) {
+                    sb.append(config.suffix + "\r\n");
+                }
             }
 
             return sb.toString();
@@ -612,6 +644,8 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     private class TradeOffConfig {
         String fremarkerKey;
+        String prefix;
+        String suffix;
         boolean isOnlyMatch = false;
         JSONObject json;
 
@@ -622,6 +656,12 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
             if (json.containsKey(SelectionObj.only_match.key)) {
                 isOnlyMatch = json.getBoolean(SelectionObj.only_match.key);
+            }
+            if (json.containsKey(SelectionObj.prefix.key)) {
+                prefix = json.getString(SelectionObj.prefix.key);
+            }
+            if (json.containsKey(SelectionObj.suffix.key)) {
+                suffix = json.getString(SelectionObj.suffix.key);
             }
         }
     }
@@ -866,22 +906,35 @@ public class RegexReplacer extends javax.swing.JFrame {
     }
 
     private enum SelectionObj {
-        NA("na", "NA"), //
-        equal("arry", "equal (含有的字串  ,正則加//)"), //
-        not_equal("not_arry", "not_equal (不含有的字串  ,正則加//)"), //
-        ftl("ftl", "ftl (設定ftl變數 , ex:arry)"), //
-        only_match("only_match", "only_match (是否只抓group, true|false)"),//
+        NA("na", "NA", "NA"), //
+        equal("arry", "equal (含有的字串  ,正則加//)", "arryKey"), //
+        not_equal("not_arry", "not_equal (不含有的字串  ,正則加//)", "arryKey"), //
+        ftl("ftl", "ftl (設定ftl變數 , ex:arry)", "strKey"), //
+        only_match("only_match", "only_match (是否只抓group, true|false)", "boolKey"), //
+        prefix("prefix", "prefix (前置文字)", "strKey"), //
+        suffix("suffix", "suffix (後置文字)", "strKey"),//
         ;
         final String key;
         final String label;
+        final String type;
 
-        SelectionObj(String key, String label) {
+        SelectionObj(String key, String label, String type) {
             this.key = key;
             this.label = label;
+            this.type = type;
         }
 
         public String toString() {
             return label;
         }
+    }
+
+    private void clearTemplateBtnAction() {
+        configKeyText.setText("");
+        repFromText.setText("");
+        repToText.setText("");
+        tradeOffArea.setText("");
+        multiLineCheckBox.setSelected(false);
+        autoPasteToClipboardCheckbox.setSelected(false);
     }
 }

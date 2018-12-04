@@ -121,11 +121,12 @@
 	
 	var util = {
 		hide : function(id){
+			document.getElementById(id).style.visibility = "hidden";
 			document.getElementById(id).style.display = "none";
 		},
 		show : function(id){
-			alert(document.getElementById(id).tagName);
-			document.getElementById(id).style.display = "visible";
+			document.getElementById(id).style.visibility = "visible";
+	        document.getElementById(id).style.display = "block";
 		},
 		empty : function(id){
 			debugger

@@ -1,0 +1,69 @@
+<script type='text/javascript'>
+
+(function(item){
+	if (item.hasOwnProperty('emptyChildren')) {
+		return;
+	}
+	Object.defineProperty(item, 'emptyChildren', {
+		configurable: true,
+		enumerable: true,
+		writable: true,
+		value : function emptyChildren() {
+			var myNode = this;
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+		}
+	});
+})(HTMLElement.prototype);
+
+(function (arr) {
+	arr.forEach(function (item) {
+		if (item.hasOwnProperty('after')) {
+			return;
+		}
+		Object.defineProperty(item, 'after', {
+			configurable: true,
+			enumerable: true,
+			writable: true,
+			value: function after() {
+				var argArr = Array.prototype.slice.call(arguments),
+				docFrag = document.createDocumentFragment();
+	        
+				argArr.forEach(function (argItem) {
+				var isNode = argItem instanceof Node;
+				docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+				});
+	        
+				this.parentNode.insertBefore(docFrag, this.nextSibling);
+			}
+		});
+	});
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+(function(item){
+	if (item.hasOwnProperty('show')) {
+		return;
+	}
+	Object.defineProperty(item, 'show', {
+		configurable: true,
+		enumerable: true,
+		writable: true,
+		value : function show(isShow) {
+			if(isShow){
+				this.style.visibility = "visible";
+				this.style.display = "block";
+			}else{
+				this.style.visibility = "hidden";
+		     	this.style.display = "none";
+			}
+		}
+	});
+})(HTMLElement.prototype);
+
+</script>
+
+<html>
+<body onload="">
+</body>
+<html>
