@@ -1,0 +1,160 @@
+<html>
+<head>
+
+<script type='text/javascript' src=""></script>
+<script type='text/javascript'>
+
+function init(){
+        setTabEvent("#test1");
+        setTabEvent("#test2");
+        setTabEvent("#test3");
+}
+
+function setTabEvent(id){
+        var tab = document.querySelector(id);
+        var div = document.getElementById(tab.getAttribute("div_id"));
+        tab.addEventListener("mouseover", function(e){
+                var rect = tab.getBoundingClientRect();
+                div.style.position = "absolute";
+                div.style.left = (rect.left + rect.width);
+                div.style.top = (rect.top + rect.height);
+                
+                div.style.visibility = "visible";
+                div.style.display = "block";
+        });
+        tab.addEventListener("mouseout", function(e){
+                div.style.visibility = "hidden";
+                div.style.display = "none";
+        });
+}
+</script>
+
+<style>
+.textarea2 {
+	display: inline;
+	overflow-x: hidden;
+	overflow-y: visible;
+	height: 60px;
+	width: 186px;
+}
+
+div.tbXY td {
+	border: #C7E49C solid 0px;
+}
+
+.BoxCase1 {
+	Z-INDEX: 100000;
+	LEFT: -800px;
+	VISIBILITY: hidden;
+	WIDTH: 300px;
+	POSITION: absolute;
+	TOP: -600px;
+	HEIGHT: 50px;
+	overflow: visible;
+	FILTER: Alpha(Opacity =   90);
+	scrollbar-face-color: #B0D8FF;
+	scrollbar-highlight-color: #B0D8FF;
+	scrollbar-3dlight-color: #E6F2FF;
+	scrollbar-darkshadow-color: #4DA2FF;
+	scrollbar-shadow-color: #95C8FF;
+	scrollbar-arrow-color: #fff;
+	scrollbar-track-color: #DFEEFF;
+}
+
+.BoxCase1 {
+	BORDER-RIGHT: 2px outset;
+	PADDING-RIGHT: 6px;
+	BORDER-TOP: 2px outset;
+	PADDING-LEFT: 6px;
+	BACKGROUND: #FFF;
+	PADDING-BOTTOM: 6px;
+	BORDER-LEFT: 2px outset;
+	COLOR: #000000;
+	PADDING-TOP: 6px;
+	BORDER-BOTTOM: 2px outset;
+	TEXT-ALIGN: left;
+}
+
+.BoxCase1 {
+	font: 13px/ 15px verdana, arial, sans-serif;
+}
+
+.BoxCase1 p {
+	margin: 0px;
+	margin-top: 5px;
+	line-height: 18px;
+	color: '#0078F0';
+	word-wrap: normal
+}
+
+.BoxCase1 p:first-letter {
+	font-weight: 900;
+	color: '#0078F0';
+	font-size: 24px;
+}
+
+.BoxCase1 em {
+	display: block;
+	margin-top: 3px;
+	color: #f60;
+	font-style: normal;
+	font-weight: bold;
+}
+
+.BoxCase1 em span {
+	font-weight: bold;
+	color: '#0078F0';
+	word-wrap: normal
+}
+
+.BoxShad {
+	LEFT: -800px;
+	WIDTH: 100px;
+	TOP: -600px;
+	HEIGHT: 200px
+}
+
+.tabs_menu {
+	padding: 3px;
+	margin: 0px 2px;
+	border: 1px solid #666;
+	border-bottom-width: 0px;
+	padding-bottom: 1px;
+	border-collapse: collapse;
+	background: #EEE;
+	color: #666;
+	border-radius: 7px 7px 0px 0px;
+}
+
+.onSelected {
+	position: relative;
+	z-index: 1 !important;
+	top: 1px;
+	padding-bottom: 1px;
+	margin: 0px 3px 0px 3px;
+	border: 1px solid #666;
+	border-bottom-width: 0px;
+	background: #FA1;
+	color: #000;
+	font-weight: bold;
+	cursor: default;
+	border-radius: 7px 7px 0px 0px;
+}
+</style>
+
+
+
+</head>
+<body onload="init()"init()>
+        <table>
+                <tr>
+                        <td id="test1" class="tabs_menu onSelected" div_id="MEMO1">test1</td>
+                        <td id="test2" class="tabs_menu" div_id="MEMO2">test2</td>
+                        <td id="test3" class="tabs_menu" div_id="MEMO3">test3</td>
+                </tr>
+        </table>
+        <div id="MEMO1" class="BoxCase1"><em style="width:auto;">MEMO1<span>1</span></em></div>
+        <div id="MEMO2" class="BoxCase1"><em style="width:auto;">MEMO2<span>2</span></em></div>
+        <div id="MEMO3" class="BoxCase1"><em style="width:auto;">MEMO3<span>3</span></em></div>
+</body>
+</html>
