@@ -1,0 +1,59 @@
+<html>
+   <head> 
+        <title></title> 
+        
+        <!-- js  -->
+        <script src=""></script>
+        <script type="text/javascript">
+                function init(){
+                        var testDiv = document.querySelector("#testDiv");
+                        var dgDiv = document.querySelector("#dg");
+                        
+                        testDiv.addEventListener("mouseover", function(e){
+                                show(dgDiv, true);
+                                dgDiv.style.position = "absolute";
+                                dgDiv.style.top = e.y; 
+                                dgDiv.style.left = e.x; 
+                        });
+                        
+                        testDiv.addEventListener("mouseout", function(e){
+                                show(dgDiv, false);
+                        });
+                }
+                
+                function show(div, isShow){
+                        if(isShow){
+				div.style.visibility = "visible";
+				//div.style.display = "block";
+			}else{
+				div.style.visibility = "hidden";
+		     	        //div.style.display = "none";
+			}
+                }
+        </script>
+
+        <!-- css -->
+        <link href="" rel="stylesheet" />
+        <STYLE type=text/css> 
+        
+        </style> 
+        </head> 
+
+        <body onload="javascript:init();">
+                <div id="testDiv">
+                        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                </div>
+        
+                <div id="dg" style="z-index: 9999; position: fixed ! important; right: 0px; top: 0px;">
+                        <table width=""100% style="position: absolute; width:260px; right: 0px; top: 0px;" border="1">
+                                table 內部控制項代碼
+                        </table>
+                </div>
+        </body>
+
+</html>
+
+
+

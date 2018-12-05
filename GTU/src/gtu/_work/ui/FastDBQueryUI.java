@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -657,15 +658,15 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_19.add(refContentConfigSaveBtn);
-        
+
         refContentConfigClearBtn = new JButton("清除");
         refContentConfigClearBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try{
+                try {
                     refSearchText.setText("");
                     refContentArea.setText("");
                     refSerarchListConfigHandler.find("");
-                }catch(Exception ex){
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
@@ -2293,13 +2294,18 @@ public class FastDBQueryUI extends JFrame {
             for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String value = config.getConfigProp().getProperty(key);
-                compareMap.put(SimilarityUtil.sim(message, key), key);
+                Double score = SimilarityUtil.sim(message.toLowerCase(), key.toLowerCase());
+                System.out.println("分數 : " + score + "\t" + key + "\t" + value);
+                compareMap.put(score, key);
             }
             if (compareMap.isEmpty()) {
                 return "";
             }
-            Double k = compareMap.keySet().iterator().next();
-            if (k != null) {
+            Double k = Double.MIN_VALUE;
+            for (Double k1 : compareMap.keySet()) {
+                k = Math.max(k, k1);
+            }
+            if (k != null || k != 0) {
                 String refKey = compareMap.get(k);
                 if (config.getConfigProp().containsKey(refKey)) {
                     BigDecimal dd = new BigDecimal(k);
