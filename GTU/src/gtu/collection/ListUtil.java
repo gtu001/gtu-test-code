@@ -214,8 +214,8 @@ public class ListUtil {
         Collections.sort(lst, new Comparator<T>() {
             @Override
             public int compare(Object o1, Object o2) {
-                String o1s = StringUtils.defaultString((String) o1, "").toLowerCase();
-                String o2s = StringUtils.defaultString((String) o2, "").toLowerCase();
+                String o1s = o1 == null ? "" : String.valueOf(o1).toLowerCase();
+                String o2s = o2 == null ? "" : String.valueOf(o2).toLowerCase();
                 return o1s.compareTo(o2s);
             }
         });

@@ -9,11 +9,13 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -147,35 +149,47 @@ public class PropertiesUtilBean {
     }
 
     public void reflectInit(Window jframe) {
-        configReflect.setToUI(jframe);
+        configReflect.setToUI(jframe, null);
     }
 
     public void reflectSetConfig(Window jframe) {
-        configReflect.setToConfig(jframe);
+        configReflect.setToConfig(jframe, null);
+    }
+
+    public void reflectInit(Window jframe, List<JComponent> componentArry) {
+        configReflect.setToUI(jframe, componentArry);
+    }
+
+    public void reflectSetConfig(Window jframe, List<JComponent> componentArry) {
+        configReflect.setToConfig(jframe, componentArry);
     }
 
     // swing 自動化設直
     private class _JFrameReflectionToConfig {
-        private void setToUI(Window jframe) {
+        private void setToUI(Window jframe, List<JComponent> componentArry) {
             for (Field f : jframe.getClass().getDeclaredFields()) {
                 if (configProp.containsKey(f.getName())) {
                     String value = configProp.getProperty(f.getName());
                     try {
+                        JComponent component = (JComponent) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                        if (!isMatch(component, componentArry)) {
+                            continue;
+                        }
                         if (f.getType() == JTextField.class) {
-                            JTextField text = (JTextField) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                            JTextField text = (JTextField) component;
                             text.setText(value);
                             logger.info("set " + f.getName() + " = " + value);
                         } else if (f.getType() == JCheckBox.class) {
-                            JCheckBox text = (JCheckBox) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                            JCheckBox text = (JCheckBox) component;
                             text.setSelected(Boolean.parseBoolean(value));
                             logger.info("set " + f.getName() + " = " + Boolean.parseBoolean(value));
                         } else if (f.getType() == JComboBox.class) {
-                            JComboBox text = (JComboBox) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                            JComboBox text = (JComboBox) component;
                             int selectIndex = Integer.parseInt(value.split("^")[0]);
                             text.setSelectedIndex(selectIndex);
                             logger.info("set " + f.getName() + " = " + value);
                         } else if (f.getType() == JTextArea.class) {
-                            JTextArea text = (JTextArea) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                            JTextArea text = (JTextArea) component;
                             text.setText(value);
                             logger.info("set " + f.getName() + " = " + value);
                         }
@@ -186,24 +200,35 @@ public class PropertiesUtilBean {
             }
         }
 
-        private void setToConfig(Window jframe) {
+        private boolean isMatch(JComponent component, List<JComponent> componentArry) {
+            if (componentArry == null) {
+                return true;
+            }
+            return componentArry.contains(component);
+        }
+
+        private void setToConfig(Window jframe, List<JComponent> componentArry) {
             for (Field f : jframe.getClass().getDeclaredFields()) {
                 try {
+                    JComponent component = (JComponent) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                    if (!isMatch(component, componentArry)) {
+                        continue;
+                    }
                     if (f.getType() == JTextField.class) {
-                        JTextField text = (JTextField) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                        JTextField text = (JTextField) component;
                         configProp.setProperty(f.getName(), StringUtils.trimToEmpty(text.getText()));
                         logger.info("set " + f.getName() + " = " + StringUtils.trimToEmpty(text.getText()));
                     } else if (f.getType() == JCheckBox.class) {
-                        JCheckBox text = (JCheckBox) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                        JCheckBox text = (JCheckBox) component;
                         configProp.setProperty(f.getName(), String.valueOf(text.isSelected()));
                         logger.info("set " + f.getName() + " = " + String.valueOf(text.isSelected()));
                     } else if (f.getType() == JComboBox.class) {
-                        JComboBox text = (JComboBox) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                        JComboBox text = (JComboBox) component;
                         String value = text.getSelectedIndex() + "^" + text.getSelectedItem();
                         configProp.setProperty(f.getName(), value);
                         logger.info("set " + f.getName() + " = " + value);
                     } else if (f.getType() == JTextArea.class) {
-                        JTextArea text = (JTextArea) FieldUtils.readDeclaredField(jframe, f.getName(), true);
+                        JTextArea text = (JTextArea) component;
                         configProp.setProperty(f.getName(), StringUtils.trimToEmpty(text.getText()));
                         logger.info("set " + f.getName() + " = " + StringUtils.trimToEmpty(text.getText()));
                     }

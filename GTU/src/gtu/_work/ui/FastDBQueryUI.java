@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,9 +42,11 @@ import javax.sql.DataSource;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -157,6 +161,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton nextConnBtn;
     private JComboBox dbNameIdText;
     private AutoComboBox dbNameIdText_Auto;
+    private AutoComboBox refSearchCategoryCombobox_Auto;
     private JLabel lblDbName;
     private JTextField sqlQueryText;
     private JPanel panel_8;
@@ -214,9 +219,16 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_7;
     private JTextArea refContentArea;
     private JList refSearchList;
-    private RefSerarchListConfigHandler refSerarchListConfigHandler;
+    private RefSearchListConfigHandler refSerarchListConfigHandler;
     private JButton refContentConfigSaveBtn;
     private JButton refContentConfigClearBtn;
+    private JComboBox refSearchCategoryCombobox;
+    private JComboBox refSearchColorComboBox;
+    private JTextField refConfigPathText;
+    private JLabel lbl_config_etc;
+    private JPanel panel_23;
+    private JButton saveEtcConfigBtn;
+    private EtcConfigHandler etcConfigHandler;
 
     /**
      * Launch the application.
@@ -621,6 +633,25 @@ public class FastDBQueryUI extends JFrame {
         panel_19 = new JPanel();
         panel_18.add(panel_19, BorderLayout.NORTH);
 
+        refSearchCategoryCombobox = new JComboBox();
+        refSearchCategoryCombobox_Auto = AutoComboBox.applyAutoComboBox(refSearchCategoryCombobox);
+        refSearchCategoryCombobox_Auto.setMatchType(MatchType.Contains);
+        refSearchCategoryCombobox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    refSerarchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
+        refSearchColorComboBox = new JComboBox();
+        refSearchColorComboBox.setModel(RefSearchColor.getModel());
+        panel_19.add(refSearchColorComboBox);
+        panel_19.add(refSearchCategoryCombobox);
+
         lblNewLabel_6 = new JLabel("搜尋條件");
         panel_19.add(lblNewLabel_6);
 
@@ -628,7 +659,7 @@ public class FastDBQueryUI extends JFrame {
         refSearchText.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
-                    refSerarchListConfigHandler.find(refSearchText.getText());
+                    refSerarchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -636,14 +667,14 @@ public class FastDBQueryUI extends JFrame {
         });
 
         panel_19.add(refSearchText);
-        refSearchText.setColumns(20);
+        refSearchText.setColumns(15);
 
         lblNewLabel_7 = new JLabel("內文");
         panel_19.add(lblNewLabel_7);
 
         refContentArea = new JTextArea();
         refContentArea.setRows(3);
-        refContentArea.setColumns(30);
+        refContentArea.setColumns(25);
         JTextAreaUtil.setWrapTextArea(refContentArea);
         panel_19.add(JCommonUtil.createScrollComponent(refContentArea));
 
@@ -651,7 +682,9 @@ public class FastDBQueryUI extends JFrame {
         refContentConfigSaveBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    refSerarchListConfigHandler.add(refSearchText.getText(), refContentArea.getText());
+                    String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+                    RefSearchColor categoryColor = (RefSearchColor) refSearchColorComboBox.getSelectedItem();
+                    refSerarchListConfigHandler.add(category, refSearchText.getText(), refContentArea.getText(), categoryColor.colorCode);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -663,9 +696,10 @@ public class FastDBQueryUI extends JFrame {
         refContentConfigClearBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    refSearchCategoryCombobox_Auto.getTextComponent().setText("");
                     refSearchText.setText("");
                     refContentArea.setText("");
-                    refSerarchListConfigHandler.find("");
+                    refSerarchListConfigHandler.find("", "");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -682,23 +716,30 @@ public class FastDBQueryUI extends JFrame {
         panel_22 = new JPanel();
         panel_18.add(panel_22, BorderLayout.SOUTH);
 
+        lbl_config_etc = new JLabel("設定擋路徑");
+        panel_22.add(lbl_config_etc);
+
+        refConfigPathText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(refConfigPathText, true);
+        panel_22.add(refConfigPathText);
+        refConfigPathText.setColumns(30);
+
         refSearchList = new JList();
         refSearchList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    String key = (String) refSearchList.getSelectedValue();
-                    if (StringUtils.isBlank(key)) {
+                    RefSearchListConfigBean bean = (RefSearchListConfigBean) refSearchList.getSelectedValue();
+                    if (bean == null) {
                         refSearchList.setToolTipText(null);
                         return;
                     }
-                    refSearchText.setText(key);
-                    String text = refSerarchListConfigHandler.get(key);
                     if (JMouseEventUtil.buttonLeftClick(1, e)) {
-                        refSearchList.setToolTipText(text);
-                    }
-                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        refContentArea.setText(text);
+                        refSearchText.setText(bean.searchKey);
+                        refSearchList.setToolTipText(bean.content);
+                        refContentArea.setText(bean.content);
+                        refSearchCategoryCombobox_Auto.getTextComponent().setText(bean.category);
+                        refSearchColorComboBox.setSelectedItem(RefSearchColor.valueFrom(bean.categoryColor));
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -711,15 +752,11 @@ public class FastDBQueryUI extends JFrame {
                 try {
                     JListUtil.newInstance(refSearchList).defaultJListKeyPressed(e, false);
                     if (e.getKeyCode() == 127) {
-                        String key = (String) refSearchList.getSelectedValue();
-                        if (StringUtils.isBlank(key)) {
+                        RefSearchListConfigBean bean = (RefSearchListConfigBean) refSearchList.getSelectedValue();
+                        if (bean == null) {
                             return;
                         }
-                        boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除 : " + key, "刪除");
-                        if (delConfirm) {
-                            refSerarchListConfigHandler.delete(key);
-                            JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功 : " + key);
-                        }
+                        refSerarchListConfigHandler.delete(bean.category, bean.searchKey);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -737,7 +774,9 @@ public class FastDBQueryUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         saveConnectionBtn = new JButton("儲存");
         saveConnectionBtn.addActionListener(new ActionListener() {
@@ -845,6 +884,17 @@ public class FastDBQueryUI extends JFrame {
         });
         panel_6.add(connTestBtn, "4, 24");
 
+        panel_23 = new JPanel();
+        panel_6.add(panel_23, "10, 34, fill, fill");
+
+        saveEtcConfigBtn = new JButton("儲存configure設定");
+        saveEtcConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveEtcConfigBtnAction();
+            }
+        });
+        panel_23.add(saveEtcConfigBtn);
+
         {
             // 初始化datasource
             this.initDataSourceProperties(null);
@@ -870,7 +920,11 @@ public class FastDBQueryUI extends JFrame {
             // 初始化 sqlList
             initLoadSqlListConfig();
             initLoadSqlIdMappingConfig();
-            refSerarchListConfigHandler = new RefSerarchListConfigHandler(refSearchList);
+
+            etcConfigHandler = new EtcConfigHandler();
+            etcConfigHandler.reflectInit();
+
+            refSerarchListConfigHandler = new RefSearchListConfigHandler(refConfigPathText, refSearchList, refSearchCategoryCombobox);
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -1299,9 +1353,15 @@ public class FastDBQueryUI extends JFrame {
             storeSqlIdListDsMappingProp();
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
-            String findMessage = refSerarchListConfigHandler.findExceptionMessage(ex.getMessage());
-            findMessage = StringUtils.isNotBlank(findMessage) ? String.format("參考 : %s", findMessage) : "";
-            JCommonUtil.handleException(findMessage, ex);
+            String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+            String findMessage = refSerarchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+            // 一般顯示
+            if (StringUtils.isBlank(findMessage)) {
+                JCommonUtil.handleException(ex);
+            } else {
+                // html顯示
+                JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
+            }
         }
     }
 
@@ -2223,80 +2283,231 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private class RefSerarchListConfigHandler {
-        private PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class.getSimpleName() + "_refList");
-        private JList jList;
+    private static class RefSearchListConfigBean {
+        String category;
+        String searchKey;
+        String content;
+        String categoryColor;
 
-        private RefSerarchListConfigHandler(JList jList) {
-            this.jList = jList;
-            this.find("");
+        private static String getArry(int idx, String[] arry, String defaultVal) {
+            if (idx <= arry.length - 1) {
+                return StringUtils.trimToEmpty(arry[idx]);
+            }
+            return defaultVal;
         }
 
-        private void find(String text) {
+        public static RefSearchListConfigBean of(String key, String value) {
+            RefSearchListConfigBean bean = new RefSearchListConfigBean();
+            String[] keys = StringUtils.trimToEmpty(key).split(Pattern.quote("#^#"));
+            String[] values = StringUtils.trimToEmpty(value).split(Pattern.quote("#^#"));
+            bean.category = getArry(0, keys, "NA");
+            bean.searchKey = getArry(1, keys, "");
+            bean.content = getArry(0, values, "");
+            bean.categoryColor = getArry(1, values, "blue");
+            return bean;
+        }
+
+        public static String getKey(String category, String searchKey) {
+            return StringUtils.trimToEmpty(category) + "#^#" + StringUtils.trimToEmpty(searchKey);
+        }
+
+        public static String getValue(String content, String categoryColor) {
+            return StringUtils.trimToEmpty(content) + "#^#" + StringUtils.trimToEmpty(categoryColor);
+        }
+
+        public static String getContent(String value) {
+            String[] values = StringUtils.trimToEmpty(value).split(Pattern.quote("#^#"));
+            return getArry(0, values, "");
+        }
+
+        public boolean isMatch(String category, String text) {
+            category = StringUtils.trimToEmpty(category).toLowerCase();
+            text = StringUtils.trimToEmpty(text);
+
+            boolean isCategoryOk = (StringUtils.trimToEmpty(this.category).toLowerCase().contains(category));
+            boolean isSearchKeyOk = (StringUtils.trimToEmpty(this.searchKey).toLowerCase().contains(text));
+            boolean isContentOk = (StringUtils.trimToEmpty(this.content).toLowerCase().contains(text));
+
+            if (StringUtils.isBlank(category) && StringUtils.isBlank(text)) {
+                return true;
+            } else if (StringUtils.isNotBlank(category) && StringUtils.isNotBlank(text)) {
+                if (isCategoryOk && (isSearchKeyOk || isContentOk)) {
+                    return true;
+                }
+            } else if (StringUtils.isBlank(category) && StringUtils.isNotBlank(text)) {
+                if (isSearchKeyOk || isContentOk) {
+                    return true;
+                }
+            } else if (StringUtils.isNotBlank(category) && StringUtils.isBlank(text)) {
+                if (isCategoryOk) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public String toString() {
+            return String.format("<html><font color=\"%s\"><b></b>%s</font>&nbsp;&nbsp;  <font color=\"black\">%s</font></html>", //
+                    StringUtils.trimToEmpty(this.categoryColor), //
+                    StringUtils.trimToEmpty(this.category), //
+                    StringUtils.trimToEmpty(this.content));
+        }
+
+        public String toStringInfo() {
+            return "RefSearchListConfigBean [category=" + category + ", searchKey=" + searchKey + ", content=" + content + ", categoryColor=" + categoryColor + "]";
+        }
+    }
+
+    private enum RefSearchColor {
+        藍("BLUE"), //
+        綠("GREEN"), //
+        紅("RED"),//
+        ;
+        final String colorCode;
+
+        RefSearchColor(String colorCode) {
+            this.colorCode = colorCode;
+        }
+
+        private static DefaultComboBoxModel getModel() {
+            DefaultComboBoxModel d = new DefaultComboBoxModel();
+            for (RefSearchColor e : RefSearchColor.values()) {
+                d.addElement(e);
+            }
+            return d;
+        }
+
+        private static RefSearchColor valueFrom(String categoryColor) {
+            for (RefSearchColor e : RefSearchColor.values()) {
+                if (StringUtils.equals(e.colorCode, categoryColor)) {
+                    return e;
+                }
+            }
+            return RefSearchColor.藍;
+        }
+    }
+
+    private class RefSearchListConfigHandler {
+
+        private PropertiesUtilBean config;
+        private JList jList;
+        private JComboBox refSearchCategoryCombobox;
+        private JTextField refConfigPathText;
+
+        private RefSearchListConfigHandler(JTextField refConfigPathText, JList jList, JComboBox refSearchCategoryCombobox) {
+            String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.properties";
+            File configFile = new File(refConfigPathText.getText());
+            if (configFile == null || !configFile.exists()) {
+                config = new PropertiesUtilBean(new File(PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class), fileName));
+            } else {
+                config = new PropertiesUtilBean(configFile);
+            }
+            refConfigPathText.setText(config.getPropFile().getAbsolutePath());
+
+            this.refConfigPathText = refConfigPathText;
+            this.jList = jList;
+            this.refSearchCategoryCombobox = refSearchCategoryCombobox;
+            this.find("", "");
+        }
+
+        private void find(String category, String text) {
             text = StringUtils.trimToEmpty(text).toLowerCase();
-            List<String> lst = new ArrayList<String>();
+            List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
+            Set<String> categoryLst = new TreeSet<String>();
+
             for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String value = config.getConfigProp().getProperty(key);
-                boolean findOk = false;
-                if (StringUtils.isBlank(text)) {
-                    findOk = true;
-                } else if (StringUtils.isNotBlank(text) && //
-                        (StringUtils.trimToEmpty(key).toLowerCase().contains(text) || //
-                                StringUtils.trimToEmpty(value).toLowerCase().contains(text))) {
-                    findOk = true;
+                RefSearchListConfigBean bean = RefSearchListConfigBean.of(key, value);
+                if (bean.isMatch(category, text)) {
+                    lst.add(bean);
                 }
-                if (findOk) {
-                    lst.add(key);
-                }
+                categoryLst.add(bean.category);
             }
             ListUtil.sortIgnoreCase(lst);
             DefaultListModel model = JListUtil.createModel();
-            for (String key : lst) {
+            for (RefSearchListConfigBean key : lst) {
                 model.addElement(key);
             }
             this.jList.setModel(model);
+
+            refSearchCategoryCombobox_Auto.applyComboxBoxList(new ArrayList<String>(categoryLst));
+            refSearchCategoryCombobox_Auto.getTextComponent().setText(category);
         }
 
-        private void add(String key, String text) {
-            if (StringUtils.isBlank(key) || StringUtils.isBlank(text)) {
+        private void add(String category, String searchKey, String content, String categoryColor) {
+            if (StringUtils.isBlank(category) || StringUtils.isBlank(searchKey) || StringUtils.isBlank(content)) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("請輸入內容!");
                 return;
             }
-            key = StringUtils.trimToEmpty(key);
-            text = StringUtils.trimToEmpty(text);
-            config.getConfigProp().setProperty(key, text);
+
+            String key = RefSearchListConfigBean.getKey(category, searchKey);
+            String value = RefSearchListConfigBean.getValue(content, categoryColor);
+            if (config.getConfigProp().containsKey(key)) {
+                String compareContent = RefSearchListConfigBean.getContent(config.getConfigProp().getProperty(key));
+                if (!StringUtils.equals(compareContent, content)) {
+                    boolean confirmOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已存在 : " + category + " " + searchKey + ", 是否要蓋掉?", "覆蓋確認");
+                    if (!confirmOk) {
+                        return;
+                    }
+                }
+            }
+
+            config.getConfigProp().setProperty(key, value);
             config.store();
-            find("");
+            find(category, "");
+            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         }
 
-        private void delete(String key) {
-            key = StringUtils.trimToEmpty(key);
+        private void delete(String category, String searchKey) {
+            String key = RefSearchListConfigBean.getKey(category, searchKey);
+            if (config.getConfigProp().containsKey(key)) {
+                boolean confirmOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除 : " + category + " " + searchKey + "?", "確認刪除");
+                if (!confirmOk) {
+                    return;
+                }
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + category + " " + searchKey + "!");
+                return;
+            }
             config.getConfigProp().remove(key);
             config.store();
-            find("");
+            find("", "");
         }
 
-        private String get(String key) {
-            key = StringUtils.trimToEmpty(key);
+        private RefSearchListConfigBean get(String category, String searchKey) {
+            String key = RefSearchListConfigBean.getKey(category, searchKey);
             if (!config.getConfigProp().containsKey(key)) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + key);
-                return "";
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + category + " " + searchKey);
+                return null;
             }
-            return config.getConfigProp().getProperty(key);
+            String value = config.getConfigProp().getProperty(key);
+            return RefSearchListConfigBean.of(key, value);
         }
 
-        private String findExceptionMessage(String message) {
+        private String findExceptionMessage(String category, String message) {
             if (StringUtils.isBlank(message)) {
                 return "";
             }
-            Map<Double, String> compareMap = new TreeMap<Double, String>();
+            Map<Double, List<String>> compareMap = new TreeMap<Double, List<String>>();
             for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String value = config.getConfigProp().getProperty(key);
-                Double score = SimilarityUtil.sim(message.toLowerCase(), key.toLowerCase());
-                System.out.println("分數 : " + score + "\t" + key + "\t" + value);
-                compareMap.put(score, key);
+                RefSearchListConfigBean bean = RefSearchListConfigBean.of(key, value);
+
+                if (StringUtils.isNotBlank(category) && !StringUtils.equalsIgnoreCase(bean.category, category)) {
+                    continue;
+                }
+
+                Double score = SimilarityUtil.sim(message.toLowerCase(), bean.searchKey.toLowerCase());
+                System.out.println("加入排行 --> 分數 : " + score + "\t" + bean.toStringInfo());
+
+                List<String> keyLst = new ArrayList<String>();
+                if (compareMap.containsKey(score)) {
+                    keyLst = compareMap.get(score);
+                }
+                keyLst.add(key);
+                compareMap.put(score, keyLst);
             }
             if (compareMap.isEmpty()) {
                 return "";
@@ -2306,14 +2517,58 @@ public class FastDBQueryUI extends JFrame {
                 k = Math.max(k, k1);
             }
             if (k != null || k != 0) {
-                String refKey = compareMap.get(k);
+                List<String> keyLst = compareMap.get(k);
+                if (keyLst == null || keyLst.isEmpty()) {
+                    return "";
+                }
+                Collections.sort(keyLst, new Comparator<String>() {
+                    @Override
+                    public int compare(String o1, String o2) {
+                        return new Integer(StringUtils.trimToEmpty(o1).length()).compareTo(StringUtils.trimToEmpty(o2).length());
+                    }
+                });
+                String refKey = keyLst.get(0);
                 if (config.getConfigProp().containsKey(refKey)) {
+                    String value = config.getConfigProp().getProperty(refKey);
+                    RefSearchListConfigBean bean = RefSearchListConfigBean.of(refKey, value);
                     BigDecimal dd = new BigDecimal(k);
                     dd = dd.setScale(3, BigDecimal.ROUND_HALF_UP);
-                    return String.format("[score:%s] ", dd.toString()) + config.getConfigProp().getProperty(refKey);
+                    System.out.println("最高分 --> 分數 : " + dd + "\t" + bean.toStringInfo());
+                    return String.format("[score:%s] ", dd.toString()) + String.format("<font color=\"%s\"><b>%s</b></font>", bean.categoryColor, bean.content);
                 }
             }
             return "";
+        }
+    }
+
+    private class EtcConfigHandler {
+        PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class + "_Etc");
+        List<JComponent> containArry = new ArrayList<JComponent>();
+
+        EtcConfigHandler() {
+            containArry.add(FastDBQueryUI.this.refConfigPathText);
+        }
+
+        public void reflectInit() {
+            config.reflectInit(FastDBQueryUI.this, containArry);
+        }
+
+        public void reflectSetConfig() {
+            config.reflectSetConfig(FastDBQueryUI.this, containArry);
+        }
+
+        public void store() {
+            config.store();
+        }
+    }
+
+    private void saveEtcConfigBtnAction() {
+        try {
+            etcConfigHandler.reflectSetConfig();
+            etcConfigHandler.store();
+            JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }

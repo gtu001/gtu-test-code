@@ -394,6 +394,18 @@ public class JCommonUtil {
         });
     }
 
+    public static void _jOptionPane_showMessageDialog_InvokeLater_Html(final Object message) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                String strMessage = message == null ? "" : String.valueOf(message);
+                strMessage = strMessage.replaceAll("\n", "<br/>");
+                strMessage = "<html>" + strMessage + "</html>";
+                JOptionPane.showMessageDialog(null, strMessage);
+            }
+        });
+    }
+
     /**
      * 顯示alert視窗
      */
@@ -514,41 +526,41 @@ public class JCommonUtil {
      * 錯誤處理
      */
     public static File handleException(Throwable ex, boolean writeFile) {
-        return JCommonUtil.handleException(ex.getMessage(), ex, writeFile, "", "yyyyMMdd", false);// true寫檔
+        return JCommonUtil.handleException(ex.getMessage(), ex, writeFile, "", "yyyyMMdd", false, false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Throwable ex) {
-        return JCommonUtil.handleException(ex.getMessage(), ex, true, "", "yyyyMMdd", false);// true寫檔
+        return JCommonUtil.handleException(ex.getMessage(), ex, true, "", "yyyyMMdd", false, false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Object message, Throwable ex) {
-        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd", false);// true寫檔
+        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd", false, false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleExceptionDetails(Object message, Throwable ex) {
-        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd.HHmmss.SSS", false);// true寫檔
+        return JCommonUtil.handleException(message, ex, true, "", "yyyyMMdd.HHmmss.SSS", false, false);// true寫檔
     }
 
     /**
      * 錯誤處理
      */
     public static File handleException(Object message, Throwable ex, boolean writeFile) {
-        return handleException(message, ex, writeFile, "", "yyyyMMdd", false);
+        return handleException(message, ex, writeFile, "", "yyyyMMdd", false, false);
     }
 
     /**
      * 錯誤處理
      */
-    public static File handleException(Object message, final Throwable ex, boolean writeFile, String fileNameSuffix, String dateFormat, boolean silent) {
+    public static File handleException(Object message, final Throwable ex, boolean writeFile, String fileNameSuffix, String dateFormat, boolean silent, boolean useHtml) {
         String title = (ex == null) ? "執行發生錯誤" : ex.getMessage();
         String messageStr = "";
         File writeIfNeed = null;
@@ -644,7 +656,11 @@ public class JCommonUtil {
         }
         try {
             if (!silent) {
-                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(messageStr, title, true);
+                if (!useHtml) {
+                    JCommonUtil._jOptionPane_showMessageDialog_InvokeLater(messageStr, title, true);
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(messageStr);
+                }
             }
         } catch (java.awt.HeadlessException uiError) {
         }

@@ -331,12 +331,12 @@ public class JdbcDBUtil {
                         String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, colList.get(ii - 1)) + ex.getMessage();
                         System.out.println(errorMsg);
                         ex.printStackTrace();
-                        JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true);
+                        JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true, false);
                         try {
                             lst.add(getCharStream(rs.getCharacterStream(ii)));
                         } catch (Exception ex2) {
                             lst.add("__#ERROR#__ : " + ex.getMessage());
-                            JCommonUtil.handleException(errorMsg, ex2, true, "_getCharacterStream_", "yyyyMMdd.HHmm", true);
+                            JCommonUtil.handleException(errorMsg, ex2, true, "_getCharacterStream_", "yyyyMMdd.HHmm", true, false);
                         }
                     }
                 }
