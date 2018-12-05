@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.spring.SimilarityUtil;
 import gtu.string.StringNumberUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
@@ -1280,7 +1282,9 @@ public class FastDBQueryUI extends JFrame {
             storeSqlIdListDsMappingProp();
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
-            JCommonUtil.handleException(ex);
+            String findMessage = refSerarchListConfigHandler.findExceptionMessage(ex.getMessage());
+            findMessage = StringUtils.isNotBlank(findMessage) ? String.format("參考 : [%s]", findMessage) : "";
+            JCommonUtil.handleException(findMessage, ex);
         }
     }
 
@@ -2251,9 +2255,31 @@ public class FastDBQueryUI extends JFrame {
         private String get(String key) {
             if (!config.getConfigProp().containsKey(key)) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + key);
-                return;
+                return "";
             }
             return config.getConfigProp().getProperty(key);
+        }
+
+        private String findExceptionMessage(String message) {
+            if (StringUtils.isBlank(message)) {
+                return "";
+            }
+            Map<Double, String> compareMap = new TreeMap<Double, String>();
+            for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = config.getConfigProp().getProperty(key);
+                compareMap.put(SimilarityUtil.sim(message, key), key);
+            }
+            Double k = compareMap.keySet().iterator().next();
+            if (k != null) {
+                String refKey = compareMap.get(k);
+                if (config.getConfigProp().containsKey(refKey)) {
+                    BigDecimal dd = new BigDecimal(k);
+                    dd = dd.setScale(3, BigDecimal.ROUND_HALF_UP);
+                    return String.format("[score:%d]", dd) + config.getConfigProp().getProperty(refKey);
+                }
+            }
+            return "";
         }
     }
 }
