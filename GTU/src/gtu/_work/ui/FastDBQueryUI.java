@@ -614,7 +614,7 @@ public class FastDBQueryUI extends JFrame {
         panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
 
         panel_18 = new JPanel();
-        tabbedPane.addTab("Ref", null, panel_18, null);
+        tabbedPane.addTab("ErrorRef", null, panel_18, null);
         panel_18.setLayout(new BorderLayout(0, 0));
 
         panel_19 = new JPanel();
