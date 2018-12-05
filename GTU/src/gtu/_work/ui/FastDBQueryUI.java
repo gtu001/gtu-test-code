@@ -107,8 +107,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -215,6 +215,7 @@ public class FastDBQueryUI extends JFrame {
     private JList refSearchList;
     private RefSerarchListConfigHandler refSerarchListConfigHandler;
     private JButton refContentConfigSaveBtn;
+    private JButton refContentConfigClearBtn;
 
     /**
      * Launch the application.
@@ -641,7 +642,7 @@ public class FastDBQueryUI extends JFrame {
 
         refContentArea = new JTextArea();
         refContentArea.setRows(3);
-        refContentArea.setColumns(50);
+        refContentArea.setColumns(30);
         JTextAreaUtil.setWrapTextArea(refContentArea);
         panel_19.add(JCommonUtil.createScrollComponent(refContentArea));
 
@@ -649,13 +650,27 @@ public class FastDBQueryUI extends JFrame {
         refContentConfigSaveBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    refSerarchListConfigHandler.add(refSearchText.getText(), refContentConfigSaveBtn.getText());
+                    refSerarchListConfigHandler.add(refSearchText.getText(), refContentArea.getText());
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
         panel_19.add(refContentConfigSaveBtn);
+        
+        refContentConfigClearBtn = new JButton("清除");
+        refContentConfigClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    refSearchText.setText("");
+                    refContentArea.setText("");
+                    refSerarchListConfigHandler.find("");
+                }catch(Exception ex){
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_19.add(refContentConfigClearBtn);
 
         panel_20 = new JPanel();
         panel_18.add(panel_20, BorderLayout.WEST);
@@ -676,6 +691,7 @@ public class FastDBQueryUI extends JFrame {
                         refSearchList.setToolTipText(null);
                         return;
                     }
+                    refSearchText.setText(key);
                     String text = refSerarchListConfigHandler.get(key);
                     if (JMouseEventUtil.buttonLeftClick(1, e)) {
                         refSearchList.setToolTipText(text);
@@ -1283,7 +1299,7 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             String findMessage = refSerarchListConfigHandler.findExceptionMessage(ex.getMessage());
-            findMessage = StringUtils.isNotBlank(findMessage) ? String.format("參考 : [%s]", findMessage) : "";
+            findMessage = StringUtils.isNotBlank(findMessage) ? String.format("參考 : %s", findMessage) : "";
             JCommonUtil.handleException(findMessage, ex);
         }
     }
@@ -2212,6 +2228,7 @@ public class FastDBQueryUI extends JFrame {
 
         private RefSerarchListConfigHandler(JList jList) {
             this.jList = jList;
+            this.find("");
         }
 
         private void find(String text) {
@@ -2219,10 +2236,13 @@ public class FastDBQueryUI extends JFrame {
             List<String> lst = new ArrayList<String>();
             for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
+                String value = config.getConfigProp().getProperty(key);
                 boolean findOk = false;
                 if (StringUtils.isBlank(text)) {
                     findOk = true;
-                } else if (StringUtils.isNotBlank(text) && key.toLowerCase().contains(text)) {
+                } else if (StringUtils.isNotBlank(text) && //
+                        (StringUtils.trimToEmpty(key).toLowerCase().contains(text) || //
+                                StringUtils.trimToEmpty(value).toLowerCase().contains(text))) {
                     findOk = true;
                 }
                 if (findOk) {
@@ -2242,17 +2262,22 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("請輸入內容!");
                 return;
             }
+            key = StringUtils.trimToEmpty(key);
+            text = StringUtils.trimToEmpty(text);
             config.getConfigProp().setProperty(key, text);
             config.store();
+            find("");
         }
 
         private void delete(String key) {
+            key = StringUtils.trimToEmpty(key);
             config.getConfigProp().remove(key);
             config.store();
-            find(key);
+            find("");
         }
 
         private String get(String key) {
+            key = StringUtils.trimToEmpty(key);
             if (!config.getConfigProp().containsKey(key)) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + key);
                 return "";
@@ -2270,13 +2295,16 @@ public class FastDBQueryUI extends JFrame {
                 String value = config.getConfigProp().getProperty(key);
                 compareMap.put(SimilarityUtil.sim(message, key), key);
             }
+            if (compareMap.isEmpty()) {
+                return "";
+            }
             Double k = compareMap.keySet().iterator().next();
             if (k != null) {
                 String refKey = compareMap.get(k);
                 if (config.getConfigProp().containsKey(refKey)) {
                     BigDecimal dd = new BigDecimal(k);
                     dd = dd.setScale(3, BigDecimal.ROUND_HALF_UP);
-                    return String.format("[score:%d]", dd) + config.getConfigProp().getProperty(refKey);
+                    return String.format("[score:%s] ", dd.toString()) + config.getConfigProp().getProperty(refKey);
                 }
             }
             return "";
