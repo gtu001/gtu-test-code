@@ -80,6 +80,7 @@ import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.string.StringNumberUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
@@ -93,6 +94,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
+import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 
@@ -107,7 +109,7 @@ public class FastDBQueryUI extends JFrame {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
-    
+
     static {
         System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
     }
@@ -199,6 +201,18 @@ public class FastDBQueryUI extends JFrame {
 
     private String importExcelSheetName;// 匯入目前的sheet name
     private JButton connTestBtn;
+    private JPanel panel_18;
+    private JPanel panel_19;
+    private JPanel panel_20;
+    private JPanel panel_21;
+    private JPanel panel_22;
+    private JLabel lblNewLabel_6;
+    private JTextField refSearchText;
+    private JLabel lblNewLabel_7;
+    private JTextArea refContentArea;
+    private JList refSearchList;
+    private RefSerarchListConfigHandler refSerarchListConfigHandler;
+    private JButton refContentConfigSaveBtn;
 
     /**
      * Launch the application.
@@ -596,6 +610,105 @@ public class FastDBQueryUI extends JFrame {
         queryResultJsonTextArea = new JTextArea();
         panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
 
+        panel_18 = new JPanel();
+        tabbedPane.addTab("Ref", null, panel_18, null);
+        panel_18.setLayout(new BorderLayout(0, 0));
+
+        panel_19 = new JPanel();
+        panel_18.add(panel_19, BorderLayout.NORTH);
+
+        lblNewLabel_6 = new JLabel("搜尋條件");
+        panel_19.add(lblNewLabel_6);
+
+        refSearchText = new JTextField();
+        refSearchText.addFocusListener(new FocusAdapter() {
+            public void focusLost(FocusEvent e) {
+                try {
+                    refSerarchListConfigHandler.find(refSearchText.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
+        panel_19.add(refSearchText);
+        refSearchText.setColumns(20);
+
+        lblNewLabel_7 = new JLabel("內文");
+        panel_19.add(lblNewLabel_7);
+
+        refContentArea = new JTextArea();
+        refContentArea.setRows(3);
+        refContentArea.setColumns(50);
+        JTextAreaUtil.setWrapTextArea(refContentArea);
+        panel_19.add(JCommonUtil.createScrollComponent(refContentArea));
+
+        refContentConfigSaveBtn = new JButton("儲存");
+        refContentConfigSaveBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    refSerarchListConfigHandler.add(refSearchText.getText(), refContentConfigSaveBtn.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_19.add(refContentConfigSaveBtn);
+
+        panel_20 = new JPanel();
+        panel_18.add(panel_20, BorderLayout.WEST);
+
+        panel_21 = new JPanel();
+        panel_18.add(panel_21, BorderLayout.EAST);
+
+        panel_22 = new JPanel();
+        panel_18.add(panel_22, BorderLayout.SOUTH);
+
+        refSearchList = new JList();
+        refSearchList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    String key = (String) refSearchList.getSelectedValue();
+                    if (StringUtils.isBlank(key)) {
+                        refSearchList.setToolTipText(null);
+                        return;
+                    }
+                    String text = refSerarchListConfigHandler.get(key);
+                    if (JMouseEventUtil.buttonLeftClick(1, e)) {
+                        refSearchList.setToolTipText(text);
+                    }
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        refContentArea.setText(text);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        refSearchList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                try {
+                    JListUtil.newInstance(refSearchList).defaultJListKeyPressed(e, false);
+                    if (e.getKeyCode() == 127) {
+                        String key = (String) refSearchList.getSelectedValue();
+                        if (StringUtils.isBlank(key)) {
+                            return;
+                        }
+                        boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除 : " + key, "刪除");
+                        if (delConfirm) {
+                            refSerarchListConfigHandler.delete(key);
+                            JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功 : " + key);
+                        }
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_18.add(JCommonUtil.createScrollComponent(refSearchList), BorderLayout.CENTER);
+
         panel_6 = new JPanel();
         tabbedPane.addTab("Connection", null, panel_6, null);
         panel_6.setLayout(new FormLayout(
@@ -738,6 +851,7 @@ public class FastDBQueryUI extends JFrame {
             // 初始化 sqlList
             initLoadSqlListConfig();
             initLoadSqlIdMappingConfig();
+            refSerarchListConfigHandler = new RefSerarchListConfigHandler(refSearchList);
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -1165,6 +1279,7 @@ public class FastDBQueryUI extends JFrame {
             // 儲存sqlId mapping dataSource 設定
             storeSqlIdListDsMappingProp();
         } catch (Exception ex) {
+            queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             JCommonUtil.handleException(ex);
         }
     }
@@ -2084,6 +2199,61 @@ public class FastDBQueryUI extends JFrame {
                 conn.close();
             } catch (SQLException e) {
             }
+        }
+    }
+
+    private class RefSerarchListConfigHandler {
+        private PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class.getSimpleName() + "_refList");
+        private JList jList;
+
+        private RefSerarchListConfigHandler(JList jList) {
+            this.jList = jList;
+        }
+
+        private void find(String text) {
+            text = StringUtils.trimToEmpty(text).toLowerCase();
+            List<String> lst = new ArrayList<String>();
+            for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                boolean findOk = false;
+                if (StringUtils.isBlank(text)) {
+                    findOk = true;
+                } else if (StringUtils.isNotBlank(text) && key.toLowerCase().contains(text)) {
+                    findOk = true;
+                }
+                if (findOk) {
+                    lst.add(key);
+                }
+            }
+            ListUtil.sortIgnoreCase(lst);
+            DefaultListModel model = JListUtil.createModel();
+            for (String key : lst) {
+                model.addElement(key);
+            }
+            this.jList.setModel(model);
+        }
+
+        private void add(String key, String text) {
+            if (StringUtils.isBlank(key) || StringUtils.isBlank(text)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("請輸入內容!");
+                return;
+            }
+            config.getConfigProp().setProperty(key, text);
+            config.store();
+        }
+
+        private void delete(String key) {
+            config.getConfigProp().remove(key);
+            config.store();
+            find(key);
+        }
+
+        private String get(String key) {
+            if (!config.getConfigProp().containsKey(key)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + key);
+                return;
+            }
+            return config.getConfigProp().getProperty(key);
         }
     }
 }
