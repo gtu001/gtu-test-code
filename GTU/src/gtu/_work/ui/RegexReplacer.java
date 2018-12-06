@@ -149,6 +149,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                             clearReplaceAreaBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e) {
                                     replaceArea.setText("");
+                                    resultArea.setText("");
                                 }
                             });
                             panel_5.add(clearReplaceAreaBtn);
@@ -335,7 +336,37 @@ public class RegexReplacer extends javax.swing.JFrame {
                     jTabbedPane1.addTab("result", null, jPanel4, null);
                     {
                         jScrollPane2 = new JScrollPane();
-                        jPanel4.add(jScrollPane2, BorderLayout.CENTER);
+                        JPanel jPanel4_inner = new JPanel();
+                        jPanel4.add(jPanel4_inner, BorderLayout.CENTER);
+                        jPanel4_inner.setLayout(new BorderLayout(0, 0));
+                        {
+                            panel_6 = new JPanel();
+                            jPanel4_inner.add(panel_6, BorderLayout.NORTH);
+                        }
+                        {
+                            panel_7 = new JPanel();
+                            jPanel4_inner.add(panel_7, BorderLayout.WEST);
+                        }
+                        {
+                            panel_8 = new JPanel();
+                            jPanel4_inner.add(panel_8, BorderLayout.SOUTH);
+                            {
+                                resultAreaClearBtn = new JButton("清除");
+                                resultAreaClearBtn.addActionListener(new ActionListener() {
+                                    public void actionPerformed(ActionEvent e) {
+                                        resultArea.setText("");
+                                    }
+                                });
+                                panel_8.add(resultAreaClearBtn);
+                            }
+                        }
+                        {
+                            panel_9 = new JPanel();
+                            jPanel4_inner.add(panel_9, BorderLayout.EAST);
+                        }
+                        {
+                            jPanel4_inner.add(jScrollPane2, BorderLayout.CENTER);
+                        }
                         {
                             resultArea = new JTextArea();
                             JTextUndoUtil.applyUndoProcess1(resultArea);
@@ -519,6 +550,11 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JPanel panel_4;
     private JPanel panel_5;
     private JButton clearReplaceAreaBtn;
+    private JPanel panel_6;
+    private JPanel panel_7;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JButton resultAreaClearBtn;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
