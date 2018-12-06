@@ -565,6 +565,7 @@ public class EnglishSearchUI extends JFrame {
         panel_2.add(queryButton, BorderLayout.EAST);
 
         meaningText = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(meaningText);
         meaningText.setFont(new Font("Monospaced", Font.PLAIN, 16));
         JScrollPane jScrollPane1 = new JScrollPane();
         panel_2.add(jScrollPane1, BorderLayout.CENTER);
@@ -585,6 +586,7 @@ public class EnglishSearchUI extends JFrame {
         });
 
         searchResultArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(searchResultArea);
         searchResultArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
         JTextAreaUtil.setWrapTextArea(searchResultArea);
         JCommonUtil.createScrollComponent(panel_1, searchResultArea);
@@ -878,6 +880,7 @@ public class EnglishSearchUI extends JFrame {
         panel_5.add(panel_9, BorderLayout.EAST);
 
         googleTranslateArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(googleTranslateArea);
         panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea), BorderLayout.CENTER);
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {

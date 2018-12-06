@@ -24,6 +24,7 @@ import javax.swing.text.Document;
 
 import org.mockito.Mockito;
 
+import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTreeUtil;
 
 public class DebugMointerUIUIContent {
@@ -214,6 +215,12 @@ public class DebugMointerUIUIContent {
         panel = new JPanel();
         runningClassArea = new JTextArea();
         scrollPane = new JScrollPane();
+        
+        JTextAreaUtil.applyCommonSetting(callStackArea);
+        JTextAreaUtil.applyCommonSetting(conditionArea);
+        JTextAreaUtil.applyCommonSetting(errorLogArea);
+        JTextAreaUtil.applyCommonSetting(dynamicClassArea);
+        JTextAreaUtil.applyCommonSetting(runningClassArea);
     }
 
     private void initMockUI() {

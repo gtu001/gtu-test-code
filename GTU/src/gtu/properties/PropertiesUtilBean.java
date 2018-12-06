@@ -18,6 +18,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -192,6 +193,10 @@ public class PropertiesUtilBean {
                             JTextArea text = (JTextArea) component;
                             text.setText(value);
                             logger.info("set " + f.getName() + " = " + value);
+                        } else if (f.getType() == JTextPane.class) {
+                            JTextPane text = (JTextPane) component;
+                            text.setText(value);
+                            logger.info("set " + f.getName() + " = " + value);
                         }
                     } catch (Exception e) {
                         logger.warning("reflection field not found : " + f.getName() + " -> " + e.getMessage());
@@ -229,6 +234,10 @@ public class PropertiesUtilBean {
                         logger.info("set " + f.getName() + " = " + value);
                     } else if (f.getType() == JTextArea.class) {
                         JTextArea text = (JTextArea) component;
+                        configProp.setProperty(f.getName(), StringUtils.trimToEmpty(text.getText()));
+                        logger.info("set " + f.getName() + " = " + StringUtils.trimToEmpty(text.getText()));
+                    } else if (f.getType() == JTextPane.class) {
+                        JTextPane text = (JTextPane) component;
                         configProp.setProperty(f.getName(), StringUtils.trimToEmpty(text.getText()));
                         logger.info("set " + f.getName() + " = " + StringUtils.trimToEmpty(text.getText()));
                     }

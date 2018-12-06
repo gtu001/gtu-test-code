@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -57,6 +58,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
@@ -360,7 +362,7 @@ public class FastDBQueryUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
-        JTextUndoUtil.applyUndoProcess1(sqlTextArea);
+        JTextAreaUtil.applyCommonSetting(sqlTextArea);
         sqlTextArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -624,6 +626,7 @@ public class FastDBQueryUI extends JFrame {
         panel_7.add(panel_11, BorderLayout.EAST);
 
         queryResultJsonTextArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(queryResultJsonTextArea);
         panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
 
         panel_18 = new JPanel();
@@ -673,9 +676,9 @@ public class FastDBQueryUI extends JFrame {
         panel_19.add(lblNewLabel_7);
 
         refContentArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(refContentArea);
         refContentArea.setRows(3);
         refContentArea.setColumns(25);
-        JTextAreaUtil.setWrapTextArea(refContentArea);
         panel_19.add(JCommonUtil.createScrollComponent(refContentArea));
 
         refContentConfigSaveBtn = new JButton("儲存");

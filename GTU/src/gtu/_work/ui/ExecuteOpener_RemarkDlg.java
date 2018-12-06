@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JTextAreaUtil;
 
 public class ExecuteOpener_RemarkDlg extends JDialog {
 
@@ -78,6 +79,7 @@ public class ExecuteOpener_RemarkDlg extends JDialog {
         }
         {
             remarkArea = new JTextArea();
+            JTextAreaUtil.applyCommonSetting(remarkArea);
             contentPanel.add(JCommonUtil.createScrollComponent(remarkArea), BorderLayout.CENTER);
         }
         {

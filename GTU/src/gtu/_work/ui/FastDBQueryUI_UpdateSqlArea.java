@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
+import gtu.swing.util.JTextAreaUtil;
 
 public class FastDBQueryUI_UpdateSqlArea extends JDialog {
 
@@ -101,6 +102,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         }
         {
             updateSqlArea = new JTextArea();
+            JTextAreaUtil.applyCommonSetting(updateSqlArea);
             contentPanel.add(JCommonUtil.createScrollComponent(updateSqlArea), BorderLayout.CENTER);
         }
         {

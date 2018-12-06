@@ -96,9 +96,9 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                     }
                     {
                         queryConditionArea = new JTextArea();
+                        JTextAreaUtil.applyCommonSetting(queryConditionArea);
                         queryConditionArea.setRows(2);
                         queryConditionArea.setColumns(50);
-                        JCommonUtil.createScrollComponent(queryConditionArea);
                         panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
                     }
                     {

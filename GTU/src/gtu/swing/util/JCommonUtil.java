@@ -236,7 +236,7 @@ public class JCommonUtil {
      */
     public static String getDocumentText(DocumentEvent doc) {
         try {
-            return doc.getDocument().getText(0, doc.getDocument().getLength());
+            return doc.getDocument().getText(0, doc.getDocument().getEndPosition().getOffset());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -875,6 +875,7 @@ public class JCommonUtil {
      *            是否顯示於console
      * @return
      */
+    @Deprecated
     public static PrintStream getNewPrintStream2JTextArea(final JTextArea logArea, final int limit, final boolean logDebug) {
         return JTextAreaUtil.getNewPrintStream2JTextArea(logArea, limit, logDebug);
     }

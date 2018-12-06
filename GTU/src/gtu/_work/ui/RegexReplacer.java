@@ -63,6 +63,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -160,7 +161,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         jPanel1.add(jScrollPane1, BorderLayout.CENTER);
                         {
                             replaceArea = new JTextArea();
-                            JTextUndoUtil.applyUndoProcess1(replaceArea);
+                            JTextAreaUtil.applyCommonSetting(replaceArea);
                             jScrollPane1.setViewportView(replaceArea);
                         }
                     }
@@ -215,7 +216,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             repFromText = new JTextArea();
-                            JTextUndoUtil.applyUndoProcess1(repFromText);
+                            JTextAreaUtil.applyCommonSetting(repFromText);
                             repFromText.setRows(4);
                             jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
                             repFromText.setColumns(10);
@@ -226,7 +227,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             repToText = new JTextArea();
-                            JTextUndoUtil.applyUndoProcess1(repToText);
+                            JTextAreaUtil.applyCommonSetting(repToText);
                             repToText.setRows(10);
                             // repToText.setPreferredSize(new Dimension(0, 50));
                             jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
@@ -369,7 +370,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                         {
                             resultArea = new JTextArea();
-                            JTextUndoUtil.applyUndoProcess1(resultArea);
+                            JTextAreaUtil.applyCommonSetting(resultArea);
                             jScrollPane2.setViewportView(resultArea);
                         }
                     }
@@ -391,7 +392,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
                 {
                     tradeOffArea = new JTextArea();
-                    JTextUndoUtil.applyUndoProcess1(tradeOffArea);
+                    JTextAreaUtil.applyCommonSetting(tradeOffArea);
                     tradeOffArea.setRows(3);
                     // tradeOffArea.setPreferredSize(new Dimension(0, 50));
                     tradeOffArea.addMouseListener(new MouseAdapter() {

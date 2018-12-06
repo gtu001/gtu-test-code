@@ -55,6 +55,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JTextAreaUtil;
 import net.sf.json.JSONObject;
 
 public class FreemarkerReplaceUI extends JFrame {
@@ -158,6 +159,7 @@ public class FreemarkerReplaceUI extends JFrame {
         panel.add(panel_5, BorderLayout.EAST);
 
         jsonArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(jsonArea);
         jsonArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {

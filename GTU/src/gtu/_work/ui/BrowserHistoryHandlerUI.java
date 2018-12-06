@@ -122,7 +122,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTextUndoUtil;
+import gtu.swing.util.JTextAreaUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
@@ -248,8 +248,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel.add(scrollPane, "4, 8, fill, fill");
 
             remarkArea = new JTextArea();
+            JTextAreaUtil.applyCommonSetting(remarkArea);
             scrollPane.setViewportView(remarkArea);
-            JTextUndoUtil.applyUndoProcess1(remarkArea);
 
             JLabel lblCommandType = new JLabel("command type");
             panel.add(lblCommandType, "2, 10, right, default");
@@ -497,6 +497,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_6.add(panel_10, BorderLayout.SOUTH);
 
             batLogArea = new JTextArea();
+            JTextAreaUtil.applyCommonSetting(batLogArea);
             panel_6.add(JCommonUtil.createScrollComponent(batLogArea), BorderLayout.CENTER);
 
             pack();

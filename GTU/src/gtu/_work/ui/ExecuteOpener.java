@@ -65,6 +65,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
 
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
@@ -80,14 +85,11 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.factories.FormFactory;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -221,6 +223,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             jPanel4.add(jScrollPane1, BorderLayout.CENTER);
                             {
                                 exeArea = new JTextArea();
+                                JTextAreaUtil.applyCommonSetting(exeArea);
                                 jScrollPane1.setViewportView(exeArea);
                             }
                         }
@@ -541,6 +544,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             jScrollPane6.setPreferredSize(new java.awt.Dimension(168, 69));
                             {
                                 scannerText = new JTextArea();
+                                JTextAreaUtil.applyCommonSetting(scannerText);
                                 scannerText.setToolTipText("query condition");
                                 jScrollPane6.setViewportView(scannerText);
                             }

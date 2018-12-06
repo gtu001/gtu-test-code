@@ -69,6 +69,7 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 
 /**
@@ -147,6 +148,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                         jPanel2.setPreferredSize(new java.awt.Dimension(660, 36));
                         {
                             leftDirText = new JTextArea();
+                            JTextAreaUtil.applyCommonSetting(leftDirText);
                             leftDirText.setPreferredSize(leftDirText.getPreferredSize());
                             leftDirText.setBorder(new LineBorder(new java.awt.Color(0, 0, 0), 1, false));
                             JCommonUtil.jTextFieldSetFilePathMouseEvent(leftDirText, true);
@@ -160,6 +162,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                         }
                         {
                             rightDirText = new JTextArea();
+                            JTextAreaUtil.applyCommonSetting(rightDirText);
                             rightDirText.setPreferredSize(rightDirText.getPreferredSize());
                             rightDirText.setBorder(new LineBorder(new java.awt.Color(0, 0, 0), 1, false));
                             JCommonUtil.jTextFieldSetFilePathMouseEvent(rightDirText, true);
