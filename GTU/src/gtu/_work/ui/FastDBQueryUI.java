@@ -2350,7 +2350,7 @@ public class FastDBQueryUI extends JFrame {
             return String.format("<html><font color=\"%s\"><b></b>%s</font>&nbsp;&nbsp;  <font color=\"black\">%s</font></html>", //
                     StringUtils.trimToEmpty(this.categoryColor), //
                     StringUtils.trimToEmpty(this.category), //
-                    StringUtils.trimToEmpty(this.content));
+                    StringUtils.trimToEmpty(this.searchKey));
         }
 
         public String toStringInfo() {
