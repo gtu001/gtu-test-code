@@ -70,6 +70,13 @@
             android:weightSum="1">
 
             <ImageView
+                android:id="@+id/btn_img_previous_song"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.21" />
+
+            <ImageView
                 android:id="@+id/btn_img_backward"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -96,6 +103,13 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="0.22" />
+
+            <ImageView
+                android:id="@+id/btn_img_next_song"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.21" />
         </LinearLayout>
 
     </LinearLayout>

@@ -23,6 +23,7 @@ import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -34,17 +35,28 @@ public class UrlPlayerDialog_bg {
     private static final String TAG = UrlPlayerDialog_bg.class.getSimpleName();
 
     private Context context;
-    private String url;
     private String message;
+    private Mp3Bean bean;
+    private List<Mp3Bean> totalUrlList;
+    private int currentIndex = -1;
     private static AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
 
     public UrlPlayerDialog_bg(Context context) {
         this.context = context;
     }
 
-    public UrlPlayerDialog_bg setUrl(String message, String url) {
-        this.url = url;
+    public UrlPlayerDialog_bg setUrl(String message, Mp3Bean bean, List<Mp3Bean> totalUrlList) {
+        this.bean = bean;
         this.message = message;
+        this.totalUrlList = totalUrlList;
+
+        if(StringUtils.isBlank(this.message)){
+            this.message = bean.name;
+        }
+
+        if (totalUrlList != null) {
+            currentIndex = totalUrlList.indexOf(bean);
+        }
 
         //只做一次
         if (this.urlPlayerServiceHander.get() == null || this.urlPlayerServiceHander.get().initNotDone()) {
@@ -65,6 +77,8 @@ public class UrlPlayerDialog_bg {
         final ImageView btn_img_cancel = (ImageView) dialog.findViewById(R.id.btn_img_cancel);
         final ImageView btn_img_backward = (ImageView) dialog.findViewById(R.id.btn_img_backward);
         final ImageView btn_img_forward = (ImageView) dialog.findViewById(R.id.btn_img_forward);
+        final ImageView btn_img_previous_song = (ImageView) dialog.findViewById(R.id.btn_img_previous_song);
+        final ImageView btn_img_next_song = (ImageView) dialog.findViewById(R.id.btn_img_next_song);
 
         text_title.setText("播放");
         text_content.setText(UrlPlayerDialog_bg.this.message);
@@ -73,13 +87,15 @@ public class UrlPlayerDialog_bg {
         new ImageButtonImageHelper(R.drawable.mp3_stop_unpressed, R.drawable.going_icon, btn_img_cancel);
         new ImageButtonImageHelper(R.drawable.mp3_backward_unpressed, R.drawable.going_icon, btn_img_backward);
         new ImageButtonImageHelper(R.drawable.mp3_forward_unpressed, R.drawable.going_icon, btn_img_forward);
+        new ImageButtonImageHelper(R.drawable.mp3_previous_song_unpressed, R.drawable.going_icon, btn_img_previous_song);
+        new ImageButtonImageHelper(R.drawable.mp3_next_song_unpressed, R.drawable.going_icon, btn_img_next_song);
 
         btn_img_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     if (!urlPlayerServiceHander.get().getMService().isInitDone()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.url);
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -144,6 +160,65 @@ public class UrlPlayerDialog_bg {
             }
         });
 
+        btn_img_previous_song.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    previousUrl();
+                    text_title.setText(UrlPlayerDialog_bg.this.bean.getName());
+                    text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
+
+                    if (urlPlayerServiceHander.get().getMService().isPlaying()) {
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        if (StringUtils.isNotBlank(result)) {
+                            Validate.isTrue(false, result);
+                        }
+                    }else{
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        if (StringUtils.isNotBlank(result)) {
+                            Validate.isTrue(false, result);
+                        }
+                        urlPlayerServiceHander.get().getMService().pauseAndResume();
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        btn_img_next_song.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    nextUrl();
+                    text_title.setText(UrlPlayerDialog_bg.this.bean.getName());
+                    text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
+
+                    if (urlPlayerServiceHander.get().getMService().isPlaying()) {
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        if (StringUtils.isNotBlank(result)) {
+                            Validate.isTrue(false, result);
+                        }
+                    }else{
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        if (StringUtils.isNotBlank(result)) {
+                            Validate.isTrue(false, result);
+                        }
+                        urlPlayerServiceHander.get().getMService().pauseAndResume();
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         text_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,6 +245,48 @@ public class UrlPlayerDialog_bg {
         return dialog;
     }
 
+    private void nextUrl() {
+        if (totalUrlList == null || totalUrlList.isEmpty()) {
+            return;
+        }
+        currentIndex++;
+        if (currentIndex >= totalUrlList.size()) {
+            currentIndex = 0;
+        }
+        this.bean = totalUrlList.get(currentIndex);
+    }
+
+    private void previousUrl() {
+        if (totalUrlList == null || totalUrlList.isEmpty()) {
+            return;
+        }
+        currentIndex--;
+        if (currentIndex < 0) {
+            currentIndex = totalUrlList.size() - 1;
+        }
+        this.bean = totalUrlList.get(currentIndex);
+    }
+
+    public static class Mp3Bean {
+        String name;
+        String url;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
 
     private class UrlPlayerServiceHander {
         private IUrlPlayerService mService;

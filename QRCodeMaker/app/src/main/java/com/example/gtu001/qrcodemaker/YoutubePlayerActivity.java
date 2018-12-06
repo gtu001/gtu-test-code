@@ -92,7 +92,11 @@ public class YoutubePlayerActivity extends Activity {
                 Log.v(TAG, "videoUrl = " + item2.videoUrl);
                 Log.v(TAG, "====================================================================");
 
-                Dialog _dialog = dialog.setUrl(item2.name, item2.videoUrl).build();
+                UrlPlayerDialog_bg.Mp3Bean bean = new UrlPlayerDialog_bg.Mp3Bean();
+                bean.setUrl(item2.videoUrl);
+                bean.setName(item2.name);
+
+                Dialog _dialog = dialog.setUrl(null, bean, initListViewHandler.getTotalUrlList()).build();
                 _dialog.show();
             }
         });
@@ -141,6 +145,18 @@ public class YoutubePlayerActivity extends Activity {
 
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
+
+        public List<UrlPlayerDialog_bg.Mp3Bean> getTotalUrlList() {
+            List<UrlPlayerDialog_bg.Mp3Bean> lst = new ArrayList<>();
+            for (Map<String, Object> m : listItem) {
+                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                YoutubeItem y = (YoutubeItem) m.get("item");
+                b.setName(y.name);
+                b.setUrl(y.videoUrl);
+                lst.add(b);
+            }
+            return lst;
+        }
 
         private void delete(String id) {
             boolean deleteOk = youtubeVideoService.deleteId(id);

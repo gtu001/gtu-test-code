@@ -14,6 +14,9 @@ import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+
+import java.util.List;
 
 /**
  * Created by gtu001 on 2017/12/12.
@@ -25,15 +28,28 @@ public class UrlPlayerDialog {
 
     private Context context;
     private Mp3PlayerHandler mp3Helper;
-    private String url;
     private String message;
+    private UrlPlayerDialog_bg.Mp3Bean bean;
+    private List<UrlPlayerDialog_bg.Mp3Bean> totalUrlList;
+    private int currentIndex = -1;
 
     public UrlPlayerDialog(Context context) {
         this.context = context;
     }
 
-    public UrlPlayerDialog setUrl(String message, String url) {
-        this.url = url;
+    public UrlPlayerDialog setUrl(String message, UrlPlayerDialog_bg.Mp3Bean bean, List<UrlPlayerDialog_bg.Mp3Bean> totalUrlList) {
+        this.bean = bean;
+        this.message = message;
+        this.totalUrlList = totalUrlList;
+
+        if (StringUtils.isBlank(this.message)) {
+            this.message = bean.name;
+        }
+
+        if (totalUrlList != null) {
+            currentIndex = totalUrlList.indexOf(bean);
+        }
+
         this.message = message;
         return this;
     }
@@ -49,6 +65,8 @@ public class UrlPlayerDialog {
         final ImageView btn_img_cancel = (ImageView) dialog.findViewById(R.id.btn_img_cancel);
         final ImageView btn_img_forward = (ImageView) dialog.findViewById(R.id.btn_img_forward);
         final ImageView btn_img_backward = (ImageView) dialog.findViewById(R.id.btn_img_backward);
+        final ImageView btn_img_previous_song = (ImageView) dialog.findViewById(R.id.btn_img_previous_song);
+        final ImageView btn_img_next_song = (ImageView) dialog.findViewById(R.id.btn_img_next_song);
 
         text_title.setText("播放");
         text_content.setText(UrlPlayerDialog.this.message);
@@ -57,17 +75,19 @@ public class UrlPlayerDialog {
         new ImageButtonImageHelper(R.drawable.mp3_stop_unpressed, R.drawable.going_icon, btn_img_cancel);
         new ImageButtonImageHelper(R.drawable.mp3_backward_unpressed, R.drawable.going_icon, btn_img_backward);
         new ImageButtonImageHelper(R.drawable.mp3_forward_unpressed, R.drawable.going_icon, btn_img_forward);
+        new ImageButtonImageHelper(R.drawable.mp3_previous_song_unpressed, R.drawable.going_icon, btn_img_previous_song);
+        new ImageButtonImageHelper(R.drawable.mp3_next_song_unpressed, R.drawable.going_icon, btn_img_next_song);
 
         btn_img_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    if (StringUtils.isBlank(UrlPlayerDialog.this.url)) {
+                    if (UrlPlayerDialog.this.bean == null || StringUtils.isBlank(UrlPlayerDialog.this.bean.url)) {
                         Toast.makeText(context, "檔案錯誤!", Toast.LENGTH_SHORT).show();
                     }
                     if (mp3Helper == null) {
                         mp3Helper = Mp3PlayerHandler.create(context);
-                        mp3Helper.of(UrlPlayerDialog.this.url);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
                         mp3Helper.play();
                     } else {
                         mp3Helper.pauseAndResume();
@@ -126,6 +146,52 @@ public class UrlPlayerDialog {
             }
         });
 
+
+        btn_img_previous_song.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    previousUrl();
+                    text_title.setText(UrlPlayerDialog.this.bean.getName());
+                    text_content.setText(UrlPlayerDialog.this.bean.getUrl());
+
+                    if (mp3Helper.isPlaying()) {
+                        mp3Helper = Mp3PlayerHandler.create(context);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
+                        mp3Helper.play();
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        btn_img_next_song.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    nextUrl();
+                    text_title.setText(UrlPlayerDialog.this.bean.getName());
+                    text_content.setText(UrlPlayerDialog.this.bean.getUrl());
+
+                    if (mp3Helper.isPlaying()) {
+                        mp3Helper = Mp3PlayerHandler.create(context);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
+                        mp3Helper.play();
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         text_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,5 +216,27 @@ public class UrlPlayerDialog {
         });
 
         return dialog;
+    }
+
+    private void nextUrl() {
+        if (totalUrlList == null || totalUrlList.isEmpty()) {
+            return;
+        }
+        currentIndex++;
+        if (currentIndex >= totalUrlList.size()) {
+            currentIndex = 0;
+        }
+        this.bean = totalUrlList.get(currentIndex);
+    }
+
+    private void previousUrl() {
+        if (totalUrlList == null || totalUrlList.isEmpty()) {
+            return;
+        }
+        currentIndex--;
+        if (currentIndex < 0) {
+            currentIndex = totalUrlList.size() - 1;
+        }
+        this.bean = totalUrlList.get(currentIndex);
     }
 }

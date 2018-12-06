@@ -100,7 +100,11 @@ public class Mp3PlayerActivity extends Activity {
                 com.example.gtu001.qrcodemaker.common.Log.v(TAG, "videoUrl = " + item2.videoUrl);
                 com.example.gtu001.qrcodemaker.common.Log.v(TAG, "====================================================================");
 
-                Dialog _dialog = dialog.setUrl(item2.name, item2.videoUrl).build();
+                UrlPlayerDialog_bg.Mp3Bean bean = new UrlPlayerDialog_bg.Mp3Bean();
+                bean.setName(item2.name);
+                bean.setUrl(item2.videoUrl);
+
+                Dialog _dialog = dialog.setUrl(null, bean, initListViewHandler.getTotalUrlList()).build();
                 _dialog.show();
             }
         });
@@ -119,6 +123,11 @@ public class Mp3PlayerActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        initListViewHandler.delete(item2);
+                                        break;
                                     default:
                                         Toast.makeText(Mp3PlayerActivity.this, "Unknow choice " + which, Toast.LENGTH_SHORT).show();
                                         break;
@@ -142,6 +151,31 @@ public class Mp3PlayerActivity extends Activity {
 
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
+
+        public void delete(FileItem item2){
+            for (int ii = 0; ii < listItem.size() ; ii ++) {
+                Map<String, Object> m = listItem.get(ii);
+                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                FileItem y = (FileItem) m.get("item");
+                if(y == item2){
+                    listItem.remove(ii);
+                    ii -- ;
+                }
+            }
+            baseAdapter.notifyDataSetChanged();
+        }
+
+        public List<UrlPlayerDialog_bg.Mp3Bean> getTotalUrlList() {
+            List<UrlPlayerDialog_bg.Mp3Bean> lst = new ArrayList<>();
+            for (Map<String, Object> m : listItem) {
+                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                FileItem y = (FileItem) m.get("item");
+                b.setName(y.name);
+                b.setUrl(y.videoUrl);
+                lst.add(b);
+            }
+            return lst;
+        }
 
         private Map<String, Object> getItem2Map(FileItem item) {
             Map<String, Object> map = new HashMap<String, Object>();

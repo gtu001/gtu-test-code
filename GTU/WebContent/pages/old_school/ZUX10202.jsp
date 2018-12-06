@@ -34,6 +34,125 @@
 <script type="text/JavaScript"
 	src="${htmlBase}/CM/js/ui/InputUtility.js"></script>
 <script type="text/javascript" src="${htmlBase}/CM/js/RPTUtil.js"></script>
+<script language="JavaScript" src="<%=htmlBase%>/CM/js/showWindow.js"></script>
+<script language="JavaScript" src="<%=htmlBase%>/CM/js/utility.js"></script>
+<script language="JavaScript" src="<%=htmlBase%>/CM/js/ElementGroup.js"></script>
+<script language="JavaScript" src="<%=htmlBase%>/CM/js/date.js"></script>
+<script language="JavaScript" src="<%=htmlBase%>/CM/js/calendar.js"></script>
+
+<style>
+.textarea2 {
+	display: inline;
+	overflow-x: hidden;
+	overflow-y: visible;
+	height: 60px;
+	width: 186px;
+}
+
+div.tbXY td {
+	border: #C7E49C solid 0px;
+}
+
+.BoxCase1 {
+	Z-INDEX: 100000;
+	LEFT: -800px;
+	VISIBILITY: hidden;
+	WIDTH: 300px;
+	POSITION: absolute;
+	TOP: -600px;
+	HEIGHT: 50px;
+	overflow: visible;
+	FILTER: Alpha(Opacity =     90);
+	scrollbar-face-color: #B0D8FF;
+	scrollbar-highlight-color: #B0D8FF;
+	scrollbar-3dlight-color: #E6F2FF;
+	scrollbar-darkshadow-color: #4DA2FF;
+	scrollbar-shadow-color: #95C8FF;
+	scrollbar-arrow-color: #fff;
+	scrollbar-track-color: #DFEEFF;
+}
+
+.BoxCase1 {
+	BORDER-RIGHT: 2px outset;
+	PADDING-RIGHT: 6px;
+	BORDER-TOP: 2px outset;
+	PADDING-LEFT: 6px;
+	BACKGROUND: #FFF;
+	PADDING-BOTTOM: 6px;
+	BORDER-LEFT: 2px outset;
+	COLOR: #000000;
+	PADDING-TOP: 6px;
+	BORDER-BOTTOM: 2px outset;
+	TEXT-ALIGN: left;
+}
+
+.BoxCase1 {
+	font: 13px/ 15px verdana, arial, sans-serif;
+}
+
+.BoxCase1 p {
+	margin: 0px;
+	margin-top: 5px;
+	line-height: 18px;
+	color: '#0078F0';
+	word-wrap: normal
+}
+
+.BoxCase1 p:first-letter {
+	font-weight: 900;
+	color: '#0078F0';
+	font-size: 24px;
+}
+
+.BoxCase1 em {
+	display: block;
+	margin-top: 3px;
+	color: #f60;
+	font-style: normal;
+	font-weight: bold;
+}
+
+.BoxCase1 em span {
+	font-weight: bold;
+	color: '#0078F0';
+	word-wrap: normal
+}
+
+.BoxShad {
+	LEFT: -800px;
+	WIDTH: 100px;
+	TOP: -600px;
+	HEIGHT: 200px
+}
+
+.tabs_menu {
+	padding: 3px;
+	margin: 0px 2px;
+	border: 1px solid #666;
+	border-bottom-width: 0px;
+	padding-bottom: 1px;
+	border-collapse: collapse;
+	background: #EEE;
+	color: #666;
+	border-radius: 7px 7px 0px 0px;
+}
+
+.onSelected {
+	position: relative;
+	z-index: 1 !important;
+	top: 1px;
+	padding-bottom: 1px;
+	margin: 0px 3px 0px 3px;
+	border: 1px solid #666;
+	border-bottom-width: 0px;
+	background: #FA1;
+	color: #000;
+	font-weight: bold;
+	cursor: default;
+	border-radius: 7px 7px 0px 0px;
+}
+</style>
+
 <script type='text/javascript'>
 
 <%-- 產生畫面物件 --%>
@@ -41,84 +160,189 @@
 var mZUX10202 = new ZUX10202();
 Event.observe(window, 'load', mZUX10202.initApp);
 
-(function(item){
-	if (item.hasOwnProperty('emptyChildren')) {
-		return;
+HTMLElement.prototype.after = function() {
+	var argArr = Array.prototype.slice.call(arguments),
+	docFrag = document.createDocumentFragment();
+	argArr.forEach(function (argItem) {
+		var isNode = argItem instanceof Node;
+		docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+	});
+	this.parentNode.insertBefore(docFrag, this.nextSibling);
+}
+
+HTMLElement.prototype.show = function(isShow) {
+	if(isShow){
+		this.style.visibility = "visible";
+		this.style.display = "block";
+	}else{
+		this.style.visibility = "hidden";
+     	this.style.display = "none";
 	}
-	Object.defineProperty(item, 'emptyChildren', {
-		configurable: true,
-		enumerable: true,
-		writable: true,
-		value : function emptyChildren() {
-			var myNode = this;
-			while (myNode.firstChild) {
-			    myNode.removeChild(myNode.firstChild);
+}
+
+HTMLElement.prototype.emptyChildren = function(){
+	var myNode = this;
+	while (myNode.firstChild) {
+	    myNode.removeChild(myNode.firstChild);
+	}
+}
+
+function SerialNoList() {
+	this.initSelection = function(MOD_NO, SER_NO, mapX121List){
+		this.mapX121List = mapX121List;
+		var arry = document.getElementsByName("SER_NO_LIST");
+		for(var ii = 0 ; ii < arry.length; ii ++){
+			var serNoList = arry[ii];
+			var modNo = serNoList.getAttribute("MOD_NO");
+			var serNo = serNoList.getAttribute("SER_NO");
+			
+			if((MOD_NO == undefined && SER_NO == undefined) || 
+				(modNo == MOD_NO && serNo == SER_NO)) {
+				this.initDetail(serNoList, modNo, serNo);
 			}
 		}
-	});
-})(HTMLElement.prototype);
-
-(function (arr) {
-	arr.forEach(function (item) {
-		if (item.hasOwnProperty('after')) {
+	}
+	
+	this.initDetail = function(serNoList, modNo, serNo){
+		var dtlArry = this.mapX121List[modNo + "-" + serNo];
+		if(!dtlArry){
 			return;
 		}
-		Object.defineProperty(item, 'after', {
-			configurable: true,
-			enumerable: true,
-			writable: true,
-			value: function after() {
-				var argArr = Array.prototype.slice.call(arguments),
-				docFrag = document.createDocumentFragment();
-	        
-				argArr.forEach(function (argItem) {
-				var isNode = argItem instanceof Node;
-				docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
-				});
-	        
-				this.parentNode.insertBefore(docFrag, this.nextSibling);
-			}
-		});
-	});
-})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
-
-(function(item){
-	if (item.hasOwnProperty('show')) {
-		return;
-	}
-	Object.defineProperty(item, 'show', {
-		configurable: true,
-		enumerable: true,
-		writable: true,
-		value : function show(isShow) {
-			if(isShow){
-				this.style.visibility = "visible";
-				this.style.display = "block";
-			}else{
-				this.style.visibility = "hidden";
-		     	this.style.display = "none";
-			}
+		
+		serNoList.emptyChildren();
+		for(var ii = 0 ; ii < dtlArry.length; ii ++) {
+			var span = document.createElement("span");
+			var txt1 = document.createTextNode(" " + (ii + 1) + " ");
+			span.setAttribute("jsonObj", Object.toJSON(dtlArry[ii]));
+			span.setAttribute("class", "tabs_menu");
+			span.appendChild(txt1);
+			serNoList.appendChild(span);
+			
+			span.addEventListener("click", function(e) {
+				var reqMap = JSON.parse(this.getAttribute("jsonObj"));
+				mZUX10202.actions.doQuery0022(reqMap.FORM_NO, reqMap.MOD_NO, reqMap.SER_NO, reqMap.EXEC_NO, reqMap.SQL_NO, reqMap.CK_SQL, reqMap.Q_COLs);
+			});
 		}
-	});
-})(HTMLElement.prototype);
+	};
+	return this;
+}
 
+function ActionForValueTr() {
+	this.commonValidate = function(){
+		var Q_COLs = mZUX10202.applyMapX112.getQColMap();
+		if(!Q_COLs){
+			return false;
+		}
+		if(!mZUX10202.applyMapX112.isQMapNoModify()){
+			alert('查詢條件已異動,請重新查詢');
+			return false;
+		}
+		var valueMap = mZUX10202.applyMapX112.getUColMap();
+		if(!valueMap){
+			return false;
+		}
+		return true;
+	};
+	
+	this.getReqMap = function(){
+		var reqMap = {
+			FORM_NO : $('FORM_NO').value,
+			MOD_NO : mZUX10202.applyMapX112.reqMap.MOD_NO,
+			SER_NO : mZUX10202.applyMapX112.reqMap.SER_NO,
+			EXEC_NO : mZUX10202.applyMapX112.reqMap.EXEC_NO,
+		};
+		return reqMap;
+	}
 
-function ApplyMapX112(reqMap, mapX112) {
+	this.enter = function(){
+		if(!this.commonValidate()){
+			return;
+		}
+		mZUX10202.actions.doSaveValues_Input(this.getReqMap());
+	};
+	
+	this.update = function(){
+		if(!this.commonValidate()){
+			return;
+		}
+		mZUX10202.actions.doSaveValues_Update(this.getReqMap());
+	};
+	
+	this.delete1 = function(){
+		if(!this.commonValidate()){
+			return;
+		}
+		mZUX10202.actions.doSaveValues_Delete(this.getReqMap());
+	};
+}
+
+function ApplyMapX112(reqMap, mapX112, x125Map) {
 	this.reqMap = reqMap;
 	this.mapX112 = mapX112;
+	
+	this.getX125Map = function(typeChar, x125Map){
+		var rtnMap = {};
+		for(var key in x125Map){
+			if(key.indexOf(typeChar + "||") != -1){
+				var keyNew = key.replace(typeChar + "||", "");
+				rtnMap[keyNew] = x125Map[key];
+			}
+		}
+		return rtnMap;
+	};
+	
+	this.Qx125Map = this.getX125Map("Q", x125Map || {});
+	this.Ux125Map = this.getX125Map("U", x125Map || {});
 	
 	this.COL_PROPERTIES = mapX112.COL_PROPERTIES;
 	this.Q_COLs = mapX112.Q_COLs;
 	this.U_COLs = mapX112.U_COLs;
 	
+	this.updateReqMap = function(reqMap1){
+		for(var key in reqMap1){
+			this.reqMap[key] = reqMap1[key];
+		}
+	};
+	
+	this.isQMapNoModify = function(){
+		var currentMap = this.getQColMap();
+		var orignMap = this.Qx125Map;
+		for(var column in currentMap){
+			if(currentMap[column] != orignMap[column]){
+				return false;
+			}
+		}
+		return true;
+	};
+	
+	this.isUMapNoModify = function(){
+		var currentMap = this.getUColMap();
+		var orignMap = this.Ux125Map;
+		for(var column in currentMap){
+			if(currentMap[column] != orignMap[column]){
+				return false;
+			}
+		}
+		return true;
+	};
+	
+	this.doQueryByQCOLDone = function(){
+		this.Qx125Map = this.getQColMap();
+	};
+	
 	this.tdAddInput = function(td, namePrefix, name){
 		var input = document.createElement("input");
-		input.setAttribute("name", namePrefix + name);
+		input.setAttribute("name", namePrefix + "_" + name);
 		var def = this.COL_PROPERTIES[name];
 		input.setAttribute("nullable", def['NULLABLE']);
 		input.setAttribute("maxlength", def['COL_LENGTH']);
 		input.setAttribute("COL_TYPE", def['COL_TYPE']);
 		td.appendChild(input);
+		if(namePrefix == "Q"){
+			input.value = this.Qx125Map[name] || "";
+		}else if(namePrefix == "U"){
+			input.value = this.Ux125Map[name] || "";
+		}
 	
 		if("DATE" == def['COL_TYPE']) { //
 			input.setAttribute('datatype','date');
@@ -154,18 +378,23 @@ function ApplyMapX112(reqMap, mapX112) {
 	
 	this.createQueryBtn = function(){
 		var btn = document.createElement("input");
+		btn.setAttribute("id", "BTN_query");
 		btn.setAttribute("type", "button");
 		btn.setAttribute("value", "查詢");
 		btn.addEventListener("click", function(e){
-			mZUX10202.buttons.BTN_doQueryByQCOL();
+			mZUX10202.actions.doQueryByQCOL();
 		});
 		return btn;
 	};
 	
-	this.createBtn = function(value){
+	this.createBtn = function(id, value, func){
 		var btn = document.createElement("input");
+		btn.setAttribute("id", id);
 		btn.setAttribute("type", "button");
 		btn.setAttribute("value", value);
+		btn.addEventListener("click", function(e){
+			func();
+		});
 		return btn;
 	};
 	
@@ -207,7 +436,7 @@ function ApplyMapX112(reqMap, mapX112) {
 			
 			var td2 = document.createElement("td");
 			this.setTd(td2);	
-			this.tdAddInput(td2, "Q_", column);
+			this.tdAddInput(td2, "Q", column);
 			tr1.appendChild(td2);
 			
 			if(trIndex == 0){
@@ -218,6 +447,18 @@ function ApplyMapX112(reqMap, mapX112) {
 				tr1.appendChild(td3);
 			}
 			trIndex ++;
+		}
+	};
+	
+	this.isBtn_showControl = function() {
+		if(!this.reqMap.EXEC_NO || this.reqMap.EXEC_NO == ''){
+			document.querySelector("#BTN_doSaveValues_Input").show(true);
+			document.querySelector("#BTN_doSaveValues_Update").show(false);
+			document.querySelector("#BTN_doSaveValues_Delete").show(false);
+		}else{
+			document.querySelector("#BTN_doSaveValues_Input").show(false);
+			document.querySelector("#BTN_doSaveValues_Update").show(true);
+			document.querySelector("#BTN_doSaveValues_Delete").show(true);
 		}
 	};
 	
@@ -239,15 +480,20 @@ function ApplyMapX112(reqMap, mapX112) {
 			
 			var td2 = document.createElement("td");
 			this.setTd(td2);	
-			this.tdAddInput(td2, "U_", column);
+			this.tdAddInput(td2, "U", column);
 			tr1.appendChild(td2);
 			
 			if(trIndex == 0){
 				var td3 = document.createElement("td");
 				td3.setAttribute("rowspan", rowspanLength);
 				this.setTd(td3);	
-				td3.appendChild(this.createBtn("輸入"));
+				
+				td3.appendChild(this.createBtn("BTN_doSaveValues_Input", "輸入", function() { mZUX10202.actionForValueTr.enter(); }));
+				td3.appendChild(this.createBtn("BTN_doSaveValues_Update", "儲存", function() { mZUX10202.actionForValueTr.update(); }));
+				td3.appendChild(this.createBtn("BTN_doSaveValues_Delete", "刪除", function() { mZUX10202.actionForValueTr.delete1(); }));
 				tr1.appendChild(td3);
+				
+				this.isBtn_showControl();
 			}
 			trIndex ++;
 		}
@@ -257,7 +503,20 @@ function ApplyMapX112(reqMap, mapX112) {
 }
 
 function ValTableControl() {
+	this.tabMenuTriggerClick = function(){
+		var objs = document.querySelector(".tabs_menu");
+		if(Array.isArray(objs)){
+			objs = objs[0];
+		}
+		//objs.classList.remove("onSelected");
+		$(objs).simulate("click");
+	};
+
 	this.creatSQL_LINK = function(dataList) {
+		if(!dataList){
+			return;
+		}
+		
 		document.querySelector('#SQL_LINK').emptyChildren();
 		
 		var sqlLink = document.querySelector("#SQL_LINK");
@@ -286,7 +545,9 @@ function ValTableControl() {
 			a1.setAttribute("jsonObj", Object.toJSON(
 								{MOD_NO : data.MOD_NO,
 								SER_NO : data.SER_NO,
-								SQL_NO : data.SQL_NO}));
+								SQL_NO : data.SQL_NO,
+								EXEC_NO : data.EXEC_NO,
+								}));
 			a1.setAttribute("CK_SQL", data.CK_SQL);
 
 			var div1 = document.createElement("div");
@@ -294,8 +555,8 @@ function ValTableControl() {
 	        
 	        a1.addEventListener("mouseover", function(e){
                 var rect = td1.getBoundingClientRect();
-	        
-	   	        div1.style.left = (rect.left + rect.width);
+                div1.style.position = "absolute";
+                div1.style.left = (rect.left + rect.width);
 	   	        div1.style.top = (rect.top + rect.height);
 	                
 	            div1.style.visibility = "visible";
@@ -307,6 +568,7 @@ function ValTableControl() {
 	        });
 	        
 	        a1.addEventListener("click", function(e){
+	        	td1.setAttribute("class", "tabs_menu onSelected");
 				var data = JSON.parse(a1.getAttribute("jsonObj")||'{}');
 				var CK_SQL = a1.getAttribute("CK_SQL") || "";
 				mZUX10202.actions.doQuerySqlDetail(data, CK_SQL);
@@ -315,6 +577,8 @@ function ValTableControl() {
 			div1.setAttribute("class", "BoxCase1");
 			div1.setAttribute("id", "SQLBOX"+i);
 			div1.setAttribute("style", "width:auto;");
+			div1.style.visibility = "hidden";
+	       	div1.style.display = "none";
 			
 			var em1 = document.createElement("em");
 			em1.setAttribute("style", "width:auto;");
@@ -338,9 +602,8 @@ function ValTableControl() {
 		document.querySelector('#I_AREA').show(false);	
 		document.querySelector('#Q_AREA').show(false);	
 		
-		debugger
-		
 		var MOD_TP = rtnMap.MOD_TP;
+		
 		if('2' == MOD_TP){//修改
 			document.querySelector('#Q_AREA').show(true);
 			document.querySelector('#U_AREA').show(true);	
@@ -625,7 +888,9 @@ function ZUX10202(){
 	var valid1;
 	
 	this.applyMapX112 = null;
-	this.valTableControl = null;
+	this.valTableControl = new ValTableControl();
+	this.actionForValueTr = new ActionForValueTr();
+	this.serialNoList = new SerialNoList();
 	
 	var validAction = {
 		// 欄位檢核
@@ -759,7 +1024,7 @@ function ZUX10202(){
         	
         },
         
-        doQuery0022_byAdd : function(FORM_NO, MOD_NO, SER_NO, EXEC_NO, SQL_NO, CHK_SQL, Q_COLs){
+        doQuery0022 : function(FORM_NO, MOD_NO, SER_NO, EXEC_NO, SQL_NO, CK_SQL, Q_COLs){
 			FORM_NO = document.querySelector("input[name=FORM_NO]").value;
 			
 			var reqMap = {
@@ -768,33 +1033,47 @@ function ZUX10202(){
 				SER_NO : SER_NO, 
 				EXEC_NO : EXEC_NO, 
 				SQL_NO : SQL_NO, 
-				CHK_SQL : CHK_SQL,
+				CK_SQL : CK_SQL,
 			};
+			
+			$("EXEC_NO").value = EXEC_NO;
+			$("MOD_NO").value = MOD_NO;
+			$("FORM_NO").value = FORM_NO;
+			//$("SER_NO").value = SER_NO;
+			//$("SQL_NO").value = SQL_NO;
 			
 			ajaxRequest.post('doQuery0022', {reqMap : Object.toJSON(reqMap), Q_COLs : Object.toJSON(Q_COLs)},
 				function(resp){
+				
 					actions.showReqMap(resp.mapX120);
 					actions.applyReqMapToForm(resp.mapX120);
 					
-					this.applyMapX112 = new ApplyMapX112(reqMap, resp.mapX112);
-					this.applyMapX112.apply();
+					mZUX10202.applyMapX112 = new ApplyMapX112(reqMap, resp.mapX112, resp.x125Map);
+					mZUX10202.applyMapX112.apply();
+					
+					mZUX10202.valTableControl.creatSQL_LINK(resp.listX111);
+					
+					var rtnMap = resp.rtnMap||{};
+					var tableMap = resp.tableMap||{};
+					mZUX10202.valTableControl.controlSQLTable(rtnMap, tableMap);
 				}
 			);
 		},
 		
 		doQueryByQCOL : function() {
-			if(!applyMapX112){
+			if(!mZUX10202.applyMapX112){
 				alert('applyMapX112 undefined!!');
 				return;
 			}
 			
 			var reqMap = {
 				FORM_NO : $("FORM_NO") ? $("FORM_NO").value : "",
-				MOD_NO : applyMapX112.reqMap.MOD_NO, 
-				SER_NO : applyMapX112.reqMap.SER_NO,
+				MOD_NO : mZUX10202.applyMapX112.reqMap.MOD_NO, 
+				SER_NO : mZUX10202.applyMapX112.reqMap.SER_NO,
+				EXEC_NO : mZUX10202.applyMapX112.reqMap.EXEC_NO,
 			};
 			
-			ajaxRequest.post('doQueryByQCOL', {reqMap : Object.toJSON(reqMap), Q_COLs : Object.toJSON(applyMapX112.getQColMap())},
+			ajaxRequest.post('doQueryByQCOL', {reqMap : Object.toJSON(reqMap), Q_COLs : Object.toJSON(mZUX10202.applyMapX112.getQColMap())},
 				function(resp){
 					actions.showReqMap(resp.listX111);
 					actions.applyReqMapToForm(resp.listX111);
@@ -802,8 +1081,9 @@ function ZUX10202(){
 					actions.showReqMap(resp.mapX120);
 					actions.applyReqMapToForm(resp.mapX120);
 					
-					this.valTableControl = new ValTableControl();
-					this.valTableControl.creatSQL_LINK(resp.listX111);
+					mZUX10202.applyMapX112.doQueryByQCOLDone();
+					
+					mZUX10202.valTableControl.creatSQL_LINK(resp.listX111);
 				}
 			);
 		},
@@ -817,11 +1097,129 @@ function ZUX10202(){
 				SQL_NO : data.SQL_NO,
 			};
 			
-			ajaxRequest.post('doQuerySqlDetail', {reqMap : Object.toJSON(reqMap), Q_COLs : Object.toJSON(applyMapX112.getQColMap()), CK_SQL : CK_SQL},
+			ajaxRequest.post('doQuerySqlDetail', {reqMap : Object.toJSON(reqMap), Q_COLs : Object.toJSON(mZUX10202.applyMapX112.getQColMap()), CK_SQL : CK_SQL},
 				function(resp){
 					var rtnMap = resp.rtnMap||{};
-					var TABLE_PROPERTIES_MAP = resp.TABLE_PROPERTIES_MAP||{};
-					this.valTableControl.controlSQLTable(rtnMap, TABLE_PROPERTIES_MAP);
+					var tableMap = resp.tableMap||{};
+					
+					mZUX10202.valTableControl.controlSQLTable(rtnMap, tableMap);
+				}
+			);
+		},//
+		
+		doSaveValues_Input : function(reqMap1){
+			var reqMap = {
+				FORM_NO : reqMap1.FORM_NO, 
+				MOD_NO : reqMap1.MOD_NO, 
+				SER_NO : reqMap1.SER_NO, 
+				EXEC_NO : reqMap1.EXEC_NO, 
+			};
+			
+			ajaxRequest.post('doSaveValues_Input', 
+				{	reqMap : Object.toJSON(reqMap), 
+					Q_COLs : Object.toJSON(mZUX10202.applyMapX112.getQColMap()), 
+					valueMap : Object.toJSON(mZUX10202.applyMapX112.getUColMap()),
+				},
+				function(resp){
+					var rtnMap = {
+						MOD_NO : resp.MOD_NO, 
+						FORM_NO : resp.FORM_NO, 
+						SER_NO : resp.SER_NO, 
+						EXEC_NO : resp.EXEC_NO, 
+					};
+					
+					actions.showReqMap(rtnMap);
+					actions.applyReqMapToForm(rtnMap);
+					
+					mZUX10202.applyMapX112.updateReqMap(rtnMap);
+					mZUX10202.applyMapX112.isBtn_showControl();
+				
+					mZUX10202.valTableControl.creatSQL_LINK(resp.listX111);
+					
+					var rtnMap = resp.rtnMap||{};
+					var tableMap = resp.tableMap||{};
+					mZUX10202.valTableControl.controlSQLTable(rtnMap, tableMap);
+					
+					var mapX121List = resp.mapX121List || [];
+					mZUX10202.serialNoList.initSelection(rtnMap.MOD_NO, rtnMap.SER_NO, mapX121List);
+				}
+			);
+		},//
+		
+		doSaveValues_Update : function(reqMap1){
+			var reqMap = {
+				FORM_NO : reqMap1.FORM_NO, 
+				MOD_NO : reqMap1.MOD_NO, 
+				SER_NO : reqMap1.SER_NO, 
+				EXEC_NO : reqMap1.EXEC_NO, 
+			};
+			
+			ajaxRequest.post('doSaveValues_Update', 
+				{	reqMap : Object.toJSON(reqMap), 
+					Q_COLs : Object.toJSON(mZUX10202.applyMapX112.getQColMap()), 
+					valueMap : Object.toJSON(mZUX10202.applyMapX112.getUColMap()),
+				},
+				function(resp){
+					var rtnMap = {
+						MOD_NO : resp.MOD_NO, 
+						FORM_NO : resp.FORM_NO, 
+						SER_NO : resp.SER_NO, 
+						EXEC_NO : resp.EXEC_NO, 
+					};
+					
+					actions.showReqMap(rtnMap);
+					actions.applyReqMapToForm(rtnMap);
+					
+					mZUX10202.applyMapX112.updateReqMap(rtnMap);
+					mZUX10202.applyMapX112.isBtn_showControl();
+				
+					mZUX10202.valTableControl.creatSQL_LINK(resp.listX111);
+					
+					var rtnMap = resp.rtnMap||{};
+					var tableMap = resp.tableMap||{};
+					mZUX10202.valTableControl.controlSQLTable(rtnMap, tableMap);
+					
+					var mapX121List = resp.mapX121List || [];
+					mZUX10202.serialNoList.initSelection(rtnMap.MOD_NO, rtnMap.SER_NO, mapX121List);
+				}
+			);
+		},//
+		
+		doSaveValues_Delete : function(reqMap1){
+			var reqMap = {
+				FORM_NO : reqMap1.FORM_NO, 
+				MOD_NO : reqMap1.MOD_NO, 
+				SER_NO : reqMap1.SER_NO, 
+				EXEC_NO : reqMap1.EXEC_NO, 
+			};
+			
+			ajaxRequest.post('doSaveValues_Delete', 
+				{	reqMap : Object.toJSON(reqMap), 
+					Q_COLs : Object.toJSON(mZUX10202.applyMapX112.getQColMap()), 
+					valueMap : Object.toJSON(mZUX10202.applyMapX112.getUColMap()),
+				},
+				function(resp){
+					var rtnMap = {
+						MOD_NO : resp.MOD_NO, 
+						FORM_NO : resp.FORM_NO, 
+						SER_NO : resp.SER_NO, 
+						EXEC_NO : resp.EXEC_NO, 
+					};
+					
+					actions.showReqMap(rtnMap);
+					actions.applyReqMapToForm(rtnMap);
+					
+					mZUX10202.applyMapX112.updateReqMap(rtnMap);
+					mZUX10202.applyMapX112.isBtn_showControl();
+				
+					mZUX10202.valTableControl.creatSQL_LINK(resp.listX111);
+					
+					var rtnMap = resp.rtnMap||{};
+					var tableMap = resp.tableMap||{};
+					mZUX10202.valTableControl.controlSQLTable(rtnMap, tableMap);
+					
+					var mapX121List = resp.mapX121List || [];
+					mZUX10202.serialNoList.initSelection(rtnMap.MOD_NO, rtnMap.SER_NO, mapX121List);
 				}
 			);
 		},//
@@ -838,7 +1236,7 @@ function ZUX10202(){
 				var v = validAction.createRequired({"RLT_FORMNO" : "關聯表單號不可空白"});
 				if(!v.validate()){
 					return;
-				}
+				} 
 			}
 			
 			ajaxRequest.post('doMemo', {reqMap : Object.toJSON($('form1').serialize(true))},
@@ -857,10 +1255,6 @@ function ZUX10202(){
 				}
 			);
 		} ,
-		
-		BTN_doQueryByQCOL : function(){
-			actions.doQueryByQCOL();
-		},
 	};
 	this.buttons = buttons;
 		
@@ -875,6 +1269,9 @@ function ZUX10202(){
 		var rtnMap = <c:out value='${mapX120JSON}' default='{}' escapeXml='false'/>;  // rtnMap物件
 		actions.btnDisable(rtnMap);
 		actions.applyReqMapToForm(rtnMap);
+		
+		var mapX121List = <c:out value='${mapX121ListJSON}' default='{}' escapeXml='false'/>;  // rtnMap物件
+		mZUX10202.serialNoList.initSelection(undefined, undefined, mapX121List);
 		
 		validAction.init();
 		
@@ -895,21 +1292,31 @@ function ZUX10202(){
 <input type="text" name="FORM_NO" value="${mapX120.FORM_NO}"
 	title="FORM_NO" /> <input type="text" name="MOD_NO"
 	value="${mapX120.MOD_NO}" title="MOD_NO" /> <input type="text"
-	name="EXEC_NO" value="" title="EXEC_NO" /> <%--↓↓↓↓↓↓↓↓ 資料修正作業  ↓↓↓↓↓↓↓↓--%>
+	name="EXEC_NO" value="" title="EXEC_NO" /> <input type="text"
+	name="SER_NO" value="" title="SER_NO" /> 
+<%--↓↓↓↓↓↓↓↓ 資料修正作業  ↓↓↓↓↓↓↓↓--%>
 <TABLE width=100% border=0 cellpadding="0" cellspacing="1"
-	class="tbBox2" align="center" id="SER_NO_LIST">
+	class="tbBox2" align="center" id="SER_NO_LIST_Main">
 	<thead>
 		<c:forEach var="mapX111" items="${listX111}" varStatus="idx">
 			<tr>
 				<td width="20%" class="tbBlue" style="white-space: nowrap"
-					align="left">${mapX111.SER_NO}.${mapX111.DF_MEMO} 
-					<input type="text" value="${mapX111.MOD_NO}" id="mapX111_MOD_NO_${idx.index}" alt="MOD_NO" />
-					<input type="text" value="${mapX111.SER_NO}" id="mapX111_SER_NO_${idx.index}" alt="SER_NO" />
-					<input type="text" value="${mapX111.EXEC_NO}" id="mapX111_EXEC_NO_${idx.index}" alt="EXEC_NO" />
-					<input type="text" value="${mapX111.SQL_NO}" id="mapX111_SQL_NO_${idx.index}" alt="SQL_NO" />
-					<input type="text" value="${mapX111.Q_COLs}" id="mapX111_Q_COLs_${idx.index}" alt="Q_COLs" />
-					<a href="javascript:mZUX10202.actions.doQuery0022_byAdd('${mapX111.FORM_NO}', '${mapX111.MOD_NO}', '${mapX111.SER_NO}', '${mapX111.EXEC_NO}', '${mapX111.SQL_NO}', '${mapX111.CHK_SQL}', '${mapX111.Q_COLs}')">
-				&nbsp;&nbsp;<font color="red"> ＋ </font>&nbsp;&nbsp; </a></td>
+					align="left">${mapX111.SER_NO}.${mapX111.DF_MEMO} <input
+					type="hidden" value="${mapX111.MOD_NO}"
+					id="mapX111_MOD_NO_${idx.index}" alt="MOD_NO" /> <input
+					type="hidden" value="${mapX111.SER_NO}"
+					id="mapX111_SER_NO_${idx.index}" alt="SER_NO" /> <input
+					type="hidden" value="${mapX111.EXEC_NO}"
+					id="mapX111_EXEC_NO_${idx.index}" alt="EXEC_NO" /> <input
+					type="hidden" value="${mapX111.SQL_NO}"
+					id="mapX111_SQL_NO_${idx.index}" alt="SQL_NO" /> <input
+					type="hidden" value="${mapX111.Q_COLs}"
+					id="mapX111_Q_COLs_${idx.index}" alt="Q_COLs" /> <a
+					href="javascript:mZUX10202.actions.doQuery0022('${mapX111.FORM_NO}', 
+						'${mapX111.MOD_NO}', '${mapX111.SER_NO}', '${mapX111.EXEC_NO}', '${mapX111.SQL_NO}', '${mapX111.CK_SQL}', '${mapX111.Q_COLs}')">
+				&nbsp;&nbsp;<font color="red"> ＋ </font>&nbsp;&nbsp; </a> <span
+					name="SER_NO_LIST" MOD_NO="${mapX111.MOD_NO}"
+					SER_NO="${mapX111.SER_NO}"></span></td>
 			</tr>
 		</c:forEach>
 	</thead>
@@ -971,7 +1378,7 @@ function ZUX10202(){
 			<td width="100%" class="tbBlue" style="white-space: nowrap"
 				align="left" colspan="10">
 			<TABLE width=100% border=0 cellpadding="0" cellspacing="1"
-				class="tbBox2" align="center" id="Q_AREA" style="display:none;">
+				class="tbBox2" align="center" id="Q_AREA" style="display: none;">
 				<tr>
 					<td width="20%" class="tbBlue" style="white-space: nowrap"
 						align="center">表名</td>
@@ -989,7 +1396,7 @@ function ZUX10202(){
 			<td width="100%" class="tbBlue" style="white-space: nowrap"
 				align="left" colspan="10">
 			<TABLE width=100% border=0 cellpadding="0" cellspacing="1"
-				class="tbBox2" align="center" id="U_AREA" style="display:none;">
+				class="tbBox2" align="center" id="U_AREA" style="display: none;">
 				<tr>
 					<td width="25%" class="tbBlue" style="white-space: nowrap"
 						align="center">修正的項目</td>
@@ -1004,16 +1411,19 @@ function ZUX10202(){
 			</TABLE>
 			</td>
 		</tr>
-		
+
 		<tr>
 			<td width="100%" class="tbBlue" style="white-space: nowrap"
 				align="left" colspan="10">
 			<TABLE width=100% border=0 cellpadding="0" cellspacing="1"
-				class="tbBox2" align="center" id="D_AREA" style="display:none;">
+				class="tbBox2" align="center" id="D_AREA" style="display: none;">
 				<tr>
-					<td width="20%" class="tbBlue" style="white-space: nowrap" align="center">修正的項目</td>
-					<td width="70%" class="tbBlue" style="white-space: nowrap" align="center">修正前</td>
-					<td width="10%" class="tbBlue" style="white-space: nowrap" align="center">執行狀況</td>
+					<td width="20%" class="tbBlue" style="white-space: nowrap"
+						align="center">修正的項目</td>
+					<td width="70%" class="tbBlue" style="white-space: nowrap"
+						align="center">修正前</td>
+					<td width="10%" class="tbBlue" style="white-space: nowrap"
+						align="center">執行狀況</td>
 				</tr>
 				<tbody id="D_Table"></tbody>
 			</TABLE>
@@ -1024,7 +1434,7 @@ function ZUX10202(){
 			<td width="100%" class="tbBlue" style="white-space: nowrap"
 				align="left" colspan="10">
 			<TABLE width=100% border=0 cellpadding="0" cellspacing="1"
-				class="tbBox2" align="center" id="I_AREA" style="display:none;">
+				class="tbBox2" align="center" id="I_AREA" style="display: none;">
 				<tr>
 					<td width="100%" class="tbBlue" style="white-space: nowrap"
 						align="center" colspan="10">XXX設定檔</td>
