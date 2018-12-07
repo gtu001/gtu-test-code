@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 
 import org.apache.commons.lang.StringUtils;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JComboBoxUtil {
 
     private JComboBox comboBox;
