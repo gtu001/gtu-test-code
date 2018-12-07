@@ -2,8 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -58,7 +56,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
@@ -79,6 +76,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.collection.ListUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -104,7 +102,6 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
-import gtu.swing.util.JTextUndoUtil;
 import net.sf.json.JSONArray;
 
 public class FastDBQueryUI extends JFrame {
@@ -221,7 +218,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_7;
     private JTextArea refContentArea;
     private JList refSearchList;
-    private RefSearchListConfigHandler refSerarchListConfigHandler;
+    private RefSearchListConfigHandler refSearchListConfigHandler;
     private JButton refContentConfigSaveBtn;
     private JButton refContentConfigClearBtn;
     private JComboBox refSearchCategoryCombobox;
@@ -236,16 +233,22 @@ public class FastDBQueryUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    FastDBQueryUI frame = new FastDBQueryUI();
-                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        /*
+         * EventQueue.invokeLater(new Runnable() { public void run() { try {
+         * FastDBQueryUI frame = new FastDBQueryUI();
+         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception
+         * e) { e.printStackTrace(); } } });
+         */
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "big_boobs.ico", FastDBQueryUI.class, true);
+        tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
+            public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
+                if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
+                    ((FastDBQueryUI) jframeKeeperLst.get(tabIndex)).reloadAllProperties();
                 }
             }
         });
+        tabUI.setSize(1000, 600);
+        tabUI.startUI();
     }
 
     /**
@@ -643,7 +646,7 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    refSerarchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
+                    refSearchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -662,7 +665,7 @@ public class FastDBQueryUI extends JFrame {
         refSearchText.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
-                    refSerarchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
+                    refSearchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -687,7 +690,7 @@ public class FastDBQueryUI extends JFrame {
                 try {
                     String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
                     RefSearchColor categoryColor = (RefSearchColor) refSearchColorComboBox.getSelectedItem();
-                    refSerarchListConfigHandler.add(category, refSearchText.getText(), refContentArea.getText(), categoryColor.colorCode);
+                    refSearchListConfigHandler.add(category, refSearchText.getText(), refContentArea.getText(), categoryColor.colorCode);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -702,7 +705,7 @@ public class FastDBQueryUI extends JFrame {
                     refSearchCategoryCombobox_Auto.getTextComponent().setText("");
                     refSearchText.setText("");
                     refContentArea.setText("");
-                    refSerarchListConfigHandler.find("", "");
+                    refSearchListConfigHandler.find("", "");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -759,7 +762,7 @@ public class FastDBQueryUI extends JFrame {
                         if (bean == null) {
                             return;
                         }
-                        refSerarchListConfigHandler.delete(bean.category, bean.searchKey);
+                        refSearchListConfigHandler.delete(bean.category, bean.searchKey);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -927,7 +930,7 @@ public class FastDBQueryUI extends JFrame {
             etcConfigHandler = new EtcConfigHandler();
             etcConfigHandler.reflectInit();
 
-            refSerarchListConfigHandler = new RefSearchListConfigHandler(refConfigPathText, refSearchList, refSearchCategoryCombobox);
+            refSearchListConfigHandler = new RefSearchListConfigHandler(refConfigPathText, refSearchList, refSearchCategoryCombobox);
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -1357,7 +1360,7 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
-            String findMessage = refSerarchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+            String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
             // 一般顯示
             if (StringUtils.isBlank(findMessage)) {
                 JCommonUtil.handleException(ex);
@@ -2413,6 +2416,10 @@ public class FastDBQueryUI extends JFrame {
             this.find("", "");
         }
 
+        public void reload() {
+            config.reload();
+        }
+
         private void find(String category, String text) {
             text = StringUtils.trimToEmpty(text).toLowerCase();
             List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
@@ -2563,6 +2570,10 @@ public class FastDBQueryUI extends JFrame {
         public void store() {
             config.store();
         }
+
+        public void reload() {
+            config.reload();
+        }
     }
 
     private void saveEtcConfigBtnAction() {
@@ -2572,6 +2583,19 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    public void reloadAllProperties() {
+        try {
+            initLoadSqlListConfig();
+            initLoadSqlIdMappingConfig();
+            // loadParameterTableConfig();//不需要
+            refSearchListConfigHandler.reload();
+            etcConfigHandler.reload();
+            dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
+        } catch (IOException e) {
+            JCommonUtil.handleException("reloadAllProperties ERR : " + e.getMessage(), e);
         }
     }
 }
