@@ -772,6 +772,8 @@ public class JCommonUtil {
             e.printStackTrace();
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 

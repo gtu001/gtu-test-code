@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +94,7 @@ import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
+import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -228,6 +230,10 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_23;
     private JButton saveEtcConfigBtn;
     private EtcConfigHandler etcConfigHandler;
+    private JPanel panel_24;
+    private JComboBox lookNFeelComboBox;
+
+    private static SwingTabTemplateUI TAB_UI;
 
     /**
      * Launch the application.
@@ -239,6 +245,10 @@ public class FastDBQueryUI extends JFrame {
          * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception
          * e) { e.printStackTrace(); } } });
          */
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            System.out.println("=====" + info.getClassName());
+            // javax.swing.UIManager.setLookAndFeel(info.getClassName());
+        }
         SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "big_boobs.ico", FastDBQueryUI.class, true);
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
@@ -249,6 +259,7 @@ public class FastDBQueryUI extends JFrame {
         });
         tabUI.setSize(1000, 600);
         tabUI.startUI();
+        TAB_UI = tabUI;
     }
 
     /**
@@ -270,7 +281,7 @@ public class FastDBQueryUI extends JFrame {
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        tabbedPane.addTab("Sql List", null, panel, null);
+        tabbedPane.addTab("Sql列表", null, panel, null);
         panel.setLayout(new BorderLayout(0, 0));
 
         JScrollPane scrollPane = new JScrollPane();
@@ -294,6 +305,7 @@ public class FastDBQueryUI extends JFrame {
 
         newPanel1 = new JPanel();
         sqlQueryText = new JTextField();
+        sqlQueryText.setToolTipText("SQL ID標籤過濾");
         sqlQueryText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -332,6 +344,7 @@ public class FastDBQueryUI extends JFrame {
 
         sqlContentFilterText = new JTextField();
         sqlContentFilterText.setColumns(30);
+        sqlContentFilterText.setToolTipText("SQL內所包含文字過濾");
 
         sqlContentFilterText.addFocusListener(new FocusAdapter() {
             @Override
@@ -361,7 +374,7 @@ public class FastDBQueryUI extends JFrame {
 
         newPanel1.add(sqlContentFilterText);
         JPanel panel_2 = new JPanel();
-        tabbedPane.addTab("Sql", null, panel_2, null);
+        tabbedPane.addTab("SQL", null, panel_2, null);
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
@@ -386,6 +399,7 @@ public class FastDBQueryUI extends JFrame {
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
 
         sqlIdText = new JTextField();
+        sqlIdText.setToolTipText("設定SQL ID");
         panel_2.add(sqlIdText, BorderLayout.NORTH);
         sqlIdText.setColumns(10);
 
@@ -409,7 +423,7 @@ public class FastDBQueryUI extends JFrame {
         });
 
         JPanel panel_1 = new JPanel();
-        tabbedPane.addTab("Parameters", null, panel_1, null);
+        tabbedPane.addTab("SQL參數", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
 
         scrollPane_1 = new JScrollPane();
@@ -432,6 +446,7 @@ public class FastDBQueryUI extends JFrame {
         panel_4.add(lblMaxRows);
 
         maxRowsText = new JTextField();
+        maxRowsText.setToolTipText("設定最大筆數,小於等於0則無限制");
         maxRowsText.addFocusListener(new FocusListener() {
             int tempNumber = 0;
 
@@ -458,7 +473,7 @@ public class FastDBQueryUI extends JFrame {
         panel_4.add(executeSqlButton);
 
         panel_5 = new JPanel();
-        tabbedPane.addTab("QueryResult", null, panel_5, null);
+        tabbedPane.addTab("查詢結果", null, panel_5, null);
         panel_5.setLayout(new BorderLayout(0, 0));
 
         queryResultTable = new JTable();
@@ -495,7 +510,7 @@ public class FastDBQueryUI extends JFrame {
         panel_13 = new JPanel();
         panel_12.add(panel_13, BorderLayout.NORTH);
 
-        distinctQueryBtn = new JButton("distinct");
+        distinctQueryBtn = new JButton("Distinct");
         distinctQueryBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 distinctQueryBtnAction();
@@ -510,8 +525,9 @@ public class FastDBQueryUI extends JFrame {
         panel_13.add(label);
 
         columnFilterText = new JTextField();
+        columnFilterText.setToolTipText("多欄位用\"^\"分隔");
         panel_13.add(columnFilterText);
-        columnFilterText.setColumns(15);
+        columnFilterText.setColumns(20);
         columnFilterText.setToolTipText("分隔符號為\"^\"");
         columnFilterText.addFocusListener(new FocusAdapter() {
 
@@ -539,9 +555,9 @@ public class FastDBQueryUI extends JFrame {
         panel_13.add(lblNewLabel_3);
 
         rowFilterText = new JTextField();
+        rowFilterText.setToolTipText("多值用\"^\"分隔");
         panel_13.add(rowFilterText);
-        rowFilterText.setColumns(15);
-        rowFilterText.setToolTipText("分隔符號為\"^\"");
+        rowFilterText.setColumns(20);
         rowFilterText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -613,7 +629,7 @@ public class FastDBQueryUI extends JFrame {
         panel_12.add(JTableUtil.getScrollPane(queryResultTable), BorderLayout.CENTER);
 
         panel_7 = new JPanel();
-        tabbedPane.addTab("JSON", null, panel_7, null);
+        tabbedPane.addTab("查詢結果JSON", null, panel_7, null);
         panel_7.setLayout(new BorderLayout(0, 0));
 
         panel_8 = new JPanel();
@@ -633,7 +649,7 @@ public class FastDBQueryUI extends JFrame {
         panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
 
         panel_18 = new JPanel();
-        tabbedPane.addTab("ErrorRef", null, panel_18, null);
+        tabbedPane.addTab("參考備註", null, panel_18, null);
         panel_18.setLayout(new BorderLayout(0, 0));
 
         panel_19 = new JPanel();
@@ -662,6 +678,7 @@ public class FastDBQueryUI extends JFrame {
         panel_19.add(lblNewLabel_6);
 
         refSearchText = new JTextField();
+        refSearchText.setToolTipText("儲存時為key");
         refSearchText.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
@@ -679,6 +696,7 @@ public class FastDBQueryUI extends JFrame {
         panel_19.add(lblNewLabel_7);
 
         refContentArea = new JTextArea();
+        refContentArea.setToolTipText("參考備註");
         JTextAreaUtil.applyCommonSetting(refContentArea);
         refContentArea.setRows(3);
         refContentArea.setColumns(25);
@@ -722,7 +740,7 @@ public class FastDBQueryUI extends JFrame {
         panel_22 = new JPanel();
         panel_18.add(panel_22, BorderLayout.SOUTH);
 
-        lbl_config_etc = new JLabel("設定擋路徑");
+        lbl_config_etc = new JLabel("參考備註設定擋路徑");
         panel_22.add(lbl_config_etc);
 
         refConfigPathText = new JTextField();
@@ -772,7 +790,7 @@ public class FastDBQueryUI extends JFrame {
         panel_18.add(JCommonUtil.createScrollComponent(refSearchList), BorderLayout.CENTER);
 
         panel_6 = new JPanel();
-        tabbedPane.addTab("Connection", null, panel_6, null);
+        tabbedPane.addTab("DB連線設定", null, panel_6, null);
         panel_6.setLayout(new FormLayout(
                 new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                         FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
@@ -782,16 +800,16 @@ public class FastDBQueryUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
-        saveConnectionBtn = new JButton("儲存");
+        saveConnectionBtn = new JButton("儲存連線設定");
         saveConnectionBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 saveConnectionBtnClick();
             }
         });
 
-        lblDbName = new JLabel("DB Name");
+        lblDbName = new JLabel("DB設定名");
         panel_6.add(lblDbName, "4, 2");
 
         dbNameIdText = new JComboBox();
@@ -817,28 +835,28 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
-        lblUrl = new JLabel("url");
+        lblUrl = new JLabel("連線URL");
         panel_6.add(lblUrl, "4, 6");
 
         dbUrlText = new JTextField();
         panel_6.add(dbUrlText, "10, 6, fill, default");
         dbUrlText.setColumns(10);
 
-        lblNewLabel = new JLabel("user");
+        lblNewLabel = new JLabel("DB帳號");
         panel_6.add(lblNewLabel, "4, 10");
 
         dbUserText = new JTextField();
         panel_6.add(dbUserText, "10, 10, fill, default");
         dbUserText.setColumns(10);
 
-        lblNewLabel_1 = new JLabel("pwd");
+        lblNewLabel_1 = new JLabel("DB密碼");
         panel_6.add(lblNewLabel_1, "4, 14");
 
         dbPwdText = new JTextField();
         panel_6.add(dbPwdText, "10, 14, fill, default");
         dbPwdText.setColumns(10);
 
-        lblNewLabel_2 = new JLabel("driver");
+        lblNewLabel_2 = new JLabel("Driver類別");
         panel_6.add(lblNewLabel_2, "4, 18");
 
         dbDriverText = new JTextField();
@@ -860,7 +878,7 @@ public class FastDBQueryUI extends JFrame {
         nextConnBtn = new JButton("下一組");
         panel_17.add(nextConnBtn);
 
-        removeConnectionBtn = new JButton("刪除設定");
+        removeConnectionBtn = new JButton("刪除連線設定");
         removeConnectionBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 removeConnectionBtnAction();
@@ -890,10 +908,20 @@ public class FastDBQueryUI extends JFrame {
         });
         panel_6.add(connTestBtn, "4, 24");
 
+        panel_24 = new JPanel();
+        panel_6.add(panel_24, "10, 32, fill, fill");
+
+        panel_24.add(JComboBoxUtil.createLookAndFeelComboBox(new Callable<JFrame>() {
+            @Override
+            public JFrame call() throws Exception {
+                return TAB_UI.getJframe();
+            }
+        }));
+
         panel_23 = new JPanel();
         panel_6.add(panel_23, "10, 34, fill, fill");
 
-        saveEtcConfigBtn = new JButton("儲存configure設定");
+        saveEtcConfigBtn = new JButton("儲存設定組態");
         saveEtcConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveEtcConfigBtnAction();
@@ -2366,6 +2394,7 @@ public class FastDBQueryUI extends JFrame {
 
     private enum RefSearchColor {
         藍("BLUE"), //
+        黃("YELLOW"), //
         綠("GREEN"), //
         紅("RED"),//
         ;

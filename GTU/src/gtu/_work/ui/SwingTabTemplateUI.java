@@ -187,4 +187,8 @@ public class SwingTabTemplateUI {
             JCommonUtil.handleException(ex);
         }
     }
+
+    public JFrame getJframe() {
+        return jframe;
+    }
 }
