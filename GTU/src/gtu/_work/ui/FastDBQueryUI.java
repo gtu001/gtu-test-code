@@ -103,7 +103,6 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
-import gtu.swing.util.SwingJDesktopTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import net.sf.json.JSONArray;
@@ -115,8 +114,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -233,7 +232,6 @@ public class FastDBQueryUI extends JFrame {
     private JButton saveEtcConfigBtn;
     private EtcConfigHandler etcConfigHandler;
     private JPanel panel_24;
-    private JComboBox lookNFeelComboBox;
 
     private static SwingTabTemplateUI TAB_UI1;
 

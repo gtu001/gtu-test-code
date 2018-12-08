@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
@@ -19,11 +18,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
-
-import gtu._work.ui.JMenuBarUtil;
-import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu._work.ui.SwingTemplateUI.ActionDefine;
-import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
 public class SwingTabTemplateUI {
 
