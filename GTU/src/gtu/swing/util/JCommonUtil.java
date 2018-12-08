@@ -759,6 +759,7 @@ public class JCommonUtil {
     public static void defaultLookAndFeel() {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                System.out.println("LookAndFeel:\t" + info.getName() + "\t" + info.getClassName());
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;

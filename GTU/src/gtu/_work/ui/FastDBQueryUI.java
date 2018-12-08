@@ -77,7 +77,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu._work.ui.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.collection.ListUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -104,6 +103,9 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.SwingJDesktopTemplateUI;
+import gtu.swing.util.SwingTabTemplateUI;
+import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import net.sf.json.JSONArray;
 
 public class FastDBQueryUI extends JFrame {
@@ -233,7 +235,7 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_24;
     private JComboBox lookNFeelComboBox;
 
-    private static SwingTabTemplateUI TAB_UI;
+    private static SwingTabTemplateUI TAB_UI1;
 
     /**
      * Launch the application.
@@ -259,7 +261,7 @@ public class FastDBQueryUI extends JFrame {
         });
         tabUI.setSize(1000, 600);
         tabUI.startUI();
-        TAB_UI = tabUI;
+        TAB_UI1 = tabUI;
     }
 
     /**
@@ -911,12 +913,14 @@ public class FastDBQueryUI extends JFrame {
         panel_24 = new JPanel();
         panel_6.add(panel_24, "10, 32, fill, fill");
 
-        panel_24.add(JComboBoxUtil.createLookAndFeelComboBox(new Callable<JFrame>() {
-            @Override
-            public JFrame call() throws Exception {
-                return TAB_UI.getJframe();
-            }
-        }));
+        if (true) {
+            panel_24.add(JComboBoxUtil.createLookAndFeelComboBox(new Callable<JFrame>() {
+                @Override
+                public JFrame call() throws Exception {
+                    return TAB_UI1.getJframe();
+                }
+            }));
+        }
 
         panel_23 = new JPanel();
         panel_6.add(panel_23, "10, 34, fill, fill");

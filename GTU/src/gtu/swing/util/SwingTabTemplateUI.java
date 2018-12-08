@@ -1,4 +1,4 @@
-package gtu._work.ui;
+package gtu.swing.util;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
@@ -19,9 +20,10 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JMouseEventUtil;
-import gtu.swing.util.JPopupMenuUtil;
+import gtu._work.ui.JMenuBarUtil;
+import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu._work.ui.SwingTemplateUI.ActionDefine;
+import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
 public class SwingTabTemplateUI {
 
