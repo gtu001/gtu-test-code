@@ -9,6 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.EventObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,14 +27,17 @@ import org.apache.commons.lang3.StringUtils;
 
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 
 public class ScheduleBatRunnerUI_SwingAntDlg extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private SwingActionUtil swingUtil;
     private JTextField swingAntDirText;
@@ -209,26 +213,49 @@ public class ScheduleBatRunnerUI_SwingAntDlg extends JDialog {
             swingUtil.addAction("swingAntList.mouseClicked", new Action() {
                 @Override
                 public void action(EventObject evt) throws Exception {
-                    if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
-                        return;
-                    }
-
-                    FileZ file = (FileZ) JListUtil.getLeadSelectionObject(swingAntList);
+                    final FileZ file = (FileZ) JListUtil.getLeadSelectionObject(swingAntList);
                     if (file == null) {
                         return;
                     }
 
-                    if (actionEvent == null) {
-                        throw new Exception("EVENT未設定");
-                    }
+                    if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                        JPopupMenuUtil.newInstance(swingAntList)//
+                                .addJMenuItem("開啟目錄", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            DesktopUtil.openDir(file);
+                                        } catch (Exception e1) {
+                                            JCommonUtil.handleException(e1);
+                                        }
+                                    }
+                                })//
+                                .addJMenuItem("開啟文件", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            DesktopUtil.browse(file.toURL().toString());
+                                        } catch (Exception e1) {
+                                            JCommonUtil.handleException(e1);
+                                        }
+                                    }
+                                })//
+                                .applyEvent(evt)//
+                                .show();//
+                    } else if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+                        if (actionEvent == null) {
+                            throw new Exception("EVENT未設定");
+                        }
 
-                    String command = file.getAbsolutePath();
-                    if (StringUtils.isNotBlank(formatText.getText())) {
-                        command = String.format(formatText.getText(), file.getAbsolutePath());
-                    }
+                        String command = file.getAbsolutePath();
+                        if (StringUtils.isNotBlank(formatText.getText())) {
+                            command = String.format(formatText.getText(), file.getAbsolutePath());
+                        }
 
-                    ActionEvent evt2 = new ActionEvent(command, -1, file.getName());
-                    actionEvent.actionPerformed(evt2);
+                        ActionEvent evt2 = new ActionEvent(command, -1, file.getName());
+                        actionEvent.actionPerformed(evt2);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("加入成功！");
+                    }
                 }
             });
             swingUtil.addAction("btn.Close", new Action() {

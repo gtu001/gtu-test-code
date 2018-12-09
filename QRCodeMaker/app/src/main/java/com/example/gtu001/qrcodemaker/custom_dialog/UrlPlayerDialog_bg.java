@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
-import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceUtil;
 import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 
@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -47,15 +48,27 @@ public class UrlPlayerDialog_bg {
 
     public UrlPlayerDialog_bg setUrl(String message, Mp3Bean bean, List<Mp3Bean> totalUrlList) {
         this.bean = bean;
+
+        if (this.bean == null) {
+            try {
+                Map currentBeanMap = this.urlPlayerServiceHander.get().getMService().getCurrentBean();
+                this.bean = Mp3Bean.valueOf(currentBeanMap);
+            } catch (Exception e) {
+                Log.e(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
+                Toast.makeText(context, "開啟失敗" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                this.bean = new Mp3Bean();
+            }
+        }
+
         this.message = message;
         this.totalUrlList = totalUrlList;
 
-        if(StringUtils.isBlank(this.message)){
-            this.message = bean.name;
+        if (StringUtils.isBlank(this.message)) {
+            this.message = this.bean.name;
         }
 
         if (totalUrlList != null) {
-            currentIndex = totalUrlList.indexOf(bean);
+            currentIndex = totalUrlList.indexOf(this.bean);
         }
 
         //只做一次
@@ -95,7 +108,7 @@ public class UrlPlayerDialog_bg {
             public void onClick(View v) {
                 try {
                     if (!urlPlayerServiceHander.get().getMService().isInitDone()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -169,12 +182,12 @@ public class UrlPlayerDialog_bg {
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
                     if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
-                    }else{
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                    } else {
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -198,12 +211,12 @@ public class UrlPlayerDialog_bg {
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
                     if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
-                    }else{
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.url);
+                    } else {
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -230,7 +243,7 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 Log.v(TAG, "# Listen onDismiss");
-                btn_img_cancel.performClick();
+                //btn_img_cancel.performClick();
             }
         });
 
@@ -285,6 +298,16 @@ public class UrlPlayerDialog_bg {
 
         public void setUrl(String url) {
             this.url = url;
+        }
+
+        public static Mp3Bean valueOf(Map map) {
+            if (map == null || map.isEmpty()) {
+                return null;
+            }
+            Mp3Bean bean = new Mp3Bean();
+            bean.setName((String) map.get("name"));
+            bean.setUrl((String) map.get("url"));
+            return bean;
         }
     }
 

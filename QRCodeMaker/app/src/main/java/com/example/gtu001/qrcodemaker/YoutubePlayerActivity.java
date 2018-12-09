@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class YoutubePlayerActivity extends Activity {
 
@@ -65,7 +67,8 @@ public class YoutubePlayerActivity extends Activity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean result = initListViewHandler.add(youtubeIdText.getText().toString());
+                String parseId = getYoutubeId(youtubeIdText.getText().toString());
+                boolean result = initListViewHandler.add(parseId);
                 if (result) {
                     youtubeIdText.setText("");
                 }
@@ -134,6 +137,28 @@ public class YoutubePlayerActivity extends Activity {
         });
 
         initServices();
+    }
+
+    public String getYoutubeId(String strVal) {
+        //  https://www.youtube.com/watch?v=VZnHlYwXNms
+        //  https://youtu.be/XXXXXXXXXXXX
+        strVal = StringUtils.trimToEmpty(strVal);
+        Pattern ptn = Pattern.compile("watch\\?v\\=(.*?)\\&");
+        Matcher mth = ptn.matcher(strVal);
+        if (mth.find()) {
+            return mth.group(1);
+        }
+        Pattern ptn2 = Pattern.compile("watch\\?v\\=(.*)");
+        Matcher mth2 = ptn2.matcher(strVal);
+        if (mth2.find()) {
+            return mth2.group(1);
+        }
+        Pattern ptn3 = Pattern.compile("youtu\\.be\\/(.*)");
+        Matcher mth3 = ptn3.matcher(strVal);
+        if (mth3.find()) {
+            return mth3.group(1);
+        }
+        return strVal;
     }
 
 

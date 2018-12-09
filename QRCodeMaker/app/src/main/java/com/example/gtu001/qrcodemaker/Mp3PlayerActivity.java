@@ -64,9 +64,6 @@ public class Mp3PlayerActivity extends Activity {
 
         PermissionUtil.verifyStoragePermissions(this);
 
-        final EditText youtubeIdText = new EditText(this);
-        layout.addView(youtubeIdText);
-
         //初始Btn狀態紐
         Button btn1 = new Button(this);
         btn1.setText("選擇檔案");
@@ -77,6 +74,19 @@ public class Mp3PlayerActivity extends Activity {
                 Intent intent = new Intent();
                 Bundle bundle = new Bundle();
                 TaskInfo.LOAD_CONTENT_FROM_FILE_RANDOM.onOptionsItemSelected(Mp3PlayerActivity.this, intent, bundle);
+            }
+        });
+
+        //初始Btn狀態紐
+        Button btn2 = new Button(this);
+        btn2.setText("開啟現在播放");
+        layout.addView(btn2);
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UrlPlayerDialog_bg dialog = new UrlPlayerDialog_bg(Mp3PlayerActivity.this);
+                Dialog _dialog = dialog.setUrl(null, null, initListViewHandler.getTotalUrlList()).build();
+                _dialog.show();
             }
         });
 
@@ -152,14 +162,14 @@ public class Mp3PlayerActivity extends Activity {
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
 
-        public void delete(FileItem item2){
-            for (int ii = 0; ii < listItem.size() ; ii ++) {
+        public void delete(FileItem item2) {
+            for (int ii = 0; ii < listItem.size(); ii++) {
                 Map<String, Object> m = listItem.get(ii);
                 UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
                 FileItem y = (FileItem) m.get("item");
-                if(y == item2){
+                if (y == item2) {
                     listItem.remove(ii);
-                    ii -- ;
+                    ii--;
                 }
             }
             baseAdapter.notifyDataSetChanged();

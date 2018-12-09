@@ -183,7 +183,7 @@ public class JavaYoutubeVideoUrlHandler {
                 System.out.println("YoutubeUrlHandler >> : " + d);//TODO
             }
         } catch (Exception e) {
-            throw new RuntimeException(" YoutubeVideoUrlHandler Err : " + e.getMessage(), e);
+            throw new RuntimeException("Error VedioId : " + videoId + ", YoutubeVideoUrlHandler : " + e.getMessage(), e);
         }
     }
 

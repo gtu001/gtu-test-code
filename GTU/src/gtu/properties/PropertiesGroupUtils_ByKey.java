@@ -85,19 +85,27 @@ public class PropertiesGroupUtils_ByKey {
         return map;
     }
 
-    public List<String> getSaveKeys() {
-        if (!configProp.containsKey(SAVE_KEYS)) {
-            throw new RuntimeException("檔案 : " + configFile + " , 缺少  " + SAVE_KEYS);
-        }
-        List<String> lst = new ArrayList<String>();
-        String keystr = configProp.getProperty(SAVE_KEYS);
-        String[] keys = keystr.split(",", -1);
-        for (String k : keys) {
-            if (!lst.contains(k)) {
-                lst.add(k);
+    public List<String> getSaveKeys(boolean endureFailure) {
+        try {
+            if (!configProp.containsKey(SAVE_KEYS)) {
+                throw new RuntimeException("檔案 : " + configFile + " , 缺少  " + SAVE_KEYS);
+            }
+            List<String> lst = new ArrayList<String>();
+            String keystr = configProp.getProperty(SAVE_KEYS);
+            String[] keys = keystr.split(",", -1);
+            for (String k : keys) {
+                if (!lst.contains(k)) {
+                    lst.add(k);
+                }
+            }
+            return lst;
+        } catch (Exception ex) {
+            if (endureFailure) {
+                return new ArrayList<String>();
+            } else {
+                throw new RuntimeException(ex);
             }
         }
-        return lst;
     }
 
     /**

@@ -13,8 +13,12 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
+import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by wistronits on 2018/6/27.
@@ -26,6 +30,7 @@ public class UrlPlayerService extends Service {
 
     private Context context;
     private Handler handler = new Handler();
+    private UrlPlayerDialog_bg.Mp3Bean currentBean;
     ;
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
@@ -57,7 +62,11 @@ public class UrlPlayerService extends Service {
     //↓↓↓↓↓↓↓↓ business logical ------------------------------------------------------------------------------------------------------------------------------------
     private Mp3PlayerHandler mp3Helper;
 
-    private String startPlay(String url) {
+    private String startPlay(String name, String url) {
+        currentBean = new UrlPlayerDialog_bg.Mp3Bean();
+        currentBean.setName(name);
+        currentBean.setUrl(url);
+
         Log.v(TAG, "#---startPlay : " + url);
         if (StringUtils.isBlank(url)) {
             return "檔案錯誤!";
@@ -97,6 +106,17 @@ public class UrlPlayerService extends Service {
         return mp3Helper != null;
     }
 
+    private Map getCurrentBean() {
+        if (currentBean == null) {
+            return null;
+        } else {
+            Map<String, String> rtnMap = new HashMap<String, String>();
+            rtnMap.put("name", currentBean.getName());
+            rtnMap.put("url", currentBean.getUrl());
+            return rtnMap;
+        }
+    }
+
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
         @Override
         public boolean isPlaying() throws RemoteException {
@@ -114,8 +134,8 @@ public class UrlPlayerService extends Service {
         }
 
         @Override
-        public String startPlay(String url) throws RemoteException {
-            return UrlPlayerService.this.startPlay(url);
+        public String startPlay(String name, String url) throws RemoteException {
+            return UrlPlayerService.this.startPlay(name, url);
         }
 
         @Override
@@ -126,6 +146,11 @@ public class UrlPlayerService extends Service {
         @Override
         public boolean isInitDone() throws RemoteException {
             return UrlPlayerService.this.isInitDone();
+        }
+
+        @Override
+        public Map getCurrentBean() throws RemoteException {
+            return UrlPlayerService.this.getCurrentBean();
         }
     };
 

@@ -26,11 +26,20 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
+import gtu._work.ui.AlwaysOpenUI;
+import gtu._work.ui.DirectoryCompareUI;
+import gtu._work.ui.ExecuteOpener;
 import gtu._work.ui.FastDBQueryUI;
+import gtu._work.ui.FreemarkerReplaceUI;
 import gtu._work.ui.JMenuBarUtil;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu._work.ui.JarFinderUI;
+import gtu._work.ui.RegexCatchReplacer;
 import gtu._work.ui.RegexReplacer;
+import gtu._work.ui.RegexTestUI;
+import gtu._work.ui.VoMapCompareUI;
 import gtu.file.OsInfoUtil;
+import gtu.jpg.FileToBmpUtilUI;
 
 public class SwingJDesktopTemplateUI {
     private static final int IF_WIDTH = 150;
@@ -44,30 +53,36 @@ public class SwingJDesktopTemplateUI {
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         List<MyJFrameDefine> jframeLst = new ArrayList<MyJFrameDefine>();
-        {
-            MyJFrameDefine def = new MyJFrameDefine();
-            def.setUiJframeClass(RegexReplacer.class);
-            def.setTitle("文字替換器");
-            jframeLst.add(def);
-        }
-        {
-            MyJFrameDefine def = new MyJFrameDefine();
-            def.setUiJframeClass(FastDBQueryUI.class);
-            def.setTitle("資料庫處理");
-            def.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
-                public void afterChangeTab(List<JFrame> jframeKeeperLst) {
-                    if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
-                        for (JFrame inFrame : jframeKeeperLst) {
-                            ((FastDBQueryUI) inFrame).reloadAllProperties();
-                        }
+        addClassToMenuLst("正則表達", RegexTestUI.class, jframeLst, null);
+        addClassToMenuLst("圖檔轉換", FileToBmpUtilUI.class, jframeLst, null);
+        addClassToMenuLst("保持登入", AlwaysOpenUI.class, jframeLst, null);
+        addClassToMenuLst("文字替換器", RegexReplacer.class, jframeLst, null);
+        addClassToMenuLst("文字替換器", RegexCatchReplacer.class, jframeLst, null);
+        addClassToMenuLst("檔案搜尋器", ExecuteOpener.class, jframeLst, null);
+        addClassToMenuLst("模板替換工具", FreemarkerReplaceUI.class, jframeLst, null);
+        addClassToMenuLst("尋找Jar檔", JarFinderUI.class, jframeLst, null);
+        addClassToMenuLst("VO或Map清單", VoMapCompareUI.class, jframeLst, null);
+        addClassToMenuLst("档案比對", DirectoryCompareUI.class, jframeLst, null);
+        addClassToMenuLst("資料庫處理", FastDBQueryUI.class, jframeLst, new ChangeTabHandlerGtu001() {
+            public void afterChangeTab(List<JFrame> jframeKeeperLst) {
+                if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
+                    for (JFrame inFrame : jframeKeeperLst) {
+                        ((FastDBQueryUI) inFrame).reloadAllProperties();
                     }
                 }
-            });
-            jframeLst.add(def);
-        }
+            }
+        });
         SwingJDesktopTemplateUI tabUI = SwingJDesktopTemplateUI.newInstance(null, "big_boobs.ico", jframeLst);
         tabUI.setSize(1000, 600);
         tabUI.startUI();
+    }
+
+    private static void addClassToMenuLst(String label, Class<?> clz, List<MyJFrameDefine> jframeLst, ChangeTabHandlerGtu001 event) {
+        MyJFrameDefine def = new MyJFrameDefine();
+        def.setUiJframeClass(clz);
+        def.setTitle(label + clz.getSimpleName());
+        def.setEventAfterChangeTab(event);
+        jframeLst.add(def);
     }
 
     public static SwingJDesktopTemplateUI newInstance(String title, String iconPath, List<MyJFrameDefine> jframeLst) {
@@ -158,6 +173,10 @@ public class SwingJDesktopTemplateUI {
             desktopPane.add(internalFrame);
             desktopPane.getDesktopManager().activateFrame(internalFrame);
 
+            if (jfreamDef.getEventAfterChangeTab() != null) {
+                jfreamDef.getEventAfterChangeTab().afterChangeTab(jfreamDef.getJframeKeeperLst());
+            }
+
             JFrame childFrame = (JFrame) jfreamDef.getUiJframeClass().newInstance();
             if (jfreamDef.getJframeKeeperLst().isEmpty()) {
                 internalFrame.setSize(childFrame.getSize());
@@ -190,9 +209,12 @@ public class SwingJDesktopTemplateUI {
                         popupUtil.addJMenuItem("新增分頁", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                String newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", "New Frame");
-                                if (StringUtils.isBlank(newName)) {
-                                    newName = "New Frame";
+                                String newName = jfreamDef.getTitle();
+                                if (jfreamDef.isAskNewName) {
+                                    newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", jfreamDef.getTitle());
+                                    if (StringUtils.isBlank(newName)) {
+                                        newName = jfreamDef.getTitle();
+                                    }
                                 }
                                 addInternalFrame(newName, jfreamDef);
                             }
@@ -236,9 +258,12 @@ public class SwingJDesktopTemplateUI {
             jMenuAppender.addMenuItem(jframeDef.getTitle(), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", jframeDef.getTitle());
-                    if (StringUtils.isBlank(newName)) {
-                        newName = jframeDef.getTitle();
+                    String newName = jframeDef.getTitle();
+                    if (jframeDef.isAskNewName) {
+                        newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", jframeDef.getTitle());
+                        if (StringUtils.isBlank(newName)) {
+                            newName = jframeDef.getTitle();
+                        }
                     }
                     addInternalFrame(newName, jframeDef);
                 }
@@ -267,6 +292,7 @@ public class SwingJDesktopTemplateUI {
         List<JFrame> jframeKeeperLst = new ArrayList<JFrame>();
         Dimension internalFrameSize = new Dimension(300, 180);
         boolean initOneTab;
+        boolean isAskNewName;
 
         public String getTitle() {
             return title;
@@ -314,6 +340,14 @@ public class SwingJDesktopTemplateUI {
 
         public void setInitOneTab(boolean initOneTab) {
             this.initOneTab = initOneTab;
+        }
+
+        public boolean isAskNewName() {
+            return isAskNewName;
+        }
+
+        public void setAskNewName(boolean isAskNewName) {
+            this.isAskNewName = isAskNewName;
         }
     }
 }

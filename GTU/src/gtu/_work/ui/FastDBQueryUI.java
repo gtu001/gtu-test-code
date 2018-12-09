@@ -1138,7 +1138,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void reload_DataSourceConfig_autoComplete() {
-        dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
+        dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(true), dbNameIdText_getText());
     }
 
     private void storeSqlIdListDsMappingProp() throws IOException {
