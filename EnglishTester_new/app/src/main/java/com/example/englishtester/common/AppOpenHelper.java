@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+
 import com.example.englishtester.common.Log;
 
 /**
@@ -16,7 +17,7 @@ public class AppOpenHelper {
 
     /**
      * Open another app.
-     *
+     * <p>
      * 取得packageName的方式 , 可從 googleplay 的網址找到
      * Ex : https://play.google.com/store/apps/details?id=jp.naver.line.android
      *
@@ -24,7 +25,7 @@ public class AppOpenHelper {
      * @param packageName the full package name of the app to open
      * @return true if likely successful, false if unsuccessful
      */
-    public static boolean openApp(Context context, String packageName) {
+    public static boolean openApp(Context context, String packageName, Intent extraIntent) {
         Log.v(TAG, "openApp :" + packageName);
         PackageManager manager = context.getPackageManager();
         try {
@@ -33,6 +34,9 @@ public class AppOpenHelper {
                 return false;
             }
             i.addCategory(Intent.CATEGORY_LAUNCHER);
+            if (extraIntent != null) {
+                i.putExtras(extraIntent);
+            }
             context.startActivity(i);
             return true;
         } catch (ActivityNotFoundException e) {

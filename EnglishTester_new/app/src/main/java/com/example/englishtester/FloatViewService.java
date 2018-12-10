@@ -875,7 +875,17 @@ public class FloatViewService extends Service {
             void process(FloatViewService self) {
                 String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
                 ClipboardHelper.copyToClipboard(self.getApplicationContext(), inputText);
-                AppOpenHelper.openApp(self.getApplicationContext(), "jp.naver.line.android");
+                AppOpenHelper.openApp(self.getApplicationContext(), "jp.naver.line.android", null);
+            }
+        },//
+        MY_APP("開啟MyApp", R.drawable.qr_code_icon) {//
+            @Override
+            void process(FloatViewService self) {
+                String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                ClipboardHelper.copyToClipboard(self.getApplicationContext(), inputText);
+                Intent intent1 = new Intent();
+                intent1.putExtra("youtube", inputText);
+                AppOpenHelper.openApp(self.getApplicationContext(), "com.example.gtu001.qrcodemaker", intent1);
             }
         },//
         SEARCH_IN_BROWSER("以Google搜尋", R.drawable.icon_chrome) {//

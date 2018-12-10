@@ -41,6 +41,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //重新導向至youtube
+        if (getIntent().getExtras().containsKey(YoutubePlayerActivity.YOUTUBE_KEY)) {
+            gotoActivity(YoutubePlayerActivity.class, getIntent());
+        }
     }
 
     @Override
@@ -82,19 +87,19 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_qrcode_maker) {
-            gotoActivity(QRCodeMackerActivity.class);
+            gotoActivity(QRCodeMackerActivity.class, null);
 
         } else if (id == R.id.nav_processes_loader) {
-            gotoActivity(ProcessesActivity.class);
+            gotoActivity(ProcessesActivity.class, null);
 
         } else if (id == R.id.nav_mp3_player) {
-            gotoActivity(Mp3PlayerActivity.class);
+            gotoActivity(Mp3PlayerActivity.class, null);
 
         } else if (id == R.id.youtube_player) {
-            gotoActivity(YoutubePlayerActivity.class);
+            gotoActivity(YoutubePlayerActivity.class, null);
 
         } else if (id == R.id.app_list_filter) {
-            gotoActivity(AppListFilterActivity.class);
+            gotoActivity(AppListFilterActivity.class, null);
 
         } else if (id == R.id.nav_send) {
 
@@ -105,8 +110,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void gotoActivity(Class clz) {
+    private void gotoActivity(Class clz, Intent intent2) {
         Intent intent = new Intent();
+        if (intent2 != null) {
+            intent.putExtras(intent2);
+        }
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);
         intent.setClass(this, clz);

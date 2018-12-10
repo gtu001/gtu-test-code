@@ -48,6 +48,8 @@ public class YoutubePlayerActivity extends Activity {
     private InitListViewHandler initListViewHandler;
     private YoutubeVideoService youtubeVideoService;
 
+    public static final String YOUTUBE_KEY = "youtube";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,11 @@ public class YoutubePlayerActivity extends Activity {
 
         final EditText youtubeIdText = new EditText(this);
         layout.addView(youtubeIdText);
+
+        //取得youtube內容
+        if (getIntent().getExtras().containsKey(YoutubePlayerActivity.YOUTUBE_KEY)) {
+            youtubeIdText.setText(getIntent().getExtras().getString(YoutubePlayerActivity.YOUTUBE_KEY));
+        }
 
         //初始Btn狀態紐
         Button btn1 = new Button(this);
@@ -72,6 +79,19 @@ public class YoutubePlayerActivity extends Activity {
                 if (result) {
                     youtubeIdText.setText("");
                 }
+            }
+        });
+
+        //初始Btn狀態紐
+        Button btn2 = new Button(this);
+        btn2.setText("開啟現在播放");
+        layout.addView(btn2);
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UrlPlayerDialog_bg dialog = new UrlPlayerDialog_bg(YoutubePlayerActivity.this);
+                Dialog _dialog = dialog.setUrl(null, null, initListViewHandler.getTotalUrlList()).build();
+                _dialog.show();
             }
         });
 
