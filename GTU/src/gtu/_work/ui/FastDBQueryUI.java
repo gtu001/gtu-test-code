@@ -2583,7 +2583,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private class EtcConfigHandler {
-        PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class + "_Etc");
+        PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class.getSimpleName() + "_Etc");
         List<JComponent> containArry = new ArrayList<JComponent>();
 
         EtcConfigHandler() {

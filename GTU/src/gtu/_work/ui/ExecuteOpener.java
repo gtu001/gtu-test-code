@@ -648,6 +648,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         ZFile.is_show_detail = scanLstShowDetailChk.isSelected();
                                         scanList.updateUI();
                                         execList.updateUI();
+                                        propertiesList.updateUI();
                                     }
                                 });
                                 {
@@ -1683,7 +1684,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
     void reloadCurrentDirPropertiesList() {
         final String $filterText = StringUtils.trimToEmpty(propertiesListFilterText.getText()).toLowerCase();
-        List<File> lst = new ArrayList<File>();
+        List<ZFile> lst = new ArrayList<ZFile>();
         for (File file : jarPositionDir.listFiles(new FileFilter() {
             public boolean accept(File paramFile) {
                 boolean isPropFile = paramFile.getName().toLowerCase().endsWith(".properties");
@@ -1704,7 +1705,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 return false;
             }
         })) {
-            lst.add(file);
+            lst.add(new ZFile(file.getAbsolutePath()));
         }
         Collections.sort(lst);
         DefaultListModel model = new DefaultListModel();
@@ -2021,9 +2022,21 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
         public String toString() {
             if (is_show_detail) {
-                String createTime = DateFormatUtils.format(FileUtil.getCreateTime(this), "yyyy/MM/dd_HHmm");
-                String modifyTime = DateFormatUtils.format(this.lastModified(), "yyyy/MM/dd_HHmm");
-                String sizeDesc = FileUtil.getSizeDescription(this.length());
+                String createTime = "";
+                String modifyTime = "";
+                String sizeDesc = "";
+                try {
+                    createTime = DateFormatUtils.format(FileUtil.getCreateTime(this), "yyyy/MM/dd_HHmm");
+                } catch (Exception ex) {
+                }
+                try {
+                    modifyTime = DateFormatUtils.format(this.lastModified(), "yyyy/MM/dd_HHmm");
+                } catch (Exception ex) {
+                }
+                try {
+                    sizeDesc = FileUtil.getSizeDescription(this.length());
+                } catch (Exception ex) {
+                }
                 String formatStr = "<html><font color='#cc88cc'>建%s</font>&nbsp;&nbsp;<font color='#cccc88'>改%s</font>&nbsp;&nbsp;<font color='#6341a5'>%s</font>&nbsp;&nbsp;&nbsp;&nbsp;%s</html>";
                 return String.format(formatStr, createTime, modifyTime, sizeDesc, super.toString());
             } else {
