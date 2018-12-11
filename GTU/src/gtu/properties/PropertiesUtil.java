@@ -161,6 +161,37 @@ public class PropertiesUtil {
     }
 
     /**
+     * 不會咬住檔案的開檔方式
+     * 
+     * @param inputStream
+     * @return
+     */
+    public static Properties loadProperties(File file, Properties _prop, boolean failThrow) {
+        FileInputStream inputStream = null;
+        Properties prop = new Properties();
+        try {
+            inputStream = new FileInputStream(file);
+            if (_prop != null) {
+                prop = _prop;
+            }
+            prop.load(inputStream);
+            return prop;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (failThrow) {
+                throw new RuntimeException(ex);
+            }
+            return prop;
+        } finally {
+            try {
+                inputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * 不會咬住檔案的存檔方式
      * 
      * @param inputStream

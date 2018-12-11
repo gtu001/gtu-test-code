@@ -114,8 +114,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -234,6 +234,9 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_24;
 
     private static SwingTabTemplateUI TAB_UI1;
+    private JLabel lblDb;
+    private JTextField sqlMappingFilterText;
+    private JButton sqlFilterClearBtn;
 
     /**
      * Launch the application.
@@ -306,63 +309,63 @@ public class FastDBQueryUI extends JFrame {
         newPanel1 = new JPanel();
         sqlQueryText = new JTextField();
         sqlQueryText.setToolTipText("SQL ID標籤過濾");
-        sqlQueryText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                String txt = sqlQueryText.getText();
-                try {
-                    // 初始化 sqlList
-                    initLoadSqlListConfig();
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
-                }
-            }
-        });
-        sqlQueryText.setColumns(30);
-        sqlQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            @Override
-            public void process(DocumentEvent event) {
-                String txt = JCommonUtil.getDocumentText(event);
-                try {
-                    // 初始化 sqlList
-                    initLoadSqlListConfig();
-                } catch (Exception e) {
-                    JCommonUtil.handleException(e);
-                }
-            }
-        }));
+        sqlQueryText.setColumns(15);
 
-        lblNewLabel_4 = new JLabel("sqlKey filter");
+        lblNewLabel_4 = new JLabel("SQL ID過濾");
         newPanel1.add(lblNewLabel_4);
-
         newPanel1.add(sqlQueryText);
 
         panel.add(newPanel1, BorderLayout.NORTH);
 
-        lblNewLabel_5 = new JLabel("content filter");
+        lblNewLabel_5 = new JLabel("SQL過濾");
         newPanel1.add(lblNewLabel_5);
 
         sqlContentFilterText = new JTextField();
-        sqlContentFilterText.setColumns(30);
+        sqlContentFilterText.setColumns(15);
         sqlContentFilterText.setToolTipText("SQL內所包含文字過濾");
 
-        sqlContentFilterText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                String txt = sqlContentFilterText.getText();
-                try {
-                    // 初始化 sqlList
-                    initLoadSqlListConfig();
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
+        newPanel1.add(sqlContentFilterText);
+
+        lblDb = new JLabel("DB名稱過濾");
+        newPanel1.add(lblDb);
+
+        sqlMappingFilterText = new JTextField();
+        sqlMappingFilterText.setToolTipText("SQL ID標籤過濾");
+        sqlMappingFilterText.setColumns(15);
+
+        newPanel1.add(sqlMappingFilterText);
+
+        for (JTextField text : new JTextField[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText }) {
+            text.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    try {
+                        // 初始化 sqlList
+                        initLoadSqlListConfig();
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
                 }
-            }
-        });
-        sqlContentFilterText.setColumns(30);
-        sqlContentFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            @Override
-            public void process(DocumentEvent event) {
-                String txt = JCommonUtil.getDocumentText(event);
+            });
+            text.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                @Override
+                public void process(DocumentEvent event) {
+                    try {
+                        // 初始化 sqlList
+                        initLoadSqlListConfig();
+                    } catch (Exception e) {
+                        JCommonUtil.handleException(e);
+                    }
+                }
+            }));
+        }
+
+        sqlFilterClearBtn = new JButton("清除");
+        sqlFilterClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e1) {
+                sqlQueryText.setText("");
+                sqlContentFilterText.setText("");
+                sqlMappingFilterText.setText("");
                 try {
                     // 初始化 sqlList
                     initLoadSqlListConfig();
@@ -370,9 +373,8 @@ public class FastDBQueryUI extends JFrame {
                     JCommonUtil.handleException(e);
                 }
             }
-        }));
-
-        newPanel1.add(sqlContentFilterText);
+        });
+        newPanel1.add(sqlFilterClearBtn);
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("SQL", null, panel_2, null);
         panel_2.setLayout(new BorderLayout(0, 0));
@@ -1078,12 +1080,12 @@ public class FastDBQueryUI extends JFrame {
         if (!sqlIdListFile.exists()) {
             sqlIdListFile.createNewFile();
         }
-        Properties prop = new Properties();
-        PropertiesUtil.loadProperties(new FileInputStream(sqlIdListFile), prop);
-        sqlIdListProp = prop;
+        sqlIdListProp = PropertiesUtil.loadProperties(sqlIdListFile, null, false);
+        sqlIdListDSMappingProp = PropertiesUtil.loadProperties(sqlIdListDSMappingFile, null, false);
 
         String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
         String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
+        String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText.getText()).toLowerCase();
 
         List<String> sqlIdList = new ArrayList<String>();
         for (Enumeration enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
@@ -1104,6 +1106,16 @@ public class FastDBQueryUI extends JFrame {
                     findOk = true;
                 } else if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
                     findOk = true;
+                }
+            }
+
+            if (StringUtils.isNotBlank(mappingFilterText)) {
+                if (findOk) {
+                    if (StringUtils.isNotBlank(sqlIdListDSMappingProp.getProperty(sqlId)) && //
+                            sqlIdListDSMappingProp.getProperty(sqlId).toLowerCase().contains(mappingFilterText)) {
+                    } else {
+                        findOk = false;
+                    }
                 }
             }
 
