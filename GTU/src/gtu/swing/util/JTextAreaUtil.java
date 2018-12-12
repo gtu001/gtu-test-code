@@ -1,17 +1,24 @@
 package gtu.swing.util;
 
-import gtu.log.Log;
-import gtu.log.PrintStreamAdapter;
-
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.io.StringReader;
+import java.util.TreeMap;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
+import gtu.log.Log;
+import gtu.log.PrintStreamAdapter;
 
 public class JTextAreaUtil {
 
@@ -97,8 +104,96 @@ public class JTextAreaUtil {
         jtext.setFont(font);
     }
 
-    public static void applyCommonSetting(JTextComponent sqlTextArea) {
-        JTextAreaUtil.applyFont(sqlTextArea);
-        JTextUndoUtil.applyUndoProcess1(sqlTextArea);
+    public static void applyTabKey(final JTextComponent jTextComponent) {
+        jTextComponent.addKeyListener(new KeyAdapter() {
+
+            private TreeMap<Integer, Pair<Integer, Integer>> getLinePosMap(String textStr) {
+                TreeMap<Integer, Pair<Integer, Integer>> treeMap = new TreeMap<Integer, Pair<Integer, Integer>>();
+                StringReader reader = null;
+                try {
+                    int lineStartPos = -1;
+                    int pos = 0;
+                    int linePos = 1;
+                    Integer val = null;
+                    reader = new StringReader(textStr);
+                    while ((val = reader.read()) != -1) {
+                        if (lineStartPos == -1) {
+                            lineStartPos = pos;
+                        }
+                        if (val == 10) {
+                            Pair<Integer, Integer> newLinePos = Pair.of(lineStartPos, pos);
+                            treeMap.put(linePos, newLinePos);
+                            linePos++;
+                            lineStartPos = -1;
+                        }
+                        pos++;
+                    }
+                    if (lineStartPos < pos) {
+                        Pair<Integer, Integer> newLinePos = Pair.of(lineStartPos, pos);
+                        treeMap.put(linePos, newLinePos);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    reader.close();
+                }
+                return treeMap;
+            }
+
+            private int getLineNumber(int pos, TreeMap<Integer, Pair<Integer, Integer>> linePosMap) {
+                for (Integer lineNumber : linePosMap.keySet()) {
+                    Pair<Integer, Integer> pair = linePosMap.get(lineNumber);
+                    if (pair.getLeft() <= pos && pair.getRight() >= pos) {
+                        return lineNumber;
+                    }
+                }
+                return -1;
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int startPos = jTextComponent.getSelectionStart();
+                int endPos = jTextComponent.getSelectionEnd();
+
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    StringBuilder sb = new StringBuilder(jTextComponent.getText());
+                    
+                    TreeMap<Integer, Pair<Integer, Integer>> linePosMap = getLinePosMap(sb.toString());
+                    
+                    int startLineNumber = getLineNumber(startPos, linePosMap);
+                    int endLineNumber = getLineNumber(endPos, linePosMap);
+                    
+                    if (startLineNumber != endLineNumber) {
+                        LineNumberReader reader = null;
+                        try {
+                            reader = new LineNumberReader(new StringReader(sb.toString()));
+                            sb.setLength(0);
+                            for (String line = null; (line = reader.readLine()) != null;) {
+                                if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
+                                    sb.append("    " + line + "\n");
+                                } else {
+                                    sb.append(line + "\n");
+                                }
+                            }
+                            jTextComponent.setText(sb.toString());
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        } finally {
+                            try {
+                                reader.close();
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public static void applyCommonSetting(JTextComponent jTextComponent) {
+        JTextAreaUtil.applyFont(jTextComponent);
+        JTextUndoUtil.applyUndoProcess1(jTextComponent);
+        JTextAreaUtil.applyTabKey(jTextComponent);
     }
 }

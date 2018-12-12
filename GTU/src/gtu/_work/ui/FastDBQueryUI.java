@@ -116,7 +116,6 @@ public class FastDBQueryUI extends JFrame {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
-            JAR_PATH_FILE = new File("C:/Users/wistronits/Desktop/FastDBQueryUI");
         }
     }
 
