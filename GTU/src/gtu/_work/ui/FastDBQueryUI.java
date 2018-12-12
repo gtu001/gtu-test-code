@@ -1475,35 +1475,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {
-        TableInfo tabInfo = new TableInfo();
-        DefaultTableModel model = JTableUtil.createModel(true, new Object[0]);
-        List<Object[]> queryLst = new ArrayList<Object[]>();
-        try {
-            Map<String, Object> valMap = new LinkedHashMap<String, Object>();
-            tabInfo.execute(pair.getLeft().getQuestionSql(), pair.getRight().toArray(), this.getDataSource().getConnection());
-            List<String> columns = new ArrayList<String>(tabInfo.getColumns());
-            model = JTableUtil.createModel(true, columns.toArray());
-            List<Object> arry = new ArrayList<Object>();
-            for (int ii = 0; ii < columns.size(); ii++) {
-                String col = columns.get(ii);
-                Object val = null;
-                if (tabInfo.getNumberCol().contains(col)) {
-                    val = (0);
-                } else if (tabInfo.getDateCol().contains(col)) {
-                    val = (new java.sql.Date(System.currentTimeMillis()));
-                } else if (tabInfo.getTimestampCol().contains(col)) {
-                    val = (new java.sql.Timestamp(System.currentTimeMillis()));
-                } else {
-                    val = ("1");
-                }
-                arry.add(val);
-            }
-            queryLst.add(arry.toArray());
-            model.addRow(arry.toArray());
-            this.queryList = Pair.of(columns, queryLst);
-        } catch (Exception e) {
-        }
-        return model;
+        FakeDataModelHandler handler = new FakeDataModelHandler(pair, this.getDataSource());
+        this.queryList = handler.getQueryList();
+        return handler.getModel();
     }
 
     /**
@@ -2639,6 +2613,107 @@ public class FastDBQueryUI extends JFrame {
             dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
         } catch (IOException e) {
             JCommonUtil.handleException("reloadAllProperties ERR : " + e.getMessage(), e);
+        }
+    }
+
+    private class FakeDataModelHandler {
+        private Map<String, String> getParametersTable_Map() {
+            Map<String, String> paramMap = new LinkedHashMap<String, String>();
+            JTableUtil util = JTableUtil.newInstance(parametersTable);
+            for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+                String columnName = (String) util.getRealValueAt(ii, 0);
+                String value = (String) util.getRealValueAt(ii, 1);
+                paramMap.put(columnName, value);
+            }
+            return paramMap;
+        }
+
+        TableInfo tabInfo = new TableInfo();
+        DefaultTableModel model = JTableUtil.createModel(true, new Object[0]);
+        List<Object[]> queryLst = new ArrayList<Object[]>();
+        Map<String, String> parameterTableMap;
+        List<String> columns;
+        Pair<List<String>, List<Object[]>> queryList;
+
+        private Object getValue(Object val, char type) {
+            switch (type) {
+            case 'i':
+                try {
+                    return Integer.parseInt(String.valueOf(val));
+                } catch (Throwable ex) {
+                    return 0;
+                }
+            case 'd':
+                try {
+                    return java.sql.Date.valueOf(String.valueOf(val));
+                } catch (Throwable ex) {
+                    return new java.sql.Date(System.currentTimeMillis());
+                }
+            case 't':
+                try {
+                    return java.sql.Timestamp.valueOf(String.valueOf(val));
+                } catch (Throwable ex) {
+                    return new java.sql.Timestamp(System.currentTimeMillis());
+                }
+            default:
+                try {
+                    if (val != null) {
+                        return String.valueOf(val);
+                    } else {
+                        return "1";
+                    }
+                } catch (Throwable ex) {
+                    return "1";
+                }
+            }
+        }
+
+        public FakeDataModelHandler(Pair<SqlParam, List<Object>> pair, DataSource ds) {
+            try {
+                this.parameterTableMap = getParametersTable_Map();
+
+                tabInfo.execute(pair.getLeft().getQuestionSql(), pair.getRight().toArray(), ds.getConnection());
+                columns = new ArrayList<String>(tabInfo.getColumns());
+                model = JTableUtil.createModel(true, columns.toArray());
+
+                List<Object> arry = new ArrayList<Object>();
+                for (int ii = 0; ii < columns.size(); ii++) {
+                    String col = columns.get(ii);
+                    Object val = null;
+                    char type = ' ';
+
+                    // 用 參數表的 值來當作預設值
+                    if (parameterTableMap.containsKey(col)) {
+                        val = parameterTableMap.get(col);
+                    }
+
+                    if (tabInfo.getNumberCol().contains(col)) {
+                        type = 'i';
+                    } else if (tabInfo.getDateCol().contains(col)) {
+                        type = 'd';
+                    } else if (tabInfo.getTimestampCol().contains(col)) {
+                        type = 't';
+                    } else {
+                        type = ' ';
+                    }
+
+                    val = getValue(val, type);
+                    arry.add(val);
+                }
+                queryLst.add(arry.toArray());
+                model.addRow(arry.toArray());
+                queryList = Pair.of(columns, queryLst);
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+
+        public Pair<List<String>, List<Object[]>> getQueryList() {
+            return queryList;
+        }
+
+        public DefaultTableModel getModel() {
+            return model;
         }
     }
 }
