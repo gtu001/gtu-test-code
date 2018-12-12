@@ -25,6 +25,31 @@ public class ReflectUtil {
             throw new RuntimeException(e);
         }
     }
+    
+    public static Object newInstanceDefault(Class entityClz, boolean debug) {
+        Object entity = null;
+        try {
+            entity = entityClz.newInstance();
+        } catch (Exception ex) {
+            if (debug)
+                ex.printStackTrace();
+            try {
+                Constructor cons = entityClz.getConstructor(new Class[0]);
+                entity = cons.newInstance(new Object[0]);
+            } catch (Exception e1) {
+                if (debug)
+                    e1.printStackTrace();
+                try {
+                    Constructor cons = entityClz.getDeclaredConstructor(new Class[0]);
+                    cons.setAccessible(true);
+                    entity = cons.newInstance(new Object[0]);
+                } catch (Exception e2) {
+                    throw new RuntimeException("newInstanceDefault ERR : " + e2.getMessage(), e2);
+                }
+            }
+        }
+        return entity;
+    }
 
     public static Object getField(String field, Object bean) {
         try {

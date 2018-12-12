@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -63,6 +61,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -85,6 +84,7 @@ import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
+import gtu.properties.PropertiesMultiUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.spring.SimilarityUtil;
@@ -114,8 +114,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -124,9 +124,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
-    private static Properties sqlIdListProp;
     private static final File sqlIdListDSMappingFile = new File(JAR_PATH_FILE, "sqlList_DS_Mapping.properties");
     private static Properties sqlIdListDSMappingProp;
+    private SqlIdConfigBeanHandler sqlIdConfigBeanHandler;
 
     // private static PropertiesGroupUtils dataSourceConfig = new
     // PropertiesGroupUtils(new File(JAR_PATH_FILE, "dataSource.properties"));
@@ -237,6 +237,13 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblDb;
     private JTextField sqlMappingFilterText;
     private JButton sqlFilterClearBtn;
+    private JLabel lblNewLabel_8;
+    private JLabel lblNewLabel_9;
+    private JComboBox sqlIdCategoryComboBox;
+    private AutoComboBox sqlIdCategoryComboBox_Auto;
+    private JComboBox sqlIdColorComboBox;
+    private JLabel lblNewLabel_10;
+    private JButton btnNewButton;
 
     /**
      * Launch the application.
@@ -400,10 +407,28 @@ public class FastDBQueryUI extends JFrame {
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
 
+        JPanel sqlIdPanel = new JPanel();
+        lblNewLabel_10 = new JLabel("顏色");
+        sqlIdPanel.add(lblNewLabel_10);
+
+        sqlIdColorComboBox = new JComboBox();
+        sqlIdColorComboBox.setModel(RefSearchColor.getModel());
+        sqlIdPanel.add(sqlIdColorComboBox);
+
+        lblNewLabel_9 = new JLabel("類別");
+        sqlIdPanel.add(lblNewLabel_9);
+
+        sqlIdCategoryComboBox = new JComboBox();
+        sqlIdCategoryComboBox_Auto = AutoComboBox.applyAutoComboBox(sqlIdCategoryComboBox);
+        sqlIdPanel.add(sqlIdCategoryComboBox);
+
+        lblNewLabel_8 = new JLabel("SQL ID");
+        sqlIdPanel.add(lblNewLabel_8);
         sqlIdText = new JTextField();
+        sqlIdPanel.add(sqlIdText);
         sqlIdText.setToolTipText("設定SQL ID");
-        panel_2.add(sqlIdText, BorderLayout.NORTH);
-        sqlIdText.setColumns(10);
+        panel_2.add(sqlIdPanel, BorderLayout.NORTH);
+        sqlIdText.setColumns(40);
 
         JPanel panel_3 = new JPanel();
         panel_2.add(panel_3, BorderLayout.SOUTH);
@@ -932,9 +957,36 @@ public class FastDBQueryUI extends JFrame {
                 saveEtcConfigBtnAction();
             }
         });
+
+        btnNewButton = new JButton("New button");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File file = JCommonUtil._jFileChooser_selectFileOnly();
+                    Properties sqlIdProp = PropertiesUtil.loadProperties(file, null, true);
+                    Properties saveConfigProp = new Properties();
+                    for (Enumeration enu = sqlIdProp.keys(); enu.hasMoreElements();) {
+                        String sqlId = (String) enu.nextElement();
+                        String sql = sqlIdProp.getProperty(sqlId);
+                        SqlIdConfigBean bean = new SqlIdConfigBean();
+                        bean.sqlId = sqlId;
+                        bean.sql = sql;
+                        bean.color = RefSearchColor.藍.colorCode;
+                        bean.category = "";
+                        saveConfigProp.setProperty(bean.getKey(), bean.getValue());
+                    }
+                    PropertiesUtil.storeProperties(saveConfigProp, new File(file.getParentFile(), "new_sqlList.properties"), "");
+                    JCommonUtil._jOptionPane_showMessageDialog_info("done...");
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_23.add(btnNewButton);
         panel_23.add(saveEtcConfigBtn);
 
         {
+            sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             // 初始化datasource
             this.initDataSourceProperties(null);
 
@@ -1081,18 +1133,19 @@ public class FastDBQueryUI extends JFrame {
         if (!sqlIdListFile.exists()) {
             sqlIdListFile.createNewFile();
         }
-        sqlIdListProp = PropertiesUtil.loadProperties(sqlIdListFile, null, false);
+        sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
         sqlIdListDSMappingProp = PropertiesUtil.loadProperties(sqlIdListDSMappingFile, null, false);
 
         String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
         String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
         String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText.getText()).toLowerCase();
 
-        List<String> sqlIdList = new ArrayList<String>();
-        for (Enumeration enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
-            String sqlId = StringUtils.defaultString((String) enu.nextElement());
+        List<SqlIdConfigBean> sqlIdList = new ArrayList<SqlIdConfigBean>();
+        for (SqlIdConfigBean enu : sqlIdConfigBeanHandler.lst) {
+            String sqlId = enu.sqlId;
+            String category = StringUtils.trimToEmpty(enu.category).toLowerCase();
             String sqlIdCompare = sqlId.toLowerCase().toLowerCase();
-            String content = StringUtils.trimToEmpty((String) sqlIdListProp.getProperty(sqlId)).toLowerCase();
+            String content = StringUtils.trimToEmpty(enu.sql).toLowerCase();
 
             boolean findOk = false;
 
@@ -1100,10 +1153,10 @@ public class FastDBQueryUI extends JFrame {
                 findOk = true;
             } else {
                 if (StringUtils.isNotBlank(queryText) && StringUtils.isNotBlank(contentFilterText)) {
-                    if (sqlIdCompare.contains(queryText) && content.contains(contentFilterText)) {
+                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText)) && content.contains(contentFilterText)) {
                         findOk = true;
                     }
-                } else if (StringUtils.isNotBlank(queryText) && sqlIdCompare.contains(queryText)) {
+                } else if (StringUtils.isNotBlank(queryText) && (category.contains(queryText) || sqlIdCompare.contains(queryText))) {
                     findOk = true;
                 } else if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
                     findOk = true;
@@ -1121,13 +1174,13 @@ public class FastDBQueryUI extends JFrame {
             }
 
             if (findOk) {
-                sqlIdList.add(sqlId);
+                sqlIdList.add(enu);
             }
         }
         ListUtil.sortIgnoreCase(sqlIdList);
 
         DefaultListModel model = JListUtil.createModel();
-        for (String s : sqlIdList) {
+        for (SqlIdConfigBean s : sqlIdList) {
             model.addElement(s);
         }
         sqlList.setModel(model);
@@ -1235,6 +1288,8 @@ public class FastDBQueryUI extends JFrame {
     private void saveSqlButtonClick() {
         try {
             String sqlId = sqlIdText.getText().toString();
+            RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
+            String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
             String sql = sqlTextArea.getText().toString();
             JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
@@ -1245,7 +1300,7 @@ public class FastDBQueryUI extends JFrame {
             setParameterTable(param);
 
             // 儲存sqlList Prop
-            this.saveSqlListProp(sqlId, sql);
+            this.saveSqlListProp(color.colorCode, category, sqlId, sql);
 
             // 載入參數設定
             sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
@@ -1275,12 +1330,14 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 儲存prop
      */
-    private void saveSqlListProp(String sqlId, String sql) throws IOException {
-        Properties prop = sqlIdListProp;
-        if (StringUtils.isNotBlank(sqlId) && StringUtils.isNotBlank(sql)) {
-            prop.put(sqlId, sql);
-        }
-        PropertiesUtil.storeProperties(prop, sqlIdListFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
+    private void saveSqlListProp(String color, String category, String sqlId, String sql) throws IOException {
+        SqlIdConfigBean bean = new SqlIdConfigBean();
+        bean.color = color;
+        bean.category = category;
+        bean.sqlId = sqlId;
+        bean.sql = sql;
+        System.out.println("#saveSqlListProp = " + ReflectionToStringBuilder.toString(bean));
+        sqlIdConfigBeanHandler.save(bean);
         System.out.println("儲存檔案路徑 : " + sqlIdListFile);
     }
 
@@ -1665,15 +1722,16 @@ public class FastDBQueryUI extends JFrame {
         // if(!JMouseEventUtil.buttonLeftClick(2, e)){
         // return;
         // }
-        String sqlId = JListUtil.getLeadSelectionObject(sqlList);
-        System.out.println("sqlId : " + sqlId);
+        SqlIdConfigBean sqlBean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
+        System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
-        String sql = sqlIdListProp.getProperty(sqlId);
-        sqlIdText.setText(sqlId);
+        String sql = sqlBean.sql;
+        sqlIdText.setText(sqlBean.sqlId);
         sqlTextArea.setText(sql);
+        sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
 
         // 載入參數設定
-        sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
+        sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlBean.getUniqueKey() + ".properties"));
         loadParameterTableConfig();
 
         // 判斷是否要自動切換dataSource
@@ -1686,9 +1744,9 @@ public class FastDBQueryUI extends JFrame {
     private void loadSqlIdMappingDataSourceConfig() {
         try {
             initLoadSqlIdMappingConfig();
-            String sqlId = JListUtil.getLeadSelectionObject(sqlList);
-            if (sqlIdListDSMappingProp.containsKey(sqlId)) {
-                String saveKey = sqlIdListDSMappingProp.getProperty(sqlId);
+            SqlIdConfigBean bean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
+            if (sqlIdListDSMappingProp.containsKey(bean.getUniqueKey())) {
+                String saveKey = sqlIdListDSMappingProp.getProperty(bean.getUniqueKey());
                 if (!StringUtils.equals(dbNameIdText_getText(), saveKey)) {
                     boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("目前DS為 : [" + dbNameIdText_getText() + "] \n 是否要切換為最後一次成功使用的DS :[" + saveKey + "], ", "切換dataSource");
                     if (confirm) {
@@ -2255,27 +2313,26 @@ public class FastDBQueryUI extends JFrame {
             JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
             // 刪除
             if (evt.getKeyCode() == 127) {
-                String sqlId = JListUtil.getLeadSelectionObject(sqlList);
-                String sql = sqlIdListProp.getProperty(sqlId);
+                SqlIdConfigBean sqlBean = JListUtil.getLeadSelectionObject(sqlList);
+                String sql = sqlBean.sql;
 
-                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("刪除 : " + sqlId + "\nSQL : " + sql, "是否刪除 : " + sqlId);
+                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("刪除 : " + sqlBean.getUniqueKey() + "\nSQL : " + sql, "是否刪除 : " + sqlBean.getUniqueKey());
                 if (deleteConfirm) {
 
                     // 刪除參數黨
-                    File paramFile = new File(JAR_PATH_FILE, "param_" + sqlId + ".properties");
+                    File paramFile = new File(JAR_PATH_FILE, "param_" + sqlBean.getUniqueKey() + ".properties");
                     if (paramFile.exists()) {
                         paramFile.delete();
                     }
 
                     // 刪除sqlId
                     if (!paramFile.exists()) {
-                        sqlIdListProp.remove(sqlId);
-                        saveSqlListProp("", "");
+                        sqlIdConfigBeanHandler.remove(sqlBean);
 
-                        JListUtil.removeElement(sqlList, sqlId);
+                        JListUtil.removeElement(sqlList, sqlBean);
 
                         // 移除db config mapping
-                        sqlIdListDSMappingProp.remove(sqlId);
+                        sqlIdListDSMappingProp.remove(sqlBean.getUniqueKey());
                         PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
                     }
 
@@ -2302,6 +2359,134 @@ public class FastDBQueryUI extends JFrame {
             try {
                 conn.close();
             } catch (SQLException e) {
+            }
+        }
+    }
+
+    private class SqlIdConfigBeanHandler {
+        Properties sqlIdListProp;
+        List<SqlIdConfigBean> lst = new ArrayList<SqlIdConfigBean>();
+
+        private SqlIdConfigBeanHandler() {
+            init("");
+        }
+
+        public void remove(SqlIdConfigBean sqlBean) {
+            init("");
+            boolean removeOk = lst.remove(sqlBean);
+            System.out.println("removeOk = " + removeOk);
+            store();
+        }
+
+        public void save(SqlIdConfigBean b) {
+            init("");
+            lst.add(b);
+            store();
+            init(b.category);
+        }
+
+        private void store() {
+            sqlIdListProp.clear();
+            for (SqlIdConfigBean bean : lst) {
+                sqlIdListProp.setProperty(bean.getKey(), bean.getValue());
+            }
+            PropertiesUtil.storeProperties(sqlIdListProp, sqlIdListFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd-HHmmss"));
+        }
+
+        private void init(String category) {
+            lst.clear();
+            sqlIdListProp = PropertiesUtil.loadProperties(sqlIdListFile, null, false);
+            Set<String> categoryLst = new TreeSet<String>();
+            for (Enumeration<Object> enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = sqlIdListProp.getProperty(key);
+                SqlIdConfigBean bean = SqlIdConfigBean.of(key, value);
+                lst.add(bean);
+                if (!categoryLst.contains(bean.category)) {
+                    categoryLst.add(bean.category);
+                }
+            }
+            ListUtil.sortIgnoreCase(lst);
+            sqlIdCategoryComboBox_Auto.applyComboxBoxList(new ArrayList<String>(categoryLst), category);
+        }
+    }
+
+    private static class SqlIdConfigBean {
+        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId" };
+        private static String[] VALUES_DEF = new String[] { "sql" };
+
+        String color;
+        String category;
+        String sqlId;
+        String sql;
+
+        public String getUniqueKey() {
+            String prefix = "";
+            if (StringUtils.isNotBlank(category)) {
+                prefix = StringUtils.trimToEmpty(category) + "_";
+            }
+            return prefix + StringUtils.trimToEmpty(sqlId);
+        }
+
+        public static SqlIdConfigBean of(String key, String value) {
+            return PropertiesMultiUtil.of(key, value, SqlIdConfigBean.class);
+        }
+
+        public String getKey() {
+            return PropertiesMultiUtil.getKey(this);
+        }
+
+        public String getValue() {
+            return PropertiesMultiUtil.getValue(this);
+        }
+
+        public void validate() {
+            if (StringUtils.isBlank(sqlId) && StringUtils.isBlank(sql)) {
+                Validate.isTrue(false, "sqlId, sql 不可為空!");
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((category == null) ? 0 : category.hashCode());
+            result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            SqlIdConfigBean other = (SqlIdConfigBean) obj;
+            if (category == null) {
+                if (other.category != null)
+                    return false;
+            } else if (!category.equals(other.category))
+                return false;
+            if (sql == null) {
+                if (other.sql != null)
+                    return false;
+            } else if (!sql.equals(other.sql))
+                return false;
+            return true;
+        }
+
+        public String toString() {
+            if (StringUtils.isNotBlank(category)) {
+                return String.format("<html><font color=\"%s\"><b></b>%s</font>&nbsp;&nbsp;  <font color=\"black\">%s</font></html>", //
+                        StringUtils.trimToEmpty(color), //
+                        StringUtils.trimToEmpty(category), //
+                        StringUtils.trimToEmpty(sqlId));
+            } else {
+                return String.format("<html><font color=\"%s\">%s</font></html>", //
+                        StringUtils.trimToEmpty(color), //
+                        StringUtils.trimToEmpty(sqlId));
             }
         }
     }

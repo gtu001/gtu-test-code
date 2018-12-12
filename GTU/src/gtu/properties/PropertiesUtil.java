@@ -177,8 +177,8 @@ public class PropertiesUtil {
             prop.load(inputStream);
             return prop;
         } catch (Exception ex) {
-            ex.printStackTrace();
             if (failThrow) {
+                ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
             return prop;
@@ -186,7 +186,6 @@ public class PropertiesUtil {
             try {
                 inputStream.close();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
