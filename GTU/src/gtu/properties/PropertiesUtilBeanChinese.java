@@ -50,7 +50,7 @@ public class PropertiesUtilBeanChinese {
             logger.info("configFile size : " + configProp.size());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        } 
+        }
     }
 
     public void reload() {
@@ -63,6 +63,14 @@ public class PropertiesUtilBeanChinese {
 
     public PropertiesUtilBeanChinese(Class<?> clz, String encode) {
         this(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.properties"), encode);
+    }
+
+    public PropertiesUtilBeanChinese(Class<?> clz, String filename, String encode) {
+        this(new File(PropertiesUtil.getJarCurrentPath(clz), filename + "_config.properties"), encode);
+    }
+
+    public PropertiesUtilBeanChinese(File parentDir, String filename, String encode) {
+        this(new File(parentDir, filename + "_config.properties"), encode);
     }
 
     private Properties loadFileByCoding(File file, String encode) throws IOException {
