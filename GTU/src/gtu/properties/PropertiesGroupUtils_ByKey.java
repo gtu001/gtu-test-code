@@ -12,6 +12,8 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
+import gtu.collection.ListUtil;
+
 public class PropertiesGroupUtils_ByKey {
 
     public static final String SAVE_KEYS = "saveKey";
@@ -60,7 +62,7 @@ public class PropertiesGroupUtils_ByKey {
     private List<Map<String, String>> _getPropListMap() {
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         if (configProp.containsKey(SAVE_KEYS)) {
-            List<String> saveKeys = _getSaveKeys();
+            List<String> saveKeys = getSaveKeys();
             for (String _key : saveKeys) {
                 if (StringUtils.isBlank(_key)) {
                     continue;
@@ -85,27 +87,21 @@ public class PropertiesGroupUtils_ByKey {
         return map;
     }
 
-    public List<String> getSaveKeys(boolean endureFailure) {
-        try {
-            if (!configProp.containsKey(SAVE_KEYS)) {
-                throw new RuntimeException("檔案 : " + configFile + " , 缺少  " + SAVE_KEYS);
-            }
-            List<String> lst = new ArrayList<String>();
-            String keystr = configProp.getProperty(SAVE_KEYS);
-            String[] keys = keystr.split(",", -1);
-            for (String k : keys) {
-                if (!lst.contains(k)) {
-                    lst.add(k);
-                }
-            }
-            return lst;
-        } catch (Exception ex) {
-            if (endureFailure) {
-                return new ArrayList<String>();
-            } else {
-                throw new RuntimeException(ex);
-            }
+    /**
+     * 設定現在index
+     * 
+     * @param saveKey
+     * @param endureFailure
+     * @return
+     */
+    public boolean setCurrentIndex(String saveKey) {
+        List<String> keyLst = this.getSaveKeys();
+        int idx = keyLst.indexOf(saveKey);
+        if (idx == -1) {
+            return false;
         }
+        this.currentIndex = idx;
+        return true;
     }
 
     /**
@@ -133,7 +129,7 @@ public class PropertiesGroupUtils_ByKey {
     }
 
     private void _removeConfigGroup(String saveKey) {
-        List<String> saveKeys = _getSaveKeys();
+        List<String> saveKeys = getSaveKeys();
         saveKeys.remove(saveKey);
         configProp.setProperty(SAVE_KEYS, StringUtils.join(saveKeys, ","));
         for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
@@ -166,7 +162,7 @@ public class PropertiesGroupUtils_ByKey {
             throw new RuntimeException(SAVE_KEYS + " 不可含有 \",\"");
         }
 
-        List<String> saveKeys = _getSaveKeys();
+        List<String> saveKeys = getSaveKeys();
         if (!saveKeys.contains(newKeys)) {
             saveKeys.add(newKeys);
         }
@@ -182,7 +178,13 @@ public class PropertiesGroupUtils_ByKey {
         }
     }
 
-    private List<String> _getSaveKeys() {
+    /**
+     * 取得所有的 key 清單
+     *
+     * @param endureFailure
+     * @return
+     */
+    public List<String> getSaveKeys() {
         if (!configProp.containsKey(SAVE_KEYS)) {
             configProp.setProperty(SAVE_KEYS, "");
         }
@@ -193,6 +195,7 @@ public class PropertiesGroupUtils_ByKey {
                 list.add(k);
             }
         }
+        ListUtil.sortIgnoreCase(list);
         return list;
     }
 

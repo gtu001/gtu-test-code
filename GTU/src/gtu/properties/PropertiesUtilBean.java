@@ -116,6 +116,10 @@ public class PropertiesUtilBean {
     public PropertiesUtilBean(Class<?> clz, String fileName) {
         this.init(new File(PropertiesUtil.getJarCurrentPath(clz), fileName + "_config.properties"));
     }
+    
+    public PropertiesUtilBean(File parentDir, String fileName) {
+        this.init(new File(parentDir, fileName + "_config.properties"));
+    }
 
     public void store() {
         try {

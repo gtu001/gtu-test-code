@@ -116,6 +116,7 @@ public class FastDBQueryUI extends JFrame {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("C:/Users/wistronits/Desktop/FastDBQueryUI");
         }
     }
 
@@ -820,9 +821,9 @@ public class FastDBQueryUI extends JFrame {
         dbNameIdText_Auto.setMatchType(MatchType.Contains);
         reload_DataSourceConfig_autoComplete();
         panel_6.add(dbNameIdText, "10, 2, fill, default");
-        dbNameIdText.addItemListener(new ItemListener() {
+        dbNameIdText.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     String key = dbNameIdText_getText();
                     Map<String, String> param = dataSourceConfig.getConfig(key);
@@ -831,6 +832,7 @@ public class FastDBQueryUI extends JFrame {
                         return;
                     }
                     initDataSourceProperties(param);
+                    dataSourceConfig.setCurrentIndex(key);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -1150,7 +1152,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void reload_DataSourceConfig_autoComplete() {
-        dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(true), dbNameIdText_getText());
+        dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
     }
 
     private void storeSqlIdListDsMappingProp() throws IOException {
@@ -2421,7 +2423,7 @@ public class FastDBQueryUI extends JFrame {
             String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.properties";
             File configFile = new File(refConfigPathText.getText());
             if (configFile == null || !configFile.exists()) {
-                config = new PropertiesUtilBean(new File(PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class), fileName));
+                config = new PropertiesUtilBean(new File(JAR_PATH_FILE, fileName));
             } else {
                 config = new PropertiesUtilBean(configFile);
             }
@@ -2569,7 +2571,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private class EtcConfigHandler {
-        PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI.class, FastDBQueryUI.class.getSimpleName() + "_Etc");
+        PropertiesUtilBean config = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_Etc");
         List<JComponent> containArry = new ArrayList<JComponent>();
 
         EtcConfigHandler() {
