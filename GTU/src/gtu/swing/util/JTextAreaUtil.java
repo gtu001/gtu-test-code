@@ -157,6 +157,8 @@ public class JTextAreaUtil {
 
                 if (e.getKeyCode() == KeyEvent.VK_TAB) {
 
+                    boolean isShiftPress = (e.getModifiers() & KeyEvent.SHIFT_MASK) != 0;
+
                     if (startPos == endPos) {
                         try {
                             jTextComponent.getDocument().insertString(startPos, "    ", null);
@@ -181,14 +183,28 @@ public class JTextAreaUtil {
                             sb.setLength(0);
                             for (String line = null; (line = reader.readLine()) != null;) {
                                 String changeLine = reader.getLineNumber() == 1 ? "" : "\n";
+
                                 if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
-                                    sb.append(changeLine + "    ");
-                                    if (selectionRange.getLeft() == -1) {
-                                        selectionRange = Pair.of(sb.length() - 1, -1);
-                                    }
-                                    sb.append(line);
-                                    if (selectionRange.getLeft() != -1) {
-                                        selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
+                                    if (!isShiftPress) {
+                                        // 單純按TAB
+                                        sb.append(changeLine + "    ");
+                                        if (selectionRange.getLeft() == -1) {
+                                            selectionRange = Pair.of(sb.length() - 1, -1);
+                                        }
+                                        sb.append(line);
+                                        if (selectionRange.getLeft() != -1) {
+                                            selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
+                                        }
+                                    } else {
+                                        // 按Shift+TAB
+                                        sb.append(changeLine);
+                                        if (selectionRange.getLeft() == -1) {
+                                            selectionRange = Pair.of(sb.length(), -1);
+                                        }
+                                        sb.append(line.replaceAll("^(\\s{0,4}|\t)", ""));
+                                        if (selectionRange.getLeft() != -1) {
+                                            selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
+                                        }
                                     }
                                 } else {
                                     sb.append(changeLine + line);
