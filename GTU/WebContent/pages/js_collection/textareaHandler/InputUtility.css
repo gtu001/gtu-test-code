@@ -1,0 +1,134 @@
+.selectWithDatalist{
+    position: relative;
+    display: inline-block;
+    margin-right: -12px;
+}
+
+.selectWithDatalist_main{
+    display:none;
+}
+
+.selectWithDatalist_input{
+    min-width: 94px !important;
+}
+
+.selectWithDatalist_input.empty_input{
+    color: #999;
+}
+
+.selectWithDatalist_downMark,
+.selectWithDatalist_clearMark{
+    font-size: 10px !important; 
+    display: inline-block;
+    width: 12px;
+    height: 14px;
+    position: relative;
+    right: 15px;
+    z-index: 1;
+    cursor: pointer;
+    background-color: #FFF;
+}
+
+.selectWithDatalist_clearMark{
+    font-size: 16px !important;
+    font-weight: 200; 
+    display: none;
+}
+.selectWithDatalist_clearMark:hover{
+    color: darkred;
+}
+
+.working .selectWithDatalist_downMark{
+    display: none;
+}
+.working .selectWithDatalist_clearMark{
+    display: inline-block;
+}
+
+.selectWithDatalist_options{
+    min-width: 96px !important;
+    position: absolute;
+    top:105%;
+    left:0px;
+    border: 1px solid #CCC;
+    background: white;
+    display: none;
+    z-index: 999;
+}
+
+.selectWithDatalist_options.inputFocus,
+.selectWithDatalist_options.optionsIn,
+.selectWithDatalist_options.lengthCount{
+    display: block;
+}
+
+.selectWithDatalist_options_scroll{
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.selectWithDatalist_options ul{
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+}
+
+.selectWithDatalist_options li{
+    white-space: nowrap;
+    padding: 2px 10px;
+    margin: 0px;
+    cursor: pointer;
+}
+
+.selectWithDatalist_options .deactivate{
+    display: none;
+}
+
+.selectWithDatalist_options li:hover{
+
+    background-color: lightcyan;
+}
+
+li.selectWithDatalist_options_label{
+    background-color: #EEE;
+    cursor: default;
+}
+
+li.selectWithDatalist_options_label:hover{
+    background-color: #EEE;
+}
+
+li.selectWithDatalist_options_item{
+    white-space: nowrap;
+}
+
+li.selectWithDatalist_options_item.active{
+    background-color: dodgerblue;
+}
+
+span.selectWithDatalist_options_item_display{
+    padding-right: 20px;
+}
+
+span.selectWithDatalist_options_item_memo{
+    color: #999;
+    padding-left: 10px;
+    float: right;
+}
+
+.selectWithDatalist_options.lengthCount span.selectWithDatalist_options_item_memo{
+    float: none;
+}
+
+button.selectWithDatalist_allbtn{
+    font-size: 10px;
+    float: left;
+    margin-top: 2px;
+    margin-left: 2px;
+}
+
+div.selectWithDatalist_infoBar{
+    background-color: #CCC;
+    padding : 2px 10px;
+    text-align: right;
+}
