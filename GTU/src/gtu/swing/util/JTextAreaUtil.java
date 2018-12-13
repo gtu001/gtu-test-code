@@ -157,22 +157,23 @@ public class JTextAreaUtil {
 
                 if (e.getKeyCode() == KeyEvent.VK_TAB) {
                     StringBuilder sb = new StringBuilder(jTextComponent.getText());
-                    
+
                     TreeMap<Integer, Pair<Integer, Integer>> linePosMap = getLinePosMap(sb.toString());
-                    
+
                     int startLineNumber = getLineNumber(startPos, linePosMap);
                     int endLineNumber = getLineNumber(endPos, linePosMap);
-                    
+
                     if (startLineNumber != endLineNumber) {
                         LineNumberReader reader = null;
                         try {
                             reader = new LineNumberReader(new StringReader(sb.toString()));
                             sb.setLength(0);
                             for (String line = null; (line = reader.readLine()) != null;) {
+                                String changeLine = reader.getLineNumber() == 1 ? "" : "\n";
                                 if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
-                                    sb.append("    " + line + "\n");
+                                    sb.append(changeLine + "    " + line);
                                 } else {
-                                    sb.append(line + "\n");
+                                    sb.append(changeLine + line);
                                 }
                             }
                             jTextComponent.setText(sb.toString());

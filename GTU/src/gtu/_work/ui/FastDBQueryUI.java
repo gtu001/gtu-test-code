@@ -114,8 +114,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
         }
     }
 
@@ -971,7 +971,7 @@ public class FastDBQueryUI extends JFrame {
                         SqlIdConfigBean bean = new SqlIdConfigBean();
                         bean.sqlId = sqlId;
                         bean.sql = sql;
-                        bean.color = RefSearchColor.藍.colorCode;
+                        bean.color = RefSearchColor.黑.colorCode;
                         bean.category = "";
                         saveConfigProp.setProperty(bean.getKey(), bean.getValue());
                     }
@@ -2379,6 +2379,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public void save(SqlIdConfigBean b) {
+            b.validate();
             init("");
             lst.add(b);
             store();
@@ -2567,6 +2568,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private enum RefSearchColor {
+        黑("BLACK"), //
         藍("BLUE"), //
         黃("YELLOW"), //
         綠("GREEN"), //

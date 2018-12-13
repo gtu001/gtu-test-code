@@ -19,7 +19,7 @@ public class JTextUndoUtil {
 
     private static final JTextUndoUtil _INST = new JTextUndoUtil();
 
-    public static void applyUndoProcess1(JTextComponent text) {
+    public static void applyUndoProcess2(JTextComponent text) {
         final UndoManager um = new UndoManager();
         text.getDocument().addUndoableEditListener(um);
         text.addKeyListener(new KeyAdapter() {
@@ -40,7 +40,7 @@ public class JTextUndoUtil {
         });
     }
 
-    public static void applyUndoProcess2(JTextComponent text) {
+    public static void applyUndoProcess1(JTextComponent text) {
         CustomUndoHandler handler = _INST.new CustomUndoHandler();
         handler.apply(text);
     }
