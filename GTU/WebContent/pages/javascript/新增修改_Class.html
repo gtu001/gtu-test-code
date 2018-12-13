@@ -1,0 +1,25 @@
+function CssClassHandler(element) {
+        this.element = element;
+        
+        this.addClass = function(clzName) {
+                var arr = this.element.className.split(" ");
+                if (arr.indexOf(clzName) == -1) {
+                        this.element.className += " " + clzName;
+                }
+        };
+        
+        this.removeClass = function(clzName){
+                var arr = this.element.className.split(" ");
+                var removeIdx = arr.indexOf(clzName);
+                arr.splice(removeIdx, 1);
+                var clzStr = "";
+                for(var i in arr){
+                        clzStr += i + " ";
+                }
+                this.element.className = clzStr;
+        };
+
+        this.hasClass = function(clzName){
+                return this.element.className.indexOf(clzName) != -1;
+        };
+}

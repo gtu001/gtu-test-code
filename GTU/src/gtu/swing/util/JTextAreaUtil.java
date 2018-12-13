@@ -188,7 +188,7 @@ public class JTextAreaUtil {
                                     }
                                     sb.append(line);
                                     if (selectionRange.getLeft() != -1) {
-                                        selectionRange = Pair.of(selectionRange.getLeft(), sb.length() - 1);
+                                        selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
                                     }
                                 } else {
                                     sb.append(changeLine + line);
