@@ -156,12 +156,23 @@ public class JTextAreaUtil {
                 int endPos = jTextComponent.getSelectionEnd();
 
                 if (e.getKeyCode() == KeyEvent.VK_TAB) {
+
+                    if (startPos == endPos) {
+                        try {
+                            jTextComponent.getDocument().insertString(startPos, "    ", null);
+                        } catch (BadLocationException e1) {
+                            e1.printStackTrace();
+                        }
+                        e.consume();
+                    }
+
                     StringBuilder sb = new StringBuilder(jTextComponent.getText());
 
                     TreeMap<Integer, Pair<Integer, Integer>> linePosMap = getLinePosMap(sb.toString());
 
                     int startLineNumber = getLineNumber(startPos, linePosMap);
                     int endLineNumber = getLineNumber(endPos, linePosMap);
+                    Pair<Integer, Integer> selectionRange = Pair.of(-1, -1);
 
                     if (startLineNumber != endLineNumber) {
                         LineNumberReader reader = null;
@@ -171,12 +182,22 @@ public class JTextAreaUtil {
                             for (String line = null; (line = reader.readLine()) != null;) {
                                 String changeLine = reader.getLineNumber() == 1 ? "" : "\n";
                                 if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
-                                    sb.append(changeLine + "    " + line);
+                                    sb.append(changeLine + "    ");
+                                    if (selectionRange.getLeft() == -1) {
+                                        selectionRange = Pair.of(sb.length() - 1, -1);
+                                    }
+                                    sb.append(line);
+                                    if (selectionRange.getLeft() != -1) {
+                                        selectionRange = Pair.of(selectionRange.getLeft(), sb.length() - 1);
+                                    }
                                 } else {
                                     sb.append(changeLine + line);
                                 }
                             }
                             jTextComponent.setText(sb.toString());
+                            jTextComponent.setSelectionStart(selectionRange.getLeft());
+                            jTextComponent.setSelectionEnd(selectionRange.getRight());
+                            e.consume();
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         } finally {
