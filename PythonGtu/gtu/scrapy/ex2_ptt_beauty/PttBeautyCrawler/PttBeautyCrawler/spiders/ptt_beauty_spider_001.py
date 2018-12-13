@@ -25,7 +25,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
     start_urls = ['https://www.ptt.cc/bbs/Beauty']
     
     BASE_URL = 'https://www.ptt.cc'
-    FETCH_SINCE_DATE = dateUtil.getDatetimeByJavaFormat("2018/09/07", "yyyy/MM/dd", True)
+    FETCH_SINCE_DATE = dateUtil.getDatetimeByJavaFormat("2018/11/01", "yyyy/MM/dd", True)
     FETCH_PREFIX_YEAR = "2018/"
     
     rules = (
@@ -128,7 +128,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
         return True
     
     def isPicFormatOk(self, scraped_info):
-        if "帥哥" in scraped_info['title']:
+        if "帥哥" in scraped_info['title'] or "[公告]" in scraped_info['title'] :
             return False
         return True
 

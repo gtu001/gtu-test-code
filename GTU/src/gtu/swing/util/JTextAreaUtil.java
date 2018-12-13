@@ -155,17 +155,20 @@ public class JTextAreaUtil {
                 int startPos = jTextComponent.getSelectionStart();
                 int endPos = jTextComponent.getSelectionEnd();
 
+                boolean isShiftPress = (e.getModifiers() & KeyEvent.SHIFT_MASK) != 0;
+
                 if (e.getKeyCode() == KeyEvent.VK_TAB) {
 
-                    boolean isShiftPress = (e.getModifiers() & KeyEvent.SHIFT_MASK) != 0;
-
-                    if (startPos == endPos) {
-                        try {
-                            jTextComponent.getDocument().insertString(startPos, "    ", null);
-                        } catch (BadLocationException e1) {
-                            e1.printStackTrace();
+                    if (!isShiftPress) {
+                        if (startPos == endPos) {
+                            try {
+                                jTextComponent.getDocument().insertString(startPos, "    ", null);
+                            } catch (BadLocationException e1) {
+                                e1.printStackTrace();
+                            }
+                            e.consume();
+                            return;
                         }
-                        e.consume();
                     }
 
                     StringBuilder sb = new StringBuilder(jTextComponent.getText());
@@ -176,7 +179,7 @@ public class JTextAreaUtil {
                     int endLineNumber = getLineNumber(endPos, linePosMap);
                     Pair<Integer, Integer> selectionRange = Pair.of(-1, -1);
 
-                    if (startLineNumber != endLineNumber) {
+                    if ((startLineNumber != endLineNumber) || isShiftPress) {
                         LineNumberReader reader = null;
                         try {
                             reader = new LineNumberReader(new StringReader(sb.toString()));
