@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -286,16 +287,19 @@ public class ScheduleBatRunnerUI extends JFrame {
                                         bean.commandBeanStatue = CommandBeanStatue.SUCCESS;
                                     }
                                     bean.commandBeanStatue = CommandBeanStatue.SUCCESS;
+                                    hideInSystemTrayHelper.displayMessage("完成", bean.command + "成功!", MessageType.INFO);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     bean.commandBeanStatue = CommandBeanStatue.FAILED;
                                     bean.errMsg.append(e.getMessage());
+                                    hideInSystemTrayHelper.displayMessage("完成", bean.command + "失敗!", MessageType.ERROR);
                                 } finally {
                                     logData(bean);
                                     updateLst();
                                 }
                             }
-                            JCommonUtil._jOptionPane_showMessageDialog_error("done..");
+                            hideInSystemTrayHelper.displayMessage("完成", "全部完成..", MessageType.INFO);
+                            JCommonUtil._jOptionPane_showMessageDialog_error("全部完成..");
                         }
                     });
                     batRunningThread.start();

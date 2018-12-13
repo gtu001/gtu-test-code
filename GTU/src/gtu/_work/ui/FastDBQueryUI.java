@@ -1183,8 +1183,8 @@ public class FastDBQueryUI extends JFrame {
         Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
             @Override
             public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
-                int compare1 = StringUtils.trimToEmpty(o1.category).compareTo(StringUtils.trimToEmpty(o2.category));
-                int compare2 = StringUtils.trimToEmpty(o1.sqlId).compareTo(StringUtils.trimToEmpty(o2.sqlId));
+                int compare1 = StringUtils.trimToEmpty(o1.category).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.category).toLowerCase());
+                int compare2 = StringUtils.trimToEmpty(o1.sqlId).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.sqlId).toLowerCase());
                 if (compare1 != 0) {
                     return compare1;
                 }
