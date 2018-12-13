@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -60,6 +61,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -445,7 +447,7 @@ public class FastDBQueryUI extends JFrame {
         panel_3.add(clearButton);
         sqlSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                saveSqlButtonClick();
+                saveSqlButtonClick(true);
             }
         });
 
@@ -1177,7 +1179,18 @@ public class FastDBQueryUI extends JFrame {
                 sqlIdList.add(enu);
             }
         }
-        ListUtil.sortIgnoreCase(sqlIdList);
+
+        Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+            @Override
+            public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                int compare1 = StringUtils.trimToEmpty(o1.category).compareTo(StringUtils.trimToEmpty(o2.category));
+                int compare2 = StringUtils.trimToEmpty(o1.sqlId).compareTo(StringUtils.trimToEmpty(o2.sqlId));
+                if (compare1 != 0) {
+                    return compare1;
+                }
+                return compare2;
+            }
+        });
 
         DefaultListModel model = JListUtil.createModel();
         for (SqlIdConfigBean s : sqlIdList) {
@@ -1285,7 +1298,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 儲存sql
      */
-    private void saveSqlButtonClick() {
+    private void saveSqlButtonClick(boolean saveSqlIdConfig) {
         try {
             String sqlId = sqlIdText.getText().toString();
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
@@ -1300,7 +1313,9 @@ public class FastDBQueryUI extends JFrame {
             setParameterTable(param);
 
             // 儲存sqlList Prop
-            this.saveSqlListProp(color.colorCode, category, sqlId, sql);
+            if (saveSqlIdConfig) {
+                this.saveSqlListProp(color.colorCode, category, sqlId, sql);
+            }
 
             // 載入參數設定
             sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlId + ".properties"));
@@ -1725,10 +1740,10 @@ public class FastDBQueryUI extends JFrame {
         SqlIdConfigBean sqlBean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
         System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
-        String sql = sqlBean.sql;
         sqlIdText.setText(sqlBean.sqlId);
-        sqlTextArea.setText(sql);
+        sqlTextArea.setText(sqlBean.sql);
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
+        sqlIdColorComboBox.setSelectedItem(RefSearchColor.valueFrom(sqlBean.color));
 
         // 載入參數設定
         sqlParameterConfigLoad = new PropertiesGroupUtils(new File(JAR_PATH_FILE, "param_" + sqlBean.getUniqueKey() + ".properties"));
@@ -1738,7 +1753,7 @@ public class FastDBQueryUI extends JFrame {
         loadSqlIdMappingDataSourceConfig();
 
         // trigger 儲存按鈕
-        JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
+        saveSqlButtonClick(false);
     }
 
     private void loadSqlIdMappingDataSourceConfig() {
@@ -2381,7 +2396,15 @@ public class FastDBQueryUI extends JFrame {
         public void save(SqlIdConfigBean b) {
             b.validate();
             init("");
-            lst.add(b);
+            if (lst.contains(b)) {
+                SqlIdConfigBean b2 = lst.get(lst.indexOf(b));
+                b2.category = b.category;
+                b2.color = b.color;
+                b2.sql = b.sql;
+                b2.sqlId = b.sqlId;
+            } else {
+                lst.add(b);
+            }
             store();
             init(b.category);
         }
@@ -2479,15 +2502,20 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public String toString() {
+            String fixStyle = "style=\"background-color: #000000;\"";
             if (StringUtils.isNotBlank(category)) {
-                return String.format("<html><font color=\"%s\"><b></b>%s</font>&nbsp;&nbsp;  <font color=\"black\">%s</font></html>", //
+                return String.format("<html><body %4$s><font color=\"%1$s\"><b></b>%2$s</font>&nbsp;&nbsp;  <font color=\"black\">%3$s</font></body></html>", //
                         StringUtils.trimToEmpty(color), //
                         StringUtils.trimToEmpty(category), //
-                        StringUtils.trimToEmpty(sqlId));
+                        StringUtils.trimToEmpty(sqlId), //
+                        StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : "" //
+                );
             } else {
-                return String.format("<html><font color=\"%s\">%s</font></html>", //
+                return String.format("<html><body %3$s><font color=\"%1$s\">%2$s</font></body></html>", //
                         StringUtils.trimToEmpty(color), //
-                        StringUtils.trimToEmpty(sqlId));
+                        StringUtils.trimToEmpty(sqlId), //
+                        StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : ""//
+                );
             }
         }
     }
@@ -2556,10 +2584,13 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public String toString() {
-            return String.format("<html><font color=\"%s\"><b></b>%s</font>&nbsp;&nbsp;  <font color=\"black\">%s</font></html>", //
+            String fixStyle = "style=\"background-color: #000000;\"";
+            return String.format("<html><body %4$s><font color=\"%1$s\"><b></b>%2$s</font>&nbsp;&nbsp;  <font color=\"black\">%3$s</font></body></html>", //
                     StringUtils.trimToEmpty(this.categoryColor), //
                     StringUtils.trimToEmpty(this.category), //
-                    StringUtils.trimToEmpty(this.searchKey));
+                    StringUtils.trimToEmpty(this.searchKey), //
+                    StringUtils.trimToEmpty(this.categoryColor).equalsIgnoreCase("YELLOW") ? fixStyle : ""//
+            );
         }
 
         public String toStringInfo() {
@@ -2594,7 +2625,7 @@ public class FastDBQueryUI extends JFrame {
                     return e;
                 }
             }
-            return RefSearchColor.藍;
+            return RefSearchColor.黑;
         }
     }
 
