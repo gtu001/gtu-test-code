@@ -447,6 +447,12 @@ public class FastDBQueryUI extends JFrame {
                                 sqlIdFixNameBtnAction("clone");
                             }
                         })//
+                        .addJMenuItem("刪除", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                deleteSqlIdConfigBean(getCurrentEditSqlIdConfigBean());
+                            }
+                        })//
                         .applyEvent(e)//
                         .show();
             }
@@ -2314,35 +2320,39 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    private void deleteSqlIdConfigBean(SqlIdConfigBean sqlBean) {
+        String sql = sqlBean.sql;
+
+        boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("刪除 : " + sqlBean.getUniqueKey() + "\nSQL : " + sql, "是否刪除 : " + sqlBean.getUniqueKey());
+        if (deleteConfirm) {
+
+            // 刪除參數黨
+            File paramFile = new File(JAR_PATH_FILE, "param_" + sqlBean.getUniqueKey() + ".properties");
+            if (paramFile.exists()) {
+                paramFile.delete();
+            }
+
+            // 刪除sqlId
+            if (!paramFile.exists()) {
+                sqlIdConfigBeanHandler.remove(sqlBean);
+
+                JListUtil.removeElement(sqlList, sqlBean);
+
+                // 移除db config mapping
+                sqlIdListDSMappingHandler.remove(sqlBean.getUniqueKey());
+            }
+
+            JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
+        }
+    }
+
     private void sqlListKeyPressAction(KeyEvent evt) {
         try {
             JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
             // 刪除
             if (evt.getKeyCode() == 127) {
                 SqlIdConfigBean sqlBean = JListUtil.getLeadSelectionObject(sqlList);
-                String sql = sqlBean.sql;
-
-                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("刪除 : " + sqlBean.getUniqueKey() + "\nSQL : " + sql, "是否刪除 : " + sqlBean.getUniqueKey());
-                if (deleteConfirm) {
-
-                    // 刪除參數黨
-                    File paramFile = new File(JAR_PATH_FILE, "param_" + sqlBean.getUniqueKey() + ".properties");
-                    if (paramFile.exists()) {
-                        paramFile.delete();
-                    }
-
-                    // 刪除sqlId
-                    if (!paramFile.exists()) {
-                        sqlIdConfigBeanHandler.remove(sqlBean);
-
-                        JListUtil.removeElement(sqlList, sqlBean);
-
-                        // 移除db config mapping
-                        sqlIdListDSMappingHandler.remove(sqlBean.getUniqueKey());
-                    }
-
-                    JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
-                }
+                this.deleteSqlIdConfigBean(sqlBean);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -2466,10 +2476,10 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(sqlId) && StringUtils.isBlank(sql)) {
                 Validate.isTrue(false, "sqlId, sql 不可為空!");
             }
-            if(!FileUtil.validatePath(sqlId, false)) {
+            if (!FileUtil.validatePath(sqlId, false)) {
                 Validate.isTrue(false, "sqlId 不可含有特殊字元 [\\/:*?\"<>|]");
             }
-            if(!FileUtil.validatePath(category, false)) {
+            if (!FileUtil.validatePath(category, false)) {
                 Validate.isTrue(false, "category 不可含有特殊字元 [\\/:*?\"<>|]");
             }
         }
@@ -3131,5 +3141,19 @@ public class FastDBQueryUI extends JFrame {
                 sqlParameterConfigLoad.removeConfig();
             }
         }
+    }
+
+    private SqlIdConfigBean getCurrentEditSqlIdConfigBean() {
+        String sqlId = sqlIdText.getText().toString();
+        RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
+        String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
+        String sql = sqlTextArea.getText().toString();
+
+        SqlIdConfigBean bean = new SqlIdConfigBean();
+        bean.sql = sql;
+        bean.sqlId = sqlId;
+        bean.category = category;
+        bean.color = color.colorCode;
+        return bean;
     }
 }
