@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -42,6 +44,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +61,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
@@ -261,6 +265,29 @@ public class RegexReplacer extends javax.swing.JFrame {
                             templateList = new JList();
                             jScrollPane3.setViewportView(templateList);
                         }
+                        JPanel northPanel_1 = new JPanel();
+                        jPanel5.add(northPanel_1, BorderLayout.NORTH);
+                        {
+                            lblNewLabel_4 = new JLabel("搜尋");
+                            northPanel_1.add(lblNewLabel_4);
+                        }
+                        {
+                            templateListFilterText = new JTextField();
+                            northPanel_1.add(templateListFilterText);
+                            templateListFilterText.setColumns(30);
+                            templateListFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                @Override
+                                public void process(DocumentEvent event) {
+                                    configHandler.reloadTemplateList(JCommonUtil.getDocumentText(event));
+                                }
+                            }));
+                        }
+
+                        JPanel eastPanel_1 = new JPanel();
+                        JPanel westPanel_1 = new JPanel();
+                        jPanel5.add(eastPanel_1, BorderLayout.EAST);
+                        jPanel5.add(westPanel_1, BorderLayout.WEST);
+
                         templateList.addMouseListener(new MouseAdapter() {
                             public void mouseClicked(MouseEvent evt) {
                                 if (templateList.getLeadSelectionIndex() == -1) {
@@ -556,6 +583,8 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JPanel panel_8;
     private JPanel panel_9;
     private JButton resultAreaClearBtn;
+    private JLabel lblNewLabel_4;
+    private JTextField templateListFilterText;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
@@ -776,11 +805,27 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         void reloadTemplateList() {
+            reloadTemplateList("");
+        }
+
+        void reloadTemplateList(String filterText) {
+            filterText = StringUtils.trimToEmpty(filterText).toLowerCase();
             String repAreaText = StringUtils.trimToEmpty(replaceArea.getText());
 
             List<Config> lst = new ArrayList<Config>();
             for (Entry<Object, Object> entry : prop.entrySet()) {
-                lst.add(new Config(entry));
+                Config conf = new Config(entry);
+                boolean findOk = false;
+                if (StringUtils.isBlank(filterText)) {
+                    findOk = true;
+                } else {
+                    if (StringUtils.trimToEmpty(conf.configKeyText).toLowerCase().contains(filterText)) {
+                        findOk = true;
+                    }
+                }
+                if (findOk) {
+                    lst.add(conf);
+                }
             }
 
             for (Config conf : lst) {
