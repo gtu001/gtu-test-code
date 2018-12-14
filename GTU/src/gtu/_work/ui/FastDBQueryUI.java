@@ -12,10 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -61,7 +59,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -116,8 +113,8 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
         }
     }
 
@@ -434,10 +431,24 @@ public class FastDBQueryUI extends JFrame {
         panel_2.add(sqlIdPanel, BorderLayout.NORTH);
         sqlIdText.setColumns(40);
 
-        sqlIdFixNameBtn = new JButton("改名");
+        sqlIdFixNameBtn = new JButton("選擇功能");
         sqlIdFixNameBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                sqlIdFixNameBtnAction();
+                JPopupMenuUtil.newInstance(sqlIdFixNameBtn)//
+                        .addJMenuItem("改名", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                sqlIdFixNameBtnAction("rename");
+                            }
+                        })//
+                        .addJMenuItem("複製", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                sqlIdFixNameBtnAction("clone");
+                            }
+                        })//
+                        .applyEvent(e)//
+                        .show();
             }
         });
         sqlIdPanel.add(sqlIdFixNameBtn);
@@ -1307,7 +1318,7 @@ public class FastDBQueryUI extends JFrame {
             bean.category = category;
             bean.sqlId = sqlId;
             bean.sql = sql;
-            
+
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
             }
@@ -2455,6 +2466,12 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(sqlId) && StringUtils.isBlank(sql)) {
                 Validate.isTrue(false, "sqlId, sql 不可為空!");
             }
+            if(!FileUtil.validatePath(sqlId, false)) {
+                Validate.isTrue(false, "sqlId 不可含有特殊字元 [\\/:*?\"<>|]");
+            }
+            if(!FileUtil.validatePath(category, false)) {
+                Validate.isTrue(false, "category 不可含有特殊字元 [\\/:*?\"<>|]");
+            }
         }
 
         @Override
@@ -2462,7 +2479,7 @@ public class FastDBQueryUI extends JFrame {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((category == null) ? 0 : category.hashCode());
-            result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+            result = prime * result + ((sqlId == null) ? 0 : sqlId.hashCode());
             return result;
         }
 
@@ -2480,10 +2497,10 @@ public class FastDBQueryUI extends JFrame {
                     return false;
             } else if (!category.equals(other.category))
                 return false;
-            if (sql == null) {
-                if (other.sql != null)
+            if (sqlId == null) {
+                if (other.sqlId != null)
                     return false;
-            } else if (!sql.equals(other.sql))
+            } else if (!sqlId.equals(other.sqlId))
                 return false;
             return true;
         }
@@ -2923,7 +2940,7 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void sqlIdFixNameBtnAction() {
+    private void sqlIdFixNameBtnAction(String mode) {
         try {
             if (sqlBean == null) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("請先選擇SQL List");
@@ -2964,20 +2981,34 @@ public class FastDBQueryUI extends JFrame {
                 return;
             }
             if (newFile.exists()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("目的檔案已存在! : " + newFile);
-                return;
+                boolean overwriteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("目的檔案已存在, 是否覆蓋?! : " + newFile, "目的檔案已存在, 是否覆蓋?!");
+                if (!overwriteConfirm) {
+                    return;
+                }
             }
 
-            // DS Mapping 修正
-            sqlIdListDSMappingHandler.configMoveTo(sqlBean, bean);
+            if ("rename".equals(mode)) {
+                // DS Mapping 修正
+                sqlIdListDSMappingHandler.cloneTo(sqlBean, bean, true);
 
-            // 參數設定黨改名
-            oldFile.renameTo(newFile);
+                // 參數設定黨改名
+                oldFile.renameTo(newFile);
 
-            // sql設定修正
-            sqlIdConfigBeanHandler.remove(sqlBean);
-            sqlIdConfigBeanHandler.save(bean);
+                // sql設定修正
+                sqlIdConfigBeanHandler.remove(sqlBean);
+                sqlIdConfigBeanHandler.save(bean);
+            } else if ("clone".equals(mode)) {
+                // DS Mapping 修正
+                sqlIdListDSMappingHandler.cloneTo(sqlBean, bean, false);
 
+                // 參數設定黨改名
+                FileUtil.copyFile(oldFile, newFile);
+
+                // sql設定修正
+                sqlIdConfigBeanHandler.save(bean);
+            }
+
+            initLoadSqlListConfig();
             JCommonUtil._jOptionPane_showMessageDialog_info("已修正為 : " + bean.getUniqueKey());
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -3044,11 +3075,13 @@ public class FastDBQueryUI extends JFrame {
             PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
         }
 
-        private void configMoveTo(SqlIdConfigBean from, SqlIdConfigBean to) {
+        private void cloneTo(SqlIdConfigBean from, SqlIdConfigBean to, boolean removeOld) {
             this.init();
             if (sqlIdListDSMappingProp.containsKey(from.sqlId)) {
                 String moveToValue = sqlIdListDSMappingProp.getProperty(from.sqlId);
-                sqlIdListDSMappingProp.remove(from.sqlId);
+                if (removeOld) {
+                    sqlIdListDSMappingProp.remove(from.sqlId);
+                }
                 sqlIdListDSMappingProp.setProperty(to.getUniqueKey(), moveToValue);
                 PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
             }

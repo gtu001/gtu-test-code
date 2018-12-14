@@ -1087,6 +1087,19 @@ public class FileUtil {
         return fileName;
     }
 
+    public static boolean validatePath(String filename, boolean ignoreNotEscapeFileSepator) {
+        String replaceSeparator = "\\\\\\/";
+        if (ignoreNotEscapeFileSepator) {
+            replaceSeparator = "";
+        }
+        Pattern ptn = Pattern.compile("[" + replaceSeparator + "\\:\\*\\?\"\\<\\>\\|\r\n]", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = ptn.matcher(filename);
+        if (mth.find()) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 避掉黨名的特殊符號 \/:*?"<>|
      * 

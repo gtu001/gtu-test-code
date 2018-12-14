@@ -2,6 +2,7 @@ package gtu.swing.util;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
@@ -86,5 +87,13 @@ public class JFrameUtil {
                 System.out.println("size " + frame.getSize());
             }
         });
+    }
+    
+    public static Frame getFrame(Component c) {
+        Component w = c;
+        while (!(w instanceof Frame) && (w != null)) {
+            w = w.getParent();
+        }
+        return (Frame) w;
     }
 }

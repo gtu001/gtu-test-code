@@ -1,6 +1,9 @@
 package gtu.swing.util;
 
 import java.awt.Component;
+import java.awt.Frame;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -19,7 +22,7 @@ public class JPopupMenuUtil {
 
     JPopupMenu jPopupMenu1;
     Component component;
-    MouseEvent event;
+    EventObject event;
     List<JMenuItem> menuList;
 
     public static final ActionListener DO_THING_ACTIONLISTENER = new ActionListener() {
@@ -43,23 +46,30 @@ public class JPopupMenuUtil {
     }
 
     public JPopupMenuUtil applyEvent(EventObject event) {
-        this.event = (MouseEvent) event;
+        this.event = event;
         return this;
     }
 
     public JPopupMenuUtil show() {
-        if (event.getButton() == 3) {
+        if (event instanceof MouseEvent) {
+            MouseEvent e1 = (MouseEvent) event;
             for (JMenuItem menu : menuList) {
                 jPopupMenu1.add(menu);
             }
-            jPopupMenu1.show(component, event.getX(), event.getY());
+            jPopupMenu1.show(component, e1.getX(), e1.getY());
+        } else {
+            for (JMenuItem menu : menuList) {
+                jPopupMenu1.add(menu);
+            }
+            jPopupMenu1.show(component, 0, 0);
         }
         return this;
     }
-    
+
     public JPopupMenuUtil addJMenuItem(String text) {
         return addJMenuItem(text, true, null);
     }
+
     public JPopupMenuUtil addJMenuItem(String text, boolean enabled) {
         return addJMenuItem(text, enabled, null);
     }
@@ -72,7 +82,7 @@ public class JPopupMenuUtil {
         if (StringUtils.isEmpty(text)) {
             return this;
         }
-        if(actionListener == null){
+        if (actionListener == null) {
             actionListener = DO_THING_ACTIONLISTENER;
         }
         JMenuItem item = new JMenuItem();
@@ -94,7 +104,7 @@ public class JPopupMenuUtil {
     public static JPopupMenuUtil newInstance(Component component) {
         return new JPopupMenuUtil(component);
     }
-    
+
     public List<JMenuItem> getMenuList() {
         return menuList;
     }
