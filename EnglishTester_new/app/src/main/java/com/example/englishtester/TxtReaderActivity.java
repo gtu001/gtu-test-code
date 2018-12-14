@@ -9,24 +9,29 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.TypedValue;
-import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
@@ -51,7 +56,9 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.SimpleAdapterDecorator;
 import com.example.englishtester.common.SingleInputDialog;
+import com.example.englishtester.common.SpannableStringBuilderHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.WebViewHtmlFetcher;
@@ -63,7 +70,6 @@ import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -387,17 +393,17 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         List<Map<String, Object>> listItem = new ArrayList<>();
         for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
             Map<String, Object> map = new HashMap<String, Object>();
-            String readMark = transformer.transform(f.getName());
             map.put("ItemTitle", f.getName());
-            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss") + readMark);
+            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
+            map.put("ItemDetail2", transformer.transform(f.getName()));
             map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
             listItem.add(map);
         }
 
         SimpleAdapter aryAdapter = new SimpleAdapter(this, listItem,// 資料來源
                 R.layout.subview_dropboxlist, //
-                new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight"}, //
-                new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight}//
+                new String[]{"ItemTitle", "ItemDetail", "ItemDetail2", "ItemDetailRight"}, //
+                new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetail2, R.id.ItemDetailRight}//
         );
 
         AlertDialog.Builder builder = new AlertDialog.Builder(TxtReaderActivity.this);
