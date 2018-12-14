@@ -137,3 +137,23 @@ if __name__ == '__main__' :
     scrapy_runner.runSpider(PttBeautyCrawlerSpider)
     print("done...")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
