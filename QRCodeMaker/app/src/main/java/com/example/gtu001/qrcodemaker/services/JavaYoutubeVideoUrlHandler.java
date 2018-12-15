@@ -2,6 +2,26 @@ package com.example.gtu001.qrcodemaker.services;
 
 import com.example.gtu001.qrcodemaker.util.FileUtil;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,26 +43,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 public class JavaYoutubeVideoUrlHandler {
     private static final String scheme = "http";
@@ -74,6 +74,7 @@ public class JavaYoutubeVideoUrlHandler {
             su.finalFileName = FileUtil.escapeFilename(title, true) + "." + d.getFileExtension();
             VideoUrlConfig su2 = new VideoUrlConfig(su);
             su2.title = title;
+            su2.youtubeData = d;
             try {
                 su2.length = getContentLength(DEFAULT_USER_AGENT, d.getUrl());
             } catch (Throwable e) {
@@ -466,6 +467,7 @@ public class JavaYoutubeVideoUrlHandler {
         String title;
         String url;
         long length = -1;
+        DataFinal youtubeData;
 
         public String getFileName() {
             String prefix = StringUtils.isNotBlank(title) ? title + "_" : "";
@@ -495,6 +497,10 @@ public class JavaYoutubeVideoUrlHandler {
 
         public long getLength() {
             return length;
+        }
+
+        public DataFinal getYoutubeData() {
+            return youtubeData;
         }
     }
 

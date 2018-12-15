@@ -29,10 +29,11 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -339,13 +340,30 @@ public class YoutubePlayerActivity extends Activity {
                         JavaYoutubeVideoUrlHandler handler = new JavaYoutubeVideoUrlHandler(id, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
                         handler.execute();
                         YoutubeItem.this.name = handler.getTitle();
-                        TreeMap<Long, String> urlMap = new TreeMap<Long, String>();
-                        for (JavaYoutubeVideoUrlHandler.VideoUrlConfig vo : handler.getVideoFor91Lst()) {
-                            urlMap.put(vo.getLength(), vo.getUrl());
+                        List<JavaYoutubeVideoUrlHandler.VideoUrlConfig> videoLst = handler.getVideoFor91Lst();
+                        Collections.sort(videoLst, new Comparator<JavaYoutubeVideoUrlHandler.VideoUrlConfig>() {
+                            @Override
+                            public int compare(JavaYoutubeVideoUrlHandler.VideoUrlConfig t1, JavaYoutubeVideoUrlHandler.VideoUrlConfig t2) {
+                                boolean t1Mp4 = t1.getYoutubeData().getFileExtension().toLowerCase().contains("mp4");
+                                boolean t2Mp4 = t2.getYoutubeData().getFileExtension().toLowerCase().contains("mp4");
+                                if (t1Mp4 && t2Mp4) {
+                                    return new Long(t1.getLength()).compareTo(t2.getLength());
+                                } else {
+                                    if (t1Mp4 && !t2Mp4) {
+                                        return -1;
+                                    } else if (t2Mp4 && !t1Mp4) {
+                                        return 1;
+                                    }
+                                }
+                                return new Long(t1.getLength()).compareTo(t2.getLength());
+                            }
+                        });
+                        if (videoLst.isEmpty()) {
+                            queue.offer("沒有取得任何URL");
+                        } else {
+                            YoutubeItem.this.videoUrl = videoLst.get(0).getUrl();
+                            queue.offer("");
                         }
-                        String url = urlMap.get(urlMap.keySet().iterator().next());
-                        YoutubeItem.this.videoUrl = url;
-                        queue.offer("");
                     } catch (Exception ex) {
                         ex.printStackTrace();
                         Log.e(TAG, "processSelf ERR : " + ex.getMessage(), ex);

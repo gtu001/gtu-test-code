@@ -51,9 +51,22 @@ public class JavaYoutubeVideoUrlHandler {
     public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
 
     public static void main(String[] args) {
-//        https://www.youtube.com/watch?v=UPXSB2gMsfI
-//        https://www.youtube.com/watch?v=kHc4Zj7GbM8
-        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("FrG4TEcSuRg", "", DEFAULT_USER_AGENT);
+        // https://www.youtube.com/watch?v=UPXSB2gMsfI
+        // https://www.youtube.com/watch?v=kHc4Zj7GbM8
+
+        // 參數 檔案格式 影片大小 聲音格式 備註
+        // &fmt=0 FLV 320 x 240 單聲道 22KHz MP3 與&fmt=5相同
+        // &fmt=5 FLV 320 x 240 單聲道 44KHz MP3
+        // &fmt=6 FLV 480 x 360 單聲道 44KHz MP3
+        // &fmt=34 FLV 320 x 240 雙聲道 44KHz MP3 YouTube預設影片格式
+        // &fmt=35 FLV 640 x 380 雙聲道 44KHz MP3
+        // &fmt=13 3GP 176 x 144 雙聲道 8KHz 適合小螢幕手機
+        // &fmt=17 3GP 176 x 144 單聲道 22KHz 適合小螢幕手機
+        // &fmt=18 MP4 480 x 360 雙聲道 44KHz AAC H.264編碼
+        // &fmt=22 MP4 1280 x 720 雙聲道 44KHz AAC H.264編碼
+        // &fmt=37 MP4 1920 x 1080 雙聲道 44KHz AAC H.264編碼
+
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("szBU1NRh2YE", "18", DEFAULT_USER_AGENT);
         t.execute();
         System.out.println("done...");
     }
@@ -61,7 +74,7 @@ public class JavaYoutubeVideoUrlHandler {
     public void execute() {
         title = getTitle();
         videoFor91Lst = new ArrayList<VideoUrlConfig>();
-        for (DataFinal d : getTypeLst()) {
+        for (YoutubeDataFinal d : getTypeLst()) {
             System.out.println(d.getFileExtension());
             System.out.println(d.getQualityString());
             System.out.println(d.getSolution());
@@ -117,7 +130,7 @@ public class JavaYoutubeVideoUrlHandler {
 
     public String getUrl(int format) {
         for (int ii = 0; ii < typeLst.size(); ii++) {
-            DataFinal d = typeLst.get(ii);
+            YoutubeDataFinal d = typeLst.get(ii);
             if (Integer.parseInt(d.itag.paramStr) == format) {
                 return d.url.paramStr;
             }
@@ -125,7 +138,7 @@ public class JavaYoutubeVideoUrlHandler {
         throw new RuntimeException("找步道對應 format :" + format);
     }
 
-    List<DataFinal> typeLst = new ArrayList<DataFinal>();
+    List<YoutubeDataFinal> typeLst = new ArrayList<YoutubeDataFinal>();
     List<VideoUrlConfig> videoFor91Lst = new ArrayList<VideoUrlConfig>();
     String title;
 
@@ -174,23 +187,23 @@ public class JavaYoutubeVideoUrlHandler {
 
             System.out.println("baseUrlString = " + baseUrlString);
 
-            DataFinal.fmtMap = fmtMap;
+            YoutubeDataFinal.fmtMap = fmtMap;
             typeLst = findDataGroup(baseUrlString);
 
-            for (DataFinal d : typeLst) {
-                System.out.println("YoutubeUrlHandler >> : " + d);//TODO
+            for (YoutubeDataFinal d : typeLst) {
+                System.out.println("YoutubeUrlHandler >> : " + d);// TODO
             }
         } catch (Exception e) {
             throw new RuntimeException(" YoutubeVideoUrlHandler Err : " + e.getMessage(), e);
         }
     }
 
-    private List<DataFinal> findDataGroup(String baseUrlString) {
-        List<DataFinal> rtnLst = new ArrayList<DataFinal>();
+    private List<YoutubeDataFinal> findDataGroup(String baseUrlString) {
+        List<YoutubeDataFinal> rtnLst = new ArrayList<YoutubeDataFinal>();
         List<DataConfig> lst = new ArrayList<DataConfig>();
 
         // parse Paramster
-        for (Field f : DataFinal.class.getDeclaredFields()) {
+        for (Field f : YoutubeDataFinal.class.getDeclaredFields()) {
             Pattern ptn = Pattern.compile(f.getName());
             Matcher mth = ptn.matcher(baseUrlString);
             while (mth.find()) {
@@ -239,7 +252,7 @@ public class JavaYoutubeVideoUrlHandler {
             DataConfig qualityData = getIndex("quality", getMatchIndexDataConfig("quality", lst), ii);
             DataConfig typeData = getIndex("type", getMatchIndexDataConfig("type", lst), ii);
 
-            DataFinal dd = new DataFinal();
+            YoutubeDataFinal dd = new YoutubeDataFinal();
             dd.url = urlData;
             dd.quality = qualityData;
             dd.type = typeData;
@@ -324,12 +337,12 @@ public class JavaYoutubeVideoUrlHandler {
         }
     }
 
-    public static class DataFinal {
+    public static class YoutubeDataFinal {
         public static Map<String, String> fmtMap = Collections.emptyMap();
-        DataConfig itag;
-        DataConfig type;
-        DataConfig quality;
-        DataConfig url;
+        private DataConfig itag;
+        private DataConfig type;
+        private DataConfig quality;
+        private DataConfig url;
 
         public String getUrl() {
             return url.paramStr;
@@ -414,7 +427,7 @@ public class JavaYoutubeVideoUrlHandler {
         return result;
     }
 
-    public List<DataFinal> getTypeLst() {
+    public List<YoutubeDataFinal> getTypeLst() {
         return typeLst;
     }
 
