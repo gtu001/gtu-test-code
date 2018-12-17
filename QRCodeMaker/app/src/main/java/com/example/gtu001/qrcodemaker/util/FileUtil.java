@@ -18,7 +18,7 @@ public class FileUtil {
     public static String getSizeDescription(long filelength) {
         long size = filelength;
         String suffix = null;
-        String[] suffixS = new String[] { "kb", "mb", "gb" };
+        String[] suffixS = new String[]{"kb", "mb", "gb"};
         BigDecimal result = null;
         for (int ii = 0; ii < suffixS.length && size > 1024; ii++) {
             if (size / 1024 < 1024) {
@@ -66,8 +66,7 @@ public class FileUtil {
      * 避掉黨名的特殊符號 \/:*?"<>|
      *
      * @param filename
-     * @param ignoreNotEscapeFileSepator
-     *            false = 要把 \/轉成全形, true = 不把 \/轉成全形
+     * @param ignoreNotEscapeFileSepator false = 要把 \/轉成全形, true = 不把 \/轉成全形
      * @return
      */
     public static String escapeFilename_replaceToFullChar(String filename, boolean ignoreNotEscapeFileSepator) {

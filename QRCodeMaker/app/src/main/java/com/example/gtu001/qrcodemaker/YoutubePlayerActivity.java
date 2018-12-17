@@ -3,10 +3,17 @@ package com.example.gtu001.qrcodemaker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -14,8 +21,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gtu001.qrcodemaker.common.DownloadHelper;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.PingUtil;
@@ -23,6 +32,7 @@ import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
 import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
 import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
 import com.example.gtu001.qrcodemaker.services.YoutubeVideoService;
+import com.example.gtu001.qrcodemaker.util.FileUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -32,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -59,6 +70,9 @@ public class YoutubePlayerActivity extends Activity {
         Log.v(TAG, "#################################################", 3);
         new PingUtil.NetPing("www.youtube.com").execute();
         Log.v(TAG, "#################################################", 3);
+
+        final TextView downloadDescText = new TextView(this);
+        layout.addView(downloadDescText);
 
         final EditText youtubeIdText = new EditText(this);
         layout.addView(youtubeIdText);
@@ -131,7 +145,7 @@ public class YoutubePlayerActivity extends Activity {
                 final Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final YoutubeItem item2 = (YoutubeItem) item.get("item");
 
-                String[] items = new String[]{"刷新", "刪除"};
+                String[] items = new String[]{"刷新", "刪除", "下載"};
 
                 AlertDialog dlg = new AlertDialog.Builder(YoutubePlayerActivity.this)//
                         .setTitle("選擇操作項目")//
@@ -144,6 +158,9 @@ public class YoutubePlayerActivity extends Activity {
                                         break;
                                     case 1:
                                         initListViewHandler.delete(item2.id);
+                                        break;
+                                    case 2:
+                                        initListViewHandler.download(item, YoutubePlayerActivity.this);
                                         break;
                                     default:
                                         Toast.makeText(YoutubePlayerActivity.this, "Unknow choice " + which, Toast.LENGTH_SHORT).show();
@@ -191,6 +208,7 @@ public class YoutubePlayerActivity extends Activity {
 
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
+        Handler handler = new Handler();
 
         public List<UrlPlayerDialog_bg.Mp3Bean> getTotalUrlList() {
             List<UrlPlayerDialog_bg.Mp3Bean> lst = new ArrayList<>();
@@ -204,8 +222,26 @@ public class YoutubePlayerActivity extends Activity {
             return lst;
         }
 
+        private void download(Map<String, Object> item, Context context) {
+            YoutubeItem item2 = (YoutubeItem) item.get("item");
+
+            String title = item2.name;
+            String description = FileUtil.getSizeDescription(item2.fileLength);
+            String path = item2.videoUrl;
+
+            DownloadHelper.getInstance().download(title, description, path, "mp4", context);
+        }
+
         private void delete(String id) {
             boolean deleteOk = youtubeVideoService.deleteId(id);
+            for (int ii = 0; ii < listItem.size(); ii++) {
+                Map<String, Object> vo = listItem.get(ii);
+                YoutubeItem vo2 = (YoutubeItem) vo.get("item");
+                if (StringUtils.equals(vo2.id, id)) {
+                    listItem.remove(vo);
+                    ii--;
+                }
+            }
             Toast.makeText(YoutubePlayerActivity.this, "刪除" + (deleteOk ? "成功" : "失敗"), Toast.LENGTH_SHORT).show();
             if (deleteOk) {
                 baseAdapter.notifyDataSetChanged();
@@ -272,6 +308,7 @@ public class YoutubePlayerActivity extends Activity {
             map.put("item_title", item.name);
             map.put("item_text", item.id);
             map.put("item_image_check", null);
+            map.put("ItemTextDesc", null);
             map.put("item", item);
             return map;
         }
@@ -279,8 +316,8 @@ public class YoutubePlayerActivity extends Activity {
         private SimpleAdapter createSimpleAdapter() {
             SimpleAdapter listItemAdapter = new SimpleAdapter(YoutubePlayerActivity.this, listItem,// 資料來源
                     R.layout.subview_listview, //
-                    new String[]{"item_title", "item_text", "item_image", "item_image_check"}, //
-                    new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01}//
+                    new String[]{"item_title", "item_text", "item_image", "item_image_check", "ItemTextDesc"}, //
+                    new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01, R.id.ItemTextDesc}//
             );
             return listItemAdapter;
         }
@@ -322,6 +359,7 @@ public class YoutubePlayerActivity extends Activity {
         String name;
         String id;
         String videoUrl;
+        long fileLength;
         YoutubeVideoDAO.YoutubeVideo vo;
 
         public YoutubeItem(String id) {
@@ -362,6 +400,7 @@ public class YoutubePlayerActivity extends Activity {
                             queue.offer("沒有取得任何URL");
                         } else {
                             YoutubeItem.this.videoUrl = videoLst.get(0).getUrl();
+                            YoutubeItem.this.fileLength = videoLst.get(0).getLength();
                             queue.offer("");
                         }
                     } catch (Exception ex) {
