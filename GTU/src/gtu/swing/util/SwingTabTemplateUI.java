@@ -76,28 +76,7 @@ public class SwingTabTemplateUI {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(tabbedPane);//
                         final int idx = tabbedPane.getSelectedIndex();
-                        if (idx != -1) {
-                            popupUtil.addJMenuItem("修改分頁名子", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
-                                    if (StringUtils.isBlank(newName)) {
-                                        return;
-                                    }
-                                    tabbedPane.setTitleAt(idx, newName);
-                                }
-                            });//
-                            popupUtil.addJMenuItem("移除分頁", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確認移除 : " + tabbedPane.getTitleAt(idx), "移除分頁");
-                                    if (confirm) {
-                                        tabbedPane.remove(idx);
-                                        jframeKeeperLst.remove(idx);
-                                    }
-                                }
-                            });//
-                        }
+                        
                         popupUtil.addJMenuItem("新增分頁", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -108,6 +87,29 @@ public class SwingTabTemplateUI {
                                 addTab(newName);
                             }
                         });//
+                        if (idx != -1) {
+                            popupUtil.addJMenuItem("移除分頁", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確認移除 : " + tabbedPane.getTitleAt(idx), "移除分頁");
+                                    if (confirm) {
+                                        tabbedPane.remove(idx);
+                                        jframeKeeperLst.remove(idx);
+                                    }
+                                }
+                            });//
+                            popupUtil.addJMenuItem("修改分頁名子", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
+                                    if (StringUtils.isBlank(newName)) {
+                                        return;
+                                    }
+                                    tabbedPane.setTitleAt(idx, newName);
+                                }
+                            });//
+                        }
+                        
                         popupUtil.applyEvent(e);
                         popupUtil.show();
                     }

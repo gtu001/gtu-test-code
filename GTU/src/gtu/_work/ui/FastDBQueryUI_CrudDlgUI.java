@@ -65,6 +65,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
@@ -544,7 +545,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         });
 
-        rowTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(new JTextField()) {
+        // column = "value"
+        TableColumn valueColumn = rowTable.getColumnModel().getColumn(1);
+        JTextField valueText = new JTextField();
+        JTextUndoUtil.applyUndoProcess1(valueText);
+        valueColumn.setCellEditor(new DefaultCellEditor(valueText) {
             public boolean stopCellEditing() {
                 Object s = getCellEditorValue();
                 System.out.println("!!---" + s + " -> " + s.getClass());
