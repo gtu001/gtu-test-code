@@ -61,6 +61,7 @@ import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
@@ -68,6 +69,7 @@ import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTable rowTable;
     private JButton okButton;
@@ -1049,16 +1051,18 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
-                            JTableUtil_DefaultJMenuItems_Mask._加列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._移除列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
-                    JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
-                    JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
-                    JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
-                    );
-                    JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
+                                JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                        JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                        JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                        JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
+                        );
+                        JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
+                    }
                 }
             });
         }
