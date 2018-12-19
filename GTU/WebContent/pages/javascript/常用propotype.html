@@ -52,7 +52,7 @@
 		value : function show(isShow) {
 			if(isShow){
 				this.style.visibility = "visible";
-				this.style.display = "block";
+				this.style.display = "";//block
 			}else{
 				this.style.visibility = "hidden";
 		     	this.style.display = "none";
@@ -65,7 +65,7 @@ HTMLElement.prototype.toggle = function(){
 	if(!(this.style.visibility == "visible" || this.style.display == "block" || 
 		this.style.visibility == "" || this.style.display == "")){
 		this.style.visibility = "visible";
-		this.style.display = "block";
+		this.style.display = "";//block
 	}else{
 		this.style.visibility = "hidden";
      	this.style.display = "none";

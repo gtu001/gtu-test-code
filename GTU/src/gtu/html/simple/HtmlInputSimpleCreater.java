@@ -40,7 +40,6 @@ public class HtmlInputSimpleCreater {
             }
         }
         System.out.println(sb.toString());
-
         System.out.println("done...");
     }
 
@@ -88,7 +87,7 @@ public class HtmlInputSimpleCreater {
             @Override
             String toHtml(String tagName, String title) {
                 return String.format(
-                        "<input id=\"%1$s\" name=\"%1$s\" title=\"%2$s\" type=\"hidden\" class=\"textBox2\" />",
+                        "<input id=\"%1$s\" name=\"%1$s\" title=\"%2$s\" type=\"hidden\" class=\"textBox2\" value=\"${rtnMap.%1$s}\" />",
                         tagName, title);
             }
         }, //
@@ -149,7 +148,7 @@ public class HtmlInputSimpleCreater {
                 StringBuilder sb = new StringBuilder();
                 sb.append(
                         "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\">                                                          \n");
+                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
                 sb.append(" <option value=''>請選擇</option>                                                   \n");
                 sb.append(
                         "   <c:forEach var=\"data\" items=\"${XXXXXXXX_List}\" varStatus=\"status\">                    \n");
@@ -167,7 +166,7 @@ public class HtmlInputSimpleCreater {
                 StringBuilder sb = new StringBuilder();
                 sb.append(
                         "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\">                                                          \n");
+                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
                 sb.append(" <option value=''>請選擇</option>                                                   \n");
                 sb.append(" <option value='1'>1</option>                                                   \n");
                 sb.append(" <option value='2'>2</option>                                                   \n");
@@ -182,7 +181,7 @@ public class HtmlInputSimpleCreater {
                 StringBuilder sb = new StringBuilder();
                 sb.append(
                         "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\">                                                          \n");
+                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
                 sb.append(" <option value=''>請選擇</option>                                                   \n");
                 sb.append(
                         "   <c:forEach var=\"map\" items=\"${XXXXXXXX_MapList}\" varStatus=\"status\">                    \n");
@@ -218,7 +217,7 @@ public class HtmlInputSimpleCreater {
                 return String.format(sb.toString(), tagName, title);
             }
         }, //
-        Checkbox_MAP("c") {
+        Checkbox_MAP("cm") {
             @Override
             String toHtml(String tagName, String title) {
                 StringBuilder sb = new StringBuilder();
