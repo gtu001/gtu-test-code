@@ -1,10 +1,12 @@
-package gtu.console;
+\package gtu.console;
 
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,6 +57,48 @@ public class SystemInUtil {
             ex.printStackTrace();
         }
         return sb.toString();
+    }
+    
+    /**
+     * 讀入console資料
+     * @param trim 是否要trim
+     * @param emptyIgnore 是否忽略空白行
+     * @param distinct 是否不重複加入
+     * @return
+     */
+    public static List<String> readContentToList(boolean trim, boolean emptyIgnore, boolean distinct) {
+        System.out.println("請輸入 : ");
+        List<String> lst = new ArrayList<String>();
+        InputStreamReader reader = new InputStreamReader(System.in);
+        BufferedReader bufreader = new BufferedReader(reader);
+        try {
+            while (true) {
+                String line = bufreader.readLine();
+                if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
+                    break;
+                } else {
+                    if (trim) {
+                        line = StringUtils.trimToEmpty(line);
+                    }
+                    if (emptyIgnore && StringUtils.isBlank(line)) {
+                        continue;
+                    }
+                    if (distinct) {
+                        if (!lst.contains(line)) {
+                            lst.add(line);
+                            continue;
+                        }
+                    }
+                    lst.add(line);
+                    System.out.println(line);
+                }
+            }
+            bufreader.close();
+            reader.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return lst;
     }
 
     /**
