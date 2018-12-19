@@ -1,5 +1,6 @@
 ﻿package gtu.html.simple;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.console.SystemInUtil;
+import gtu.yaml.util.YamlUtil;
 
 public class HtmlInputSimpleCreater {
 
@@ -25,6 +27,8 @@ public class HtmlInputSimpleCreater {
 
     public static void main(String[] args) {
         HtmlInputSimpleCreater t = new HtmlInputSimpleCreater();
+        HtmlTypeHandler htmlTypeHandler = t.new HtmlTypeHandler();
+        
         List<String> lst = SystemInUtil.readContentToList(true, false, false);
         StringBuffer sb = new StringBuffer();
         sb.append("<tr>");
@@ -32,7 +36,7 @@ public class HtmlInputSimpleCreater {
             String line = lst.get(ii);
             if (StringUtils.isNotBlank(line)) {
                 String chineseLabel = t.getChineseLabel(line);
-                Map<String, HtmlType> tagMap = t.getInputGroup(line);
+                Map<String, HtmlType> tagMap = t.getInputGroup(line, htmlTypeHandler);
                 String html = t.getTagGroupHtml(tagMap, chineseLabel);
                 sb.append(String.format(TD, chineseLabel, html));
             } else {
@@ -52,13 +56,13 @@ public class HtmlInputSimpleCreater {
         return "";
     }
 
-    private Map<String, HtmlType> getInputGroup(String line) {
+    private Map<String, HtmlType> getInputGroup(String line, HtmlTypeHandler htmlTypeHandler) {
         Pattern ptn = Pattern.compile("(\\w+?)\\[(\\w+)\\]");
         Map<String, HtmlType> map = new LinkedHashMap<String, HtmlType>();
         Matcher mth = ptn.matcher(line);
         while (mth.find()) {
             String tagName = mth.group(1);
-            HtmlType tagType = HtmlType.valueOfType(mth.group(2));
+            HtmlType tagType = htmlTypeHandler.valueOfType(mth.group(2));
             map.put(tagName, tagType);
         }
         return map;
@@ -74,188 +78,36 @@ public class HtmlInputSimpleCreater {
         return sb.toString();
     }
 
-    private enum HtmlType {
-        Text("t") {
-            @Override
-            String toHtml(String tagName, String title) {
-                return String.format(
-                        "<input id=\"%1$s\" name=\"%1$s\" title=\"%2$s\" type=\"text\" class=\"textBox2\" value=\"${rtnMap.%1$s}\" />",
-                        tagName, title);
-            }
-        }, //
-        Hidden("h") {
-            @Override
-            String toHtml(String tagName, String title) {
-                return String.format(
-                        "<input id=\"%1$s\" name=\"%1$s\" title=\"%2$s\" type=\"hidden\" class=\"textBox2\" value=\"${rtnMap.%1$s}\" />",
-                        tagName, title);
-            }
-        }, //
-        Label("L") {
-            @Override
-            String toHtml(String tagName, String title) {
-                return String.format("<span id=\"%1$s_span\" name=\"%1$s_span\">${rtnMap.%1$s}</span>", tagName, title);
-            }
-        }, //
-        Radio("R") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(
-                        "<c:forEach var=\"data\" items=\"${XXXXXXXX_List}\" varStatus=\"status\">                                 \n");
-                sb.append(
-                        "        <input type=\"radio\" id=\"%1$s_${status.index}\" name=\"%1$s\" value=\"${data.XXXXXX_value}\"   \n");
-                sb.append(
-                        "                <c:if test=\"${data.XXXXXX_value eq rtnMap.%1$s}\">checked</c:if> />                    \n");
-                sb.append(
-                        "        <label for=\"%1$s_${status.index}\">${data.XXXXXX_label}</label>                                \n");
-                sb.append(
-                        "</c:forEach>                                                                                             \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Radio_Simple("Rs") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("<input type=\"radio\" id=\"%1$s_0\" name=\"%1$s\" value=\"1\" checked />\n");
-                sb.append("<label for=\"%1$s_0\">Radio1</label>\n");
-                sb.append("<input type=\"radio\" id=\"%1$s_1\" name=\"%1$s\" value=\"2\" checked />\n");
-                sb.append("<label for=\"%1$s_1\">Radio2</label>\n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Radio_MAP("Rm") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(
-                        "<c:forEach var=\"map\" items=\"${XXXXXXXX_MapList}\" varStatus=\"status\">                                 \n");
-                sb.append(
-                        "        <input type=\"radio\" id=\"%1$s_${status.index}\" name=\"%1$s\" value=\"${map.key}\"   \n");
-                sb.append(
-                        "                <c:if test=\"${map.key eq rtnMap.%1$s}\">checked</c:if> />                    \n");
-                sb.append(
-                        "        <label for=\"%1$s_${status.index}\">${map.value}</label>                                \n");
-                sb.append(
-                        "</c:forEach>                                                                                             \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Select("s") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(
-                        "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
-                sb.append(" <option value=''>請選擇</option>                                                   \n");
-                sb.append(
-                        "   <c:forEach var=\"data\" items=\"${XXXXXXXX_List}\" varStatus=\"status\">                    \n");
-                sb.append("     <option value=\"<c:out value='${data.XXXXXX_value}' />\"                     \n");
-                sb.append("         <c:if test=\"${data.XXXXXX_value eq rtnMap.%1$s}\">selected</c:if>>  \n");
-                sb.append("     <c:out value='${data.XXXXXX_label}' /></option>                            \n");
-                sb.append(" </c:forEach>                                                                       \n");
-                sb.append("</select>                                                                               \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Select_Simple("ss") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(
-                        "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
-                sb.append(" <option value=''>請選擇</option>                                                   \n");
-                sb.append(" <option value='1'>1</option>                                                   \n");
-                sb.append(" <option value='2'>2</option>                                                   \n");
-                sb.append(" <option value='3'>3</option>                                                   \n");
-                sb.append("</select>                                                                               \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Select_MAP("sm") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(
-                        "<select id=\"%1$s\"                                                                       \n");
-                sb.append(" name=\"%1$s\" title=\"%2$s\" value=\"${rtnMap.%1$s}\">                                                          \n");
-                sb.append(" <option value=''>請選擇</option>                                                   \n");
-                sb.append(
-                        "   <c:forEach var=\"map\" items=\"${XXXXXXXX_MapList}\" varStatus=\"status\">                    \n");
-                sb.append("     <option value=\"<c:out value='${map.key}' />\"                     \n");
-                sb.append("         <c:if test=\"${map.key eq rtnMap.%1$s}\">selected</c:if>>  \n");
-                sb.append("     <c:out value='${map.value}' /></option>                            \n");
-                sb.append(" </c:forEach>                                                                       \n");
-                sb.append("</select>                                                                               \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Checkbox("c") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("<c:forEach var=\"data\" items=\"${XXXXXXXX_List}\" varStatus=\"status\">        \n");
-                sb.append(" <input type=\"checkbox\"                                                 \n");
-                sb.append("         name=\"%1$s\"                                                    \n");
-                sb.append("         id=\"%1$s_${status.index}\"                   \n");
-                sb.append("     value=\"<c:out value='${data.XXXXXX_value}'/>\" title=\"%2$s\" />  \n");
-                sb.append(" <c:out value='${data.XXXXXX_label}' />                                   \n");
-                sb.append("</c:forEach>                                                                  \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Checkbox_Simple("cs") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("<input type=\"checkbox\" name=\"%1$s\" id=\"%1$s_0\" value=\"1'/>\" title=\"%2$s\" />chk1\n");
-                sb.append("<input type=\"checkbox\" name=\"%1$s\" id=\"%1$s_1\" value=\"2'/>\" title=\"%2$s\" />chk2\n");
-                sb.append("<input type=\"checkbox\" name=\"%1$s\" id=\"%1$s_2\" value=\"3'/>\" title=\"%2$s\" />chk3\n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Checkbox_MAP("cm") {
-            @Override
-            String toHtml(String tagName, String title) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("<c:forEach var=\"map\" items=\"${XXXXXXXX_MapList}\" varStatus=\"status\">        \n");
-                sb.append(" <input type=\"checkbox\"                                                 \n");
-                sb.append("         name=\"%1$s\"                                                    \n");
-                sb.append("         id=\"%1$s_${status.index}\"                   \n");
-                sb.append("     value=\"<c:out value='${map.key}'/>\" title=\"%2$s\" />  \n");
-                sb.append(" <c:out value='${map.value}' />                                   \n");
-                sb.append("</c:forEach>                                                                  \n");
-                return String.format(sb.toString(), tagName, title);
-            }
-        }, //
-        Textarea("area") {
-            @Override
-            String toHtml(String tagName, String title) {
-                return String.format(
-                        "<textarea id=\"%1$s\" name=\"%1$s\" cols=\"90\" rows=\"5\" title=\"%2$s\">${rtnMap.%1$s}</textarea>",
-                        tagName, title);
-            }
-        },//
-        ;
+    private class HtmlTypeHandler {
+        List<HtmlType> tagLst = new ArrayList<HtmlType>();
 
-        final String type;
-
-        HtmlType(String type) {
-            this.type = type;
+        private HtmlTypeHandler() {
+            InputStream is = this.getClass().getResourceAsStream("HtmlInputSimpleCreater_Template.yaml");
+            List<Map<String, String>> lst = (List<Map<String, String>>) YamlUtil.loadInputStream(is);
+            for (Map<String, String> e : lst) {
+                HtmlType vo = new HtmlType();
+                vo.tagId = e.get("tagId");
+                vo.template = e.get("template");
+                tagLst.add(vo);
+            }
         }
 
-        abstract String toHtml(String tagName, String title);
-
-        private static HtmlType valueOfType(String type) {
-            for (HtmlType e : HtmlType.values()) {
-                if (StringUtils.equalsIgnoreCase(e.type, type)) {
+        private HtmlType valueOfType(String type) {
+            for (HtmlType e : tagLst) {
+                if (StringUtils.equalsIgnoreCase(e.tagId, type)) {
                     return e;
                 }
             }
             throw new RuntimeException("無法判定Html type : " + type);
+        }
+    }
+
+    private class HtmlType {
+        String tagId;
+        String template;
+
+        public String toHtml(String tagName, String title) {
+            return String.format(template, tagName, title);
         }
     }
 

@@ -1,4 +1,4 @@
-\package gtu.console;
+package gtu.console;
 
 import java.io.BufferedReader;
 import java.io.Console;
