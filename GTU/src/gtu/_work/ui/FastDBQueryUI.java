@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -139,11 +138,8 @@ public class FastDBQueryUI extends JFrame {
     private JTextArea sqlTextArea;
     private JTextField sqlIdText;
     private JButton clearButton;
-    private JButton executeSqlButton;
     private JScrollPane scrollPane_1;
     private JTable parametersTable;
-    private JRadioButton updateSqlRadio;
-    private JRadioButton querySqlRadio;
     private JPanel panel_5;
     private JTable queryResultTable;
     private JPanel panel_6;
@@ -186,7 +182,7 @@ public class FastDBQueryUI extends JFrame {
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
 
-    private ButtonGroup btnGroup1;
+    private ButtonGroup btnExcelBtn;
     private JLabel label;
     private JTextField columnFilterText;
 
@@ -198,8 +194,6 @@ public class FastDBQueryUI extends JFrame {
     private JButton distinctQueryBtn;
     private JLabel queryResultCountLabel;
     private JButton deleteParameterBtn;
-    private JTextField maxRowsText;
-    private JLabel lblMaxRows;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
     private JButton prevConnBtn;
@@ -245,7 +239,11 @@ public class FastDBQueryUI extends JFrame {
     private JButton btnNewButton;
     private JButton sqlIdFixNameBtn;
     private SqlIdConfigBean sqlBean;// 當前選則
-    private JButton fastQueryBtn;
+    private JTextField maxRowsText;
+    private JButton executeSqlButton;
+    private JLabel label_1;
+    private JRadioButton updateSqlRadio;
+    private JRadioButton querySqlRadio;
 
     /**
      * Launch the application.
@@ -463,6 +461,15 @@ public class FastDBQueryUI extends JFrame {
         JPanel panel_3 = new JPanel();
         panel_2.add(panel_3, BorderLayout.SOUTH);
 
+        label_1 = new JLabel("max rows :");
+        panel_3.add(label_1);
+
+        maxRowsText = new JTextField();
+        maxRowsText.setToolTipText("設定最大筆數,小於等於0則無限制");
+        maxRowsText.setText("1000");
+        maxRowsText.setColumns(5);
+        panel_3.add(maxRowsText);
+
         sqlSaveButton = new JButton("儲存");
         panel_3.add(sqlSaveButton);
 
@@ -473,14 +480,23 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_3.add(clearButton);
-        
-        fastQueryBtn = new JButton("快速查詢");
-        fastQueryBtn.addActionListener(new ActionListener() {
+
+        querySqlRadio = new JRadioButton("查詢模式");
+        querySqlRadio.setSelected(true);
+        panel_3.add(querySqlRadio);
+
+        updateSqlRadio = new JRadioButton("修改模式");
+        JButtonGroupUtil.createRadioButtonGroup(querySqlRadio, updateSqlRadio);
+
+        panel_3.add(updateSqlRadio);
+
+        executeSqlButton = new JButton("執行Sql");
+        executeSqlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                fastQueryBtnAction();
+                executeSqlButtonClick();
             }
         });
-        panel_3.add(fastQueryBtn);
+        panel_3.add(executeSqlButton);
         sqlSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveSqlButtonClick(true);
@@ -499,43 +515,6 @@ public class FastDBQueryUI extends JFrame {
 
         JPanel panel_4 = new JPanel();
         panel_1.add(panel_4, BorderLayout.SOUTH);
-
-        executeSqlButton = new JButton("執行sql");
-        executeSqlButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                executeSqlButtonClick();
-            }
-        });
-
-        lblMaxRows = new JLabel("max rows :");
-        panel_4.add(lblMaxRows);
-
-        maxRowsText = new JTextField();
-        maxRowsText.setToolTipText("設定最大筆數,小於等於0則無限制");
-        maxRowsText.addFocusListener(new FocusListener() {
-            int tempNumber = 0;
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                tempNumber = StringNumberUtil.parseInt(maxRowsText.getText(), tempNumber);
-            }
-
-            public void focusLost(FocusEvent e) {
-                maxRowsText.setText("" + StringNumberUtil.parseInt(maxRowsText.getText(), tempNumber));
-            }
-        });
-        maxRowsText.setToolTipText("n <= 0 表示無限制!");
-        maxRowsText.setText("1000");
-
-        panel_4.add(maxRowsText);
-        maxRowsText.setColumns(5);
-
-        querySqlRadio = new JRadioButton("查詢模式");
-        panel_4.add(querySqlRadio);
-
-        updateSqlRadio = new JRadioButton("修改模式");
-        panel_4.add(updateSqlRadio);
-        panel_4.add(executeSqlButton);
 
         panel_5 = new JPanel();
         tabbedPane.addTab("查詢結果", null, panel_5, null);
@@ -678,7 +657,7 @@ public class FastDBQueryUI extends JFrame {
         radio_export_excel = new JRadioButton("匯出excel");
         panel_15.add(radio_export_excel);
 
-        btnGroup1 = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel);
+        btnExcelBtn = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel);
 
         excelExportBtn = new JButton("動作");
         excelExportBtn.addActionListener(new ActionListener() {
@@ -958,7 +937,7 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
-        nextParameterBtn = new JButton("下一組設定");
+        nextParameterBtn = new JButton("下一組參數");
         nextParameterBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 nextParameterBtnClick();
@@ -1036,11 +1015,7 @@ public class FastDBQueryUI extends JFrame {
             // 初始化queryResultTable
             JTableUtil.defaultSetting(queryResultTable);
 
-            // radio 設群組
-            JCommonUtil.createRadioButtonGroup(querySqlRadio, updateSqlRadio);
-            querySqlRadio.setSelected(true);
-
-            deleteParameterBtn = new JButton("刪除設定");
+            deleteParameterBtn = new JButton("刪除當前參數");
             deleteParameterBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     sqlParameterConfigLoadHandler.deleteParameterBtnAction();
@@ -1308,6 +1283,7 @@ public class FastDBQueryUI extends JFrame {
     private void clearButtonClick() {
         sqlIdText.setText("");
         sqlTextArea.setText("");
+        this.sqlBean = null;
     }
 
     /**
@@ -2055,7 +2031,7 @@ public class FastDBQueryUI extends JFrame {
     private void excelExportBtnAction() {
         try {
             ExcelUtil exlUtl = ExcelUtil.getInstance();
-            AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnGroup1);
+            AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnExcelBtn);
             if (radio_import_excel == selBtn) {
                 File xlsfile = JCommonUtil._jFileChooser_selectFileOnly();
                 if (!xlsfile.exists() || !xlsfile.getName().endsWith(".xls")) {
@@ -2482,7 +2458,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public void validate() {
-            if (StringUtils.isBlank(sqlId) && StringUtils.isBlank(sql)) {
+            if (StringUtils.isBlank(sqlId) || StringUtils.isBlank(sql)) {
                 Validate.isTrue(false, "sqlId, sql 不可為空!");
             }
             if (!FileUtil.validatePath(sqlId, false)) {
@@ -3067,27 +3043,15 @@ public class FastDBQueryUI extends JFrame {
 
         private void store() throws IOException {
             SqlIdConfigBean bean = (SqlIdConfigBean) sqlList.getSelectedValue();
-            String sqlId = "";
-
-            if (bean != null) {
-                sqlId = bean.getUniqueKey();
-                Validate.isTrue(StringUtils.isNotBlank(sqlId), "sqlId為空!");
-            } else {
-                String sqlIdX = sqlIdText.getText().toString();
-                RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
-                String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
-                String sql = sqlTextArea.getText().toString();
-
-                SqlIdConfigBean bean2 = new SqlIdConfigBean();
-                bean2.sql = sql;
-                bean2.sqlId = sqlIdX;
-                Validate.isTrue(StringUtils.isNotBlank(bean2.sqlId), "sqlId為空!");
-                bean2.category = category;
-                bean2.color = color.colorCode;
-
-                sqlId = bean2.getUniqueKey();
+            if (bean == null) {
+                return;
             }
-
+            try {
+                bean.validate();
+            } catch (Exception ex) {
+                return;
+            }
+            String sqlId = bean.getUniqueKey();
             String dbNameId = dbNameIdText_getText();
             this.init();
             sqlIdListDSMappingProp.setProperty(sqlId, dbNameId);
@@ -3164,40 +3128,5 @@ public class FastDBQueryUI extends JFrame {
         bean.category = category;
         bean.color = color.colorCode;
         return bean;
-    }
-    
-    private void fastQueryBtnAction(){
-        try{
-         // init
-            {
-                isResetQuery = true;
-                filterRowsQueryList = null;// rows 過濾清除
-                importExcelSheetName = null; // 清除匯入黨名
-            }
-            
-            String sql = StringUtils.defaultString(sqlTextArea.getText());
-            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
-            
-            SqlParam param = new SqlParam();
-            param.questionSql = sql;
-            
-            int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
-            Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(sql, new Object[0], this.getDataSource().getConnection(), true,
-                    maxRowsLimit);
-            this.queryList = queryList;
-            this.queryModeProcess(queryList, false, Pair.of(param, Arrays.asList(new Object[0])));
-            this.showJsonArry(queryList);
-        }catch(Exception ex){
-            queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
-            String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
-            String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
-            // 一般顯示
-            if (StringUtils.isBlank(findMessage)) {
-                JCommonUtil.handleException(ex);
-            } else {
-                // html顯示
-                JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
-            }
-        }
     }
 }
