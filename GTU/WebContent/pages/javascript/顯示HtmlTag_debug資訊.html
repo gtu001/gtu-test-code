@@ -15,10 +15,9 @@
 				if(ele.tagName != "SELECT"){
 					return ele.options[ele.selectedIndex].value;
 				}	
-				return null;
 			}catch(e){
-				return null;
 			}
+			return null;
 		};
 		
 		var getMsg = function(ele){
