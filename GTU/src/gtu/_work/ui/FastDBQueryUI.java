@@ -245,6 +245,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton btnNewButton;
     private JButton sqlIdFixNameBtn;
     private SqlIdConfigBean sqlBean;// 當前選則
+    private JButton fastQueryBtn;
 
     /**
      * Launch the application.
@@ -472,6 +473,14 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_3.add(clearButton);
+        
+        fastQueryBtn = new JButton("快速查詢");
+        fastQueryBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                fastQueryBtnAction();
+            }
+        });
+        panel_3.add(fastQueryBtn);
         sqlSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveSqlButtonClick(true);
@@ -3155,5 +3164,40 @@ public class FastDBQueryUI extends JFrame {
         bean.category = category;
         bean.color = color.colorCode;
         return bean;
+    }
+    
+    private void fastQueryBtnAction(){
+        try{
+         // init
+            {
+                isResetQuery = true;
+                filterRowsQueryList = null;// rows 過濾清除
+                importExcelSheetName = null; // 清除匯入黨名
+            }
+            
+            String sql = StringUtils.defaultString(sqlTextArea.getText());
+            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+            
+            SqlParam param = new SqlParam();
+            param.questionSql = sql;
+            
+            int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
+            Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(sql, new Object[0], this.getDataSource().getConnection(), true,
+                    maxRowsLimit);
+            this.queryList = queryList;
+            this.queryModeProcess(queryList, false, Pair.of(param, Arrays.asList(new Object[0])));
+            this.showJsonArry(queryList);
+        }catch(Exception ex){
+            queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
+            String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+            String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+            // 一般顯示
+            if (StringUtils.isBlank(findMessage)) {
+                JCommonUtil.handleException(ex);
+            } else {
+                // html顯示
+                JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
+            }
+        }
     }
 }
