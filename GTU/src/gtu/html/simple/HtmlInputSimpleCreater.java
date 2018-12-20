@@ -9,6 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.Yaml;
 
 import gtu.console.SystemInUtil;
 import gtu.yaml.util.YamlUtil;
@@ -28,7 +31,7 @@ public class HtmlInputSimpleCreater {
     public static void main(String[] args) {
         HtmlInputSimpleCreater t = new HtmlInputSimpleCreater();
         HtmlTypeHandler htmlTypeHandler = t.new HtmlTypeHandler();
-        
+
         List<String> lst = SystemInUtil.readContentToList(true, false, false);
         StringBuffer sb = new StringBuffer();
         sb.append("<tr>");

@@ -6,7 +6,9 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 
 public class YamlUtil {
 
@@ -45,7 +47,24 @@ public class YamlUtil {
     }
 
     public static void saveToFile(File file, boolean append) {
-        Yaml yaml = new Yaml();
+        DumperOptions options = new DumperOptions();
+        {
+            // options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+            // options.setDefaultScalarStyle(ScalarStyle.FOLDED);
+            // options.setDefaultScalarStyle(ScalarStyle.PLAIN);
+            options.setDefaultScalarStyle(ScalarStyle.LITERAL);
+            // options.setDefaultFlowStyle(DumperOptions.FlowStyle.FLOW);//json
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            options.setAllowUnicode(true);
+            options.setPrettyFlow(true);
+            options.setWidth(-1);
+            options.setIndent(2);
+            options.setExplicitStart(true);
+            options.setExplicitEnd(true);
+            options.setSplitLines(true);
+            // options.setCanonical(true);
+        }
+        Yaml yaml = new Yaml(options);
         Writer writer = null;
         try {
             writer = new FileWriter(file, append);

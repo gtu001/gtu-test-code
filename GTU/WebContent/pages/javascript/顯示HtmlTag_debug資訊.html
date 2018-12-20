@@ -9,6 +9,34 @@
 			});
 			this.parentNode.insertBefore(docFrag, this.nextSibling);
 		};
+		
+		var getMsgForSelect = function(ele){
+			try{
+				if(ele.tagName != "SELECT"){
+					return ele.options[ele.selectedIndex].value;
+				}	
+				return null;
+			}catch(e){
+				return null;
+			}
+		};
+		
+		var getMsg = function(ele){
+			var msg = "";
+			if(ele.getAttribute("name")){
+            	msg += "name = " + ele.getAttribute("name");
+            }else{
+            	msg += "id = " + ele.getAttribute("id");
+            }
+            if(ele.getAttribute("value")){
+            	msg += "<BR/>value = " + ele.getAttribute("value");
+            }else if(getMsgForSelect(ele)){
+            	msg += "<BR/>selectValue = " + getMsgForSelect(ele);
+            }else{
+            	msg += "<BR/>text = " + ele.innerText;
+            }
+            return msg;
+		};
 	
 		var hoverShow = function(ele){
 			var div1 = document.createElement("span");
@@ -24,19 +52,7 @@
 	            div1.style.visibility = "visible";
 	            div1.style.display = "block";
 	            
-	            var val = "";
-	            if(ele.getAttribute("value")){
-	            	val = ", value = " + ele.getAttribute("value");
-	            }else{
-	            	val = ", text = " + ele.innerText;
-	            }
-	            var text = "";
-	            if(ele.getAttribute("name")){
-	            	text = "name = " + ele.getAttribute("name");
-	            }else{
-	            	text = "id = " + ele.getAttribute("id");
-	            }
-	            div1.innerHTML = text + val;
+	            div1.innerHTML = getMsg(ele);
 	        });
 	        ele.addEventListener("mouseout", function(e){
 	       		div1.style.visibility = "hidden";
@@ -56,7 +72,21 @@
 		for(ii = 0 ; ii < arry.length; ii ++){
 			hoverShow(arry[ii]);
 		}
-	};
+		arry = document.getElementsByTagName("span");
+		for(ii = 0 ; ii < arry.length; ii ++){
+			var obj = arry[ii];
+			if(obj.getAttribute("id") || obj.getAttribute("name")){
+				hoverShow(obj);
+			}
+		}
+		arry = document.getElementsByTagName("div");
+		for(ii = 0 ; ii < arry.length; ii ++){
+			var obj = arry[ii];
+			if(obj.getAttribute("id") || obj.getAttribute("name")){
+				hoverShow(obj);
+			}
+		}
+	}
 
 
 
