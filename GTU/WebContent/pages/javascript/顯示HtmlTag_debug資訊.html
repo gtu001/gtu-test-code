@@ -1,4 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="" />
+<script type="text/javascript" src=""></script>
 
+<script type="text/javascript">
 	function hoverShowInfo(){
 		HTMLElement.prototype.after = function() {
 			var argArr = Array.prototype.slice.call(arguments),
@@ -39,12 +48,13 @@
 	
 		var hoverShow = function(ele){
 			var div1 = document.createElement("span");
-			div1.style.backgroundColor = "WHITE"; 
 			ele.after(div1);
 			
 			ele.addEventListener("mouseover", function(e){
                 var rect = ele.getBoundingClientRect();
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:#FFAC55;padding:5px;");
                 div1.style.position = "absolute";
+                div1.style.backgroundColor = "WHITE"; 
                 
                 div1.style.left = (rect.left + rect.width);
 	   	        div1.style.top = (rect.top + rect.height);
@@ -86,10 +96,16 @@
 			}
 		}
 	}
-
-
-
-	$(document).ready(function(){
+	
+	function init(){
 		hoverShowInfo();
-	});
+	}
+</script>
+	
+</head>
+<body onload="javascript:init();">
+
+	<input type="text" id="test_input" value="text_value" /></br>
+</body>
+</html>
 	
