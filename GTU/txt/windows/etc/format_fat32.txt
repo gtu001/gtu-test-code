@@ -1,2 +1,2 @@
 	
-	$ format x: /fs:fat32
+	$ format x: /Q /fs:fat32

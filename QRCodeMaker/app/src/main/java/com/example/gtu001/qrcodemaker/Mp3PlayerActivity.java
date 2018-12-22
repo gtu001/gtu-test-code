@@ -248,7 +248,7 @@ public class Mp3PlayerActivity extends Activity {
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3)");
+                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
                 if (BuildConfig.DEBUG) {
                     bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
                 }

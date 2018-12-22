@@ -120,6 +120,7 @@ public abstract class HtmlBaseParser {
         content = _step0_CustomPicDirForDropbox(content, isPure);
         validateContent("_step0_CustomPicDirForDropbox", content, checkStr);
 
+
         content = _step0_hiddenHead(content, isPure);
         validateContent("_step0_hiddenHead", content, checkStr);
         content = _step1_hTitleHandler(content, isPure);
@@ -242,7 +243,7 @@ public abstract class HtmlBaseParser {
                 String text = mth.group(2);
                 String tmpVal = "";
                 if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
-                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}" + NEW_LINE;
+                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}" + "";//NEW_LINE
                     if (isPure) {
                         tmpVal = StringUtil_.appendReplacementEscape(text);
                     }
@@ -343,7 +344,7 @@ public abstract class HtmlBaseParser {
             String titleStr = mth.group(1);
             String title = "";
             if (StringUtils.isNotBlank(titleStr)) {
-                title = StringUtil_.appendReplacementEscape(titleStr) + NEW_LINE;
+                title = StringUtil_.appendReplacementEscape(titleStr) + "";//NEW_LINE
                 if (isPure) {
                     title = StringUtil_.appendReplacementEscape(titleStr);
                 }
