@@ -23,6 +23,10 @@ android {
         checkReleaseBuilds false
         abortOnError true
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 dependencies {
@@ -46,7 +50,9 @@ dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.apache.commons:commons-collections4:4.1'
+
     compile files('libs/httpclient-4.5.2.jar')
+    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
 
     testCompile 'junit:junit:4.12'
 }

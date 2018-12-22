@@ -1,0 +1,99 @@
+  - tagId : t
+    template : |
+      <input id="%1$s" name="%1$s" title="%2$s" type="text" 
+        class="textBox2" value="${rtnMap.%1$s}" />
+      
+  - tagId : h
+    template : |
+      <input id="%1$s" name="%1$s" title="%2$s" type="hidden" 
+        class="textBox2" value="${rtnMap.%1$s}" />
+        
+  - tagId : L
+    template : |
+      <span id="%1$s_span" name="%1$s_span">${rtnMap.%1$s}</span>
+      
+  - tagId : R
+    template : |
+       <c:forEach var="data" items="${XXXXXXXX_List}" varStatus="status">                             
+            <input type="radio" id="%1$s_${status.index}" name="%1$s" value="${data.XXXXXX_value}" 
+                    <c:if test="${data.XXXXXX_value eq rtnMap.%1$s}">checked</c:if> />                   
+            <label for="%1$s_${status.index}">${data.XXXXXX_label}</label>                               
+       </c:forEach>  
+       
+  - tagId : Rs
+    template : |
+      <input type="radio" id="%1$s_0" name="%1$s" value="1" checked />
+        <label for="%1$s_0">Radio1</label>
+      <input type="radio" id="%1$s_1" name="%1$s" value="2" />
+        <label for="%1$s_1">Radio2</label>
+        
+  - tagId : Rm
+    template : |
+      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">                 
+          <input type="radio" id="%1$s_${status.index}" name="%1$s" value="${map.key}" 
+              <c:if test="${map.key eq rtnMap.%1$s}">checked</c:if> />                 
+          <label for="%1$s_${status.index}">${map.value}</label>                             
+      </c:forEach>                                                                                 
+        
+  - tagId : s
+    template : |
+      <select id="%1$s" name="%1$s" title="%2$s" value="${rtnMap.%1$s}">                                                          
+        <option value=''>請選擇</option>                                                   
+        <c:forEach var="data" items="${XXXXXXXX_List}" varStatus="status">                    
+            <option value="<c:out value='${data.XXXXXX_value}' />"                     
+                <c:if test="${data.XXXXXX_value eq rtnMap.%1$s}">selected</c:if>>  
+                <c:out value='${data.XXXXXX_label}' /></option>                            
+        </c:forEach>                                                                       
+      </select>    
+       
+  - tagId : ss
+    template : |
+       <select id="%1$s" name="%1$s" title="%2$s" value="${rtnMap.%1$s}">  
+         <option value=''>請選擇</option>                        
+         <option value='1'>1</option>                            
+         <option value='2'>2</option>                            
+         <option value='3'>3</option>                            
+        </select>                                                                                                                          
+      
+  - tagId : sm
+    template : |
+      <select id="%1$s" name="%1$s" title="%2$s" value="${rtnMap.%1$s}">                                       
+          <option value=''>請選擇</option>                                                   
+          <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">         
+              <option value="<c:out value='${map.key}' />"                     
+                  <c:if test="${map.key eq rtnMap.%1$s}">selected</c:if>>  
+              <c:out value='${map.value}' /></option>                            
+          </c:forEach>                                                                       
+      </select>  
+      
+  - tagId : c
+    template : |
+      <c:forEach var="data" items="${XXXXXXXX_List}" varStatus="status">        
+         <input type="checkbox"                                                 
+                 name="%1$s" id="%1$s_${status.index}"                   
+                 value="<c:out value='${data.XXXXXX_value}'/>" title="%2$s" />  
+            <c:out value='${data.XXXXXX_label}' />                                   
+      </c:forEach>                                                                  
+    
+  - tagId : cs
+    template : |
+      <input type="checkbox" name="%1$s" id="%1$s_0" value="1" title="%2$s" />chk1
+      <input type="checkbox" name="%1$s" id="%1$s_1" value="2" title="%2$s" />chk2
+      <input type="checkbox" name="%1$s" id="%1$s_2" value="3" title="%2$s" />chk3
+      
+  - tagId : cm
+    template : |
+      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">        
+         <input type="checkbox"                                                 
+                 name="%1$s"                                                    
+                 id="%1$s_${status.index}"                   
+             value="<c:out value='${map.key}'/>" title="%2$s" />  
+         <c:out value='${map.value}' />                                   
+      </c:forEach> 
+                                                                       
+  - tagId : area
+    template : |
+      <textarea id="%1$s" name="%1$s" cols="90" rows="5" title="%2$s">${rtnMap.%1$s}</textarea>
+                                                                                                 
+      
+                                                                                           

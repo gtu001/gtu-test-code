@@ -133,10 +133,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private PropertiesUtilBean configSelf = null;
     {
-        if (OsInfoUtil.isWindows()) {
-            configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_win10");
+        if (PropertiesUtil.isClassInJar(BrowserHistoryHandlerUI.class)) {
+            if (OsInfoUtil.isWindows()) {
+                configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_win10");
+            } else {
+                configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_linux");
+            }
         } else {
-            configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName() + "_linux");
+            if (OsInfoUtil.isWindows()) {
+                configSelf = new PropertiesUtilBean(new File("D:/my_tool"), BrowserHistoryHandlerUI.class.getSimpleName() + "_win10");
+            } else {
+                configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/"), BrowserHistoryHandlerUI.class.getSimpleName() + "_linux");
+            }
         }
         System.out.println("configFile : " + configSelf.getPropFile());
     }
@@ -528,7 +536,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             initAddSaveShortcutKeyEvent();
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
             jFrameRGBColorPanel.setIgnoreLst(this);
-            
 
             panel_3.add(jFrameRGBColorPanel.getToggleButton(false), "8, 4");
 

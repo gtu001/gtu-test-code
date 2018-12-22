@@ -1,0 +1,55 @@
+
+	function SelectElementResetter(selectId, lst, valueKey, textKey, textKey2, defaultVal) {
+		if(Array.isArray(lst)){
+			this.lst = lst || [];
+			this.length = this.lst.length;
+		}else{
+			lst = lst || {};
+			this.length = Object.keys(lst).length;
+			var arry = new Array();
+			for(var k in lst){
+				arry.push({"key" : k, "val" : lst[k]});
+			}
+			this.lst = arry;
+			valueKey = "key";
+			textKey = "val";
+			textKey2 = null;
+		}
+		this.select = document.querySelector(selectId);
+		
+		console.log("dropdownlst : " + selectId + ", size= " + this.length);
+		
+		if(this.defaultVal != null && this.defaultVal.length != 0){
+			this.select.setAttribute("value", defaultVal);
+		}
+		
+		this.empty = function(){
+			var myNode = this.select;
+			while (myNode.firstChild) {
+			    myNode.removeChild(myNode.firstChild);
+			}
+		};
+		
+		this.createOption = function(value, text){
+			var opt = new Element("option", {value : value});
+			opt.update(text);
+			if(defaultVal == value){
+				opt.setAttribute("selected", "");
+			}
+			return opt;
+		}
+		
+		this.empty();
+		this.select.appendChild(this.createOption("", "請選擇")); 
+		
+		for(var ii = 0 ; ii < this.lst.length; ii ++){
+			var val = this.lst[ii][valueKey];
+			var txt = this.lst[ii][textKey];
+			var txt2 = this.lst[ii][textKey2];
+			if(txt2){
+				txt = txt + ":" + txt2;
+			}
+			var opt = this.createOption(val, txt);
+			this.select.appendChild(opt); 
+		}
+	};

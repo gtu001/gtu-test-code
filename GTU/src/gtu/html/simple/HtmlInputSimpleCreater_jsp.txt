@@ -1,0 +1,39 @@
+		var applyReqMapToForm = function(reqMap){ 
+			for(var id in reqMap){
+                var value = reqMap[id];
+                var element = document.getElementById(id);
+                var spanElement = document.getElementById(id + "_span");
+                if(!element){
+                    element = document.getElementsByName(id);
+                    if(element){
+                            element = element[0];
+                    }
+                }
+                if(element){
+                    if(element.tagName == "span") {
+                            element.innerHTML = value;
+                    }else{
+                            element.value = value;
+                    }
+                }
+                if(spanElement){
+                    spanElement.innerHTML = value;
+                }
+            }
+		};
+		
+		/*
+		Jsp 畫面做 ajax 更新處理方式
+		*/
+		<%--修改--%>
+		doUpdate : function(){
+			if(!valid1.validate()){
+				return; 
+			}
+			// 發送 Ajax 請求
+			ajaxRequest.post('update', {reqMap : Object.toJSON(actions.getreqMap())},
+				function(resp){
+					applyReqMapToForm(resp.rtnMap||{}); //<---自動更新到畫面上的欄位
+				}
+			);
+		},

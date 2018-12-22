@@ -12,7 +12,8 @@
         android:layout_width="30dip"
         android:layout_height="30dip"
         android:layout_alignParentRight="true"
-        android:paddingTop="12dip" />
+        android:paddingTop="12dip"
+        android:text="ItemImage"/>
 
     <ImageView
         android:id="@+id/ImageView01"
@@ -20,7 +21,8 @@
         android:layout_height="30dip"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:paddingTop="12dip" />
+        android:paddingTop="12dip"
+        android:text="ImageView01"/>
 
     <TextView
         android:id="@+id/ItemTitle"
@@ -28,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/ItemImage"
         android:layout_toRightOf="@+id/ImageView01"
-        android:text="TextView01"
+        android:text="ItemTitle"
         android:textSize="20dip" />
 
     <TextView
@@ -38,6 +40,13 @@
         android:layout_alignRight="@+id/ItemTitle"
         android:layout_below="@+id/ItemTitle"
         android:layout_toRightOf="@+id/ImageView01"
-        android:text="TextView02" />
+        android:text="ItemText" />
+
+    <TextView
+        android:id="@+id/ItemTextDesc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ItemText"
+        android:text="ItemTextDesc" />
 
 </RelativeLayout>

@@ -1,0 +1,21 @@
+表單種類 FORM_TP[s]
+狀態 STATUS_NM[L] STATUS[h]
+修正設定編號 MOD_NO[L]
+
+平台 DB_NO[s]
+系統別 BUS_TP[s]
+修正名稱 MOD_NAME
+
+權責單位 DEPT_NO[s] DIV_NO[s] GRP_NO[s]
+呈核層級 AGREE_LEVEL[r] IT_TP[c]
+
+說明 MEMO[area]
+
+異動人員 TNS_EMPNM[L]
+異動時間 TNS_DT[L]
+
+初核人員 GRP_LDR_NM[L]
+初核時間 GRP_LDR_DT[L]
+
+覆核人員 CFM_EMPNM[L]
+覆核時間 CFM_DT[L]
