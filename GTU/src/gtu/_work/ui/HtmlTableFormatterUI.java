@@ -6,24 +6,23 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.string.StringLineNumberHandler;
 import gtu.string.StringUtil_;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -33,8 +32,6 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 public class HtmlTableFormatterUI extends JFrame {
 
