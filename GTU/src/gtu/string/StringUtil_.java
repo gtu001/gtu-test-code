@@ -4,7 +4,6 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.MatchResult;
