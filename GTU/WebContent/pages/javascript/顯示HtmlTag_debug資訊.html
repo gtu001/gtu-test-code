@@ -21,7 +21,7 @@
 		
 		var getMsgForSelect = function(ele){
 			try{
-				if(ele.tagName != "SELECT"){
+				if(ele.tagName == "SELECT"){
 					return ele.options[ele.selectedIndex].value;
 				}	
 			}catch(e){
@@ -30,20 +30,21 @@
 		};
 		
 		var getMsg = function(ele){
-			var msg = "";
-			if(ele.getAttribute("name")){
-            	msg += "name = " + ele.getAttribute("name");
-            }else{
-            	msg += "id = " + ele.getAttribute("id");
+			var msgAry = new Array();
+			if(ele.getAttribute("id")){
+            	msgAry.push("id = " + ele.getAttribute("id"));
+            }
+            if(ele.getAttribute("name")){
+            	msgAry.push("name = " + ele.getAttribute("name"));
             }
             if(ele.getAttribute("value")){
-            	msg += "<BR/>value = " + ele.getAttribute("value");
+            	msgAry.push("value = " + ele.getAttribute("value"));
             }else if(getMsgForSelect(ele)){
-            	msg += "<BR/>selectValue = " + getMsgForSelect(ele);
+            	msgAry.push("selectValue = " + getMsgForSelect(ele));
             }else{
-            	msg += "<BR/>text = " + ele.innerText;
+            	msgAry.push("text = " + ele.innerText);
             }
-            return msg;
+            return msgAry.join("<br/>");
 		};
 	
 		var hoverShow = function(ele){
