@@ -19,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.log.Log;
 import gtu.log.PrintStreamAdapter;
+import gtu.string.StringLineNumberHandler;
 
 public class JTextAreaUtil {
 
@@ -107,49 +108,6 @@ public class JTextAreaUtil {
     public static void applyTabKey(final JTextComponent jTextComponent) {
         jTextComponent.addKeyListener(new KeyAdapter() {
 
-            private TreeMap<Integer, Pair<Integer, Integer>> getLinePosMap(String textStr) {
-                TreeMap<Integer, Pair<Integer, Integer>> treeMap = new TreeMap<Integer, Pair<Integer, Integer>>();
-                StringReader reader = null;
-                try {
-                    int lineStartPos = -1;
-                    int pos = 0;
-                    int linePos = 1;
-                    Integer val = null;
-                    reader = new StringReader(textStr);
-                    while ((val = reader.read()) != -1) {
-                        if (lineStartPos == -1) {
-                            lineStartPos = pos;
-                        }
-                        if (val == 10) {
-                            Pair<Integer, Integer> newLinePos = Pair.of(lineStartPos, pos);
-                            treeMap.put(linePos, newLinePos);
-                            linePos++;
-                            lineStartPos = -1;
-                        }
-                        pos++;
-                    }
-                    if (lineStartPos < pos) {
-                        Pair<Integer, Integer> newLinePos = Pair.of(lineStartPos, pos);
-                        treeMap.put(linePos, newLinePos);
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    reader.close();
-                }
-                return treeMap;
-            }
-
-            private int getLineNumber(int pos, TreeMap<Integer, Pair<Integer, Integer>> linePosMap) {
-                for (Integer lineNumber : linePosMap.keySet()) {
-                    Pair<Integer, Integer> pair = linePosMap.get(lineNumber);
-                    if (pair.getLeft() <= pos && pair.getRight() >= pos) {
-                        return lineNumber;
-                    }
-                }
-                return -1;
-            }
-
             @Override
             public void keyPressed(KeyEvent e) {
                 int startPos = jTextComponent.getSelectionStart();
@@ -173,10 +131,10 @@ public class JTextAreaUtil {
 
                     StringBuilder sb = new StringBuilder(jTextComponent.getText());
 
-                    TreeMap<Integer, Pair<Integer, Integer>> linePosMap = getLinePosMap(sb.toString());
+                    TreeMap<Integer, Pair<Integer, Integer>> linePosMap = StringLineNumberHandler.getLinePosMap(sb.toString());
 
-                    int startLineNumber = getLineNumber(startPos, linePosMap);
-                    int endLineNumber = getLineNumber(endPos, linePosMap);
+                    int startLineNumber = StringLineNumberHandler.getLineNumber(startPos, linePosMap);
+                    int endLineNumber = StringLineNumberHandler.getLineNumber(endPos, linePosMap);
                     Pair<Integer, Integer> selectionRange = Pair.of(-1, -1);
 
                     if ((startLineNumber != endLineNumber) || isShiftPress) {
