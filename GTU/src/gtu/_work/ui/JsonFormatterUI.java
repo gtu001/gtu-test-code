@@ -3,9 +3,11 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -14,7 +16,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,8 +30,6 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import javax.swing.JButton;
-import java.awt.event.ActionEvent;
 
 public class JsonFormatterUI extends JFrame {
 
@@ -200,6 +200,9 @@ public class JsonFormatterUI extends JFrame {
                 try {
                     if (tabbedPane.getSelectedIndex() == 1) {
                         String jsonFromText = StringUtils.defaultString(jsonFromArea.getText());
+                        if (StringUtils.isBlank(jsonFromText)) {
+                            return;
+                        }
                         String resultStr = getFormatJSON(jsonFromText);
                         jsonToArea.setText(resultStr);
                     }

@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -31,6 +33,8 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -106,7 +110,7 @@ public class VoMapCompareUI extends JFrame {
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        tabbedPane.addTab("New tab", null, panel, null);
+        tabbedPane.addTab("Vo ToString或Map", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -126,6 +130,10 @@ public class VoMapCompareUI extends JFrame {
         vo2Area = new JTextArea();
         vo2Area.setRows(3);
         panel.add(JCommonUtil.createScrollComponent(vo2Area), "4, 4, fill, fill");
+
+        lblNewLabel_3 = new JLabel("不支援 List,Array");
+        lblNewLabel_3.setForeground(Color.RED);
+        panel.add(lblNewLabel_3, "4, 6");
 
         panel_3 = new JPanel();
         panel.add(panel_3, "4, 16, fill, fill");
@@ -147,7 +155,7 @@ public class VoMapCompareUI extends JFrame {
         panel_3.add(clearBtn);
 
         JPanel panel_1 = new JPanel();
-        tabbedPane.addTab("New tab", null, panel_1, null);
+        tabbedPane.addTab("比對結果", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
 
         panel_4 = new JPanel();
@@ -208,6 +216,7 @@ public class VoMapCompareUI extends JFrame {
     private DefaultTableModel allModel;
     private JLabel lblNewLabel_2;
     private JTextField filterText;
+    private JLabel lblNewLabel_3;
 
     private void applyAllEvents() {
         swingUtil.addAction(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
@@ -224,7 +233,7 @@ public class VoMapCompareUI extends JFrame {
         });
         swingUtil.addAction("executeBtn.click", new Action() {
 
-            private Map<String, String> parse(String text) {
+            private Map<String, String> parseToString(String text) {
                 Map<String, String> treeMap = new TreeMap<String, String>();
                 {
                     Pattern ptn = Pattern.compile("(\\w+)\\=([\u4e00-\u9fa5\\w\\.○\\-\\_\\:\\s]*)");
@@ -247,13 +256,32 @@ public class VoMapCompareUI extends JFrame {
                 return treeMap;
             }
 
+            private Map<String, String> parseJSON(String text) throws JSONException {
+                Map<String, String> rtnMap = new HashMap<String, String>();
+                JSONObject json = new JSONObject(text);
+                for (Iterator it = json.keys(); it.hasNext();) {
+                    String key = (String) it.next();
+                    String value = json.getString(key);
+                    rtnMap.put(key, value);
+                }
+                return rtnMap;
+            }
+
+            private Map<String, String> parseMain(String text) {
+                try {
+                    return parseJSON(text);
+                } catch (JSONException ex) {
+                    return parseToString(text);
+                }
+            }
+
             @Override
             public void action(EventObject evt) throws Exception {
                 String text1 = StringUtils.trimToEmpty(vo1Area.getText());
                 String text2 = StringUtils.trimToEmpty(vo2Area.getText());
 
-                Map<String, String> vo1 = parse(text1);
-                Map<String, String> vo2 = parse(text2);
+                Map<String, String> vo1 = parseMain(text1);
+                Map<String, String> vo2 = parseMain(text2);
 
                 Set<String> set1 = new TreeSet<String>();
                 set1.addAll(vo1.keySet());
