@@ -373,11 +373,11 @@ public class FacebookVideoDownloader extends JFrame {
         panel_15.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
                         RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("default:grow"), }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         JLabel label_2 = new JLabel("下載位置");
         panel_15.add(label_2, "2, 2, right, default");
@@ -478,6 +478,26 @@ public class FacebookVideoDownloader extends JFrame {
                         }
                         Desktop.getDesktop().open(vo.downloadToFile);
                     }
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        final int row = JTableUtil.getRealRowPos(jTab.getSelectedRow(), downloadListTable);
+                        final VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, DownloadTableConfig.VO.ordinal());
+
+                        JPopupMenuUtil.newInstance(downloadListTable)//
+                                .addJMenuItem("重新下載", new ActionListener() {
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        if (downloadPool.getState() == Thread.State.TERMINATED) {
+                                            downloadPool = new DownloadThreadPoolWatcher();
+                                            downloadPool.start();
+                                        }
+                                        ((DefaultTableModel) downloadListTable.getModel()).removeRow(row);
+                                        downloadPool.downloadLst.add(vo);
+                                    }
+                                })//
+                                .applyEvent(e)//
+                                .show();
+                    }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -504,7 +524,7 @@ public class FacebookVideoDownloader extends JFrame {
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/facebook.ico");
 
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        
+
         panel_23.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 

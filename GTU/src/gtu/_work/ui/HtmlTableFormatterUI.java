@@ -6,6 +6,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -197,11 +200,12 @@ public class HtmlTableFormatterUI extends JFrame {
 
             private String fixNoSpace(String html) {
                 html = StringUtils.defaultString(html);
-                Pattern ptn = Pattern.compile("(\\<(?:.|\n)*?\\>)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+                Pattern ptn = Pattern.compile("\\<(?:.|\n)*?\\>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
                 Matcher mth = ptn.matcher(html);
                 StringBuffer sb = new StringBuffer();
                 while (mth.find()) {
                     String tmp = StringUtil_.appendReplacementEscape(mth.group());
+                    System.out.println("fixNoSpace - " + tmp);
                     mth.appendReplacement(sb, tmp);
                 }
                 mth.appendTail(sb);
@@ -226,7 +230,7 @@ public class HtmlTableFormatterUI extends JFrame {
                 Matcher mth = ptn.matcher(html);
                 StringBuffer sb = new StringBuffer();
                 while (mth.find()) {
-                    String orignTag = mth.group(0);
+                    String orignTag = StringUtil_.appendReplacementEscape(mth.group());
                     String tag = mth.group(1);
                     String body = mth.group(2);
                     System.out.println("----" + tag);
