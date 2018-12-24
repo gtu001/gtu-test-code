@@ -244,6 +244,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel label_1;
     private JRadioButton updateSqlRadio;
     private JRadioButton querySqlRadio;
+    private JButton executeSqlButton2;
 
     /**
      * Launch the application.
@@ -1022,6 +1023,14 @@ public class FastDBQueryUI extends JFrame {
                 }
             });
             panel_4.add(deleteParameterBtn);
+            
+            executeSqlButton2 = new JButton("執行Sql");
+            executeSqlButton2.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    executeSqlButtonClick();
+                }
+            });
+            panel_4.add(executeSqlButton2);
 
             // 初始化 sqlList
             initLoadSqlListConfig();

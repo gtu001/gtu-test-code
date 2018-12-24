@@ -67,10 +67,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -94,10 +95,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -119,10 +121,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -143,10 +146,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -191,10 +195,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -217,10 +222,11 @@ public class FreeMarkerSimpleUtil {
         } catch (Exception ex) {
             throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
             }
         }
     }

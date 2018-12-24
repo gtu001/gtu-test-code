@@ -3,6 +3,7 @@ package gtu.json;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,13 +52,17 @@ public class JSONPrettyUtil {
         }
     }
 
-    public static String formatByOrgJson(String jsonString) {
+    public static String formatByOrgJson(String orignJSON) {
         try {
-            JSONObject json = new JSONObject(jsonString);// Convert text to
-                                                         // object
-            return json.toString(4); // Print it with specified indentation
-        } catch (Exception e) {
-            throw new RuntimeException("formatByOrgJson ERR : " + e.getMessage(), e);
+            JSONObject json = new JSONObject(orignJSON);
+            return json.toString(4);
+        } catch (JSONException ex) {
+            try {
+                JSONArray json = new JSONArray(orignJSON);
+                return json.toString(4);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

@@ -703,7 +703,8 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             return sb.toString();
         } catch (Exception ex) {
-            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
+//            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
+            JCommonUtil.handleException(ex);
             return errorRtn;
         }
     }

@@ -128,9 +128,11 @@ public class PropertiesUtil {
         } catch (Exception e) {
             throw new RuntimeException("getComment ERR : " + e.getMessage(), e);
         } finally {
-            try {
-                reader.close();
-            } catch (Exception e) {
+            if(reader != null){
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -152,10 +154,11 @@ public class PropertiesUtil {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
-            try {
-                inputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -183,9 +186,11 @@ public class PropertiesUtil {
             }
             return prop;
         } finally {
-            try {
-                inputStream.close();
-            } catch (Exception e) {
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -203,15 +208,15 @@ public class PropertiesUtil {
         } catch (Exception ex) {
             throw new RuntimeException("[storeProperties] 存檔失敗  , ERR : " + ex.getMessage(), ex);
         } finally {
-            try {
-                ouputStream.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                ouputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (ouputStream != null) {
+                try {
+                    ouputStream.flush();
+                } catch (Exception e) {
+                }
+                try {
+                    ouputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
