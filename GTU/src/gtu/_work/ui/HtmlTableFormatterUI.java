@@ -216,22 +216,29 @@ public class HtmlTableFormatterUI extends JFrame {
                 return "";
             }
 
+            private String fixTagChangeLineBody(String orignTag, int spaceLength) {
+                return orignTag.replaceAll("\n", "\n" + getSpace(spaceLength + 4));
+            }
+
             private String formatter(String html) {
                 html = StringUtils.defaultString(html);
-                Pattern ptn = Pattern.compile("\\<\\/?(table|tr|td|\\w+" + getSpecialPattern() + ")[\\s|\\>]", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+                Pattern ptn = Pattern.compile("\\<\\/?(table|tr|td|\\w+" + getSpecialPattern() + ")(\\s(?:.|\n)*?)?\\>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
                 Matcher mth = ptn.matcher(html);
                 StringBuffer sb = new StringBuffer();
                 while (mth.find()) {
                     String orignTag = mth.group(0);
                     String tag = mth.group(1);
+                    String body = mth.group(2);
+                    System.out.println("----" + tag);
+                    System.out.println("\t" + body);
                     if ("table".equalsIgnoreCase(tag)) {
-                        mth.appendReplacement(sb, "\r\n" + getSpace(0) + orignTag);
+                        mth.appendReplacement(sb, "\r\n" + getSpace(0) + fixTagChangeLineBody(orignTag, 0));
                     } else if ("tr".equalsIgnoreCase(tag)) {
-                        mth.appendReplacement(sb, "\r\n" + getSpace(4) + orignTag);
+                        mth.appendReplacement(sb, "\r\n" + getSpace(4) + fixTagChangeLineBody(orignTag, 4));
                     } else if ("td".equalsIgnoreCase(tag)) {
-                        mth.appendReplacement(sb, "\r\n" + getSpace(8) + orignTag);
+                        mth.appendReplacement(sb, "\r\n" + getSpace(8) + fixTagChangeLineBody(orignTag, 8));
                     } else {
-                        mth.appendReplacement(sb, "\r\n" + getSpace(12) + orignTag);
+                        mth.appendReplacement(sb, "\r\n" + getSpace(12) + fixTagChangeLineBody(orignTag, 12));
                     }
                 }
                 mth.appendTail(sb);
