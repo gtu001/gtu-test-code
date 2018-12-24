@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="" />
+<!-- <script type="text/javascript" src=""></script> -->
+
+<script type="text/javascript">
+	function applyReqMapToInput(reqMap, type) {
+		var setVal = function(e, val) {
+			if(e.getAttribute("type") == 'radio' || e.getAttribute("type") == 'checkbox'){
+				if(Array.isArray(val)){
+					e.checked = val.indexOf(e.value) != -1;
+				}else{
+					e.checked = e.value == val;
+				}
+			}
+			if (e.getAttribute("value")) {
+				e.value = val;
+			} else {
+				e.innerText = val;
+			}
+		};
+		
+		var setValByName = function(e, val) {
+			if(e.length == 1){
+				setVal(e[0], val);
+			}else{
+				for (var ii = 0 ; ii < e.length; ii ++) {
+					setVal(e[ii], val);
+				}
+			}
+		};
+
+		for ( var key in reqMap) {
+			var e1 = document.getElementById(key);
+			var e2 = document.getElementsByName(key);
+			var e3 = document.getElementById(key + "_span");
+			var val = reqMap[key];
+			if (e1) {
+				setVal(e1, val)
+			} else if (e2 && e2.length != 0) {
+				setValByName(e2, val)
+			} else if (e3) {
+				setVal(e3, val)
+			}
+		}
+	}
+
+	function init() {
+		var reqMap = {
+			test_input : "aaa",
+			test_radio : "2",
+			test_select : "2",
+			test_chk : "2",
+			test_area : "bbbb",
+			testText : "XXXXXX"
+		}
+		applyReqMapToInput(reqMap);
+	}
+</script>
+
+</head>
+<body onload="javascript:init();">
+
+	<input type="text" name="test_input" value="text_value" />
+	</br>
+
+	<input type="checkbox" id="chk1" name="test_chk" value="1" />
+	</br>
+	<input type="checkbox" id="chk2" name="test_chk" value="2" />
+	</br>
+	<input type="checkbox" id="chk3" name="test_chk" value="3" />
+	</br>
+
+	<input type="radio" id="radio_1" name="test_radio" value="1" />
+	</br>
+	<input type="radio" id="radio_2" name="test_radio" value="2" />
+	</br>
+	<input type="radio" id="radio_3" name="test_radio" value="3" />
+	</br>
+
+	<select name="test_select"  value="1">
+		<option value="1">a</option>
+		<option value="2">b</option>
+		<option value="3">c</option>
+	</select>
+	</br>
+
+	<textarea name="test_area"></textarea>
+	</br>
+	
+	<span id="testText_span"></span></br>
+</body>
+</html>
