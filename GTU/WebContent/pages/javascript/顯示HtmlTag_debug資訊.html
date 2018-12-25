@@ -41,11 +41,11 @@
             if(ele.getAttribute("name")){
             	msgAry.push("name = " + ele.getAttribute("name"));
             }
-            if(ele.getAttribute("value")){
-            	msgAry.push("value = " + ele.getAttribute("value"));
-            }else if(getMsgForSelect(ele)){
+            if(getMsgForSelect(ele)){
             	msgAry.push("selectValue = " + getMsgForSelect(ele));
-            }else{
+            }else if(ele.getAttribute("value")){
+            	msgAry.push("value = " + ele.value);
+            }else {
             	msgAry.push("text = " + ele.innerText);
             }
             return msgAry.join("<br/>");
@@ -92,7 +92,35 @@
 </head>
 <body onload="">
 
-	<input type="text" id="test_input" value="text_value" /></br>
+	<input type="text" name="test_input" value="text_value" />
+	</br>
+
+	<input type="checkbox" id="chk1" name="test_chk" value="1" />
+	</br>
+	<input type="checkbox" id="chk2" name="test_chk" value="2" />
+	</br>
+	<input type="checkbox" id="chk3" name="test_chk" value="3" />
+	</br>
+
+	<input type="radio" id="radio_1" name="test_radio" value="1" />
+	</br>
+	<input type="radio" id="radio_2" name="test_radio" value="2" />
+	</br>
+	<input type="radio" id="radio_3" name="test_radio" value="3" />
+	</br>
+
+	<select name="test_select"  value="1">
+		<option value="1">a</option>
+		<option value="2">b</option>
+		<option value="3">c</option>
+	</select>
+	</br>
+
+	<textarea name="test_area"></textarea>
+	</br>
+	
+	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span></br>
 </body>
 </html>
+
 	
