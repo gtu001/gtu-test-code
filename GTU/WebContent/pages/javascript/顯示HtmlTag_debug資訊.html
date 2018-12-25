@@ -43,7 +43,7 @@
             }
             if(getMsgForSelect(ele)){
             	msgAry.push("selectValue = " + getMsgForSelect(ele));
-            }else if(ele.getAttribute("value")){
+            }else if(ele.value){
             	msgAry.push("value = " + ele.value);
             }else {
             	msgAry.push("text = " + ele.innerText);
@@ -92,7 +92,7 @@
 </head>
 <body onload="">
 
-	<input type="text" name="test_input" value="text_value" />
+	<input type="text" name="test_input" value="test_input_value" />
 	</br>
 
 	<input type="checkbox" id="chk1" name="test_chk" value="1" />
