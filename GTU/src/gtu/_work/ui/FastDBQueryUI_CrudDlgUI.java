@@ -897,7 +897,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         String getQuoteStringVal(String col, Map<String, String> dataMap) {
-            col = col.toLowerCase();
+            col = col.toUpperCase();
             String value = dataMap.get(col);
             if (value == null || "null".equals(value)) {
                 return "null";

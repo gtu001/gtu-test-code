@@ -8,7 +8,7 @@
 <script type="text/javascript" src=""></script>
 
 <script type="text/javascript">
-	function hoverShowInfo(){
+	document.addEventListener("DOMContentLoaded", function(){
 		Element.prototype.remove = function() {
 		    this.parentElement && this.parentElement.removeChild(this);
 		};
@@ -102,15 +102,11 @@
 				hoverShow(obj);
 			}
 		}
-	}
-	
-	function init(){
-		hoverShowInfo();
-	}
+	});
 </script>
 	
 </head>
-<body onload="javascript:init();">
+<body onload="">
 
 	<input type="text" id="test_input" value="text_value" /></br>
 </body>

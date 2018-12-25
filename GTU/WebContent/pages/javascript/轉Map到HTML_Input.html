@@ -48,8 +48,8 @@
 			}
 		}
 	}
-
-	function init() {
+	
+	document.addEventListener("DOMContentLoaded", function(){
 		var reqMap = {
 			test_input : "aaa",
 			test_radio : "2",
@@ -59,7 +59,7 @@
 			testText : "XXXXXX"
 		}
 		applyReqMapToInput(reqMap);
-	}
+	});
 </script>
 
 </head>
@@ -95,3 +95,5 @@
 	<span id="testText_span"></span></br>
 </body>
 </html>
+
+	
