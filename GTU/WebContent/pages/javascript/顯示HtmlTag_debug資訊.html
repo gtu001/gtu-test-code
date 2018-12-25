@@ -52,13 +52,13 @@
             return msgAry.join("<br/>");
 		};
 	
-		var hoverShow = function(ele){
+		var hoverShow = function(ele, color, func){
 			ele.addEventListener("mouseover", function(e){
 				var div1 = document.createElement("span");
 				ele.after(div1);
 			
                 var rect = ele.getBoundingClientRect();
-                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:#FFAC55;padding:5px;");
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px;");
                 div1.style.position = "absolute";
                 div1.style.backgroundColor = "WHITE"; 
                 
@@ -67,7 +67,7 @@
 	            div1.style.visibility = "visible";
 	            div1.style.display = "block";
 	            
-	            div1.innerHTML = getMsg(ele);
+	            div1.innerHTML = func(ele);
 	            
 	            ele.addEventListener("mouseout", function(e){
 		       		//div1.style.visibility = "hidden";
@@ -83,48 +83,25 @@
 			for(var ii = 0 ; ii < arry.length; ii ++){
 				var obj = arry[ii];
 				if(obj.getAttribute("id") || obj.getAttribute("name")){
-					hoverShow(obj);
+					hoverShow(obj, "#FFAC55", getMsg);
 				}
 			}
 		}
 		
-		//特別處理 ----------------------------
-		var showHiddenMsg = function(){
-			var msgArry = new Array();
-			var arry = document.querySelectorAll("[type=hidden]");
-			for(var ii = 0 ; ii < arry.length; ii ++){
-				var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
-				if(name){
-					msgArry.push(name + " = " + arry[ii].value);
+		//特別處理 hidden ----------------------------
+		if(document.querySelector(".showHidden")){
+			hoverShow(document.querySelector(".showHidden"), "#d0dfef", function(){
+				var msgArry = new Array();
+				var arry = document.querySelectorAll("[type=hidden]");
+				for(var ii = 0 ; ii < arry.length; ii ++){
+					var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
+					if(name){
+						msgArry.push(name + " = " + arry[ii].value);
+					}
 				}
-			}
-			return msgArry.join("</br>");
-		};
-		
-		document.querySelector(".showHidden") && document.querySelector(".showHidden")//
-			.addEventListener("mouseover", function(e){
-				var ele = e.target;
-				var div1 = document.createElement("span");
-				ele.after(div1);
-			
-                var rect = ele.getBoundingClientRect();
-                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:#d0dfef;padding:5px;");
-                div1.style.position = "absolute";
-                div1.style.backgroundColor = "WHITE"; 
-                
-                div1.style.left = (rect.left + rect.width);
-	   	        div1.style.top = (rect.top + rect.height);
-	            div1.style.visibility = "visible";
-	            div1.style.display = "block";
-	            
-	            div1.innerHTML = showHiddenMsg(ele);
-	            
-	            ele.addEventListener("mouseout", function(e){
-		       		//div1.style.visibility = "hidden";
-		       		//div1.style.display = "none";
-		       		div1.removeChild1();
-		        });
-	        });
+				return msgArry.join("</br>");
+			});
+		} 
 	});
 </script>
 	
