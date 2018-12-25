@@ -9,7 +9,7 @@
 
 <script type="text/javascript">
 	document.addEventListener("DOMContentLoaded", function(){
-		Element.prototype.remove = function() {
+		Element.prototype.removeChild1 = function() {
 		    this.parentElement && this.parentElement.removeChild(this);
 		};
 
@@ -71,35 +71,19 @@
 	            ele.addEventListener("mouseout", function(e){
 		       		//div1.style.visibility = "hidden";
 		       		//div1.style.display = "none";
-		       		div1.remove();
+		       		div1.removeChild1();
 		        });
 	        });
 		};
 	
-		var arry = document.getElementsByTagName("input");
-		for(var ii = 0 ; ii < arry.length; ii ++){
-			hoverShow(arry[ii]);
-		}
-		arry = document.getElementsByTagName("select");
-		for(ii = 0 ; ii < arry.length; ii ++){
-			hoverShow(arry[ii]);
-		}
-		arry = document.getElementsByTagName("textarea");
-		for(ii = 0 ; ii < arry.length; ii ++){
-			hoverShow(arry[ii]);
-		}
-		arry = document.getElementsByTagName("span");
-		for(ii = 0 ; ii < arry.length; ii ++){
-			var obj = arry[ii];
-			if(obj.getAttribute("id") || obj.getAttribute("name")){
-				hoverShow(obj);
-			}
-		}
-		arry = document.getElementsByTagName("div");
-		for(ii = 0 ; ii < arry.length; ii ++){
-			var obj = arry[ii];
-			if(obj.getAttribute("id") || obj.getAttribute("name")){
-				hoverShow(obj);
+		var singleChkArry1 = ["input", "select", "textarea", "button", "span", "div", "label"];
+		for(var i in singleChkArry1){
+			var arry = document.getElementsByTagName(singleChkArry1[i]);
+			for(var ii = 0 ; ii < arry.length; ii ++){
+				var obj = arry[ii];
+				if(obj.getAttribute("id") || obj.getAttribute("name")){
+					hoverShow(obj);
+				}
 			}
 		}
 	});
