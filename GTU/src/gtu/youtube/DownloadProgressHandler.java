@@ -192,22 +192,25 @@ public class DownloadProgressHandler {
             this.percentScale = percentScale;
         }
     }
-    
+
     public static String getSummaryAverageKbps(DownloadProgressHandler.DownloadProgress proc) {
         if (proc.isComplete()) {
-            long totalKbps = proc.getProcessLst().stream()//
-                    .filter(vo -> vo.getKbpers() >= 0)//
-                    .map(vo -> vo.getKbpers())//
-                    .reduce(0, (a, b) -> {
-                        if (a > 0 && b > 0) {
-                            a += b;
-                            return a;
-                        }
-                        return a > 0 ? a : (b > 0) ? b : 0;
-                    });
-            long motherCount = proc.getProcessLst().stream()//
-                    .filter(vo -> vo.getKbpers() > 0)//
-                    .collect(Collectors.counting());
+            /*
+             * long totalKbps = proc.getProcessLst().stream()// .filter(vo ->
+             * vo.getKbpers() >= 0)// .map(vo -> vo.getKbpers())// .reduce(0,
+             * (a, b) -> { if (a > 0 && b > 0) { a += b; return a; } return a >
+             * 0 ? a : (b > 0) ? b : 0; }); long motherCount =
+             * proc.getProcessLst().stream()// .filter(vo -> vo.getKbpers() >
+             * 0)// .collect(Collectors.counting());
+             */
+            long totalKbps = 0;
+            long motherCount = 0;
+            for (DownloadProgress v1 : proc.getProcessLst()) {
+                if (v1.getKbpers() >= 0) {
+                    totalKbps += v1.getKbpers();
+                    motherCount++;
+                }
+            }
             long avgKbps = (totalKbps / motherCount);
             return "(avg :" + avgKbps + "KB/s)";
         }

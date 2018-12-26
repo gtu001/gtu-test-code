@@ -109,14 +109,14 @@ public class ${main_action_clz} extends UCBean {
 			
             MessageHelper.setReturnMessage(msg, ReturnCode.OK, "查詢成功");
         } catch (ErrorInputException eie) {
-            log.error(eie);
+            log.error("查詢失敗", eie);
             MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
         } catch (DataNotFoundException dnfe) {
-            log.error("", dnfe);
+            log.error("查詢失敗", dnfe);
             MessageHelper.setReturnMessage(msg, ReturnCode.DATA_NOT_FOUND, "查無資料");
         } catch (ModuleException me) {
             if (me.getRootException() == null) {
-                log.error("", me);
+                log.error("查詢失敗", me);
                 MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_MODULE, me.getMessage());
             } else {
                 log.error(me.getMessage(), me.getRootException());
@@ -165,7 +165,7 @@ public class ${main_action_clz} extends UCBean {
             }
 
         } catch (ErrorInputException eie) {
-            log.error(eie);
+            log.error("新增失敗", eie);
             //MessageUtil.setReturnMessage(msg, ReturnCode.ERROR_INPUT, "ZZXZ_0100_UI_001");
             MessageHelper.setReturnMessage(msg, ReturnCode.ERROR_INPUT, eie.getMessage());
         } catch (ModuleException me) {

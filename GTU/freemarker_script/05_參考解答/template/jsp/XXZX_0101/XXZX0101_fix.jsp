@@ -1,13 +1,6 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'>
 <%@ page language='java' contentType='text/html; charset=BIG5'%>
 
-<!--
-程式：XXZX0101.jsp
-功能：基本EBAF練習
-作者：
-完成：
--->
-
 <html>
 <head>
 <%@ include file='/html/CM/header.jsp'%>
@@ -28,13 +21,10 @@
 <script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/calendar.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/validation.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/PageUI.js"></script>
-<script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/calendar.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/popupWin.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/commView.js"></script>
-<script type="text/JavaScript"
-	src="${r"${htmlBase}"}/CM/js/ui/LocaleDisplay.js"></script>
-<script type="text/JavaScript"
-	src="${r"${htmlBase}"}/CM/js/ui/InputUtility.js"></script>
+<script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/ui/LocaleDisplay.js"></script>
+<script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/ui/InputUtility.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/RPTUtil.js"></script>
 <script type='text/javascript'>
 
@@ -42,6 +32,102 @@
 <%-- 產生畫面物件 --%>
 <%--透過 prototype 的 Event 物件監聽 onload 事件，觸發時進行 initApp()--%>
 Event.observe(window, 'load', new ${edit_jsp}().initApp);
+
+
+	document.addEventListener("DOMContentLoaded", function(){
+		Element.prototype.removeChild1 = function() {
+		    this.parentElement && this.parentElement.removeChild(this);
+		};
+
+		HTMLElement.prototype.after = function() {
+			var argArr = Array.prototype.slice.call(arguments),
+			docFrag = document.createDocumentFragment();
+			argArr.forEach(function (argItem) {
+				var isNode = argItem instanceof Node;
+				docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+			});
+			this.parentNode.insertBefore(docFrag, this.nextSibling);
+		};
+		
+		var getMsgForSelect = function(ele){
+			try{
+				if(ele.tagName == "SELECT"){
+					return ele.options[ele.selectedIndex].value;
+				}	
+			}catch(e){
+			}
+			return null;
+		};
+		
+		var getMsg = function(ele){
+			var msgAry = new Array();
+			if(ele.getAttribute("id")){
+            	msgAry.push("id = " + ele.getAttribute("id"));
+            }
+            if(ele.getAttribute("name")){
+            	msgAry.push("name = " + ele.getAttribute("name"));
+            }
+            if(getMsgForSelect(ele)){
+            	msgAry.push("selectValue = " + getMsgForSelect(ele));
+            }else if(ele.value){
+            	msgAry.push("value = " + ele.value);
+            }else {
+            	msgAry.push("text = " + ele.innerText);
+            }
+            return msgAry.join("<br/>");
+		};
+	
+		var hoverShow = function(ele, color, func){
+			ele.addEventListener("mouseover", function(e){
+				var div1 = document.createElement("span");
+				ele.after(div1);
+			
+                var rect = ele.getBoundingClientRect();
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px;");
+                div1.style.position = "absolute";
+                div1.style.backgroundColor = "WHITE"; 
+                
+                div1.style.left = (rect.left + rect.width);
+	   	        div1.style.top = (rect.top + rect.height);
+	            div1.style.visibility = "visible";
+	            div1.style.display = "block";
+	            
+	            div1.innerHTML = func(ele);
+	            
+	            ele.addEventListener("mouseout", function(e){
+		       		//div1.style.visibility = "hidden";
+		       		//div1.style.display = "none";
+		       		div1.removeChild1();
+		        });
+	        });
+		};
+	
+		var singleChkArry1 = ["input", "select", "textarea", "button", "span", "div", "label"];
+		for(var i in singleChkArry1){
+			var arry = document.getElementsByTagName(singleChkArry1[i]);
+			for(var ii = 0 ; ii < arry.length; ii ++){
+				var obj = arry[ii];
+				if(obj.getAttribute("id") || obj.getAttribute("name")){
+					hoverShow(obj, "#FFAC55", getMsg);
+				}
+			}
+		}
+		
+		//特別處理 hidden ----------------------------
+		if(document.querySelector(".showHidden")){
+			hoverShow(document.querySelector(".showHidden"), "#d0dfef", function(){
+				var msgArry = new Array();
+				var arry = document.querySelectorAll("[type=hidden]");
+				for(var ii = 0 ; ii < arry.length; ii ++){
+					var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
+					if(name){
+						msgArry.push(name + " = " + arry[ii].value);
+					}
+				}
+				return msgArry.join("</br>");
+			});
+		} 
+	});
 
 function ${edit_jsp}(){
 
@@ -57,20 +143,114 @@ function ${edit_jsp}(){
 			<#list insertColumns_pk as col>
 			valid1.define( "required" , { id : "${col}", errMsg:'${columnLabel[col]}不得為空'} );
 			</#list>
+		},
+		
+		createRequired : function( type, map ){
+			var valid = new Validation('form1', {focusOnError:true, immediate:false});
+			Validation.addAllThese([
+				['addErrorValid', '', function(v){ return false; } ]
+			]);
+			for(var key in map){
+				switch(type){
+					case "required" :
+						valid.define( "required" , { id : key, errMsg: map[key] } );
+						break;
+					default :
+						valid.define( "addErrorValid" , { id : key, errMsg: map[key]} );
+						break;
+				}
+			}
+			return valid;
 		}
 	};
 	
+	
 	var actions = {
-		closePopupWin : function(data){
-			if(window.isPopupWin && window.popupWinBack){
-				window.popupWinBack(data);
-			}else if(window.parent && window.parent.popupWin){
-				window.parent.popupWin.back(data);
+                
+		selectElementResetter : function(selectId, lst, valueKey, textKey, textKey2, defaultVal) {
+			if(Array.isArray(lst)){
+				this.lst = lst;
+				this.length = this.lst.length;
 			}else{
-				CSRUtil.linkBack();
+				lst = lst || {};
+				this.length = Object.keys(lst).length;
+				var arry = new Array();
+				for(var k in lst){
+					arry.push({"key" : k, "val" : lst[k]});
+				}
+				this.lst = arry;
+				valueKey = "key";
+				textKey = "val";
+				textKey2 = null;
+			}
+			this.select = $(selectId);
+			
+			if(this.defaultVal != null && this.defaultVal.length != 0){
+				this.select.setAttribute("value", defaultVal);
+			}
+			
+			this.createOption = function(value, text){
+				var opt = new Element("option", {value : value});
+				opt.update(text);
+				if(defaultVal == value){
+					opt.setAttribute("selected", "");
+				}
+				return opt;
+			}
+			
+			$(selectId).length = 0;
+			this.select.insert(this.createOption("", "請選擇")); 
+			
+			for(var ii = 0 ; ii < this.lst.length; ii ++){
+				var val = this.lst[ii][valueKey];
+				var txt = this.lst[ii][textKey];
+				var txt2 = this.lst[ii][textKey2];
+				if(txt2){
+					txt = txt + ":" + txt2;
+				}
+				var opt = this.createOption(val, txt);
+				this.select.insert(opt); 
 			}
 		},
 		
+		applyReqMapToForm : function(reqMap){ 
+			for(var id in reqMap){
+                                var value = reqMap[id];
+                                var element = $(id);
+                                var spanElement = $(id + "_span");
+                                if(!element){
+                                        element = $(id);
+                                        if(element){
+                                                element = element[0];
+                                        }
+                                }
+                                if(element){
+                                        if(element.tagName == "span") {
+                                                element.update(value);
+                                        }else{
+                                                element.setValue(value);
+                                        }
+                                }
+                                if(spanElement){
+                                        spanElement.update(value);
+                                }
+                        }
+                
+                        //重整
+                        InputUtility.lengthLimit.doLengthLimit('MEMO');
+		},
+		
+		getValue : function(id) {
+			if($(id)){
+				return $F(id);
+			}
+			if($(id + "_span")){
+				return $(id + "_span").innerText;
+			}
+			return "";
+		},
+		
+			
 		// 根據OP_STATUS讓指定按鈕失效
 		btnDisable : function(reqMap){
 			$w('BTN_confirm  BTN_insert BTN_update BTN_approve BTN_reject BTN_delete  ').each(  //BTN_back
@@ -78,51 +258,25 @@ function ${edit_jsp}(){
 					$(id).disable();
 				}
 			);
-			
-			var ACTION_TYPE = reqMap.ACTION_TYPE;
-			
-			if (ACTION_TYPE == "I"){ // 新增時
-				<#list insertColumns as col>
-				$('${col}').update(reqMap.${col} || '');
-				</#list>
-			
-				$('BTN_insert').enable();
-				
-			} else { // 修改時, ACTION_TYPE=U
-				<#list updateColumns as col>
-				$('${col}').setValue(reqMap.${col} || '');
-				</#list>
-				
-				if(reqMap.OP_STATUS == "10"){ // OP_STATUS 為10 審核、退回disable 其餘enable
-					$w('BTN_confirm  BTN_insert BTN_update BTN_approve BTN_delete').each( 
-						function(id) { 
-							$(id).enable();
-						}
-					);
-				}else if(reqMap.OP_STATUS == "20"){ // OP_STATUS 為20 提交disable 其餘enable
-					$w('BTN_confirm  BTN_insert BTN_update BTN_reject BTN_delete').each( 
-						function(id) { 
-							$(id).enable();
-						}
-					);
-				}else{
-					$('BTN_update').enable();
-				}
-			}
+			$w('BTN_confirm  BTN_insert BTN_update BTN_approve BTN_delete').each( 
+                                function(id) { 
+                                        $(id).enable();
+                                }
+                        );
 		},
 		
-		getreqMap:function (){
-                var sendRecord = {
-                <#list insertColumns as col>
-				<#if col?is_last>
-					${col} : $('${col}') != null ? $('${col}').value : ""
-				<#else>
-					${col} : $('${col}') != null ? $('${col}').value : "",
-				</#if>
-                </#list>
-                }
-                return sendRecord;
-        },	
+		getreqMap : function (){
+                        var sendRecord = {
+                        <#list insertColumns as col>
+                                <#if col?is_last>
+                                        ${col} : actions.getValue('${col}')
+                                <#else>
+                                        ${col} : actions.getValue('${col}') ,
+                                </#if>
+                        </#list>
+                        }
+                        return sendRecord;
+                },	
 	};
 	
 	var buttons = {
@@ -224,7 +378,7 @@ function ${edit_jsp}(){
 		
 		<%--回上一頁--%>
 		doBack : function(){
-			actions.closePopupWin(); // 回上一頁方法
+			CSRUtil.linkBack(); // 回上一頁方法
 		}
 	};
 	
@@ -245,8 +399,15 @@ function ${edit_jsp}(){
 				'單位代號索引GTU001'
 			);
 			
+			// 上一頁回來重查
+			var LP_JSON = CSRUtil.isBackLink('form1');
+			if(LP_JSON){
+				buttons.doQuery();
+			}
+			
 			var rtnMap = <c:out value='${r"${rtnMap}"}' default='{}' escapeXml='false'/>;  // rtnMap物件
 			actions.btnDisable(rtnMap);
+			actions.applyReqMapToForm(rtnMap);
 			validAction.init();
 			
 			$('BTN_depNm_index').observe('click', buttons.doIndex_DEP); // 索引(單位代號)
@@ -258,6 +419,12 @@ function ${edit_jsp}(){
 			$('BTN_approve').observe('click', buttons.doApprove); // 審核
 			$('BTN_reject').observe('click', buttons.doReject); // 退回
 			$('BTN_delete').observe('click', buttons.doDelete); // 刪除
+			
+			// 上一頁回來重查
+                        var LP_JSON = CSRUtil.isBackLink('form1');
+                        if(LP_JSON){
+                                buttons.doQuery();
+                        }
 			
 			PageUI.resize();
 			displayMessage();

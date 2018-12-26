@@ -487,12 +487,12 @@ public class FacebookVideoDownloader extends JFrame {
 
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        if (downloadPool.getState() == Thread.State.TERMINATED) {
-                                            downloadPool = new DownloadThreadPoolWatcher();
-                                            downloadPool.start();
+                                        try {
+                                            ((DefaultTableModel) downloadListTable.getModel()).removeRow(row);
+                                            appendToDownloadBar(vo.orign, true, true);
+                                        } catch (Exception ex) {
+
                                         }
-                                        ((DefaultTableModel) downloadListTable.getModel()).removeRow(row);
-                                        downloadPool.downloadLst.add(vo);
                                     }
                                 })//
                                 .applyEvent(e)//
@@ -616,7 +616,7 @@ public class FacebookVideoDownloader extends JFrame {
                         b1.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                appendToDownloadBar(vo, throwEx);
+                                appendToDownloadBar(vo, false, throwEx);
                             }
                         });
 
@@ -653,36 +653,43 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
-    private void appendToDownloadBar(VideoUrlConfig vo, boolean throwEx) {
+    private void appendToDownloadBar(VideoUrlConfig vo, boolean forceDownload, boolean throwEx) {
+        if (downloadPool == null || downloadPool.getState() == Thread.State.TERMINATED) {
+            downloadPool = new DownloadThreadPoolWatcher();
+            downloadPool.start();
+        }
+
         boolean findOk1 = false;
-        for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
-            VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);
-            if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
-                findOk1 = true;
-                break;
-            }
-        }
-
         boolean findOk2 = false;
-        for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
-            VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
-            if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
-                findOk2 = true;
-                break;
-            }
-        }
-
         File willingDownloadFile = new File(targetDirectory, vo.getFileName());
-        if (willingDownloadFile.exists()) {
-            if (throwEx) {
-                throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
-            } else {
-                JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+
+        if (!forceDownload) {
+            for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
+                VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);
+                if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
+                    findOk1 = true;
+                    break;
+                }
             }
-            return;
+            for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
+                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
+                if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
+                    findOk2 = true;
+                    break;
+                }
+            }
+
+            if (willingDownloadFile.exists()) {
+                if (throwEx) {
+                    throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+                }
+                return;
+            }
         }
 
-        if (!findOk1 && !findOk2) {
+        if ((!findOk1 && !findOk2) || forceDownload) {
             VideoUrlConfigZ vo2 = new VideoUrlConfigZ(vo);
             vo2.downloadToFile = willingDownloadFile;
 
