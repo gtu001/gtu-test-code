@@ -29,7 +29,9 @@ import android.content.ContextWrapper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.Toast;
 
 import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
@@ -37,6 +39,7 @@ import com.example.englishtester.EnglishwordInfoDAO.EnglishWordSchema;
 import com.example.englishtester.EnglishwordInfoDAO.LastResultEnum;
 import com.example.englishtester.common.InitExamInterface;
 import com.example.englishtester.common.NetWorkUtil;
+import com.example.englishtester.common.SharedPreferencesUtil;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -480,9 +483,25 @@ public class EnglishwordInfoService {
                 message.setData(bundle);
                 message.what = WHAT_INT;
                 handler.sendMessage(message);
+
+                ScanFileToEnglishwordHandler.setImportLog(context, file.getName() + " -> " + messageStr);
             }
         }, "scanFileToEnglishWordThread..");
         scanFileToEnglishWordThread.start();
+    }
+
+    /**
+     * 設定import log
+     */
+    public static class ScanFileToEnglishwordHandler {
+        public static void setImportLog(Context context, String message) {
+            SharedPreferencesUtil.putData(context, EnglishwordInfoService.class.getName(), EnglishwordInfoService.class.getSimpleName() + "_scanFileToEnglishword", message);
+        }
+
+        public static String getImportLog(Context context) {
+            return SharedPreferencesUtil.getData(
+                    context, EnglishwordInfoService.class.getName(), EnglishwordInfoService.class.getSimpleName() + "_scanFileToEnglishword");
+        }
     }
 
     /**

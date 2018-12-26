@@ -102,6 +102,8 @@ public class StatusInfoService {
         String hermannEbbinghausLastestUpdateCount; //
         @StatusInfoService_DataAnn(name = "艾賓浩斯記憶更新次數", index = 24)
         String hermannEbbinghausRuntime; //
+        @StatusInfoService_DataAnn(name = "最後一次匯入題庫", index = 25)
+        String lastestQuestionImportLog;//
     }
 
     StatusInfoService_Data getStatusInfo() {
@@ -259,6 +261,8 @@ public class StatusInfoService {
             val.hermannEbbinghausRuntime = "NA";
             val.hermannEbbinghausLastestUpdateCount = "NA";
         }
+
+        val.lastestQuestionImportLog = EnglishwordInfoService.ScanFileToEnglishwordHandler.getImportLog(context);
         return val;
     }
 
