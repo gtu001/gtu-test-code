@@ -46,7 +46,7 @@ public class YamlUtil {
         }
     }
 
-    public static void saveToFile(File file, boolean append) {
+    public static void saveToFile(File file, Object dumpObject, boolean append) {
         DumperOptions options = new DumperOptions();
         {
             // options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
@@ -68,7 +68,7 @@ public class YamlUtil {
         Writer writer = null;
         try {
             writer = new FileWriter(file, append);
-            yaml.dump(yaml, writer);
+            yaml.dump(dumpObject, writer);
         } catch (Exception ex) {
             throw new RuntimeException("loadFromFile ERR : " + ex.getMessage(), ex);
         } finally {

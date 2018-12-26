@@ -52,9 +52,9 @@ public class MapUtil {
     /**
      * 將map的值對應到bean裡去
      */
-    public static <T, V> T mapToBean(T bean, Map<String, V> map) {
+    public static <T> T mapToBean(T bean, Map<String, Object> map) {
         try {
-            for (Map.Entry<String, V> entry : map.entrySet()) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
                 String field = entry.getKey();
                 Field fid = bean.getClass().getDeclaredField(field);
                 boolean access = fid.isAccessible();
@@ -67,11 +67,10 @@ public class MapUtil {
             throw new RuntimeException(ex);
         }
     }
-
+    
     /**
      * 將bean對應到map的值裡去
      */
-
     public static void beanToMap(Object bean, Map<String, Object> map) {
         try {
             for (Field f : bean.getClass().getDeclaredFields()) {

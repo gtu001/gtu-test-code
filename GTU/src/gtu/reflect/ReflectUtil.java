@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -25,8 +26,8 @@ public class ReflectUtil {
             throw new RuntimeException(e);
         }
     }
-    
-    public static Object newInstanceDefault(Class entityClz, boolean debug) {
+
+    public static Object newInstanceDefault(Class entityClz, Object parentInst, boolean debug) {
         Object entity = null;
         try {
             entity = entityClz.newInstance();
@@ -44,7 +45,16 @@ public class ReflectUtil {
                     cons.setAccessible(true);
                     entity = cons.newInstance(new Object[0]);
                 } catch (Exception e2) {
-                    throw new RuntimeException("newInstanceDefault ERR : " + e2.getMessage(), e2);
+                    if (debug)
+                        e2.printStackTrace();
+                    try {
+                        Constructor cons = entityClz.getDeclaredConstructor(parentInst.getClass());
+                        cons.setAccessible(true);
+                        entity = cons.newInstance(parentInst);
+                    } catch (Exception e3) {
+                        System.err.println("若private class且有建構子時, 須建立一個空的建構子!!!!");
+                        throw new RuntimeException("newInstanceDefault ERR : " + e3.getMessage(), e3);
+                    }
                 }
             }
         }
