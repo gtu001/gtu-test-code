@@ -10,6 +10,10 @@
 <script type="text/javascript">
 	<!-- 顯示input資訊 -->
 	document.addEventListener("DOMContentLoaded", function(){
+		function getType(node){
+			return node ? {}.toString.call(node) : "undefined";
+		}
+		
 		Element.prototype.removeChild1 = function() {
 		    this.parentElement && this.parentElement.removeChild(this);
 		};
@@ -58,7 +62,7 @@
 				ele.after(div1);
 			
                 var rect = ele.getBoundingClientRect();
-                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px;");
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px; font-size: 12px;");
                 div1.style.position = "absolute";
                 div1.style.backgroundColor = "WHITE"; 
                 
@@ -88,20 +92,64 @@
 			}
 		}
 		
-		//特別處理 hidden ----------------------------
-		if(document.querySelector(".showHidden")){
-			hoverShow(document.querySelector(".showHidden"), "#d0dfef", function(){
-				var msgArry = new Array();
-				var arry = document.querySelectorAll("[type=hidden]");
-				for(var ii = 0 ; ii < arry.length; ii ++){
-					var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
-					if(name){
-						msgArry.push(name + " = " + arry[ii].value);
-					}
+		//特別處理 Message ----------------------------
+		var getMsgFromMap = function(title, rtnMap){
+			var msgArry = new Array();
+			if(title){
+				msgArry.push("<font color='red'>"+title+"</font>");
+			}
+			var keys = Object.keys(rtnMap).sort();
+			var html = "<table style='font-size: 10px;'>"
+			var tmpArry = [];
+			var tdCount = Math.max(Math.floor(keys.length / 10), 1);
+			for(var ii = 0 ; ii < keys.length; ii ++){
+				if((ii + 1) % tdCount == 0){
+					html += "<tr><td>" + tmpArry.join("</td><td>") + "</td></tr>";
+					tmpArry = [];
 				}
-				return msgArry.join("</br>");
-			});
-		} 
+				tmpArry.push(keys[ii] + " = " + rtnMap[keys[ii]]);
+			}
+			if(tmpArry.length != 0){
+				html += "<tr><td>" + tmpArry.join("</td><td>") + "</td></tr>";
+			}
+			html += "</table>"
+			msgArry.push(html);
+			return msgArry.join("<br/>");
+		};
+		
+		var showMapConfig = {
+								".showAttr" : { title : "顯示Init資料", 
+												dataMap : {} //<c:out value='${mapX120JSON}' default='{}' escapeXml='false'/> 
+												},
+								".showHidden" : { title : "顯示Hidden欄位", 
+												dataMap : function(){
+													var formMap = {};
+													var arry = document.querySelectorAll("[type=hidden]");
+													for(var ii = 0 ; ii < arry.length; ii ++){
+														var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
+														if(name){
+															formMap[name] = arry[ii].value;
+														}
+													}
+													return formMap;
+												 }
+												}
+							 };
+							
+		for(var queryKey in showMapConfig){
+			if(document.querySelector(queryKey)){
+				var tag = document.querySelector(queryKey);
+				tag.setAttribute("queryKey", queryKey);
+				hoverShow(tag, "#d0dfef", function(ele){
+					var config = showMapConfig[ele.getAttribute("queryKey")];
+					var obj = config.dataMap;
+					if(getType(obj) == '[object Function]'){
+						obj = obj();
+					}
+					return getMsgFromMap(config.title, obj);
+				});
+			} 
+		}
 	});
 </script>
 	
@@ -112,37 +160,37 @@
 	<input type="hidden" name="test_hidden2" value="12345B" />
 	<input type="hidden" name="test_hidden3" value="12345C" />
 	<span class="showHidden">顯示隱藏欄位資料</span>
-	</br>
-	</br>
+	<br/>
+	<br/>
 
 	<input type="text" name="test_input" value="test_input_value" />
-	</br>
+	<br/>
 
 	<input type="checkbox" id="chk1" name="test_chk" value="1" />
-	</br>
+	<br/>
 	<input type="checkbox" id="chk2" name="test_chk" value="2" />
-	</br>
+	<br/>
 	<input type="checkbox" id="chk3" name="test_chk" value="3" />
-	</br>
+	<br/>
 
 	<input type="radio" id="radio_1" name="test_radio" value="1" />
-	</br>
+	<br/>
 	<input type="radio" id="radio_2" name="test_radio" value="2" />
-	</br>
+	<br/>
 	<input type="radio" id="radio_3" name="test_radio" value="3" />
-	</br>
+	<br/>
 
 	<select name="test_select"  value="1">
 		<option value="1">a</option>
 		<option value="2">b</option>
 		<option value="3">c</option>
 	</select>
-	</br>
+	<br/>
 
 	<textarea name="test_area"></textarea>
-	</br>
+	<br/>
 	
-	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span></br>
+	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span><br/>
 </body>
 </html>
 

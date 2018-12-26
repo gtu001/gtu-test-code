@@ -35,6 +35,10 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 
 
 	document.addEventListener("DOMContentLoaded", function(){
+		function getType(node){
+			return node ? {}.toString.call(node) : "undefined";
+		}
+		
 		Element.prototype.removeChild1 = function() {
 		    this.parentElement && this.parentElement.removeChild(this);
 		};
@@ -83,7 +87,7 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 				ele.after(div1);
 			
                 var rect = ele.getBoundingClientRect();
-                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px;");
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px; font-size: 12px;");
                 div1.style.position = "absolute";
                 div1.style.backgroundColor = "WHITE"; 
                 
@@ -113,20 +117,65 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 			}
 		}
 		
-		//特別處理 hidden ----------------------------
-		if(document.querySelector(".showHidden")){
-			hoverShow(document.querySelector(".showHidden"), "#d0dfef", function(){
-				var msgArry = new Array();
-				var arry = document.querySelectorAll("[type=hidden]");
-				for(var ii = 0 ; ii < arry.length; ii ++){
-					var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
-					if(name){
-						msgArry.push(name + " = " + arry[ii].value);
-					}
+		//特別處理 Message ----------------------------
+		var getMsgFromMap = function(title, rtnMap){
+			var msgArry = new Array();
+			if(title){
+				msgArry.push("<font color='red'>"+title+"</font>");
+			}
+			var keys = Object.keys(rtnMap).sort();
+			var html = "<table style='font-size: 10px;'>"
+			var tmpArry = [];
+			var tdCount = Math.floor(keys.length / 10);
+			tdCount = tdCount == 0 ? 1 : 0;
+			for(var ii = 0 ; ii < keys.length; ii ++){
+				if((ii + 1) % tdCount == 0){
+					html += "<tr><td>" + tmpArry.join("</td><td>") + "</td></tr>";
+					tmpArry = [];
 				}
-				return msgArry.join("</br>");
-			});
-		} 
+				tmpArry.push(keys[ii] + " = " + rtnMap[keys[ii]]);
+			}
+			if(tmpArry.length != 0){
+				html += "<tr><td>" + tmpArry.join("</td><td>") + "</td></tr>";
+			}
+			html += "</table>"
+			msgArry.push(html);
+			return msgArry.join("<br/>");
+		};
+		
+		var showMapConfig = {
+								".showAttr" : { title : "顯示Init資料", 
+												dataMap : <c:out value='${mapX120JSON}' default='{}' escapeXml='false'/> 
+												},
+								".showHidden" : { title : "顯示Hidden欄位", 
+												dataMap : function(){
+													var formMap = {};
+													var arry = document.querySelectorAll("[type=hidden]");
+													for(var ii = 0 ; ii < arry.length; ii ++){
+														var name = arry[ii].getAttribute("name") ? arry[ii].getAttribute("name") : arry[ii].getAttribute("id");
+														if(name){
+															formMap[name] = arry[ii].value;
+														}
+													}
+													return formMap;
+												 }
+												}
+							 };
+							
+		for(var queryKey in showMapConfig){
+			if(document.querySelector(queryKey)){
+				var tag = document.querySelector(queryKey);
+				tag.setAttribute("queryKey", queryKey);
+				hoverShow(tag, "#d0dfef", function(ele){
+					var config = showMapConfig[ele.getAttribute("queryKey")];
+					var obj = config.dataMap;
+					if(getType(obj) == '[object Function]'){
+						obj = obj();
+					}
+					return getMsgFromMap(config.title, obj);
+				});
+			} 
+		}
 	});
 
 function ${edit_jsp}(){
@@ -215,29 +264,26 @@ function ${edit_jsp}(){
 		
 		applyReqMapToForm : function(reqMap){ 
 			for(var id in reqMap){
-                                var value = reqMap[id];
-                                var element = $(id);
-                                var spanElement = $(id + "_span");
-                                if(!element){
-                                        element = $(id);
-                                        if(element){
-                                                element = element[0];
-                                        }
-                                }
-                                if(element){
-                                        if(element.tagName == "span") {
-                                                element.update(value);
-                                        }else{
-                                                element.setValue(value);
-                                        }
-                                }
-                                if(spanElement){
-                                        spanElement.update(value);
-                                }
-                        }
-                
-                        //重整
-                        InputUtility.lengthLimit.doLengthLimit('MEMO');
+                var value = reqMap[id];
+                var element = $(id);
+                var spanElement = $(id + "_span");
+                if(!element){
+                    element = $$("[name="+id+"]");
+                    if(element){
+                    	element = element[0];
+                    }
+                }
+                if(element){
+                    if(element.tagName == "SPAN") {
+                    	element.update(value);
+                    }else{
+                    	element.setValue(value);
+                    }
+                }
+                if(spanElement){
+                	spanElement.update(value);
+                }
+        	}
 		},
 		
 		getValue : function(id) {
