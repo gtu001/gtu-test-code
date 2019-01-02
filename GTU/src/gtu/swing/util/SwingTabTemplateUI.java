@@ -76,7 +76,7 @@ public class SwingTabTemplateUI {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(tabbedPane);//
                         final int idx = tabbedPane.getSelectedIndex();
-                        
+
                         popupUtil.addJMenuItem("新增分頁", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -98,20 +98,30 @@ public class SwingTabTemplateUI {
                                     }
                                 }
                             });//
-                            popupUtil.addJMenuItem("修改分頁名子", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
-                                    if (StringUtils.isBlank(newName)) {
-                                        return;
-                                    }
-                                    tabbedPane.setTitleAt(idx, newName);
-                                }
-                            });//
+                            /*
+                             * popupUtil.addJMenuItem("修改分頁名子", new
+                             * ActionListener() {
+                             * 
+                             * @Override public void actionPerformed(ActionEvent
+                             * e) { String newName =
+                             * JCommonUtil._jOptionPane_showInputDialog(
+                             * "修改分頁名子", tabbedPane.getTitleAt(idx)); if
+                             * (StringUtils.isBlank(newName)) { return; }
+                             * tabbedPane.setTitleAt(idx, newName); } });//
+                             */
                         }
-                        
+
                         popupUtil.applyEvent(e);
                         popupUtil.show();
+                    }
+
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        final int idx = tabbedPane.getSelectedIndex();
+                        String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
+                        if (StringUtils.isBlank(newName)) {
+                            return;
+                        }
+                        tabbedPane.setTitleAt(idx, newName);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
