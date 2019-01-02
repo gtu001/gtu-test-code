@@ -1,8 +1,8 @@
 package gtu.json;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ import net.sf.json.JSONObject;
 public class JSONObject2CollectionUtil2 {
 
     public static Map<String, Object> jsonToMap(JSONObject json) throws JSONException {
-        Map<String, Object> retMap = new HashMap<String, Object>();
+        Map<String, Object> retMap = new LinkedHashMap<String, Object>();
 
         if (!net.sf.json.util.JSONUtils.isNull(json)) {
             retMap = toMap(json);
@@ -22,7 +22,7 @@ public class JSONObject2CollectionUtil2 {
     }
 
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         Iterator<String> keysItr = object.keys();
         while (keysItr.hasNext()) {

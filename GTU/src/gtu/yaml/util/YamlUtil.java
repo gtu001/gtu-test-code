@@ -68,7 +68,8 @@ public class YamlUtil {
             options.setSplitLines(true);
             // options.setCanonical(true);
         }
-        Yaml yaml = new Yaml(constructor, representer, options);
+//        Yaml yaml = new Yaml(constructor, representer, options);
+        Yaml yaml = new Yaml(options);
         Writer writer = null;
         try {
             writer = new FileWriter(file, append);
