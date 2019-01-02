@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.io.Writer;
 
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 public class YamlUtil {
 
@@ -47,6 +49,8 @@ public class YamlUtil {
     }
 
     public static void saveToFile(File file, Object dumpObject, boolean append) {
+        Constructor constructor = new Constructor();
+        Representer representer = new Representer();
         DumperOptions options = new DumperOptions();
         {
             // options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
@@ -64,7 +68,7 @@ public class YamlUtil {
             options.setSplitLines(true);
             // options.setCanonical(true);
         }
-        Yaml yaml = new Yaml(options);
+        Yaml yaml = new Yaml(constructor, representer, options);
         Writer writer = null;
         try {
             writer = new FileWriter(file, append);
