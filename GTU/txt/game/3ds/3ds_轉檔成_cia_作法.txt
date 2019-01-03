@@ -1,0 +1,4 @@
+把3ds檔放在files9資料夾下的d9game資料夾裡，按住start鍵開機，進dercypt9
+然後content dercyptor
+再cia bulid
+再bulid cia from ncch
