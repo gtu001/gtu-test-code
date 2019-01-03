@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="" />
+<script type="text/javascript" src=""></script>
+
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function(){
+	});
+	
+	function FormGetter(){
+		var radioElementValue = function(name, value){
+        	var arry = $(name);
+			for(var ii = 0; ii < arry.length; ii ++){
+				if(!value){
+					if(arry[ii].checked){
+						return arry[ii].value;
+					}
+				}else if(arry[ii].value == value){
+					arry[ii].checked = true;
+				}
+			}
+			return "";
+        };
+        
+        this.setValue = function(id, value){
+        	if($(id)){
+        		try{
+					if($(id).getAttribute("type") == "radio"){
+						radioElementValue(id, value);
+					} else{
+						$(id).setValue(value);				
+					}
+        		}catch(e){
+        			console.log("Error -> id : " + id + ", tag : " + $(id).tagName + ", type : " + $(id).getAttribute("type"));
+        		}
+			}
+			if($(id + "_span")){
+				return $(id + "_span").innerText = value;
+			}
+        };
+        
+		this.getValue = function(id) {
+			if($(id)){
+				if($(id).getAttribute("type") == "radio"){
+					return radioElementValue(id);
+				}  else if($(id).getAttribute("type") == "checkbox") {
+					return  $(id).checked ? $F(id) : "";
+				} else {
+					return $F(id);
+				}
+			}
+			if($(id + "_span")){
+				return $(id + "_span").innerText;
+			}
+			return "";
+		};
+	};
+	
+	function setFormData(backForm){
+		var formGetter = new FormGetter();
+		for(var k in backForm){
+			if(typeof(backForm[k]) == 'string'){
+				formGetter.setValue(k, backForm[k]);
+			} else{
+				actions.setBackForm(backForm[k]);
+			}
+		}
+	};
+	
+	function init(){
+		var formObj = {
+			test_hidden1 : "12345B",
+			test_input : "test1",
+			test_chk : "2",
+			test_chk : "3",
+			test_radio : "3",
+			test_select : "2",
+			test_area : "tttteeexxxxttaarreeaa",
+			testText : "SPAN_TEST",
+		};
+		setFormData(formObj);
+	}
+</script>
+	
+</head>
+<body onload="javascript:init();">
+
+	<input type="hidden" name="test_hidden1" value="12345A" />
+	<input type="hidden" name="test_hidden2" value="12345B" />
+	<input type="hidden" name="test_hidden3" value="12345C" />
+	<span class="showHidden">顯示隱藏欄位資料</span>
+	<br/>
+	<br/>
+
+	<input type="text" name="test_input" value="test_input_value" />
+	<br/>
+
+	<input type="checkbox" id="chk1" name="test_chk" value="1" />
+	<br/>
+	<input type="checkbox" id="chk2" name="test_chk" value="2" />
+	<br/>
+	<input type="checkbox" id="chk3" name="test_chk" value="3" />
+	<br/>
+
+	<input type="radio" id="radio_1" name="test_radio" value="1" />
+	<br/>
+	<input type="radio" id="radio_2" name="test_radio" value="2" />
+	<br/>
+	<input type="radio" id="radio_3" name="test_radio" value="3" />
+	<br/>
+
+	<select name="test_select"  value="1">
+		<option value="1">a</option>
+		<option value="2">b</option>
+		<option value="3">c</option>
+	</select>
+	<br/>
+
+	<textarea name="test_area"></textarea>
+	<br/>
+	
+	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span><br/>
+</body>
+</html>
+
+	

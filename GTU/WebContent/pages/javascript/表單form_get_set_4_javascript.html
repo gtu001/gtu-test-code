@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="" />
+<script type="text/javascript" src=""></script>
+
+<script type="text/javascript">
+	document.addEventListener("DOMContentLoaded", function(){
+	});
+	
+	function FormGetter(){
+		function El(id){
+       		var name = null;
+       		if(document.getElementById(id)){
+       			 this.e1 = document.getElementById(id);
+       			 this.tag = this.e1.tagName
+       			 this.type = this.e1.getAttribute("type");
+       			 name = document.getElementById(id).getAttribute("name");
+       		}
+       		if(!name){
+       			name = id;
+       		}
+       		if(name){
+   				var arry = document.getElementsByName(name);
+   				if(arry.length == 1){
+   					this.e2 = arry[0];
+   					this.name = name;
+   					this.type = this.e2.getAttribute("type");
+   					this.tag = this.e2.tagName
+   				}else if(arry.length > 1){
+   					this.name = name;
+   					this.arry = arry;
+   				}
+   			}
+		};
+		
+       	var getEl = function(id) {
+       		var e = new El(id);
+       		return e.e2 || e.e1 || e.arry;
+       	};
+       	
+		var radioElementValue = function(name, value){
+        	var arry = getEl(name);
+			for(var ii = 0; ii < arry.length; ii ++){
+				if(!value){
+					if(arry[ii].checked){
+						return arry[ii].value;
+					}
+				}else if(arry[ii].value == value){
+					arry[ii].checked = true;
+				}
+			}
+			return "";
+        };
+        
+        this.setValue = function(id, value){
+        	if(id == 'chk2'){
+        		debugger
+        	}
+        	
+        	var el = getEl(id);
+        	if(el){
+        		try{
+					if(el.length){
+						radioElementValue(id, value);
+					}
+					el.value = value;	
+        		}catch(e){
+        			console.log("Error -> id : " + id + ", tag : " + el.tagName);
+        		}
+			}
+			var spanEl = getEl(id + "_span");
+			if(spanEl){
+				spanEl.innerText = value;
+			}
+        };
+        
+		this.getValue = function(id) {
+			var el = getEl(id, true);
+			if(el){
+				if(el.length){
+					return radioElementValue(id);
+				}
+				if(el.value){
+					return el.value;
+				}
+			}
+			var spanEl = getEl(id + "_span");
+			if(spanEl){
+				return spanEl.innerText;
+			}
+			return "";
+		};
+	};
+	
+	var formGetter = new FormGetter();
+	
+	function setFormData(backForm){
+		for(var k in backForm){
+			if(typeof(backForm[k]) == 'string'){
+				formGetter.setValue(k, backForm[k]);
+			} else{
+				actions.setBackForm(backForm[k]);
+			}
+		}
+	};
+	
+	function init(){
+		var formObj = {
+			test_hidden1 : "12345B",
+			test_input : "test1",
+			chk2 : "2",
+			chk3 : "3",
+			test_radio : "3",
+			test_select : "2",
+			test_area : "tttteeexxxxttaarreeaa",
+			testText : "SPAN_TEST",
+		};
+		setFormData(formObj);
+		
+		var formGetterObj = {
+			test_hidden1 : formGetter.getValue("test_hidden1"),
+			test_input : formGetter.getValue("test_input"),
+			chk1 : formGetter.getValue("chk1"),
+			chk2 : formGetter.getValue("chk2"),
+			chk3 : formGetter.getValue("chk3"),
+			test_radio : formGetter.getValue("test_radio"),
+			test_select : formGetter.getValue("test_select"),
+			test_area : formGetter.getValue("test_area"),
+			testText : formGetter.getValue("testText"),
+		};
+		
+		alert(JSON.stringify(formGetterObj));
+	}
+</script>
+	
+</head>
+<body onload="javascript:init();">
+
+	<input type="hidden" name="test_hidden1" value="12345A" />
+	<input type="hidden" name="test_hidden2" value="12345B" />
+	<input type="hidden" name="test_hidden3" value="12345C" />
+	<span class="showHidden"></span>
+	<br/>
+	<br/>
+
+	<input type="text" name="test_input" value="test_input_value" />
+	<br/>
+
+	<input type="checkbox" id="chk1" name="test_chk" value="1" />
+	<br/>
+	<input type="checkbox" id="chk2" name="test_chk" value="2" />
+	<br/>
+	<input type="checkbox" id="chk3" name="test_chk" value="3" />
+	<br/>
+
+	<input type="radio" id="radio_1" name="test_radio" value="1" />
+	<br/>
+	<input type="radio" id="radio_2" name="test_radio" value="2" />
+	<br/>
+	<input type="radio" id="radio_3" name="test_radio" value="3" />
+	<br/>
+
+	<select name="test_select"  value="1">
+		<option value="1">a</option>
+		<option value="2">b</option>
+		<option value="3">c</option>
+	</select>
+	<br/>
+
+	<textarea name="test_area"></textarea>
+	<br/>
+	
+	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span><br/>
+</body>
+</html>
+
+	
