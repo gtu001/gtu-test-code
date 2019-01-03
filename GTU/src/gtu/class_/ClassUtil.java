@@ -1,9 +1,12 @@
 package gtu.class_;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class ClassUtil {
 
     public static void main(String[] args) {
-        System.out.println(ClassUtil.isAssignFrom(Character.class, char.class));
+        System.out.println(ClassUtil.isAssignFrom(Collection.class, ArrayList.class));
         System.out.println("done...");
     }
 

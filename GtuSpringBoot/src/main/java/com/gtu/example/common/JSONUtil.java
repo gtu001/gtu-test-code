@@ -5,8 +5,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gtu.example.controller.JqBootgridTestController;
-
 import net.sf.json.JSONObject;
 
 public class JSONUtil {
