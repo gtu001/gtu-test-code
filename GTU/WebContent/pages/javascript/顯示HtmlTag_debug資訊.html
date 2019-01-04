@@ -50,6 +50,8 @@
             	msgAry.push("selectValue = " + getMsgForSelect(ele));
             }else if(ele.value){
             	msgAry.push("value = " + ele.value);
+            }else if(ele.getAttribute("value")){
+            	msgAry.push("value = " + ele.getAttribute("value"));
             }else {
             	msgAry.push("text = " + ele.innerText);
             }
@@ -119,7 +121,7 @@
 		
 		var showMapConfig = {
 								".showAttr" : { title : "顯示Init資料", 
-												dataMap : {} //<c:out value='${mapX120JSON}' default='{}' escapeXml='false'/> 
+												dataMap : {} // <c:out value='${mapX120JSON}' default='{}' escapeXml='false'/> 
 												},
 								".showHidden" : { title : "顯示Hidden欄位", 
 												dataMap : function(){
