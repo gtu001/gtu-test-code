@@ -131,8 +131,8 @@ public class FloatViewService extends Service {
     ImageView imageViewNoteAction;//記事本內容
     ImageView imageViewConfig2;// 設定
     LinearLayout searchLayout2;//記事本模式
-    Button redPlusBtn;//儲存記事本
-    Button redPlusListBtn;//儲存記事本
+    Button redPlusBtn;//加入記事本
+    Button redPlusListBtn;//開啟記事本
     Button saveNoteBtn;//儲存記事本
     ImageView imageViewEraser2;//清除記事本
     // ----------------------------------------------------------------
@@ -485,7 +485,7 @@ public class FloatViewService extends Service {
                         }
                         final StringBuffer saveSb = new StringBuffer();
                         for (int ii = 0; ii < arry.length; ii++) {
-                            saveSb.append((ii + 1) + " . " + arry[ii] + "\n");
+                            saveSb.append((ii + 1) + " . " + arry[ii] + "\r\n");
                         }
 
                         final Context context = FloatViewService.this.getApplicationContext();
