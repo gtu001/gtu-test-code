@@ -1,0 +1,4 @@
+D:\workstuff\android-sdk_r24.3.4-windows\android-sdk-windows\platform-tools>
+
+Settings -> Appearance & Behavior -> System Settings -> Android SDK
+  

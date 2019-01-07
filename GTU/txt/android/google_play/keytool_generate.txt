@@ -1,0 +1,18 @@
+﻿檔案不存在用 : -genkeypair or -genkey
+keytool -genkeypair -v -alias AndroidDebugKey -keystore %USERPROFILE%\.android\androidDebugKey.keystore
+檔案存在用 : -exportcert -list
+keytool -exportcert -list -v -alias AndroidDebugKey -keystore %USERPROFILE%\.android\androidDebugKey.keystore
+
+keytool -genkey      -keyalg RSA -alias AndroidDebugKey -keystore %USERPROFILE%\.android\androidDebugKey.keystore -storepass changeit -validity 10000 -keysize 2048
+
+
+
+目前用這組
+keytool -genkeypair -v -alias AndroidDebugKey -keystore %USERPROFILE%\.android\androidDebugKey.keystore -validity 10000 -keysize 2048
+
+
+keytool導入證書時出現如下錯誤：
+keytool錯誤:java.io.IOException:keystore was tampered with,or password was incorrect
+原因是在你的home目錄下是否還有.keystore存在。如果存在那麼把他刪除掉，後再執行
+或者刪除"%JAVA_HOME%/JRE/LIB/SECURITY/CACERTS 再執行
+強烈建議直接刪掉cacerts再導就是了 = =

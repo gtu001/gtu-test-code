@@ -1,0 +1,92 @@
+Android Debug Bridge(ADB) 是一個很好用的工具，
+它可以讓你直接對Android作存取的動作，
+例如刪除Android內部的檔案，將某個檔案放到Android之下，
+也可以得到一些目前系統的資訊，或者將Android內部的檔案抓出來...等等。
+有人會說，Eclipse也可以做到這些功能，
+我猜，Eclipse應該也是利用adb作存取吧？
+不過Eclipse可以做的命令似乎只有幾個而已。
+
+
+根據官方網站
+http://developer.android.com/guide/developing/tools/adb.html
+可以看出，adb有超多功能的。
+
+我們針對幾個比較常用的來說明好了：
+
+ADB放在Android SDK platform-tools之下, 在2.1版之前是放在tools之下，
+如果在cmd之下要隨時調用adb，則必須設定環境變數，
+在Window下設定環境變數
+在Linux下設定環境變數
+
+adb shell
+可以讓你進入android的系統裡面
+在console上面看到
+# 代表已經取得root 權限
+如果看到
+$ 代表只有shell權限
+
+如果你拿到一個apk，可能不是從market抓下來的，
+而是從電腦上抓下來的，
+那麼就可以利用adb install指令，將它安裝到手機上，
+可以這樣下指令：
+adb install 路徑/xxx.apk
+
+
+預設會安裝在/system/app/ 底下
+
+
+輸入 
+# adb shell 
+# cd /system/app
+# ls
+就會進入shell 然後到/system/app資料夾下面，把該資料夾下的內容顯示出來。
+
+
+
+
+如果你想要把某個檔案，如圖片，影片或者音樂放進去手機，
+你可以使用adb push指令。
+指令如下
+adb push xxx.avi /sdcard/movies
+adb push xxx.mp3 /sdcard/music
+adb push xxx.jpg /sdcard/image
+
+
+如果sdcard下面沒有指定的資料夾，則會跳出錯誤訊息，
+因此我們可以進入adb shell建立一個
+指令如下
+adb shell
+#cd /sdcard
+#mkdir image
+#exit
+adb push xxx.jpg /sdcard/image
+就可以成功了。
+
+
+
+
+如果你想把某個已經存在apk取出來給朋友，
+那麼你就可以利用adb pull指令，把它抓出來。
+指令如下：
+adb pull /system/app/xxx.apk  你要存放的路徑
+
+
+例如
+window 下面指令下
+adb pull /system/app/xxx.apk c:\
+
+
+linux下面指令下
+adb pull /system/app/xxx.apk ~/
+
+
+這樣就會放在你指定的路徑之下。
+
+
+想要查看目前電腦跟裝置有幾個連線，
+可以使用adb devices這個指令。
+
+
+想要查看目前Android的訊息，
+可以下adb logcat這個指令。
+

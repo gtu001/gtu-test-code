@@ -1,5 +1,0 @@
-Logcat console > Edit Filter Configuration > Log Tag(regex) 
-
-輸入tag 的 regex
-
-^(?!(EXCLUDE_TAG1|EXCLUDE_TAG2))
