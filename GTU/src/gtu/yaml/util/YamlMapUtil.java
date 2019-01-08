@@ -34,7 +34,7 @@ public class YamlMapUtil {
             YamlMapUtil.getInstance().saveToFile(yamlFile1, lst, false);
             YamlMapUtil.getInstance().saveToFile(yamlFile2, new YamlMapUtil_Test_Bean(), false);
         }
-        if(true){
+        if (true) {
             List<YamlMapUtil_Test_Bean> vvvv1 = YamlMapUtil.getInstance().loadFromFile(yamlFile1, YamlMapUtil_Test_Bean.class);
             System.out.println(vvvv1);
             YamlMapUtil_Test_Bean vvvv2 = YamlMapUtil.getInstance().loadFromFile(yamlFile2, YamlMapUtil_Test_Bean.class);
@@ -69,6 +69,9 @@ public class YamlMapUtil {
     public <T> T loadFromFile(File file, Class<?> clz) {
         try {
             Object yamlObj = YamlUtil.loadFromFile(file);
+            if (yamlObj == null) {
+                return null;
+            }
             if (Collection.class.isAssignableFrom(yamlObj.getClass())) {
                 JSONArray arry = JSONArray.fromObject(yamlObj);
                 return (T) JSONArray.toList(arry, clz);

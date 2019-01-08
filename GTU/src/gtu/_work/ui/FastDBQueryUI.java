@@ -103,6 +103,8 @@ import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
+import gtu.yaml.util.YamlMapUtil;
+import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
 
@@ -237,7 +239,7 @@ public class FastDBQueryUI extends JFrame {
     private AutoComboBox sqlIdCategoryComboBox_Auto;
     private JComboBox sqlIdColorComboBox;
     private JLabel lblNewLabel_10;
-    private JButton btnNewButton;
+    private JButton exportYamlConfigBtn;
     private JButton sqlIdFixNameBtn;
     private SqlIdConfigBean sqlBean;// 當前選則
     private JTextField maxRowsText;
@@ -246,6 +248,7 @@ public class FastDBQueryUI extends JFrame {
     private JRadioButton updateSqlRadio;
     private JRadioButton querySqlRadio;
     private JButton executeSqlButton2;
+    private JButton refConfigPathYamlExportBtn;
 
     /**
      * Launch the application.
@@ -997,31 +1000,20 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
-        btnNewButton = new JButton("New button");
-        btnNewButton.addActionListener(new ActionListener() {
+        exportYamlConfigBtn = new JButton("匯出yaml設定");
+        exportYamlConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    File file = JCommonUtil._jFileChooser_selectFileOnly();
-                    Properties sqlIdProp = PropertiesUtil.loadProperties(file, null, true);
-                    Properties saveConfigProp = new Properties();
-                    for (Enumeration enu = sqlIdProp.keys(); enu.hasMoreElements();) {
-                        String sqlId = (String) enu.nextElement();
-                        String sql = sqlIdProp.getProperty(sqlId);
-                        SqlIdConfigBean bean = new SqlIdConfigBean();
-                        bean.sqlId = sqlId;
-                        bean.sql = sql;
-                        bean.color = RefSearchColor.黑.colorCode;
-                        bean.category = "";
-                        saveConfigProp.setProperty(bean.getKey(), bean.getValue());
-                    }
-                    PropertiesUtil.storeProperties(saveConfigProp, new File(file.getParentFile(), "new_sqlList.properties"), "");
+                    File sqlIdFile = new File(FileUtil.DESKTOP_PATH, FastDBQueryUI.class.getSimpleName() + "_sqlList.yaml");
+                    sqlIdConfigBeanHandler.init("");
+                    YamlMapUtil.getInstance().saveToFile(sqlIdFile, sqlIdConfigBeanHandler.lst, false);
                     JCommonUtil._jOptionPane_showMessageDialog_info("done...");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
-        panel_23.add(btnNewButton);
+        panel_23.add(exportYamlConfigBtn);
         panel_23.add(saveEtcConfigBtn);
 
         {
@@ -1061,6 +1053,34 @@ public class FastDBQueryUI extends JFrame {
             etcConfigHandler.reflectInit();
 
             refSearchListConfigHandler = new RefSearchListConfigHandler(refConfigPathText, refSearchList, refSearchCategoryCombobox);
+
+            refConfigPathYamlExportBtn = new JButton("產生yaml");
+            refConfigPathYamlExportBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        File yamlFile = JCommonUtil._jFileChooser_selectFileOnly();
+                        if (yamlFile == null) {
+                            return;
+                        }
+
+                        List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
+                        Properties prop = PropertiesUtil.loadProperties(yamlFile, null, true);
+                        for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                            String key = (String) enu.nextElement();
+                            String value = prop.getProperty(key);
+                            RefSearchListConfigBean bean = PropertiesMultiUtil.of(key, value, RefSearchListConfigBean.class);
+                            lst.add(bean);
+                        }
+
+                        File destYamlFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_Ref.yaml");
+                        YamlMapUtil.getInstance().saveToFile(destYamlFile, lst, false);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("ok!");
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
+                }
+            });
+            panel_22.add(refConfigPathYamlExportBtn);
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -2473,7 +2493,7 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private static class SqlIdConfigBean {
+    public static class SqlIdConfigBean {
         private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId" };
         private static String[] VALUES_DEF = new String[] { "sql" };
 
@@ -2482,7 +2502,19 @@ public class FastDBQueryUI extends JFrame {
         String sqlId;
         String sql;
 
-        public String getUniqueKey() {
+        public String getCategory() {
+            return category;
+        }
+
+        public String getSqlId() {
+            return sqlId;
+        }
+
+        public String getSql() {
+            return sql;
+        }
+
+        private String getUniqueKey() {
             String prefix = "";
             if (StringUtils.isNotBlank(category)) {
                 prefix = StringUtils.trimToEmpty(category) + "_";
@@ -2494,15 +2526,15 @@ public class FastDBQueryUI extends JFrame {
             return PropertiesMultiUtil.of(key, value, SqlIdConfigBean.class);
         }
 
-        public String getKey() {
+        private String getKey() {
             return PropertiesMultiUtil.getKey(this);
         }
 
-        public String getValue() {
+        private String getValue() {
             return PropertiesMultiUtil.getValue(this);
         }
 
-        public void validate() {
+        private void validate() {
             if (StringUtils.isBlank(sqlId) || StringUtils.isBlank(sql)) {
                 Validate.isTrue(false, "sqlId, sql 不可為空!");
             }
@@ -2564,11 +2596,46 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private static class RefSearchListConfigBean {
+    public static class RefSearchListConfigBean {
+        private static String[] KEYS_DEF = new String[] { "category", "searchKey" };
+        private static String[] VALUES_DEF = new String[] { "content", "categoryColor" };
+
         String category;
         String searchKey;
         String content;
         String categoryColor;
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public void setSearchKey(String searchKey) {
+            this.searchKey = searchKey;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public void setCategoryColor(String categoryColor) {
+            this.categoryColor = categoryColor;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public String getSearchKey() {
+            return searchKey;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public String getCategoryColor() {
+            return categoryColor;
+        }
 
         private static String getArry(int idx, String[] arry, String defaultVal) {
             if (idx <= arry.length - 1) {
@@ -2588,6 +2655,11 @@ public class FastDBQueryUI extends JFrame {
             return bean;
         }
 
+        public static String getContent(String value) {
+            String[] values = StringUtils.trimToEmpty(value).split(Pattern.quote("#^#"));
+            return getArry(0, values, "");
+        }
+
         public static String getKey(String category, String searchKey) {
             return StringUtils.trimToEmpty(category) + "#^#" + StringUtils.trimToEmpty(searchKey);
         }
@@ -2596,9 +2668,35 @@ public class FastDBQueryUI extends JFrame {
             return StringUtils.trimToEmpty(content) + "#^#" + StringUtils.trimToEmpty(categoryColor);
         }
 
-        public static String getContent(String value) {
-            String[] values = StringUtils.trimToEmpty(value).split(Pattern.quote("#^#"));
-            return getArry(0, values, "");
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((category == null) ? 0 : category.hashCode());
+            result = prime * result + ((searchKey == null) ? 0 : searchKey.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            RefSearchListConfigBean other = (RefSearchListConfigBean) obj;
+            if (category == null) {
+                if (other.category != null)
+                    return false;
+            } else if (!category.equals(other.category))
+                return false;
+            if (searchKey == null) {
+                if (other.searchKey != null)
+                    return false;
+            } else if (!searchKey.equals(other.searchKey))
+                return false;
+            return true;
         }
 
         public boolean isMatch(String category, String text) {
@@ -2675,18 +2773,18 @@ public class FastDBQueryUI extends JFrame {
 
     private class RefSearchListConfigHandler {
 
-        private PropertiesUtilBean config;
+        private YamlUtilBean<RefSearchListConfigBean> config;
         private JList jList;
         private JComboBox refSearchCategoryCombobox;
         private JTextField refConfigPathText;
 
         private RefSearchListConfigHandler(JTextField refConfigPathText, JList jList, JComboBox refSearchCategoryCombobox) {
-            String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.properties";
+            String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.yaml";
             File configFile = new File(refConfigPathText.getText());
             if (configFile == null || !configFile.exists()) {
-                config = new PropertiesUtilBean(new File(JAR_PATH_FILE, fileName));
+                config = new YamlUtilBean<RefSearchListConfigBean>(new File(JAR_PATH_FILE, fileName), RefSearchListConfigBean.class);
             } else {
-                config = new PropertiesUtilBean(configFile);
+                config = new YamlUtilBean<RefSearchListConfigBean>(configFile, RefSearchListConfigBean.class);
             }
             refConfigPathText.setText(config.getPropFile().getAbsolutePath());
 
@@ -2705,14 +2803,13 @@ public class FastDBQueryUI extends JFrame {
             List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
             Set<String> categoryLst = new TreeSet<String>();
 
-            for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
-                String key = (String) enu.nextElement();
-                String value = config.getConfigProp().getProperty(key);
-                RefSearchListConfigBean bean = RefSearchListConfigBean.of(key, value);
+            for (RefSearchListConfigBean bean : config.getConfigProp()) {
                 if (bean.isMatch(category, text)) {
                     lst.add(bean);
                 }
-                categoryLst.add(bean.category);
+                if (StringUtils.isNotBlank(bean.category)) {
+                    categoryLst.add(bean.category);
+                }
             }
             ListUtil.sortIgnoreCase(lst);
             DefaultListModel model = JListUtil.createModel();
@@ -2731,10 +2828,14 @@ public class FastDBQueryUI extends JFrame {
                 return;
             }
 
-            String key = RefSearchListConfigBean.getKey(category, searchKey);
-            String value = RefSearchListConfigBean.getValue(content, categoryColor);
-            if (config.getConfigProp().containsKey(key)) {
-                String compareContent = RefSearchListConfigBean.getContent(config.getConfigProp().getProperty(key));
+            RefSearchListConfigBean bean = new RefSearchListConfigBean();
+            bean.category = category;
+            bean.searchKey = searchKey;
+            bean.content = content;
+            bean.categoryColor = categoryColor;
+
+            if (config.contains(bean)) {
+                String compareContent = bean.content;
                 if (!StringUtils.equals(compareContent, content)) {
                     boolean confirmOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已存在 : " + category + " " + searchKey + ", 是否要蓋掉?", "覆蓋確認");
                     if (!confirmOk) {
@@ -2743,15 +2844,17 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            config.getConfigProp().setProperty(key, value);
+            config.setProperty(bean);
             config.store();
             find(category, "");
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         }
 
         private void delete(String category, String searchKey) {
-            String key = RefSearchListConfigBean.getKey(category, searchKey);
-            if (config.getConfigProp().containsKey(key)) {
+            RefSearchListConfigBean bean = new RefSearchListConfigBean();
+            bean.category = category;
+            bean.searchKey = searchKey;
+            if (config.contains(bean)) {
                 boolean confirmOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除 : " + category + " " + searchKey + "?", "確認刪除");
                 if (!confirmOk) {
                     return;
@@ -2760,31 +2863,28 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + category + " " + searchKey + "!");
                 return;
             }
-            config.getConfigProp().remove(key);
+            config.remove(bean);
             config.store();
             find("", "");
         }
 
         private RefSearchListConfigBean get(String category, String searchKey) {
-            String key = RefSearchListConfigBean.getKey(category, searchKey);
-            if (!config.getConfigProp().containsKey(key)) {
+            RefSearchListConfigBean bean = new RefSearchListConfigBean();
+            bean.category = category;
+            bean.searchKey = searchKey;
+            if (!config.contains(bean)) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + category + " " + searchKey);
                 return null;
             }
-            String value = config.getConfigProp().getProperty(key);
-            return RefSearchListConfigBean.of(key, value);
+            return config.getProperty(bean);
         }
 
         private String findExceptionMessage(String category, String message) {
             if (StringUtils.isBlank(message)) {
                 return "";
             }
-            Map<Double, List<String>> compareMap = new TreeMap<Double, List<String>>();
-            for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
-                String key = (String) enu.nextElement();
-                String value = config.getConfigProp().getProperty(key);
-                RefSearchListConfigBean bean = RefSearchListConfigBean.of(key, value);
-
+            Map<Double, List<RefSearchListConfigBean>> compareMap = new TreeMap<Double, List<RefSearchListConfigBean>>();
+            for (RefSearchListConfigBean bean : config.getConfigProp()) {
                 if (StringUtils.isNotBlank(category) && !StringUtils.equalsIgnoreCase(bean.category, category)) {
                     continue;
                 }
@@ -2792,11 +2892,12 @@ public class FastDBQueryUI extends JFrame {
                 Double score = SimilarityUtil.sim(message.toLowerCase(), bean.searchKey.toLowerCase());
                 System.out.println("加入排行 --> 分數 : " + score + "\t" + bean.toStringInfo());
 
-                List<String> keyLst = new ArrayList<String>();
+                List<RefSearchListConfigBean> keyLst = new ArrayList<RefSearchListConfigBean>();
                 if (compareMap.containsKey(score)) {
                     keyLst = compareMap.get(score);
                 }
-                keyLst.add(key);
+                keyLst.add(bean);
+
                 compareMap.put(score, keyLst);
             }
             if (compareMap.isEmpty()) {
@@ -2807,20 +2908,21 @@ public class FastDBQueryUI extends JFrame {
                 k = Math.max(k, k1);
             }
             if (k != null || k != 0) {
-                List<String> keyLst = compareMap.get(k);
+                List<RefSearchListConfigBean> keyLst = compareMap.get(k);
                 if (keyLst == null || keyLst.isEmpty()) {
                     return "";
                 }
-                Collections.sort(keyLst, new Comparator<String>() {
+                Collections.sort(keyLst, new Comparator<RefSearchListConfigBean>() {
                     @Override
-                    public int compare(String o1, String o2) {
-                        return new Integer(StringUtils.trimToEmpty(o1).length()).compareTo(StringUtils.trimToEmpty(o2).length());
+                    public int compare(RefSearchListConfigBean o1, RefSearchListConfigBean o2) {
+                        String o1Val = RefSearchListConfigBean.getKey(o1.category, o1.searchKey);
+                        String o2Val = RefSearchListConfigBean.getKey(o2.category, o2.searchKey);
+                        return new Integer(StringUtils.trimToEmpty(o1Val).length()).compareTo(StringUtils.trimToEmpty(o2Val).length());
                     }
                 });
-                String refKey = keyLst.get(0);
-                if (config.getConfigProp().containsKey(refKey)) {
-                    String value = config.getConfigProp().getProperty(refKey);
-                    RefSearchListConfigBean bean = RefSearchListConfigBean.of(refKey, value);
+                RefSearchListConfigBean refKey = keyLst.get(0);
+                if (config.contains(refKey)) {
+                    RefSearchListConfigBean bean = config.getProperty(refKey);
                     BigDecimal dd = new BigDecimal(k);
                     dd = dd.setScale(3, BigDecimal.ROUND_HALF_UP);
                     System.out.println("最高分 --> 分數 : " + dd + "\t" + bean.toStringInfo());
