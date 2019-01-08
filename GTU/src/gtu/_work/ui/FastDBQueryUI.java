@@ -104,6 +104,7 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import net.sf.json.JSONArray;
+import net.sf.json.util.JSONUtils;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -401,6 +402,8 @@ public class FastDBQueryUI extends JFrame {
                 if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
                 e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
+                } else if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    executeSqlButtonClick();
                 }
             }
         });
@@ -1539,7 +1542,7 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }
             }
-            queryResultJsonTextArea.setText(JSONArray.fromObject(cloneLst).toString());
+            queryResultJsonTextArea.setText(JSONUtils.valueToString(JSONArray.fromObject(cloneLst), 8, 4));
         } catch (Exception ex) {
             queryResultJsonTextArea.setText("");
             JCommonUtil.handleException(ex);

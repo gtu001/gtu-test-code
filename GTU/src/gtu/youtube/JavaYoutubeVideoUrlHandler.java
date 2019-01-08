@@ -98,10 +98,10 @@ public class JavaYoutubeVideoUrlHandler {
         // https://www.youtube.com/watch?v=2FgvaJJayyA
         // https://youtu.be/2FgvaJJayyA
         Pattern[] arry = new Pattern[] { //
-                Pattern.compile("www\\.youtube\\.com\\/watch\\?v\\=(\\w*?)\\&"), //
-                Pattern.compile("www\\.youtube\\.com\\/watch\\?v\\=(\\w*)"), //
-                Pattern.compile("youtu\\.be\\/(\\w*?)\\&"), //
-                Pattern.compile("youtu\\.be\\/(\\w*)"), //
+                Pattern.compile("www\\.youtube\\.com\\/watch\\?v\\=([\\w\\-]*?)\\&"), //
+                Pattern.compile("www\\.youtube\\.com\\/watch\\?v\\=([\\w\\-]*)"), //
+                Pattern.compile("youtu\\.be\\/([\\w\\-]*?)\\&"), //
+                Pattern.compile("youtu\\.be\\/([\\w\\-]*)"), //
                 Pattern.compile("^(\\w{11})$"),//
         };
 
