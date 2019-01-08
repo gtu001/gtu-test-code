@@ -407,7 +407,7 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange();
+                sqlTextAreaChange(null);
             }
         }));
 
@@ -431,7 +431,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCategoryComboBox_Auto.getTextComponent().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange();
+                sqlTextAreaChange(null);
             }
         }));
 
@@ -445,7 +445,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange();
+                sqlTextAreaChange(null);
             }
         }));
 
@@ -1311,6 +1311,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText.setText("");
         sqlTextArea.setText("");
         this.sqlBean = null;
+        setSqlListSelection(this.sqlBean);
     }
 
     /**
@@ -1349,12 +1350,21 @@ public class FastDBQueryUI extends JFrame {
             sqlIdListDSMappingHandler.init();
 
             // 儲存變更
-            sqlBean = bean;
-            sqlList.setSelectedValue(sqlBean, true);
-            sqlTextAreaChange();
+            setSqlListSelection(bean);
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    // 儲存變更
+    private void setSqlListSelection(SqlIdConfigBean bean) {
+        sqlBean = bean;
+        sqlList.setSelectedValue(sqlBean, true);
+        Boolean isModify = null;
+        if (sqlBean == null) {
+            isModify = false;
+        }
+        sqlTextAreaChange(isModify);
     }
 
     /**
@@ -3162,7 +3172,7 @@ public class FastDBQueryUI extends JFrame {
         return bean;
     }
 
-    private void sqlTextAreaChange() {
+    private void sqlTextAreaChange(Boolean isModify) {
         try {
             String text = sqlTextArea.getText();
             boolean isNotEqual = false;
@@ -3172,6 +3182,9 @@ public class FastDBQueryUI extends JFrame {
                 } else if (!StringUtils.equals(sqlBean.getKey(), getCurrentEditSqlIdConfigBean().getKey())) {
                     isNotEqual = true;
                 }
+            }
+            if (isModify != null) {
+                isNotEqual = isModify;
             }
             if (isNotEqual) {
                 sqlSaveButton.setText("<html><font color='RED'>＊儲存</font></html>");
