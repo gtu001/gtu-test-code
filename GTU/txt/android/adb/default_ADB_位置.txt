@@ -14,3 +14,7 @@ List of devices attached
 ----------------------------
 可看設備狀態
 Tools -> Android -> Android Device Monitor
+
+或是
+	$ android-sdk/tools/
+	$ mointer

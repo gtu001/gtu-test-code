@@ -404,6 +404,12 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        sqlTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                sqlTextAreaChange();
+            }
+        }));
 
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
@@ -422,6 +428,12 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCategoryComboBox = new JComboBox();
         sqlIdCategoryComboBox_Auto = AutoComboBox.applyAutoComboBox(sqlIdCategoryComboBox);
         sqlIdPanel.add(sqlIdCategoryComboBox);
+        sqlIdCategoryComboBox_Auto.getTextComponent().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                sqlTextAreaChange();
+            }
+        }));
 
         lblNewLabel_8 = new JLabel("SQL ID");
         sqlIdPanel.add(lblNewLabel_8);
@@ -430,6 +442,12 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText.setToolTipText("設定SQL ID");
         panel_2.add(sqlIdPanel, BorderLayout.NORTH);
         sqlIdText.setColumns(40);
+        sqlIdText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                sqlTextAreaChange();
+            }
+        }));
 
         sqlIdFixNameBtn = new JButton("選擇功能");
         sqlIdFixNameBtn.addActionListener(new ActionListener() {
@@ -1023,7 +1041,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             });
             panel_4.add(deleteParameterBtn);
-            
+
             executeSqlButton2 = new JButton("執行Sql");
             executeSqlButton2.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -1329,6 +1347,11 @@ public class FastDBQueryUI extends JFrame {
             // 刷新sqlList
             initLoadSqlListConfig();
             sqlIdListDSMappingHandler.init();
+
+            // 儲存變更
+            sqlBean = bean;
+            sqlList.setSelectedValue(sqlBean, true);
+            sqlTextAreaChange();
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
@@ -3137,5 +3160,26 @@ public class FastDBQueryUI extends JFrame {
         bean.category = category;
         bean.color = color.colorCode;
         return bean;
+    }
+
+    private void sqlTextAreaChange() {
+        try {
+            String text = sqlTextArea.getText();
+            boolean isNotEqual = false;
+            if (sqlBean != null) {
+                if (!StringUtils.equals(StringUtils.trimToEmpty(text), StringUtils.trimToEmpty(sqlBean.sql))) {
+                    isNotEqual = true;
+                } else if (!StringUtils.equals(sqlBean.getKey(), getCurrentEditSqlIdConfigBean().getKey())) {
+                    isNotEqual = true;
+                }
+            }
+            if (isNotEqual) {
+                sqlSaveButton.setText("<html><font color='RED'>＊儲存</font></html>");
+            } else {
+                sqlSaveButton.setText("<html><font color='BLACK'>儲存</font></html>");
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 }
