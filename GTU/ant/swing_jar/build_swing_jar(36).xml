@@ -86,6 +86,8 @@
 			
 			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
+			
+			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
 
 		</jarfinder>
 
