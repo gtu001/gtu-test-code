@@ -1,0 +1,8 @@
+            cast(
+             cast(INTEGER(
+                        decode(length(nvl(LAW.MGR_DATE, '')), 6, '0' || substr(LAW.MGR_DATE, 1, 2), 0, '000', substr(LAW.MGR_DATE, 1, 3))
+                    )  + 1911 as char(4)) || '-' || 
+                decode(length(nvl(LAW.MGR_DATE, '')), 6, substr(LAW.MGR_DATE, 3, 2), 0, '01', substr(LAW.MGR_DATE, 4, 2))   || '-' || 
+                decode(length(nvl(LAW.MGR_DATE, '')), 6, substr(LAW.MGR_DATE, 5, 2), 0, '01', substr(LAW.MGR_DATE, 6, 2))
+             as date) 
+             as MGR_DATE ,
