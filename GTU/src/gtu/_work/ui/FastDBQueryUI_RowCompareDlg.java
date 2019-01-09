@@ -37,6 +37,7 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
 import gtu.collection.MapUtil;
@@ -285,7 +286,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
     private JTextArea queryConditionArea;
     private FastDBQueryUI _parent;
-    private Pair<List<String>, List<Object[]>> queryList;
+    private Triple<List<String>, List<Class<?>>, List<Object[]>> queryList;
     private JTable queryResultTable;
     private JRadioButton importRowToCompareRowRadio;
     private JRadioButton otherRowToImportRowRadio;
@@ -308,7 +309,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    private String getImportValue(String column, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst) {
+    private String getImportValue(String column, int selectRowIndex, Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst) {
         Object[] rowArry = excelImportLst.getRight().get(selectRowIndex);
         for (int ii = 0; ii < excelImportLst.getLeft().size(); ii++) {
             String col = excelImportLst.getLeft().get(ii);
@@ -329,7 +330,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    private void initTab1(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) throws SQLException {
+    private void initTab1(String schemaTable, int selectRowIndex, Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) throws SQLException {
         DefaultTableModel model = initImportRowTable();
 
         this._parent = _parent;

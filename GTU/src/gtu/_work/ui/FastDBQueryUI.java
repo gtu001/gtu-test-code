@@ -1664,7 +1664,8 @@ public class FastDBQueryUI extends JFrame {
             return;
         } else {
             if (!silent) {
-                JCommonUtil._jOptionPane_showMessageDialog_info("size : " + queryList.getRight().size());
+                // JCommonUtil._jOptionPane_showMessageDialog_info("size : " +
+                // queryList.getRight().size());
             }
             queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
         }
