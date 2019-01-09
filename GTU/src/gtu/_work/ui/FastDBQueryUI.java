@@ -556,6 +556,14 @@ public class FastDBQueryUI extends JFrame {
         panel_1.add(scrollPane_1, BorderLayout.CENTER);
 
         parametersTable = new JTable();
+        parametersTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    executeSqlButtonClick();
+                }
+            }
+        });
         scrollPane_1.setViewportView(parametersTable);
 
         JPanel panel_4 = new JPanel();
