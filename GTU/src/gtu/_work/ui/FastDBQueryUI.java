@@ -249,6 +249,7 @@ public class FastDBQueryUI extends JFrame {
     private JRadioButton querySqlRadio;
     private JButton executeSqlButton2;
     private JButton refConfigPathYamlExportBtn;
+    private JTabbedPane tabbedPane;
 
     /**
      * Launch the application.
@@ -292,7 +293,22 @@ public class FastDBQueryUI extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(new BorderLayout(0, 0));
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_F5) {
+                    switch (tabbedPane.getSelectedIndex()) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        executeSqlButtonClick();
+                        break;
+                    }
+                }
+            }
+        });
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -313,6 +329,10 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent evt) {
                 sqlListKeyPressAction(evt);
+
+                if (evt.getKeyCode() == KeyEvent.VK_F5) {
+                    executeSqlButtonClick();
+                }
             }
         });
 
@@ -413,7 +433,7 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange(null);
+                sqlTextAreaChange();
             }
         }));
 
@@ -437,7 +457,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCategoryComboBox_Auto.getTextComponent().getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange(null);
+                sqlTextAreaChange();
             }
         }));
 
@@ -451,7 +471,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                sqlTextAreaChange(null);
+                sqlTextAreaChange();
             }
         }));
 
@@ -1383,11 +1403,7 @@ public class FastDBQueryUI extends JFrame {
     private void setSqlListSelection(SqlIdConfigBean bean) {
         sqlBean = bean;
         sqlList.setSelectedValue(sqlBean, true);
-        Boolean isModify = null;
-        if (sqlBean == null) {
-            isModify = false;
-        }
-        sqlTextAreaChange(isModify);
+        sqlTextAreaChange();
     }
 
     /**
@@ -1450,6 +1466,10 @@ public class FastDBQueryUI extends JFrame {
             }
 
             String sql = sqlTextArea.getText().toString();
+            if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+                sql = sqlTextArea.getSelectedText();
+            }
+
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
 
             // 取得執行sql物件
@@ -1491,6 +1511,12 @@ public class FastDBQueryUI extends JFrame {
                 Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true,
                         maxRowsLimit);
                 this.queryList = queryList;
+
+                // 切換查詢結果
+                if (!queryList.getRight().isEmpty()) {
+                    tabbedPane.setSelectedIndex(3);
+                }
+
                 this.queryModeProcess(queryList, false, Pair.of(param, parameterList));
                 this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
@@ -3277,19 +3303,20 @@ public class FastDBQueryUI extends JFrame {
         return bean;
     }
 
-    private void sqlTextAreaChange(Boolean isModify) {
+    private void sqlTextAreaChange() {
         try {
             String text = sqlTextArea.getText();
             boolean isNotEqual = false;
             if (sqlBean != null) {
                 if (!StringUtils.equals(StringUtils.trimToEmpty(text), StringUtils.trimToEmpty(sqlBean.sql))) {
                     isNotEqual = true;
-                } else if (!StringUtils.equals(sqlBean.getKey(), getCurrentEditSqlIdConfigBean().getKey())) {
+                } else if (!StringUtils.equals(sqlBean.getUniqueKey(), getCurrentEditSqlIdConfigBean().getUniqueKey())) {
                     isNotEqual = true;
                 }
-            }
-            if (isModify != null) {
-                isNotEqual = isModify;
+            } else {
+                if (StringUtils.isNotBlank(text) || StringUtils.isNotBlank(getCurrentEditSqlIdConfigBean().getUniqueKey())) {
+                    isNotEqual = true;
+                }
             }
             if (isNotEqual) {
                 sqlSaveButton.setText("<html><font color='RED'>＊儲存</font></html>");

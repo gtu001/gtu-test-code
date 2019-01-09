@@ -2,9 +2,11 @@ package gtu.yaml.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
@@ -72,7 +74,8 @@ public class YamlUtil {
         Yaml yaml = new Yaml(options);
         Writer writer = null;
         try {
-            writer = new FileWriter(file, append);
+//            writer = new FileWriter(file, append);
+            writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
             yaml.dump(dumpObject, writer);
         } catch (Exception ex) {
             throw new RuntimeException("loadFromFile ERR : " + ex.getMessage(), ex);
