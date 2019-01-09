@@ -49,7 +49,7 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu.collection.MapUtil;
@@ -60,13 +60,13 @@ import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
+import gtu.swing.util.JTextUndoUtil;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
@@ -160,7 +160,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Pair<List<String>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

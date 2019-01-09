@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +48,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -55,16 +55,25 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.EventListenerList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -178,8 +187,8 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_16;
     private JPanel newPanel1;
 
-    private Pair<List<String>, List<Object[]>> queryList = null;
-    private Pair<List<String>, List<Object[]>> filterRowsQueryList = null;
+    private Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = null;
+    private Triple<List<String>, List<Class<?>>, List<Object[]>> filterRowsQueryList = null;
 
     private boolean distinctHasClicked = false;// 是否按過distinct btn
 
@@ -762,7 +771,7 @@ public class FastDBQueryUI extends JFrame {
                     System.out.println("qList - " + qList.size());
 
                     // 過濾欄位紀錄
-                    filterRowsQueryList = Pair.of(cols, qList);
+                    filterRowsQueryList = fixPairToTripleQueryResult(Pair.of(cols, qList));
 
                     queryModeProcess(filterRowsQueryList, true, null);
                 } catch (Exception ex) {
@@ -1589,9 +1598,9 @@ public class FastDBQueryUI extends JFrame {
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
                 int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
-                Pair<List<String>, List<Object[]>> queryList = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(), this.getDataSource().getConnection(), true,
-                        maxRowsLimit);
-                this.queryList = queryList;
+                Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
+                        this.getDataSource().getConnection(), true, maxRowsLimit);
+                this.queryList = orignQueryResult;
 
                 // 切換查詢結果
                 if (!queryList.getRight().isEmpty()) {
@@ -1651,7 +1660,7 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void showJsonArry(Pair<List<String>, List<Object[]>> queryList) {
+    private void showJsonArry(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList) {
         try {
             List<String> columns = queryList.getLeft();
             List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
@@ -1681,7 +1690,7 @@ public class FastDBQueryUI extends JFrame {
      * 
      * @param pair
      */
-    private void queryModeProcess(Pair<List<String>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair) {
+    private void queryModeProcess(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair) {
         if (queryList.getRight().isEmpty()) {
             if (!silent) {
                 System.out.println("fake row----");
@@ -1700,16 +1709,40 @@ public class FastDBQueryUI extends JFrame {
             queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
         }
 
-        // 取得標題
-        String[] titles = queryList.getLeft().toArray(new String[0]);
-
         // 查詢結果table
-        DefaultTableModel createModel = JTableUtil.createModel(true, titles);
+        DefaultTableModel createModel = createModel4QueryResult(queryResultTable, true, queryList.getLeft(), queryList.getMiddle());
         queryResultTable.setModel(createModel);
+
+        // 設定 Timestamp 顯示方式
+        this.applyTimestampValueStyle(queryList);
+
         JTableUtil.setColumnWidths(queryResultTable, getInsets());
         for (Object[] rows : queryList.getRight()) {
             createModel.addRow(rows);
         }
+    }
+
+    public static DefaultTableModel createModel4QueryResult(final JTable queryResultTable, final boolean readonly, List<String> header, final List<Class<?>> typeLst) {
+        DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header.toArray()) {
+            private static final long serialVersionUID = 1L;
+
+            // 設定column class
+            @Override
+            public Class<?> getColumnClass(int c) {
+                int col = JTableUtil.getRealColumnPos(c, queryResultTable);
+                return typeLst.get(col);
+            }
+
+            // 設定可否編輯
+            public boolean isCellEditable(int row, int column) {
+                if (readonly) {
+                    return false;
+                } else {
+                    return super.isCellEditable(row, column);
+                }
+            }
+        };
+        return model;
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {
@@ -2042,7 +2075,7 @@ public class FastDBQueryUI extends JFrame {
                         rowMapLst.add(rowMap);
                     }
 
-                    Pair<List<String>, List<Object[]>> allRows = null;
+                    Triple<List<String>, List<Class<?>>, List<Object[]>> allRows = null;
                     if (filterRowsQueryList != null) {
                         allRows = filterRowsQueryList;
                     } else {
@@ -2056,9 +2089,11 @@ public class FastDBQueryUI extends JFrame {
                     if (StringUtils.isBlank(shemaTable)) {
                         Validate.isTrue(false, "查詢結果為空!");
                     }
-                    Pair<List<String>, List<Object[]>> excelImportLst = JdbcDBUtil.queryForList_customColumns(//
+
+                    Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(//
                             String.format(" select * from %s where 1=1 ", shemaTable), //
                             new Object[0], getDataSource().getConnection(), true, 1);
+                    Pair<List<String>, List<Object[]>> excelImportLst = Pair.of(orignQueryResult.getLeft(), orignQueryResult.getRight());
 
                     excelImportLst = transRealRowToQuyerLstIndex(excelImportLst);
                     int selectRowIndex = queryResultTable.getSelectedRow();
@@ -2363,7 +2398,7 @@ public class FastDBQueryUI extends JFrame {
             }
 
             List<String> matchColumnLst = new ArrayList<String>(columnMapping.values());
-            Pair<List<String>, List<Object[]>> queryResultFinal = Pair.of(matchColumnLst, queryLst);
+            Triple<List<String>, List<Class<?>>, List<Object[]>> queryResultFinal = fixPairToTripleQueryResult(Pair.of(matchColumnLst, queryLst));
             this.queryModeProcess(queryResultFinal, true, null);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -3105,7 +3140,7 @@ public class FastDBQueryUI extends JFrame {
         List<Object[]> queryLst = new ArrayList<Object[]>();
         Map<String, String> parameterTableMap;
         List<String> columns;
-        Pair<List<String>, List<Object[]>> queryList;
+        Triple<List<String>, List<Class<?>>, List<Object[]>> queryList;
 
         private Object getValue(Object val, char type) {
             switch (type) {
@@ -3149,10 +3184,12 @@ public class FastDBQueryUI extends JFrame {
                 model = JTableUtil.createModel(true, columns.toArray());
 
                 List<Object> arry = new ArrayList<Object>();
+                List<Class<?>> typeLst = new ArrayList<Class<?>>();
                 for (int ii = 0; ii < columns.size(); ii++) {
                     String col = columns.get(ii);
                     Object val = null;
                     char type = ' ';
+                    Class<?> typeClz = null;
 
                     // 用 參數表的 值來當作預設值
                     if (parameterTableMap.containsKey(col)) {
@@ -3161,26 +3198,31 @@ public class FastDBQueryUI extends JFrame {
 
                     if (tabInfo.getNumberCol().contains(col)) {
                         type = 'i';
+                        typeClz = BigDecimal.class;
                     } else if (tabInfo.getDateCol().contains(col)) {
                         type = 'd';
+                        typeClz = java.sql.Date.class;
                     } else if (tabInfo.getTimestampCol().contains(col)) {
                         type = 't';
+                        typeClz = java.sql.Timestamp.class;
                     } else {
                         type = ' ';
+                        typeClz = String.class;
                     }
 
                     val = getValue(val, type);
                     arry.add(val);
+                    typeLst.add(typeClz);
                 }
                 queryLst.add(arry.toArray());
                 model.addRow(arry.toArray());
-                queryList = Pair.of(columns, queryLst);
+                queryList = Triple.of(columns, typeLst, queryLst);
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
             }
         }
 
-        public Pair<List<String>, List<Object[]>> getQueryList() {
+        public Triple<List<String>, List<Class<?>>, List<Object[]>> getQueryList() {
             return queryList;
         }
 
@@ -3407,5 +3449,102 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    /**
+     * 計算欄位型態
+     * 
+     * @param queryLst
+     * @return
+     */
+    private Triple<List<String>, List<Class<?>>, List<Object[]>> fixPairToTripleQueryResult(Pair<List<String>, List<Object[]>> queryLst) {
+        List<Object[]> lst = queryLst.getRight();
+        TreeMap<Integer, Class<?>> typeMap = new TreeMap<Integer, Class<?>>();
+        A: for (int ii = 0; ii < lst.size(); ii++) {
+            if (queryLst.getLeft().size() == typeMap.size()) {
+                break A;
+            }
+            Object[] arry = lst.get(ii);
+            B: for (int jj = 0; jj < arry.length; jj++) {
+                if (typeMap.containsKey(jj)) {
+                    continue;
+                }
+                if (arry[jj] != null) {
+                    typeMap.put(jj, arry[jj].getClass());
+                }
+            }
+        }
+        for (int ii = 0; ii < queryLst.getLeft().size(); ii++) {
+            if (!typeMap.containsKey(ii)) {
+                typeMap.put(ii, Object.class);
+            }
+        }
+        List<Class<?>> typeLst = new ArrayList<Class<?>>(typeMap.values());
+        return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
+    }
+
+    private class MyQueryResultTableColumnModelListener implements TableColumnModelListener {
+        final Runnable run;
+
+        MyQueryResultTableColumnModelListener(Runnable run) {
+            this.run = run;
+        }
+
+        public void columnAdded(TableColumnModelEvent e) {
+            this.run.run();
+        }
+
+        public void columnRemoved(TableColumnModelEvent e) {
+            this.run.run();
+        }
+
+        public void columnMoved(TableColumnModelEvent e) {
+            this.run.run();
+        }
+
+        public void columnMarginChanged(ChangeEvent e) {
+            this.run.run();
+        }
+
+        public void columnSelectionChanged(ListSelectionEvent e) {
+            this.run.run();
+        }
+    }
+
+    /**
+     * 設定 Timestamp 顯示方式
+     * 
+     * @param queryList
+     */
+    private void applyTimestampValueStyle(final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList) {
+        final Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                for (int ii = 0; ii < queryList.getMiddle().size(); ii++) {
+                    int realCol = ii; //JTableUtil.getRealColumnPos(ii, queryResultTable);
+                    if (queryList.getMiddle().get(ii) == Timestamp.class) {
+                        JTableUtil.newInstance(queryResultTable).columnIsTimestamp(realCol);
+                    } else if (queryList.getMiddle().get(ii) == java.sql.Date.class) {
+                        JTableUtil.newInstance(queryResultTable).columnIsSqlDate(realCol);
+                    }
+                }
+            }
+        };
+        r.run();
+        DefaultTableColumnModel model = (DefaultTableColumnModel) queryResultTable.getTableHeader().getColumnModel();
+        try {
+            EventListenerList listenerList = (EventListenerList) FieldUtils.readDeclaredField(model, "listenerList", true);
+            Object[] listenerList2 = (Object[]) FieldUtils.readDeclaredField(listenerList, "listenerList", true);
+            for (int ii = 0; ii < listenerList2.length; ii++) {
+                if (listenerList2[ii].getClass() == MyQueryResultTableColumnModelListener.class) {
+                    listenerList2 = ArrayUtils.remove(listenerList2, ii);
+                }
+            }
+            FieldUtils.writeDeclaredField(listenerList, "listenerList", listenerList2, true);
+        } catch (IllegalAccessException e1) {
+            e1.printStackTrace();
+        }
+
+        model.addColumnModelListener(new MyQueryResultTableColumnModelListener(r));
     }
 }

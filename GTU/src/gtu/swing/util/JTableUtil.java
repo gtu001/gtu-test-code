@@ -18,6 +18,8 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -228,6 +230,52 @@ public class JTableUtil {
         } else {
             throw new RuntimeException("必須是JComboBox, JCheckBox, JTextField");
         }
+    }
+
+    public void columnIsTimestamp(int index) {
+        class TimestampCellRenderer extends DefaultTableCellRenderer {
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+            public TimestampCellRenderer() {
+                super();
+            }
+
+            public void setValue(Object value) {
+                if (formatter == null) {
+                    formatter = DateFormat.getDateInstance();
+                }
+                try {
+                    value = (value == null) ? "" : formatter.format(value);
+                } catch (Exception ex) {
+                }
+                setText(String.valueOf(value));
+            }
+        }
+        TableColumn comboCol1 = table.getColumnModel().getColumn(index);
+        comboCol1.setCellRenderer(new TimestampCellRenderer());
+    }
+    
+    public void columnIsSqlDate(int index) {
+        class SqlDateCellRenderer extends DefaultTableCellRenderer {
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            
+            public SqlDateCellRenderer() {
+                super();
+            }
+            
+            public void setValue(Object value) {
+                if (formatter == null) {
+                    formatter = DateFormat.getDateInstance();
+                }
+                try {
+                    value = (value == null) ? "" : formatter.format(value);
+                } catch (Exception ex) {
+                }
+                setText(String.valueOf(value));
+            }
+        }
+        TableColumn comboCol1 = table.getColumnModel().getColumn(index);
+        comboCol1.setCellRenderer(new SqlDateCellRenderer());
     }
 
     public void defaultToolTipText(MouseEvent event) {

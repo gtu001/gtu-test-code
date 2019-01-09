@@ -13,19 +13,22 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.db.tradevan.DBCommon_tradevan;
+import gtu.db.tradevan.DBTypeMapping_tradevan.JdbcTypeMappingToJava;
 import gtu.swing.util.JCommonUtil;
 
 public class JdbcDBUtil {
@@ -294,9 +297,10 @@ public class JdbcDBUtil {
         }
     }
 
-    public static Pair<List<String>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn, int maxRowsLimit) throws Exception {
+    public static Triple<List<String>, List<Class<?>>, List<Object[]>> queryForList_customColumns(String sql, Object param[], Connection con, boolean isCloseConn, int maxRowsLimit) throws Exception {
         List<String> colList = new ArrayList<String>();
         List<Object[]> rsList = new ArrayList<Object[]>();
+        List<Class<?>> typeList = new ArrayList<Class<?>>();
         java.sql.ResultSet rs = null;
         System.out.println("sql : " + sql);
         try {
@@ -320,6 +324,7 @@ public class JdbcDBUtil {
             int cols = mdata.getColumnCount();
             for (int i = 1; i <= cols; i++) {
                 colList.add(mdata.getColumnName(i));
+                typeList.add(JdbcTypeMappingToJava.getMappingClass(mdata.getColumnType(i)));
             }
 
             A: while (rs.next()) {
@@ -362,7 +367,7 @@ public class JdbcDBUtil {
                 }
             }
         }
-        return Pair.of(colList, rsList);
+        return Triple.of(colList, typeList, rsList);
     }
 
     /**
