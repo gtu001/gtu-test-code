@@ -2054,9 +2054,9 @@ public class FastDBQueryUI extends JFrame {
                     Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(//
                             String.format(" select * from %s where 1=1 ", shemaTable), //
                             new Object[0], getDataSource().getConnection(), true, 1);
-                    Pair<List<String>, List<Object[]>> excelImportLst = Pair.of(orignQueryResult.getLeft(), orignQueryResult.getRight());
 
-                    excelImportLst = transRealRowToQuyerLstIndex(excelImportLst);
+                    Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex(orignQueryResult);
+                    
                     int selectRowIndex = queryResultTable.getSelectedRow();
 
                     FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
@@ -2093,7 +2093,7 @@ public class FastDBQueryUI extends JFrame {
         return "";
     }
 
-    private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex(Pair<List<String>, List<Object[]>> excelImportLst) {
+    private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex(Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst) {
         TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
         List<String> leftLst = new ArrayList<String>(columnMapping.values());
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
@@ -2110,8 +2110,7 @@ public class FastDBQueryUI extends JFrame {
             }
             rightRowsLit.add(map.values().toArray());
         }
-        excelImportLst = Pair.of(leftLst, rightRowsLit);
-        return excelImportLst;
+        return Pair.of(leftLst, rightRowsLit);
     }
 
     private TreeMap<Integer, String> getQueryResult_ColumnDefine() {

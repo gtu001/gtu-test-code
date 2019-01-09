@@ -309,7 +309,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    private String getImportValue(String column, int selectRowIndex, Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst) {
+    private String getImportValue(String column, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst) {
         Object[] rowArry = excelImportLst.getRight().get(selectRowIndex);
         for (int ii = 0; ii < excelImportLst.getLeft().size(); ii++) {
             String col = excelImportLst.getLeft().get(ii);
@@ -330,7 +330,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    private void initTab1(String schemaTable, int selectRowIndex, Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) throws SQLException {
+    private void initTab1(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) throws SQLException {
         DefaultTableModel model = initImportRowTable();
 
         this._parent = _parent;
@@ -408,7 +408,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             for (int row = 0; row < util.getModel().getRowCount(); row++) {
                 String column = (String) util.getRealValueAt(row, 0);
                 int colPos = util.getRealColumnPos(2, importRowTable);
-                String value = getImportValue(column, selectRow, queryList);
+                String value = getImportValue(column, selectRow, Pair.of(queryList.getLeft(), queryList.getRight()));
                 importRowTable.setValueAt(value, row, colPos);
             }
         } catch (Exception ex) {
