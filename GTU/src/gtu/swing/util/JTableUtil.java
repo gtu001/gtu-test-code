@@ -115,6 +115,28 @@ public class JTableUtil {
     }
 
     /**
+     * 滑鼠點標題的事件
+     */
+    public static void tableHeaderClickEvent(final JTable table, final ActionListener listener) {
+        table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = table.columnAtPoint(e.getPoint());
+                String name = table.getColumnName(col);
+                System.out.println("Column index selected " + col + " " + name);
+
+                Object source = e;
+                int id = col;
+                String command = name;
+                int modifiers = e.getModifiers();
+                ActionEvent event = new ActionEvent(source, id, command, modifiers);
+
+                listener.actionPerformed(event);
+            }
+        });
+    }
+
+    /**
      * 若第一列為checkbox
      */
     public void columnOneIsCheckbox() {

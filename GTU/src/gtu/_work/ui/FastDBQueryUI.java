@@ -47,6 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -74,6 +75,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -564,6 +566,43 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        parametersTable.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = parametersTable.columnAtPoint(e.getPoint());
+                final String name = parametersTable.getColumnName(col);
+                System.out.println("Column index selected " + col + " " + name);
+
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(parametersTable)//
+                            .addJMenuItem("複製欄位", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    List<String> lst = new ArrayList<String>();
+                                    // 取選擇
+                                    int[] rows = parametersTable.getSelectedRows();
+                                    if (rows != null && rows.length > 0) {
+                                        for (int ii = 0; ii < rows.length; ii++) {
+                                            int row = JTableUtil.getRealRowPos(rows[ii], parametersTable);
+                                            int col = JTableUtil.getRealColumnPos(0, parametersTable);
+                                            lst.add((String) parametersTable.getValueAt(row, col));
+                                        }
+                                    }
+                                    // 取全部
+                                    if (lst.isEmpty()) {
+                                        for (int row = 0; row < parametersTable.getRowCount(); row++) {
+                                            int col = JTableUtil.getRealColumnPos(0, parametersTable);
+                                            lst.add((String) parametersTable.getValueAt(row, col));
+                                        }
+                                    }
+                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "^"));
+                                }
+                            }).applyEvent(e)//
+                            .show();
+                }
+            }
+        });
+
         scrollPane_1.setViewportView(parametersTable);
 
         JPanel panel_4 = new JPanel();
@@ -599,6 +638,40 @@ public class FastDBQueryUI extends JFrame {
                 queryResultTableMouseClickAction(e);
             }
         });
+        queryResultTable.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = queryResultTable.columnAtPoint(e.getPoint());
+                final String name = queryResultTable.getColumnName(col);
+                System.out.println("Column index selected " + col + " " + name);
+
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(queryResultTable)//
+                            .addJMenuItem("複製 : " + name, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    ClipboardUtil.getInstance().setContents(name);
+                                }
+                            }).addJMenuItem("複製全部(逗號)", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
+                                    List<Object> lst = tabUtil.getColumnTitleArray();
+                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, " , "));
+                                }
+                            }).addJMenuItem("複製全部(多行)", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
+                                    List<Object> lst = tabUtil.getColumnTitleArray();
+                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
+                                }
+                            }).applyEvent(e)//
+                            .show();
+                }
+            }
+        });
+
         panel_12 = new JPanel();
 
         panel_5.add(panel_12, BorderLayout.CENTER);
