@@ -18,7 +18,9 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -232,50 +234,41 @@ public class JTableUtil {
         }
     }
 
-    public void columnIsTimestamp(int index) {
-        class TimestampCellRenderer extends DefaultTableCellRenderer {
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    public void columnUseCommonFormatter(Integer index) {
+        class DataFormatteProcessRenderer extends DefaultTableCellRenderer {
+            DateFormat formatterD = new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat formatterT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            DecimalFormat formatterN = new DecimalFormat("#.#############");
 
-            public TimestampCellRenderer() {
+            public DataFormatteProcessRenderer() {
                 super();
             }
 
             public void setValue(Object value) {
-                if (formatter == null) {
-                    formatter = DateFormat.getDateInstance();
+                if (value == null) {
+                    setText("");
+                } else if (value.getClass() == java.sql.Date.class) {
+                    setText(formatterD.format(value));
+                } else if (value.getClass() == java.sql.Timestamp.class || value.getClass() == java.util.Date.class) {
+                    setText(formatterT.format(value));
+                } else if (value.getClass() == BigDecimal.class) {
+                    setText(formatterN.format(value));
+                } else {
+                    setText(String.valueOf(value));
                 }
-                try {
-                    value = (value == null) ? "" : formatter.format(value);
-                } catch (Exception ex) {
-                }
-                setText(String.valueOf(value));
             }
         }
-        TableColumn comboCol1 = table.getColumnModel().getColumn(index);
-        comboCol1.setCellRenderer(new TimestampCellRenderer());
-    }
-    
-    public void columnIsSqlDate(int index) {
-        class SqlDateCellRenderer extends DefaultTableCellRenderer {
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            
-            public SqlDateCellRenderer() {
-                super();
-            }
-            
-            public void setValue(Object value) {
-                if (formatter == null) {
-                    formatter = DateFormat.getDateInstance();
-                }
-                try {
-                    value = (value == null) ? "" : formatter.format(value);
-                } catch (Exception ex) {
-                }
-                setText(String.valueOf(value));
+        DataFormatteProcessRenderer renderer = new DataFormatteProcessRenderer();
+        if (index != null) {
+            TableColumn comboCol1 = table.getColumnModel().getColumn(index);
+            comboCol1.setCellRenderer(renderer);
+        } else {
+            for (int ii = 0; ii < table.getColumnCount(); ii++) {
+                int realCol = JTableUtil.getRealColumnPos(ii, table);
+                TableColumn comboCol1 = table.getColumnModel().getColumn(realCol);
+                comboCol1.setCellRenderer(renderer);
             }
         }
-        TableColumn comboCol1 = table.getColumnModel().getColumn(index);
-        comboCol1.setCellRenderer(new SqlDateCellRenderer());
     }
 
     public void defaultToolTipText(MouseEvent event) {

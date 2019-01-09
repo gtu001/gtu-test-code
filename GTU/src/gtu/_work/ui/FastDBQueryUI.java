@@ -13,10 +13,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,22 +55,15 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.EventListenerList;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -305,21 +298,6 @@ public class FastDBQueryUI extends JFrame {
         contentPane.setLayout(new BorderLayout(0, 0));
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_F5) {
-                    switch (tabbedPane.getSelectedIndex()) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                        executeSqlButtonClick();
-                        break;
-                    }
-                }
-            }
-        });
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -333,17 +311,6 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 sqlListMouseClicked(e);
-            }
-        });
-
-        sqlList.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent evt) {
-                sqlListKeyPressAction(evt);
-
-                if (evt.getKeyCode() == KeyEvent.VK_F5) {
-                    executeSqlButtonClick();
-                }
             }
         });
 
@@ -436,8 +403,6 @@ public class FastDBQueryUI extends JFrame {
                 if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
                 e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
-                } else if (e.getKeyCode() == KeyEvent.VK_F5) {
-                    executeSqlButtonClick();
                 }
             }
         });
@@ -567,14 +532,6 @@ public class FastDBQueryUI extends JFrame {
         panel_1.add(scrollPane_1, BorderLayout.CENTER);
 
         parametersTable = new JTable();
-        parametersTable.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_F5) {
-                    executeSqlButtonClick();
-                }
-            }
-        });
         parametersTable.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -1126,6 +1083,49 @@ public class FastDBQueryUI extends JFrame {
         panel_23.add(exportYamlConfigBtn);
         panel_23.add(saveEtcConfigBtn);
 
+        deleteParameterBtn = new JButton("刪除當前參數");
+        deleteParameterBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                sqlParameterConfigLoadHandler.deleteParameterBtnAction();
+            }
+        });
+        panel_4.add(deleteParameterBtn);
+
+        executeSqlButton2 = new JButton("執行Sql");
+        executeSqlButton2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                executeSqlButtonClick();
+            }
+        });
+        panel_4.add(executeSqlButton2);
+
+        refConfigPathYamlExportBtn = new JButton("產生yaml");
+        refConfigPathYamlExportBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File yamlFile = JCommonUtil._jFileChooser_selectFileOnly();
+                    if (yamlFile == null) {
+                        return;
+                    }
+
+                    List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
+                    Properties prop = PropertiesUtil.loadProperties(yamlFile, null, true);
+                    for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                        String key = (String) enu.nextElement();
+                        String value = prop.getProperty(key);
+                        RefSearchListConfigBean bean = PropertiesMultiUtil.of(key, value, RefSearchListConfigBean.class);
+                        lst.add(bean);
+                    }
+
+                    File destYamlFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_Ref.yaml");
+                    YamlMapUtil.getInstance().saveToFile(destYamlFile, lst, false);
+                    JCommonUtil._jOptionPane_showMessageDialog_info("ok!");
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
         {
             sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             sqlIdListDSMappingHandler = new SqlIdListDSMappingHandler();
@@ -1139,22 +1139,6 @@ public class FastDBQueryUI extends JFrame {
             // 初始化queryResultTable
             JTableUtil.defaultSetting(queryResultTable);
 
-            deleteParameterBtn = new JButton("刪除當前參數");
-            deleteParameterBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    sqlParameterConfigLoadHandler.deleteParameterBtnAction();
-                }
-            });
-            panel_4.add(deleteParameterBtn);
-
-            executeSqlButton2 = new JButton("執行Sql");
-            executeSqlButton2.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    executeSqlButtonClick();
-                }
-            });
-            panel_4.add(executeSqlButton2);
-
             // 初始化 sqlList
             initLoadSqlListConfig();
             sqlIdListDSMappingHandler.init();
@@ -1164,33 +1148,9 @@ public class FastDBQueryUI extends JFrame {
 
             refSearchListConfigHandler = new RefSearchListConfigHandler(refConfigPathText, refSearchList, refSearchCategoryCombobox);
 
-            refConfigPathYamlExportBtn = new JButton("產生yaml");
-            refConfigPathYamlExportBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        File yamlFile = JCommonUtil._jFileChooser_selectFileOnly();
-                        if (yamlFile == null) {
-                            return;
-                        }
-
-                        List<RefSearchListConfigBean> lst = new ArrayList<RefSearchListConfigBean>();
-                        Properties prop = PropertiesUtil.loadProperties(yamlFile, null, true);
-                        for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
-                            String key = (String) enu.nextElement();
-                            String value = prop.getProperty(key);
-                            RefSearchListConfigBean bean = PropertiesMultiUtil.of(key, value, RefSearchListConfigBean.class);
-                            lst.add(bean);
-                        }
-
-                        File destYamlFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_Ref.yaml");
-                        YamlMapUtil.getInstance().saveToFile(destYamlFile, lst, false);
-                        JCommonUtil._jOptionPane_showMessageDialog_info("ok!");
-                    } catch (Exception ex) {
-                        JCommonUtil.handleException(ex);
-                    }
-                }
-            });
             panel_22.add(refConfigPathYamlExportBtn);
+
+            new KeyEventDoQueryHandler(this);
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -1713,8 +1673,8 @@ public class FastDBQueryUI extends JFrame {
         DefaultTableModel createModel = createModel4QueryResult(queryResultTable, true, queryList.getLeft(), queryList.getMiddle());
         queryResultTable.setModel(createModel);
 
-        // 設定 Timestamp 顯示方式
-        this.applyTimestampValueStyle(queryList);
+        // 設定 Value 顯示方式
+        JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null);
 
         JTableUtil.setColumnWidths(queryResultTable, getInsets());
         for (Object[] rows : queryList.getRight()) {
@@ -3483,68 +3443,35 @@ public class FastDBQueryUI extends JFrame {
         return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
     }
 
-    private class MyQueryResultTableColumnModelListener implements TableColumnModelListener {
-        final Runnable run;
-
-        MyQueryResultTableColumnModelListener(Runnable run) {
-            this.run = run;
-        }
-
-        public void columnAdded(TableColumnModelEvent e) {
-            this.run.run();
-        }
-
-        public void columnRemoved(TableColumnModelEvent e) {
-            this.run.run();
-        }
-
-        public void columnMoved(TableColumnModelEvent e) {
-            this.run.run();
-        }
-
-        public void columnMarginChanged(ChangeEvent e) {
-            this.run.run();
-        }
-
-        public void columnSelectionChanged(ListSelectionEvent e) {
-            this.run.run();
-        }
-    }
-
-    /**
-     * 設定 Timestamp 顯示方式
-     * 
-     * @param queryList
-     */
-    private void applyTimestampValueStyle(final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList) {
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                for (int ii = 0; ii < queryList.getMiddle().size(); ii++) {
-                    int realCol = ii; //JTableUtil.getRealColumnPos(ii, queryResultTable);
-                    if (queryList.getMiddle().get(ii) == Timestamp.class) {
-                        JTableUtil.newInstance(queryResultTable).columnIsTimestamp(realCol);
-                    } else if (queryList.getMiddle().get(ii) == java.sql.Date.class) {
-                        JTableUtil.newInstance(queryResultTable).columnIsSqlDate(realCol);
+    private class KeyEventDoQueryHandler {
+        private KeyEventDoQueryHandler(FastDBQueryUI self) {
+            for (Field f : self.getClass().getDeclaredFields()) {
+                if (JComponent.class.isAssignableFrom(f.getType())) {
+                    try {
+                        JComponent j = (JComponent) FieldUtils.readDeclaredField(self, f.getName(), true);
+                        j.addKeyListener(new KeyAdapter() {
+                            @Override
+                            public void keyPressed(KeyEvent e) {
+                                doExecuteSqlButtonClick(e);
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
-        };
-        r.run();
-        DefaultTableColumnModel model = (DefaultTableColumnModel) queryResultTable.getTableHeader().getColumnModel();
-        try {
-            EventListenerList listenerList = (EventListenerList) FieldUtils.readDeclaredField(model, "listenerList", true);
-            Object[] listenerList2 = (Object[]) FieldUtils.readDeclaredField(listenerList, "listenerList", true);
-            for (int ii = 0; ii < listenerList2.length; ii++) {
-                if (listenerList2[ii].getClass() == MyQueryResultTableColumnModelListener.class) {
-                    listenerList2 = ArrayUtils.remove(listenerList2, ii);
-                }
-            }
-            FieldUtils.writeDeclaredField(listenerList, "listenerList", listenerList2, true);
-        } catch (IllegalAccessException e1) {
-            e1.printStackTrace();
         }
 
-        model.addColumnModelListener(new MyQueryResultTableColumnModelListener(r));
+        private void doExecuteSqlButtonClick(KeyEvent e) {
+            boolean execute = false;
+            if ((e.getModifiers() & KeyEvent.ALT_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_ENTER) {
+                execute = true;
+            } else if (e.getKeyCode() == KeyEvent.VK_F5) {
+                execute = true;
+            }
+            if (execute) {
+                executeSqlButtonClick();
+            }
+        }
     }
 }
