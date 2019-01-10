@@ -15,7 +15,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -88,6 +90,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JCheckBox applyAllQueryResultCheckBox;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JRadioButton rdbtnSelect;
+    private List<String> columnsLst;
 
     static class ColumnConf {
         String columnName;
@@ -160,7 +163,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, final FastDBQueryUI _parent) {
+    private class ValueFixHandler {
+        DecimalFormat formatterN = new DecimalFormat("#.#############");
+
+        private Object getValueFix(Object value) {
+            if (value == null) {
+                return value;
+            }
+            if (value.getClass() == BigDecimal.class) {
+                return formatterN.format(value);
+            }
+            return value;
+        }
+    }
+
+    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
+            final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -170,13 +188,16 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             DefaultTableModel model = dialog.initRowTable();
 
             final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
+            ValueFixHandler valueFixHandler = dialog.new ValueFixHandler();
 
+            dialog.columnsLst = new ArrayList<String>();
             Map<String, Object> rowMap = rowMapLst.get(0);
 
             Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
             dialog.rowMap.set(rowMapForBackup);
             for (String col : rowMap.keySet()) {
                 Object value = rowMap.get(col);
+                value = valueFixHandler.getValueFix(value);
 
                 ColumnConf df = new ColumnConf();
                 df.columnName = col;
@@ -187,6 +208,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 rowMapForBackup.put(col, df);
 
                 model.addRow(df.toArry());
+                dialog.columnsLst.add(col);
             }
             System.out.println("-------------init size : " + dialog.rowMap.get().size());
 
@@ -560,7 +582,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return super.stopCellEditing();// true 表示修改成功
             }
         });
-
         return tableUtil.getModel();
     }
 
@@ -605,7 +626,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 JCommonUtil._jOptionPane_showMessageDialog_info("設定完成 \n 已設定:" + success + "\n 找不到 :" + failed);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             JCommonUtil.handleException(e);
         }
     }
@@ -652,10 +673,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 df = this.rowMap.get().get(columnName);
             }
 
-            if ("DESCRIPTION".equals(columnName)) {
-                System.out.println("ddddddddd");
-            }
-
             // 判斷欄位是否修改過
             if (("null".equals(String.valueOf(value)) && null == df.orignValue) || //
                     StringUtils.equals(value, String.valueOf(df.orignValue))) {
@@ -682,7 +699,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         FindTextHandler finder = new FindTextHandler(searchText, "^");
         boolean allMatch = finder.isAllMatch();
 
-        B: for (String columnName : rowMap.get().keySet()) {
+        B: for (String columnName : columnsLst) {
             ColumnConf df = rowMap.get().get(columnName);
             if (allMatch) {
                 model.addRow(df.toArry());

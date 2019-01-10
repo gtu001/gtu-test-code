@@ -254,6 +254,7 @@ public class JTableUtil {
                 } else if (value.getClass() == BigDecimal.class) {
                     setText(formatterN.format(value));
                 } else {
+                    System.out.println("formatter-setValue : " + value + " - " + (value != null ? value.getClass().getSimpleName() : ""));
                     setText(String.valueOf(value));
                 }
             }
