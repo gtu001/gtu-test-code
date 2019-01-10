@@ -82,6 +82,7 @@
         <#return rtn>
 </#function>
 
+
 <#-- 將字串轉charArray -->
 <#function toCharArray strValue>
          <#local lst = []>
@@ -90,6 +91,7 @@
          </#list>
          <#return lst>
 </#function>
+
 
 <#-- 資料庫欄位轉java屬性 -->
 <#function dbColumnToJava strValue>
@@ -109,6 +111,7 @@
          </#list>
          <#return rtnVal>
 </#function>
+
 
 <#-- java屬性轉資料庫欄位 -->
 <#function javaToDbColumn strValue>

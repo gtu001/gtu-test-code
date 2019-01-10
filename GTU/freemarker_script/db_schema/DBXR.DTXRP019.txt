@@ -1,0 +1,128 @@
+    [
+                        {
+                    "NAME": "COMP_ID",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "公司別",
+                    "NULLS": "N",
+                    "LENGTH": 2
+            },
+                        {
+                    "NAME": "DIV_NO",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "單位代號",
+                    "NULLS": "N",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "EMPLOYEE_ID",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "員工ID",
+                    "NULLS": "N",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "EMPLOYEE_NAME",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "員工姓名",
+                    "NULLS": "Y",
+                    "LENGTH": 50
+            },
+                        {
+                    "NAME": "MMB_TYPE",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "成員種類",
+                    "NULLS": "Y",
+                    "LENGTH": 2
+            },
+                        {
+                    "NAME": "STR_DATE",
+                    "COLTYPE": "DATE    ",
+                    "REMARKS": "開始日期",
+                    "NULLS": "N",
+                    "LENGTH": 4
+            },
+                        {
+                    "NAME": "END_DATE",
+                    "COLTYPE": "DATE    ",
+                    "REMARKS": "結束日期",
+                    "NULLS": "Y",
+                    "LENGTH": 4
+            },
+                        {
+                    "NAME": "CHG_TIME",
+                    "COLTYPE": "TIMESTMP",
+                    "REMARKS": "異動日期時間",
+                    "NULLS": "N",
+                    "LENGTH": 10
+            },
+                        {
+                    "NAME": "LST_PROC_ID",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "最後作業人員ID",
+                    "NULLS": "Y",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "LST_PROC_NAME",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "最後作業人員姓名",
+                    "NULLS": "Y",
+                    "LENGTH": 50
+            },
+                        {
+                    "NAME": "CHG_TYPE",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "異動種類",
+                    "NULLS": "Y",
+                    "LENGTH": 2
+            },
+                        {
+                    "NAME": "CHG_ID",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "異動人員ID",
+                    "NULLS": "Y",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "CHG_NAME",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "異動人員姓名",
+                    "NULLS": "Y",
+                    "LENGTH": 40
+            },
+                        {
+                    "NAME": "CHG_DIV_NO",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "異動人員單位代號",
+                    "NULLS": "Y",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "CHG_DIV_NAME",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "異動人員單位名稱",
+                    "NULLS": "Y",
+                    "LENGTH": 80
+            },
+                        {
+                    "NAME": "LST_PROC_DIV_NO",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "最後異動人員單位代號",
+                    "NULLS": "Y",
+                    "LENGTH": 20
+            },
+                        {
+                    "NAME": "LST_PROC_DIV_NAME",
+                    "COLTYPE": "VARCHAR ",
+                    "REMARKS": "最後異動人員單位名稱",
+                    "NULLS": "Y",
+                    "LENGTH": 80
+            },
+                        {
+                    "NAME": "LST_PROC_TIME",
+                    "COLTYPE": "TIMESTMP",
+                    "REMARKS": "最後作業日期時間",
+                    "NULLS": "Y",
+                    "LENGTH": 10
+            }
+    ]

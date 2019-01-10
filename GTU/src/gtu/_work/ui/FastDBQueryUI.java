@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -254,6 +255,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton executeSqlButton2;
     private JButton refConfigPathYamlExportBtn;
     private JTabbedPane tabbedPane;
+    private AtomicBoolean isQueryProceding = new AtomicBoolean(false);
 
     /**
      * Launch the application.
@@ -1489,6 +1491,12 @@ public class FastDBQueryUI extends JFrame {
      */
     private void executeSqlButtonClick() {
         try {
+            if (isQueryProceding.get()) {
+                return;
+            } else {
+                isQueryProceding.set(true);
+            }
+
             // init
             {
                 isResetQuery = true;
@@ -1617,6 +1625,8 @@ public class FastDBQueryUI extends JFrame {
                 // html顯示
                 JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
             }
+        } finally {
+            isQueryProceding.set(false);
         }
     }
 
@@ -1675,7 +1685,7 @@ public class FastDBQueryUI extends JFrame {
         queryResultTable.setModel(createModel);
 
         // 設定 Value 顯示方式
-        JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null);
+        JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
 
         JTableUtil.setColumnWidths(queryResultTable, getInsets());
         for (Object[] rows : queryList.getRight()) {
@@ -2056,7 +2066,7 @@ public class FastDBQueryUI extends JFrame {
                             new Object[0], getDataSource().getConnection(), true, 1);
 
                     Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex(orignQueryResult);
-                    
+
                     int selectRowIndex = queryResultTable.getSelectedRow();
 
                     FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);

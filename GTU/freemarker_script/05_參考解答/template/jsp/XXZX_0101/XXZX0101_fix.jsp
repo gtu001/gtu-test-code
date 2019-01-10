@@ -20,7 +20,6 @@
 <script type='text/JavaScript' src='${r"${htmlBase}"}/CM/js/ui/PageUI.js'></script>
 <script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/calendar.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/validation.js"></script>
-<script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/PageUI.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/popupWin.js"></script>
 <script type="text/javascript" src="${r"${htmlBase}"}/CM/js/ui/commView.js"></script>
 <script type="text/JavaScript" src="${r"${htmlBase}"}/CM/js/ui/LocaleDisplay.js"></script>
@@ -75,6 +74,8 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
             	msgAry.push("selectValue = " + getMsgForSelect(ele));
             }else if(ele.value){
             	msgAry.push("value = " + ele.value);
+            }else if(ele.getAttribute("value")){
+            	msgAry.push("value = " + ele.getAttribute("value"));
             }else {
             	msgAry.push("text = " + ele.innerText);
             }
@@ -126,8 +127,7 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 			var keys = Object.keys(rtnMap).sort();
 			var html = "<table style='font-size: 10px;'>"
 			var tmpArry = [];
-			var tdCount = Math.floor(keys.length / 10);
-			tdCount = tdCount == 0 ? 1 : 0;
+			var tdCount = Math.max(Math.floor(keys.length / 10), 1);
 			for(var ii = 0 ; ii < keys.length; ii ++){
 				if((ii + 1) % tdCount == 0){
 					html += "<tr><td>" + tmpArry.join("</td><td>") + "</td></tr>";
@@ -140,12 +140,12 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 			}
 			html += "</table>"
 			msgArry.push(html);
-			return msgArry.join("<br/>");
+			return msgArry.join("</br>");
 		};
 		
 		var showMapConfig = {
 								".showAttr" : { title : "顯示Init資料", 
-												dataMap : <c:out value='${mapX120JSON}' default='{}' escapeXml='false'/> 
+												dataMap : <c:out value='${r"${mapX120JSON}"}' default='{}' escapeXml='false'/> 
 												},
 								".showHidden" : { title : "顯示Hidden欄位", 
 												dataMap : function(){
@@ -180,6 +180,12 @@ Event.observe(window, 'load', new ${edit_jsp}().initApp);
 
 function ${edit_jsp}(){
 
+	function buttonAuth(){
+		var authButtons = {
+			//B0004 : 'BTN_update', 			<%--修改--%>
+		};
+		<im:grantButtons FUNC_ID='${edit_jsp}' ignored='false' />
+	};	
 
 	<%-- TablE UI物件 --%>
 	var ajaxRequest = new CSRUtil.AjaxHandler.request('${r"${dispatcher}/${edit_action_clz}/"}');	
@@ -213,6 +219,54 @@ function ${edit_jsp}(){
 		}
 	};
 	
+	function FormGetter(){
+		var radioElementValue = function(name, value){
+        	var arry = $$("[name="+name+"]");
+			for(var ii = 0; ii < arry.length; ii ++){
+				if(!value){
+					if(arry[ii].checked){
+						return arry[ii].value;
+					}
+				}else if(arry[ii].value == value){
+					arry[ii].checked = true;
+				}
+			}
+			return "";
+        };
+        
+        this.setValue = function(id, value){
+        	if($(id)){
+        		try{
+					if($(id).getAttribute("type") == "radio"){
+						radioElementValue(id, value);
+					} else{
+						$(id).setValue(value);				
+					}
+        		}catch(e){
+        			console.log("Error -> id : " + id + ", tag : " + $(id).tagName + ", type : " + $(id).getAttribute("type"));
+        		}
+			}
+			if($(id + "_span")){
+				return $(id + "_span").innerText = value;
+			}
+        };
+        
+		this.getValue = function(id) {
+			if($(id)){
+				if($(id).getAttribute("type") == "radio"){
+					return radioElementValue(id);
+				}  else if($(id).getAttribute("type") == "checkbox") {
+					return  $(id).checked ? $F(id) : "";
+				} else {
+					return $F(id);
+				}
+			}
+			if($(id + "_span")){
+				return $(id + "_span").innerText;
+			}
+			return "";
+		};
+	};
 	
 	var actions = {
                 
@@ -267,6 +321,13 @@ function ${edit_jsp}(){
                 var value = reqMap[id];
                 var element = $(id);
                 var spanElement = $(id + "_span");
+                
+                try{
+                	$$("input[type=radio][name="+id+"][value='"+value+"']")[0].checked = true;
+                	continue;
+                }catch(e){
+                }
+                
                 if(!element){
                     element = $$("[name="+id+"]");
                     if(element){
@@ -287,7 +348,15 @@ function ${edit_jsp}(){
 		},
 		
 		getValue : function(id) {
-			if($(id)){
+			if($$("[name=" + id + "]").length >= 1){
+				try{
+					var o = $$("[name=" + id + "]:checked")[0].getValue();
+					if(o){
+						return o;
+					}
+				}catch(e){}
+				return $$("[name=" + id + "]")[0].getValue();
+			}else if($(id)){
 				return $F(id);
 			}
 			if($(id + "_span")){
@@ -296,6 +365,15 @@ function ${edit_jsp}(){
 			return "";
 		},
 		
+		setBackForm : function(backForm){
+			for(var k in backForm){
+				if(typeof(backForm[k]) == 'string'){
+					formGetter.setValue(k, backForm[k]);
+				} else{
+					actions.setBackForm(backForm[k]);
+				}
+			}
+		},
 			
 		// 根據OP_STATUS讓指定按鈕失效
 		btnDisable : function(reqMap){
@@ -312,17 +390,55 @@ function ${edit_jsp}(){
 		},
 		
 		getreqMap : function (){
-                        var sendRecord = {
-                        <#list insertColumns as col>
-                                <#if col?is_last>
-                                        ${col} : actions.getValue('${col}')
-                                <#else>
-                                        ${col} : actions.getValue('${col}') ,
-                                </#if>
-                        </#list>
-                        }
-                        return sendRecord;
-                },	
+				var sendRecord = {
+				<#list insertColumns as col>
+						<#if col?is_last>
+								${col} : actions.getValue('${col}')
+						<#else>
+								${col} : actions.getValue('${col}') ,
+						</#if>
+				</#list>
+				}
+				return sendRecord;
+		},	
+				
+		
+		do_IFrame_show : function(isShow, reqMap){
+			if(!isShow){
+				$("iframe_ZUX10102").hide();
+				return;
+			}else{
+				$("iframe_ZUX10102").show();
+			}
+		
+			var getMapToParameters = function(reqMap){
+	        	var arry = new Array();
+	        	for(var key in reqMap){
+	        		arry.push(key + "=" + encodeURIComponent(reqMap[key]));
+	        	}
+	        	return arry.join("&");
+	        };
+        
+        	var getIframeForwardUrl = function(LP_JSON){
+				var baseUrl = "${r"${dispatcher}"}" + "/ZUX1_0102/prompt?";
+				return baseUrl + "LP_JSON=" + encodeURIComponent(Object.toJSON(LP_JSON) || "{}") + "&" + getMapToParameters(LP_JSON);
+			};
+			
+			function reinitIframe(iframeId){
+				var iframe = document.getElementById(iframeId);
+				try{
+					var bHeight = iframe.contentWindow.document.body.scrollHeight;
+					var dHeight = iframe.contentWindow.document.documentElement.scrollHeight;
+					var height = Math.max(bHeight, dHeight);
+					iframe.height = height;
+					//console.log("iframe height : " + height);
+				}catch (ex){
+				}
+			};
+			
+			$("iframe_ZUX10102").src = getIframeForwardUrl(reqMap);
+        	reinitIframe("iframe_ZUX10102");
+		}
 	};
 	
 	var buttons = {
@@ -435,7 +551,7 @@ function ${edit_jsp}(){
 			<#list insertColumns as col>
 			<#if column_dateLst?? && column_timestampLst?? &&
 			        (column_dateLst?seq_contains(col) || column_timestampLst?seq_contains(col))>
-			<cathay:LocaleDisplay sysCode="RG" dateFields="${col}" var="localeDisplay" />
+			<cathay:LocaleDisplay sysCode="RG" dateFields="${col}" dateymFields="" dateyFields="" numberFields="" var="localeDisplay" />
 			</#if>
 			</#list>
 						
@@ -444,6 +560,9 @@ function ${edit_jsp}(){
 				'程式開發訓練GTU001',
 				'單位代號索引GTU001'
 			);
+			
+			<%-- 按鈕控制 --%>
+			buttonAuth();
 			
 			// 上一頁回來重查
 			var LP_JSON = CSRUtil.isBackLink('form1');
@@ -454,6 +573,10 @@ function ${edit_jsp}(){
 			var rtnMap = <c:out value='${r"${rtnMap}"}' default='{}' escapeXml='false'/>;  // rtnMap物件
 			actions.btnDisable(rtnMap);
 			actions.applyReqMapToForm(rtnMap);
+			
+			var IFrame_show = <c:out value='${r"${IFrame_show}"}' default='false' escapeXml='false'/>;  // 是否顯示iframe
+			actions.do_IFrame_show(IFrame_show, rtnMap);
+		
 			validAction.init();
 			
 			$('BTN_depNm_index').observe('click', buttons.doIndex_DEP); // 索引(單位代號)
@@ -467,10 +590,11 @@ function ${edit_jsp}(){
 			$('BTN_delete').observe('click', buttons.doDelete); // 刪除
 			
 			// 上一頁回來重查
-                        var LP_JSON = CSRUtil.isBackLink('form1');
-                        if(LP_JSON){
-                                buttons.doQuery();
-                        }
+			var LP_JSON = CSRUtil.isBackLink('form1');
+			if(LP_JSON){
+					actions.setBackForm(LP_JSON['BACK_FORM']);
+					buttons.doQuery();
+			}
 			
 			PageUI.resize();
 			displayMessage();
@@ -503,18 +627,30 @@ function ${edit_jsp}(){
 	
 	<tr>
 		<td class="tbYellow2" colspan="4" align="center">
-		<button id="BTN_insert" class="button">新增</button>
-		<button id="BTN_update" class="button">修改</button>
-		<button id="BTN_confirm" class="button">提交</button>
-		<button id="BTN_approve" class="button">審核</button>
-		<button id="BTN_reject" class="button">退回</button>
-		<button id="BTN_delete" class="button">刪除</button>
-		<button id="BTN_back" class="button">回上一頁</button>
+			<button id="BTN_insert" class="button">新增</button>
+			<button id="BTN_update" class="button">修改</button>
+			<button id="BTN_confirm" class="button">提交</button>
+			<button id="BTN_approve" class="button">審核</button>
+			<button id="BTN_reject" class="button">退回</button>
+			<button id="BTN_delete" class="button">刪除</button>
+			<button id="BTN_back" class="button">回上一頁</button>
+			
+			<span class="showAttr">&nbsp;&nbsp;&nbsp;</span>
+			<span class="showHidden">&nbsp;&nbsp;&nbsp;</span>
+		
 		</td>
 	</tr>
 
 	<tr>
 		<td class="tbYellow2" colspan="4" align="center"></td>
+	</tr>
+	
+	<tr>
+		<td class="tbYellow2" colspan="20" align="center">
+		<%--↓↓↓↓↓↓↓↓ Iframe  ↓↓↓↓↓↓↓↓--%>
+		<iframe id="iframe_ZUX10102" width="100%" frameborder="0" scrolling="no" height="1000"></iframe>
+		<%--↑↑↑↑↑↑↑↑ Iframe  ↑↑↑↑↑↑↑↑--%>
+		</td>
 	</tr>
 </table>
 </form>

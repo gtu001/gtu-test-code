@@ -104,8 +104,6 @@ public class ${model_clz} {
         if (eie != null) {
             throw eie;
         }
-				
-		DataSet ds = Transaction.getDataSet();
 		
 		// 若檢核無誤
 		<#list insertColumns_pk as col>
@@ -124,6 +122,7 @@ public class ${model_clz} {
         </#if>
         </#list>
 
+        DataSet ds = Transaction.getDataSet();
         <#list insertColumns as col>
 		<#if ! insertColumns_pk?seq_contains(col)>
         if (StringUtils.isNotEmpty(${col})) {
@@ -138,6 +137,7 @@ public class ${model_clz} {
         </#if>
         </#list>
 				
+        //hard code ↓↓↓↓↓
         Timestamp UPDT_DATE = DATE.currentTime();
 		String FLOW_NO = new RZ_N0Z001().startFlow("XXZX0101", "新增", "", UPDT_ID, user.getDivNo());
         String UPDT_ID = user.getEmpID();
@@ -148,7 +148,7 @@ public class ${model_clz} {
 		ds.setField("FLOW_NO", FLOW_NO);
 		
 		//將資料新增至 資料檔 
-        DBUtil.executeUpdate(ds, SQL_insert_001);
+        DBUtil.executeUpdate(ds, SQL_insert_001, false);
 		
     }
 
@@ -174,7 +174,7 @@ public class ${model_clz} {
 		// 若檢核無誤
 		<#list updateColumns_pk as col>
 		String ${col} = MapUtils.getString(reqMap, "${col}");
-        if (StringUtils.isBlank(EMP_ID)) {
+        if (StringUtils.isBlank(${col})) {
             eie = getErrorInputException(eie, "${columnLabel[col]}不可為空");
         }
 		</#list>
@@ -188,6 +188,7 @@ public class ${model_clz} {
         </#if>
         </#list>
 
+        DataSet ds = Transaction.getDataSet();
         <#list updateColumns as col>
 		<#if ! updateColumns_pk?seq_contains(col)>
         if (StringUtils.isNotEmpty(${col})) {
@@ -195,12 +196,17 @@ public class ${model_clz} {
         }
         </#if>
         </#list>
-		        
+        
+        <#list updateColumns_pk as col>
+        ds.setField("${col}", ${col});
+        </#list>
+        
+        //hard code ↓↓↓↓↓
         ds.setField("UPDT_ID", user.getEmpID());
         ds.setField("UPDT_DATE", UPDT_DATE);
         
 		//將資料更新至 資料檔 
-        DBUtil.executeUpdate(ds, SQL_update_001);
+        DBUtil.executeUpdate(ds, SQL_update_001, false);
     }
 
     /**
@@ -210,11 +216,16 @@ public class ${model_clz} {
      */
     public void delete(String EMP_ID) throws ModuleException {
 		//針對傳入參數進行檢核
+        ErrorInputException eie = null;
         <#list deleteColumns_pk as col>
         if (StringUtils.isEmpty(${col})) {
             throw new ErrorInputException("${columnLabel[col]}不可為空");
+            eie = getErrorInputException(eie, "${columnLabel[col]}不可為空");
         }
         </#list>
+        if (eie != null) {
+            throw eie;
+        }
 		
 		DataSet ds = Transaction.getDataSet();
 		<#list deleteColumns_pk as col>
@@ -222,7 +233,7 @@ public class ${model_clz} {
         </#list>
         
 		//依傳入EMP_ID刪除 人員基本資料檔 DBXX.DTXXTP01 資料
-        DBUtil.executeUpdate(ds, SQL_delete_001);
+        DBUtil.executeUpdate(ds, SQL_delete_001, false);
     }
 
     /**

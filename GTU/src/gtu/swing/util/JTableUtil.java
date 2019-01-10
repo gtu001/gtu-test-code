@@ -234,7 +234,7 @@ public class JTableUtil {
         }
     }
 
-    public void columnUseCommonFormatter(Integer index) {
+    public void columnUseCommonFormatter(Integer index, final boolean debug) {
         class DataFormatteProcessRenderer extends DefaultTableCellRenderer {
             DateFormat formatterD = new SimpleDateFormat("yyyy-MM-dd");
             DateFormat formatterT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -245,6 +245,9 @@ public class JTableUtil {
             }
 
             public void setValue(Object value) {
+                if (debug) {
+                    System.out.println("formatter-setValue : " + value + " - " + (value != null ? value.getClass().getSimpleName() : ""));
+                }
                 if (value == null) {
                     setText("");
                 } else if (value.getClass() == java.sql.Date.class) {
@@ -254,7 +257,6 @@ public class JTableUtil {
                 } else if (value.getClass() == BigDecimal.class) {
                     setText(formatterN.format(value));
                 } else {
-                    System.out.println("formatter-setValue : " + value + " - " + (value != null ? value.getClass().getSimpleName() : ""));
                     setText(String.valueOf(value));
                 }
             }

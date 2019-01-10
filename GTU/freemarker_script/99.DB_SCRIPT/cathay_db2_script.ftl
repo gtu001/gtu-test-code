@@ -74,7 +74,7 @@ VALUES (
         </#if>
 </#list>
 	)
-WITH UR
+
 
 
 -----------------------------------------------------------------------
@@ -96,7 +96,7 @@ WHERE 1=1
        [ and T1.${col} = ${getColVal(col)} ]
 </#list>
 	
-	WITH UR
+	
 	
 
 -----------------------------------------------------------------------
@@ -105,9 +105,9 @@ DELETE
   FROM ${main_schema}.${main_table} t1
  WHERE  1=1 
   <#list deleteColumns_where as col>
-       [ and T1.${getWhereCol(col)} = ${getColVal(col)} ]
+       [ and ${getWhereCol(col)} = ${getColVal(col)} ]
   </#list>
-  WITH UR
+
   
   
 -----------------------------------------------------------------------
