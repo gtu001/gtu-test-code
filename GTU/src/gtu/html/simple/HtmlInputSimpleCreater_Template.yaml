@@ -10,7 +10,7 @@
         
   - tagId : L
     template : |
-      <span id="%1$s_span" name="%1$s_span">${rtnMap.%1$s}</span>
+      <span id="%1$s_span" name="%1$s_span">${rtnMap.%1$s}&nbsp;&nbsp;</span>
       
   - tagId : R
     template : |

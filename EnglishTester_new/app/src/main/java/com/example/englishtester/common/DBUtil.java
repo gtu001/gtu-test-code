@@ -44,6 +44,17 @@ public class DBUtil {
         return sb.toString();
     }
 
+    public static String getRowsLimit(String tableName, String orderColumn, boolean isAsc, String whereCondition, int limit) {
+        String orderType2 = isAsc ? " asc " : " desc ";
+        StringBuilder sb = new StringBuilder();
+        sb.append(" select * from  ");
+        sb.append(" " + tableName + " ");
+        sb.append(" where 1=1 " + whereCondition);
+        sb.append(" order by " + orderColumn + " " + orderType2 + " ");
+        sb.append(" limit " + limit + " ");
+        return sb.toString();
+    }
+
     /**
      * rawsql查詢
      */

@@ -1469,6 +1469,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             return bookmarkMode.get();
         }
 
+        public void setBookmarkMode(boolean bookmarkMode) {
+            this.bookmarkMode.set(bookmarkMode);
+        }
+
         public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
             return bookmarkHolder;
         }

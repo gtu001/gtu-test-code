@@ -2,7 +2,9 @@ package com.example.englishtester;
 
 import android.content.Context;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.Toast;
 
 import com.example.englishtester.RecentSearchDAO.RecentSearch;
@@ -89,7 +91,7 @@ public class RecentSearchService {
      */
     public List<String> recentSearchHistory(int rowmax) {
         List<String> list = new ArrayList<String>();
-        String sql = DBUtil.getRownumRawSql(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.INSERT_DATE, false, " and rownum <= " + rowmax + " ");
+        String sql = DBUtil.getRowsLimit(RecentSearchSchema.TABLE_NAME, RecentSearchSchema.INSERT_DATE, false, "", rowmax);
         List<Map<String, String>> queryList = DBUtil.queryBySQL(sql, new String[]{}, context);
         for (Map<String, String> m : queryList) {
             String englishId = m.get(RecentSearchSchema.ENGLISH_ID);

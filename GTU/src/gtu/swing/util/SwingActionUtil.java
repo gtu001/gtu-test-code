@@ -58,16 +58,34 @@ public class SwingActionUtil {
         void action(EventObject evt) throws Exception;
     }
 
-    public SwingActionUtil addAction(String actionName, final Action action) {
+    public SwingActionUtil addAction(String actionName, final boolean isHandleEx, final Action action) {
         if (registerActionMap.containsKey(actionName)) {
             throw new RuntimeException(actionName + "已存在!!");
         }
         System.out.println("註冊 action : " + actionName);
         registerActionMap.put(actionName, new Process() {
             public void action(EventObject evt) throws Exception {
-                action.action(evt);
+                try {
+                    action.action(evt);
+                } catch (Exception ex) {
+                    if (isHandleEx) {
+                        JCommonUtil.handleException(ex);
+                    } else {
+                        throw ex;
+                    }
+                }
             }
         });
+        return this;
+    }
+
+    public SwingActionUtil addActionHex(String actionName, final Action action) {
+        addAction(actionName, true, action);
+        return this;
+    }
+
+    public SwingActionUtil addAction(String actionName, final Action action) {
+        addAction(actionName, false, action);
         return this;
     }
 

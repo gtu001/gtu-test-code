@@ -17,6 +17,8 @@ public interface ITxtReaderActivityDTO {
 
     boolean getBookmarkMode();
 
+    void setBookmarkMode(boolean bookmarkMode);
+
     Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
 
     AtomicReference<Integer> getBookmarkIndexHolder();

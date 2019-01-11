@@ -73,7 +73,7 @@ public class SwingTemplateUI extends JFrame {
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("New tab", null, panel_1, null);
-        
+
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -101,13 +101,13 @@ public class SwingTemplateUI extends JFrame {
     }
 
     private void applyAllEvents() {
-        swingUtil.addAction(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("====Test Default Event!!====");
             }
         });
-        swingUtil.addAction(ActionDefine.JTabbedPane_ChangeIndex.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.JTabbedPane_ChangeIndex.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());

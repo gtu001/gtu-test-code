@@ -1,4 +1,4 @@
-﻿package gtu.html.simple;
+package gtu.html.simple;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,11 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
-import org.yaml.snakeyaml.Yaml;
 
 import gtu.console.SystemInUtil;
+import gtu.string.StringUtil_;
 import gtu.yaml.util.YamlUtil;
 
 public class HtmlInputSimpleCreater {
@@ -30,24 +28,31 @@ public class HtmlInputSimpleCreater {
 
     public static void main(String[] args) {
         HtmlInputSimpleCreater t = new HtmlInputSimpleCreater();
-        HtmlTypeHandler htmlTypeHandler = t.new HtmlTypeHandler();
+        String fromData = SystemInUtil.readContent();
+        InputStream is = HtmlInputSimpleCreater.class.getResourceAsStream("HtmlInputSimpleCreater_Template.yaml");
+        String result = t.execute(is, fromData);
+        System.out.println(result);
+        System.out.println("done...");
+    }
 
-        List<String> lst = SystemInUtil.readContentToList(true, false, false);
+    public String execute(InputStream template, String fromData) {
+        HtmlTypeHandler htmlTypeHandler = new HtmlTypeHandler(template);
+        List<String> lst = StringUtil_.readContentToList(fromData, true, false, false);
         StringBuffer sb = new StringBuffer();
         sb.append("<tr>");
         for (int ii = 0; ii < lst.size(); ii++) {
             String line = lst.get(ii);
             if (StringUtils.isNotBlank(line)) {
-                String chineseLabel = t.getChineseLabel(line);
-                Map<String, HtmlType> tagMap = t.getInputGroup(line, htmlTypeHandler);
-                String html = t.getTagGroupHtml(tagMap, chineseLabel);
+                String chineseLabel = getChineseLabel(line);
+                Map<String, HtmlType> tagMap = getInputGroup(line, htmlTypeHandler);
+                String html = getTagGroupHtml(tagMap, chineseLabel);
                 sb.append(String.format(TD, chineseLabel, html));
             } else {
                 sb.append("</tr>\n<tr>");
             }
         }
         System.out.println(sb.toString());
-        System.out.println("done...");
+        return sb.toString();
     }
 
     private String getChineseLabel(String line) {
@@ -84,8 +89,7 @@ public class HtmlInputSimpleCreater {
     private class HtmlTypeHandler {
         List<HtmlType> tagLst = new ArrayList<HtmlType>();
 
-        private HtmlTypeHandler() {
-            InputStream is = this.getClass().getResourceAsStream("HtmlInputSimpleCreater_Template.yaml");
+        private HtmlTypeHandler(InputStream is) {
             List<Map<String, String>> lst = (List<Map<String, String>>) YamlUtil.loadInputStream(is);
             for (Map<String, String> e : lst) {
                 HtmlType vo = new HtmlType();

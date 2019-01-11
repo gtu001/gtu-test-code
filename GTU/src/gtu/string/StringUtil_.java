@@ -1,9 +1,13 @@
 package gtu.string;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.MatchResult;
@@ -657,5 +661,37 @@ public class StringUtil_ {
         private String getResult() {
             return result;
         }
+    }
+
+    public static List<String> readContentToList(String content, boolean trim, boolean emptyIgnore, boolean distinct) {
+        List<String> lst = new ArrayList<String>();
+        BufferedReader bufreader = null;
+        try {
+            bufreader = new BufferedReader(new StringReader(content));
+            for (String line = null; (line = bufreader.readLine()) != null;) {
+                if (trim) {
+                    line = StringUtils.trimToEmpty(line);
+                }
+                if (emptyIgnore && StringUtils.isBlank(line)) {
+                    continue;
+                }
+                if (distinct) {
+                    if (!lst.contains(line)) {
+                        lst.add(line);
+                        continue;
+                    }
+                }
+                lst.add(line);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                bufreader.close();
+            } catch (IOException e) {
+            }
+        }
+        return lst;
     }
 }

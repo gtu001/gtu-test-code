@@ -181,6 +181,8 @@ public class TxtReaderAppender {
                             isClickBookmark = true;
                             setBookmarking(!this.isBookmarking());
                             putToBookmarkHolder(this);
+
+                            dto.setBookmarkMode(false);
                         }
 
                         // 新增單字
