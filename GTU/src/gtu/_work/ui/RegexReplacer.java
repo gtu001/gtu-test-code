@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -322,7 +323,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                                     String replaceText = StringUtils.defaultString(replaceArea.getText());
-                                    replaceText = replacer(config.fromVal, config.toVal, replaceText);
+                                    replaceText = replacerDetail(config.fromVal, config.toVal, replaceText);
                                     resultArea.setText(replaceText);
                                     jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
                                     // 貼到記事本
@@ -617,7 +618,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
             Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
             Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
-            resultArea.setText(replacer(fromPattern, toFormat, replaceText));
+            resultArea.setText(replacerDetail(fromPattern, toFormat, replaceText));
             // 切換到結果
             jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
             // 貼到記事本
@@ -642,7 +643,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         DefaultListModel model = (DefaultListModel) templateList.getModel();
         for (int ii = 0; ii < model.getSize(); ii++) {
             PropConfigHandler.Config entry = (PropConfigHandler.Config) model.getElementAt(ii);
-            replaceText = replacer(entry.fromVal, entry.toVal, replaceText);
+            replaceText = replacerDetail(entry.fromVal, entry.toVal, replaceText);
         }
         resultArea.setText(replaceText);
     }
@@ -655,87 +656,99 @@ public class RegexReplacer extends javax.swing.JFrame {
      * @param replaceText
      *            要替換的本文
      */
-    String replacer(String fromPattern, String toFormat, String replaceText) {
-        String errorRtn = replaceText.toString();
-        try {
-            int patternFlag = 0;
+    String replacerDetail(String fromPattern, String $toFormat, String replaceText) {
+        TradeOffConfig config = this.getTradeOffConfig();
 
-            // 多行判斷
-            if (multiLineCheckBox.isSelected()) {
-                patternFlag = Pattern.DOTALL | Pattern.MULTILINE;
-            }
+        List<String> toFormatLst = new ArrayList<String>();
+        if (StringUtils.isNotBlank(config.split)) {
+            String[] arrys = $toFormat.split(Pattern.quote(config.split));
+            toFormatLst.addAll(Arrays.asList(arrys));
+        } else {
+            toFormatLst.add(replaceText);
+        }
 
-            Pattern pattern = Pattern.compile(fromPattern, patternFlag);
-            Matcher matcher = pattern.matcher(replaceText);
+        List<String> rtnLst = new ArrayList<String>();
+        for (String toFormat : toFormatLst) {
+            try {
+                int patternFlag = 0;
 
-            StringBuffer sb = new StringBuffer();
-            String tempStr = null;
-
-            TradeOffConfig config = this.getTradeOffConfig();
-
-            {
-                if (StringUtils.isNotBlank(config.prefix)) {
-                    sb.append(config.prefix + "\r\n");
+                // 多行判斷
+                if (multiLineCheckBox.isSelected()) {
+                    patternFlag = Pattern.DOTALL | Pattern.MULTILINE;
                 }
 
-                int startPos = 0;
-                for (; matcher.find();) {
-                    tempStr = toFormat.toString();
+                Pattern pattern = Pattern.compile(fromPattern, patternFlag);
+                Matcher matcher = pattern.matcher(replaceText);
+
+                StringBuffer sb = new StringBuffer();
+                String tempStr = null;
+                {
+                    if (StringUtils.isNotBlank(config.prefix)) {
+                        sb.append(config.prefix + "\r\n");
+                    }
+
+                    int startPos = 0;
+                    for (; matcher.find();) {
+                        tempStr = toFormat.toString();
+
+                        if (!config.isOnlyMatch) {
+                            sb.append(replaceText.substring(startPos, matcher.start()));
+                        }
+
+                        // ----------------------------------------------
+                        if (StringUtils.isBlank(config.fremarkerKey)) {
+                            // regex
+                            for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                                System.out.println(ii + " -- " + matcher.group(ii));
+                                tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                            }
+                        } else if (StringUtils.isNotBlank(config.fremarkerKey)) {
+                            // freemarker
+                            Map<String, Object> root = new HashMap<String, Object>();
+                            TreeMap<Integer, Object> lstMap = new TreeMap<Integer, Object>();
+                            for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                                lstMap.put(ii, matcher.group(ii));
+                            }
+                            root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
+                            System.out.println("template Map : " + root);
+                            tempStr = FreeMarkerSimpleUtil.replace(tempStr, root);
+                        }
+                        // ----------------------------------------------
+
+                        sb.append(tempStr);
+                        startPos = matcher.end();
+
+                        if (config.isOnlyMatch) {
+                            sb.append("\r\n");
+                        }
+                    }
 
                     if (!config.isOnlyMatch) {
-                        sb.append(replaceText.substring(startPos, matcher.start()));
+                        sb.append(replaceText.substring(startPos));
                     }
 
-                    // ----------------------------------------------
-                    if (StringUtils.isBlank(config.fremarkerKey)) {
-                        // regex
-                        for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                            System.out.println(ii + " -- " + matcher.group(ii));
-                            tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
-                        }
-                    } else if (StringUtils.isNotBlank(config.fremarkerKey)) {
-                        // freemarker
-                        Map<String, Object> root = new HashMap<String, Object>();
-                        TreeMap<Integer, Object> lstMap = new TreeMap<Integer, Object>();
-                        for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                            lstMap.put(ii, matcher.group(ii));
-                        }
-                        root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
-                        System.out.println("template Map : " + root);
-                        tempStr = FreeMarkerSimpleUtil.replace(tempStr, root);
-                    }
-                    // ----------------------------------------------
-
-                    sb.append(tempStr);
-                    startPos = matcher.end();
-
-                    if (config.isOnlyMatch) {
-                        sb.append("\r\n");
+                    if (StringUtils.isNotBlank(config.suffix)) {
+                        sb.append(config.suffix + "\r\n");
                     }
                 }
 
-                if (!config.isOnlyMatch) {
-                    sb.append(replaceText.substring(startPos));
-                }
-
-                if (StringUtils.isNotBlank(config.suffix)) {
-                    sb.append(config.suffix + "\r\n");
-                }
+                rtnLst.add(sb.toString());
+            } catch (Exception ex) {
+                // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
+                // getTitle());
+                JCommonUtil.handleException(ex);
+                return "";
             }
-
-            return sb.toString();
-        } catch (Exception ex) {
-            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
-            // getTitle());
-            JCommonUtil.handleException(ex);
-            return errorRtn;
         }
+
+        return StringUtils.join(rtnLst, "\r\n");
     }
 
     private class TradeOffConfig {
         String fremarkerKey;
         String prefix;
         String suffix;
+        String split;
         boolean isOnlyMatch = false;
         JSONObject json;
 
@@ -752,6 +765,9 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
             if (json.containsKey(SelectionObj.suffix.key)) {
                 suffix = json.getString(SelectionObj.suffix.key);
+            }
+            if (json.containsKey(SelectionObj.split.key)) {
+                split = json.getString(SelectionObj.split.key);
             }
         }
     }
@@ -1018,7 +1034,8 @@ public class RegexReplacer extends javax.swing.JFrame {
         ftl("ftl", "ftl (設定ftl變數 , ex:arry)", "strKey"), //
         only_match("only_match", "only_match (是否只抓group, true|false)", "boolKey"), //
         prefix("prefix", "prefix (前置文字)", "strKey"), //
-        suffix("suffix", "suffix (後置文字)", "strKey"),//
+        suffix("suffix", "suffix (後置文字)", "strKey"), //
+        split("split", "split (分頁)", "strKey"),//
         ;
         final String key;
         final String label;
