@@ -664,7 +664,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             String[] arrys = $toFormat.split(Pattern.quote(config.split));
             toFormatLst.addAll(Arrays.asList(arrys));
         } else {
-            toFormatLst.add(replaceText);
+            toFormatLst.add($toFormat);
         }
 
         List<String> rtnLst = new ArrayList<String>();
