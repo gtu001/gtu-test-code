@@ -50,6 +50,7 @@ public class UrlPlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        onMyServiceDestory();
         super.onDestroy();
     }
 
