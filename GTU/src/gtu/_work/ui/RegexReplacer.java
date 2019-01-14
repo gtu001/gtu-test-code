@@ -70,6 +70,7 @@ import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
+import gtu.swing.util.SwingTabTemplateUI.FocusTabHandlerGtu001;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -109,6 +110,14 @@ public class RegexReplacer extends javax.swing.JFrame {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
                     RegexReplacer regex = ((RegexReplacer) jframeKeeperLst.get(tabIndex));
+                    regex.jTabbedPane1.setSelectedIndex(0);
+                }
+            }
+        });
+        tabUI.setEventOnFocus(new FocusTabHandlerGtu001() {
+            public void focusOnWin(List<JFrame> jframeKeeperLst) {
+                for (JFrame f : jframeKeeperLst) {
+                    RegexReplacer regex = ((RegexReplacer) f);
                     regex.jTabbedPane1.setSelectedIndex(0);
                 }
             }

@@ -7,26 +7,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 
+import gtu.swing.util.DraggableTabbedPane.DraggableTabbedPaneMove;
+
 public class SwingTabTemplateUI {
 
     private JPanel contentPane;
-    private JTabbedPane tabbedPane;
+    private DraggableTabbedPane tabbedPane;
     private JFrame jframe;
     private Class<?> uiJframeClass = null;
     private List<JFrame> jframeKeeperLst = new ArrayList<JFrame>();
     private ChangeTabHandlerGtu001 changeTabHandlerGtu001;
+    private FocusTabHandlerGtu001 focusTabHandlerGtu001;
 
     /**
      * Launch the application.
@@ -53,7 +58,8 @@ public class SwingTabTemplateUI {
         jframe.setContentPane(contentPane);
         contentPane.setLayout(new BorderLayout(0, 0));
 
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new DraggableTabbedPane();// new
+                                               // JTabbedPane(JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 System.out.println("changeTab : " + tabbedPane.getSelectedIndex());
@@ -128,6 +134,34 @@ public class SwingTabTemplateUI {
                 }
             }
         });
+        tabbedPane.setEventOfMove(new DraggableTabbedPaneMove() {
+            @Override
+            public void beforeMoveFromTo(int fromIndex, int toIndex) {
+                TreeMap<Integer, JFrame> oldMap = new TreeMap<Integer, JFrame>();
+                for (int ii = 0; ii < jframeKeeperLst.size(); ii++) {
+                    JFrame f = jframeKeeperLst.get(ii);
+                    oldMap.put(ii, f);
+                }
+                JFrame from = oldMap.get(fromIndex);
+                JFrame to = oldMap.get(toIndex);
+                oldMap.put(fromIndex, to);
+                oldMap.put(toIndex, from);
+                jframeKeeperLst = new ArrayList<JFrame>(oldMap.values());
+            }
+        });
+        jframe.addWindowFocusListener(new WindowFocusListener() {
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+            }
+
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                if (focusTabHandlerGtu001 != null) {
+                    focusTabHandlerGtu001.focusOnWin(jframeKeeperLst);
+                }
+            }
+        });
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         {
@@ -174,8 +208,16 @@ public class SwingTabTemplateUI {
         public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst);
     }
 
+    public interface FocusTabHandlerGtu001 {
+        public void focusOnWin(List<JFrame> jframeKeeperLst);
+    }
+
     public void setEventAfterChangeTab(ChangeTabHandlerGtu001 changeTabHandlerGtu001) {
         this.changeTabHandlerGtu001 = changeTabHandlerGtu001;
+    }
+
+    public void setEventOnFocus(FocusTabHandlerGtu001 focusTabHandlerGtu001) {
+        this.focusTabHandlerGtu001 = focusTabHandlerGtu001;
     }
 
     public void setSize(int width, int height) {
