@@ -109,7 +109,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
                     RegexReplacer regex = ((RegexReplacer) jframeKeeperLst.get(tabIndex));
-                    System.out.println("afterChangeTab = " + regex);
+                    regex.jTabbedPane1.setSelectedIndex(0);
                 }
             }
         });
