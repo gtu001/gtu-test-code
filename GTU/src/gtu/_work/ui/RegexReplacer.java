@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -33,6 +31,7 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -40,7 +39,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -66,9 +64,11 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
-import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextUndoUtil;
+import gtu.swing.util.KeyEventExecuteHandler;
+import gtu.swing.util.SwingTabTemplateUI;
+import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -92,13 +92,28 @@ public class RegexReplacer extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                RegexReplacer inst = new RegexReplacer();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        // SwingUtilities.invokeLater(new Runnable() {
+        // public void run() {
+        // RegexReplacer inst = new RegexReplacer();
+        // inst.setLocationRelativeTo(null);
+        // gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        // }
+        // });
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            System.out.println("=====" + info.getClassName());
+            // javax.swing.UIManager.setLookAndFeel(info.getClassName());
+        }
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "cheater.ico", RegexReplacer.class, true);
+        tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
+            public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
+                if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
+                    RegexReplacer regex = ((RegexReplacer) jframeKeeperLst.get(tabIndex));
+                    System.out.println("afterChangeTab = " + regex);
+                }
             }
         });
+        tabUI.setSize(700, 550);
+        tabUI.startUI();
     }
 
     public RegexReplacer() {
@@ -517,6 +532,13 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
             hideInSystemTrayHelper.apply(this);
 
+            KeyEventExecuteHandler.newInstance(this, new Runnable() {
+                @Override
+                public void run() {
+                    exeucteActionPerformed(null);
+                }
+            });
+
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
 
             panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
@@ -703,7 +725,8 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             return sb.toString();
         } catch (Exception ex) {
-//            JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(), getTitle());
+            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
+            // getTitle());
             JCommonUtil.handleException(ex);
             return errorRtn;
         }
