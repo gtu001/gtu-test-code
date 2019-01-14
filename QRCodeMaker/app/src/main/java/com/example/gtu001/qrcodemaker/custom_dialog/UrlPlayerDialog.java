@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gtu001.qrcodemaker.Mp3Bean;
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
@@ -29,21 +30,21 @@ public class UrlPlayerDialog {
     private Context context;
     private Mp3PlayerHandler mp3Helper;
     private String message;
-    private UrlPlayerDialog_bg.Mp3Bean bean;
-    private List<UrlPlayerDialog_bg.Mp3Bean> totalUrlList;
+    private Mp3Bean bean;
+    private List<Mp3Bean> totalUrlList;
     private int currentIndex = -1;
 
     public UrlPlayerDialog(Context context) {
         this.context = context;
     }
 
-    public UrlPlayerDialog setUrl(String message, UrlPlayerDialog_bg.Mp3Bean bean, List<UrlPlayerDialog_bg.Mp3Bean> totalUrlList) {
+    public UrlPlayerDialog setUrl(String message, Mp3Bean bean, List<Mp3Bean> totalUrlList) {
         this.bean = bean;
         this.message = message;
         this.totalUrlList = totalUrlList;
 
         if (StringUtils.isBlank(this.message)) {
-            this.message = bean.name;
+            this.message = bean.getName();
         }
 
         if (totalUrlList != null) {
@@ -82,12 +83,12 @@ public class UrlPlayerDialog {
             @Override
             public void onClick(View v) {
                 try {
-                    if (UrlPlayerDialog.this.bean == null || StringUtils.isBlank(UrlPlayerDialog.this.bean.url)) {
+                    if (UrlPlayerDialog.this.bean == null || StringUtils.isBlank(UrlPlayerDialog.this.bean.getUrl())) {
                         Toast.makeText(context, "檔案錯誤!", Toast.LENGTH_SHORT).show();
                     }
                     if (mp3Helper == null) {
                         mp3Helper = Mp3PlayerHandler.create(context);
-                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.getUrl());
                         mp3Helper.play();
                     } else {
                         mp3Helper.pauseAndResume();
@@ -157,7 +158,7 @@ public class UrlPlayerDialog {
 
                     if (mp3Helper.isPlaying()) {
                         mp3Helper = Mp3PlayerHandler.create(context);
-                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.getUrl());
                         mp3Helper.play();
                     }
                 } catch (IllegalArgumentException ex) {
@@ -179,7 +180,7 @@ public class UrlPlayerDialog {
 
                     if (mp3Helper.isPlaying()) {
                         mp3Helper = Mp3PlayerHandler.create(context);
-                        mp3Helper.of(UrlPlayerDialog.this.bean.url);
+                        mp3Helper.of(UrlPlayerDialog.this.bean.getUrl());
                         mp3Helper.play();
                     }
                 } catch (IllegalArgumentException ex) {

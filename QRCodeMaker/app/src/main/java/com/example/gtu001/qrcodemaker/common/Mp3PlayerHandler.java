@@ -86,6 +86,10 @@ public class Mp3PlayerHandler {
         mediaplayer.release();
     }
 
+    public int getCurrentPosition() {
+        return mediaplayer.getCurrentPosition();
+    }
+
     public void backwardOrBackward(int second) {
         int length = mediaplayer.getCurrentPosition();
         mediaplayer.seekTo(length + (second * 1000));

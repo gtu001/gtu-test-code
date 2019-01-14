@@ -110,7 +110,7 @@ public class Mp3PlayerActivity extends Activity {
                 com.example.gtu001.qrcodemaker.common.Log.v(TAG, "videoUrl = " + item2.videoUrl);
                 com.example.gtu001.qrcodemaker.common.Log.v(TAG, "====================================================================");
 
-                UrlPlayerDialog_bg.Mp3Bean bean = new UrlPlayerDialog_bg.Mp3Bean();
+                Mp3Bean bean = new Mp3Bean();
                 bean.setName(item2.name);
                 bean.setUrl(item2.videoUrl);
 
@@ -165,7 +165,7 @@ public class Mp3PlayerActivity extends Activity {
         public void delete(FileItem item2) {
             for (int ii = 0; ii < listItem.size(); ii++) {
                 Map<String, Object> m = listItem.get(ii);
-                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                Mp3Bean b = new Mp3Bean();
                 FileItem y = (FileItem) m.get("item");
                 if (y == item2) {
                     listItem.remove(ii);
@@ -175,10 +175,10 @@ public class Mp3PlayerActivity extends Activity {
             baseAdapter.notifyDataSetChanged();
         }
 
-        public List<UrlPlayerDialog_bg.Mp3Bean> getTotalUrlList() {
-            List<UrlPlayerDialog_bg.Mp3Bean> lst = new ArrayList<>();
+        public List<Mp3Bean>  getTotalUrlList() {
+            List<Mp3Bean> lst = new ArrayList<>();
             for (Map<String, Object> m : listItem) {
-                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                Mp3Bean b = new Mp3Bean();
                 FileItem y = (FileItem) m.get("item");
                 b.setName(y.name);
                 b.setUrl(y.videoUrl);

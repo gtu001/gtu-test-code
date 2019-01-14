@@ -11,13 +11,13 @@ import android.support.annotation.RequiresApi;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
+import com.example.gtu001.qrcodemaker.Mp3Bean;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
-import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
+import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,8 +30,8 @@ public class UrlPlayerService extends Service {
 
     private Context context;
     private Handler handler = new Handler();
-    private UrlPlayerDialog_bg.Mp3Bean currentBean;
-    ;
+    private Mp3Bean currentBean;
+    private CurrentBeanHandler currentBeanHandler;
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +40,7 @@ public class UrlPlayerService extends Service {
         super.onCreate();
         Log.i(TAG, "oncreat");
         context = this.getApplicationContext();
+        currentBeanHandler = new CurrentBeanHandler();
     }
 
     @Override
@@ -63,7 +64,7 @@ public class UrlPlayerService extends Service {
     private Mp3PlayerHandler mp3Helper;
 
     private String startPlay(String name, String url) {
-        currentBean = new UrlPlayerDialog_bg.Mp3Bean();
+        currentBean = new Mp3Bean();
         currentBean.setName(name);
         currentBean.setUrl(url);
 
@@ -106,14 +107,40 @@ public class UrlPlayerService extends Service {
         return mp3Helper != null;
     }
 
+    public void onMyServiceDestory() {
+        if (currentBean == null) {
+            return;
+        }
+        currentBean.setLastPosition(String.valueOf(mp3Helper.getCurrentPosition()));
+        currentBeanHandler.putBean(context, currentBean);
+    }
+
+    private static class CurrentBeanHandler {
+        public void putBean(Context context, Mp3Bean currentBean) {
+            String refKey = UrlPlayerService.class.getName() + "_currentBean";
+            SharedPreferencesUtil.putData(context, refKey, "currentBean_name", currentBean.getName());
+            SharedPreferencesUtil.putData(context, refKey, "currentBean_url", currentBean.getUrl());
+            SharedPreferencesUtil.putData(context, refKey, "currentBean_lastPosition", currentBean.getLastPosition());
+        }
+
+        public Mp3Bean getBean(Context context) {
+            String refKey = UrlPlayerService.class.getName() + "_currentBean";
+            String name = SharedPreferencesUtil.getData(context, refKey, "currentBean_name");
+            String url = SharedPreferencesUtil.getData(context, refKey, "currentBean_url");
+            String lastPosition = SharedPreferencesUtil.getData(context, refKey, "currentBean_lastPosition");
+            Mp3Bean b = new Mp3Bean();
+            b.setUrl(url);
+            b.setName(name);
+            b.setLastPosition(lastPosition);
+            return b;
+        }
+    }
+
     private Map getCurrentBean() {
         if (currentBean == null) {
-            return null;
+            return currentBeanHandler.getBean(context).toMap();
         } else {
-            Map<String, String> rtnMap = new HashMap<String, String>();
-            rtnMap.put("name", currentBean.getName());
-            rtnMap.put("url", currentBean.getUrl());
-            return rtnMap;
+            return currentBean.toMap();
         }
     }
 
@@ -151,6 +178,11 @@ public class UrlPlayerService extends Service {
         @Override
         public Map getCurrentBean() throws RemoteException {
             return UrlPlayerService.this.getCurrentBean();
+        }
+
+        @Override
+        public void onMyServiceDestory() throws RemoteException {
+            UrlPlayerService.this.onMyServiceDestory();
         }
     };
 

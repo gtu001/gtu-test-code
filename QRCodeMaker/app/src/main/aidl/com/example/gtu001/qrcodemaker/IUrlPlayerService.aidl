@@ -18,4 +18,6 @@ interface IUrlPlayerService {
     boolean isInitDone();
 
     Map getCurrentBean();
+
+    void onMyServiceDestory();
 }

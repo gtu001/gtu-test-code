@@ -130,7 +130,7 @@ public class YoutubePlayerActivity extends Activity {
                 Log.v(TAG, "videoUrl = " + item2.videoUrl);
                 Log.v(TAG, "====================================================================");
 
-                UrlPlayerDialog_bg.Mp3Bean bean = new UrlPlayerDialog_bg.Mp3Bean();
+                Mp3Bean bean = new Mp3Bean();
                 bean.setUrl(item2.videoUrl);
                 bean.setName(item2.name);
 
@@ -210,10 +210,10 @@ public class YoutubePlayerActivity extends Activity {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
         Handler handler = new Handler();
 
-        public List<UrlPlayerDialog_bg.Mp3Bean> getTotalUrlList() {
-            List<UrlPlayerDialog_bg.Mp3Bean> lst = new ArrayList<>();
+        public List<Mp3Bean> getTotalUrlList() {
+            List<Mp3Bean> lst = new ArrayList<>();
             for (Map<String, Object> m : listItem) {
-                UrlPlayerDialog_bg.Mp3Bean b = new UrlPlayerDialog_bg.Mp3Bean();
+                Mp3Bean b = new Mp3Bean();
                 YoutubeItem y = (YoutubeItem) m.get("item");
                 b.setName(y.name);
                 b.setUrl(y.videoUrl);
