@@ -542,7 +542,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
             hideInSystemTrayHelper.apply(this);
 
-            KeyEventExecuteHandler.newInstance(this, new Runnable() {
+            KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
                 @Override
                 public void run() {
                     exeucteActionPerformed(null);

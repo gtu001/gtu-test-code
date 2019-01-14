@@ -18,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang.Validate;
+
 public class JProgressBarHelper {
 
     private JDialog dlg;
@@ -32,6 +34,7 @@ public class JProgressBarHelper {
     private boolean indeterminate = false;
     private int barValue = 0;
     private ActionListener closeListener;
+    private boolean modal = true;
 
     private static ActionListener DEFAULT_CLOSE_EVENT = new ActionListener() {
         @Override
@@ -117,6 +120,11 @@ public class JProgressBarHelper {
         return this;
     }
 
+    public JProgressBarHelper modal(boolean modal) {
+        this.modal = modal;
+        return this;
+    }
+
     public JProgressBarHelper dismissByMax() {
         setBarValue(max);
         try {
@@ -128,6 +136,7 @@ public class JProgressBarHelper {
     }
 
     public JProgressBarHelper show() {
+        Validate.notNull(dlg, "請先執行build!");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 dlg.setVisible(true);
@@ -160,7 +169,7 @@ public class JProgressBarHelper {
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                if (parentFrame != null &&gtu.swing.util.JFrameUtil.isVisible( parentFrame)) {
+                if (parentFrame != null && gtu.swing.util.JFrameUtil.isVisible(parentFrame)) {
                     Point newLoc = dlg.getLocation();
 
                     boolean setBackLoc = false;
@@ -200,6 +209,7 @@ public class JProgressBarHelper {
         dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dlg.setSize(width, height);
         dlg.setLocationRelativeTo(parentFrame);
+        dlg.setModal(modal);
         setBarValue(barValue);
         this.applyMoveBoundEvent(dlg);
         if (this.closeListener != null) {

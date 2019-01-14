@@ -282,6 +282,28 @@ public class JTableUtil {
             table.setToolTipText(content);
         }
     }
+    
+    public static DefaultTableModel createModelIndicateType(final boolean readonly, List<?> header, final List<Class<?>> typeLst) {
+        DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header.toArray()) {
+            private static final long serialVersionUID = 1L;
+
+            // 設定column class
+            @Override
+            public Class<?> getColumnClass(int c) {
+                return typeLst.get(c);
+            }
+
+            // 設定可否編輯
+            public boolean isCellEditable(int row, int column) {
+                if (readonly) {
+                    return false;
+                } else {
+                    return super.isCellEditable(row, column);
+                }
+            }
+        };
+        return model;
+    }
 
     public static DefaultTableModel createModel(final boolean readonly, Object... header) {
         DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header) {

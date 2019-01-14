@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -64,7 +63,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -106,6 +104,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
@@ -255,7 +254,6 @@ public class FastDBQueryUI extends JFrame {
     private JButton executeSqlButton2;
     private JButton refConfigPathYamlExportBtn;
     private JTabbedPane tabbedPane;
-    private AtomicBoolean isQueryProceding = new AtomicBoolean(false);
 
     /**
      * Launch the application.
@@ -1152,7 +1150,12 @@ public class FastDBQueryUI extends JFrame {
 
             panel_22.add(refConfigPathYamlExportBtn);
 
-            new KeyEventDoQueryHandler(this);
+            KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "查詢中...", null, new Runnable() {
+                @Override
+                public void run() {
+                    executeSqlButtonClick();
+                }
+            });
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -1491,12 +1494,6 @@ public class FastDBQueryUI extends JFrame {
      */
     private void executeSqlButtonClick() {
         try {
-            if (isQueryProceding.get()) {
-                return;
-            } else {
-                isQueryProceding.set(true);
-            }
-
             // init
             {
                 isResetQuery = true;
@@ -1626,7 +1623,6 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
             }
         } finally {
-            isQueryProceding.set(false);
         }
     }
 
@@ -1681,7 +1677,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         // 查詢結果table
-        DefaultTableModel createModel = createModel4QueryResult(queryResultTable, true, queryList.getLeft(), queryList.getMiddle());
+        DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, queryList.getLeft(), queryList.getMiddle());
         queryResultTable.setModel(createModel);
 
         // 設定 Value 顯示方式
@@ -1691,29 +1687,6 @@ public class FastDBQueryUI extends JFrame {
         for (Object[] rows : queryList.getRight()) {
             createModel.addRow(rows);
         }
-    }
-
-    public static DefaultTableModel createModel4QueryResult(final JTable queryResultTable, final boolean readonly, List<String> header, final List<Class<?>> typeLst) {
-        DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header.toArray()) {
-            private static final long serialVersionUID = 1L;
-
-            // 設定column class
-            @Override
-            public Class<?> getColumnClass(int c) {
-                int col = JTableUtil.getRealColumnPos(c, queryResultTable);
-                return typeLst.get(col);
-            }
-
-            // 設定可否編輯
-            public boolean isCellEditable(int row, int column) {
-                if (readonly) {
-                    return false;
-                } else {
-                    return super.isCellEditable(row, column);
-                }
-            }
-        };
-        return model;
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {
@@ -3451,37 +3424,5 @@ public class FastDBQueryUI extends JFrame {
         }
         List<Class<?>> typeLst = new ArrayList<Class<?>>(typeMap.values());
         return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
-    }
-
-    private class KeyEventDoQueryHandler {
-        private KeyEventDoQueryHandler(FastDBQueryUI self) {
-            for (Field f : self.getClass().getDeclaredFields()) {
-                if (JComponent.class.isAssignableFrom(f.getType())) {
-                    try {
-                        JComponent j = (JComponent) FieldUtils.readDeclaredField(self, f.getName(), true);
-                        j.addKeyListener(new KeyAdapter() {
-                            @Override
-                            public void keyPressed(KeyEvent e) {
-                                doExecuteSqlButtonClick(e);
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        private void doExecuteSqlButtonClick(KeyEvent e) {
-            boolean execute = false;
-            if ((e.getModifiers() & KeyEvent.ALT_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_ENTER) {
-                execute = true;
-            } else if (e.getKeyCode() == KeyEvent.VK_F5) {
-                execute = true;
-            }
-            if (execute) {
-                executeSqlButtonClick();
-            }
-        }
     }
 }
