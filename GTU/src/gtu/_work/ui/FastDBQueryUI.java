@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -736,6 +735,31 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+
+        for (final JTextField f : new JTextField[] { rowFilterText, columnFilterText }) {
+            f.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String[] texts = StringUtils.split(f.getText(), " ");
+                                List<String> arry = new ArrayList<String>();
+                                for (String x : texts) {
+                                    x = StringUtils.trimToEmpty(x);
+                                    if (StringUtils.isNotBlank(x)) {
+                                        arry.add(x);
+                                    }
+                                }
+                                f.setText(StringUtils.join(arry, "^"));
+                            }
+                        }).applyEvent(e).show();
+                    }
+                }
+            });
+        }
 
         panel_14 = new JPanel();
         panel_12.add(panel_14, BorderLayout.WEST);
@@ -3425,8 +3449,8 @@ public class FastDBQueryUI extends JFrame {
         List<Class<?>> typeLst = new ArrayList<Class<?>>(typeMap.values());
         return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
     }
-    
-    protected void handleExceptionForExecuteSQL(Exception ex){
+
+    protected void handleExceptionForExecuteSQL(Exception ex) {
         String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
         String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
         // 一般顯示

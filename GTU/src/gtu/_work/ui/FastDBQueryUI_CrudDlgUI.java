@@ -994,6 +994,30 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             {
                 searchText = new JTextField();
+                for (final JTextField f : new JTextField[] { searchText }) {
+                    f.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            if (JMouseEventUtil.buttonRightClick(1, e)) {
+                                JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        String[] texts = StringUtils.split(f.getText(), " ");
+                                        List<String> arry = new ArrayList<String>();
+                                        for (String x : texts) {
+                                            x = StringUtils.trimToEmpty(x);
+                                            if (StringUtils.isNotBlank(x)) {
+                                                arry.add(x);
+                                            }
+                                        }
+                                        f.setText(StringUtils.join(arry, "^"));
+                                    }
+                                }).applyEvent(e).show();
+                            }
+                        }
+                    });
+                }
                 panel.add(searchText);
                 searchText.setColumns(25);
                 searchText.setToolTipText("分隔符號為\"^\"");
