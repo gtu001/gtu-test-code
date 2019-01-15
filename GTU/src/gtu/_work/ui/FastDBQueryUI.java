@@ -3425,4 +3425,16 @@ public class FastDBQueryUI extends JFrame {
         List<Class<?>> typeLst = new ArrayList<Class<?>>(typeMap.values());
         return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
     }
+    
+    protected void handleExceptionForExecuteSQL(Exception ex){
+        String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+        String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+        // 一般顯示
+        if (StringUtils.isBlank(findMessage)) {
+            JCommonUtil.handleException(ex);
+        } else {
+            // html顯示
+            JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
+        }
+    }
 }

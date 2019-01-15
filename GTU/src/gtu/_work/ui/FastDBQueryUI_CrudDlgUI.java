@@ -419,7 +419,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                     JCommonUtil._jOptionPane_showMessageDialog_info(String.format("成功:%d,失敗:%d,共:%d\n", successCount, failCount, (successCount + failCount)) + resultLst);
                                     if (ex1 != null) {
                                         ex1.printStackTrace();
-                                        JCommonUtil.handleException(ex1);
+                                        // JCommonUtil.handleException(ex1);
+                                        _parent.handleExceptionForExecuteSQL(ex1);
                                     }
                                 }
                             });
