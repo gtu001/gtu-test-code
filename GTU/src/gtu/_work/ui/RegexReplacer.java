@@ -89,6 +89,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
+    private KeyEventExecuteHandler keyEventExecuteHandler;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -118,6 +119,12 @@ public class RegexReplacer extends javax.swing.JFrame {
             public void focusOnWin(List<JFrame> jframeKeeperLst) {
                 for (JFrame f : jframeKeeperLst) {
                     RegexReplacer regex = ((RegexReplacer) f);
+
+                    // 還在進行
+                    if (System.currentTimeMillis() - regex.keyEventExecuteHandler.getExecuteStartTime() < 1000) {
+                        continue;
+                    }
+
                     regex.jTabbedPane1.setSelectedIndex(0);
                 }
             }
@@ -542,7 +549,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/cheater.ico");
             hideInSystemTrayHelper.apply(this);
 
-            KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
+            keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
                 @Override
                 public void run() {
                     exeucteActionPerformed(null);

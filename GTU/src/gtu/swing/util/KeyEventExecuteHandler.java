@@ -4,6 +4,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class KeyEventExecuteHandler {
     private AtomicBoolean isPrecedingExeucte = new AtomicBoolean(false);
+    private AtomicLong executeStartTime = new AtomicLong(-1);
     private Runnable runnable;
     private JFrame self;
     private String title;
@@ -69,6 +71,7 @@ public class KeyEventExecuteHandler {
         if (doExecute) {
             if (!isPrecedingExeucte.get()) {
                 isPrecedingExeucte.set(true);
+                executeStartTime.set(System.currentTimeMillis());
             } else {
                 return;
             }
@@ -93,5 +96,13 @@ public class KeyEventExecuteHandler {
                 }
             }).start();
         }
+    }
+
+    public boolean isPrecedingExeucte() {
+        return isPrecedingExeucte.get();
+    }
+
+    public long getExecuteStartTime() {
+        return executeStartTime.get();
     }
 }
