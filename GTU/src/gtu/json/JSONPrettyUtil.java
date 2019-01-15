@@ -14,6 +14,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import net.sf.json.JSONSerializer;
 import net.sf.json.util.JSONUtils;
 
 public class JSONPrettyUtil {
@@ -36,7 +37,11 @@ public class JSONPrettyUtil {
     }
 
     public static String formatByNetSf(Object jsonObject) {
-        return JSONUtils.valueToString(jsonObject, 8, 4);
+        if (jsonObject instanceof String) {
+            return JSONUtils.valueToString(JSONSerializer.toJSON(jsonObject), 8, 4);
+        } else {
+            return net.sf.json.util.JSONUtils.valueToString(jsonObject, 8, 4);
+        }
     }
 
     public static String formatByJDK17(String jsonStringNoWhitespace) {

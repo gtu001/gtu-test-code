@@ -46,7 +46,6 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.json.JSONObject2CollectionUtil2;
-import gtu.net.socket.ex1.SocketUtilForSwing;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
@@ -55,11 +54,14 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+import net.sf.json.util.JSONUtils;
 
 public class FreemarkerReplaceUI extends JFrame {
-    
+
     private static final long serialVersionUID = 1L;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
@@ -159,6 +161,23 @@ public class FreemarkerReplaceUI extends JFrame {
         panel.add(panel_5, BorderLayout.EAST);
 
         jsonArea = new JTextArea();
+        jsonArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(jsonArea)//
+                            .addJMenuItem("格式化json", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    String text = formatByNetSf(jsonArea.getText());
+                                    if (StringUtils.isNotBlank(text)) {
+                                        jsonArea.setText(text);
+                                    }
+                                }
+                            }).applyEvent(e).show();
+                }
+            }
+        });
         JTextAreaUtil.applyCommonSetting(jsonArea);
         jsonArea.addKeyListener(new KeyAdapter() {
             @Override
@@ -308,10 +327,11 @@ public class FreemarkerReplaceUI extends JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/monster.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
+            panel_16.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
-            
+
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-            
+
             panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
             this.setTitle("You Set My World On Fire");
         }
@@ -513,6 +533,14 @@ public class FreemarkerReplaceUI extends JFrame {
         String fixPath = FileUtil.fixPath(file.getAbsolutePath(), true);
         System.out.println("getRelativePath = " + fixPath);
         return fixPath;
+    }
+
+    public static String formatByNetSf(Object jsonObject) {
+        if (jsonObject instanceof String) {
+            return JSONUtils.valueToString(JSONSerializer.toJSON(jsonObject), 8, 4);
+        } else {
+            return net.sf.json.util.JSONUtils.valueToString(jsonObject, 8, 4);
+        }
     }
 
     private class FileZ {
