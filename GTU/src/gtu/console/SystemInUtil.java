@@ -2,6 +2,8 @@ package gtu.console;
 
 import java.io.BufferedReader;
 import java.io.Console;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,11 +39,17 @@ public class SystemInUtil {
      * @return
      */
     public static String readContent() {
+        return readContent(System.in);
+    }
+
+    public static String readContent(InputStream in) {
         System.out.println("請輸入 : ");
-        InputStreamReader reader = new InputStreamReader(System.in);
-        BufferedReader bufreader = new BufferedReader(reader);
+        InputStreamReader reader = null;
+        BufferedReader bufreader = null;
         StringBuffer sb = new StringBuffer();
         try {
+            reader = new InputStreamReader(in);
+            bufreader = new BufferedReader(reader);
             while (true) {
                 String line = bufreader.readLine();
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
@@ -51,19 +59,30 @@ public class SystemInUtil {
                     System.out.println(line);
                 }
             }
-            bufreader.close();
-            reader.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                bufreader.close();
+            } catch (Exception e) {
+            }
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
         }
         return sb.toString();
     }
-    
+
     /**
      * 讀入console資料
-     * @param trim 是否要trim
-     * @param emptyIgnore 是否忽略空白行
-     * @param distinct 是否不重複加入
+     * 
+     * @param trim
+     *            是否要trim
+     * @param emptyIgnore
+     *            是否忽略空白行
+     * @param distinct
+     *            是否不重複加入
      * @return
      */
     public static List<String> readContentToList(boolean trim, boolean emptyIgnore, boolean distinct) {

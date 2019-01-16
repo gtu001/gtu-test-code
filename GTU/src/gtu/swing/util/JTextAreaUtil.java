@@ -4,13 +4,18 @@ import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.TreeMap;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
@@ -85,6 +90,51 @@ public class JTextAreaUtil {
      */
     public static PrintStream getNewPrintStream2JTextArea(final JTextArea logArea) {
         return getNewPrintStream2JTextArea(logArea, -1, false);
+    }
+
+    /**
+     * 可把 TextArea當成console, 程式必須放在 Thread
+     * @param consoleArea
+     * @param encode
+     * @return
+     * @throws Exception
+     */
+    public static InputStream getConsoleInput_fromJTextArea(final JTextArea consoleArea, final String encode) throws Exception {
+        try {
+            consoleArea.setText("請輸入(exit為結束):\r\n");
+            final PipedOutputStream pop = new PipedOutputStream();
+            PipedInputStream pin = new PipedInputStream();
+            pin.connect(pop);
+            consoleArea.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                }
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    try {
+                        String text = e.getDocument().getText(e.getOffset(), e.getLength());
+                        byte[] bs = text.getBytes(encode);
+                        try {
+                            pop.write(bs);
+                        } catch (IOException ex) {
+                            if (!ex.getMessage().contains("Pipe closed")) {
+                                throw ex;
+                            }
+                        }
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                }
+            });
+            return pin;
+        } catch (Exception e2) {
+            throw e2;
+        }
     }
 
     /**
