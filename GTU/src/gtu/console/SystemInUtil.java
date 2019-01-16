@@ -43,7 +43,7 @@ public class SystemInUtil {
     }
 
     public static String readContent(InputStream in) {
-        System.out.println("請輸入 : ");
+        System.out.println("請輸入(exit,quit為結束) : ");
         InputStreamReader reader = null;
         BufferedReader bufreader = null;
         StringBuffer sb = new StringBuffer();

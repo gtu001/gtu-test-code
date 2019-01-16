@@ -101,7 +101,7 @@ public class JTextAreaUtil {
      */
     public static InputStream getConsoleInput_fromJTextArea(final JTextArea consoleArea, final String encode) throws Exception {
         try {
-            consoleArea.setText("請輸入(exit為結束):\r\n");
+            consoleArea.setText("請輸入(exit,quit為結束):\r\n");
             final PipedOutputStream pop = new PipedOutputStream();
             PipedInputStream pin = new PipedInputStream();
             pin.connect(pop);
