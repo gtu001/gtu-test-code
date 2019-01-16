@@ -74,6 +74,9 @@
         <activity
             android:name=".FileFindActivity"
             android:label="檔案選擇" />
+        <activity
+            android:name=".BigFileActivity"
+            android:label="大檔檢測" />
 
     </application>
 

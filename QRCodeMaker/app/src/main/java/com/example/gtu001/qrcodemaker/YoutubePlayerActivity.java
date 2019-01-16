@@ -181,17 +181,17 @@ public class YoutubePlayerActivity extends Activity {
         //  https://www.youtube.com/watch?v=VZnHlYwXNms
         //  https://youtu.be/XXXXXXXXXXXX
         strVal = StringUtils.trimToEmpty(strVal);
-        Pattern ptn = Pattern.compile("watch\\?v\\=(.*?)\\&");
+        Pattern ptn = Pattern.compile("watch\\?v\\=([.\\-]*?)\\&");
         Matcher mth = ptn.matcher(strVal);
         if (mth.find()) {
             return mth.group(1);
         }
-        Pattern ptn2 = Pattern.compile("watch\\?v\\=(.*)");
+        Pattern ptn2 = Pattern.compile("watch\\?v\\=([.\\-]*)");
         Matcher mth2 = ptn2.matcher(strVal);
         if (mth2.find()) {
             return mth2.group(1);
         }
-        Pattern ptn3 = Pattern.compile("youtu\\.be\\/(.*)");
+        Pattern ptn3 = Pattern.compile("youtu\\.be\\/([.\\-]*)");
         Matcher mth3 = ptn3.matcher(strVal);
         if (mth3.find()) {
             return mth3.group(1);

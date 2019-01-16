@@ -1,13 +1,73 @@
 package com.example.gtu001.qrcodemaker.util;
 
+import com.example.gtu001.qrcodemaker.common.Log;
+
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileUtil {
+
+    public static boolean moveFile(File fromFile, File destFile) {
+        try {
+            boolean moveOk = fromFile.renameTo(fromFile);
+            if (moveOk) {
+                return true;
+            }
+        } catch (Exception ex) {
+        }
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            //create output directory if it doesn't exist
+            File dir = destFile.getParentFile();
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            in = new FileInputStream(fromFile);
+            out = new FileOutputStream(destFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            // write the output file
+            out.flush();
+            out.close();
+            out = null;
+            // delete the original file
+            if (destFile.exists() && fromFile.length() == destFile.length()) {
+                fromFile.delete();
+                return true;
+            }
+        } catch (FileNotFoundException fnfe1) {
+            throw new RuntimeException("moveFile FileNotFoundException : " + fromFile + " -> " + destFile, fnfe1);
+        } catch (Exception e) {
+            throw new RuntimeException("moveFile ERR : " + fromFile + " -> " + destFile + " : " + e.getMessage(), e);
+        } finally {
+            try {
+                in.close();
+            } catch (Exception e) {
+            }
+            try {
+                out.close();
+            } catch (Exception e) {
+            }
+        }
+        return false;
+    }
 
     /**
      * 取得檔案的大小敘述 Ex : 100kb

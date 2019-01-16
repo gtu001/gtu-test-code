@@ -965,8 +965,8 @@ public class FileUtil {
         BigDecimal result = null;
         for (int ii = 0; ii < suffixS.length && size > 1024; ii++) {
             if (size / 1024 < 1024) {
-                result = BigDecimal.valueOf(size).divide(new BigDecimal(1024d));
-                result = result.setScale(2, RoundingMode.HALF_UP);
+                result = BigDecimal.valueOf(size).divide(new BigDecimal(1024d), 2, RoundingMode.HALF_UP);
+//                result = result.setScale(2, RoundingMode.HALF_UP);
             }
             size = size / 1024;
             suffix = suffixS[ii];
