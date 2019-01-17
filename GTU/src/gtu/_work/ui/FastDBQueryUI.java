@@ -1959,10 +1959,19 @@ public class FastDBQueryUI extends JFrame {
      * 將設定黨設定到parameterTable
      */
     private void loadParameterTableConfig() {
+        // 按順序載入參數
+        Set<String> paramSet = new LinkedHashSet<String>();
+        {
+            String sql = sqlTextArea.getText().toString();
+            SqlParam param = parseSqlToParam(sql);
+            paramSet.addAll(param.paramSet);
+            paramSet.addAll(param.sqlInjectionMap.keySet());
+        }
+
         Map<String, String> paramMap = sqlParameterConfigLoadHandler.loadConfig();
         initParametersTable();
         DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
-        for (String col : paramMap.keySet()) {
+        for (String col : paramSet) { // paramMap.keySet()
             String val = paramMap.get(col);
             model.addRow(new Object[] { col, val, DataType.varchar });
         }
