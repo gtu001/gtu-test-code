@@ -212,8 +212,9 @@ public class JFileExecuteUtil {
                                 .showConfirmDialog("are you sure copy file to \n" + copyToDir, "COPY")) {
                             return;
                         }
-                        File copyToFile = null;
-                        FileUtil.copyFile(file, copyToFile = new File(copyToFile, file.getName()));
+                        File copyToFile = new File(copyToDir, file.getName());
+                        System.out.println("CopyFromTo : " + file + " -> " + copyToFile);
+                        FileUtil.copyFile(file, copyToFile);
                         boolean copyOk = (copyToFile.exists() && copyToFile.length() == file.length());
                         JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog((copyOk ? "successd" : "failed") + " copy to\n" + copyToFile, "COPY");
                     } catch (Exception ex) {
@@ -319,7 +320,7 @@ public class JFileExecuteUtil {
     private static final String Path_ECLIPSE;
     private static final String Path_ECLIPSE_COMPANY;
     private static final String Path_7Z;
-    
+
     static {
         Properties prop = executeConfig.getConfigProp();
         Path_MAD_EDIT = prop.getProperty("MAD_EDIT");

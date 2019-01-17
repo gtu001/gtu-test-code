@@ -162,9 +162,10 @@ public class CathayMethodCreaterUI extends JFrame {
                     @Override
                     public void run() {
                         try {
+                            String encode = "big5";
                             CathayMethodCreater t = new CathayMethodCreater();
-                            InputStream in = JTextAreaUtil.getConsoleInput_fromJTextArea(textArea, "UTF8");
-                            PrintStream out = JTextAreaUtil.getNewPrintStream2JTextArea(textArea, 10000, true);
+                            InputStream in = JTextAreaUtil.getConsoleInput_fromJTextArea(textArea, encode);
+                            PrintStream out = JTextAreaUtil.getNewPrintStream2JTextArea(textArea, encode, 10000, true);
                             t.execute(in, out);
                         } catch (Exception e) {
                             JCommonUtil.handleException(e);

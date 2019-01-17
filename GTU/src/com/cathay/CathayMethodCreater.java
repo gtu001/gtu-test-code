@@ -38,7 +38,7 @@ public class CathayMethodCreater {
         METHOD_STR = sb.toString();
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         CathayMethodCreater t = new CathayMethodCreater();
         t.execute(System.in, System.out);
         System.out.println("done...");
@@ -277,7 +277,7 @@ public class CathayMethodCreater {
             sb.append("        log.debug(\"====test_{0} 1.負向(P)=====\");                                    \r\n");
             sb.append("        try '{'                                                                        \r\n");
             sb.append("            {1}                                                                      \r\n");
-            sb.append("            Map result = mXXXXXXXXXXX.{0}({2});                                        \r\n");
+            sb.append("            {4} mXXXXXXXXXXX.{0}({2});                                        \r\n");
             sb.append("            fail();                                                                  \r\n");
             sb.append("        } catch (ErrorInputException e1) '{'                                           \r\n");
             sb.append("            log.debug(\"====test_{0} 1.負向(成功)=====\" + e1.getMessage());           \r\n");
@@ -332,7 +332,7 @@ public class CathayMethodCreater {
             if ("void".equals(mth.rtnObj.type)) {
                 return "";
             }
-            return mth.rtnObj.type + " result ";
+            return StringUtils.capitalize(mth.rtnObj.type) + " " + mth.rtnObj.name + " = ";
         }
 
         private String getSuccessParams(MethodClass mth) {

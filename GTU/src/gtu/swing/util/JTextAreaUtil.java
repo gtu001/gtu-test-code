@@ -114,6 +114,7 @@ public class JTextAreaUtil {
                 public void insertUpdate(DocumentEvent e) {
                     try {
                         String text = e.getDocument().getText(e.getOffset(), e.getLength());
+                        System.out.print(text);
                         byte[] bs = text.getBytes(encode);
                         try {
                             pop.write(bs);
