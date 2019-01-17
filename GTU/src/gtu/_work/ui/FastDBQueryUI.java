@@ -1491,11 +1491,8 @@ public class FastDBQueryUI extends JFrame {
     private void setParameterTable(SqlParam param) {
         initParametersTable();
         DefaultTableModel createModel = (DefaultTableModel) parametersTable.getModel();
-        for (String column : param.paramSet) {
+        for (String column : param.getOrderParametersLst()) {
             createModel.addRow(new Object[] { column, "", DataType.varchar });
-        }
-        for (String key : param.sqlInjectionMap.keySet()) {
-            createModel.addRow(new Object[] { key, "", DataType.varchar });
         }
     }
 
@@ -1791,6 +1788,13 @@ public class FastDBQueryUI extends JFrame {
                 sqlInjectionMap.put(key, "");
             }
         }
+
+        public List<String> getOrderParametersLst() {
+            List<String> lst = new ArrayList<String>();
+            lst.addAll(paramSet);
+            lst.addAll(sqlInjectionMap.keySet());
+            return lst;
+        }
     }
 
     private static class SqlParam_IfExists extends SqlParam {
@@ -1960,12 +1964,11 @@ public class FastDBQueryUI extends JFrame {
      */
     private void loadParameterTableConfig() {
         // 按順序載入參數
-        Set<String> paramSet = new LinkedHashSet<String>();
+        List<String> paramSet = Collections.emptyList();
         {
             String sql = sqlTextArea.getText().toString();
             SqlParam param = parseSqlToParam(sql);
-            paramSet.addAll(param.paramSet);
-            paramSet.addAll(param.sqlInjectionMap.keySet());
+            paramSet = param.getOrderParametersLst();
         }
 
         Map<String, String> paramMap = sqlParameterConfigLoadHandler.loadConfig();
