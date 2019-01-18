@@ -53,7 +53,7 @@ public class PropertiesMultiUtil {
 
     private static String getArry(int idx, String[] arry, String defaultVal) {
         if (idx <= arry.length - 1) {
-            return StringUtils.trimToEmpty(arry[idx]);
+            return StringUtils.defaultString(arry[idx]);
         }
         return defaultVal;
     }
@@ -66,11 +66,11 @@ public class PropertiesMultiUtil {
         try {
             String[] keysColumns = (String[]) FieldUtils.readDeclaredStaticField(clz, KEYS, true);
             String[] valuesColumns = (String[]) FieldUtils.readDeclaredStaticField(clz, VALUES, true);
-            
+
             T inst = (T) ReflectUtil.newInstanceDefault(clz, null, false);
-            
-            String[] keys = StringUtils.trimToEmpty(key).split(Pattern.quote(SPLIT_STR));
-            String[] values = StringUtils.trimToEmpty(value).split(Pattern.quote(SPLIT_STR));
+
+            String[] keys = StringUtils.defaultString(key).split(Pattern.quote(SPLIT_STR));
+            String[] values = StringUtils.defaultString(value).split(Pattern.quote(SPLIT_STR));
 
             for (int ii = 0; ii < keysColumns.length; ii++) {
                 String fieldName = keysColumns[ii];
