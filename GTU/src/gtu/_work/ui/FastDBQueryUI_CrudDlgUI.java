@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,6 +40,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
@@ -57,6 +60,7 @@ import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
+import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
@@ -91,6 +95,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JRadioButton rdbtnSelect;
     private List<String> columnsLst;
+    private DBTypeFormatHandler dBTypeFormatHandler;
+
+    private static final String KEY_DBDateFormat = FastDBQueryUI_CrudDlgUI.class.getSimpleName() + "_" + DBDateFormat.class.getSimpleName();
 
     static class ColumnConf {
         String columnName;
@@ -980,6 +987,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
      */
     public FastDBQueryUI_CrudDlgUI(FastDBQueryUI _parent) {
         this._parent = _parent;
+        this.dBTypeFormatHandler = new DBTypeFormatHandler(_parent);
+
         setBounds(100, 100, 680, 463);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -1048,6 +1057,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     model.addElement(e);
                 }
                 dbTypeComboBox.setModel(model);
+                // 設定default DB Type
+                dBTypeFormatHandler.setDefaultDBType();
             }
             {
                 JLabel label = new JLabel("table");
@@ -1066,6 +1077,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             {
                 rdbtnInsert = new JRadioButton("insert");
+                rdbtnInsert.setSelected(true);// 預設值
                 panel.add(rdbtnInsert);
             }
             {
@@ -1114,6 +1126,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             });
         }
         {
+            addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    // 儲存default DB Type
+                    dBTypeFormatHandler.storeCurrentDBType();
+                }
+            });
+        }
+        {
 
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -1145,6 +1165,38 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
         jFrameRGBColorPanel.setStop(_parent.getjFrameRGBColorPanel().isStop());
+    }
+
+    private class DBTypeFormatHandler {
+        FastDBQueryUI _parent;
+
+        DBTypeFormatHandler(FastDBQueryUI _parent) {
+            this._parent = _parent;
+        }
+
+        private void setDefaultDBType() {
+            try {
+                String DBDateFormatVal = _parent.getEtcConfig().getProperty(KEY_DBDateFormat);
+                if (StringUtils.isNotBlank(DBDateFormatVal)) {
+                    DBDateUtil.DBDateFormat defaultSelectVal = DBDateUtil.DBDateFormat.valueOf(DBDateFormatVal);
+                    dbTypeComboBox.setSelectedItem(defaultSelectVal);
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+
+        private void storeCurrentDBType() {
+            try {
+                DBDateUtil.DBDateFormat defaultSelectVal = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
+                if (defaultSelectVal != null) {
+                    _parent.getEtcConfig().setProperty(KEY_DBDateFormat, defaultSelectVal.name());
+                    _parent.getEtcConfig().store();
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
     }
 
     private void resetColumnWidth() {

@@ -538,11 +538,17 @@
 		</dependency>
 
 		<!-- 鍵盤滑鼠監控 https://github.com/kwhat/jnativehook/ -->
-		<!-- 鍵盤滑鼠監控 https://github.com/tulskiy/jkeymaster -->
 		<dependency>
 			<groupId>com.1stleg</groupId>
 			<artifactId>jnativehook</artifactId>
 			<version>2.1.0</version>
+		</dependency>
+
+		<!-- 鍵盤滑鼠監控 https://github.com/tulskiy/jkeymaster -->
+		<dependency>
+			<groupId>com.github.tulskiy</groupId>
+			<artifactId>jkeymaster</artifactId>
+			<version>1.2</version>
 		</dependency>
 
 		<!-- 網路爬蟲 -->

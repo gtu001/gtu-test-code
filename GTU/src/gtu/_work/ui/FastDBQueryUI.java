@@ -8,6 +8,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -310,6 +311,12 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 sqlListMouseClicked(e);
+            }
+        });
+        sqlList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                sqlListKeyPressAction(e);
             }
         });
 
@@ -3054,7 +3061,7 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private class EtcConfigHandler {
+    class EtcConfigHandler {
         PropertiesUtilBean config = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_Etc");
         List<JComponent> containArry = new ArrayList<JComponent>();
 
@@ -3068,6 +3075,14 @@ public class FastDBQueryUI extends JFrame {
 
         public void reflectSetConfig() {
             config.reflectSetConfig(FastDBQueryUI.this, containArry);
+        }
+
+        public void setProperty(String key, String value) {
+            config.getConfigProp().setProperty(key, value);
+        }
+
+        public String getProperty(String key) {
+            return config.getConfigProp().getProperty(key);
         }
 
         public void store() {
@@ -3472,5 +3487,9 @@ public class FastDBQueryUI extends JFrame {
             // html顯示
             JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
         }
+    }
+
+    public EtcConfigHandler getEtcConfig() {
+        return etcConfigHandler;
     }
 }

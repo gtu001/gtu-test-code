@@ -342,9 +342,9 @@ public class CathayMethodCreater {
                 if ("string".equalsIgnoreCase(p.type)) {
                     chkStr = "String " + p.name + " = \"x\"; ";
                 } else if (p.type.toLowerCase().startsWith("map")) {
-                    chkStr = String.format(" Map %s = new HashMap(); %s.put(\"XXXX\",\"XXXX\");", p.name);
+                    chkStr = String.format(" Map %1$s = new HashMap(); %1$s.put(\"XXXX\",\"XXXX\");", p.name);
                 } else if (p.type.toLowerCase().startsWith("list")) {
-                    chkStr = String.format(" List %s = new ArrayList(); %s.add(\"XXXX\");", p.name);
+                    chkStr = String.format(" List %1$s = new ArrayList(); %1$s.add(\"XXXX\");", p.name);
                 } else {
                     chkStr = p.type + " " + p.name + " = new " + p.type + "(); ";
                 }
