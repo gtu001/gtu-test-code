@@ -1,5 +1,6 @@
 package gtu.swing.util;
 
+import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
@@ -9,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,19 +18,19 @@ public class KeyEventExecuteHandler {
     private AtomicBoolean isPrecedingExeucte = new AtomicBoolean(false);
     private AtomicLong executeStartTime = new AtomicLong(-1);
     private Runnable runnable;
-    private JFrame self;
+    private Window self;
     private String title;
-    private KeyEventExecuteHandlerDoExecute doExecuteEvent;
+    private Transformer isDoExecuteEvent;
 
-    public static KeyEventExecuteHandler newInstance(JFrame self, String title, KeyEventExecuteHandlerDoExecute doExecuteEvent, Runnable runnable) {
-        return new KeyEventExecuteHandler(self, title, doExecuteEvent, runnable);
+    public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
+        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable);
     }
 
-    private KeyEventExecuteHandler(JFrame self, String title, KeyEventExecuteHandlerDoExecute doExecuteEvent, Runnable runnable) {
+    private KeyEventExecuteHandler(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
         this.runnable = runnable;
         this.self = self;
         this.title = StringUtils.defaultIfEmpty(title, "執行中...");
-        this.doExecuteEvent = doExecuteEvent;
+        this.isDoExecuteEvent = isDoExecuteEvent;
         for (Field f : self.getClass().getDeclaredFields()) {
             if (JComponent.class.isAssignableFrom(f.getType())) {
                 try {
@@ -46,27 +48,16 @@ public class KeyEventExecuteHandler {
         }
     }
 
-    public void setDoExecuteEvent(KeyEventExecuteHandlerDoExecute doExecuteEvent) {
-        this.doExecuteEvent = doExecuteEvent;
-    }
-
-    /**
-     * 預設為 F5 or Alt+Enter
-     */
-    public interface KeyEventExecuteHandlerDoExecute {
-        boolean isExecute(KeyEvent e);
-    }
-
     private void doExecuteSqlButtonClick(KeyEvent e) {
         boolean doExecute = false;
-        if (doExecuteEvent == null) {
+        if (isDoExecuteEvent == null) {
             if ((e.getModifiers() & KeyEvent.ALT_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_ENTER) {
                 doExecute = true;
             } else if (e.getKeyCode() == KeyEvent.VK_F5) {
                 doExecute = true;
             }
         } else {
-            doExecute = doExecuteEvent.isExecute(e);
+            doExecute = (Boolean) isDoExecuteEvent.transform(e);
         }
         if (doExecute) {
             if (!isPrecedingExeucte.get()) {
@@ -76,7 +67,12 @@ public class KeyEventExecuteHandler {
                 return;
             }
 
-            final JProgressBarHelper proHelper = JProgressBarHelper.newInstance(self, title);
+            JFrame relativeFrame = null;
+            if (self instanceof JFrame) {
+                relativeFrame = (JFrame) self;
+            }
+
+            final JProgressBarHelper proHelper = JProgressBarHelper.newInstance(relativeFrame, title);
             proHelper.indeterminate(true);
             proHelper.modal(false);
             proHelper.build();

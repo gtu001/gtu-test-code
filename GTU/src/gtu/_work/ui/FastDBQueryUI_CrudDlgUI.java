@@ -38,9 +38,9 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
@@ -72,7 +72,9 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
+import gtu.swing.util.KeyEventExecuteHandler.KeyEventExecuteHandlerDoExecute;
 import gtu.swing.util.JTextUndoUtil;
+import gtu.swing.util.KeyEventExecuteHandler;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
@@ -96,6 +98,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JRadioButton rdbtnSelect;
     private List<String> columnsLst;
     private DBTypeFormatHandler dBTypeFormatHandler;
+    private KeyEventExecuteHandler keyEventExecuteHandler;
 
     private static final String KEY_DBDateFormat = FastDBQueryUI_CrudDlgUI.class.getSimpleName() + "_" + DBDateFormat.class.getSimpleName();
 
@@ -1161,6 +1164,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 });
             }
         }
+
+        this.keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
+            @Override
+            public void run() {
+                JCommonUtil.triggerButtonActionPerformed(okButton);
+            }
+        });
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);

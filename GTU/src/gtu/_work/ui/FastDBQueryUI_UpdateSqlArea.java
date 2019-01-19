@@ -20,9 +20,11 @@ import org.apache.commons.lang.StringUtils;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.KeyEventExecuteHandler;
 
 public class FastDBQueryUI_UpdateSqlArea extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTextArea updateSqlArea;
     private JLabel lblForMessage;
@@ -32,6 +34,8 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
     private ActionListener confirmDo;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private boolean jFrameRGBColorPanel_isStop;
+    private KeyEventExecuteHandler keyEventExecuteHandler;
+    private JButton okButton;
 
     /**
      * Launch the application.
@@ -110,7 +114,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
-                JButton okButton = new JButton("OK");
+                okButton = new JButton("OK");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);// 預設按鈕
@@ -137,6 +141,14 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
                 });
             }
         }
+
+        this.keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
+            @Override
+            public void run() {
+                JCommonUtil.triggerButtonActionPerformed(okButton);
+            }
+        });
+
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
