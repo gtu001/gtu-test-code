@@ -383,10 +383,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 if (scrollY == -1 || maxHeight == -1) {
                     return "";
                 }
-                BigDecimal val = new BigDecimal(scrollY).divide(new BigDecimal(maxHeight), 4, RoundingMode.HALF_UP);
-                val = val.multiply(new BigDecimal(100));
-                val = val.setScale(1, RoundingMode.HALF_UP);
-                return "[已讀:" + String.valueOf(val) + "%]";
+                try {
+                    BigDecimal val = new BigDecimal(scrollY).divide(new BigDecimal(maxHeight), 4, RoundingMode.HALF_UP);
+                    val = val.multiply(new BigDecimal(100));
+                    val = val.setScale(1, RoundingMode.HALF_UP);
+                    return "[已讀:" + String.valueOf(val) + "%]";
+                } catch (Exception ex) {
+                    return "";
+                }
             }
         };
 
