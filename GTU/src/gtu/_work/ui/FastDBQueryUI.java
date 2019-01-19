@@ -254,6 +254,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton executeSqlButton2;
     private JButton refConfigPathYamlExportBtn;
     private JTabbedPane tabbedPane;
+    private EditColumnHistoryHandler editColumnHistoryHandler;
 
     /**
      * Launch the application.
@@ -1187,6 +1188,8 @@ public class FastDBQueryUI extends JFrame {
                     executeSqlButtonClick();
                 }
             });
+
+            editColumnHistoryHandler = new EditColumnHistoryHandler();
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
@@ -3188,6 +3191,9 @@ public class FastDBQueryUI extends JFrame {
                     // 用 參數表的 值來當作預設值
                     if (parameterTableMap.containsKey(col)) {
                         val = parameterTableMap.get(col);
+                        editColumnHistoryHandler.addColumnDef(col, val);
+                    } else if (editColumnHistoryHandler.hasColumnDef(col)) {
+                        val = editColumnHistoryHandler.getSingleValue(col);
                     }
 
                     if (tabInfo.getNumberCol().contains(col)) {
@@ -3211,6 +3217,9 @@ public class FastDBQueryUI extends JFrame {
                 queryLst.add(arry.toArray());
                 model.addRow(arry.toArray());
                 queryList = Triple.of(columns, typeLst, queryLst);
+
+                // 儲存 欄位編輯歷史紀錄
+                editColumnHistoryHandler.store();
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
             }
@@ -3491,5 +3500,55 @@ public class FastDBQueryUI extends JFrame {
 
     public EtcConfigHandler getEtcConfig() {
         return etcConfigHandler;
+    }
+
+    static class EditColumnHistoryHandler {
+        String delimit = "#^#";
+        PropertiesUtilBean config = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_ColumnHis");
+
+        protected void addColumnDef(String column, Object value) {
+            column = StringUtils.trimToEmpty(column).toUpperCase();
+            String realVal = value == null ? "" : String.valueOf(value);
+            realVal = StringUtils.trimToEmpty(realVal);
+            String[] values = StringUtils.trimToEmpty(config.getConfigProp().getProperty(column)).split(Pattern.quote(delimit));
+            Set<String> vals = new LinkedHashSet<String>();
+            vals.add(realVal);
+            for (String v : values) {
+                vals.add(v);
+            }
+            String valStr = StringUtils.join(vals, delimit);
+            config.getConfigProp().setProperty(column, valStr);
+        }
+
+        protected void store() {
+            config.store();
+        }
+
+        protected List<String> getColumnValues(String column) {
+            column = StringUtils.trimToEmpty(column).toUpperCase();
+            String[] values = StringUtils.trimToEmpty(config.getConfigProp().getProperty(column)).split(Pattern.quote(delimit));
+            Set<String> vals = new LinkedHashSet<String>();
+            for (String v : values) {
+                vals.add(v);
+            }
+            return new ArrayList<String>(vals);
+        }
+
+        protected String getSingleValue(String column) {
+            try {
+                return getColumnValues(column).get(0);
+            } catch (Exception ex) {
+                return "1";
+            }
+        }
+
+        protected boolean hasColumnDef(String column) {
+            column = StringUtils.trimToEmpty(column).toUpperCase();
+            return config.getConfigProp().containsKey(column);
+        }
+    }
+
+    public EditColumnHistoryHandler getEditColumnConfig() {
+        return editColumnHistoryHandler;
     }
 }

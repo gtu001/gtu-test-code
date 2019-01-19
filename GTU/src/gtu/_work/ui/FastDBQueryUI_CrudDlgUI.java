@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractButton;
@@ -38,7 +39,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -57,6 +57,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
+import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
@@ -72,7 +73,6 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.JTableUtil_DefaultJMenuItems_Mask;
-import gtu.swing.util.KeyEventExecuteHandler.KeyEventExecuteHandlerDoExecute;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 
@@ -427,10 +427,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                         resultLst.add(updateResult);
                                     }
                                     JCommonUtil._jOptionPane_showMessageDialog_info(String.format("成功:%d,失敗:%d,共:%d\n", successCount, failCount, (successCount + failCount)) + resultLst);
+
                                     if (ex1 != null) {
                                         ex1.printStackTrace();
                                         // JCommonUtil.handleException(ex1);
                                         _parent.handleExceptionForExecuteSQL(ex1);
+                                    } else {
+                                        // 更新欄位歷史紀錄
+                                        dialog.updateColumnHistory();
                                     }
                                 }
                             });
@@ -988,7 +992,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     /**
      * Create the dialog.
      */
-    public FastDBQueryUI_CrudDlgUI(FastDBQueryUI _parent) {
+    public FastDBQueryUI_CrudDlgUI(final FastDBQueryUI _parent) {
         this._parent = _parent;
         this.dBTypeFormatHandler = new DBTypeFormatHandler(_parent);
 
@@ -1072,6 +1076,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 tableAndSchemaText.setColumns(10);
                 panel.add(tableAndSchemaText);
                 tableAndSchemaText.addFocusListener(new FocusAdapter() {
+
                     @Override
                     public void focusLost(FocusEvent e) {
                         tableAndSchemaText_focusLost_action(tableAndSchemaText);
@@ -1114,6 +1119,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        final AtomicReference<List<String>> valueLst = new AtomicReference<List<String>>();
+                        valueLst.set(new ArrayList<String>());
+                        final AtomicInteger rowPos = new AtomicInteger(-1);
+                        try {
+                            int $rowPos = rowTable.getSelectedRow();
+                            if ($rowPos != -1) {
+                                $rowPos = JTableUtil.getRealRowPos($rowPos, rowTable);
+                                rowPos.set($rowPos);
+                                String column = (String) rowTable.getValueAt($rowPos, 0);
+                                column = StringUtils.trimToEmpty(column).toUpperCase();
+                                valueLst.set(_parent.getEditColumnConfig().getColumnValues(column));
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
                         List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
                                 JTableUtil_DefaultJMenuItems_Mask._加列 | //
                         JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
@@ -1123,13 +1144,29 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
                         JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
                         );
-                        JPopupMenuUtil.newInstance(rowTable).addJMenuItem(menuList).applyEvent(e).show();
+                        JPopupMenuUtil inst = JPopupMenuUtil.newInstance(rowTable);
+                        inst.addJMenuItem(menuList);
+                        System.out.println("valueLst --- " + valueLst + " / " + valueLst.get().size());
+                        if (valueLst.get().size() > 0) {
+                            JMenuAppender chdMenu = JMenuAppender.newInstance("參考Value");
+                            for (final String val : valueLst.get()) {
+                                chdMenu.addMenuItem(val, new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        rowTable.setValueAt(val, rowPos.get(), 1);
+                                    }
+                                });
+                            }
+                            inst.addJMenuItem(chdMenu.getMenu());
+                        }
+                        inst.applyEvent(e).show();
                     }
                 }
             });
         }
         {
             addWindowListener(new WindowAdapter() {
+
                 public void windowClosed(WindowEvent e) {
                     // 儲存default DB Type
                     dBTypeFormatHandler.storeCurrentDBType();
@@ -1157,6 +1194,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
                 cancelButton.addActionListener(new ActionListener() {
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         FastDBQueryUI_CrudDlgUI.this.dispose();
@@ -1207,6 +1245,18 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 JCommonUtil.handleException(ex);
             }
         }
+    }
+
+    // 儲存 欄位編輯歷史紀錄
+    private void updateColumnHistory() {
+        Map<String, ColumnConf> colDef = this.rowMap.get();
+        for (String col : colDef.keySet()) {
+            ColumnConf def = colDef.get(col);
+            if (def.isModify) {
+                _parent.getEditColumnConfig().addColumnDef(col, def.value);
+            }
+        }
+        _parent.getEditColumnConfig().store();
     }
 
     private void resetColumnWidth() {
