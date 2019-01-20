@@ -82,6 +82,7 @@ import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
@@ -119,8 +120,11 @@ public class FastDBQueryUI extends JFrame {
     private static File JAR_PATH_FILE = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
-            JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
-            JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            if (OsInfoUtil.isWindows()) {
+                JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+            } else {
+                JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
+            }
         }
     }
 

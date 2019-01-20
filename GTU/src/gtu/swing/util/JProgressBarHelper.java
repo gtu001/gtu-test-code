@@ -116,7 +116,8 @@ public class JProgressBarHelper {
     }
 
     public JProgressBarHelper dismiss() {
-        dlg.setVisible(false);
+        //dlg.setVisible(false);
+        dlg.dispose();
         return this;
     }
 
@@ -131,7 +132,8 @@ public class JProgressBarHelper {
             Thread.sleep(1000L);
         } catch (InterruptedException e) {
         }
-        dlg.setVisible(false);
+        //dlg.setVisible(false);
+        dlg.dispose();
         return this;
     }
 

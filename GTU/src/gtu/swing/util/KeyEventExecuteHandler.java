@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.reflect.FieldUtils;
@@ -87,8 +88,9 @@ public class KeyEventExecuteHandler {
                         JCommonUtil.handleException(ex);
                     } finally {
                         isPrecedingExeucte.set(false);
+                        proHelper.dismiss();
+                        System.out.println("KeyEventExecuteHandler ... exe done!!");
                     }
-                    proHelper.dismiss();
                 }
             }).start();
         }

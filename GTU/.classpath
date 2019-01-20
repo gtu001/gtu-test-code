@@ -15,17 +15,19 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v7.0"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.tetrade.eclipse.plugins.easyshell_1.4.2.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/forms-1.3.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/google-api-translate-java-0.97.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jcc-bate-0.7.3.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jnativehook-2.1.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/webTest2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/forms-1.3.0.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/db2jcc.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/derbyclient.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/mysql-connector-java-5.1.35.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/ojdbc7.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/postgresql-42.2.3.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/sqljdbc4-4.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

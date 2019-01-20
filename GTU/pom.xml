@@ -524,7 +524,7 @@
 			<artifactId>DebugMointerUI</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
+			<systemPath>/media/gtu001/OLD_D/my_tool/DebugMointerUI/DebugMointerUI.jar</systemPath>
 		</dependency>
 		<!-- <systemPath>/media/gtu001/OLD_D/my_tool/DebugMointerUI/DebugMointerUI.jar</systemPath> -->
 		<!-- <systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath> -->
@@ -644,7 +644,7 @@
 			<!-- <systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
+			<systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -722,11 +722,11 @@
 			<version>3.1</version>
 		</dependency>
 
-		<!-- swing form [1.8.0] -->
+		<!-- swing form -->
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-forms</artifactId>
-			<version>1.6.0</version>
+			<version>1.8.0</version>
 		</dependency>
 
 		<dependency>
