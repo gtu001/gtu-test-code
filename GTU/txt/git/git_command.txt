@@ -28,6 +28,24 @@
 	git checkout HEAD GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java
 	or
 	git checkout <commit_id>  <path>/<file>
+	or
+	
+	
+--------------------------------------------------------------------------
+衝突速解
+	# git版本大於1.6.1
+	git checkout --ours <file>
+	git checkout --theirs <file>
+
+	# git版本小於1.6.1
+	同theirs
+		git reset -- <file>
+		git checkout MERGE_HEAD -- <file>
+
+	同ours:
+		git reset -- <file>
+		git checkout ORIG_HEAD -- <file>
+	
 	
 
 --------------------------------------------------------------------------
