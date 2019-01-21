@@ -59,6 +59,7 @@ import com.example.englishtester.common.GoogleSearchHandler;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.InterstitialAdHelper;
 import com.example.englishtester.common.KeyboardHelper;
+import com.example.englishtester.common.LockScreenHelper;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
@@ -149,6 +150,7 @@ public class FloatViewService extends Service {
     RedPlusBtnHandler redPlusBtnHandler = new RedPlusBtnHandler(this);
     Handler handler = new Handler();
     ModeHandler modeHandler;
+    LockScreenHelper lockScreenHelper = new LockScreenHelper(this, TAG);
     // ----------------------------------------------------------------
 
     @Override
@@ -837,6 +839,12 @@ public class FloatViewService extends Service {
                 self.modeHandler.changeMode(null, false);
             }
         },
+        LOCK_SCREEN("螢幕鎖定", R.drawable.icon_lock_screen, false) {
+            @Override
+            void process(FloatViewService self) {
+                self.lockScreenHelper.toggle();
+            }
+        },//
         EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app, false) {
             @Override
             void process(FloatViewService self) {
@@ -879,6 +887,7 @@ public class FloatViewService extends Service {
             }
         },//
         MY_APP("開啟MyApp", R.drawable.qr_code_icon) {//
+
             @Override
             void process(FloatViewService self) {
                 String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());

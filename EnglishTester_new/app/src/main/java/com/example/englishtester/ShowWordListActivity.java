@@ -620,7 +620,7 @@ public class ShowWordListActivity extends ListActivity {
                 recentSearchService.deleteOldData(200);
 
                 //查詢最近的歷史紀錄
-                List<String> list = recentSearchService.recentSearchHistory(100);
+                List<String> list = recentSearchService.recentSearchHistory(500);
 
                 dto.wordsList = list;
                 dto.wordsListCopy = list;
