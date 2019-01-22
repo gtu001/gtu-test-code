@@ -46,7 +46,7 @@ public class TxtReaderAppenderPageDivider {
             this.txtContent = txtContent;
         }
 
-        Pattern ptn = Pattern.compile("(\n|\\}\\})", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern ptn = Pattern.compile("(\n|\\}\\}|\\.)", Pattern.DOTALL | Pattern.MULTILINE);
 
         private void processPages() {
             int startPos = 0;
