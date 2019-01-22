@@ -92,6 +92,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,7 +152,9 @@ public class FloatViewService extends Service {
     Handler handler = new Handler();
     ModeHandler modeHandler;
     LockScreenHelper lockScreenHelper = new LockScreenHelper(this, TAG);
+    AtomicReference<String> sentance4RecentSearch = new AtomicReference<String>();//查詢例句
     // ----------------------------------------------------------------
+
 
     @Override
     public void onCreate() {
@@ -1148,16 +1151,17 @@ public class FloatViewService extends Service {
     private void searchEnglishId() {
         autoCompleteTextView1.dismissDropDown();// 關閉下拉
         final String englishId = StringUtils.trimToEmpty(autoCompleteTextView1.getText().toString()).toLowerCase();
+        final String sentance = sentance4RecentSearch.getAndSet("");
         EnglishWord currentWord = englishwordInfoDAO.queryOneWord(englishId);
         if (englishMap.containsKey(englishId)) {
             EnglishWord english = englishMap.get(englishId);
             setEnglishInfo(englishId, english.englishDesc, english.pronounce, null);
-            recentSearchService.recordRecentSearch(englishId);
+            recentSearchService.recordRecentSearch(englishId, sentance);
             writeSearchWordToProperties(englishId, null);
         } else if (currentWord != null) {
             EnglishWord english = currentWord;
             setEnglishInfo(englishId, english.englishDesc, english.pronounce, null);
-            recentSearchService.recordRecentSearch(englishId);
+            recentSearchService.recordRecentSearch(englishId, sentance);
             writeSearchWordToProperties(englishId, null);
         } else if (StringUtils.isNotBlank(englishId)) {
             new Thread(new Runnable() {
@@ -1183,7 +1187,7 @@ public class FloatViewService extends Service {
                         }
                     });
 
-                    recentSearchService.recordRecentSearch(englishId);
+                    recentSearchService.recordRecentSearch(englishId, sentance);
                     writeSearchWordToProperties(englishId, newWord);
                     handler.post(new Runnable() {
                         @Override
@@ -1951,11 +1955,15 @@ public class FloatViewService extends Service {
     // 與activity連線 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ (新的寫法)
     private final IFloatServiceAidlInterface.Stub mBinderNew = new IFloatServiceAidlInterface.Stub() {
         @Override
-        public void searchWord(final String englishId) throws RemoteException {
+        public void searchWord(final String englishId, final String sentance) throws RemoteException {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    //設定例句
+                    sentance4RecentSearch.set(sentance);
+
+                    //查詢
                     searchWordForActivity(englishId);
                 }
             });

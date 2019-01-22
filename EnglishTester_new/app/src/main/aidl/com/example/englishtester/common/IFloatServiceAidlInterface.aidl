@@ -11,5 +11,5 @@ interface IFloatServiceAidlInterface {
 //    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
 //            double aDouble, String aString);
 
-    void searchWord(String englishId);
+    void searchWord(String englishId, String sentance);
 }

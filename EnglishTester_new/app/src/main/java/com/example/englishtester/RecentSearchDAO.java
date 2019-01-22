@@ -226,6 +226,26 @@ public class RecentSearchDAO {
         return DBUtil.transferToLst(c, db, transferToEntity);
     }
 
+    //取得查詢歷史紀錄
+    public List<RecentSearch> queryRecentSearchHistory(int limitSize) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getReadableDatabase();
+
+        String table = RecentSearchSchema.TABLE_NAME;
+        String[] columns = null;
+        String selection = "";
+        String[] selectionArgs = new String[0];
+        String groupBy = null;
+        String having = null;
+        String orderBy = RecentSearchSchema.INSERT_DATE + " DESC ";
+        String limit = limitSize <= 0 ? null : String.valueOf(limitSize);
+
+        Cursor c = db.query(table, columns, selection,
+                selectionArgs, groupBy, having,
+                orderBy, limit);
+
+        return DBUtil.transferToLst(c, db, transferToEntity);
+    }
+
     /**
      * 關閉資料庫
      */
@@ -239,6 +259,7 @@ public class RecentSearchDAO {
         word.insertDate = c.getLong(c.getColumnIndex(RecentSearchSchema.INSERT_DATE));
         word.searchTime = c.getInt(c.getColumnIndex(RecentSearchSchema.SEARCH_TIME));
         word.uploadType = c.getString(c.getColumnIndex(RecentSearchSchema.UPLOAD_TYPE));
+        word.sentance = c.getString(c.getColumnIndex(RecentSearchSchema.SENTANCE));
         return word;
     }
 
@@ -248,6 +269,7 @@ public class RecentSearchDAO {
         values.put(RecentSearchSchema.INSERT_DATE, word.insertDate);
         values.put(RecentSearchSchema.SEARCH_TIME, word.searchTime);
         values.put(RecentSearchSchema.UPLOAD_TYPE, word.uploadType);
+        values.put(RecentSearchSchema.SENTANCE, word.sentance);
         return values;
     }
 
@@ -262,6 +284,7 @@ public class RecentSearchDAO {
     public static class RecentSearch implements Serializable {
         private static final long serialVersionUID = -8975363169799885680L;
         String englishId;
+        String sentance;
         long insertDate;
         int searchTime;
         String uploadType;
@@ -297,6 +320,14 @@ public class RecentSearchDAO {
         public void setUploadType(String uploadType) {
             this.uploadType = uploadType;
         }
+
+        public String getSentance() {
+            return sentance;
+        }
+
+        public void setSentance(String sentance) {
+            this.sentance = sentance;
+        }
     }
 
     public interface RecentSearchSchema {
@@ -305,6 +336,7 @@ public class RecentSearchDAO {
         String INSERT_DATE = "insert_date";
         String SEARCH_TIME = "search_time";
         String UPLOAD_TYPE = "upload_type";
-        final String[] FROM = {ENGLISH_ID, INSERT_DATE, SEARCH_TIME, UPLOAD_TYPE};
+        String SENTANCE = "sentance";
+        final String[] FROM = {ENGLISH_ID, INSERT_DATE, SEARCH_TIME, UPLOAD_TYPE, SENTANCE};
     }
 }

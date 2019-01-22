@@ -521,7 +521,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 continue;
             }
             int end = start + chinesePara.length();
-            TxtReaderAppender.WordSpan clickableSpan = new TxtReaderAppender.WordSpan(0) {
+            TxtReaderAppender.WordSpan clickableSpan = new TxtReaderAppender.WordSpan(0, "") {
                 @Override
                 public void updateDrawState(TextPaint ds) {
                     // ds.bgColor = Color.WHITE;

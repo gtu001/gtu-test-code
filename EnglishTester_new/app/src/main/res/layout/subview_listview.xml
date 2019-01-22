@@ -28,8 +28,17 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/ItemImage"
         android:layout_toRightOf="@+id/ImageView01"
-        android:text="TextView01"
+        android:text="ItemTitle"
         android:textSize="20dip" />
+
+    <TextView
+        android:id="@+id/ItemSentance"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/ItemTitle"
+        android:layout_toRightOf="@+id/ImageView01"
+        android:layout_below="@+id/ItemTitle"
+        android:text="ItemSentance" />
 
     <TextView
         android:id="@+id/ItemText"
@@ -37,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/ItemTitle"
         android:layout_toRightOf="@+id/ImageView01"
-        android:layout_below="@+id/ItemTitle"
-        android:text="TextView02" />
+        android:layout_below="@+id/ItemSentance"
+        android:text="ItemText" />
 
 </RelativeLayout>

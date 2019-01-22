@@ -1,15 +1,11 @@
 package com.example.englishtester;
 
 import android.content.Context;
-import android.os.Handler;
-
-import com.example.englishtester.common.Log;
-
-import android.widget.Toast;
 
 import com.example.englishtester.RecentSearchDAO.RecentSearch;
 import com.example.englishtester.RecentSearchDAO.RecentSearchSchema;
 import com.example.englishtester.common.DBUtil;
+import com.example.englishtester.common.Log;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -39,7 +35,7 @@ public class RecentSearchService {
     /**
      * 紀錄查詢紀錄
      */
-    public synchronized void recordRecentSearch(String englishId) {
+    public synchronized void recordRecentSearch(String englishId, String sentance) {
         RecentSearch recent = recentSearchDAO.queryOneWord(englishId);
         boolean update = false;
         if (recent == null) {
@@ -48,6 +44,7 @@ public class RecentSearchService {
             update = true;
         }
         recent.englishId = englishId;
+        recent.sentance = sentance;
         recent.insertDate = System.currentTimeMillis();
         recent.searchTime++;
         if (update) {
@@ -98,6 +95,14 @@ public class RecentSearchService {
             list.add(englishId);
         }
         return list;
+    }
+
+    /**
+     * 查詢歷史紀錄
+     * 最多查rowmax筆
+     */
+    public List<RecentSearch> recentSearchHistoryOrign(int rowmax) {
+        return recentSearchDAO.queryRecentSearchHistory(rowmax);
     }
 
     /**

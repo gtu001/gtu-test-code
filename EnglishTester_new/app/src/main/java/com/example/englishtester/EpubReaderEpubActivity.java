@@ -581,6 +581,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 map.put("ItemTitle", file_name);
                 map.put("ItemDetail", "page " + (page_index + 1));
                 map.put("ItemDetailRight", DateFormatUtils.format(insert_date, "yyyy/MM/dd HH:mm:ss"));
+                map.put("ItemDetail2", "");
                 return map;
             }
         }
@@ -621,8 +622,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
             SimpleAdapter aryAdapter = new SimpleAdapter(EpubReaderEpubActivity.this, lst4Adapter,// 資料來源
                     R.layout.subview_dropboxlist, //
-                    new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight"}, //
-                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight}//
+                    new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight", "ItemDetail2"}, //
+                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight, R.id.ItemDetail2}//
             );
 
             AlertDialog.Builder builder = new AlertDialog.Builder(EpubReaderEpubActivity.this);

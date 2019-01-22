@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import com.example.englishtester.common.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.example.englishtester.common.DialogSingleInput.DialogConfirmClickList
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.TextToSpeechComponent;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -69,6 +72,9 @@ public class ShowWordListActivity extends ListActivity {
     RecentSearchService recentSearchService;
     EnglishTester_Diectory_Factory diectory = new EnglishTester_Diectory_Factory();
     EnglishDescKeeper englishDescKeeper;
+
+    //例句
+    Map<String, String> sentanceMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -362,13 +368,20 @@ public class ShowWordListActivity extends ListActivity {
             // map.put("item_text", word.desc);
             map.put("item_text", "");
             map.put("item_image_check", null);
+
+            //設定例句
+            if (sentanceMap == null) {
+                map.put("ItemSentance", "");
+            } else {
+                map.put("ItemSentance", MapUtils.getString(sentanceMap, word.word, ""));
+            }
             listItem.add(map);
         }
 
         listItemAdapter = new SimpleAdapter(this, listItem,// 資料來源
                 R.layout.subview_listview, //
-                new String[]{"item_title", "item_text", "item_image", "item_image_check"}, //
-                new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01}//
+                new String[]{"item_title", "item_text", "item_image", "item_image_check", "ItemSentance"}, //
+                new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01, R.id.ItemSentance}//
         );
 
         // setListAdapter(wordsArray);
@@ -614,16 +627,35 @@ public class ShowWordListActivity extends ListActivity {
         final ProgressDialog myDialog = ProgressDialog.show(this, "查詢資料中", "初始化...", true);
         final Handler handler = new Handler();
         DropboxEnglishService.getRunOnUiThread(new Callable<Object>() {
+
+            private List<String> transRecentSearchLst(List<RecentSearchDAO.RecentSearch> list) {
+                List<String> lst = new ArrayList<String>();
+                for (RecentSearchDAO.RecentSearch v : list) {
+                    lst.add(v.englishId);
+                }
+                return lst;
+            }
+
+            private Map<String, String> getSentanceMap(List<RecentSearchDAO.RecentSearch> list) {
+                Map<String, String> sentanceMap = new HashMap<String, String>();
+                for (RecentSearchDAO.RecentSearch v : list) {
+                    sentanceMap.put(v.englishId, v.sentance);
+                }
+                return sentanceMap;
+            }
+
             @Override
             public Object call() throws Exception {
                 //刪除超過n的歷史資料
                 recentSearchService.deleteOldData(200);
 
                 //查詢最近的歷史紀錄
-                List<String> list = recentSearchService.recentSearchHistory(500);
+                List<RecentSearchDAO.RecentSearch> list = recentSearchService.recentSearchHistoryOrign(500);
+                List<String> lst = transRecentSearchLst(list);
 
-                dto.wordsList = list;
-                dto.wordsListCopy = list;
+                dto.wordsList = lst;
+                dto.wordsListCopy = lst;
+                sentanceMap = getSentanceMap(list);
 
                 Map<String, EnglishWord> englishMap = new HashMap<String, EnglishWord>();
                 for (String word : dto.wordsList) {

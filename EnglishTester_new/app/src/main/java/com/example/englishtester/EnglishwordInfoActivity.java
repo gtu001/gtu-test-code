@@ -407,7 +407,7 @@ public class EnglishwordInfoActivity extends Activity {
             setEnglishInfo(word.englishDesc, getEnglishPropPronounce(word), word.englishId);
             // 紀錄單字
             if (isMakeRecord) {
-                recentSearchService.recordRecentSearch(englishId_);
+                recentSearchService.recordRecentSearch(englishId_, "");
                 writeSearchWordToProperties(englishId_, null);
             }
 
@@ -428,7 +428,7 @@ public class EnglishwordInfoActivity extends Activity {
 
                     // 紀錄單字
                     if (isMakeRecord) {
-                        recentSearchService.recordRecentSearch(englishId_);
+                        recentSearchService.recordRecentSearch(englishId_, "");
                         writeSearchWordToProperties(englishId_, newWord);
                     }
                     toastMessage(EnglishwordInfoActivity.this, "你查了新字!", handler);

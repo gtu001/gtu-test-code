@@ -151,7 +151,9 @@ public class TxtReaderAppender {
                     continue;
                 }
 
-                WordSpan clickableSpan = new WordSpan(index) {
+                final String sentance = getSentanceFromContext(txtContent_, mth.start(), mth.end());
+
+                WordSpan clickableSpan = new WordSpan(index, sentance) {
 
                     private void checkFloatServiceOn() {
                         if (!ServiceUtil.isServiceRunning(activity.getApplicationContext(), FloatViewService.class)) {
@@ -170,7 +172,7 @@ public class TxtReaderAppender {
                             try {
                                 checkFloatServiceOn();
 
-                                mService.searchWord(txtNow);
+                                mService.searchWord(txtNow, sentance);
                             } catch (RemoteException e) {
                                 Log.e(TAG, e.getMessage(), e);
                                 Toast.makeText(activity.getApplicationContext(), "查詢失敗!", Toast.LENGTH_SHORT).show();
@@ -229,6 +231,26 @@ public class TxtReaderAppender {
 
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
+            }
+        }
+
+        //取得例句
+        private String getSentanceFromContext(String context, int start, int end) {
+            try {
+                String prefix = StringUtils.substring(context, 0, start);
+                String suffix = StringUtils.substring(context, end);
+                int startPos = prefix.lastIndexOf(".") + 1;
+                if (startPos == -1) {
+                    startPos = 0;
+                }
+                int endPos = end + suffix.indexOf(".");
+                if (endPos == -1) {
+                    endPos = context.length() - 1;
+                }
+                return StringUtils.substring(context, startPos, endPos);
+            } catch (Exception ex) {
+                Log.e(TAG, "getSentanceFromContext ERR : " + ex.getMessage(), ex);
+                return "";
             }
         }
 
@@ -326,12 +348,14 @@ public class TxtReaderAppender {
         private String word;
         private boolean marking = false;
         private boolean bookmarking = false;
+        private String sentance;
 
         public WordSpan() {
         }
 
-        public WordSpan(int id) {
+        public WordSpan(int id, String sentance) {
             this.id = id;
+            this.sentance = sentance;
         }
 
         @Override
@@ -385,6 +409,10 @@ public class TxtReaderAppender {
 
         public void setWord(String word) {
             this.word = word;
+        }
+
+        public String getSentance() {
+            return sentance;
         }
     }
 }
