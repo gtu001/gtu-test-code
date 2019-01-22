@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ActionBarSimpleHandler;
+import com.example.englishtester.common.BackButtonPreventer;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
@@ -65,6 +66,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,6 +98,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     ActionBarSimpleHandler actionBarCustomTitleHandler;
     ReaderCommonHelper.FreeGoogleTranslateHandler freeGoogleTranslateHandler;
     Thread translateThread;
+    BackButtonPreventer backButtonPreventer;
 
     TextView txtReaderView;
     TextView translateView;
@@ -318,6 +321,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         this.scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
         this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
         this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
+        this.backButtonPreventer = new BackButtonPreventer(this);
 
         this.doOnoffService(true);
     }
@@ -988,6 +992,12 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             }
         }).start();
     }
+
+    // ↓↓↓↓↓↓ 按兩下回前頁-------------------------------------------------------------------
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        return this.backButtonPreventer.onKeyDown(keyCode, event);
+    }
+    // ↑↑↑↑↑↑ 按兩下回前頁-------------------------------------------------------------------
 
     // --------------------------------------------------------------------
 

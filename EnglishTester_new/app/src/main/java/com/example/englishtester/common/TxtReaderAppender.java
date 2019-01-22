@@ -120,6 +120,8 @@ public class TxtReaderAppender {
             Matcher mth = ptn.matcher(txtContent);
             final String txtContent_ = txtContent;
 
+            final TxtReaderAppenderEscaper escaper = new TxtReaderAppenderEscaper(txtContent_);
+
             Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
             List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
             Log.v(TAG, "recentTxtMark list size = " + qList.size());
@@ -151,7 +153,7 @@ public class TxtReaderAppender {
                     continue;
                 }
 
-                final String sentance = getSentanceFromContext(txtContent_, mth.start(), mth.end());
+                final String sentance = escaper.getSentance(mth.start(), mth.end());
 
                 WordSpan clickableSpan = new WordSpan(index, sentance) {
 
@@ -231,26 +233,6 @@ public class TxtReaderAppender {
 
                 index++;
                 ss.setSpan(clickableSpan, start, end, Spanned.SPAN_COMPOSING);// SPAN_EXCLUSIVE_EXCLUSIVE
-            }
-        }
-
-        //取得例句
-        private String getSentanceFromContext(String context, int start, int end) {
-            try {
-                String prefix = StringUtils.substring(context, 0, start);
-                String suffix = StringUtils.substring(context, end);
-                int startPos = prefix.lastIndexOf(".") + 1;
-                if (startPos == -1) {
-                    startPos = 0;
-                }
-                int endPos = end + suffix.indexOf(".");
-                if (endPos == -1) {
-                    endPos = context.length() - 1;
-                }
-                return StringUtils.substring(context, startPos, endPos);
-            } catch (Exception ex) {
-                Log.e(TAG, "getSentanceFromContext ERR : " + ex.getMessage(), ex);
-                return "";
             }
         }
 

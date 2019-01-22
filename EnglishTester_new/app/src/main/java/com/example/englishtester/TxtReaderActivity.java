@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ActionBarSimpleHandler;
+import com.example.englishtester.common.BackButtonPreventer;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DBUtil;
@@ -156,6 +157,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 免費翻譯
      */
     ReaderCommonHelper.FreeGoogleTranslateHandler freeGoogleTranslateHandler;
+    /**
+     * 回前頁控制
+     */
+    BackButtonPreventer backButtonPreventer;
 
     EditText editText1;
     Button clearBtn;
@@ -503,6 +508,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
 
         this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
+
+        this.backButtonPreventer = new BackButtonPreventer(this);
 
         doOnoffService(true);
     }
@@ -1220,6 +1227,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         }).start();
     }
+
+    // ↓↓↓↓↓↓ 按兩下回前頁-------------------------------------------------------------------
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        return this.backButtonPreventer.onKeyDown(keyCode, event);
+    }
+    // ↑↑↑↑↑↑ 按兩下回前頁-------------------------------------------------------------------
 
     // --------------------------------------------------------------------
 

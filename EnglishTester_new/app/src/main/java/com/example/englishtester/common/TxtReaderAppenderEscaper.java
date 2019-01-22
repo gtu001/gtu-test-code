@@ -1,17 +1,12 @@
 package com.example.englishtester.common;
 
-import android.graphics.Bitmap;
-import android.graphics.Typeface;
-import android.text.Spannable;
-import android.text.style.ImageSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-
-import com.example.englishtester.common.html.image.IImageLoaderCandidate;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,9 +18,12 @@ public class TxtReaderAppenderEscaper {
 
     String orignText;
     String resultText;
+    TreeMap<Pair<Integer, Integer>, String> groupMap = new TreeMap<Pair<Integer, Integer>, String>();
+    char[] orignTextArry;
 
     public TxtReaderAppenderEscaper(String orignText) {
         this.orignText = orignText;
+        this.orignTextArry = this.orignText.toCharArray();
 
         Pattern ptn = Pattern.compile("\\{\\{(.|\n)*?\\}\\}", Pattern.MULTILINE | Pattern.DOTALL);
         Matcher mth = ptn.matcher(orignText);
@@ -37,6 +35,7 @@ public class TxtReaderAppenderEscaper {
                 if (e.isMatch(text)) {
                     text = e.replace(text);
                     mth.appendReplacement(sb, text);
+                    groupMap.put(Pair.of(mth.start(), mth.end()), text);
                     continue A;
                 }
             }
@@ -44,6 +43,49 @@ public class TxtReaderAppenderEscaper {
         mth.appendTail(sb);
 
         this.resultText = sb.toString();
+    }
+
+    public String getSentance(int start, int end) {
+        LinkedList<String> prefixLst = new LinkedList<String>();
+        A:
+        for (int ii = (start > 0 ? start - 1 : start); ii > 0; ii--) {
+            boolean isMatch = false;
+            for (Pair<Integer, Integer> p : groupMap.keySet()) {
+                if (ii >= p.getLeft() && ii <= p.getRight()) {
+                    isMatch = true;
+                    prefixLst.push(groupMap.get(p));
+                    ii = p.getLeft();
+                }
+            }
+            if (!isMatch) {
+                if (orignTextArry[ii] == '.') {
+                    break A;
+                }
+                prefixLst.push(String.valueOf(orignTextArry[ii]));
+            }
+        }
+
+        List<String> suffixLst = new ArrayList<String>();
+        A:
+        for (int ii = end; ii < orignTextArry.length; ii++) {
+            boolean isMatch = false;
+            for (Pair<Integer, Integer> p : groupMap.keySet()) {
+                if (ii >= p.getLeft() && ii <= p.getRight()) {
+                    isMatch = true;
+                    suffixLst.add(groupMap.get(p));
+                    ii = p.getRight();
+                }
+            }
+            if (!isMatch) {
+                if (orignTextArry[ii] == '.') {
+                    break A;
+                }
+                suffixLst.add(String.valueOf(orignTextArry[ii]));
+            }
+        }
+
+        String group = StringUtils.substring(orignText, start, end);
+        return new StringBuilder(StringUtils.join(prefixLst, "")).append(group).append(StringUtils.join(suffixLst, "")).toString();
     }
 
     private enum ReplaceBack {
