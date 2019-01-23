@@ -60,7 +60,7 @@ public class PomodoroClockHandler {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, 25);
         String message = "工作結束時間為未來 : " + DateFormatUtils.format(cal, "yyyy/MM/dd HH:mm:ss.SSS");
-        this.notificationHelper.notifyNow(1, "番茄鐘", message, message + "_2", "番茄鐘_2", false, MainActivity.class);
+        this.notificationHelper.notifyNow(2, "番茄鐘", message, message + "_2", "番茄鐘_2", false, MainActivity.class);
     }
 
     public void start() {
