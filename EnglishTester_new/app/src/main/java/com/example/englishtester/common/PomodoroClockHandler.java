@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import gtu.other.line.LineAppNotifiyHelper_Simple;
 
 public class PomodoroClockHandler {
-    //https://proandroiddev.com/using-vibrate-in-android-b0e3ef5d5e07
     private Vibrator myVibrator;
     private static AtomicReference<Timer> TIMER = new AtomicReference<Timer>();
     private Context context;
@@ -32,6 +31,7 @@ public class PomodoroClockHandler {
     }
 
     private void customVibratePatternNoRepeat() {
+        //https://proandroiddev.com/using-vibrate-in-android-b0e3ef5d5e07
         // 0 : Start without a delay
         // 400 : Vibrate for 400 milliseconds
         // 200 : Pause for 200 milliseconds
@@ -46,7 +46,7 @@ public class PomodoroClockHandler {
     private void showMessage(final String message) {
         LineAppNotifiyHelper_Simple.getInstance().send(message);
 
-        this.notificationHelper.notifyNow(1, "番茄鐘", message, message + "_2", "番茄鐘_2", false, MainActivity.class);
+        this.notificationHelper.notifyNow(1, "番茄鐘", message, false, MainActivity.class);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -59,8 +59,9 @@ public class PomodoroClockHandler {
     private void showFinishTimeNotify() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, 25);
-        String message = "工作結束時間為未來 : " + DateFormatUtils.format(cal, "yyyy/MM/dd HH:mm:ss.SSS");
-        this.notificationHelper.notifyNow(2, "番茄鐘", message, message + "_2", "番茄鐘_2", false, MainActivity.class);
+        String message = "工作時間:" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss") + " ～ " + DateFormatUtils.format(cal, "yyyy/MM/dd HH:mm:ss");
+        LineAppNotifiyHelper_Simple.getInstance().send("番茄鐘起訖時間 : " + message);
+        this.notificationHelper.notifyNow(2, "番茄鐘起訖時間", message, false, MainActivity.class);
     }
 
     public void start() {
