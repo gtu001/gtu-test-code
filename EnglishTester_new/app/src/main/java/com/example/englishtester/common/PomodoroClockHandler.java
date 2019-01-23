@@ -14,6 +14,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import gtu.other.line.LineAppNotifiyHelper_Simple;
@@ -23,6 +24,7 @@ public class PomodoroClockHandler {
     private static AtomicReference<Timer> TIMER = new AtomicReference<Timer>();
     private Context context;
     private NotificationHelper notificationHelper;
+    private static AtomicBoolean isStarting = new AtomicBoolean(false);
 
     public PomodoroClockHandler(Context context) {
         this.context = context;
@@ -91,5 +93,25 @@ public class PomodoroClockHandler {
                 showMessage("休息時間到!..");
             }
         }, 30 * 60 * 1000);
+
+        isStarting.set(true);
+    }
+
+    public boolean isStart() {
+        return TIMER.get() != null && isStarting.get();
+    }
+
+    public void cancel() {
+        if (TIMER.get() != null) {
+            TIMER.get().cancel();
+        }
+        TIMER.set(null);
+
+        this.notificationHelper.cancel(1);
+        this.notificationHelper.cancel(2);
+
+        showMessage("取消番茄鐘!!");
+
+        isStarting.set(false);
     }
 }

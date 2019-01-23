@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
@@ -26,11 +27,15 @@ public class NotificationHelper {
         Notification.Builder builder = new Notification.Builder(context);
         builder.setContentTitle(title);//通知标题
         builder.setContentText(text);//主内容区
-        builder.setContentInfo("补充内容 目前無作用");//补充内容
+        builder.setContentInfo("補充內容 目前無作用");//补充内容
         builder.setSmallIcon(R.mipmap.janna_icon1);
         builder.setTicker("新消息 目前無作用");//新消息
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(autoCancel);
         builder.setWhen(System.currentTimeMillis());
+
+        builder.setLights(Color.BLUE, 500, 500);
+        builder.setStyle(new Notification.BigTextStyle());
+        builder.setVibrate(new long[]{500, 500});
 
         //音效
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

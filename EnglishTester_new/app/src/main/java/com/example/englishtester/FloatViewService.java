@@ -852,7 +852,12 @@ public class FloatViewService extends Service {
         POMODORO_CLOCK("番茄鐘", R.drawable.icon_pomodoro_clock, false) {
             @Override
             void process(FloatViewService self) {
-                new PomodoroClockHandler(self).start();
+                PomodoroClockHandler p = new PomodoroClockHandler(self);
+                if (!p.isStart()) {
+                    p.start();
+                } else {
+                    p.cancel();
+                }
             }
         },//
         EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app, false) {
