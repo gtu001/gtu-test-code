@@ -63,6 +63,7 @@ import com.example.englishtester.common.LockScreenHelper;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
+import com.example.englishtester.common.PomodoroClockHandler;
 import com.example.englishtester.common.RepeatMoveListener;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
@@ -846,6 +847,12 @@ public class FloatViewService extends Service {
             @Override
             void process(FloatViewService self) {
                 self.lockScreenHelper.toggle();
+            }
+        },//
+        POMODORO_CLOCK("番茄鐘", R.drawable.icon_pomodoro_clock, false) {
+            @Override
+            void process(FloatViewService self) {
+                new PomodoroClockHandler(self).start();
             }
         },//
         EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app, false) {
