@@ -91,9 +91,11 @@ public class PomodoroClockHandler {
             public void run() {
                 customVibratePatternNoRepeat();
                 showMessage("休息時間到!..");
+                //設定為初始狀態
+                isStarting.set(false);
             }
         }, 30 * 60 * 1000);
-
+        //設定為開始
         isStarting.set(true);
     }
 

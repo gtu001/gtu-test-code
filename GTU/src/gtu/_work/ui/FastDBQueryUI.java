@@ -8,7 +8,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -138,8 +137,6 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdListDSMappingHandler sqlIdListDSMappingHandler;
     private SqlParameterConfigLoadHandler sqlParameterConfigLoadHandler = new SqlParameterConfigLoadHandler();
 
-    // private static PropertiesGroupUtils dataSourceConfig = new
-    // PropertiesGroupUtils(new File(JAR_PATH_FILE, "dataSource.properties"));
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
 
     private FastDBQueryUI_CrudDlgUI fastDBQueryUI_CrudDlgUI;
@@ -1224,9 +1221,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private enum DataType {
-        varchar(String.class) {
+        varchar(new Class[]{String.class}, false) {
         }, //
-        date(java.sql.Date.class) {
+        date(new Class[]{java.sql.Date.class}, false) {
             protected Object applyDataChange(Object value) {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 if (value instanceof String && StringUtils.isNotBlank((String) value)) {
@@ -1241,7 +1238,7 @@ public class FastDBQueryUI extends JFrame {
                 return value;
             }
         }, //
-        timestamp(java.sql.Timestamp.class) {
+        timestamp(new Class[]{java.sql.Timestamp.class}, false) {
             protected Object applyDataChange(Object value) {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 if (value instanceof String && StringUtils.isNotBlank((String) value)) {
@@ -1256,22 +1253,36 @@ public class FastDBQueryUI extends JFrame {
                 return value;
             }
         }, //
-        number(Number.class) {
+        number(new Class[]{Number.class}, false) {
         }, //
-        NULL(void.class) {
+        NULL(new Class[]{void.class, true) {
+            protected Object applyDataChange(Object value) {
+                return null;
+            }
         }, //
-        UNKNOW(void.class) {
+        Empty(new Class[]{String.class}, true) {
+            protected Object applyDataChange(Object value) {
+                return "";
+            }
+        }, //
+        UNKNOW(new Class[]{void.class}, false) {
         },//
         ;
 
         final Class<?>[] clz;
+        final boolean forceAddColumn;
 
-        DataType(Class<?>... clz) {
+        DataType(Class<?>[] clz, boolean forceAddColumn) {
             this.clz = clz;
+            this.forceAddColumn = forceAddColumn;
         }
 
         protected Object applyDataChange(Object value) {
             return value;
+        }
+        
+        protected boolean isForceAddColumn(){
+            return forceAddColumn;
         }
     }
 
@@ -1540,6 +1551,8 @@ public class FastDBQueryUI extends JFrame {
 
             Map<String, Object> paramMap = new HashMap<String, Object>();
             Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
+            
+            Set<String> forceAddColumns = new HashSet<String>();
 
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
                 String columnName = (String) util.getRealValueAt(ii, 0);
@@ -1552,6 +1565,10 @@ public class FastDBQueryUI extends JFrame {
                     // 一般處理
                     DataType dataType = (DataType) util.getRealValueAt(ii, 2);
                     paramMap.put(columnName, getRealValue(value, dataType));
+                    
+                    if(dataType.isForceAddColumn()){
+                        forceAddColumns.add(columnName);
+                    }
                 }
             }
 
@@ -1582,7 +1599,7 @@ public class FastDBQueryUI extends JFrame {
                     parameterList.add(paramMap.get(columnName));
                 }
             } else if (param.getClass() == SqlParam_IfExists.class) {
-                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap));
+                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, forceAddColumns));
             }
 
             // 設定 sqlInjectionMap
@@ -1814,22 +1831,35 @@ public class FastDBQueryUI extends JFrame {
     private static class SqlParam_IfExists extends SqlParam {
         List<Pair<List<String>, int[]>> paramListFix = new ArrayList<Pair<List<String>, int[]>>();
 
-        private boolean isAllOk(List<String> paramLst, Map<String, Object> paramMap) {
+        private boolean isParametersAllOk(List<String> paramLst, Map<String, Object> paramMap, Set<String> forceAddColumns) {
+            List<Pair<String,Boolean>> paramBoolLst = new ArrayList<Pair<String,Boolean>>(); 
             for (String col : paramLst) {
                 if (paramMap.containsKey(col) && paramMap.get(col) != null) {
-                    if (paramMap.get(col) instanceof String) {
+                    if(forceAddColumns.contains(col)){
+                        paramBoolLst.add(Pair.of(col, true));
+                    }else if (paramMap.get(col) instanceof String) {
                         String tmpParamVal = StringUtils.trimToEmpty((String) paramMap.get(col));
-                        if (StringUtils.isBlank(tmpParamVal)) {
-                            return false;
+                        if (StringUtils.isNotBlank(tmpParamVal)) {
+                            paramBoolLst.add(Pair.of(col, true));
+                        }else{
+                            paramBoolLst.add(Pair.of(col, false));
                         }
                     } else {
-                        // TODO
+                        // TODO 特殊形態
+                        paramBoolLst.add(Pair.of(col, null));
                     }
                 } else {
-                    return false;
+                    paramBoolLst.add(Pair.of(col, false));
                 }
             }
-            return true;
+            boolean isOk = true;
+            for(Pair<String,Boolean> param : paramBoolLst){
+                System.out.println("param : " + param.getLeft() + "\t" + param.getRight() );
+                if(param.getRight() == null||  !param.getRight()){
+                    isOk = false;
+                }
+            }
+            return isOk;
         }
 
         public static SqlParam_IfExists parseToSqlParam(String sql) {
@@ -1857,7 +1887,7 @@ public class FastDBQueryUI extends JFrame {
                     if (!params.isEmpty()) {
                         sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
                     }
-                }
+                 }
                 // 必填檢查
                 else {
                     String realQuoteLine = mth.group(3);
@@ -1888,7 +1918,7 @@ public class FastDBQueryUI extends JFrame {
             return rtnStr;
         }
 
-        public List<Object> processParamMap(Map<String, Object> paramMap) {
+        public List<Object> processParamMap(Map<String, Object> paramMap, Set<String> forceAddColumns) {
             String orginialSqlBackup = this.orginialSql.toString();
 
             List<Object> rtnParamLst = new ArrayList<Object>();
@@ -1899,7 +1929,7 @@ public class FastDBQueryUI extends JFrame {
                 String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
                 String replaceToSql = StringUtils.rightPad("", markSql.length());
 
-                if (isAllOk(row.getLeft(), paramMap) || markSql.matches("\\:\\w+")) {
+                if (isParametersAllOk(row.getLeft(), paramMap) || markSql.matches("\\:\\w+")) {
                     replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap);
                 }
 
