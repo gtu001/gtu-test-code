@@ -21,6 +21,7 @@ http://cloudgarden.org/update-site[可能掛了]
 
 WindowBuilder
 http://download.eclipse.org/windowbuilder/WB/release/R201406251200/4.4/
+http://download.eclipse.org/windowbuilder/latest/
 
 OpenImplementors
 http://eclipse-tools.sourceforge.net/updates/
