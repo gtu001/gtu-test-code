@@ -74,7 +74,7 @@ public class EpubViewerMainHandler {
         this.epubSpannableTextHandler = new EpubSpannableTextHandler();
         this.self = this;
         this.epubActivityInterface = epubActivityInterface;
-        this.dto = new EpubDTO(epubActivityInterface);
+        this.dto = new EpubDTO(epubActivityInterface, this);
     }
 
     public void setTextView(TextView textView) {
@@ -247,7 +247,7 @@ public class EpubViewerMainHandler {
 
     public static class PageContentHolder {
         private AtomicInteger spinePos = new AtomicInteger(-1);
-        private List<TxtReaderAppender.TxtAppenderProcess> pages;
+        private List<TxtReaderAppender.TxtAppenderProcess> processPages;
         private Map<Integer, SpannableString> pageMap = new HashMap<Integer, SpannableString>();
         private List<String> pages4Debug;
         private List<String> translateLst;
@@ -259,15 +259,23 @@ public class EpubViewerMainHandler {
         private AtomicReference<String> customContent = new AtomicReference<>();
 
         public boolean isEmpty() {
-            return pages == null || pages.isEmpty();
+            return processPages == null || processPages.isEmpty();
         }
 
         private SpannableString getSpannablePage(int index) {
             if (!pageMap.containsKey(index)) {
-                SpannableString span = pages.get(index).getResult();
+                SpannableString span = processPages.get(index).getResult();
                 pageMap.put(index, span);
             }
             return pageMap.get(index);
+        }
+
+        public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkMap() {
+            try {
+                return this.processPages.get(this.currentPageIndex).getBookmarkMap();
+            } catch (Exception ex) {
+                return new HashMap<>();
+            }
         }
 
         public SpannableString getCurrentPage() {
@@ -275,7 +283,7 @@ public class EpubViewerMainHandler {
         }
 
         public int size() {
-            return pages.size();
+            return processPages.size();
         }
 
         public String getPageContent4Debug() {
@@ -285,8 +293,8 @@ public class EpubViewerMainHandler {
         public SpannableString gotoPage(int index) {
             if (index < 0) {
                 currentPageIndex = 0;
-            } else if (index >= pages.size()) {
-                currentPageIndex = pages.size() - 1;
+            } else if (index >= processPages.size()) {
+                currentPageIndex = processPages.size() - 1;
             }
             return getSpannablePage(currentPageIndex);
         }
@@ -304,7 +312,7 @@ public class EpubViewerMainHandler {
         }
 
         public void setPages(List<TxtReaderAppender.TxtAppenderProcess> pages, List<String> pages4Debug, List<String> page4Translate) {
-            this.pages = pages;
+            this.processPages = pages;
             this.pages4Debug = pages4Debug;
             this.currentPageIndex = 0;
             this.translateLst = page4Translate;
@@ -312,7 +320,7 @@ public class EpubViewerMainHandler {
         }
 
         public boolean hasNext() {
-            if (this.currentPageIndex + 1 >= pages.size()) {
+            if (this.currentPageIndex + 1 >= processPages.size()) {
                 return false;
             }
             return true;
@@ -347,7 +355,7 @@ public class EpubViewerMainHandler {
         }
 
         public SpannableString lastPage() {
-            this.currentPageIndex = this.pages.size() - 1;
+            this.currentPageIndex = this.processPages.size() - 1;
             return getSpannablePage(this.currentPageIndex);
         }
 
@@ -383,11 +391,13 @@ public class EpubViewerMainHandler {
         private PageForwardEnum pageForwardEnum;
         private BookStatusHolder bookStatusHolder;
         private EpubActivityInterface epubActivityInterface;
+        private EpubViewerMainHandler handler;
 
         private int pageIndex = -1;
 
-        public EpubDTO(EpubActivityInterface epubActivityInterface) {
+        public EpubDTO(EpubActivityInterface epubActivityInterface, EpubViewerMainHandler handler) {
             this.epubActivityInterface = epubActivityInterface;
+            this.handler = handler;
         }
 
         public void setTextView(TextView textView) {
@@ -396,7 +406,8 @@ public class EpubViewerMainHandler {
 
         @Override
         public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
-            return bookStatusHolder.bookmarkHolder.getBookmarkHolder(this.getFileName().toString());
+            final EpubViewerMainHandler.PageContentHolder holder = handler.gotoPosition(getPageIndex());
+            return holder.getBookmarkMap();
         }
 
         @Override
@@ -501,22 +512,9 @@ public class EpubViewerMainHandler {
         }
     }
 
-    private static class BookmarkHolder {
-
-        Map<String, Map<Integer, TxtReaderAppender.WordSpan>> fileNameBookmark = new HashMap<>();
-
-        Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder(String currentFileName) {
-            Assert.assertTrue(StringUtils.isNotBlank(currentFileName));
-            if (!fileNameBookmark.containsKey(currentFileName)) {
-                fileNameBookmark.put(currentFileName, new TreeMap<Integer, TxtReaderAppender.WordSpan>());
-            }
-            return fileNameBookmark.get(currentFileName);
-        }
-    }
 
     private static class BookStatusHolder {
         private SpineRangeHolder spineRangeHolder = new SpineRangeHolder();
-        private BookmarkHolder bookmarkHolder = new BookmarkHolder();
     }
 
     private static class SpineRangeHolder extends Observable {
@@ -552,9 +550,9 @@ public class EpubViewerMainHandler {
             try {
                 int totalSize = 0;
                 for (int ii = 0; ii < spinePos; ii++) {
-                    totalSize += spineHolder.get().get(ii).pages.size();
+                    totalSize += spineHolder.get().get(ii).processPages.size();
                 }
-                int pageRight = totalSize + spineHolder.get().get(spinePos).pages.size() - 1;
+                int pageRight = totalSize + spineHolder.get().get(spinePos).processPages.size() - 1;
                 return Pair.of(totalSize, pageRight);
             } catch (Exception ex) {
                 return null;

@@ -10,7 +10,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
-
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +27,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,6 +71,7 @@ public class TxtReaderAppender {
         int maxPicWidth;
         List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
         String dtoFileName;
+        Map<Integer, WordSpan> bookmarkMap = new HashMap<Integer, WordSpan>();
 
         TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth, String dtoFileName) {
             this.txtContent = txtContent;
@@ -251,7 +253,12 @@ public class TxtReaderAppender {
         }
 
         private void putToBookmarkHolder(WordSpan clickableSpan) {
+            bookmarkMap.put(clickableSpan.id, clickableSpan);
             dto.getBookmarkHolder().put(clickableSpan.id, clickableSpan);
+        }
+
+        public Map<Integer, WordSpan> getBookmarkMap() {
+            return bookmarkMap;
         }
     }
 
