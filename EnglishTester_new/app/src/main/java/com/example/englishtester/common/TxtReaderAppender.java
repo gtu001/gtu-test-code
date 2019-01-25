@@ -62,7 +62,7 @@ public class TxtReaderAppender {
         this.txtView = txtView;
     }
 
-    private class TxtAppenderProcess {
+    public class TxtAppenderProcess {
 
         String txtContent;
         boolean isWordHtml;
@@ -78,12 +78,15 @@ public class TxtReaderAppender {
         }
 
         public SpannableString getResult() {
+            long startTime = System.currentTimeMillis();
             if (isWordHtml) {
                 wordHtmlProcess();
             }
 
             normalTxtProcess();
 
+            long duringTime = System.currentTimeMillis() - startTime;
+            Log.v(TAG, "duringTime : " + duringTime);
             return ss;
         }
 
@@ -153,9 +156,7 @@ public class TxtReaderAppender {
                     continue;
                 }
 
-                final String sentance = escaper.getSentance(mth.start(), mth.end());
-
-                WordSpan clickableSpan = new WordSpan(index, sentance) {
+                WordSpan clickableSpan = new WordSpan(index, mth.start(), mth.end(), escaper) {//sentance
 
                     private void checkFloatServiceOn() {
                         if (!ServiceUtil.isServiceRunning(activity.getApplicationContext(), FloatViewService.class)) {
@@ -174,7 +175,7 @@ public class TxtReaderAppender {
                             try {
                                 checkFloatServiceOn();
 
-                                mService.searchWord(txtNow, sentance);
+                                mService.searchWord(txtNow, this.getSentance());
                             } catch (RemoteException e) {
                                 Log.e(TAG, e.getMessage(), e);
                                 Toast.makeText(activity.getApplicationContext(), "查詢失敗!", Toast.LENGTH_SHORT).show();
@@ -271,8 +272,10 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Triple<List<SpannableString>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
-        List<SpannableString> pageDividLst = new ArrayList<>();
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
+        long startTime = System.currentTimeMillis();
+
+        List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
         Pair<List<String>, List<String>> pair = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
         List<String> pages = pair.getLeft();
         List<String> orign4TranslateLst = pair.getRight();
@@ -295,9 +298,12 @@ public class TxtReaderAppender {
             dto.setFileName(titleHandler.getTitle(ii));
 
             TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth);
-            pageDividLst.add(appender.getResult());
+            pageDividLst.add(appender);
         }
 
+        long duringTime = System.currentTimeMillis() - startTime;
+
+        Log.v(TAG, "duringTime : " + duringTime);
         return Triple.of(pageDividLst, pages, orign4TranslateLst);
     }
 
@@ -330,14 +336,18 @@ public class TxtReaderAppender {
         private String word;
         private boolean marking = false;
         private boolean bookmarking = false;
-        private String sentance;
+        private int groupStart;
+        private int groupEnd;
+        private TxtReaderAppenderEscaper escaper;
 
         public WordSpan() {
         }
 
-        public WordSpan(int id, String sentance) {
+        public WordSpan(int id, int groupStart, int groupEnd, TxtReaderAppenderEscaper escaper) {
             this.id = id;
-            this.sentance = sentance;
+            this.groupStart = groupStart;
+            this.groupEnd = groupEnd;
+            this.escaper = escaper;
         }
 
         @Override
@@ -394,7 +404,11 @@ public class TxtReaderAppender {
         }
 
         public String getSentance() {
-            return sentance;
+            try {
+                return escaper.getSentance(groupStart, groupEnd);
+            } catch (Exception ex) {
+                return "";
+            }
         }
     }
 }

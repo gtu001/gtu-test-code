@@ -6,10 +6,8 @@ import android.text.SpannableString;
 import android.widget.TextView;
 
 import com.example.englishtester.DropboxFileLoadService;
-import com.example.englishtester.RecentTxtMarkService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.interf.EpubActivityInterface;
-import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml;
@@ -200,7 +198,7 @@ public class EpubViewerMainHandler {
 
                     dto.setFileName(dto.getBookFile().getName());
                     TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, EpubViewerMainHandler.this.dto.textView);
-                    Triple<List<SpannableString>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
+                    Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(navigationEvent.getCurrentSpinePos(), pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
 
                     pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
                     pageContentHolder.setSpinePos(navigationEvent.getCurrentSpinePos());
@@ -249,7 +247,8 @@ public class EpubViewerMainHandler {
 
     public static class PageContentHolder {
         private AtomicInteger spinePos = new AtomicInteger(-1);
-        private List<SpannableString> pages;
+        private List<TxtReaderAppender.TxtAppenderProcess> pages;
+        private Map<Integer, SpannableString> pageMap = new HashMap<Integer, SpannableString>();
         private List<String> pages4Debug;
         private List<String> translateLst;
         private String[] translateDoneArry;
@@ -263,8 +262,16 @@ public class EpubViewerMainHandler {
             return pages == null || pages.isEmpty();
         }
 
+        private SpannableString getSpannablePage(int index) {
+            if (!pageMap.containsKey(index)) {
+                SpannableString span = pages.get(index).getResult();
+                pageMap.put(index, span);
+            }
+            return pageMap.get(index);
+        }
+
         public SpannableString getCurrentPage() {
-            return pages.get(currentPageIndex);
+            return getSpannablePage(currentPageIndex);
         }
 
         public int size() {
@@ -281,7 +288,7 @@ public class EpubViewerMainHandler {
             } else if (index >= pages.size()) {
                 currentPageIndex = pages.size() - 1;
             }
-            return pages.get(currentPageIndex);
+            return getSpannablePage(currentPageIndex);
         }
 
         public void setTranslateDoneText(String text) {
@@ -296,7 +303,7 @@ public class EpubViewerMainHandler {
             return this.translateLst.get(currentPageIndex);
         }
 
-        public void setPages(List<SpannableString> pages, List<String> pages4Debug, List<String> page4Translate) {
+        public void setPages(List<TxtReaderAppender.TxtAppenderProcess> pages, List<String> pages4Debug, List<String> page4Translate) {
             this.pages = pages;
             this.pages4Debug = pages4Debug;
             this.currentPageIndex = 0;
@@ -323,7 +330,7 @@ public class EpubViewerMainHandler {
                 return null;
             }
             this.currentPageIndex++;
-            return this.pages.get(this.currentPageIndex);
+            return getSpannablePage(this.currentPageIndex);
         }
 
         public SpannableString previousPage() {
@@ -331,17 +338,17 @@ public class EpubViewerMainHandler {
                 return null;
             }
             this.currentPageIndex--;
-            return this.pages.get(this.currentPageIndex);
+            return getSpannablePage(this.currentPageIndex);
         }
 
         public SpannableString firstPage() {
             this.currentPageIndex = 0;
-            return this.pages.get(this.currentPageIndex);
+            return getSpannablePage(this.currentPageIndex);
         }
 
         public SpannableString lastPage() {
             this.currentPageIndex = this.pages.size() - 1;
-            return this.pages.get(this.currentPageIndex);
+            return getSpannablePage(this.currentPageIndex);
         }
 
         public int getSpinePos() {

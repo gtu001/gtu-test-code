@@ -77,6 +77,7 @@ public abstract class HtmlBaseParser {
     }
 
     protected String getFromContent(String content, boolean isPure, String checkStr) {
+        long startTime = System.currentTimeMillis();
         Log.v(TAG, "ORIGN start : =======================================================================");
 //        log(content);
         Log.v(TAG, "total len : " + StringUtils.length(content));
@@ -94,6 +95,8 @@ public abstract class HtmlBaseParser {
 //        logContent(content);
         Log.v(TAG, "total len : " + StringUtils.length(content));
         Log.v(TAG, "RESULT end    : =======================================================================");
+        long duringTime = System.currentTimeMillis() - startTime;
+        Log.v(TAG, "duringTime : " + duringTime);
         return content;
     }
 
