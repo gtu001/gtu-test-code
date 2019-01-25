@@ -69,12 +69,14 @@ public class TxtReaderAppender {
         SpannableString ss;
         int maxPicWidth;
         List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
+        String dtoFileName;
 
-        TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth) {
+        TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth, String dtoFileName) {
             this.txtContent = txtContent;
             this.isWordHtml = isWordHtml;
             this.ss = new SpannableString(txtContent);
             this.maxPicWidth = maxPicWidth;
+            this.dtoFileName = dtoFileName;
         }
 
         public SpannableString getResult() {
@@ -126,7 +128,7 @@ public class TxtReaderAppender {
             final TxtReaderAppenderEscaper escaper = new TxtReaderAppenderEscaper(txtContent_);
 
             Log.v(TAG, "recentTxtMark fileName = " + dto.getFileName());
-            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dto.getFileName().toString());
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = recentTxtMarkService.getFileMark(dtoFileName);
             Log.v(TAG, "recentTxtMark list size = " + qList.size());
 
             //debug ↓↓↓↓↓↓↓↓↓↓
@@ -135,7 +137,7 @@ public class TxtReaderAppender {
                 for (RecentTxtMarkDAO.RecentTxtMark v : qList) {
                     sb.append(v.getFileName() + " : " + v.getMarkEnglish() + " : " + v.getMarkIndex() + "\r\n");
                 }
-//                Log.line(TAG, ">> mark size : " + dto.getFileName().toString() + " -->  \n" + sb);
+//                Log.line(TAG, ">> mark size : " + qList.size() + " \t " + dtoFileName + " -->  \n" + sb); //TODO
             }
             //debug ↑↑↑↑↑↑↑↑↑↑
 
@@ -256,16 +258,16 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public SpannableString getAppendTxt(String txtContent) {
-        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, false, -1);
+    public SpannableString getAppendTxt(String txtContent, String dtoFileName) {
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, false, -1, dtoFileName);
         return appender.getResult();
     }
 
     /**
      * 建立可點擊文件
      */
-    public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth) {
-        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth);
+    public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth, String dtoFileName) {
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth, dtoFileName);
         return appender.getResult();
     }
 
@@ -297,7 +299,7 @@ public class TxtReaderAppender {
 
             dto.setFileName(titleHandler.getTitle(ii));
 
-            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth);
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
             pageDividLst.add(appender);
         }
 
