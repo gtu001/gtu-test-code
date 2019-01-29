@@ -55,6 +55,9 @@ public class StringUtil_ {
         }
 
         private String replaceChar(String content, char from) {
+            if (content.indexOf(from) == -1) {
+                return content;
+            }
             StringBuffer sb = new StringBuffer();
             char[] arry = content.toCharArray();
             for (int ii = 0; ii < arry.length; ii++) {
