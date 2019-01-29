@@ -10,11 +10,15 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gtu.util.StringUtil_;
+
 /**
  * Created by wistronits on 2018/8/24.
  */
 
 public class TxtReaderAppenderEscaper {
+
+    private static final String TAG = TxtReaderAppenderEscaper.class.getSimpleName();
 
     String orignText;
     String resultText;
@@ -34,6 +38,7 @@ public class TxtReaderAppenderEscaper {
             for (ReplaceBack e : ReplaceBack.values()) {
                 if (e.isMatch(text)) {
                     text = e.replace(text);
+                    text = StringUtil_.appendReplacementEscape(text);
                     mth.appendReplacement(sb, text);
                     groupMap.put(Pair.of(mth.start(), mth.end()), text);
                     continue A;
