@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- 
+<script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.7.3.custom.min.js"></script>
+ -->
+<link rel="stylesheet" href="" />
+<script type="text/javascript">
+	function init(){
+		distnceArray();
+		simpleSearch();
+		flatteningArray();
+		frequencyCount();
+		setLookupTable();
+		extractUniqueValue();
+		keyValueReversal();
+		celsiusTofahrenheit();
+		encodeToQueryString();
+		jsonToStringFormatter();
+		replaceByCondition();
+		unionArry();
+		intersectionArry();
+	}
+	
+	//Distinct
+	//Remove duplicates from an array of numbers/strings
+	function distnceArray(){
+		let values = [3, 1, 3, 5, 2, 4, 4, 4];
+		let uniqueValues = [...new Set(values)];
+		// uniqueValues is [3, 1, 5, 2, 4]
+		console.log("distnceArray : " + uniqueValues);
+	}
+	
+	//簡易蒐尋器
+	//A simple search 
+	function simpleSearch(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		let res1 = users.filter(it => it.name.includes('oli'));
+		// res is []
+		console.log("simpleSearch (case-sensitive) : " + JSON.stringify(res1));
+		let res2 = users.filter(it => new RegExp('oli', "i").test(it.name));
+		console.log("simpleSearch (case-insensitive) : " + JSON.stringify(res2));
+		
+		//Check if any of the users have admin rights
+		let hasAdmin = users.some(user => user.group === 'admin');
+		// hasAdmin is true
+		console.log("hasAdmin : " + hasAdmin);
+	}
+	
+	//攤平
+	//Flattening an array of arrays
+	function flatteningArray(){
+		let nested = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+		let flat = nested.reduce((acc, it) => [...acc, ...it], []);
+		// flat is [1, 2, 3, 4, 5, 6, 7, 8, 9]
+		console.log("flatteningArray : " + flat);
+		
+		//簡易版flattening array
+		let flat2 = [].concat.apply([], nested);
+		console.log("flatteningArray2 : " + flat2);
+	}
+	
+	//計數器
+	//Create an object that contains the frequency of the specified key
+	function frequencyCount(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		let groupByAge = users.reduce((acc, it) =>
+		  ({ ...acc, [it.age]: (acc[it.age] || 0) + 1 }),
+		{});
+		// groupByAge is {23: 1, 28: 2, 34: 1}
+		console.log("frequencyCount :" + JSON.stringify(groupByAge));
+	}
+	
+	//把id變成key
+	//Indexing an array of objects (lookup table)
+	function setLookupTable(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		let uTable = users.reduce((acc, it) => ({...acc, [it.id]: it }), {})
+		console.log("LookupTable :" + JSON.stringify(uTable));
+	}
+	
+	//取得Distinct某個屬性
+	//Extract the unique values for the given key of each item in the array
+	function extractUniqueValue(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		let listOfUserGroups = [...new Set(users.map(it => it.group))];
+		console.log("extractUniqueValue : " + JSON.stringify(listOfUserGroups));
+	}
+	
+	//同樣value合併
+	//Object key-value map reversal
+	function keyValueReversal(){
+		let cities = {
+		  Lyon: 'France',
+		  Berlin: 'Germany',
+		  Paris: 'France'
+		};
+		let countries = Object.keys(cities).reduce(
+		  (acc, k) => (acc[cities[k]] = [...(acc[cities[k]] || []), k], acc) , {});
+		console.log("keyValueReversal : " + JSON.stringify(countries));
+		
+		//完整寫法
+		let countries2 = Object.keys(cities).reduce((acc, k) => {
+		  let country = cities[k];
+		  acc[country] = [...(acc[country] || []), k];
+		  return acc;
+		}, {});
+		console.log("keyValueReversal2 : " + JSON.stringify(countries2));
+		//keyValueReversal : {"France":["Lyon","Paris"],"Germany":["Berlin"]}
+	}
+	
+	//氣溫計算切換(map使用)
+	//Create an array of Fahrenheit values from an array of Celsius values
+	function celsiusTofahrenheit(){
+		let celsius = [-15, -5, 0, 10, 16, 20, 24, 32]
+		let fahrenheit = celsius.map(t => t * 1.8 + 32);
+		console.log("celsiusTofahrenheit : " + fahrenheit);
+		// fahrenheit is [5, 23, 32, 50, 60.8, 68, 75.2, 89.6]
+	}
+	
+	//產生request網址
+	//Encode an object into a query string
+	function encodeToQueryString(){
+		let params = {lat: 45, lng: 6, alt: 1000};
+		let queryString = Object.entries(params).map(
+			p => encodeURIComponent(p[0]) + '=' + encodeURIComponent(p[1])).join('&')
+		// queryString is "lat=45&lng=6&alt=1000"
+		console.log("encodeToQueryString : " + queryString);
+	}
+	
+	//將json物件給自訂格式輸出成字串
+	function jsonToStringFormatter(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		let resultStr = users.map(({id, age, group}) => `\n${id} ${age} ${group}`).join('')
+		console.log("jsonToStringFormatter : " + resultStr);
+	}
+
+	//更新某欄位值by 特定條件
+	//Find and replace a key-value pair in an array of objects
+	function replaceByCondition(){
+		let users = [
+		  { id: 11, name: 'Adam', age: 23, group: 'editor' },
+		  { id: 47, name: 'John', age: 28, group: 'admin' },
+		  { id: 85, name: 'William', age: 34, group: 'editor' },
+		  { id: 97, name: 'Oliver', age: 28, group: 'admin' }
+		];
+		//更新id = 47則 age + 1
+		let updatedUsers = users.map(
+		  p => p.id !== 47 ? p : {...p, age: p.age + 1}
+		);
+		console.log("replaceByCondition : " + JSON.stringify(updatedUsers));
+		// John is turning 29 now
+	}
+	
+	//聯集
+	//Union (A ∪ B) of arrays
+	function unionArry(){
+		let arrA = [1, 4, 3, 2];
+		let arrB = [5, 2, 6, 7, 1];
+		let resultArry = [...new Set([...arrA, ...arrB])];
+		console.log("unionArry : " + resultArry);
+	}
+	
+	//交集
+	//Intersection (A ∩ B) of arrays
+	function intersectionArry(){
+		let arrA = [1, 4, 3, 2];
+		let arrB = [5, 2, 6, 7, 1];
+		let resultArry = arrA.filter(it => arrB.includes(it));
+		console.log("intersectionArry : " + resultArry);
+	}
+
+</script>
+</head>
+<body onload="init();">
+
+</body>
+</html>
