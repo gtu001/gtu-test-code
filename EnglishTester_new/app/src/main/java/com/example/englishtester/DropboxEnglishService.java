@@ -14,6 +14,7 @@ import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -260,6 +261,17 @@ public class DropboxEnglishService {
         } catch (Exception ex) {
             Log.e(TAG, "getRunInThread ERROR", ex);
             return null;
+        }
+    }
+
+    public List<String> getDropboxWordLst() {
+        try {
+            File tmpFile = File.createTempFile("TmpDropboxWOrd_", ".txt");
+            DropboxUtilV2.download(NEW_ENGLISH_WORD_FILE, new FileOutputStream(tmpFile), DropboxUtilV2.getClient(accessToken));
+            return FileUtils.readLines(tmpFile, "UTF8");
+        } catch (Exception e) {
+            Log.e(TAG, "getDropboxWordLst ERR : " + e.getMessage(), e);
+            throw new RuntimeException("getDropboxWordLst 取得檔案失敗 , ERR : " + e.getMessage(), e);
         }
     }
 

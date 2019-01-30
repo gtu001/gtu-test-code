@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.Log;
 
 import android.view.Menu;
@@ -34,6 +35,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +53,8 @@ import gtu._work.etc.EnglishTester_Diectory_Factory;
 public class ShowWordListActivity extends ListActivity {
 
     private static final String TAG = ShowWordListActivity.class.getSimpleName();
+
+    public static final String INIT_FLAG_KEY = "INIT_FLAG_KEY";//決定初始狀態要做什麼
 
     public static String ShowWordListActivity_DTO = "ShowWordListActivity_DTO";
 
@@ -76,6 +80,9 @@ public class ShowWordListActivity extends ListActivity {
     //例句
     Map<String, String> sentanceMap;
 
+    String token;
+    DropboxEnglishService dropboxEnglishService;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
@@ -87,10 +94,7 @@ public class ShowWordListActivity extends ListActivity {
 
         setContentView(R.layout.activity_showword_list);
 
-        talkComponent = new TextToSpeechComponent(getApplicationContext());
-        englishwordInfoDAO = new EnglishwordInfoDAO(getApplicationContext());
-        recentSearchService = new RecentSearchService(getApplicationContext());
-        englishDescKeeper = new EnglishDescKeeper(getApplicationContext());
+        initServices();
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -101,7 +105,21 @@ public class ShowWordListActivity extends ListActivity {
 
         if (dto == null) {
             dto = new MainActivityDTO();
-            this.recentSearchHistory();
+
+            String initFlag = extras.getString(INIT_FLAG_KEY, "recent");
+
+            if ("recent".equals(initFlag)) {
+                this.loadListStatus = LoadListStatus.ALL;
+                this.selectStatus = SelectStatus.NONE;
+                this.sortStatus = SortStatus.QUESTIONS;
+                this.recentSearchHistory();
+            } else if ("dropboxWord".equals(initFlag)) {
+                this.loadListStatus = LoadListStatus.ALL;
+                this.selectStatus = SelectStatus.NONE;
+                this.sortStatus = SortStatus.NONE;
+                this.dropboxSearchHistory();
+            }
+
             Log.v(TAG, "# recentSearchHistory go");
         } else {
             if (dto.englishFile == Constant.ERROR_MIX_FILE) {
@@ -114,6 +132,16 @@ public class ShowWordListActivity extends ListActivity {
 
         // 重設ListView
         updateMainList();
+    }
+
+    private void initServices() {
+        talkComponent = new TextToSpeechComponent(getApplicationContext());
+        englishwordInfoDAO = new EnglishwordInfoDAO(getApplicationContext());
+        recentSearchService = new RecentSearchService(getApplicationContext());
+        englishDescKeeper = new EnglishDescKeeper(getApplicationContext());
+
+        token = DropboxApplicationActivity.getDropboxAccessToken(ShowWordListActivity.this);
+        dropboxEnglishService = new DropboxEnglishService(ShowWordListActivity.this, token);
     }
 
     enum LoadListStatus {
@@ -685,6 +713,46 @@ public class ShowWordListActivity extends ListActivity {
         }, -1L);
     }
 
+    /**
+     * 查詢dropbox線上查詢紀錄
+     */
+    private void dropboxSearchHistory() {
+        final ProgressDialog myDialog = ProgressDialog.show(this, "查詢資料中", "初始化...", true);
+        final Handler handler = new Handler();
+        DropboxEnglishService.getRunOnUiThread(new Callable<Object>() {
+
+            @Override
+            public Object call() throws Exception {
+                List<String> lst = dropboxEnglishService.getDropboxWordLst();
+                Collections.reverse(lst);
+
+                dto.wordsList = lst;
+                dto.wordsListCopy = lst;
+                sentanceMap = null;
+
+                Map<String, EnglishWord> englishMap = new HashMap<String, EnglishWord>();
+                for (String word : dto.wordsList) {
+                    EnglishWord word2 = englishwordInfoDAO.queryOneWord(word);
+                    if (word2 == null) {
+                        word2 = new EnglishWord();
+                        word2.englishId = word;
+                    }
+                    englishMap.put(word, word2);
+                }
+
+                dto.englishProp = englishMap;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //取消dialog
+                        myDialog.cancel();
+                    }
+                });
+                return null;
+            }
+        }, -1L);
+    }
+
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 功能選單
     static int REQUEST_CODE = 5566;
     static int MENU_FIRST = Menu.FIRST;
@@ -694,6 +762,15 @@ public class ShowWordListActivity extends ListActivity {
             protected void onOptionsItemSelected(ShowWordListActivity activity, Intent intent, Bundle bundle) {
                 activity.sortStatus = SortStatus.QUESTIONS;
                 activity.recentSearchHistory();
+                activity.initList();
+                activity.updateListActivity();
+            }
+        }, //
+        DROPBOX_SEARCH("Dropbox歷史紀錄", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(ShowWordListActivity activity, Intent intent, Bundle bundle) {
+                activity.loadListStatus = LoadListStatus.ALL;
+                activity.sortStatus = SortStatus.NONE;
+                activity.dropboxSearchHistory();
                 activity.initList();
                 activity.updateListActivity();
             }

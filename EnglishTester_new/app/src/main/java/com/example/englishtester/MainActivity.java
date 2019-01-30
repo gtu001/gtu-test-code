@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-
-import com.example.englishtester.common.GodToast;
-import com.example.englishtester.common.Log;
-
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,12 +15,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.englishtester.common.HermannEbbinghaus_Memory_Service;
+import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.PermissionUtil;
 import com.example.englishtester.common.ServiceUtil;
 import com.google.android.gms.ads.NativeExpressAdView;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.File;
+import java.util.Map;
 
 public class MainActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -79,7 +79,13 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
         contentView.addView(createLabel(""));
         contentView.addView(createLabel("使用懸浮字典查單字的歷史紀錄"));
         contentView.addView(createButton("查詢歷史紀錄",//
-                createOnClickListener(ShowWordListActivity.class, new Bundle(), null)));
+                createOnClickListener(ShowWordListActivity.class, getBundle(new Object[]{new Object[]{ShowWordListActivity.INIT_FLAG_KEY, "recent"}}), null)));
+
+        //----------------------------------------------------------------
+        contentView.addView(createLabel(""));
+        contentView.addView(createLabel("使用懸浮字典查單字的歷史紀錄"));
+        contentView.addView(createButton("Dropbox查詢歷史紀錄",//
+                createOnClickListener(ShowWordListActivity.class, getBundle(new Object[]{new Object[]{ShowWordListActivity.INIT_FLAG_KEY, "dropboxWord"}}), null)));
 
         //----------------------------------------------------------------
         contentView.addView(createLabel(""));
@@ -360,6 +366,17 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
             }
         };
         return onClickListner;
+    }
+
+    private Bundle getBundle(Object[] objs) {
+        Map map = ArrayUtils.toMap(objs);
+        Bundle b = new Bundle();
+        for (Object key : map.keySet()) {
+            String k = (String) key;
+            String v = (String) map.get(key);
+            b.putString(k, v);
+        }
+        return b;
     }
 
     @Override
