@@ -22,7 +22,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
@@ -35,6 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * @author Troy 2009/05/04
@@ -52,6 +54,27 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 public class FileUtil {
 
     public static void main(String[] args) {
+        List<String> lst = new ArrayList<String>();
+        lst.add("267.44mb");
+        lst.add("1.81kb");
+        lst.add("234.97mb");
+        lst.add("31.09mb");
+        lst.add("23.76kb");
+        lst.add("36.66kb");
+        lst.add("3.61kb");
+        lst.add("8.82kb");
+        lst.add("192.71kb");
+        lst.add("16.17kb");
+        Collections.sort(lst, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return FileUtil.getSizeDescriptionCompare(o1, o2);
+            }
+        });
+
+        for (String v : lst) {
+            System.out.println("\t>> " + v);
+        }
         System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
     }
 
@@ -966,7 +989,7 @@ public class FileUtil {
         for (int ii = 0; ii < suffixS.length && size > 1024; ii++) {
             if (size / 1024 < 1024) {
                 result = BigDecimal.valueOf(size).divide(new BigDecimal(1024d), 2, RoundingMode.HALF_UP);
-//                result = result.setScale(2, RoundingMode.HALF_UP);
+                // result = result.setScale(2, RoundingMode.HALF_UP);
             }
             size = size / 1024;
             suffix = suffixS[ii];
@@ -980,6 +1003,55 @@ public class FileUtil {
             sizeStr = result.toString();
         }
         return sizeStr + suffix;
+    }
+
+    public static Pair<String, String> getSizeDescriptionOrign(long filelength) {
+        long size = filelength;
+        String suffix = null;
+        String[] suffixS = new String[] { "kb", "mb", "gb" };
+        BigDecimal result = null;
+        for (int ii = 0; ii < suffixS.length && size > 1024; ii++) {
+            if (size / 1024 < 1024) {
+                result = BigDecimal.valueOf(size).divide(new BigDecimal(1024d), 2, RoundingMode.HALF_UP);
+                // result = result.setScale(2, RoundingMode.HALF_UP);
+            }
+            size = size / 1024;
+            suffix = suffixS[ii];
+        }
+        if (suffix == null) {
+            suffix = "byte";
+        }
+        String sizeStr = String.valueOf(size);
+        if (result != null) {
+            // System.out.println(size + " / " + result.toString());
+            sizeStr = result.toString();
+        }
+        return Pair.of(sizeStr, suffix);
+    }
+
+    public static int getSizeDescriptionCompare(String left, String right) {
+        Pattern ptn = Pattern.compile("(\\-?[\\d\\.]+)(byte|kb|mb|gb)");
+        Matcher mth = ptn.matcher(StringUtils.trimToEmpty(left));
+        mth.find();
+        Matcher mth2 = ptn.matcher(StringUtils.trimToEmpty(right));
+        mth2.find();
+        return getSizeDescriptionCompare(//
+                Pair.of(mth.group(1), mth.group(2)), //
+                Pair.of(mth2.group(1), mth2.group(2)));
+    }
+
+    public static int getSizeDescriptionCompare(Pair<String, String> left, Pair<String, String> right) {
+        String[] unitRank = new String[] { "byte", "kb", "mb", "gb" };
+        int leftRank = ArrayUtils.indexOf(unitRank, left.getRight());
+        int rightRank = ArrayUtils.indexOf(unitRank, right.getRight());
+        int unitCompare = new Integer(leftRank).compareTo(rightRank);
+        if (unitCompare != 0) {
+            return unitCompare;
+        } else {
+            int result = new Double(Double.parseDouble(left.getLeft()))//
+                    .compareTo(Double.parseDouble(right.getLeft()));
+            return result;
+        }
     }
 
     /**

@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -602,6 +603,15 @@ public class FacebookVideoDownloader extends JFrame {
                         }
                         return;
                     }
+
+                    Collections.sort(list, new Comparator<VideoUrlConfig>() {
+                        @Override
+                        public int compare(VideoUrlConfig o1, VideoUrlConfig o2) {
+                            int result = FileUtil.getSizeDescriptionCompare(o1.getFizeSize(), o2.getFizeSize()) * -1;
+                            //System.out.println("# compare : " + result + "\t" + o1.getFizeSize() + "\t" + o2.getFizeSize());
+                            return result;
+                        }
+                    });
 
                     DefaultTableModel model = JTableUtil.createModel(true, new String[] { "檔名", "URL", "大小", "下載", "VO" });
                     videoTable.setModel(model);
