@@ -78,6 +78,19 @@ public class Mp3PlayerActivity extends Activity {
         });
 
         //初始Btn狀態紐
+        Button btn3 = new Button(this);
+        btn3.setText("選擇目錄");
+        layout.addView(btn3);
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                TaskInfo.LOAD_CONTENT_FROM_DIR.onOptionsItemSelected(Mp3PlayerActivity.this, intent, bundle);
+            }
+        });
+
+        //初始Btn狀態紐
         Button btn2 = new Button(this);
         btn2.setText("開啟現在播放");
         layout.addView(btn2);
@@ -242,17 +255,24 @@ public class Mp3PlayerActivity extends Activity {
 
     enum TaskInfo {
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取檔案", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
+        protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+            File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
+            activity.initListViewHandler.add(file);
+        }
+
+        protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+            bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
+            if (BuildConfig.DEBUG) {
+                bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+            }
+            super.onOptionsItemSelected(activity, intent, bundle);
+        }
+        }, //
+        LOAD_CONTENT_FROM_DIR("讀取目錄", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
-                activity.initListViewHandler.add(file);
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
-                if (BuildConfig.DEBUG) {
-                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
-                }
-                super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
         ;

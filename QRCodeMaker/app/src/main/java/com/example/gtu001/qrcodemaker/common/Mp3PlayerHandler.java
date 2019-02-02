@@ -25,6 +25,7 @@ public class Mp3PlayerHandler {
 
     MediaPlayer mediaplayer = new MediaPlayer();
     Context context;
+    MyReplayListObj mMyReplayListObj;
 
     private Mp3PlayerHandler(Context context) {
         this.context = context;
@@ -67,14 +68,18 @@ public class Mp3PlayerHandler {
                 mediaplayer.seekTo(0);
             }
 
-            mediaplayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    Log.v(TAG, "Orign setOnCompletionListener ----");
-                    mediaplayer.stop();
-                    mediaplayer.reset();
-                }
-            });
+            if (mMyReplayListObj == null) {
+                mediaplayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        Log.v(TAG, "Orign setOnCompletionListener ----");
+                        mediaplayer.stop();
+                        mediaplayer.reset();
+                    }
+                });
+            } else {
+                mediaplayer.setOnCompletionListener(mMyReplayListObj);
+            }
         } catch (Exception ex) {
             throw new RuntimeException("mp3讀取錯誤 ex : " + ex.getMessage(), ex);
         }
@@ -119,33 +124,55 @@ public class Mp3PlayerHandler {
     }
 
     public void setReplayMode(final String currentName, final List<Mp3Bean> lst) {
-        mediaplayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                Log.v(TAG, "# Replaying ...");
-                if (lst.isEmpty()) {
-                    Log.v(TAG, "# Replaying ... ERROR");
-                    return;
-                }
-                if (lst.size() == 1) {
-                    Log.v(TAG, "# Replaying ... ONE");
-                    of("");//播放同一首
-                    mediaplayer.start();
-                } else {
-                    Log.v(TAG, "# Replaying ... ALL");
-                    int findIndex = 0;
-                    for (int ii = 0; ii < lst.size(); ii++) {
-                        Mp3Bean b = lst.get(ii);
-                        if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
-                            findIndex = ii + 1;
-                            break;
-                        }
-                    }
-                    of(lst.get(findIndex).getUrl());
-                    mediaplayer.start();
-                }
+        Log.v(TAG, "# ReplayList ----------- start");
+        for (Mp3Bean b : lst) {
+            Log.v(TAG, "\t " + ReflectionToStringBuilder.toString(b));
+        }
+        Log.v(TAG, "# ReplayList ----------- end");
+
+        mMyReplayListObj = new MyReplayListObj(this, currentName, lst);
+        mediaplayer.setOnCompletionListener(mMyReplayListObj);
+    }
+
+    private static class MyReplayListObj implements MediaPlayer.OnCompletionListener {
+        String currentName;
+        List<Mp3Bean> lst;
+        Mp3PlayerHandler mp3PlayerHandler;
+
+        MyReplayListObj(Mp3PlayerHandler mp3PlayerHandler, final String currentName, final List<Mp3Bean> lst) {
+            this.mp3PlayerHandler = mp3PlayerHandler;
+            this.currentName = currentName;
+            this.lst = lst;
+        }
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            Log.v(TAG, "# Replaying ...");
+            if (lst.isEmpty()) {
+                Log.v(TAG, "# Replaying ... ERROR");
+                return;
             }
-        });
+            if (lst.size() == 1) {
+                Log.v(TAG, "# Replaying ... ONE");
+                mp3PlayerHandler.of("");//播放同一首
+                mp3PlayerHandler.mediaplayer.start();
+            } else {
+                Log.v(TAG, "# Replaying ... ALL");
+                int findIndex = 0;
+                for (int ii = 0; ii < lst.size(); ii++) {
+                    Mp3Bean b = lst.get(ii);
+                    if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
+                        findIndex = ii + 1;
+                        break;
+                    }
+                }
+                mp3PlayerHandler.of(lst.get(findIndex).getUrl());
+                mp3PlayerHandler.mediaplayer.start();
+
+                //設定當前首
+                this.currentName = lst.get(findIndex).getName();
+            }
+        }
     }
 
     public void onProgressChange(int percent) {

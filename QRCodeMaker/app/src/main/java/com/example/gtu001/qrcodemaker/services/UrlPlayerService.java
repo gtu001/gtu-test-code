@@ -115,6 +115,7 @@ public class UrlPlayerService extends Service {
     public void setReplayMode(Map totalLst) {
         List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
         if (totalLst != null) {
+            Log.v(TAG, "TotalLst size : " + totalLst.size());
             for (Object k : totalLst.keySet()) {
                 String name = (String) k;
                 String url = (String) totalLst.get(k);

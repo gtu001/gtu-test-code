@@ -66,6 +66,7 @@ public class UrlPlayerDialog_bg {
 
         this.message = message;
         this.totalUrlList = totalUrlList;
+        Log.v(TAG, "<<<<<<<< totalUrlList size : " + totalUrlList.size());
 
         if (StringUtils.isBlank(this.message)) {
             this.message = this.bean.getName();
@@ -267,6 +268,7 @@ public class UrlPlayerDialog_bg {
             public void onClick(View v) {
                 try {
                     ReplayModeType rMode = ReplayModeType.nextVal(replayMode);
+                    replayMode = rMode.mode;
                     rMode.apply(UrlPlayerDialog_bg.this);
                 } catch (RemoteException e) {
                     Log.e(TAG, "btn_img_replay ERR : " + e.getMessage(), e);
@@ -422,10 +424,10 @@ public class UrlPlayerDialog_bg {
 
                 Map<String, String> toMap = new HashMap<String, String>();
                 for (Mp3Bean b : totalUrlList) {
-                    toMap.put(bean.getName(), bean.getUrl());
+                    toMap.put(b.getName(), b.getUrl());
                 }
                 self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
-                Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
+                Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
             }
         },//
         ;
