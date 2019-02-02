@@ -20,4 +20,8 @@ interface IUrlPlayerService {
     Map getCurrentBean();
 
     void onMyServiceDestory();
+
+    void setReplayMode(inout Map totalLst);
+
+    void onProgressChange(int percent);
 }

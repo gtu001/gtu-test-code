@@ -97,6 +97,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
 import gtu.util.StringUtil_;
@@ -693,8 +694,22 @@ public class FloatViewService extends Service {
                     String description = StringUtils.trimToEmpty(editText1.getText().toString());
                     if (StringUtils.isNotBlank(englishId) && StringUtils.isNotBlank(description)) {
                         EnglishWord englishWord = englishwordInfoDAO.queryOneWord(englishId);
+                        boolean isInsert = false;
+                        if (englishWord == null) {
+                            englishWord = new EnglishWord();
+                            englishWord.englishId = englishId;
+                            englishWord.insertDate = System.currentTimeMillis();
+                            EnglishTester_Diectory.WordInfo w1 = diectory.parseToWordInfo(englishId, FloatViewService.this, new Handler());
+                            englishWord.pronounce = w1.getPronounce();
+                            isInsert = true;
+                        }
+                        englishWord.lastbrowerDate = System.currentTimeMillis();
                         englishWord.englishDesc = description;
-                        englishwordInfoDAO.updateWord(englishWord);
+                        if (isInsert) {
+                            englishwordInfoDAO.insertWord(englishWord);
+                        } else {
+                            englishwordInfoDAO.updateWord(englishWord);
+                        }
                         englishMap.put(englishId, englishWord);
                         Toast.makeText(getApplicationContext(), "修改了解釋!", Toast.LENGTH_SHORT).show();
                     }

@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class UrlPlayerDialog_bg {
     private Mp3Bean bean;
     private List<Mp3Bean> totalUrlList;
     private int currentIndex = -1;
+    private int replayMode = -1;
     private static AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
 
     public UrlPlayerDialog_bg(Context context) {
@@ -94,6 +96,8 @@ public class UrlPlayerDialog_bg {
         final ImageView btn_img_forward = (ImageView) dialog.findViewById(R.id.btn_img_forward);
         final ImageView btn_img_previous_song = (ImageView) dialog.findViewById(R.id.btn_img_previous_song);
         final ImageView btn_img_next_song = (ImageView) dialog.findViewById(R.id.btn_img_next_song);
+        final ImageView btn_img_replay = (ImageView) dialog.findViewById(R.id.btn_img_replay);
+        final SeekBar progressBar = (SeekBar) dialog.findViewById(R.id.progressBar);
 
         text_title.setText("播放");
         text_content.setText(UrlPlayerDialog_bg.this.message);
@@ -104,6 +108,7 @@ public class UrlPlayerDialog_bg {
         new ImageButtonImageHelper(R.drawable.mp3_forward_unpressed, R.drawable.going_icon, btn_img_forward);
         new ImageButtonImageHelper(R.drawable.mp3_previous_song_unpressed, R.drawable.going_icon, btn_img_previous_song);
         new ImageButtonImageHelper(R.drawable.mp3_next_song_unpressed, R.drawable.going_icon, btn_img_next_song);
+        new ImageButtonImageHelper(R.drawable.mp3_replay_unpressed, R.drawable.going_icon, btn_img_replay);
 
         btn_img_play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,6 +262,39 @@ public class UrlPlayerDialog_bg {
             }
         });
 
+        btn_img_replay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    ReplayModeType rMode = ReplayModeType.nextVal(replayMode);
+                    rMode.apply(UrlPlayerDialog_bg.this);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "btn_img_replay ERR : " + e.getMessage(), e);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        progressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                try {
+                    urlPlayerServiceHander.get().getMService().onProgressChange(progress);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "progressBar ERR : " + e.getMessage(), e);
+                    Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
         return dialog;
     }
 
@@ -352,5 +390,77 @@ public class UrlPlayerDialog_bg {
             }
             return false;
         }
+    }
+
+    private enum ReplayModeType {
+        None(-1) {
+            @Override
+            void apply(UrlPlayerDialog_bg self) {
+                Mp3Bean bean = self.bean;
+                List<Mp3Bean> totalUrlList = self.totalUrlList;
+
+                Toast.makeText(self.context, "無重複撥放", Toast.LENGTH_SHORT).show();
+            }
+        },//
+        ReplayOne(1) {
+            @Override
+            void apply(UrlPlayerDialog_bg self) throws RemoteException {
+                Mp3Bean bean = self.bean;
+                List<Mp3Bean> totalUrlList = self.totalUrlList;
+
+                Map<String, String> toMap = new HashMap<String, String>();
+                toMap.put(bean.getName(), bean.getUrl());
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+                Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
+            }
+        },//
+        ReplayAll(2) {
+            @Override
+            void apply(UrlPlayerDialog_bg self) throws RemoteException {
+                Mp3Bean bean = self.bean;
+                List<Mp3Bean> totalUrlList = self.totalUrlList;
+
+                Map<String, String> toMap = new HashMap<String, String>();
+                for (Mp3Bean b : totalUrlList) {
+                    toMap.put(bean.getName(), bean.getUrl());
+                }
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+                Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
+            }
+        },//
+        ;
+
+        int mode;
+
+        ReplayModeType(int mode) {
+            this.mode = mode;
+        }
+
+        private static ReplayModeType nextVal(int mode) {
+            ReplayModeType e = valueOfByVal(mode);
+            ReplayModeType[] es = values();
+            for (int ii = 0; ii < es.length; ii++) {
+                ReplayModeType e1 = es[ii];
+                if (e1.mode == mode) {
+                    if (es.length > e1.ordinal() + 1) {
+                        return es[e1.ordinal() + 1];
+                    } else {
+                        return None;
+                    }
+                }
+            }
+            return None;
+        }
+
+        private static ReplayModeType valueOfByVal(int mode) {
+            for (ReplayModeType e : ReplayModeType.values()) {
+                if (e.mode == mode) {
+                    return e;
+                }
+            }
+            return None;
+        }
+
+        abstract void apply(UrlPlayerDialog_bg self) throws RemoteException;
     }
 }

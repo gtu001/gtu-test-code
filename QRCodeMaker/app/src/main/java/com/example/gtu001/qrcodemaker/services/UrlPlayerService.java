@@ -17,7 +17,10 @@ import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +35,7 @@ public class UrlPlayerService extends Service {
     private Handler handler = new Handler();
     private Mp3Bean currentBean;
     private CurrentBeanHandler currentBeanHandler;
+    private List<Mp3Bean> totalLst = new ArrayList<>();
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -108,6 +112,25 @@ public class UrlPlayerService extends Service {
         return mp3Helper != null;
     }
 
+    public void setReplayMode(Map totalLst) {
+        List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
+        if (totalLst != null) {
+            for (Object k : totalLst.keySet()) {
+                String name = (String) k;
+                String url = (String) totalLst.get(k);
+                Mp3Bean b = new Mp3Bean();
+                b.setName(name);
+                b.setUrl(url);
+                Log.v(TAG, "Add TotalLst : " + ReflectionToStringBuilder.toString(b));
+                lst.add(b);
+            }
+        }
+        this.totalLst = lst;
+        if (!this.totalLst.isEmpty()) {
+            mp3Helper.setReplayMode(this.currentBean.getName(), this.totalLst);
+        }
+    }
+
     public void onMyServiceDestory() {
         if (currentBean == null) {
             return;
@@ -143,6 +166,10 @@ public class UrlPlayerService extends Service {
         } else {
             return currentBean.toMap();
         }
+    }
+
+    public void onProgressChange(int percent) {
+        mp3Helper.onProgressChange(percent);
     }
 
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
@@ -184,6 +211,16 @@ public class UrlPlayerService extends Service {
         @Override
         public void onMyServiceDestory() throws RemoteException {
             UrlPlayerService.this.onMyServiceDestory();
+        }
+
+        @Override
+        public void setReplayMode(Map totalLst) throws RemoteException {
+            UrlPlayerService.this.setReplayMode(totalLst);
+        }
+
+        @Override
+        public void onProgressChange(int percent) throws RemoteException {
+            UrlPlayerService.this.onProgressChange(percent);
         }
     };
 

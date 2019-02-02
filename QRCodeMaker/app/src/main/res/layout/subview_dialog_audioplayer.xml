@@ -62,6 +62,13 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/black" />
 
+        <SeekBar
+            android:id="@+id/progressBar"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,42 +81,49 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.21" />
+                android:layout_weight="0.166" />
 
             <ImageView
                 android:id="@+id/btn_img_backward"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.21" />
+                android:layout_weight="0.166" />
 
             <ImageView
                 android:id="@+id/btn_img_play"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.21" />
+                android:layout_weight="0.166" />
 
             <ImageView
                 android:id="@+id/btn_img_forward"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.21" />
+                android:layout_weight="0.166" />
 
             <ImageView
                 android:id="@+id/btn_img_cancel"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.22" />
+                android:layout_weight="0.166" />
 
             <ImageView
                 android:id="@+id/btn_img_next_song"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.21" />
+                android:layout_weight="0.166" />
+
+            <ImageView
+                android:id="@+id/btn_img_replay"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.166" />
         </LinearLayout>
 
     </LinearLayout>
