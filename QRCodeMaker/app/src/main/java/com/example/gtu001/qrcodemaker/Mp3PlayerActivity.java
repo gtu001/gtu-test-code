@@ -188,7 +188,7 @@ public class Mp3PlayerActivity extends Activity {
             baseAdapter.notifyDataSetChanged();
         }
 
-        public List<Mp3Bean>  getTotalUrlList() {
+        public List<Mp3Bean> getTotalUrlList() {
             List<Mp3Bean> lst = new ArrayList<>();
             for (Map<String, Object> m : listItem) {
                 Mp3Bean b = new Mp3Bean();
@@ -255,24 +255,46 @@ public class Mp3PlayerActivity extends Activity {
 
     enum TaskInfo {
         LOAD_CONTENT_FROM_FILE_RANDOM("讀取檔案", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
-        protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-            File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
-            activity.initListViewHandler.add(file);
-        }
-
-        protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-            bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
-            if (BuildConfig.DEBUG) {
-                bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
-            }
-            super.onOptionsItemSelected(activity, intent, bundle);
-        }
-        }, //
-        LOAD_CONTENT_FROM_DIR("讀取目錄", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
             protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+                File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
+                activity.initListViewHandler.add(file);
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
+                if (BuildConfig.DEBUG) {
+                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                }
+                super.onOptionsItemSelected(activity, intent, bundle);
+            }
+        }, //
+        LOAD_CONTENT_FROM_DIR("讀取目錄", MENU_FIRST++, REQUEST_CODE++, FileFindMultiiActivity.class) {
+            protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+                File file = FileFindMultiiActivity.FileFindActivityStarter.getFile(intent);
+                if (file != null) {
+                    activity.initListViewHandler.add(file);
+                } else {
+                    List<File> fileLst = FileFindMultiiActivity.FileFindActivityStarter.getFiles(intent);
+                    for (File f : fileLst) {
+                        if (f.isDirectory()) {
+                            if (f.listFiles() != null) {
+                                for (File subFile : f.listFiles()) {
+                                    activity.initListViewHandler.add(subFile);
+                                }
+                            }
+                        } else {
+                            activity.initListViewHandler.add(f);
+                        }
+                    }
+                }
+            }
+
+            protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
+                bundle.putString(FileFindMultiiActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
+                if (BuildConfig.DEBUG) {
+                    bundle.putStringArray(FileFindMultiiActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                }
+                super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
         ;
