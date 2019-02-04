@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -120,8 +121,10 @@ public class UrlPlayerDialog_bg {
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
+                        Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
                     } else {
                         urlPlayerServiceHander.get().getMService().pauseAndResume();
+                        Toast.makeText(context, "暫停", Toast.LENGTH_SHORT).show();
                     }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -422,12 +425,26 @@ public class UrlPlayerDialog_bg {
                 Mp3Bean bean = self.bean;
                 List<Mp3Bean> totalUrlList = self.totalUrlList;
 
-                Map<String, String> toMap = new HashMap<String, String>();
+                Map<String, String> toMap = new LinkedHashMap<String, String>();
                 for (Mp3Bean b : totalUrlList) {
                     toMap.put(b.getName(), b.getUrl());
                 }
                 self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
                 Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
+            }
+        },//
+        ReplayAll_Random(2) {
+            @Override
+            void apply(UrlPlayerDialog_bg self) throws RemoteException {
+                Mp3Bean bean = self.bean;
+                List<Mp3Bean> totalUrlList = self.totalUrlList;
+
+                Map<String, String> toMap = new HashMap<String, String>();
+                for (Mp3Bean b : totalUrlList) {
+                    toMap.put(b.getName(), b.getUrl());
+                }
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+                Toast.makeText(self.context, "重複播放全部(隨機)", Toast.LENGTH_SHORT).show();
             }
         },//
         ;

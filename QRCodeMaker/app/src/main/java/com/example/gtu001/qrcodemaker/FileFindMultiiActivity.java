@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.brightcove.player.captioning.TTMLParser;
 import com.example.gtu001.qrcodemaker.common.ExternalStorageV2;
@@ -514,5 +516,29 @@ public class FileFindMultiiActivity extends ListActivity {
             }
             return true;
         }
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            String path = mPath.getText().toString();
+            File currentDir = new File(path);
+            boolean changeDirOk = false;
+            if (!rootDirHolder.isRootDir(currentDir)) {
+                if (currentDir.exists() && currentDir.isDirectory()) {
+                    File parentDir = currentDir.getParentFile();
+                    if (parentDir.exists() && parentDir.isDirectory()) {
+                        getFileDir(parentDir.getAbsolutePath());
+                        changeDirOk = true;
+                    }
+                }
+            } else {
+                this.initStartDir();
+                changeDirOk = true;
+            }
+            if (!changeDirOk) {
+                onBackPressed();
+            }
+        }
+        return false;
     }
 }

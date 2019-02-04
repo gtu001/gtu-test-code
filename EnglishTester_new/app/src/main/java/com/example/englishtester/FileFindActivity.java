@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.example.englishtester.common.Log;
 
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -319,5 +320,29 @@ public class FileFindActivity extends ListActivity {
             }
             return false;
         }
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            String path = mPath.getText().toString();
+            File currentDir = new File(path);
+            boolean changeDirOk = false;
+            if (!rootDirHolder.isRootDir(currentDir)) {
+                if (currentDir.exists() && currentDir.isDirectory()) {
+                    File parentDir = currentDir.getParentFile();
+                    if (parentDir.exists() && parentDir.isDirectory()) {
+                        getFileDir(parentDir.getAbsolutePath());
+                        changeDirOk = true;
+                    }
+                }
+            } else {
+                this.initStartDir();
+                changeDirOk = true;
+            }
+            if (!changeDirOk) {
+                onBackPressed();
+            }
+        }
+        return false;
     }
 }
