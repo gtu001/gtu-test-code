@@ -98,6 +98,10 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
             return resourceHref;
         } else {
             //gtu001 custom ↓↓↓↓↓↓
+            if (hasImage(requestUrl)) {
+                return requestUrl;
+            }
+
             String tmpDir = currentFolder;
             if (tmpDir.endsWith("/")) {
                 tmpDir = StringUtils.substring(tmpDir, 0, -1);
@@ -134,6 +138,19 @@ class ImageLoaderCache extends Dictionary<String, Bitmap> {
             Log.e(TAG, "createBitmap ERR : " + e.getMessage(), e);
         }
         return result;
+    }
+
+    public boolean hasImage(Object key) {
+        if (cache.containsKey(key)) {
+            return true;
+        } else {
+            for (Resource res : book.getResources().getAll()) {
+                if (StringUtils.equals(res.getHref(), (String) key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Bitmap get(Object key) {

@@ -46,6 +46,7 @@ import com.example.englishtester.common.RecyclerPagerAdapter;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.EpubActivityInterface;
@@ -76,11 +77,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     private static final String TAG = EpubReaderEpubActivity.class.getSimpleName();
 
     public static final String KEY_CONTENT = "EpubReaderActivity_content";
-
-    private static final Class[] CLICKABLE_SPAN_IMPL_CLZ = new Class[]{//
-            TxtReaderAppender.WordSpan.class, //
-            TxtReaderAppender.SimpleUrlLinkSpan.class//
-    };//
 
     /**
      * 綁定服務器
@@ -140,7 +136,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
 
         txtReaderView.setHighlightColor(Color.TRANSPARENT);
-        txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
+        txtReaderView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, TxtReaderAppenderSpanClass.CLICKABLE_SPAN_IMPL_CLZ));
 
         paddingAdjuster.applyPadding(txtReaderView);
 
@@ -557,7 +553,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         // TODO
     }
 
-    private void gotoViewPagerPosition(int position) {
+    public void gotoViewPagerPosition(int position) {
         ViewPagerHelper.triggerPageSelected(viewPager, position);
     }
 
@@ -699,6 +695,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             public void onPageSelected(final int position) {
                 Log.v(TAG, "##### onPageSelected");
                 epubViewerMainHandler.getDto().setPageIndex(position);
+
+                epubViewerMainHandler.getDto().setGoDirectLink(false);
 
                 initScrollView1YPos();
 

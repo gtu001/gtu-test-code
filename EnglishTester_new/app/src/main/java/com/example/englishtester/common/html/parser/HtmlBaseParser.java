@@ -142,6 +142,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step2_nomalContent", content, checkStr);
         content = _step2_hrefTag(content, isPure);
         validateContent("_step2_hrefTag", content, checkStr);
+        content = _step2$1_hrefTag(content, isPure);
+        validateContent("_step2$1_hrefTag", content, checkStr);
         content = _step3_imageProcMaster(content, isPure, checkStr);
         validateContent("_step3_imageProcMaster", content, checkStr);
         content = _step3_imageProc_4Epub(content, isPure, checkStr);
@@ -158,6 +160,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step6_preTag", content, checkStr);
         content = _step7_codeTag(content, isPure);
         validateContent("_step7_codeTag", content, checkStr);
+        content = _step8_endNote(content, isPure);
+        validateContent("_step8_endNote", content, checkStr);
 
         content = _step999_hiddenSomething(content, isPure, checkStr);
         validateContent("_step999_hiddenSomething", content, checkStr);
@@ -324,6 +328,7 @@ public abstract class HtmlBaseParser {
             Matcher mth2 = titleDtlStylePtn.matcher(detailContent.toString());
             while (mth2.find()) {
                 String mth2_li_string = mth2.group(1);
+                mth2_li_string = StringUtil_.appendReplacementEscape(mth2_li_string);
                 String indexFix = isPure ? "" + index : String.format("{{b:%d.}}", index);
                 if ("ul".equals(detailType)) {
                     indexFix = "● ";
@@ -333,7 +338,7 @@ public abstract class HtmlBaseParser {
             }
             mth2.appendTail(dtlSb);
             // ------------------------------------
-            mth.appendReplacement(tempSb, dtlSb.toString());
+            mth.appendReplacement(tempSb, StringUtil_.appendReplacementEscape(dtlSb.toString()));
         }
         mth.appendTail(tempSb);
         return tempSb.toString();
@@ -420,6 +425,33 @@ public abstract class HtmlBaseParser {
 
     protected String _step2_hrefTag(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<a\\s*?href\\=\"((?:.|\n)*?)\"(?:.|\n)*?>((?:.|\n)*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String link = mth.group(1);
+            String linkLabel = StringUtils.trimToEmpty(mth.group(2));
+
+            if (linkLabel.contains("<img")) {
+                continue;
+            }
+
+            // linkLabel = appendReplacementEscape(linkLabel);
+            linkLabel = _stepFinal_hidden_tag(linkLabel, "\\<(?:.|\n)*?\\>");
+            String replaeStr = "";
+            if (StringUtils.isNotBlank(link) && StringUtils.isNotBlank(linkLabel)) {
+                replaeStr = "{{link:" + link + ",value:" + StringUtil_.appendReplacementEscape(linkLabel) + "}}";
+                if (isPure) {
+                    replaeStr = StringUtil_.appendReplacementEscape(linkLabel);
+                }
+            }
+            mth.appendReplacement(sb, replaeStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step2$1_hrefTag(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile("\\<a\\s(?:.|\n)*?href\\=\"((?:.|\n)*?)\"(?:.|\n)*?>((?:.|\n)*?)\\<\\/a\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
@@ -544,6 +576,19 @@ public abstract class HtmlBaseParser {
             }
 
             mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step8_endNote(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile("\\<sup\\s*?class\\=\"endnote\"(?:.|\n)*?>((?:.|\n)*?)\\<\\/sup\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String link = mth.group(1);
+            link = _stepFinal_hidden_tag(link, "\\<(?:.|\n)*?\\>");
+            mth.appendReplacement(sb, link);
         }
         mth.appendTail(sb);
         return sb.toString();

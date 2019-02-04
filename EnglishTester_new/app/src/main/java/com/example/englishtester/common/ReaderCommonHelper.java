@@ -365,7 +365,7 @@ public class ReaderCommonHelper {
         }
         dto.getBookmarkIndexHolder().set(currentId);
 
-        final TxtReaderAppender.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
+        final TxtReaderAppenderSpanClass.WordSpan spanObject = dto.getBookmarkHolder().get(currentId);
         TxtCoordinateFetcher coordinate = new TxtCoordinateFetcher(txtView, spanObject, windowManager);
 
         final Rect rect = coordinate.getCoordinate();

@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -220,7 +221,7 @@ public class TxtReaderAppenderForHtmlTag {
                 final __SpecialTagHolder_Pos linkUrl = new __SpecialTagHolder_Pos(pair, mth, 1);
                 final __SpecialTagHolder_Pos linkLabel = new __SpecialTagHolder_Pos(pair, mth, 2);
 
-                TxtReaderAppender.SimpleUrlLinkSpan hrefLinkSpan = new TxtReaderAppender.SimpleUrlLinkSpan(self.context, linkUrl.getContent());
+                ClickableSpan hrefLinkSpan = TxtReaderAppenderSpanClass.createLinkSpan(self.context, linkUrl.getContent(), self.dto);
                 log(linkUrl);
 
                 //長度太長的link

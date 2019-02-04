@@ -4,6 +4,7 @@ import android.widget.TextView;
 
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,7 +20,7 @@ public interface ITxtReaderActivityDTO {
 
     void setBookmarkMode(boolean bookmarkMode);
 
-    Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder();
+    Map<Integer, TxtReaderAppenderSpanClass.WordSpan> getBookmarkHolder();
 
     AtomicReference<Integer> getBookmarkIndexHolder();
 

@@ -62,6 +62,7 @@ import com.example.englishtester.common.SingleInputDialog;
 import com.example.englishtester.common.SpannableStringBuilderHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TxtReaderAppender;
+import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 import com.example.englishtester.common.WebViewHtmlFetcher;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
@@ -105,11 +106,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     public static final String KEY_CONTENT = TxtReaderActivity.class.getSimpleName() + "_content";
     public static final String LOAD_URL_CONTENT = TxtReaderActivity.class.getSimpleName() + "_loadUrlContent";
-
-    private static final Class[] CLICKABLE_SPAN_IMPL_CLZ = new Class[]{//
-            TxtReaderAppender.WordSpan.class, //
-            TxtReaderAppender.SimpleUrlLinkSpan.class//
-    };//
 
     /**
      * 綁定服務器
@@ -327,7 +323,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         txtView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         txtView.setHighlightColor(Color.TRANSPARENT);
-        txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
+        txtView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, TxtReaderAppenderSpanClass.CLICKABLE_SPAN_IMPL_CLZ));
         paddingAdjuster.applyPadding(txtView);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
@@ -343,7 +339,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         float fontsize = new ReaderCommonHelper.FontSizeApplyer().getFontSize(this, TxtReaderActivity.class);
         translateView.setTextSize(TypedValue.COMPLEX_UNIT_PX, fontsize);
         translateView.setHighlightColor(Color.TRANSPARENT);
-        translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, CLICKABLE_SPAN_IMPL_CLZ));
+        translateView.setMovementMethod(ClickableSpanMethodCreater.createMovementMethod(this, TxtReaderAppenderSpanClass.CLICKABLE_SPAN_IMPL_CLZ));
         paddingAdjuster.applyPadding(translateView);
 //        参数add表示要增加的间距数值，对应android:lineSpacingExtra参数。
 //        参数mult表示要增加的间距倍数，对应android:lineSpacingMultiplier参数。
@@ -528,7 +524,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 continue;
             }
             int end = start + chinesePara.length();
-            TxtReaderAppender.WordSpan clickableSpan = new TxtReaderAppender.WordSpan(0, -1, -1, null) {
+            TxtReaderAppenderSpanClass.WordSpan clickableSpan = new TxtReaderAppenderSpanClass.WordSpan(0, -1, -1, null) {
                 @Override
                 public void updateDrawState(TextPaint ds) {
                     // ds.bgColor = Color.WHITE;
@@ -1435,7 +1431,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
         private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
-        private transient Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder;
+        private transient Map<Integer, TxtReaderAppenderSpanClass.WordSpan> bookmarkHolder;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private File cacheDir;
         private TxtReaderActivity activity;
@@ -1490,11 +1486,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             this.bookmarkMode.set(bookmarkMode);
         }
 
-        public Map<Integer, TxtReaderAppender.WordSpan> getBookmarkHolder() {
+        public Map<Integer, TxtReaderAppenderSpanClass.WordSpan> getBookmarkHolder() {
             return bookmarkHolder;
         }
 
-        public void setBookmarkHolder(Map<Integer, TxtReaderAppender.WordSpan> bookmarkHolder) {
+        public void setBookmarkHolder(Map<Integer, TxtReaderAppenderSpanClass.WordSpan> bookmarkHolder) {
             this.bookmarkHolder = bookmarkHolder;
         }
 

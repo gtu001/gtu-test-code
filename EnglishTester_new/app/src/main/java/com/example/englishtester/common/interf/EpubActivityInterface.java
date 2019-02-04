@@ -11,4 +11,6 @@ public interface EpubActivityInterface extends ITxtReaderActivity {
     RecentTxtMarkService getRecentTxtMarkService();
 
     int getFixScreenWidth();
+
+    void gotoViewPagerPosition(int position);
 }

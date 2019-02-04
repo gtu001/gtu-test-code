@@ -71,7 +71,7 @@ public class TxtReaderAppender {
         int maxPicWidth;
         List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
         String dtoFileName;
-        Map<Integer, WordSpan> bookmarkMap = new HashMap<Integer, WordSpan>();
+        Map<Integer, TxtReaderAppenderSpanClass.WordSpan> bookmarkMap = new HashMap<Integer, TxtReaderAppenderSpanClass.WordSpan>();
 
         TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth, String dtoFileName) {
             this.txtContent = txtContent;
@@ -160,7 +160,7 @@ public class TxtReaderAppender {
                     continue;
                 }
 
-                WordSpan clickableSpan = new WordSpan(index, mth.start(), mth.end(), escaper) {//sentance
+                TxtReaderAppenderSpanClass.WordSpan clickableSpan = new TxtReaderAppenderSpanClass.WordSpan(index, mth.start(), mth.end(), escaper) {//sentance
 
                     private void checkFloatServiceOn() {
                         if (!ServiceUtil.isServiceRunning(activity.getApplicationContext(), FloatViewService.class)) {
@@ -252,12 +252,12 @@ public class TxtReaderAppender {
             return maxPos;
         }
 
-        private void putToBookmarkHolder(WordSpan clickableSpan) {
+        private void putToBookmarkHolder(TxtReaderAppenderSpanClass.WordSpan clickableSpan) {
             bookmarkMap.put(clickableSpan.id, clickableSpan);
             dto.getBookmarkHolder().put(clickableSpan.id, clickableSpan);
         }
 
-        public Map<Integer, WordSpan> getBookmarkMap() {
+        public Map<Integer, TxtReaderAppenderSpanClass.WordSpan> getBookmarkMap() {
             return bookmarkMap;
         }
     }
@@ -314,110 +314,5 @@ public class TxtReaderAppender {
 
         Log.v(TAG, "duringTime : " + duringTime);
         return Triple.of(pageDividLst, pages, orign4TranslateLst);
-    }
-
-    public static class SimpleUrlLinkSpan extends ClickableSpan {
-        Context context;
-        String url;
-
-        public SimpleUrlLinkSpan(Context context, String url) {
-            this.context = context;
-            this.url = url;
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            ds.setColor(Color.BLUE);
-            ds.setUnderlineText(true);
-        }
-
-        @Override
-        public void onClick(View view) {
-            Log.v(TAG, "click " + " - " + url);
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(browserIntent);
-        }
-    }
-
-    public static class WordSpan extends ClickableSpan {
-        int id = -1;
-        private String word;
-        private boolean marking = false;
-        private boolean bookmarking = false;
-        private int groupStart;
-        private int groupEnd;
-        private TxtReaderAppenderEscaper escaper;
-
-        public WordSpan() {
-        }
-
-        public WordSpan(int id, int groupStart, int groupEnd, TxtReaderAppenderEscaper escaper) {
-            this.id = id;
-            this.groupStart = groupStart;
-            this.groupEnd = groupEnd;
-            this.escaper = escaper;
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            // ds.bgColor = Color.WHITE;
-            ds.setColor(Color.BLACK);
-            ds.setUnderlineText(false);
-            if (marking) {
-                ds.setTypeface(Typeface.create("新細明體", Typeface.BOLD));
-            }
-
-            // if the word selected is the same as the ID set the highlight flag
-            if (bookmarking) {
-                ds.setColor(ds.linkColor);
-                ds.bgColor = Color.YELLOW;
-//                ds.setARGB(255, 255, 255, 255);
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-        }
-
-        public void setMarking(boolean m) {
-            marking = m;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public boolean isMarking() {
-            return marking;
-        }
-
-        public boolean isBookmarking() {
-            return bookmarking;
-        }
-
-        public void setBookmarking(boolean bookmarking) {
-            this.bookmarking = bookmarking;
-        }
-
-        public String getWord() {
-            return word;
-        }
-
-        public void setWord(String word) {
-            this.word = word;
-        }
-
-        public String getSentance() {
-            try {
-                return escaper.getSentance(groupStart, groupEnd);
-            } catch (Exception ex) {
-                return "";
-            }
-        }
     }
 }
