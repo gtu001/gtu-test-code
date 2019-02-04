@@ -2,6 +2,7 @@ package com.example.englishtester.common.epub.base;
 
 import android.graphics.Bitmap;
 
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import android.os.Handler;
@@ -23,6 +24,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -97,6 +99,7 @@ public class EpubViewerMainHandler {
             this.htmlDocumentFactory = new HTMLDocumentFactory(navigator, myHtmlEditorKit, self, epubSpannableTextHandler);
             this.dto.setBookFile(bookFile);
             this.dto.bookStatusHolder = new BookStatusHolder();
+            this.dto.getGoDirectLinkStack().clear();
         } catch (Exception ex) {
             throw new RuntimeException("initBook ERR : " + ex.getMessage(), ex);
         }
@@ -243,9 +246,14 @@ public class EpubViewerMainHandler {
 
                     //設定當前頁
                     Pair<Integer, Integer> currentPageRange = this.settingPageContext(resource, navigationEvent.getCurrentSpinePos());
+
+                    //判斷是否自動導頁
                     if (dto.isGoDirectLink()) {
+                        //設定當前PageIndex
+                        dto.getGoDirectLinkStack().push(epubActivityInterface.getCurrentPageIndex());
                         //強制島頁
                         epubActivityInterface.gotoViewPagerPosition(currentPageRange.getLeft());
+                        //清空自動導頁
                         dto.setGoDirectLink(false);
                     }
 
@@ -437,6 +445,7 @@ public class EpubViewerMainHandler {
         private EpubActivityInterface epubActivityInterface;
         private EpubViewerMainHandler handler;
         private boolean goDirectLink;
+        private Stack<Integer> goDirectLinkStack = new Stack<Integer>();
 
         private int pageIndex = -1;
 
@@ -575,6 +584,14 @@ public class EpubViewerMainHandler {
 
         public boolean isGoDirectLink() {
             return goDirectLink;
+        }
+
+        public Stack<Integer> getGoDirectLinkStack() {
+            return goDirectLinkStack;
+        }
+
+        public void setGoDirectLinkStack(Stack<Integer> goDirectLinkStack) {
+            this.goDirectLinkStack = goDirectLinkStack;
         }
     }
 

@@ -13,4 +13,6 @@ public interface EpubActivityInterface extends ITxtReaderActivity {
     int getFixScreenWidth();
 
     void gotoViewPagerPosition(int position);
+
+    int getCurrentPageIndex();
 }

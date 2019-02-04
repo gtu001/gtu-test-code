@@ -318,7 +318,17 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         this.actionBarCustomTitleHandler = ActionBarSimpleHandler.newInstance().init(this, 0xFFc7edcc);
         this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
         this.backButtonPreventer = new BackButtonPreventer(this);
-
+        this.backButtonPreventer.setIsPreventDefaultEvent(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                if (!epubViewerMainHandler.getDto().getGoDirectLinkStack().isEmpty()) {
+                    int rollbackPageIndex = epubViewerMainHandler.getDto().getGoDirectLinkStack().pop();
+                    gotoViewPagerPosition(rollbackPageIndex);
+                    return true;
+                }
+                return false;
+            }
+        });
         this.doOnoffService(true);
     }
 
@@ -815,11 +825,16 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
                 @Override
                 public void run() {
+                    long startTime = System.currentTimeMillis();
+
                     pageHolder = epubViewerMainHandler.gotoPosition(position);
 
                     this.processContent();
 
                     my.isDone = true;
+
+                    long duringTime = System.currentTimeMillis() - startTime;
+                    Log.v(TAG, "duringTime : " + duringTime);
                 }
             });
         }
@@ -989,6 +1004,10 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 }
             }
         }).start();
+    }
+
+    public int getCurrentPageIndex() {
+        return viewPager.getCurrentItem();
     }
 
     // ↓↓↓↓↓↓ 按兩下回前頁-------------------------------------------------------------------

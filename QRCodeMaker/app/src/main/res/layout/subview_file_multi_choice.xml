@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/ItemTitle"
-        android:layout_width="271dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/ImageView01"

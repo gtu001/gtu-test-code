@@ -1,5 +1,6 @@
 package com.example.englishtester.common;
 
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 
 import com.example.englishtester.common.Log;
@@ -17,16 +18,23 @@ public class ViewPagerHelper {
 
     public static void triggerPageSelected(final ViewPager viewPager, Integer pageIndex) {
         final AtomicReference<Integer> pageIdx = new AtomicReference<>(pageIndex);
+
+        if (pageIdx.get() == null) {
+            pageIdx.set(viewPager.getCurrentItem());
+        } else if (pageIdx.get() != viewPager.getCurrentItem()) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setCurrentItem(pageIdx.get(), false);
+                }
+            });
+        }
+
+        /*
         viewPager.post(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (pageIdx.get() == null) {
-                        pageIdx.set(viewPager.getCurrentItem());
-                    } else if (pageIdx.get() != viewPager.getCurrentItem()) {
-                        viewPager.setCurrentItem(pageIdx.get());
-                    }
-
                     Method mth = ViewPager.class.getDeclaredMethod("dispatchOnPageSelected", int.class);
                     mth.setAccessible(true);
                     mth.invoke(viewPager, pageIdx.get());
@@ -35,5 +43,6 @@ public class ViewPagerHelper {
                 }
             }
         });
+        */
     }
 }
