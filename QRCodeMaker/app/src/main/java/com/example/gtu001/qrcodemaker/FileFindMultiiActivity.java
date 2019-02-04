@@ -78,14 +78,28 @@ public class FileFindMultiiActivity extends ListActivity {
         multiFilesBtn = (Button) findViewById(R.id.multiFilesBtn);
 
         multiFilesBtn.setOnClickListener(new View.OnClickListener() {
+
+            private void appendFileToLst(File file, ArrayList<String> multiFilesLst) {
+                if (file.isFile()) {
+                    if (extensionChecker.isMatch(file)) {
+                        multiFilesLst.add(file.getAbsolutePath());
+                    }
+                } else if (file.isDirectory()) {
+                    if (file.listFiles() != null) {
+                        for (File f : file.listFiles()) {
+                            appendFileToLst(f, multiFilesLst);
+                        }
+                    }
+                }
+            }
+
             @Override
             public void onClick(View v) {
                 ArrayList<String> lst = new ArrayList<>();
                 for (int ii = 0; ii < multiFilesLst.size(); ii++) {
                     String path = multiFilesLst.get(ii);
-                    if (extensionChecker.isMatch(new File(path))) {
-                        lst.add(path);
-                    }
+                    File file = new File(path);
+                    appendFileToLst(file, lst);
                 }
                 if (!lst.isEmpty()) {
                     returnChoiceFiles(lst);

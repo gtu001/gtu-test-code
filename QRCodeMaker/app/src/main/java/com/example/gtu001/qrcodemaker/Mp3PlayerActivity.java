@@ -52,6 +52,8 @@ public class Mp3PlayerActivity extends Activity {
 
     private static final String TAG = Mp3PlayerActivity.class.getSimpleName();
 
+    private static final String FILE_TYPE_PTN = "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp|flac)";
+    private static final String[] EXTENSION_DIR = new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"};
 
     private ListView listView;
     private BaseAdapter baseAdapter;
@@ -261,9 +263,9 @@ public class Mp3PlayerActivity extends Activity {
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
+                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, FILE_TYPE_PTN);
                 if (BuildConfig.DEBUG) {
-                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, EXTENSION_DIR);
                 }
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
@@ -290,9 +292,9 @@ public class Mp3PlayerActivity extends Activity {
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindMultiiActivity.FILE_PATTERN_KEY, "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp)");
+                bundle.putString(FileFindMultiiActivity.FILE_PATTERN_KEY, FILE_TYPE_PTN);
                 if (BuildConfig.DEBUG) {
-                    bundle.putStringArray(FileFindMultiiActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                    bundle.putStringArray(FileFindMultiiActivity.FILE_START_DIRS, EXTENSION_DIR);
                 }
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
