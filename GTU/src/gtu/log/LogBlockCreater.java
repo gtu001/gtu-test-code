@@ -72,7 +72,8 @@ public class LogBlockCreater {
         return this;
     }
 
-    public String getResult() {
-        return sb.toString();
+    public String getResult(boolean addNewLine) {
+        String prefix = addNewLine ? "\r\n" : "";
+        return prefix + sb.toString();
     }
 }
