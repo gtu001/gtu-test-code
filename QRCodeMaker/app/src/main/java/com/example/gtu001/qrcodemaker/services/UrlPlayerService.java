@@ -97,47 +97,77 @@ public class UrlPlayerService extends Service {
     }
 
     public boolean isPlaying() {
-        return mp3Helper.isPlaying();
+        try {
+            return mp3Helper.isPlaying();
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("isPlaying ERR : " + ex.getMessage(), ex);
+        }
     }
 
     public void pauseAndResume() {
-        mp3Helper.pauseAndResume();
+        try {
+            mp3Helper.pauseAndResume();
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
+        }
     }
 
     public void backwardOrBackward(int second) {
-        mp3Helper.backwardOrBackward(second);
+        try {
+            mp3Helper.backwardOrBackward(second);
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("backwardOrBackward ERR : " + ex.getMessage(), ex);
+        }
     }
 
     public boolean isInitDone() {
-        return mp3Helper != null;
+        try {
+            return mp3Helper != null;
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("isInitDone ERR : " + ex.getMessage(), ex);
+        }
     }
 
     public void setReplayMode(Map totalLst) {
-        List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
-        if (totalLst != null) {
-            Log.v(TAG, "TotalLst size : " + totalLst.size());
-            for (Object k : totalLst.keySet()) {
-                String name = (String) k;
-                String url = (String) totalLst.get(k);
-                Mp3Bean b = new Mp3Bean();
-                b.setName(name);
-                b.setUrl(url);
-                Log.v(TAG, "Add TotalLst : " + ReflectionToStringBuilder.toString(b));
-                lst.add(b);
+        try {
+            List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
+            if (totalLst != null) {
+                Log.v(TAG, "TotalLst size : " + totalLst.size());
+                for (Object k : totalLst.keySet()) {
+                    String name = (String) k;
+                    String url = (String) totalLst.get(k);
+                    Mp3Bean b = new Mp3Bean();
+                    b.setName(name);
+                    b.setUrl(url);
+                    Log.v(TAG, "Add TotalLst : " + ReflectionToStringBuilder.toString(b));
+                    lst.add(b);
+                }
             }
-        }
-        this.totalLst = lst;
-        if (!this.totalLst.isEmpty()) {
-            mp3Helper.setReplayMode(this.currentBean.getName(), this.totalLst);
+            this.totalLst = lst;
+            if (!this.totalLst.isEmpty()) {
+                mp3Helper.setReplayMode(this.currentBean.getName(), this.totalLst);
+            }
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("setReplayMode ERR : " + ex.getMessage(), ex);
         }
     }
 
     public void onMyServiceDestory() {
-        if (currentBean == null) {
-            return;
+        try {
+            if (currentBean == null) {
+                return;
+            }
+            currentBean.setLastPosition(String.valueOf(mp3Helper.getCurrentPosition()));
+            currentBeanHandler.putBean(context, currentBean);
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("onMyServiceDestory ERR : " + ex.getMessage(), ex);
         }
-        currentBean.setLastPosition(String.valueOf(mp3Helper.getCurrentPosition()));
-        currentBeanHandler.putBean(context, currentBean);
     }
 
     private static class CurrentBeanHandler {
@@ -162,15 +192,25 @@ public class UrlPlayerService extends Service {
     }
 
     private Map getCurrentBean() {
-        if (currentBean == null) {
-            return currentBeanHandler.getBean(context).toMap();
-        } else {
-            return currentBean.toMap();
+        try {
+            if (currentBean == null) {
+                return currentBeanHandler.getBean(context).toMap();
+            } else {
+                return currentBean.toMap();
+            }
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("getCurrentBean ERR : " + ex.getMessage(), ex);
         }
     }
 
     public void onProgressChange(int percent) {
-        mp3Helper.onProgressChange(percent);
+        try {
+            mp3Helper.onProgressChange(percent);
+        } catch (Exception ex) {
+            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("onProgressChange ERR : " + ex.getMessage(), ex);
+        }
     }
 
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
