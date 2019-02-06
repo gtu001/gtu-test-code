@@ -42,9 +42,15 @@
             android:process=":urlPlayerService"
             android:stopWithTask="false">
             <intent-filter android:priority="1000">
-                <action android:name="FloatViewService" />
+                <action android:name="urlPlayerService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name="com.example.gtu001.qrcodemaker.services.UrlPlayerAssistService"
+            android:exported="false"
+            android:process=":urlPlayerAssistService"
+            android:stopWithTask="false" />
 
         <activity
             android:name=".MainActivity"
