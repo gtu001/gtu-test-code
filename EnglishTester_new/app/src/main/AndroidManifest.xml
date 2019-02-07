@@ -151,6 +151,9 @@
         <activity
             android:name=".FileFindActivity"
             android:label="開啟檔案" />
+        <activity
+            android:name=".FileFind4EpubActivity"
+            android:label="開啟Epub檔案" />
         <!-- for AdMob ↓↓↓↓↓↓ -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"

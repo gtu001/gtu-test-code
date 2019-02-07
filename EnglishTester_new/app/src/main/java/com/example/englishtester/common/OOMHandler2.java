@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 /**
  * Created by wistronits on 2018/9/5.
@@ -106,16 +107,50 @@ public class OOMHandler2 {
     }
 
     public static Bitmap decodeSampledBitmapFromResource(InputStream inputStream,
-                                                         int reqWidth, int reqHeight) {
+                                                         int reqWidth, int reqHeight, int inSampleSize) {
         // 第一次解析将inJustDecodeBounds设置为true，来获取图片大小
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;//for calculateInSampleSize
-        BitmapFactory.decodeStream(inputStream, null, options);
         // 调用上面定义的方法计算inSampleSize值
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inSampleSize = inSampleSize;
         // 使用获取到的inSampleSize值再次解析图片
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeStream(inputStream, null, options);
+    }
+
+    public static Bitmap decodeSampledBitmapFromResource(Callable<InputStream> inputStreamGetter,
+                                                         int reqWidth, int reqHeight) {
+        try {
+            // 第一次解析将inJustDecodeBounds设置为true，来获取图片大小
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;//for calculateInSampleSize
+            BitmapFactory.decodeStream(inputStreamGetter.call(), null, options);
+            // 调用上面定义的方法计算inSampleSize值
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+            // 使用获取到的inSampleSize值再次解析图片
+            options.inJustDecodeBounds = false;
+            return BitmapFactory.decodeStream(inputStreamGetter.call(), null, options);
+        } catch (Exception ex) {
+            throw new RuntimeException("decodeSampledBitmapFromResource ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public static Bitmap decodeSampledBitmapFromResource(Callable<InputStream> inputStreamGetter,
+                                                         ApplyNewBitmapScale applyBitmapScale) {
+        try {
+            // 第一次解析将inJustDecodeBounds设置为true，来获取图片大小
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;//for calculateInSampleSize
+            BitmapFactory.decodeStream(inputStreamGetter.call(), null, options);
+            Pair<Integer, Integer> wh = applyBitmapScale.apply(Pair.of(options.outWidth, options.outHeight));
+            // 调用上面定义的方法计算inSampleSize值
+            options.inSampleSize = calculateInSampleSize(options, wh.getLeft(), wh.getRight());
+            // 使用获取到的inSampleSize值再次解析图片
+            options.inJustDecodeBounds = false;
+            return BitmapFactory.decodeStream(inputStreamGetter.call(), null, options);
+        } catch (Exception ex) {
+            throw new RuntimeException("decodeSampledBitmapFromResource ERR : " + ex.getMessage(), ex);
+        }
     }
 
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
@@ -149,6 +184,23 @@ public class OOMHandler2 {
 
     interface ApplyNewBitmapScale {
         Pair<Integer, Integer> apply(Pair<Integer, Integer> widthNHeight);
+    }
+
+    public static ApplyNewBitmapScale getCustomFixHeight(final int fixHeight) {
+        return new OOMHandler2.ApplyNewBitmapScale() {
+            @Override
+            public Pair<Integer, Integer> apply(Pair<Integer, Integer> widthNHeight) {
+
+                int width = widthNHeight.getLeft();
+                int height = widthNHeight.getRight();
+
+                int newHeight1 = fixHeight;
+                float scaleHeight = ((float) newHeight1) / height;
+                int newWidth = (int) (scaleHeight * width);
+
+                return Pair.of(newWidth, fixHeight);
+            }
+        };
     }
 
     public static ApplyNewBitmapScale getCustomFixWidth(final int fixWidth) {

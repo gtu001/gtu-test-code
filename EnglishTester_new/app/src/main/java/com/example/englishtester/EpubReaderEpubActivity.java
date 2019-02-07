@@ -1032,16 +1032,16 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 activity.appleFontApplyer.choiceTypeface(activity.getTxtReaderView(), activity.getTranslateView());
             }
         }, //
-        LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(epub檔)", MENU_FIRST++, REQUEST_CODE++, FileFindActivity.class) {
+        LOAD_CONTENT_FROM_FILE_RANDOM("讀取文件(epub檔)", MENU_FIRST++, REQUEST_CODE++, FileFind4EpubActivity.class) {
             protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                File file = FileFindActivity.FileFindActivityStarter.getFile(intent);
+                File file = FileFind4EpubActivity.FileFindActivityStarter.getFile(intent);
                 activity.setTxtContentFromFile(file, null, null);
             }
 
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(epub)");
                 if (BuildConfig.DEBUG) {
-                    bundle.putStringArray(FileFindActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
+                    bundle.putStringArray(FileFind4EpubActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
                 }
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
