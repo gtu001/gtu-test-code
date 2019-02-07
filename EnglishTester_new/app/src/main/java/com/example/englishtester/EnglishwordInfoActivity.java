@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+
 import com.example.englishtester.common.Log;
+
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -367,8 +369,14 @@ public class EnglishwordInfoActivity extends Activity {
     }
 
     private String getAutoCompleteTextViewEnglishId() {
-        String currentIdText = StringUtils.trim(autoCompleteTextView1.getText().toString()).toLowerCase();
-        return currentIdText;
+        return fixSearchWord(autoCompleteTextView1.getText().toString());
+    }
+
+    public static String fixSearchWord(String englishId) {
+        englishId = StringUtils.trimToEmpty(englishId).toLowerCase();
+        englishId = englishId.replaceAll("[^a-zA-Z]+$", "");
+        englishId = englishId.replaceAll("^[^a-zA-Z]+", "");
+        return englishId;
     }
 
     /**

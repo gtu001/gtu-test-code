@@ -1177,7 +1177,7 @@ public class FloatViewService extends Service {
      */
     private void searchEnglishId() {
         autoCompleteTextView1.dismissDropDown();// 關閉下拉
-        final String englishId = StringUtils.trimToEmpty(autoCompleteTextView1.getText().toString()).toLowerCase();
+        final String englishId = EnglishwordInfoActivity.fixSearchWord(autoCompleteTextView1.getText().toString());
         final String sentance = sentance4RecentSearch.getAndSet("");
         EnglishWord currentWord = englishwordInfoDAO.queryOneWord(englishId);
         if (englishMap.containsKey(englishId)) {
@@ -1234,6 +1234,7 @@ public class FloatViewService extends Service {
             }).start();
         }
     }
+
 
     /**
      * 轉換 WordInfo to EnglishWord
