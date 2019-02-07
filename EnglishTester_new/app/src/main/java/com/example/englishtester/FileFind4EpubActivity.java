@@ -6,20 +6,28 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.example.englishtester.common.ExternalStorage;
 import com.example.englishtester.common.ExternalStorageV2;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.OOMHandler2;
-import com.example.englishtester.common.SimpleAdapterDecorator;
+import com.example.englishtester.common.PixelMetricUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +41,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,6 +97,7 @@ public class FileFind4EpubActivity extends ListActivity {
         //設定可選目錄
         rootDirHolder.addPathMapItems();
 
+        /*
         SimpleAdapter fileList = new SimpleAdapter(this, pathList,// 資料來源
                 R.layout.subview_propview_epub, //
                 new String[]{"icon", "file_name"}, //
@@ -98,35 +106,9 @@ public class FileFind4EpubActivity extends ListActivity {
         apply4Bitmap(fileList);
 
         setListAdapter(fileList);
-    }
+        */
 
-    /**
-     * 若是bitmap需要此段code
-     */
-    private static void apply4Bitmap(SimpleAdapter aryAdapter) {
-        aryAdapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Object contentObj, String s) {
-                if (view instanceof ImageView) {
-                    ImageView i = (ImageView) view;
-                    if (contentObj instanceof Bitmap) {
-                        Bitmap b = (Bitmap) contentObj;
-                        i.setImageBitmap(b);
-                        if (b.getWidth() < 100) {
-                            i.getLayoutParams().width = b.getWidth();
-                            i.getLayoutParams().height = b.getHeight();
-                            i.requestLayout();
-                        }
-                        return true;
-                    } else if (contentObj instanceof Drawable) {
-                        Drawable d = (Drawable) contentObj;
-                        i.setImageDrawable(d);
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        setListAdapter(new MyBaseAdapter(this, pathList));
     }
 
     private static class CommonImageHolder {
@@ -134,7 +116,7 @@ public class FileFind4EpubActivity extends ListActivity {
         Bitmap file;
         Context context;
 
-        CommonImageHolder(Context context){
+        CommonImageHolder(Context context) {
             this.context = context;
         }
 
@@ -144,6 +126,7 @@ public class FileFind4EpubActivity extends ListActivity {
             }
             return folder;
         }
+
         public Bitmap getFile() {
             if (file == null) {
                 file = OOMHandler2.decodeSampledBitmapFromResource(context.getResources(), R.drawable.icon_file, 30, 30);
@@ -163,9 +146,8 @@ public class FileFind4EpubActivity extends ListActivity {
 //            map.put("icon", R.drawable.icon_file);
             EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
             map.put("icon", e.getImage());
-            if (StringUtils.isNotBlank(e.getMenuString())) {
-                map.put("file_name", e.getMenuString());
-            }
+            map.put("file_name", e.getTitle());
+            map.put("file_name_desc", e.getAuthor());
         } else {
             map.put("icon", null);
         }
@@ -230,6 +212,7 @@ public class FileFind4EpubActivity extends ListActivity {
 
         pathList = sortPathList(pathList);
 
+        /*
         SimpleAdapter fileList = new SimpleAdapter(this, pathList,// 資料來源
                 R.layout.subview_propview_epub, //
                 new String[]{"icon", "file_name"}, //
@@ -238,6 +221,9 @@ public class FileFind4EpubActivity extends ListActivity {
         SimpleAdapterDecorator.apply4Bitmap(fileList);
 
         setListAdapter(fileList);
+        */
+
+        setListAdapter(new MyBaseAdapter(this, pathList));
     }
 
     /**
@@ -443,17 +429,6 @@ public class FileFind4EpubActivity extends ListActivity {
             }
         }
 
-        public String getMenuString() {
-            if (StringUtils.isBlank(title)) {
-                return "";
-            }
-            String tmpSuffix = "";
-            if (StringUtils.isNotBlank(author)) {
-                tmpSuffix = "\r\n    [by " + author + "]";
-            }
-            return title + tmpSuffix;
-        }
-
         public Bitmap getImage() {
             try {
                 int width = 21;
@@ -489,6 +464,128 @@ public class FileFind4EpubActivity extends ListActivity {
 
         public String getTitle() {
             return title;
+        }
+
+        public String getAuthor() {
+            return author;
+        }
+    }
+
+    private class MyBaseAdapter extends BaseAdapter {
+        Context context;
+        List<Map<String, Object>> lst;
+
+        MyBaseAdapter(Context context, List<Map<String, Object>> lst) {
+            this.context = context;
+            this.lst = lst;
+        }
+
+        @Override
+        public int getCount() {
+            return lst.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return lst.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder = null;
+            if (convertView == null || convertView.getTag() == null) {
+                viewHolder = new ViewHolder(context);
+                convertView = viewHolder.getMainLayout();
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            final Map<String, Object> map = lst.get(position);
+
+            String name = (String) map.get("file_name");
+            String desc = (String) map.get("file_name_desc");
+            Bitmap bitmap = (Bitmap) map.get("icon");
+
+            if (StringUtils.isNotBlank(name)) {
+                SpannableString s1 = new SpannableString(StringUtils.defaultString(name));
+                s1.setSpan(new RelativeSizeSpan(1.1f), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                viewHolder.itemTitle.setText(s1);
+            } else {
+                viewHolder.itemTitle.setText("");
+            }
+
+            if (StringUtils.isNotBlank(desc)) {
+                SpannableString s2 = new SpannableString(StringUtils.defaultString(desc));
+                s2.setSpan(new StyleSpan(Typeface.ITALIC), 0, desc.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                viewHolder.itemTitle_desc.setText(s2);
+            } else {
+                viewHolder.itemTitle_desc.setText("");
+            }
+
+            viewHolder.imageView01.setImageBitmap(bitmap);
+
+            viewHolder.resetViewStatus(bitmap);
+
+            return convertView;
+        }
+    }
+
+    private static class ViewHolder {
+        TextView itemTitle;
+        TextView itemTitle_desc;
+        ImageView imageView01;
+        LinearLayout mainLayout;
+
+        ViewHolder(Context context) {
+            Display d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            int currentWidth = d.getWidth();
+
+            mainLayout = new LinearLayout(context);
+            mainLayout.setLayoutParams(new LinearLayout.LayoutParams(currentWidth, // 設定與螢幕同寬
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            mainLayout.setOrientation(LinearLayout.HORIZONTAL);
+            imageView01 = new ImageView(context);
+            imageView01.setLayoutParams(createLP());
+            mainLayout.addView(imageView01);
+
+            LinearLayout rightLayout = new LinearLayout(context);
+            rightLayout.setLayoutParams(createLP());
+            mainLayout.addView(rightLayout);
+            rightLayout.setOrientation(LinearLayout.VERTICAL);
+
+            itemTitle = new TextView(context);
+            itemTitle_desc = new TextView(context);
+            itemTitle.setLayoutParams(createLP());
+            itemTitle.setLayoutParams(createLP());
+            rightLayout.addView(itemTitle);
+            rightLayout.addView(itemTitle_desc);
+        }
+
+        private LinearLayout.LayoutParams createLP() {
+            return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, // 設定與螢幕同寬
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+        }
+
+        public void resetViewStatus(Bitmap b) {
+            if (b.getWidth() >= 100) {
+                imageView01.getLayoutParams().width = (int) PixelMetricUtil.convertDpToPixel(100);
+                imageView01.getLayoutParams().height = (int) PixelMetricUtil.convertDpToPixel(141);
+            } else {
+                imageView01.getLayoutParams().width = (int) PixelMetricUtil.convertDpToPixel(30);
+                imageView01.getLayoutParams().height = (int) PixelMetricUtil.convertDpToPixel(30);
+            }
+            imageView01.requestLayout();
+        }
+
+        public View getMainLayout() {
+            return mainLayout;
         }
     }
 }
