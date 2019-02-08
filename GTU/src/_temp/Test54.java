@@ -26,5 +26,4 @@ public class Test54 {
         sb.append("                                                                                                                                                                                                                                                           ");
         JOptionPane.showMessageDialog(null, sb.toString());
     }
-
 }

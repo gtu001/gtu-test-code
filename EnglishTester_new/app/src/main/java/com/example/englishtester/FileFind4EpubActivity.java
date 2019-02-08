@@ -114,6 +114,7 @@ public class FileFind4EpubActivity extends ListActivity {
     private static class CommonImageHolder {
         Bitmap folder;
         Bitmap file;
+        Bitmap notfound_404;
         Context context;
 
         CommonImageHolder(Context context) {
@@ -133,6 +134,13 @@ public class FileFind4EpubActivity extends ListActivity {
             }
             return file;
         }
+
+        public Bitmap getNotfound() {
+            if (notfound_404 == null) {
+                notfound_404 = OOMHandler2.decodeSampledBitmapFromResource(context.getResources(), R.drawable.notfound_404, 100, 141);
+            }
+            return notfound_404;
+        }
     }
 
     private void addPathMap(String name, String path) {
@@ -146,7 +154,9 @@ public class FileFind4EpubActivity extends ListActivity {
 //            map.put("icon", R.drawable.icon_file);
             EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
             map.put("icon", e.getImage());
-            map.put("file_name", e.getTitle());
+            if (StringUtils.isNotBlank(e.getTitle())) {
+                map.put("file_name", e.getTitle());
+            }
             map.put("file_name_desc", e.getAuthor());
         } else {
             map.put("icon", null);
@@ -444,8 +454,11 @@ public class FileFind4EpubActivity extends ListActivity {
         }
 
         public static String getFirstAuthor(Book book) {
-            if (book == null || book.getMetadata().getAuthors().isEmpty()) return null;
+            if (book == null || book.getMetadata().getAuthors().isEmpty()) {
+                return "";
+            }
 
+            List<String> authorLst = new ArrayList<>();
             // Loop through authors to get first non-empty one.
             for (Author author : book.getMetadata().getAuthors()) {
                 String fName = author.getFirstname();
@@ -455,11 +468,19 @@ public class FileFind4EpubActivity extends ListActivity {
                     continue;
 
                 // Return the name, which might only use one of the strings.
-                if (fName == null || fName.isEmpty()) return lName;
-                if (lName == null || lName.isEmpty()) return fName;
-                return fName + " " + lName;
+                String authorName = "";
+                if (fName == null || fName.isEmpty()) {
+                    authorName = lName;
+                } else if (lName == null || lName.isEmpty()) {
+                    authorName = fName;
+                } else {
+                    authorName = fName + " " + lName;
+                }
+
+                authorLst.add(authorName);
             }
-            return null;
+
+            return StringUtils.join(authorLst, "/");
         }
 
         public String getTitle() {
@@ -511,6 +532,7 @@ public class FileFind4EpubActivity extends ListActivity {
             String name = (String) map.get("file_name");
             String desc = (String) map.get("file_name_desc");
             Bitmap bitmap = (Bitmap) map.get("icon");
+            boolean isEpubFile = StringUtils.defaultString((String) map.get("path")).endsWith(".epub");
 
             if (StringUtils.isNotBlank(name)) {
                 SpannableString s1 = new SpannableString(StringUtils.defaultString(name));
@@ -528,9 +550,12 @@ public class FileFind4EpubActivity extends ListActivity {
                 viewHolder.itemTitle_desc.setText("");
             }
 
+            if (isEpubFile && bitmap == null) {
+                bitmap = commonImageHolder.getNotfound();
+            }
             viewHolder.imageView01.setImageBitmap(bitmap);
 
-            viewHolder.resetViewStatus(bitmap);
+            viewHolder.resetViewStatus(isEpubFile);
 
             return convertView;
         }
@@ -573,8 +598,8 @@ public class FileFind4EpubActivity extends ListActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT);
         }
 
-        public void resetViewStatus(Bitmap b) {
-            if (b.getWidth() >= 100) {
+        public void resetViewStatus(boolean isEpubFile) {
+            if (isEpubFile) {
                 imageView01.getLayoutParams().width = (int) PixelMetricUtil.convertDpToPixel(100);
                 imageView01.getLayoutParams().height = (int) PixelMetricUtil.convertDpToPixel(141);
             } else {
