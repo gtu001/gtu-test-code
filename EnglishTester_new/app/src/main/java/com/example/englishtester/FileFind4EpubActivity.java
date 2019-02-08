@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -137,9 +140,15 @@ public class FileFind4EpubActivity extends ListActivity {
 
         public Bitmap getNotfound() {
             if (notfound_404 == null) {
-                notfound_404 = OOMHandler2.decodeSampledBitmapFromResource(context.getResources(), R.drawable.notfound_404, 100, 141);
+                Bitmap b = OOMHandler2.decodeSampledBitmapFromResource(context.getResources(), R.drawable.notfound_404, 100, 141);
+                notfound_404 = resetBitmapSize(b, 100, 141);
             }
             return notfound_404;
+        }
+
+        // 圖片以畫面寬度縮放比例
+        protected Bitmap resetBitmapSize(Bitmap bm, int width, int height) {
+            return Bitmap.createScaledBitmap(bm, width, height, false);
         }
     }
 
