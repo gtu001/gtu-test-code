@@ -80,6 +80,15 @@ public class Mp3PlayerHandler {
             } else {
                 mediaplayer.setOnCompletionListener(mMyReplayListObj);
             }
+
+            mediaplayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Log.line(TAG, "onError : " + what + " / " + extra);
+                    return false;
+                }
+            });
+
         } catch (Exception ex) {
             throw new RuntimeException("mp3讀取錯誤 ex : " + ex.getMessage(), ex);
         }
@@ -124,6 +133,7 @@ public class Mp3PlayerHandler {
     }
 
     public void setReplayMode(final String currentName, final List<Mp3Bean> lst) {
+        Log.line(TAG, "setReplayMode size = " + lst.size());
         Log.v(TAG, "# ReplayList ----------- start");
         for (Mp3Bean b : lst) {
             Log.v(TAG, "\t " + ReflectionToStringBuilder.toString(b));
@@ -147,30 +157,40 @@ public class Mp3PlayerHandler {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Log.v(TAG, "# Replaying ...");
-            if (lst.isEmpty()) {
-                Log.v(TAG, "# Replaying ... ERROR");
-                return;
-            }
-            if (lst.size() == 1) {
-                Log.v(TAG, "# Replaying ... ONE");
-                mp3PlayerHandler.of("");//播放同一首
-                mp3PlayerHandler.mediaplayer.start();
-            } else {
-                Log.v(TAG, "# Replaying ... ALL");
-                int findIndex = 0;
-                for (int ii = 0; ii < lst.size(); ii++) {
-                    Mp3Bean b = lst.get(ii);
-                    if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
-                        findIndex = ii + 1;
-                        break;
-                    }
+            Log.line(TAG, "onCompletion start ...");
+            try {
+                Log.v(TAG, "# Replaying ...");
+                if (lst.isEmpty()) {
+                    Log.v(TAG, "# Replaying ... ERROR");
+                    return;
                 }
-                mp3PlayerHandler.of(lst.get(findIndex).getUrl());
-                mp3PlayerHandler.mediaplayer.start();
+                if (lst.size() == 1) {
+                    Log.v(TAG, "# Replaying ... ONE");
+                    mp3PlayerHandler.of("");//播放同一首
+                    mp3PlayerHandler.mediaplayer.start();
+                } else {
+                    Log.v(TAG, "# Replaying ... ALL");
+                    int findIndex = 0;
+                    for (int ii = 0; ii < lst.size(); ii++) {
+                        Mp3Bean b = lst.get(ii);
+                        if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
+                            findIndex = ii + 1;
+                            break;
+                        }
+                    }
+                    mp3PlayerHandler.of(lst.get(findIndex).getUrl());
+                    mp3PlayerHandler.mediaplayer.start();
 
-                //設定當前首
-                this.currentName = lst.get(findIndex).getName();
+                    Log.line(TAG, "onCompletion : " + findIndex + "/" + lst.size());
+
+                    //設定當前首
+                    this.currentName = lst.get(findIndex).getName();
+                }
+            } catch (Exception ex) {
+                Log.line(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
+                Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
+            } finally {
+                Log.line(TAG, "onCompletion end ...");
             }
         }
     }

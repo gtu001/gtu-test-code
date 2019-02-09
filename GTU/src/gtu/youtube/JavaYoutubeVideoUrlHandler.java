@@ -48,7 +48,8 @@ public class JavaYoutubeVideoUrlHandler {
     private static final String DEFAULT_ENCODING = "UTF-8";
     // private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows;
     // U; Windows NT 6.1; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13";
-    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+//    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.3";
 
     public static void main(String[] args) {
         // https://www.youtube.com/watch?v=UPXSB2gMsfI
@@ -66,7 +67,7 @@ public class JavaYoutubeVideoUrlHandler {
         // &fmt=22 MP4 1280 x 720 雙聲道 44KHz AAC H.264編碼
         // &fmt=37 MP4 1920 x 1080 雙聲道 44KHz AAC H.264編碼
 
-        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("szBU1NRh2YE", "18", DEFAULT_USER_AGENT);
+        JavaYoutubeVideoUrlHandler t = new JavaYoutubeVideoUrlHandler("OwJPPaEyqhI", "18", DEFAULT_USER_AGENT);
         t.execute();
         System.out.println("done...");
     }
@@ -377,6 +378,9 @@ public class JavaYoutubeVideoUrlHandler {
             List<NameValuePair> qparams = new ArrayList<NameValuePair>();
             qparams.add(new BasicNameValuePair("video_id", videoId));
             qparams.add(new BasicNameValuePair("fmt", "" + format));
+            qparams.add(new BasicNameValuePair("asv", "3"));
+            qparams.add(new BasicNameValuePair("el", "detailpage"));
+            qparams.add(new BasicNameValuePair("hl", "en_US"));
             URI uri = getUri("get_video_info", qparams);
 
             if (StringUtils.isBlank(userAgent)) {
