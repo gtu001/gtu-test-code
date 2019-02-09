@@ -117,7 +117,6 @@ public class Mp3PlayerActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final FileItem item2 = (FileItem) item.get("item");
-//                UrlPlayerDialog dialog = new UrlPlayerDialog(YoutubePlayerActivity.this);
                 UrlPlayerDialog_bg dialog = new UrlPlayerDialog_bg(Mp3PlayerActivity.this);
 
                 com.example.gtu001.qrcodemaker.common.Log.v(TAG, "====================================================================");

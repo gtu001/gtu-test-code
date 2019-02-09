@@ -133,7 +133,7 @@ public class Mp3PlayerHandler {
     }
 
     public void setReplayMode(final String currentName, final List<Mp3Bean> lst) {
-        Log.line(TAG, "setReplayMode size = " + lst.size());
+        Log.v(TAG, "setReplayMode size = " + lst.size());
         Log.v(TAG, "# ReplayList ----------- start");
         for (Mp3Bean b : lst) {
             Log.v(TAG, "\t " + ReflectionToStringBuilder.toString(b));
@@ -157,7 +157,7 @@ public class Mp3PlayerHandler {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Log.line(TAG, "onCompletion start ...");
+            Log.v(TAG, "onCompletion start ...");
             try {
                 Log.v(TAG, "# Replaying ...");
                 if (lst.isEmpty()) {
@@ -181,7 +181,7 @@ public class Mp3PlayerHandler {
                     mp3PlayerHandler.of(lst.get(findIndex).getUrl());
                     mp3PlayerHandler.mediaplayer.start();
 
-                    Log.line(TAG, "onCompletion : " + findIndex + "/" + lst.size());
+                    Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());
 
                     //設定當前首
                     this.currentName = lst.get(findIndex).getName();
@@ -190,7 +190,7 @@ public class Mp3PlayerHandler {
                 Log.line(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
                 Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
             } finally {
-                Log.line(TAG, "onCompletion end ...");
+                Log.v(TAG, "onCompletion end ...");
             }
         }
     }

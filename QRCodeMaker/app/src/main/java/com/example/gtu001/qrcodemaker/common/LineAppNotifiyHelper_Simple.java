@@ -60,7 +60,7 @@ public class LineAppNotifiyHelper_Simple {
                     String result = null;
                     try {
                         result = doPostRequest(URL, postForm, "UTF8", lineToken);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     System.out.println("#result = " + result);

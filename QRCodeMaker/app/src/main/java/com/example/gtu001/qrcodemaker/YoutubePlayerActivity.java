@@ -122,7 +122,6 @@ public class YoutubePlayerActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final YoutubeItem item2 = (YoutubeItem) item.get("item");
-//                UrlPlayerDialog dialog = new UrlPlayerDialog(YoutubePlayerActivity.this);
                 UrlPlayerDialog_bg dialog = new UrlPlayerDialog_bg(YoutubePlayerActivity.this);
 
                 Log.v(TAG, "====================================================================");

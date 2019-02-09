@@ -1,8 +1,10 @@
 package com.example.gtu001.qrcodemaker.services;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -12,22 +14,51 @@ import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
 import com.example.gtu001.qrcodemaker.Mp3Bean;
+import com.example.gtu001.qrcodemaker.Mp3PlayerActivity;
+import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
+import com.example.gtu001.qrcodemaker.common.ServiceKeepAliveHelper;
 import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by wistronits on 2018/6/27.
  */
 
 public class UrlPlayerService extends Service {
+
+    private NotificationManager mNM;
+
+    // Unique Identification Number for the Notification.
+    // We use it on Notification start, and to cancel it.
+    private int NOTIFICATION = -9999;
+
+    /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class LocalBinder extends Binder {
+        UrlPlayerService getService() {
+            return UrlPlayerService.this;
+        }
+    }
+
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
+
+    //-----------------------------------------------------------------
 
     private static final String TAG = UrlPlayerService.class.getSimpleName();
 
@@ -42,9 +73,27 @@ public class UrlPlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //-----------------------------------------------------------------
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // Display a notification about us starting.  We put an icon in the status bar.
+        ServiceKeepAliveHelper.showForegroundNotification(this, Mp3PlayerActivity.class, R.drawable.qr_code_icon, NOTIFICATION, DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss") + "播放開始!!", "Mp3播放");
+
+        //-----------------------------------------------------------------
+
         Log.i(TAG, "oncreat");
         context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                long periodSecs = this.scheduledExecutionTime() / 1000;
+                Log.v(TAG, "========== alive : " + periodSecs);
+            }
+        }, 0, 3000L);
     }
 
     @Override
@@ -54,6 +103,14 @@ public class UrlPlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        //-----------------------------------------------------------------
+        // Cancel the persistent notification.
+        mNM.cancel(NOTIFICATION);
+
+        // Tell the user we stopped.
+        Toast.makeText(this, "local_service_stopped", Toast.LENGTH_SHORT).show();
+
+        //-----------------------------------------------------------------
         onMyServiceDestory();
         super.onDestroy();
     }
@@ -262,6 +319,10 @@ public class UrlPlayerService extends Service {
         @Override
         public void onProgressChange(int percent) throws RemoteException {
             UrlPlayerService.this.onProgressChange(percent);
+        }
+
+        UrlPlayerService getService() {
+            return UrlPlayerService.this;
         }
     };
 
