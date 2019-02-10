@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //重新導向至youtube
-        if (getIntent().getExtras().containsKey(YoutubePlayerActivity.YOUTUBE_KEY)) {
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(YoutubePlayerActivity.YOUTUBE_KEY)) {
             gotoActivity(YoutubePlayerActivity.class, getIntent());
         }
     }

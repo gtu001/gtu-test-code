@@ -1,8 +1,10 @@
 package com.example.englishtester.common;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
@@ -50,16 +52,26 @@ public class ExternalStorageV2 {
         public ExternalStorageV2_Handler(Context context) {
             File[] list = ContextCompat.getExternalFilesDirs(context, null);
 
+            File oldDeviceDir = Environment.getExternalStorageDirectory();
+            if (!ArrayUtils.contains(list, oldDeviceDir)) {
+                list = ArrayUtils.add(list, oldDeviceDir);
+            }
+
             List<File> externalLst = new ArrayList<>();
 
             if (list != null) {
                 for (File f : list) {
+                    if (f == null) {
+                        continue;
+                    }
                     if (f.getAbsolutePath().contains("/0/Android/")) {
                         String sdCardPath = f.getAbsolutePath().substring(0, f.getAbsolutePath().indexOf("/0/Android/"));
                         map.put(SD_CARD, new File(sdCardPath + File.separator + "0" + File.separator));
                     } else if (f.getAbsolutePath().contains("/Android/")) {
                         String externalSdPath = f.getAbsolutePath().substring(0, f.getAbsolutePath().indexOf("/Android/"));
                         externalLst.add(new File(externalSdPath));
+                    } else {
+                        externalLst.add(f);
                     }
                 }
 
