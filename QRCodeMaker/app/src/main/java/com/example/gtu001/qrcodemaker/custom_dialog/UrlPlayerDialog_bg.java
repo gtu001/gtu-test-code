@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -19,6 +18,7 @@ import com.example.gtu001.qrcodemaker.IUrlPlayerService;
 import com.example.gtu001.qrcodemaker.Mp3Bean;
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
+import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.ServiceUtil;
 import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 
@@ -59,7 +59,7 @@ public class UrlPlayerDialog_bg {
                 Map currentBeanMap = this.urlPlayerServiceHander.get().getMService().getCurrentBean();
                 this.bean = Mp3Bean.valueOf(currentBeanMap);
             } catch (Exception e) {
-                Log.e(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
+                Log.line(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
                 Toast.makeText(context, "開啟失敗" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 this.bean = new Mp3Bean();
             }
@@ -78,9 +78,9 @@ public class UrlPlayerDialog_bg {
         }
 
         //只做一次
-        if (this.urlPlayerServiceHander.get() == null || this.urlPlayerServiceHander.get().initNotDone()) {
+        if (this.urlPlayerServiceHander.get() == null || this.urlPlayerServiceHander.get().initNotDone(context)) {
             this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
-            this.urlPlayerServiceHander.get().init();
+            this.urlPlayerServiceHander.get().init(context);
         }
         return this;
     }
@@ -333,13 +333,13 @@ public class UrlPlayerDialog_bg {
             return mService;
         }
 
-        private void init() {
+        private void init(Context context) {
             mConnection = getMConnection();
-            startStopService(true);
-            this.bindServiceMethod(true);
+            startStopService(true, context);
+            this.bindServiceMethod(true, context);
         }
 
-        private void bindServiceMethod(boolean isOn) {
+        private void bindServiceMethod(boolean isOn, Context context) {
             if (ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
                 Intent intent = new Intent(context, UrlPlayerService.class);
                 if (isOn) {
@@ -373,7 +373,7 @@ public class UrlPlayerDialog_bg {
         /**
          * 開啟/停止 服務
          */
-        private void startStopService(boolean isStart) {
+        private void startStopService(boolean isStart, Context context) {
             boolean isRunning = ServiceUtil.isServiceRunning(context, UrlPlayerService.class);
             if (!isRunning && isStart) {
                 Intent intent = new Intent(context, UrlPlayerService.class);
@@ -386,11 +386,15 @@ public class UrlPlayerDialog_bg {
             }
         }
 
-        private boolean initNotDone() {
+        private boolean initNotDone(Context context) {
+            Log.line(TAG, "#...initNotDone...start");
             if (!ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
+                Log.line(TAG, "\tServiceUtil.isServiceRunning : off");
                 return true;
             }
             if (mService == null || mConnection == null) {
+                Log.line(TAG, "\tmService : " + mService);
+                Log.line(TAG, "\tmConnection : " + mConnection);
                 return true;
             }
             return false;
