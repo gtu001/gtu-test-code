@@ -105,6 +105,17 @@ public class Mp3PlayerActivity extends Activity {
             }
         });
 
+        //初始Btn狀態紐
+        Button btn4 = new Button(this);
+        btn4.setText("停掉Service");
+        layout.addView(btn4);
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UrlPlayerDialog_bg.stopService(Mp3PlayerActivity.this);
+            }
+        });
+
         //初始listView
         listView = new ListView(this);
         layout.addView(listView, //

@@ -124,7 +124,8 @@ public class UrlPlayerDialog_bg {
                         Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
                     } else {
                         urlPlayerServiceHander.get().getMService().pauseAndResume();
-                        Toast.makeText(context, "暫停", Toast.LENGTH_SHORT).show();
+                        String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
+                        Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
                     }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -301,6 +302,16 @@ public class UrlPlayerDialog_bg {
         });
 
         return dialog;
+    }
+
+    public static void stopService(Context context) {
+        try {
+            urlPlayerServiceHander.get().startStopService(false, context);
+            urlPlayerServiceHander.get().getMService().stopSelf();
+            Toast.makeText(context, "停止服務!!", Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Log.line(TAG, ex.getMessage(), ex);
+        }
     }
 
     private void nextUrl() {

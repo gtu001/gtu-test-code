@@ -24,4 +24,6 @@ interface IUrlPlayerService {
     void setReplayMode(inout Map totalLst);
 
     void onProgressChange(int percent);
+
+    void stopSelf();
 }

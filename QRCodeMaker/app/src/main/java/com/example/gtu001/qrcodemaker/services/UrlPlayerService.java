@@ -86,14 +86,14 @@ public class UrlPlayerService extends Service {
         context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
 
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                long periodSecs = this.scheduledExecutionTime() / 1000;
-                Log.v(TAG, "========== alive : " + periodSecs);
-            }
-        }, 0, 3000L);
+//        Timer timer = new Timer();
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                long periodSecs = this.scheduledExecutionTime() / 1000;
+//                Log.v(TAG, "========== alive : " + periodSecs);
+//            }
+//        }, 0, 3000L);
     }
 
     @Override
@@ -321,10 +321,26 @@ public class UrlPlayerService extends Service {
             UrlPlayerService.this.onProgressChange(percent);
         }
 
+        public void stopSelf() throws RemoteException {
+            try {
+                UrlPlayerService.this.finalize();
+            } catch (Throwable e) {
+                Log.line(TAG, "stopSelf ERR : " + e.getMessage(), e);
+                throw new RemoteException("stopSelf ERR : " + e.getMessage());
+            }
+        }
+
         UrlPlayerService getService() {
             return UrlPlayerService.this;
         }
     };
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        UrlPlayerService.this.stopPlay();
+        UrlPlayerService.this.stopSelf();
+    }
 
     @Override
     public void onStart(Intent intent, int startid) {
