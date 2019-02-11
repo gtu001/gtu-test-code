@@ -306,8 +306,8 @@ public class UrlPlayerDialog_bg {
 
     public static void stopService(Context context) {
         try {
-            urlPlayerServiceHander.get().startStopService(false, context);
             urlPlayerServiceHander.get().getMService().stopSelf();
+            urlPlayerServiceHander.get().startStopService(false, context);
             Toast.makeText(context, "停止服務!!", Toast.LENGTH_SHORT).show();
         } catch (Exception ex) {
             Log.line(TAG, ex.getMessage(), ex);

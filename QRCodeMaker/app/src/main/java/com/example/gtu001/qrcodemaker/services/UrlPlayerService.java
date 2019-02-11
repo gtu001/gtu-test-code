@@ -103,6 +103,7 @@ public class UrlPlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        this.stopPlay();
         //-----------------------------------------------------------------
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
@@ -111,7 +112,6 @@ public class UrlPlayerService extends Service {
         Toast.makeText(this, "local_service_stopped", Toast.LENGTH_SHORT).show();
 
         //-----------------------------------------------------------------
-        onMyServiceDestory();
         super.onDestroy();
     }
 
@@ -214,19 +214,6 @@ public class UrlPlayerService extends Service {
         }
     }
 
-    public void onMyServiceDestory() {
-        try {
-            if (currentBean == null) {
-                return;
-            }
-            currentBean.setLastPosition(String.valueOf(mp3Helper.getCurrentPosition()));
-            currentBeanHandler.putBean(context, currentBean);
-        } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
-            throw new RuntimeException("onMyServiceDestory ERR : " + ex.getMessage(), ex);
-        }
-    }
-
     private static class CurrentBeanHandler {
         public void putBean(Context context, Mp3Bean currentBean) {
             String refKey = UrlPlayerService.class.getName() + "_currentBean";
@@ -307,11 +294,6 @@ public class UrlPlayerService extends Service {
         }
 
         @Override
-        public void onMyServiceDestory() throws RemoteException {
-            UrlPlayerService.this.onMyServiceDestory();
-        }
-
-        @Override
         public void setReplayMode(Map totalLst) throws RemoteException {
             UrlPlayerService.this.setReplayMode(totalLst);
         }
@@ -322,25 +304,13 @@ public class UrlPlayerService extends Service {
         }
 
         public void stopSelf() throws RemoteException {
-            try {
-                UrlPlayerService.this.finalize();
-            } catch (Throwable e) {
-                Log.line(TAG, "stopSelf ERR : " + e.getMessage(), e);
-                throw new RemoteException("stopSelf ERR : " + e.getMessage());
-            }
+            UrlPlayerService.this.onDestroy();
         }
 
         UrlPlayerService getService() {
             return UrlPlayerService.this;
         }
     };
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        UrlPlayerService.this.stopPlay();
-        UrlPlayerService.this.stopSelf();
-    }
 
     @Override
     public void onStart(Intent intent, int startid) {
