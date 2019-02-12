@@ -1,4 +1,5 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gtu.test</groupId>
@@ -524,7 +525,7 @@
 			<artifactId>DebugMointerUI</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>/media/gtu001/OLD_D/my_tool/DebugMointerUI/DebugMointerUI.jar</systemPath>
+			<systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath>
 		</dependency>
 		<!-- <systemPath>/media/gtu001/OLD_D/my_tool/DebugMointerUI/DebugMointerUI.jar</systemPath> -->
 		<!-- <systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath> -->
@@ -644,7 +645,7 @@
 			<!-- <systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath>
+			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -733,6 +734,13 @@
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.21</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.6</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
