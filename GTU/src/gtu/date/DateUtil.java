@@ -23,6 +23,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 //import org.junit.Test;
 
@@ -609,5 +610,25 @@ public class DateUtil {
         cal.setDay(date.get(Calendar.DATE));
         cal.setTime(date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), date.get(Calendar.SECOND));
         return cal;
+    }
+    
+    public static Pair<Long, Long> getDayPair(int addDay) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, addDay);
+        
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        long start = cal.getTimeInMillis();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 99999);
+
+        long end = cal.getTimeInMillis();
+        return Pair.of(start, end);
     }
 }

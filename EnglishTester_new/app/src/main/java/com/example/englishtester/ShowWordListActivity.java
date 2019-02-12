@@ -1,8 +1,8 @@
 package com.example.englishtester;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,13 +10,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-
-import com.example.englishtester.common.DropboxUtilV2;
-import com.example.englishtester.common.Log;
-
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -25,19 +26,21 @@ import com.example.englishtester.EnglishwordInfoDAO.EnglishWord;
 import com.example.englishtester.common.DialogSingleInput;
 import com.example.englishtester.common.DialogSingleInput.DialogConfirmClickListener;
 import com.example.englishtester.common.FullPageMentionDialog;
+import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TextToSpeechComponent;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -49,8 +52,9 @@ import java.util.concurrent.Callable;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
+import gtu.util.DateUtil;
 
-public class ShowWordListActivity extends ListActivity {
+public class ShowWordListActivity extends Activity implements AdapterView.OnItemClickListener { //ListActivity
 
     private static final String TAG = ShowWordListActivity.class.getSimpleName();
 
@@ -59,6 +63,7 @@ public class ShowWordListActivity extends ListActivity {
     public static String ShowWordListActivity_DTO = "ShowWordListActivity_DTO";
 
     List<Word> wordList;
+    List<Word> wordListBackup;
     MainActivityDTO dto;
 
     // ArrayAdapter<Word> wordsArray;
@@ -67,7 +72,7 @@ public class ShowWordListActivity extends ListActivity {
     LoadListStatus loadListStatus = LoadListStatus.ALL;
     SelectStatus selectStatus = SelectStatus.NONE;
     SortStatus sortStatus = SortStatus.QUESTIONS;
-    ExpSentanceStatus expSentanceStatus = ExpSentanceStatus.SHOW;
+    ExpSentanceStatus expSentanceStatus = ExpSentanceStatus.HIDDEN;
     boolean doSort = false;
     boolean dtoEnglishFileIsErrorMixFile = false;
 
@@ -79,10 +84,13 @@ public class ShowWordListActivity extends ListActivity {
     EnglishDescKeeper englishDescKeeper;
 
     //例句
-    Map<String, String> sentanceMap;
+    Map<String, RecentSearchDAO_RecentSearch_INFO> sentanceMap;
 
     String token;
     DropboxEnglishService dropboxEnglishService;
+
+    ListView listView;
+    EditText searchTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +102,9 @@ public class ShowWordListActivity extends ListActivity {
         }
 
         setContentView(R.layout.activity_showword_list);
+
+        listView = (ListView) findViewById(android.R.id.list);
+        searchTextView = (EditText) findViewById(R.id.searchTextView);
 
         initServices();
 
@@ -130,6 +141,9 @@ public class ShowWordListActivity extends ListActivity {
 
         // 取得wordList
         initList();
+
+        // 初始化事件
+        initViewEvent();
 
         // 重設ListView
         updateMainList();
@@ -336,18 +350,12 @@ public class ShowWordListActivity extends ListActivity {
 
     private enum ExpSentanceStatus {
         SHOW() {
-            @Override
-            void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap) {
-                if (sentanceMap == null) {
-                    map.put("ItemSentance", "");
-                } else {
-                    map.put("ItemSentance", MapUtils.getString(sentanceMap, word.word, ""));
-                }
+            void innerApplySentance(Map<String, Object> map, RecentSearchDAO_RecentSearch_INFO d) {
+                map.put("ItemSentance", d.sentance);
             }
         },//
         HIDDEN() {
-            @Override
-            void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap) {
+            void innerApplySentance(Map<String, Object> map, RecentSearchDAO_RecentSearch_INFO d) {
                 map.put("ItemSentance", "");
             }
         },//
@@ -356,7 +364,20 @@ public class ShowWordListActivity extends ListActivity {
         ExpSentanceStatus() {
         }
 
-        abstract void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap);
+        protected void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, RecentSearchDAO_RecentSearch_INFO> sentanceMap) {
+            if (sentanceMap == null) {
+                map.put("ItemSentance", "");
+                map.put("ItemRightText", "");
+            } else {
+                RecentSearchDAO_RecentSearch_INFO d = sentanceMap.get(word.word);
+                if (d != null) {
+                    map.put("ItemRightText", d.recordDateStr);
+                    innerApplySentance(map, d);
+                }
+            }
+        }
+
+        abstract void innerApplySentance(Map<String, Object> map, RecentSearchDAO_RecentSearch_INFO d);
     }
 
     /**
@@ -400,6 +421,44 @@ public class ShowWordListActivity extends ListActivity {
         }
     }
 
+    public void initViewEvent() {
+        listView.setOnItemClickListener(this);
+
+        searchTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String searchText = StringUtils.trimToEmpty(searchTextView.getText().toString()).toLowerCase();
+                Log.v(TAG, "[searchTextView] key : " + searchText);
+
+                if (wordListBackup == null) {
+                    wordListBackup = new ArrayList<Word>(wordList);
+                }
+
+                if (StringUtils.isNotBlank(searchText)) {
+                    for (int ii = 0; ii < wordList.size(); ii++) {
+                        Word word = wordList.get(ii);
+                        if (!word.word.toLowerCase().contains(searchText)) {
+                            wordList.remove(ii);
+                            ii--;
+                        }
+                    }
+                } else {
+                    wordList = new ArrayList<Word>(wordListBackup);
+                }
+
+                updateMainList();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
     /**
      * 重設ListView
      */
@@ -431,12 +490,13 @@ public class ShowWordListActivity extends ListActivity {
 
         listItemAdapter = new SimpleAdapter(this, listItem,// 資料來源
                 R.layout.subview_listview, //
-                new String[]{"item_title", "item_text", "item_image", "item_image_check", "ItemSentance"}, //
-                new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01, R.id.ItemSentance}//
+                new String[]{"item_title", "item_text", "item_image", "item_image_check", "ItemSentance", "ItemRightText"}, //
+                new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01, R.id.ItemSentance, R.id.ItemRightText}//
         );
 
         // setListAdapter(wordsArray);
-        setListAdapter(listItemAdapter);
+//        setListAdapter(listItemAdapter);
+        listView.setAdapter(listItemAdapter);
     }
 
     /**
@@ -580,7 +640,8 @@ public class ShowWordListActivity extends ListActivity {
     }
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+        // void onListItemClick(ListView l, View v, int position, long id) //原來的
         final Word word = wordList.get(position);
         String desc = word.desc;
 
@@ -635,40 +696,9 @@ public class ShowWordListActivity extends ListActivity {
         }
     }
 
-    /**
-     * 刷新ListActivity
-     */
-    private void updateListActivity() {
-        final int WHAT_INT = 1;
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case WHAT_INT:
-                        // wordsArray = new
-                        // ArrayAdapter<Word>(ShowWordListActivity.this,
-                        // android.R.layout.simple_dropdown_item_1line, wordList);
-                        // setListAdapter(wordsArray);
-
-                        updateMainList();
-
-                        Log.v(TAG, "### updateLIST !!!");
-                        break;
-                }
-                super.handleMessage(msg);
-            }
-        };
-        Thread changeListThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
-            @Override
-            public void run() {
-                Message message = new Message();
-                Bundle bundle = new Bundle();
-                message.setData(bundle);
-                message.what = WHAT_INT;
-                handler.sendMessage(message);
-            }
-        }, "changeListThread..");
-        changeListThread.start();
+    private static class RecentSearchDAO_RecentSearch_INFO {
+        String sentance;
+        String recordDateStr;
     }
 
     /**
@@ -679,6 +709,8 @@ public class ShowWordListActivity extends ListActivity {
         final Handler handler = new Handler();
         DropboxEnglishService.getRunOnUiThread(new Callable<Object>() {
 
+            private DateUtil.DateFriendlyInfoHelper dateFriendlyInfoHelper = new DateUtil.DateFriendlyInfoHelper();
+
             private List<String> transRecentSearchLst(List<RecentSearchDAO.RecentSearch> list) {
                 List<String> lst = new ArrayList<String>();
                 for (RecentSearchDAO.RecentSearch v : list) {
@@ -687,10 +719,13 @@ public class ShowWordListActivity extends ListActivity {
                 return lst;
             }
 
-            private Map<String, String> getSentanceMap(List<RecentSearchDAO.RecentSearch> list) {
-                Map<String, String> sentanceMap = new HashMap<String, String>();
+            private Map<String, RecentSearchDAO_RecentSearch_INFO> getSentanceMap(List<RecentSearchDAO.RecentSearch> list) {
+                Map<String, RecentSearchDAO_RecentSearch_INFO> sentanceMap = new HashMap<String, RecentSearchDAO_RecentSearch_INFO>();
                 for (RecentSearchDAO.RecentSearch v : list) {
-                    sentanceMap.put(v.englishId, v.sentance);
+                    RecentSearchDAO_RecentSearch_INFO d = new RecentSearchDAO_RecentSearch_INFO();
+                    d.sentance = v.sentance;
+                    d.recordDateStr = dateFriendlyInfoHelper.getDateStr(v.insertDate, false);
+                    sentanceMap.put(v.englishId, d);
                 }
                 return sentanceMap;
             }
@@ -777,6 +812,43 @@ public class ShowWordListActivity extends ListActivity {
     }
 
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 功能選單
+
+    /**
+     * 刷新ListActivity
+     */
+    private void updateListActivity() {
+        final int WHAT_INT = 1;
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case WHAT_INT:
+                        // wordsArray = new
+                        // ArrayAdapter<Word>(ShowWordListActivity.this,
+                        // android.R.layout.simple_dropdown_item_1line, wordList);
+                        // setListAdapter(wordsArray);
+
+                        updateMainList();
+
+                        Log.v(TAG, "### updateLIST !!!");
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+        Thread changeListThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+            @Override
+            public void run() {
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                message.setData(bundle);
+                message.what = WHAT_INT;
+                handler.sendMessage(message);
+            }
+        }, "changeListThread..");
+        changeListThread.start();
+    }
+
     static int REQUEST_CODE = 5566;
     static int MENU_FIRST = Menu.FIRST;
 

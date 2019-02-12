@@ -49,4 +49,15 @@
         android:layout_below="@+id/ItemSentance"
         android:text="ItemText" />
 
+    <TextView
+        android:id="@+id/ItemRightText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/ItemTitle"
+        android:layout_toRightOf="@+id/ImageView01"
+        android:layout_below="@+id/ItemText"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="ItemRightText" />
+
 </RelativeLayout>
