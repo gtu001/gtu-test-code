@@ -67,6 +67,7 @@ public class ShowWordListActivity extends ListActivity {
     LoadListStatus loadListStatus = LoadListStatus.ALL;
     SelectStatus selectStatus = SelectStatus.NONE;
     SortStatus sortStatus = SortStatus.QUESTIONS;
+    ExpSentanceStatus expSentanceStatus = ExpSentanceStatus.SHOW;
     boolean doSort = false;
     boolean dtoEnglishFileIsErrorMixFile = false;
 
@@ -333,6 +334,31 @@ public class ShowWordListActivity extends ListActivity {
         abstract void apply(ShowWordListActivity this_);
     }
 
+    private enum ExpSentanceStatus {
+        SHOW() {
+            @Override
+            void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap) {
+                if (sentanceMap == null) {
+                    map.put("ItemSentance", "");
+                } else {
+                    map.put("ItemSentance", MapUtils.getString(sentanceMap, word.word, ""));
+                }
+            }
+        },//
+        HIDDEN() {
+            @Override
+            void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap) {
+                map.put("ItemSentance", "");
+            }
+        },//
+        ;
+
+        ExpSentanceStatus() {
+        }
+
+        abstract void applyShowOrHidden(Word word, Map<String, Object> map, Map<String, String> sentanceMap);
+    }
+
     /**
      * 按照字母順序排
      */
@@ -398,11 +424,8 @@ public class ShowWordListActivity extends ListActivity {
             map.put("item_image_check", null);
 
             //設定例句
-            if (sentanceMap == null) {
-                map.put("ItemSentance", "");
-            } else {
-                map.put("ItemSentance", MapUtils.getString(sentanceMap, word.word, ""));
-            }
+            expSentanceStatus.applyShowOrHidden(word, map, sentanceMap);
+
             listItem.add(map);
         }
 
@@ -834,6 +857,19 @@ public class ShowWordListActivity extends ListActivity {
         SAVE_TO_ERROR_MIX("儲存勾選到錯誤清單", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(ShowWordListActivity activity, Intent intent, Bundle bundle) {
                 activity.saveInErrorMixFile();
+            }
+        }, //
+        HIDDEN_SHOW_EXP_SENTANCE("顯示/隱藏例句", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(ShowWordListActivity activity, Intent intent, Bundle bundle) {
+                if (activity.expSentanceStatus == ExpSentanceStatus.SHOW) {
+                    activity.expSentanceStatus = ExpSentanceStatus.HIDDEN;
+                } else {
+                    activity.expSentanceStatus = ExpSentanceStatus.SHOW;
+                }
+                // 取得wordList
+                activity.initList();
+                // 重設ListView
+                activity.updateMainList();
             }
         }, //
         RESET_PICKPROP("回主功能", MENU_FIRST++, REQUEST_CODE++, MainActivity.class) {

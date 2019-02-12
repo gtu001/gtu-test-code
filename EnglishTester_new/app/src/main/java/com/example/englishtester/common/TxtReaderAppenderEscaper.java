@@ -2,6 +2,7 @@ package com.example.englishtester.common;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.cglib.core.internal.Function;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -52,15 +53,42 @@ public class TxtReaderAppenderEscaper {
 
     public String getSentance(int start, int end) {
         LinkedList<String> prefixLst = new LinkedList<String>();
+
+        Function<Integer, Pair<Integer, Integer>> cal = new Function<Integer, Pair<Integer, Integer>>() {
+            @Override
+            public Pair<Integer, Integer> apply(Integer integer) {
+                int pairLength = Integer.MAX_VALUE;
+                Pair<Integer, Integer> rtnPair = null;
+                for (Pair<Integer, Integer> p : groupMap.keySet()) {
+                    if (integer >= p.getLeft() && integer <= p.getRight()) {
+                        int tmpLength = p.getRight() - p.getLeft();
+                        if (tmpLength <= pairLength) {
+                            pairLength = tmpLength;
+                            rtnPair = p;
+                        }
+                    }
+                }
+                return rtnPair;
+            }
+        };
+
         A:
         for (int ii = (start > 0 ? start - 1 : start); ii > 0; ii--) {
             boolean isMatch = false;
+            /*
             for (Pair<Integer, Integer> p : groupMap.keySet()) {
                 if (ii >= p.getLeft() && ii <= p.getRight()) {
                     isMatch = true;
                     prefixLst.push(groupMap.get(p));
                     ii = p.getLeft();
                 }
+            }
+            */
+            Pair matchPair = cal.apply(ii);
+            if(matchPair != null){
+                prefixLst.push(groupMap.get(matchPair));
+                ii = (Integer)matchPair.getLeft();
+                isMatch = true;
             }
             if (!isMatch) {
                 if (orignTextArry[ii] == '.') {
@@ -74,12 +102,20 @@ public class TxtReaderAppenderEscaper {
         A:
         for (int ii = end; ii < orignTextArry.length; ii++) {
             boolean isMatch = false;
+            /*
             for (Pair<Integer, Integer> p : groupMap.keySet()) {
                 if (ii >= p.getLeft() && ii <= p.getRight()) {
                     isMatch = true;
                     suffixLst.add(groupMap.get(p));
                     ii = p.getRight();
                 }
+            }
+            */
+            Pair matchPair = cal.apply(ii);
+            if(matchPair != null){
+                prefixLst.push(groupMap.get(matchPair));
+                ii = (Integer)matchPair.getRight();
+                isMatch = true;
             }
             if (!isMatch) {
                 if (orignTextArry[ii] == '.') {
