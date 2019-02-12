@@ -10,7 +10,11 @@ package gtu.util;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 //import org.junit.Test;
 
@@ -55,13 +59,30 @@ public class DateUtil {
             return Pair.of(start, end);
         }
 
+        private String recentFix(long date) {
+            long during = (System.currentTimeMillis() - date) / 1000;
+            Map<String, Integer> unitMap = new LinkedHashMap<>();
+            String[] units = new String[]{"分", "時"};
+            String tmpUnit = "秒";
+            BigDecimal chk = new BigDecimal(during);
+            BigDecimal div = new BigDecimal(60);
+            for (int ii = 0; ii < units.length; ii++) {
+                chk = chk.divide(div, 2, RoundingMode.HALF_UP);
+                if (chk.doubleValue() < 60) {
+                    tmpUnit = units[ii];
+                    break;
+                }
+            }
+            return chk + tmpUnit;
+        }
+
         public String getDateStr(long date, boolean isAppendSecond) {
             String timeFormat = "HH:mm";
             if (isAppendSecond) {
                 timeFormat += ":ss";
             }
             if (today.getLeft() <= date && today.getRight() >= date) {
-                return "今天 " + DateFormatUtils.format(date, timeFormat);
+                return "今天 " + recentFix(date) + " 前";
             } else if (yesterday.getLeft() <= date && yesterday.getRight() >= date) {
                 return "昨天 " + DateFormatUtils.format(date, timeFormat);
             } else if (twoDayAgo.getLeft() <= date && twoDayAgo.getRight() >= date) {
