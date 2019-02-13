@@ -18,7 +18,10 @@ public class ProcessHandler {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    public static void killProcess(Context context, String pkgName) {
+    /**
+     * 不能殺自己
+     */
+    public static void killProcessByPackage1(Context context, String pkgName) {
         List<ApplicationInfo> packages;
         PackageManager pm = context.getPackageManager();
         //get a list of installed apps.
@@ -35,7 +38,26 @@ public class ProcessHandler {
 
             if (StringUtils.equals(pkgName, packageInfo.packageName)) {
                 mActivityManager.killBackgroundProcesses(packageInfo.packageName);
+
+
                 Toast.makeText(context, "停止Pkg : " + packageInfo.packageName, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /**
+     * 應該可以殺自己 未測試
+     */
+    public static void killProcessByPackage2(Context context, String pkgName) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> pids = am.getRunningAppProcesses();
+        for (int i = 0; i < pids.size(); i++) {
+            ActivityManager.RunningAppProcessInfo info = pids.get(i);
+
+            Log.v(TAG, "pkgName : " + info.processName + " \t PID : " + info.pid);
+
+            if (info.processName.equalsIgnoreCase(pkgName)) {
+                android.os.Process.killProcess(info.pid);
             }
         }
     }
