@@ -62,16 +62,16 @@ public class DateUtil {
         private String recentFix(long date) {
             long during = (System.currentTimeMillis() - date) / 1000;
             Map<String, Integer> unitMap = new LinkedHashMap<>();
-            String[] units = new String[]{"分", "時"};
-            String tmpUnit = "秒";
+            String[] units = new String[]{"秒", "分", "時"};
             BigDecimal chk = new BigDecimal(during);
             BigDecimal div = new BigDecimal(60);
+            String tmpUnit = "";
             for (int ii = 0; ii < units.length; ii++) {
-                chk = chk.divide(div, 2, RoundingMode.HALF_UP);
                 if (chk.doubleValue() < 60) {
                     tmpUnit = units[ii];
                     break;
                 }
+                chk = chk.divide(div, 1, RoundingMode.HALF_UP);
             }
             return chk + tmpUnit;
         }
@@ -91,6 +91,4 @@ public class DateUtil {
             return DateFormatUtils.format(date, "yyyy/MM/dd " + timeFormat);
         }
     }
-
-
 }

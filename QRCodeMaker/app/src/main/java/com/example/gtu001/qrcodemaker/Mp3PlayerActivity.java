@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.common.PermissionUtil;
 import com.example.gtu001.qrcodemaker.common.PingUtil;
+import com.example.gtu001.qrcodemaker.common.ProcessHandler;
 import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
 import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
 import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
@@ -113,6 +114,17 @@ public class Mp3PlayerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 UrlPlayerDialog_bg.stopService(Mp3PlayerActivity.this);
+            }
+        });
+
+        //初始Btn狀態紐
+        Button btn5 = new Button(this);
+        btn5.setText("停掉APP");
+        layout.addView(btn5);
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProcessHandler.killSelf();
             }
         });
 
