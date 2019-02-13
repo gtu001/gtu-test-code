@@ -60,7 +60,7 @@ public class ProcessHandler {
 
             Log.v(TAG, "pkgName : " + info.processName + " \t PID : " + info.pid);
 
-            if (info.processName.equalsIgnoreCase(pkgName)) {
+            if (info.processName.startsWith(pkgName)) {
 
                 //當前的晚一點砍掉
                 if (info.pid == selfId) {
