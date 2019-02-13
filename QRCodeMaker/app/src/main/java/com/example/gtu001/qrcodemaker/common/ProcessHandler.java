@@ -48,17 +48,34 @@ public class ProcessHandler {
     /**
      * 應該可以殺自己 未測試
      */
-    public static void killProcessByPackage2(Context context, String pkgName) {
+    public static void killProcessByPackage2(Context context, String pkgName, boolean isKillSelf) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> pids = am.getRunningAppProcesses();
+
+        final int selfId = android.os.Process.myPid();
+        boolean killSelf = false;
+
         for (int i = 0; i < pids.size(); i++) {
             ActivityManager.RunningAppProcessInfo info = pids.get(i);
 
             Log.v(TAG, "pkgName : " + info.processName + " \t PID : " + info.pid);
 
             if (info.processName.equalsIgnoreCase(pkgName)) {
+
+                //當前的晚一點砍掉
+                if (info.pid == selfId) {
+                    killSelf = true;
+                    continue;
+                }
+
                 android.os.Process.killProcess(info.pid);
+
+                Toast.makeText(context, "停止Pkg : " + info.processName + " , PID : " + info.pid, Toast.LENGTH_SHORT).show();
             }
+        }
+
+        if (killSelf && isKillSelf) {
+            android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 }

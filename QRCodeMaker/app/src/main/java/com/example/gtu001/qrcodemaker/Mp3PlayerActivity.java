@@ -124,7 +124,7 @@ public class Mp3PlayerActivity extends Activity {
         btn5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProcessHandler.killSelf();
+                ProcessHandler.killProcessByPackage2(Mp3PlayerActivity.this, "com.example.gtu001.qrcodemaker", false);
             }
         });
 
