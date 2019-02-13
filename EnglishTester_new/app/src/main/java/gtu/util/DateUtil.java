@@ -7,6 +7,7 @@
  */
 package gtu.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -62,11 +63,17 @@ public class DateUtil {
         private String recentFix(long date) {
             long during = (System.currentTimeMillis() - date) / 1000;
             Map<String, Integer> unitMap = new LinkedHashMap<>();
-            String[] units = new String[]{"秒", "分", "時"};
+            String[] units = new String[]{"秒", "分鐘", "小時"};
             BigDecimal chk = new BigDecimal(during);
             BigDecimal div = new BigDecimal(60);
             String tmpUnit = "";
             for (int ii = 0; ii < units.length; ii++) {
+
+                //超過 12 小時顯示完整時間
+                if (chk.doubleValue() >= 12 && units[ii].equalsIgnoreCase("小時")) {
+                    return "";
+                }
+
                 if (chk.doubleValue() < 60) {
                     tmpUnit = units[ii];
                     break;
@@ -82,7 +89,12 @@ public class DateUtil {
                 timeFormat += ":ss";
             }
             if (today.getLeft() <= date && today.getRight() >= date) {
-                return "今天 " + recentFix(date) + " 前";
+                String tmpStr = recentFix(date);
+                if (StringUtils.isNotBlank(tmpStr)) {
+                    return "今天 " + tmpStr + " 前";
+                } else {
+                    return "今天 " + DateFormatUtils.format(date, timeFormat);
+                }
             } else if (yesterday.getLeft() <= date && yesterday.getRight() >= date) {
                 return "昨天 " + DateFormatUtils.format(date, timeFormat);
             } else if (twoDayAgo.getLeft() <= date && twoDayAgo.getRight() >= date) {
