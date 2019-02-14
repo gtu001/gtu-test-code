@@ -25,6 +25,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
@@ -167,6 +168,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     ScrollView scrollView1;
 
     WebView webView;
+    ImageView floatBtn;
 
     private NativeExpressAdView mAdView;
 
@@ -204,6 +206,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         //卷軸
         scrollView1 = (ScrollView) this.findViewById(R.id.scrollView1);
 
+        //懸浮按鈕
+        floatBtn = (ImageView) findViewById(R.id.floatBtn);
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final TxtReaderActivity data = (TxtReaderActivity) getLastNonConfigurationInstance();
@@ -252,6 +256,20 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         //卷軸
         initScrollView();
+
+        //懸浮按鈕
+        initFloatBtn();
+    }
+
+    //懸浮按鈕
+    private void initFloatBtn() {
+        floatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isStart = autoScrollDownHandler.toggle();
+//                Toast.makeText(TxtReaderActivity.this, isStart ? "開始捲動" : "停止捲動", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -1308,12 +1326,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         activity.scrollView1.scrollTo(0, 0);
                     }
                 });
-            }
-        }, //
-        AUTO_SCROLL_DOWN("自動捲動", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                boolean isStart = activity.autoScrollDownHandler.toggle();
-                Toast.makeText(activity, isStart ? "開始捲動" : "停止捲動", Toast.LENGTH_SHORT).show();
             }
         }, //
 //        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {

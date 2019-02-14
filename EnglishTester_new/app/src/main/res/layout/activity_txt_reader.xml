@@ -116,4 +116,15 @@
         </LinearLayout>
     </ScrollView>
 
+    <ImageView
+        android:id="@+id/floatBtn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/icon_downward"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        />
+
 </RelativeLayout>
