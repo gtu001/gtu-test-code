@@ -29,6 +29,4 @@ public interface ITxtReaderActivityDTO {
     void setFileName(String title);
 
     IFloatServiceAidlInterface getIFloatService();
-
-    Runnable getOnWordClick();
 }

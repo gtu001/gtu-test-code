@@ -203,11 +203,6 @@ public class TxtReaderAppender {
                         }
                         //debug ↑↑↑↑↑↑↑↑↑↑
 
-                        //點擊後的事件
-                        if (dto.getOnWordClick() != null) {
-                            dto.getOnWordClick().run();
-                        }
-
                         view.invalidate();
                         txtView.invalidate();
                     }

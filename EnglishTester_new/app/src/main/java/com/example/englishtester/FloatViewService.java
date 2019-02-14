@@ -64,6 +64,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.PomodoroClockHandler;
+import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.RepeatMoveListener;
 import com.example.englishtester.common.SharedPreferencesUtil;
 import com.example.englishtester.common.TextToSpeechComponent;
@@ -329,6 +330,9 @@ public class FloatViewService extends Service {
             //顯示廣告
             adCheckShow.show();
         }
+
+        // 開關通知
+        ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper.sendOpenStatusMessage(isOpen, this);
     }
 
     /**

@@ -594,16 +594,6 @@ public class EpubViewerMainHandler {
         public void setGoDirectLinkStack(Stack<Integer> goDirectLinkStack) {
             this.goDirectLinkStack = goDirectLinkStack;
         }
-
-        @Override
-        public Runnable getOnWordClick() {
-            return new Runnable(){
-                @Override
-                public void run() {
-                    //TODO
-                }
-            };
-        }
     }
 
 

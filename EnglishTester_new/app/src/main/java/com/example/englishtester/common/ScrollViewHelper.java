@@ -64,13 +64,9 @@ public class ScrollViewHelper {
             isStop = true;
         }
 
-        public boolean toggle() {
-            return toggle(SCROLL_STEP, SLEEP_TIME);
-        }
-
-        public boolean toggle(int scrollStep, long sleepTime) {
+        public boolean start(int scrollStep, long sleepTime) {
             boolean isStart = false;
-            if (scrollThread == null || scrollThread.getState() == Thread.State.TERMINATED) {
+            if (!isRunning()) {
                 isStop = false;
                 scrollThread = new Thread(new Runnable() {
                     @Override
@@ -95,8 +91,28 @@ public class ScrollViewHelper {
                 });
                 scrollThread.start();
                 isStart = true;
+            }
+            return isStart;
+        }
+
+        public boolean isRunning() {
+            return !(scrollThread == null || scrollThread.getState() == Thread.State.TERMINATED);
+        }
+
+        public boolean start() {
+            return start(SCROLL_STEP, SLEEP_TIME);
+        }
+
+        public boolean toggle() {
+            return toggle(SCROLL_STEP, SLEEP_TIME);
+        }
+
+        public boolean toggle(int scrollStep, long sleepTime) {
+            boolean isStart = false;
+            if (!isRunning()) {
+                isStart = start(scrollStep, sleepTime);
             } else {
-                isStop = true;
+                stop();
             }
             return isStart;
         }

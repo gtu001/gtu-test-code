@@ -10,16 +10,20 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -27,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -69,6 +74,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.cglib.core.internal.Function;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -92,6 +98,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import gtu._work.etc.EnglishTester_Diectory;
+import gtu._work.etc.EnglishTester_Diectory2;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
 
@@ -154,6 +163,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 自動捲動器
      */
     ScrollViewHelper.AutoScrollDownHandler autoScrollDownHandler;
+    /**
+     * FloatViewService 間聽
+     */
+    ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
 
     EditText editText1;
     Button clearBtn;
@@ -258,16 +271,49 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         initScrollView();
 
         //懸浮按鈕
-        initFloatBtn();
+        initAutoScrollView();
     }
 
     //懸浮按鈕
-    private void initFloatBtn() {
+    private void initAutoScrollView() {
+        final Handler handler = new Handler();
+
         floatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean isStart = autoScrollDownHandler.toggle();
-//                Toast.makeText(TxtReaderActivity.this, isStart ? "開始捲動" : "停止捲動", Toast.LENGTH_SHORT).show();
+//                return true;
+            }
+        });
+
+        floatBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new AlertDialog.Builder(TxtReaderActivity.this).setItems(new String[]{"靠左", "靠右"}, //
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, final int which) {
+                                handler.post(new Runnable() {
+                                    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+                                    @Override
+                                    public void run() {
+                                        RelativeLayout.LayoutParams layout = (RelativeLayout.LayoutParams) floatBtn.getLayoutParams();
+                                        switch (which) {
+                                            case 0:
+                                                layout.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                                                layout.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                                break;
+                                            case 1:
+                                                layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                                layout.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                                                break;
+                                        }
+                                        floatBtn.setLayoutParams(layout);
+                                    }
+                                });
+                            }
+                        }).show();
+                return true;
             }
         });
     }
@@ -522,6 +568,21 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         this.backButtonPreventer = new BackButtonPreventer(this);
 
         this.autoScrollDownHandler = new ScrollViewHelper.AutoScrollDownHandler(this.scrollView1);
+
+        this.floatViewServiceOpenStatusReceiverHelper = new ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper();
+        this.floatViewServiceOpenStatusReceiverHelper.registerReceiver(this, new Function<Boolean, Boolean>() {
+            @Override
+            public Boolean apply(Boolean aBoolean) {
+                if (aBoolean && autoScrollDownHandler.isRunning()) {
+                    autoScrollDownHandler.stop();
+                    floatBtn.setTag(true);
+                } else if (floatBtn.getTag() != null && aBoolean == false) {
+                    autoScrollDownHandler.start();
+                    floatBtn.setTag(null);
+                }
+                return false;
+            }
+        });
 
         doOnoffService(true);
     }
@@ -1553,16 +1614,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         public void setSpannableHolder(SpannableString spannableHolder) {
             this.spannableHolder = spannableHolder;
         }
-
-        @Override
-        public Runnable getOnWordClick() {
-            return new Runnable(){
-                @Override
-                public void run() {
-                    activity.autoScrollDownHandler.stop();
-                }
-            };
-        }
     }
 
     // 測試螢幕翻轉 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -1615,6 +1666,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     public void onDestroy() {
         // Destroy the AdView.
         mAdView.destroy();
+
         super.onDestroy();
     }
 

@@ -1,23 +1,23 @@
 package com.example.englishtester.common;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ListAdapter;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +28,7 @@ import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.springframework.cglib.core.internal.Function;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -504,5 +505,39 @@ public class ReaderCommonHelper {
             public void onDestroyActionMode(ActionMode mode) {
             }
         });
+    }
+
+    public static class FloatViewServiceOpenStatusReceiverHelper {
+
+        //通知開啟或關閉
+        public static void sendOpenStatusMessage(boolean isOpen, Context context) {
+            Intent in = new Intent(FloatViewServiceOpenStatusReceiverHelper.class.getName());
+            Bundle extras = new Bundle();
+            extras.putString("openStatus", isOpen ? "true" : "false");
+            in.putExtras(extras);
+            context.sendBroadcast(in);
+        }
+
+        private BroadcastReceiver broadcastReceiver;
+
+        public void registerReceiver(Context context, final Function<Boolean, Boolean> procCall) {
+            broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String isOpenStr = intent.getStringExtra("openStatus");
+                    if (StringUtils.isBlank(isOpenStr)) {
+                        return;
+                    }
+                    procCall.apply(Boolean.parseBoolean(isOpenStr));
+                }
+            };
+            context.registerReceiver(broadcastReceiver, new IntentFilter(FloatViewServiceOpenStatusReceiverHelper.class.getName()));
+        }
+
+        public void onStop(Context context) {
+            if (broadcastReceiver != null) {
+                context.unregisterReceiver(broadcastReceiver);
+            }
+        }
     }
 }
