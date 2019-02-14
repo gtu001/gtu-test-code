@@ -1,5 +1,6 @@
 package gtu.enum_;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Rl08220ReportConstant {
-    
+
+    public static void main(String[] args) {
+        System.out.println(getReportNameList("z", ReportClass.Born, TaskClass.RC));
+    }
+
     private static Logger log = LoggerFactory.getLogger(Rl08220ReportConstant.class);
 
     public enum TaskClass {
@@ -23,7 +28,8 @@ public class Rl08220ReportConstant {
         Divorce(DivorceReportNum.values()), //
         ;//
         final Enum<?>[] enus;
-        ReportClass(Enum<?>[] enus){
+
+        ReportClass(Enum<?>[] enus) {
             this.enus = enus;
         }
     }
@@ -125,7 +131,7 @@ public class Rl08220ReportConstant {
     }
 
     enum DivorceReportNum {
-        R1("離婚動態統計表（1）", "RLRP08284", "RRRP03281", "RCRP0C581"), //
+        R1("離婚動態統計表（1）", "RLRP08251", "RRRP03281", "RCRP0C581"), //
         R2("離婚動態統計表（2）", "RLRP08252", "RRRP03242", "RCRP0C542"), //
         R3("離婚動態統計表（3）", "RLRP08253", "RRRP03243", "RCRP0C543"), //
         R4("離婚動態統計表（4）", "RLRP08254", "RRRP03244", "RCRP0C546"), //
@@ -152,32 +158,72 @@ public class Rl08220ReportConstant {
         }
     }
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        System.out.println(getReportNameList("z", ReportClass.Born, TaskClass.RC));
-    }
+    public static List<?> getDropdownList(ReportClass reportClass, TaskClass taskClass) {
+        log.debug("#. getDropdownList .s");
 
-    public static List<String> getReportNameList(String id, ReportClass reportClass, TaskClass taskClass) {
-        if(StringUtils.isBlank(id)){
-            throw new RuntimeException("報表編號不可為空!");
-        }
-        if(reportClass == null){
+        log.debug("reportClass = {}", reportClass);
+        log.debug("taskClass = {}", taskClass);
+
+        if (reportClass == null) {
             throw new RuntimeException("reportClass不可為空!");
         }
-        if(taskClass == null){
+        if (taskClass == null) {
             throw new RuntimeException("taskClass不可為空!");
         }
-        
+
+        try {
+            List<Object> list = new ArrayList<Object>();
+            Class<?> clz = Class.forName("javax.faces.model.SelectItem");
+            Constructor<?> constructor = clz.getDeclaredConstructor(Object.class, String.class);
+            for (Enum<?> e : reportClass.enus) {
+                String reportName = getReportName(e, taskClass);
+                String desc = getFieldName(e, "desc");
+                list.add(constructor.newInstance(reportName, desc));
+            }
+            list.add(constructor.newInstance("z", "全部"));
+            return list;
+        } catch (Exception e) {
+            log.error("error", e);
+            throw new RuntimeException(e);
+        } finally {
+            log.debug("#. getDropdownList .e");
+        }
+    }
+
+    /**
+     * @param id
+     *            對應報表的數字 Ex: id="5" => "離婚動態統計表（5）"
+     * @param reportClass
+     *            是取得(出生,死亡,結婚,離婚 其中一項)哪種報表
+     * @param taskClass
+     *            是取得(RC,RR,RL 其中一項)哪種報表
+     * @return
+     */
+    public static List<String> getReportNameList(String id, ReportClass reportClass, TaskClass taskClass) {
+        log.debug("#. getReportNameList .s");
+
+        log.debug("id = {}", id);
+        log.debug("reportClass = {}", reportClass);
+        log.debug("taskClass = {}", taskClass);
+
+        if (StringUtils.isBlank(id)) {
+            throw new RuntimeException("id不可為空!");
+        }
+        if (reportClass == null) {
+            throw new RuntimeException("reportClass不可為空!");
+        }
+        if (taskClass == null) {
+            throw new RuntimeException("taskClass不可為空!");
+        }
+
         List<String> list = new ArrayList<String>();
-        
-        if("z".equals(id)){
+
+        if ("z".equals(id)) {
             for (Enum<?> e : reportClass.enus) {
                 String reportName = getReportName(e, taskClass);
                 list.add(reportName);
             }
-        }else{
+        } else {
             for (Enum<?> e : reportClass.enus) {
                 String name = e.name().replaceFirst("R", "");
                 if (name.equals(id)) {
@@ -187,17 +233,31 @@ public class Rl08220ReportConstant {
                 }
             }
         }
-        
+
+        log.debug("report = {}", list);
+
+        log.debug("#. getReportNameList .e");
         return list;
     }
-    
+
     private static String getReportName(Enum<?> e, TaskClass taskClass) {
-        try{
+        try {
             String taskStr = taskClass.name().toLowerCase();
             Field f = e.getClass().getDeclaredField(taskStr);
-            String value = (String)f.get(e);
+            String value = (String) f.get(e);
             return value;
-        }catch(Exception ex){
+        } catch (Exception ex) {
+            log.error("error", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static String getFieldName(Enum<?> e, String fieldName) {
+        try {
+            Field f = e.getClass().getDeclaredField(fieldName);
+            String value = (String) f.get(e);
+            return value;
+        } catch (Exception ex) {
             log.error("error", ex);
             throw new RuntimeException(ex);
         }

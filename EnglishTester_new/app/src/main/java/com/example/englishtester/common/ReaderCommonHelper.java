@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListAdapter;
 import android.widget.ScrollView;
@@ -215,7 +217,7 @@ public class ReaderCommonHelper {
                     scrollView1.scrollTo(0, yPos);
 
                     if (scrollView1.getScrollY() != yPos) {
-                        Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" +ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" + ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
                         scrollToY(scrollView1, yPos);
                     } else {
 //                        Log.line(TAG, "成功回復Y pos !! : " + yPos);

@@ -18,10 +18,11 @@
             android:id="@+id/viewGroup"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:focusable="true"
+            android:orientation="vertical"
 
+            android:focusable="true"
             android:focusableInTouchMode="true"
-            android:orientation="vertical"><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
+            ><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
 
             <LinearLayout
                 android:id="@+id/linearLayout1"

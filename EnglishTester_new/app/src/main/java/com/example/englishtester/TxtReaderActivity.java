@@ -9,19 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -31,7 +25,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
@@ -57,9 +50,8 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
-import com.example.englishtester.common.SimpleAdapterDecorator;
+import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.SingleInputDialog;
-import com.example.englishtester.common.SpannableStringBuilderHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.TxtReaderAppenderSpanClass;
@@ -157,6 +149,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 回前頁控制
      */
     BackButtonPreventer backButtonPreventer;
+    /**
+     * 自動捲動器
+     */
+    ScrollViewHelper.AutoScrollDownHandler autoScrollDownHandler;
 
     EditText editText1;
     Button clearBtn;
@@ -506,6 +502,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         this.freeGoogleTranslateHandler = new ReaderCommonHelper.FreeGoogleTranslateHandler(this);
 
         this.backButtonPreventer = new BackButtonPreventer(this);
+
+        this.autoScrollDownHandler = new ScrollViewHelper.AutoScrollDownHandler(this.scrollView1);
 
         doOnoffService(true);
     }
@@ -1310,6 +1308,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         activity.scrollView1.scrollTo(0, 0);
                     }
                 });
+            }
+        }, //
+        AUTO_SCROLL_DOWN("自動捲動", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                boolean isStart = activity.autoScrollDownHandler.toggle();
+                Toast.makeText(activity, isStart ? "開始捲動" : "停止捲動", Toast.LENGTH_SHORT).show();
             }
         }, //
 //        DEBUG_INFO("debug info", MENU_FIRST++, REQUEST_CODE++, null, true) {
