@@ -60,6 +60,10 @@ public class ScrollViewHelper {
             this.scrollView = scrollView;
         }
 
+        public void stop() {
+            isStop = true;
+        }
+
         public boolean toggle() {
             return toggle(SCROLL_STEP, SLEEP_TIME);
         }

@@ -434,6 +434,7 @@ public class EpubViewerMainHandler {
 
     public static class EpubDTO implements ITxtReaderActivityDTO {
         private File bookFile;
+
         private StringBuilder fileName;
         private TextView textView;
         private HTMLDocument htmlDocument;
@@ -592,6 +593,16 @@ public class EpubViewerMainHandler {
 
         public void setGoDirectLinkStack(Stack<Integer> goDirectLinkStack) {
             this.goDirectLinkStack = goDirectLinkStack;
+        }
+
+        @Override
+        public Runnable getOnWordClick() {
+            return new Runnable(){
+                @Override
+                public void run() {
+                    //TODO
+                }
+            };
         }
     }
 

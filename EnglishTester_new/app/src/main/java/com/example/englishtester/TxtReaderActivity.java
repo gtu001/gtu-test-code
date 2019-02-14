@@ -1553,6 +1553,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         public void setSpannableHolder(SpannableString spannableHolder) {
             this.spannableHolder = spannableHolder;
         }
+
+        @Override
+        public Runnable getOnWordClick() {
+            return new Runnable(){
+                @Override
+                public void run() {
+                    activity.autoScrollDownHandler.stop();
+                }
+            };
+        }
     }
 
     // 測試螢幕翻轉 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
