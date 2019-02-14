@@ -1,9 +1,12 @@
 package gtu.image;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
@@ -18,23 +21,6 @@ public class DataUriUtil {
     }
 
     public static void main(String[] args) throws IOException {
-//        File dir = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\fwd");
-//        File destFile = new File(FileUtil.DESKTOP_PATH, "test.html");
-//        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), "utf8"));
-//        for (File f : dir.listFiles()) {
-//            String ext = Files.getFileExtension(f.getName()).toLowerCase();
-//            String datauri = DataUriUtil.getInstance().generateUri(f.getAbsolutePath(), ext);
-//            writer.write(String.format("%s<img src=\"%s\" />", f.getName(), datauri));
-//            writer.newLine();
-//        }
-//        writer.flush();
-//        writer.close();
-        File file = new File(FileUtil.DESKTOP_DIR, "page1.jpg");
-        String datauri = DataUriUtil.getInstance().generateUri(file.getAbsolutePath(), "jpg");
-        File file2 = new File(FileUtil.DESKTOP_DIR, "page2.jpg");
-        String datauri2 = DataUriUtil.getInstance().generateUri(file2.getAbsolutePath(), "jpg");
-        System.out.println(datauri);
-        System.out.println(datauri2);
         System.out.println("done...");
     }
 
@@ -57,8 +43,32 @@ public class DataUriUtil {
             throw new RuntimeException(e);
         }
     }
-    
+
     public String generateUri(String fileExtension, byte[] byteArry) {
         return "data:image/" + fileExtension + ";base64," + DatatypeConverter.printBase64Binary(byteArry);
+    }
+
+    public boolean savePicFromDataUri(String uri, File picFile) {
+        try {
+            Pattern ptn = Pattern.compile("data\\:image\\/(.*?)\\;base64\\,(.*)");
+            Matcher mth = ptn.matcher(uri);
+            if (mth.find()) {
+                String fileType = mth.group(1);
+                String base64Uri = mth.group(2);
+                // byte[] decodedString =
+                // org.apache.commons.codec.binary.Base64.decodeBase64(new
+                // String(base64Uri).getBytes("UTF-8"));
+
+                byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Uri);
+                BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+
+                // write the image to a file
+                ImageIO.write(img, "svg", picFile);
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            throw new RuntimeException(e);
+        }
     }
 }
