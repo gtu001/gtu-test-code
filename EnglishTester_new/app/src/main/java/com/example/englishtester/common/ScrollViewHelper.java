@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import java.util.concurrent.Callable;
+
 import static java.lang.Thread.sleep;
 
 /**
@@ -45,76 +47,5 @@ public class ScrollViewHelper {
                 });
             }
         }).start();
-    }
-
-    public static class AutoScrollDownHandler {
-        final ScrollView scrollView;
-        Thread scrollThread;
-        boolean isStop = false;
-        Handler handler = new Handler();
-
-        private static final int SCROLL_STEP = 3;
-        private static final int SLEEP_TIME = 50;
-
-        public AutoScrollDownHandler(final ScrollView scrollView) {
-            this.scrollView = scrollView;
-        }
-
-        public void stop() {
-            isStop = true;
-        }
-
-        public boolean start(int scrollStep, long sleepTime) {
-            boolean isStart = false;
-            if (!isRunning()) {
-                isStop = false;
-                scrollThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (!isStop) {
-                            try {
-                                sleep(SLEEP_TIME);
-                            } catch (InterruptedException e) {
-                            }
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    scrollView.smoothScrollTo(0, scrollView.getScrollY() + SCROLL_STEP);
-                                }
-                            });
-
-                            if (scrollView.getScrollY() >= ScrollViewHelper.getMaxHeight(scrollView)) {
-                                break;
-                            }
-                        }
-                    }
-                });
-                scrollThread.start();
-                isStart = true;
-            }
-            return isStart;
-        }
-
-        public boolean isRunning() {
-            return !(scrollThread == null || scrollThread.getState() == Thread.State.TERMINATED);
-        }
-
-        public boolean start() {
-            return start(SCROLL_STEP, SLEEP_TIME);
-        }
-
-        public boolean toggle() {
-            return toggle(SCROLL_STEP, SLEEP_TIME);
-        }
-
-        public boolean toggle(int scrollStep, long sleepTime) {
-            boolean isStart = false;
-            if (!isRunning()) {
-                isStart = start(scrollStep, sleepTime);
-            } else {
-                stop();
-            }
-            return isStart;
-        }
     }
 }

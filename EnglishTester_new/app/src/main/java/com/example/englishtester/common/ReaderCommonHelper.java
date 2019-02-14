@@ -11,12 +11,14 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,6 +42,8 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Created by gtu001 on 2018/8/8.
@@ -187,6 +191,7 @@ public class ReaderCommonHelper {
         private final String TAG = ScrollViewYHolder.class.getSimpleName();
 
         Context context;
+        final Handler handler = new Handler();
 
         public ScrollViewYHolder(Context context) {
             this.context = context;
@@ -215,7 +220,7 @@ public class ReaderCommonHelper {
                         return;
                     }
 
-                    scrollView1.scrollTo(0, yPos);
+                    doScrollToY(scrollView1, yPos);
 
                     if (scrollView1.getScrollY() != yPos) {
                         Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" + ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
@@ -226,6 +231,24 @@ public class ReaderCommonHelper {
                     }
                 }
             });
+        }
+
+        public void doScrollToY(final ScrollView scrollView1, final int yPos) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView1.scrollTo(0, yPos);
+                        }
+                    });
+                }
+            }).start();
         }
 
         public void restoreY(final String currentTitle, final ScrollView scrollView1) {

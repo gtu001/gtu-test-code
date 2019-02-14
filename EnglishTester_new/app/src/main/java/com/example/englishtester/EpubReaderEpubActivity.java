@@ -9,9 +9,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
@@ -24,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -31,6 +35,7 @@ import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ActionBarSimpleHandler;
+import com.example.englishtester.common.AutoScrollDownHandler;
 import com.example.englishtester.common.BackButtonPreventer;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.DBUtil;
@@ -43,6 +48,7 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.RecyclerPagerAdapter;
+import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -95,11 +101,13 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     ReaderCommonHelper.FreeGoogleTranslateHandler freeGoogleTranslateHandler;
     Thread translateThread;
     BackButtonPreventer backButtonPreventer;
+    AutoScrollDownHandler autoScrollDownHandler;
 
     TextView txtReaderView;
     TextView translateView;
     ScrollView scrollView1;
     ViewPager viewPager;
+    ImageView floatBtn;
 
 
     @Override
@@ -115,6 +123,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         setContentView(R.layout.activity_epub_reader);
 
         viewPager = findViewById(R.id.viewpager);
+
+        //懸浮按鈕
+        floatBtn = (ImageView) findViewById(R.id.floatBtn);
+        //懸浮按鈕
+        initAutoScrollView();
 
         // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得螢幕翻轉前的狀態
         final EpubReaderEpubActivity data = (EpubReaderEpubActivity) getLastCustomNonConfigurationInstance();
@@ -329,6 +342,13 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 return false;
             }
         });
+        this.autoScrollDownHandler = new AutoScrollDownHandler(new Callable<ScrollView>() {
+            @Override
+            public ScrollView call() throws Exception {
+                return getScrollView1();
+            }
+        });
+
         this.doOnoffService(true);
     }
 
@@ -716,6 +736,59 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             @Override
             public void onPageScrollStateChanged(int state) {
                 Log.v(TAG, "##### onPageScrollStateChanged");
+            }
+        });
+    }
+
+    //懸浮按鈕
+    private void initAutoScrollView() {
+        final Handler handler = new Handler();
+
+        floatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isStart = autoScrollDownHandler.toggle();
+//                return true;
+            }
+        });
+
+        floatBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new AlertDialog.Builder(EpubReaderEpubActivity.this).setItems(new String[]{"靠左", "靠右", "慢", "中", "快"}, //
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, final int which) {
+                                handler.post(new Runnable() {
+                                    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+                                    @Override
+                                    public void run() {
+                                        RelativeLayout.LayoutParams layout = (RelativeLayout.LayoutParams) floatBtn.getLayoutParams();
+                                        switch (which) {
+                                            case 0:
+                                                layout.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                                                layout.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                                break;
+                                            case 1:
+                                                layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                                layout.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                                                break;
+                                            case 2:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.SLOW);
+                                                break;
+                                            case 3:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.MIDDLE);
+                                                break;
+                                            case 4:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.FAST);
+                                                break;
+                                        }
+                                        floatBtn.setLayoutParams(layout);
+                                    }
+                                });
+                            }
+                        }).show();
+                return true;
             }
         });
     }

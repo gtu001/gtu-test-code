@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import com.baidu.translate.demo.TransApiNew;
 import com.example.englishtester.common.ActionBarSimpleHandler;
+import com.example.englishtester.common.AutoScrollDownHandler;
 import com.example.englishtester.common.BackButtonPreventer;
 import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
@@ -162,7 +163,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 自動捲動器
      */
-    ScrollViewHelper.AutoScrollDownHandler autoScrollDownHandler;
+    AutoScrollDownHandler autoScrollDownHandler;
     /**
      * FloatViewService 間聽
      */
@@ -289,7 +290,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         floatBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                new AlertDialog.Builder(TxtReaderActivity.this).setItems(new String[]{"靠左", "靠右"}, //
+                new AlertDialog.Builder(TxtReaderActivity.this).setItems(new String[]{"靠左", "靠右", "慢", "中", "快"}, //
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, final int which) {
@@ -306,6 +307,15 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                                             case 1:
                                                 layout.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                                                 layout.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                                                break;
+                                            case 2:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.SLOW);
+                                                break;
+                                            case 3:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.MIDDLE);
+                                                break;
+                                            case 4:
+                                                autoScrollDownHandler.setSpeedType(AutoScrollDownHandler.SpeedType.FAST);
                                                 break;
                                         }
                                         floatBtn.setLayoutParams(layout);
@@ -567,7 +577,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         this.backButtonPreventer = new BackButtonPreventer(this);
 
-        this.autoScrollDownHandler = new ScrollViewHelper.AutoScrollDownHandler(this.scrollView1);
+        this.autoScrollDownHandler = new AutoScrollDownHandler(this.scrollView1);
 
         this.floatViewServiceOpenStatusReceiverHelper = new ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper();
         this.floatViewServiceOpenStatusReceiverHelper.registerReceiver(this, new Function<Boolean, Boolean>() {
