@@ -44,6 +44,7 @@ public class DropboxUtilV2 {
 
     public static boolean exists(String path, DbxClientV2 client) {
         try {
+            client.files().getMetadata(path);
             return true;
         } catch (Exception ex) {
             if (ex.getClass().getName().equals("com.dropbox.core.v2.files.GetMetadataErrorException") && //

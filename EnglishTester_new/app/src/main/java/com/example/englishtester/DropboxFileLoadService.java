@@ -265,6 +265,36 @@ public class DropboxFileLoadService implements IDropboxFileLoadService {
         }, -1L);
     }
 
+    public boolean isPathExists(final String fullPath) {
+        final DbxClientV2 client = getClient();
+        return DropboxEnglishService.getRunOnUiThread(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    return DropboxUtilV2.exists(fullPath, client);
+                } catch (Exception ex) {
+                    Log.e(TAG, "isPathExists ERR : " + ex.getMessage() + " --> " + fullPath);
+                    return false;
+                }
+            }
+        }, -1L);
+    }
+
+    public boolean deletePath(final String fullPath) {
+        final DbxClientV2 client = getClient();
+        return DropboxEnglishService.getRunOnUiThread(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                try {
+                    return DropboxUtilV2.delete(fullPath, client);
+                } catch (Exception ex) {
+                    Log.e(TAG, "deletePath ERR : " + ex.getMessage() + " --> " + fullPath);
+                    return false;
+                }
+            }
+        }, -1L);
+    }
+
     private DbxClientV2 getClient() {
         return DropboxUtilV2.getClient(accessToken);
     }

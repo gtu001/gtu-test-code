@@ -59,8 +59,7 @@ import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
 import gtu.util.DateUtil;
 
-public class DropboxHtmlListActivity extends Activity implements AdapterView.OnItemClickListener { //ListActivity
-
+public class DropboxHtmlListActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     private static final String TAG = DropboxHtmlListActivity.class.getSimpleName();
 
     public static final String BUNDLE_FILE = "file";
@@ -231,17 +230,17 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             }
 
             if (StringUtils.isNotBlank(searchText)) {
-                for (int ii = 0; ii < listItem.size(); ii++) {
-                    Map<String, Object> map = listItem.get(ii);
+                listItem.clear();
+                for (int ii = 0; ii < listItemBackup.size(); ii++) {
+                    Map<String, Object> map = listItemBackup.get(ii);
                     String name = getSearchFileTitle(map);
-                    if (!name.toLowerCase().contains(searchText)) {
-                        listItem.remove(ii);
-                        ii--;
+                    if (name.toLowerCase().contains(searchText)) {
+                        listItem.add(map);
                     }
                 }
             } else {
-                listItem = new ArrayList<>(listItemBackup);
-                initList();
+                listItem.clear();
+                listItem.addAll(listItemBackup);
             }
 
             aryAdapter.notifyDataSetChanged();
@@ -260,6 +259,8 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
 
     public void initViewEvent() {
         listView.setOnItemClickListener(this);
+
+        listView.setOnItemLongClickListener(this);
 
         searchTextView.addTextChangedListener(new TextWatcher() {
 
@@ -290,6 +291,69 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         intent.putExtra(BUNDLE_FILENAME, fileName);
         this.setResult(RESULT_OK, intent);
         this.finish();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        final Map<String, Object> map = dropboxListItemLoader.listItem.get(position);
+
+        class MyClz {
+            public void showConfirm(String message, DialogInterface.OnClickListener confirmListener) {
+                new AlertDialog.Builder(DropboxHtmlListActivity.this)//
+                        .setMessage(message)
+                        .setPositiveButton("確定", confirmListener)
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+            }
+
+            public String getHtmlFolder(Map<String, Object> map) {
+                String fullPath = (String) map.get("fullPath");
+                return fullPath.replaceAll("\\.(htm|html)", ".files");
+            }
+        }
+        final MyClz x = new MyClz();
+
+        String[] items = new String[]{"刪除"};
+
+        new AlertDialog.Builder(DropboxHtmlListActivity.this)//
+                .setTitle("操作清單")
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                x.showConfirm("是否確認刪除", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        String htmlFolderPath = x.getHtmlFolder(map);
+                                        String fullPath = (String) map.get("fullPath");
+
+                                        int existsCount = 0;
+                                        int deleteCount = 0;
+
+                                        if (dropboxFileLoadService.isPathExists(fullPath)) {
+                                            existsCount++;
+                                            deleteCount += dropboxFileLoadService.deletePath(fullPath) ? 1 : 0;
+                                        }
+
+                                        if (dropboxFileLoadService.isPathExists(htmlFolderPath)) {
+                                            existsCount++;
+                                            deleteCount += dropboxFileLoadService.deletePath(htmlFolderPath) ? 1 : 0;
+                                        }
+
+                                        Toast.makeText(DropboxHtmlListActivity.this, String.format("路徑數 : %d , 刪除數 : %d", existsCount, deleteCount), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                break;
+                        }
+                    }
+                })
+                .show();
+        return true;
     }
 
     public static class DropboxHtmlListActivityStarter {
@@ -343,6 +407,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         protected void onActivityResult(DropboxHtmlListActivity activity, Intent intent, Bundle bundle) {
             Log.v(TAG, "onActivityResult TODO!! = " + this.name());
         }
+
     }
 
     @Override

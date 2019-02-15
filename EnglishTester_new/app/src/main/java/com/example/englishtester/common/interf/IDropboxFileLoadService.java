@@ -31,4 +31,8 @@ public interface IDropboxFileLoadService {
     void uploadFile(final File file, final String fileName) throws DbxException, IOException;
 
     File downloadGodImageFile();
+
+    boolean isPathExists(final String fullPath);
+
+    boolean deletePath(final String fullPath);
 }

@@ -435,15 +435,16 @@ public class ShowWordListActivity extends Activity implements AdapterView.OnItem
                 }
 
                 if (StringUtils.isNotBlank(searchText)) {
-                    for (int ii = 0; ii < wordList.size(); ii++) {
-                        Word word = wordList.get(ii);
-                        if (!word.word.toLowerCase().contains(searchText)) {
-                            wordList.remove(ii);
-                            ii--;
+                    wordList.clear();
+                    for (int ii = 0; ii < wordListBackup.size(); ii++) {
+                        Word word = wordListBackup.get(ii);
+                        if (word.word.toLowerCase().contains(searchText)) {
+                            wordList.add(word);
                         }
                     }
                 } else {
-                    wordList = new ArrayList<Word>(wordListBackup);
+                    wordList.clear();
+                    wordList.addAll(wordListBackup);
                 }
 
                 updateMainList();

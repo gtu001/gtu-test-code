@@ -29,6 +29,8 @@ import com.dropbox.core.v2.users.FullAccount;
 
 public class DropboxUtilV2 {
 
+    private static final String TAG = DropboxUtilV2.class.getSimpleName();
+
     public static void main(String[] args) throws ListFolderErrorException, DbxException, FileNotFoundException, IOException {
         DropboxUtilV2 t = new DropboxUtilV2();
         System.out.println("done...");
@@ -48,6 +50,7 @@ public class DropboxUtilV2 {
 
     public static boolean exists(String path, DbxClientV2 client) {
         try {
+            client.files().getMetadata(path);
             return true;
         } catch (Exception ex) {
             if (ex.getClass().getName().equals("com.dropbox.core.v2.files.GetMetadataErrorException") && //
