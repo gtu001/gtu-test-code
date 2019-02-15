@@ -420,95 +420,22 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     /**
      * 讀取dropbox文件
      */
-    private void loadDropboxList() {
-        final List<DropboxUtilV2.DropboxUtilV2_DropboxFile> fileLst = dropboxFileLoadService.listFileV2();
-        if (fileLst == null || fileLst.isEmpty()) {
-            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
-            @Override
-            public int compare(DropboxUtilV2.DropboxUtilV2_DropboxFile o1, DropboxUtilV2.DropboxUtilV2_DropboxFile o2) {
-                return new Long(o1.getClientModify()).compareTo(o2.getClientModify());
-            }
-        });
-        for (int ii = 0; ii < fileLst.size(); ii++) {
-            if (fileLst.get(ii).isFolder()) {
-                fileLst.remove(ii);
-                ii--;
-            }
-        }
+    private void loadDropboxFile(final String filename, final String fileDropboxPath) {
+        try {
+            final String fileExtension = FileUtilGtu.getSubName(filename);
 
-        //判斷是否有閱讀過的紀錄
-        Transformer<String, String> transformer = new Transformer<String, String>() {
-            @Override
-            public String transform(String fileName) {
-                Pattern ptn = Pattern.compile("(.*)\\.(?:txt|htm|html)");
-                Matcher mth = ptn.matcher(fileName);
-                if (mth.find()) {
-                    fileName = mth.group(1);
+            setTxtContentFromFile(null, filename, new Callable<File>() {
+                @Override
+                public File call() {
+                    File loadFile = dropboxFileLoadService.downloadFile(fileDropboxPath, fileExtension);
+                    return loadFile;
                 }
-                ReaderCommonHelper.ScrollYService scrollYService = new ReaderCommonHelper.ScrollYService(fileName, TxtReaderActivity.this);
-                int scrollY = scrollYService.getScrollYVO_value();
-                int maxHeight = scrollYService.getMaxHeightYVO_value();
-                if (scrollY == -1 || maxHeight == -1) {
-                    return "";
-                }
-                try {
-                    BigDecimal val = new BigDecimal(scrollY).divide(new BigDecimal(maxHeight), 4, RoundingMode.HALF_UP);
-                    val = val.multiply(new BigDecimal(100));
-                    val = val.setScale(1, RoundingMode.HALF_UP);
-                    return "[已讀:" + String.valueOf(val) + "%]";
-                } catch (Exception ex) {
-                    return "";
-                }
-            }
-        };
-
-        List<Map<String, Object>> listItem = new ArrayList<>();
-        for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("ItemTitle", f.getName());
-            map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
-            map.put("ItemDetail2", transformer.transform(f.getName()));
-            map.put("ItemDetailRight", FileUtilGtu.getSizeDescription(f.getSize()));
-            listItem.add(map);
+            });
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            throw new RuntimeException(e);
+        } finally {
         }
-
-        SimpleAdapter aryAdapter = new SimpleAdapter(this, listItem,// 資料來源
-                R.layout.subview_dropboxlist, //
-                new String[]{"ItemTitle", "ItemDetail", "ItemDetail2", "ItemDetailRight"}, //
-                new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetail2, R.id.ItemDetailRight}//
-        );
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(TxtReaderActivity.this);
-        builder.setTitle("選擇dropbox檔案");
-        builder.setAdapter(aryAdapter,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int paramInt) {
-                        final String filename = fileLst.get(paramInt).getName();
-                        final String fileDropboxPath = fileLst.get(paramInt).getFullPath();
-                        try {
-                            final String fileExtension = FileUtilGtu.getSubName(filename);
-
-                            setTxtContentFromFile(null, filename, new Callable<File>() {
-                                @Override
-                                public File call() {
-                                    File loadFile = dropboxFileLoadService.downloadFile(fileDropboxPath, fileExtension);
-                                    return loadFile;
-                                }
-                            });
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getMessage(), e);
-                            throw new RuntimeException(e);
-                        } finally {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 
     /**
@@ -559,15 +486,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         recentTxtMarkService.deleteOldData();
         scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
 
-        //監視home鍵
-        homeKeyWatcher = new HomeKeyWatcher(this);
-        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
-            public void onPressed() {
-                scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
-            }
-        });
-        homeKeyWatcher.startWatch();
-
         //網頁取得器
         webViewHtmlFetcher = new WebViewHtmlFetcher(this);
 
@@ -593,6 +511,16 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 return false;
             }
         });
+
+        //監視home鍵
+        homeKeyWatcher = new HomeKeyWatcher(this);
+        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
+            public void onPressed() {
+                autoScrollDownHandler.stop();
+                scrollViewYHolder.recordY(dto.getFileName().toString(), scrollView1);
+            }
+        });
+        homeKeyWatcher.startWatch();
 
         doOnoffService(true);
     }
@@ -1328,9 +1256,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 activity.pasteFromClipboard();
             }
         }, //
-        DROPBOX_TXT("Dropbox文件", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.loadDropboxList();
+        DROPBOX_TXT("Dropbox文件", MENU_FIRST++, REQUEST_CODE++, DropboxHtmlListActivity.class) {
+            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                String fileName = DropboxHtmlListActivity.DropboxHtmlListActivityStarter.getFileName(intent);
+                String filePath = DropboxHtmlListActivity.DropboxHtmlListActivityStarter.getFile(intent);
+                activity.loadDropboxFile(fileName, filePath);
             }
         }, //
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {

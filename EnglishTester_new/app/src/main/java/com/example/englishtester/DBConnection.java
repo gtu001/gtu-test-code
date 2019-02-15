@@ -11,7 +11,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "ExamBook";
-    static final int DATABASE_VERSION = 15;
+    static final int DATABASE_VERSION = 16;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -33,7 +33,8 @@ public class DBConnection extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
-        sb = new StringBuilder();
+
+        sb.setLength(0);
         sb.append("  create table English (                         ");
         sb.append("      english_id text primary key not null,      ");
         sb.append("      english_desc text ,                        ");
@@ -51,7 +52,7 @@ public class DBConnection extends SQLiteOpenHelper {
         db.execSQL(sb.toString());
 
         // 查單字紀錄表
-        sb = new StringBuilder();
+        sb.setLength(0);
         sb.append("  create table recent_search (                         ");
         sb.append("      english_id text primary key not null,      ");
         sb.append("      insert_date long not null,               ");
@@ -63,7 +64,7 @@ public class DBConnection extends SQLiteOpenHelper {
         db.execSQL(sb.toString());
 
         // txt查單字紀錄表
-        sb = new StringBuilder();
+        sb.setLength(0);
         sb.append("  create table recent_txt_mark (                         ");
         sb.append("      list_id integer primary key autoincrement,      ");
         sb.append("      file_name text not null,      ");
@@ -76,20 +77,36 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("  );                                           ");
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
+
+        sb.setLength(0);
+        sb.append(" create table Dropbox_Html (                        ");
+        sb.append("     file_name  text  primary key not null,         ");
+        sb.append("     upload_date  long not null,                    ");
+        sb.append("     file_size  long not null,                      ");
+        sb.append("     full_path  text not null                       ");
+        sb.append(" );                                                 ");
+        Log.i("haiyang:createDB 1=", sb.toString());
+        db.execSQL(sb.toString());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
 
-        if (newVersion == 15) {
+        if (newVersion == 16) {
             // txt查單字紀錄表
             sb = new StringBuilder();
 //            sb.append("  alter table recent_txt_mark add insert_Date_Dtype DATETIME   ");//add column
 //            sb.append("  DROP table recent_txt_mark ;   ");//add column
+//            sb.append("  alter table recent_search add sentance text    ");//add column
 
-            sb.append("  alter table recent_search add sentance text    ");//add column
-
+            sb.setLength(0);
+            sb.append(" create table Dropbox_Html (                        ");
+            sb.append("     file_name  text  primary key not null,         ");
+            sb.append("     upload_date  long not null,                    ");
+            sb.append("     file_size  long not null,                      ");
+            sb.append("     full_path  text not null                       ");
+            sb.append(" );                                                 ");
 
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());

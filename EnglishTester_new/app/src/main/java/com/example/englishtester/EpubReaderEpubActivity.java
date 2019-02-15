@@ -313,18 +313,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         epubViewerMainHandler = new EpubViewerMainHandler(this);
         recentTxtMarkService = new RecentTxtMarkService(this);
 
-        //監視home鍵
-        homeKeyWatcher = new HomeKeyWatcher(this);
-        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
-            public void onPressed() {
-                if (scrollView1 == null) {
-                    return;
-                }
-                scrollViewYHolder.recordY(EpubReaderEpubActivity.this.getTitle().toString(), getScrollView1());
-            }
-        });
-        homeKeyWatcher.startWatch();
-
         this.paddingAdjuster = new ReaderCommonHelper.PaddingAdjuster(this.getApplicationContext());
         this.appleFontApplyer = new ReaderCommonHelper.AppleFontApplyer(this);
         this.scrollViewYHolder = new ReaderCommonHelper.ScrollViewYHolder(this);
@@ -348,6 +336,19 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
                 return getScrollView1();
             }
         });
+
+        //監視home鍵
+        homeKeyWatcher = new HomeKeyWatcher(this);
+        homeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListenerAdapter() {
+            public void onPressed() {
+                autoScrollDownHandler.stop();
+                if (scrollView1 == null) {
+                    return;
+                }
+                scrollViewYHolder.recordY(EpubReaderEpubActivity.this.getTitle().toString(), getScrollView1());
+            }
+        });
+        homeKeyWatcher.startWatch();
 
         this.doOnoffService(true);
     }
