@@ -290,6 +290,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         floatBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                autoScrollDownHandler.stop();
                 new AlertDialog.Builder(TxtReaderActivity.this).setItems(new String[]{"靠左", "靠右", "慢", "中", "快"}, //
                         new DialogInterface.OnClickListener() {
                             @Override

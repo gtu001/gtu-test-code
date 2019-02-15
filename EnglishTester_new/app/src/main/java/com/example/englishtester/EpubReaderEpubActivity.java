@@ -756,6 +756,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         floatBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                autoScrollDownHandler.stop();
                 new AlertDialog.Builder(EpubReaderEpubActivity.this).setItems(new String[]{"靠左", "靠右", "慢", "中", "快"}, //
                         new DialogInterface.OnClickListener() {
                             @Override

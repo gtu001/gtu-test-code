@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import com.example.englishtester.common.Log;
 
 public class HomeKeyWatcher {
 
@@ -16,7 +15,14 @@ public class HomeKeyWatcher {
 
     public HomeKeyWatcher(Context context) {
         mContext = context;
+
+        //多工返回鍵
         mFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+
+        //Power鍵
+        mFilter.addAction(Intent.ACTION_SCREEN_ON);
+        mFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        mFilter.addAction(Intent.ACTION_USER_PRESENT);
     }
 
     public void setOnHomePressedListener(OnHomePressedListener listener) {
@@ -64,6 +70,21 @@ public class HomeKeyWatcher {
                     }
                 }
             }
+
+            //電源鍵
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                Log.v(TAG, "In Method:  ACTION_SCREEN_OFF");
+                if (mListener != null) {
+                    mListener.onPowerOff();
+                }
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                Log.v(TAG, "In Method:  ACTION_SCREEN_ON");
+                if (mListener != null) {
+                    mListener.onPowerOn();
+                }
+            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                Log.v(TAG, "In Method:  ACTION_USER_PRESENT");
+            }
         }
     }
 
@@ -84,13 +105,27 @@ public class HomeKeyWatcher {
         public void onMultitaskPressed() {
             onPressed();
         }
+
+        @Override
+        public void onPowerOff() {
+            onPressed();
+        }
+
+        @Override
+        public void onPowerOn() {
+            //onPressed();
+        }
     }
 
     public interface OnHomePressedListener {
-        public void onHomePressed();
+        void onHomePressed();
 
-        public void onHomeLongPressed();
+        void onHomeLongPressed();
 
-        public void onMultitaskPressed();
+        void onMultitaskPressed();
+
+        void onPowerOff();
+
+        void onPowerOn();
     }
 }
