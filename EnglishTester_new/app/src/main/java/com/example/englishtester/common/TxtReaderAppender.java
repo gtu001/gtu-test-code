@@ -1,15 +1,8 @@
 package com.example.englishtester.common;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.RemoteException;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextPaint;
-import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -171,6 +164,9 @@ public class TxtReaderAppender {
                     @Override
                     public void onClick(View view) {
                         Log.v(TAG, "click " + this.id + " - " + txtNow, 0);
+
+                        // 按下單字 callback
+                        activity.onWordClickBefore_TxtReaderAppender(txtNow);
 
                         boolean isClickBookmark = false;
 

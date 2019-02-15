@@ -308,11 +308,6 @@ public class FloatViewService extends Service {
      * 開啟/關閉輸入框
      */
     private void doOpenCloseEditPanel(boolean isOpen) {
-        // 開關通知
-        if (isOpen) {
-            ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper.sendOpenStatusMessage(isOpen, this);
-        }
-
         // 檢查剪貼簿是否有內容
         if (isOpen) {
             //查詢記事本的單字

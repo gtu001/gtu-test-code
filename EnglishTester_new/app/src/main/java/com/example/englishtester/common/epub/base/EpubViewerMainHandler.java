@@ -501,6 +501,8 @@ public class EpubViewerMainHandler {
             return epubActivityInterface.getFloatService();
         }
 
+
+
         @Override
         public StringBuilder getFileName() {
             if (this.fileName == null) {

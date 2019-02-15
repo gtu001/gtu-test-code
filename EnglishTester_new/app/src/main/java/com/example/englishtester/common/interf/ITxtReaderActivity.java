@@ -10,4 +10,6 @@ public interface ITxtReaderActivity {
     void doOnoffService(boolean b);
 
     Context getApplicationContext();
+
+    void onWordClickBefore_TxtReaderAppender(String word);
 }

@@ -19,11 +19,9 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -33,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +42,6 @@ import com.example.englishtester.common.ClickableSpanMethodCreater;
 import com.example.englishtester.common.ClipboardHelper;
 import com.example.englishtester.common.DBUtil;
 import com.example.englishtester.common.DialogFontSizeChange;
-import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileConstantAccessUtil;
 import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
@@ -57,7 +53,6 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
-import com.example.englishtester.common.ScrollViewHelper;
 import com.example.englishtester.common.SingleInputDialog;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TxtReaderAppender;
@@ -69,7 +64,6 @@ import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.google.android.gms.ads.NativeExpressAdView;
 
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -83,13 +77,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +88,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import gtu._work.etc.EnglishTester_Diectory;
-import gtu._work.etc.EnglishTester_Diectory2;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
 
@@ -327,6 +313,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onWordClickBefore_TxtReaderAppender(String word) {
+        if (autoScrollDownHandler.isRunning()) {
+            autoScrollDownHandler.stop();
+            floatBtn.setTag(true);
+        }
     }
 
     /**

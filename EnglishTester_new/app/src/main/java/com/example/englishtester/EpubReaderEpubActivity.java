@@ -353,6 +353,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         this.doOnoffService(true);
     }
 
+
     /**
      * 開啟字形大小修改Dialog
      */
@@ -795,6 +796,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         });
     }
 
+    @Override
+    public void onWordClickBefore_TxtReaderAppender(String word) {
+        if (autoScrollDownHandler.isRunning()) {
+            autoScrollDownHandler.stop();
+            floatBtn.setTag(true);
+        }
+    }
+
     private void progressDlgHandle(TextView txtReaderView) {
         final AtomicReference<ProgressDialog> dlg = new AtomicReference<>(LoadingProgressDlg.createSimpleLoadingDlg(EpubReaderEpubActivity.this));
         ((TextView4SpannableString) txtReaderView).getHandler().post(new Runnable() {
@@ -810,7 +819,6 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             }
         });
     }
-
 
     private class MyViewHolder extends RecyclerPagerAdapter.ViewHolder {
 
