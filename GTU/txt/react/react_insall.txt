@@ -1,0 +1,93 @@
+
+安裝nodejs
+
+	sudo apt instll nodejs
+	node -v
+
+安裝npm
+	
+	sudo apt install npm
+
+
+-----------------------------------------------------------------------------------------
+建立專案
+
+	cd /home/gtu001/桌面/ReactGtu
+	mkdir src
+	mkdir dist
+
+
+-----------------------------------------------------------------------------------------
+產生package.json
+	
+	cd /home/gtu001/桌面/ReactGtu
+	npm init
+
+
+-----------------------------------------------------------------------------------------
+安裝webpack
+
+	npm install webpack webpack-cli --save-dev
+
+
+-----------------------------------------------------------------------------------------
+寫webpack的設定檔
+
+	touch webpack.config.js
+		//內文
+		const path = require('path');
+		module.exports = {
+		    entry: './index.js',
+		    output: {
+		        filename: 'index.bundle.js',
+		        path: path.resolve(__dirname, './'),
+		    }
+		};
+
+	touch index.js
+		//內文
+		console.log("Hello")
+
+	編輯 package.json 
+		  "scripts": {
+		    "build": "webpack" <---新增
+		  },
+-----------------------------------------------------------------------------------------
+重build
+
+	npm run build
+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+
+
+//https://medium.com/@Mike_Cheng1208/%E4%BB%80%E9%BA%BC%E6%98%AFwebpack-%E4%BD%A0%E9%9C%80%E8%A6%81webpack%E5%97%8E-2d8f9658241d
+
+https://medium.com/gogovan-technology/team-structure-and-development-process-in-gogovan-bb01544f3931
+
+https://medium.freecodecamp.org/es5-to-esnext-heres-every-feature-added-to-javascript-since-2015-d0c255e13c6e
+
+https://medium.freecodecamp.org/do-we-still-need-javascript-frameworks-42576735949b
+
+https://medium.freecodecamp.org/never-feel-overwhelmed-at-work-again-how-to-use-the-m-i-t-technique-70d132aad0cc
+
+https://medium.freecodecamp.org/how-to-write-code-you-will-love-in-the-future-ee5decae5ce4
+
+https://medium.freecodecamp.org/web-scraping-for-web-developers-a-concise-summary-3af3d0ca4069
+
+
+https://medium.freecodecamp.org/how-to-set-up-continuous-deployment-in-your-home-project-the-easy-way-41b84a467eed
+
+https://medium.freecodecamp.org/10-node-js-frameworks-worth-checking-out-express-loopback-hapi-and-beyond-7b537b590f89
+
+https://medium.freecodecamp.org/web-scraping-for-web-developers-a-concise-summary-3af3d0ca4069
+
+https://medium.freecodecamp.org/how-to-set-up-your-mac-for-web-development-b40bebc0cac3
+
+https://medium.freecodecamp.org/what-you-need-to-know-for-your-first-developer-job-that-you-wont-learn-in-school-2ab39551026
+

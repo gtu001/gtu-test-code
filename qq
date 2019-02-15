@@ -1,0 +1,1107 @@
+[33mcommit 21dd3089b6dbb6516ede634087c918a473b03f3d[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 15 22:41:32 2018 +0800
+
+    ok
+
+ GTU/src/gtu/youtube/JavaYoutubeVideoUrlHandler.java                                                   | 51 [32m++++++++++++++++++++++++++++++++[m[31m-------------------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java               | 32 [32m+++++++++++++++++++++++++[m[31m-------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/JavaYoutubeVideoUrlHandler.java | 46 [32m++++++++++++++++++++++++++[m[31m--------------------[m
+ 3 files changed, 83 insertions(+), 46 deletions(-)
+
+[33mcommit 72edfc973c66cdf275dc6e23390d3d6f60402fa6[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 15 02:34:39 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 74 [32m+++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------[m
+ 1 file changed, 49 insertions(+), 25 deletions(-)
+
+[33mcommit bf5fba38de85095be4480e1b40bd2e8021589526[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 15 01:17:12 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java          | 79 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------[m
+ GTU/src/gtu/file/FileUtil.java                   | 13 [32m+++++++++++++[m
+ GTU/src/gtu/properties/PropertiesGroupUtils.java |  4 [32m++[m[31m--[m
+ GTU/src/gtu/swing/util/JCommonUtil.java          |  1 [32m+[m
+ GTU/src/gtu/swing/util/JFrameUtil.java           |  9 [32m+++++++++[m
+ GTU/src/gtu/swing/util/JPopupMenuUtil.java       | 24 [32m+++++++++++++++++[m[31m-------[m
+ 6 files changed, 98 insertions(+), 32 deletions(-)
+
+[33mcommit 3232380fef035c44c3ccea29244023df1a2acb1c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 14 17:24:21 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 296 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m---------------------------[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java |  47 [32m++++++++++++++++++[m[31m-[m
+ 2 files changed, 276 insertions(+), 67 deletions(-)
+
+[33mcommit 9ad0d8f5dbd18d9de7d54bbfe976f3047dce6127[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 14 11:46:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ EnglishTester_new/app/src/main/java/com/example/englishtester/TxtReaderActivity.java                   | 20 [32m+++++++++[m[31m-----[m
+ EnglishTester_new/app/src/main/java/com/example/englishtester/common/SimpleAdapterDecorator.java       | 19 [32m++++++++[m[31m------[m
+ EnglishTester_new/app/src/main/java/com/example/englishtester/common/SpannableStringBuilderHelper.java | 83 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ EnglishTester_new/app/src/main/res/layout/subview_dropboxlist.xml                                      | 12 [32m+++++++++[m
+ 4 files changed, 119 insertions(+), 15 deletions(-)
+
+[33mcommit eca5aad43fa471c411bb988b25cca4d254a97e8e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 14 10:28:10 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/resource/images/ico/burger.ico | Bin [31m0[m -> [32m32988[m bytes
+ GTU/src/resource/images/ico/cheese.ico | Bin [31m0[m -> [32m32988[m bytes
+ GTU/src/resource/images/ico/coffie.ico | Bin [31m0[m -> [32m32988[m bytes
+ GTU/src/resource/images/ico/malk1.ico  | Bin [31m0[m -> [32m32988[m bytes
+ GTU/src/resource/images/ico/malk2.ico  | Bin [31m0[m -> [32m32988[m bytes
+ 5 files changed, 0 insertions(+), 0 deletions(-)
+
+[33mcommit e24aa1bb0a6835c7d6af2ac95a34daa121e92021[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 14 09:15:45 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ PythonGtu/gtu/scrapy/ex2_ptt_beauty/PttBeautyCrawler/PttBeautyCrawler/spiders/ptt_beauty_spider_001.py | 20 [32m++++++++++++++++++++[m
+ 1 file changed, 20 insertions(+)
+
+[33mcommit cd500fb4b1f60b94c2425bc43e63ce3bbac85f81[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 23:30:00 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swing/util/JTextAreaUtil.java                                                              | 21 [32m++++++++++++[m[31m---------[m
+ PythonGtu/gtu/scrapy/ex2_ptt_beauty/PttBeautyCrawler/PttBeautyCrawler/spiders/ptt_beauty_spider_001.py |  4 [32m++[m[31m--[m
+ 2 files changed, 14 insertions(+), 11 deletions(-)
+
+[33mcommit 0d07fc377b08b55da5e288a24a52784bdf6cc859[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 20:36:08 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swing/util/JTextAreaUtil.java | 30 [32m+++++++++++++++++++++++[m[31m-------[m
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+[33mcommit 721fecc2823dbe4cd9bb635d09b861e6c1873d64[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 17:34:24 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java         |   4 [32m++[m[31m--[m
+ GTU/src/gtu/_work/ui/ScheduleBatRunnerUI.java   |   6 [32m++++[m[31m-[m
+ PythonGtu/gtu/tensorflow/tensorflow_test_001.py | 145 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 3 files changed, 152 insertions(+), 3 deletions(-)
+
+[33mcommit c0ac0870ac41ddc178edcb6e7f1bfc8d352fdc50[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 15:23:13 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 61 [32m++++++++++++++++++++++++++++++++++++++++++++++[m[31m---------------[m
+ 1 file changed, 46 insertions(+), 15 deletions(-)
+
+[33mcommit 7e6ea48653f1d1ab93297e6f9d2c2dc4944c3a6c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 14:29:12 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/WebContent/pages/js_collection/textareaHandler/InputUtility.css             |  134 [32m+++++++++[m
+ GTU/WebContent/pages/js_collection/textareaHandler/InputUtility.js              | 1257 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/WebContent/pages/js_collection/textareaHandler/inputUtility_Example_01.html |   21 [32m++[m
+ 3 files changed, 1412 insertions(+)
+
+[33mcommit d883604b86e3c12e55ff83a295e0449b94cfc56a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 14:05:44 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\275\210\345\207\272popup div.html"                      |   6 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\346\207\270\346\265\256div_.html"                           |   2 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\346\226\260\345\242\236\344\277\256\346\224\271_Class.html" |  25 [32m+++[m
+ GTU/WebContent/pages/js_collection/calendarPicker/calendar.gif                                | Bin [31m0[m -> [32m979[m bytes
+ GTU/WebContent/pages/js_collection/calendarPicker/calendar.js                                 | 653 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/WebContent/pages/js_collection/calendarPicker/calendar_Example_01.html                    |  23 [32m+++[m
+ GTU/src/gtu/swing/util/JTextAreaUtil.java                                                     |   2 [32m+[m[31m-[m
+ PythonGtu/gtu/tensorflow/tensorflow_test_001.py                                               |   0
+ 8 files changed, 706 insertions(+), 5 deletions(-)
+
+[33mcommit 1e9b9e5870d90260c09fe68555d84e77731cb57c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 11:21:26 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swing/util/JTextAreaUtil.java | 23 [32m++++++++++++++++++++++[m[31m-[m
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+[33mcommit cedef8b25a1ef3f4fa2a962e564af3b1b08a3e72[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 13 10:52:21 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java   |  6 [32m++++[m[31m--[m
+ GTU/src/gtu/swing/util/JTextAreaUtil.java | 11 [32m++++++[m[31m-----[m
+ GTU/src/gtu/swing/util/JTextUndoUtil.java |  4 [32m++[m[31m--[m
+ 3 files changed, 12 insertions(+), 9 deletions(-)
+
+[33mcommit b75610bd731957754f2193abe1ba52e4d4241b88[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Thu Dec 13 00:55:10 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java         | 261 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------[m
+ GTU/src/gtu/properties/PropertiesMultiUtil.java | 119 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/properties/PropertiesUtil.java      |   3 [32m+[m[31m-[m
+ GTU/src/gtu/reflect/ReflectUtil.java            |  25 [32m+++++++++++[m
+ 4 files changed, 368 insertions(+), 40 deletions(-)
+
+[33mcommit 61936ccbccc63ee90104950ad698c2ce8161000e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 12 17:06:50 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java   |   1 [31m-[m
+ GTU/src/gtu/swing/util/JTextAreaUtil.java | 109 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------[m
+ GTU/txt/tensorflow/tensorflow_install.txt |  24 [32m++++++++++++++++++++++++[m
+ 3 files changed, 126 insertions(+), 8 deletions(-)
+
+[33mcommit 0ed5610bb5cb21da51664f5efc69c53b09cf53cc[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 12 15:00:41 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/properties/PropertiesUtilBeanChinese.java | 10 [32m+++++++++[m[31m-[m
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+[33mcommit 9abfe1cb48b9cf534688f8e259415e14873f4cd0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 12 14:57:27 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                | 12 [32m+++++++[m[31m-----[m
+ GTU/src/gtu/properties/PropertiesGroupUtils_ByKey.java | 51 [32m+++++++++++++++++++++++++++[m[31m------------------------[m
+ GTU/src/gtu/properties/PropertiesUtilBean.java         |  4 [32m++++[m
+ 3 files changed, 38 insertions(+), 29 deletions(-)
+
+[33mcommit 217bb6618581e8ca8cdc37eddde5334ca7cffe7d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 12 14:15:49 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 133 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------[m
+ 1 file changed, 104 insertions(+), 29 deletions(-)
+
+[33mcommit 22d8e2b82e5266f6494d028dc6878a3f307404ee[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 12 13:26:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/WebContent/pages/old_school/ZUX10202.jsp | 1501 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------------------------------------[m
+ GTU/ant/swing_jar/build_swing_jar(44).xml    |  251 [32m+++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/HtmlConverterUI.java    |  439 [32m++++++++++++++++++++++++++++++++++[m
+ 3 files changed, 1405 insertions(+), 786 deletions(-)
+
+[33mcommit c7bb2b6dd9f086fc960ac5c3a96b37d01ad4ec55[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Dec 11 15:17:59 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java    | 116 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------------------------------------------------[m
+ GTU/src/gtu/properties/PropertiesUtil.java |  31 [32m+++++++++++++++++++++++++++++++[m
+ 2 files changed, 95 insertions(+), 52 deletions(-)
+
+[33mcommit d29b141c4f1ab9a3fb68c46515fcaf7f6e845563[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 10 18:19:59 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java | 23 [32m++++++++++++++++++[m[31m-----[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java |  2 [32m+[m[31m-[m
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
+[33mcommit 5df83eb636d861328935493604745ae454d83186[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 10 13:46:39 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ EnglishTester_new/app/src/main/java/com/example/englishtester/FloatViewService.java     |  12 [32m+++++++++++[m[31m-[m
+ EnglishTester_new/app/src/main/java/com/example/englishtester/common/AppOpenHelper.java |   8 [32m++++++[m[31m--[m
+ EnglishTester_new/app/src/main/res/drawable/qr_code_icon.png                            | Bin [31m0[m -> [32m42268[m bytes
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/MainActivity.java          |  20 [32m++++++++++++++[m[31m------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java |  20 [32m++++++++++++++++++++[m
+ 5 files changed, 51 insertions(+), 9 deletions(-)
+
+[33mcommit d9e2cac1a6dca2f1da49cdceabafd05918d0d8b4[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sun Dec 9 14:10:15 2018 +0800
+
+    ok
+
+ GTU/ant/swing_jar/build_swing_jar(43).xml                                                             | 268 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                                               |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/ScheduleBatRunnerUI_SwingAntDlg.java                                             |  55 [32m+++++++++[m[31m---[m
+ GTU/src/gtu/properties/PropertiesGroupUtils_ByKey.java                                                |  30 [32m++++[m[31m---[m
+ GTU/src/gtu/swing/util/SwingJDesktopTemplateUI.java                                                   |  84 [32m++++++++++++[m[31m------[m
+ QRCodeMaker/app/src/main/aidl/com/example/gtu001/qrcodemaker/IUrlPlayerService.aidl                   |   4 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/Mp3PlayerActivity.java                   |  24 [32m++++[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java               |  27 [32m+++++[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog_bg.java    |  47 [32m+++++++[m[31m---[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/JavaYoutubeVideoUrlHandler.java |   2 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/UrlPlayerService.java           |  31 [32m++++++[m[31m-[m
+ 11 files changed, 498 insertions(+), 76 deletions(-)
+
+[33mcommit e1caca17d1f3e36a71a09830639ec7ae78eeb402[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sun Dec 9 01:37:03 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java             |   4 [32m+[m[31m--[m
+ GTU/src/gtu/swing/util/SwingJDesktopTemplateUI.java | 192 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------------[m
+ GTU/src/gtu/swing/util/SwingTabTemplateUI.java      |   6 [31m----[m
+ 3 files changed, 141 insertions(+), 61 deletions(-)
+
+[33mcommit a7a65cb2878753ffffa9fc4c26141815fa2e661e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Dec 8 13:47:30 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                      |  22 [32m++++++[m[31m----[m
+ GTU/src/gtu/swing/util/JCommonUtil.java                      |   1 [32m+[m
+ GTU/src/gtu/swing/util/SwingJDesktopTemplateUI.java          | 231 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/{_work/ui => swing/util}/SwingTabTemplateUI.java |  10 [32m+++[m[31m--[m
+ 4 files changed, 251 insertions(+), 13 deletions(-)
+
+[33mcommit 876a7cf07ef872646e2296aceda5a1de5bfe13c4[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 7 15:04:18 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swing/util/JComboBoxUtil.java | 1 [32m+[m
+ 1 file changed, 1 insertion(+)
+
+[33mcommit 714ada230054857e7931e2dc91dca134f4214704[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 7 13:07:56 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swing/util/JComboBoxUtil.java | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 5ff8f2bc47bcf842d4f64d677575997f358a6e28[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 7 12:45:30 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java      | 71 [32m++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m---------------------[m
+ GTU/src/gtu/_work/ui/SwingTabTemplateUI.java |  4 [32m++++[m
+ GTU/src/gtu/swing/util/JComboBoxUtil.java    | 36 [32m++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/swing/util/JCommonUtil.java      |  2 [32m++[m
+ 4 files changed, 92 insertions(+), 21 deletions(-)
+
+[33mcommit ff6f80eaf1389b0f4892083ecb83953beeebed1b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 7 11:03:07 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java      |  62 [32m++++++++++++++++++++++++++[m[31m------------[m
+ GTU/src/gtu/_work/ui/SwingTabTemplateUI.java | 190 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 2 files changed, 233 insertions(+), 19 deletions(-)
+
+[33mcommit d6d76bcd4f7bc718db20f9b29cf61cb36294f83b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Dec 7 00:00:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/BrowserHistoryHandlerUI.java              |  5 [32m+++[m[31m--[m
+ GTU/src/gtu/_work/ui/DirectoryCompareUI.java                   |  3 [32m+++[m
+ GTU/src/gtu/_work/ui/EnglishSearchUI.java                      |  3 [32m+++[m
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                        | 12 [32m++++++++[m[31m----[m
+ GTU/src/gtu/_work/ui/ExecuteOpener_RemarkDlg.java              |  2 [32m++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                        |  7 [32m+++++[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_RowCompareDlg.java          |  2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_UpdateSqlArea.java          |  2 [32m++[m
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java                  |  2 [32m++[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java                        | 11 [32m++++++[m[31m-----[m
+ GTU/src/gtu/log/finder/DebugMointerUIUIContent.java            |  7 [32m+++++++[m
+ GTU/src/gtu/properties/PropertiesUtilBean.java                 |  9 [32m+++++++++[m
+ GTU/src/gtu/swing/util/JCommonUtil.java                        |  3 [32m++[m[31m-[m
+ GTU/src/gtu/swing/util/JTextAreaUtil.java                      | 74 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------[m
+ webTest2/src/main/java/gtu/log/finder/etc/WebTestJsonUtil.java | 67 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 15 files changed, 176 insertions(+), 33 deletions(-)
+
+[33mcommit 7535e3cd7dd8d87208868460f613e1a50fbfe924[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 6 18:10:48 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/WebContent/pages/old_school/ZUX10202.jsp                                                       | 614 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_Ref.properties                                                  |   9 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/Mp3PlayerActivity.java                |  36 [32m+++[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java            |  18 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog.java    |  98 [32m+++++++++[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog_bg.java | 125 [32m++++++++++++[m[31m-[m
+ QRCodeMaker/app/src/main/res/drawable/mp3_next_song_unpressed.png                                  | Bin [31m0[m -> [32m1460[m bytes
+ QRCodeMaker/app/src/main/res/drawable/mp3_previous_song_unpressed.png                              | Bin [31m0[m -> [32m1486[m bytes
+ QRCodeMaker/app/src/main/res/layout/subview_dialog_audioplayer.xml                                 |  14 [32m++[m
+ 9 files changed, 798 insertions(+), 116 deletions(-)
+
+[33mcommit 429c158bb7dc9cbc5c616a946c9c4a58ee9f4043[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 6 08:52:52 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/RegexReplacer.java | 38 [32m+++++++++++++++++++++++++++++++++++++[m[31m-[m
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+[33mcommit c97a823160454557590be151262d56c23e611033[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 6 08:38:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 4a3b2c6ecaed74ca6219d20b79c3f0d16a3c0fae[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Dec 6 00:59:45 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/_temp/Test54.java                         |  22 [32m+++++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java           | 383 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_Ref.properties |   3 [32m+[m
+ GTU/src/gtu/collection/ListUtil.java              |   4 [32m+[m[31m-[m
+ GTU/src/gtu/db/JdbcDBUtil.java                    |   4 [32m+[m[31m-[m
+ GTU/src/gtu/properties/PropertiesUtilBean.java    |  49 [32m++++++++++[m[31m----[m
+ GTU/src/gtu/swing/util/JCommonUtil.java           |  30 [32m+++++++[m[31m--[m
+ 7 files changed, 408 insertions(+), 87 deletions(-)
+
+[33mcommit 647aa12aec71fb80ef99da362ed62e43bc1b2f04[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 18:46:17 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\347\260\241\346\230\223\351\240\201\347\261\244tab_menu.html" | 160 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 1 file changed, 160 insertions(+)
+
+[33mcommit 08992db67515af987744071e45ede165ab98ce1f[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 17:56:54 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\275\210\345\207\272popup div.html" | 49 [32m+++++++++++++++++++++++++++++++++++++++++++++++++[m
+ "GTU/WebContent/pages/javascript/\346\207\270\346\265\256div_.html"      | 59 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                  | 18 [32m++++++++++++[m[31m------[m
+ 3 files changed, 120 insertions(+), 6 deletions(-)
+
+[33mcommit 86be76c8230b0510e63d5f0b5dd456a2ced0fe2b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 12:58:54 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 1d15a2eb166e1af6afa6b28fce4dac173c7c5b5f[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 12:49:49 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 42 [32m+++++++++++++++++++++++++++++++++++[m[31m-------[m
+ 1 file changed, 35 insertions(+), 7 deletions(-)
+
+[33mcommit 2abc77b81fdf8c0e52e6696bc63190cab7bcc9b8[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 12:13:35 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 30 [32m++++++++++++++++++++++++++++[m[31m--[m
+ 1 file changed, 28 insertions(+), 2 deletions(-)
+
+[33mcommit 5df5eb67a5ecfac032b6ce59276d21bdcaf90d32[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Dec 5 11:55:49 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 172 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-[m
+ 1 file changed, 171 insertions(+), 1 deletion(-)
+
+[33mcommit 99f611f738a4ed05eeed09f438bf9e5b0edacccc[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Dec 4 22:26:49 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ QRCodeMaker/app/src/main/aidl/com/example/gtu001/qrcodemaker/IUrlPlayerService.aidl                |  2 [32m++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog.java    | 30 [32m+++++++[m[31m-----------------------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog_bg.java | 30 [32m+++++++++[m[31m---------------------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/UrlPlayerService.java        | 10 [32m+++++++++[m[31m-[m
+ QRCodeMaker/app/src/main/res/layout/subview_dialog_audioplayer.xml                                 |  7 [31m-------[m
+ 5 files changed, 27 insertions(+), 52 deletions(-)
+
+[33mcommit c94f493ce1fbfd1ce7af9270ef2cc51713f2026d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Dec 4 22:02:04 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\270\270\347\224\250propotype.html"                           |  38 [32m++++++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/aidl/com/example/gtu001/qrcodemaker/IUrlPlayerService.aidl                |   2 [32m++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/Mp3PlayerHandler.java          |  10 [32m++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog.java    |  34 [32m++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog_bg.java |  34 [32m++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/UrlPlayerService.java        |   9 [32m+++++++++[m
+ QRCodeMaker/app/src/main/res/drawable/mp3_backward_unpressed.png                                   | Bin [31m0[m -> [32m6884[m bytes
+ QRCodeMaker/app/src/main/res/drawable/mp3_forward_unpressed.png                                    | Bin [31m0[m -> [32m6849[m bytes
+ QRCodeMaker/app/src/main/res/layout/subview_dialog_audioplayer.xml                                 |  14 [32m++++++++++++++[m
+ 9 files changed, 141 insertions(+)
+
+[33mcommit 104c50bc6f4ab1d79e4d9cb64da2b79fa5e63ab7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Dec 4 18:57:34 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\205\203\347\264\240after\346\226\271\346\263\225.html" |   65 [32m++++[m
+ "GTU/WebContent/pages/javascript/\345\270\270\347\224\250propotype.html"                     |   69 [32m+++++[m
+ "GTU/WebContent/pages/javascript/\345\273\272\347\253\213Tag_ElementCreater.html"            |    5 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\351\241\257\347\244\272object\347\232\204size.html"        |   10 [32m+[m
+ GTU/WebContent/pages/old_school/ZUX10202.jsp                                                 | 1057 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java                                                      |  127 [32m+++++[m[31m---[m
+ "GTU/txt/db2/DB2_table_column_\345\256\232\347\276\251.txt"                                  |   14 [32m+[m
+ "GTU/txt/db2/db2_substr_indexOf_length_\345\270\270\347\224\250\346\226\271\346\263\225.txt" |   14 [32m+[m
+ 8 files changed, 1322 insertions(+), 39 deletions(-)
+
+[33mcommit ccafe69847b3cba1c50ead538864474ea29736f0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 22:17:01 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ QRCodeMaker/app/src/main/aidl/com/example/gtu001/qrcodemaker/IUrlPlayerService.aidl                |   4 [32m++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/Mp3PlayerHandler.java          |  14 [32m++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/FilePlayerDialog.java   |   4 [32m++[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog.java    |  23 [32m+++++++++++++++++++[m[31m----[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/custom_dialog/UrlPlayerDialog_bg.java |  21 [32m+++++++++++++++++++[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/services/UrlPlayerService.java        |  19 [32m+++++++++++++++++++[m
+ QRCodeMaker/app/src/main/res/drawable/mp3_pause_unpressed.png                                      | Bin [31m0[m -> [32m23942[m bytes
+ QRCodeMaker/app/src/main/res/drawable/{play_icon_unpressed.png => mp3_play_unpressed.png}          | Bin
+ QRCodeMaker/app/src/main/res/drawable/{stop_icon_unpressed.png => mp3_stop_unpressed.png}          | Bin
+ QRCodeMaker/app/src/main/res/layout/subview_dialog_audioplayer.xml                                 |   7 [32m+++++++[m
+ 10 files changed, 84 insertions(+), 8 deletions(-)
+
+[33mcommit 637c373ad128a51ced74844a0a3ad341e6414fa7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 21:16:23 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/txt/android/android_studio_build\351\214\257\350\252\244\345\276\236\351\200\231\350\243\241\347\234\213.png" | Bin [31m0[m -> [32m41913[m bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+[33mcommit a63d364935614879e95e2f6e82691d8863afbacd[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 21:14:48 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ QRCodeMaker/app/build.gradle | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit f0b567467a011032926c06fa7b56bba5009d98d7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 21:14:27 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/RegexReplacer.java                                                 |  86 [32m+++++++++++++[m[31m-----[m
+ QRCodeMaker/app/src/main/AndroidManifest.xml                                            |  12 [32m+[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/FileFindActivity.java      |  11 [32m+[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/Mp3PlayerActivity.java     | 346 [32m+++++++++++++++++++++++++++++++++++++++++++++++[m[31m-------------------------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/PermissionUtil.java |  11 [32m+[m[31m--[m
+ 5 files changed, 302 insertions(+), 164 deletions(-)
+
+[33mcommit 5d544390942ee3c33b1848adc64642cc00a77abe[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 18:13:00 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ EnglishTester_new/app/src/main/java/com/example/englishtester/FileFindActivity.java        |   4 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/FileFindActivity.java         | 326 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/Mp3PlayerActivity.java        |  13 [32m+[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/ExternalStorage.java   | 139 [32m+++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/ExternalStorageV2.java |  85 [32m++++++++++++++++++[m
+ QRCodeMaker/app/src/main/res/drawable-v21/icon_file.png                                    | Bin [31m0[m -> [32m9990[m bytes
+ QRCodeMaker/app/src/main/res/drawable-v21/icon_folder.png                                  | Bin [31m0[m -> [32m5048[m bytes
+ QRCodeMaker/app/src/main/res/layout/activity_file_directory.xml                            |  29 [32m+++++++[m
+ QRCodeMaker/app/src/main/res/layout/subview_propview.xml                                   |  26 [32m++++++[m
+ 9 files changed, 609 insertions(+), 13 deletions(-)
+
+[33mcommit 8cdacd0cb7764bbc9fd612556e3257ec247c9a4b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Dec 3 18:11:58 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\347\260\241\346\230\223\351\240\201\347\261\244_tabConfig.html" | 73 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                                           |  4 [32m++++[m
+ GTU/src/gtu/db/JdbcDBUtil.java                                                                    | 42 [32m++++++++++++++++++++++++++++++[m[31m------[m
+ GTU/src/gtu/swing/util/JCommonUtil.java                                                           | 36 [32m++++++++++++++++++[m[31m-------------[m
+ "GTU/txt/db2/db2_\346\237\245\350\251\242\347\211\210\346\234\254.txt"                            |  3 [32m+++[m
+ 5 files changed, 136 insertions(+), 22 deletions(-)
+
+[33mcommit 1007f9a4b12722b0787831a622fc04fd5d837307[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 1 22:12:03 2018 +0800
+
+    ok
+
+ PythonGtu/gtu/_tkinter/ex/ex7/excel_test_rpt_8110_cellCompare_UI.py |  7 [32m++++[m[31m---[m
+ PythonGtu/gtu/_tkinter/util/tkinterUIUtil.py                        | 13 [32m++++++++++++[m[31m-[m
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+[33mcommit baf09ed103d317d44450f3e6a3170076a44a2910[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 1 10:20:06 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java |  2 [32m+[m[31m-[m
+ GTU/src/gtu/db/JdbcDBUtil.java          | 11 [32m++++++++++[m[31m-[m
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+[33mcommit d1c3b64008f35b18398d59f6bab2e0face2881c3[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sat Dec 1 09:24:55 2018 +0800
+
+    ok
+
+ GTU/WebContent/pages/js_collection/popupWin/popupWin_Example.txt     | 48 [32m+++++++++++++++++++++++++++++[m[31m-------------------[m
+ GTU/WebContent/pages/js_collection/popupWin/popupWin_Example_01.html | 25 [32m+++++++++++++++++++++++++[m
+ 2 files changed, 54 insertions(+), 19 deletions(-)
+
+[33mcommit 340ded0268eb2df9afa75b11ded7d6f75c38abee[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 30 17:43:12 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 59 [32m++++++++++++++++++++++++++++++++++++++++++++[m[31m---------------[m
+ 1 file changed, 44 insertions(+), 15 deletions(-)
+
+[33mcommit ad04b770e44f05ed24a064cc8b7671943c37f346[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 30 14:16:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java          | 62 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------[m
+ GTU/src/gtu/properties/PropertiesGroupUtils.java |  4 [32m++[m[31m--[m
+ 2 files changed, 54 insertions(+), 12 deletions(-)
+
+[33mcommit d2b46bb71a57420efbf1522ad76831742dbeef8b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 29 19:04:46 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\273\272\347\253\213Tag_ElementCreater.html" | 140 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ PythonGtu/gtu/openpyxl_test/ex1/janna/excel_test_rpt_8110_cellCompare.py          |  17 [32m+++++++[m[31m---[m
+ 2 files changed, 152 insertions(+), 5 deletions(-)
+
+[33mcommit 5b54b6a7327ae59c05eda68ef4eb8fa5bbec2fda[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Thu Nov 29 00:38:29 2018 +0800
+
+    ok
+
+ PythonGtu/gtu/_tkinter/ex/ex7/excel_test_rpt_8110_cellCompare_UI.py      | 36 [32m++++++++++++++++++++++++++++[m[31m--------[m
+ PythonGtu/gtu/_tkinter/util/tkinterUIUtil.py                             | 38 [32m+++++++++++++++++++++++++[m[31m-------------[m
+ PythonGtu/gtu/_tkinter/util/tkinterUtil.py                               | 36 [32m+++++++++++++++++++++++++++++++[m[31m-----[m
+ PythonGtu/gtu/openpyxl_test/ex1/janna/excel_test_rpt_8110_cellCompare.py | 34 [32m+++++++++++++++++++++++++++++[m[31m-----[m
+ 4 files changed, 113 insertions(+), 31 deletions(-)
+
+[33mcommit 0d0e2a31c8c33634b00ee9979ee2f070a0dbf2d0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Nov 28 21:00:02 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/VoMapCompareUI.java | 23 [32m+++++++++++++++++[m[31m------[m
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+[33mcommit 596c0f9bb06c1cc1b8612b54f4f808412ebb8ff4[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Nov 28 16:44:24 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java               | 26 [32m+++++++++++++++++++[m[31m-------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_RowCompareDlg.java | 18 [32m+++++++++++[m[31m-------[m
+ GTU/src/gtu/_work/ui/VoMapCompareUI.java              |  2 [32m+[m[31m-[m
+ GTU/src/gtu/poi/hssf/ExcelUtil.java                   | 71 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------[m
+ 4 files changed, 96 insertions(+), 21 deletions(-)
+
+[33mcommit 5d1219f0b988f2cf8504cd45d6e44432d05287a7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Nov 28 01:50:44 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java               | 136 [32m+++++++++++++++++++[m[31m------------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java     |  24 [32m++++[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_RowCompareDlg.java | 465 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/db/sqlMaker/DbSqlCreater.java             |   5 [32m+[m[31m-[m
+ 4 files changed, 575 insertions(+), 55 deletions(-)
+
+[33mcommit cef3dc2d88d008e28caa65710fbd79bfb6706ac0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 27 19:07:54 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar(42).xml              | 246 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                |  10 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                |  40 [32m++++++++++[m[31m--[m
+ GTU/src/gtu/_work/ui/VoMapCompareUI.java               | 367 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/swing/util/AutoComboBox.java               |  37 [32m++++++++[m[31m---[m
+ GTU/src/gtu/swing/util/JFileExecuteUtil_ConfigDlg.java |  16 [32m++++[m[31m-[m
+ 6 files changed, 696 insertions(+), 20 deletions(-)
+
+[33mcommit c79a09045b4a4ec666ccb70d7fcb5195992d2faa[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 27 11:35:06 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                | 444 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------------------------------------[m
+ GTU/src/gtu/swing/util/JFileExecuteUtil.java           |  53 [32m++++++++++[m[31m---[m
+ GTU/src/gtu/swing/util/JFileExecuteUtil_ConfigDlg.java | 221 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ 3 files changed, 506 insertions(+), 212 deletions(-)
+
+[33mcommit ab64dfe5b05ba113513d11a7cdcc9a263a393300[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 27 09:00:19 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                | 71 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m------------------[m
+ GTU/src/gtu/properties/PropertiesGroupUtils_ByKey.java | 17 [32m+++++++++++++++[m[31m--[m
+ 2 files changed, 68 insertions(+), 20 deletions(-)
+
+[33mcommit 8978b33c004fdc0703e0ce7b54c4a2eb2cef1714[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Mon Nov 26 22:20:26 2018 +0800
+
+    ok
+
+ "GTU/WebContent/pages/javascript/\345\213\276\351\201\270checkbox_join_to_hidden.html"                    |  144 [32m++[m[31m--[m
+ .../pages/javascript/\346\226\207\345\255\227\345\215\200\345\241\212_textarea_length_check.html"         |   64 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\346\226\207\345\255\227\346\226\271\345\241\212_input_text_blur.html"   |   68 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\350\247\270\347\231\274\344\272\213\344\273\266_triggerEvent.html"      |   20 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\351\201\270\346\223\207_radio_button.html"                              |   66 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/ExecuteOpener_RemarkDlg.java                                                         |  238 [32m+++[m[31m---[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                                                   |   13 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java                                                         | 2176 [32m++++++++++++++++++++++++++[m[31m---------------------------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_UpdateSqlArea.java                                                     |  288 [32m+++[m[31m----[m
+ GTU/src/gtu/_work/ui/SwingTemplateUI.java                                                                 |   12 [32m+[m
+ 10 files changed, 1552 insertions(+), 1537 deletions(-)
+
+[33mcommit f01b4e971feaf5d6a29ac9932fc04d26b072587a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Nov 26 16:17:02 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java | 37 [32m++++++++++++++++++++++++[m[31m-------------[m
+ 1 file changed, 24 insertions(+), 13 deletions(-)
+
+[33mcommit 75f4a3e63e1cfeac5dbe8136a2675779b76d0761[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Nov 26 15:41:56 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar(38).xml              |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                |  71 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------[m
+ GTU/src/gtu/_work/ui/JarFinderUI.java                  |  16 [32m+++++++++++++++[m[31m-[m
+ GTU/src/gtu/collection/ListUtil.java                   |  13 [32m+++++++++++++[m
+ GTU/src/gtu/db/sqlMaker/DbSqlCreater.java              |  14 [32m+++++++++++[m[31m---[m
+ GTU/src/resource/images/ico/icon_maker_online2.url.url |   5 [32m+++++[m
+ GTU/src/resource/images/ico/jar.ico                    | Bin [31m0[m -> [32m15086[m bytes
+ 7 files changed, 106 insertions(+), 15 deletions(-)
+
+[33mcommit 9e80cff424c2e1d1779a18b5d8f502fb293e3fad[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 23 18:17:15 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java           |  45 [32m++++++++++++++++++++++++++++++[m[31m------------[m
+ GTU/src/gtu/_work/ui/ExecuteOpener_RemarkDlg.java | 119 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java           |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java |   7 [32m+++[m[31m----[m
+ 4 files changed, 155 insertions(+), 18 deletions(-)
+
+[33mcommit f6f79dcfe5941bd20faba730a3d38b0d6899e225[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 22 20:38:22 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java          | 60 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m---[m
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java    |  2 [32m++[m
+ GTU/src/gtu/freemarker/FreeMarkerSimpleUtil.java | 45 [32m++++++++++++++++++++++++++++++++++++++++++[m[31m---[m
+ 3 files changed, 101 insertions(+), 6 deletions(-)
+
+[33mcommit 94c896c138afc0bb8b4664609a8cc6014661d91e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 22 09:26:49 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\345\213\276\351\201\270checkbox_join_to_hidden.html"                        | 2 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\346\226\207\345\255\227\345\215\200\345\241\212_textarea_length_check.html" | 2 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\346\226\207\345\255\227\346\226\271\345\241\212_input_text_blur.html"       | 2 [32m+[m[31m-[m
+ "GTU/WebContent/pages/javascript/\350\247\270\347\231\274\344\272\213\344\273\266_triggerEvent.html"          | 6 [32m+++++[m[31m-[m
+ "GTU/WebContent/pages/javascript/\351\201\270\346\223\207_radio_button.html"                                  | 2 [32m+[m[31m-[m
+ 5 files changed, 9 insertions(+), 5 deletions(-)
+
+[33mcommit 69eb4aed61a28c7d6bccfe18252cc660b5cf7a6c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 22 08:48:36 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit 4f31b8ac917688d430a5b4639888c574444ea563[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 22 08:42:42 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java               | 4 [32m++++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java     | 4 [32m++[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_UpdateSqlArea.java | 8 [32m+++++[m[31m---[m
+ GTU/src/gtu/swing/util/HideInSystemTrayHelper.java    | 4 [32m++++[m
+ 4 files changed, 15 insertions(+), 5 deletions(-)
+
+[33mcommit 1913eddab669fcb4e19e4110305f8608931ed873[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Thu Nov 22 02:05:46 2018 +0800
+
+    ok
+
+ "GTU/WebContent/pages/javascript/\344\270\213\346\213\211_dropdown_list.html"                             | 14 [32m+++++++++++[m
+ "GTU/WebContent/pages/javascript/\345\213\276\351\201\270checkbox_join_to_hidden.html"                    | 73 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ .../pages/javascript/\346\226\207\345\255\227\345\215\200\345\241\212_textarea_length_check.html"         | 33 [32m+++++++++++++++++++++++++[m
+ "GTU/WebContent/pages/javascript/\346\226\207\345\255\227\346\226\271\345\241\212_input_text_blur.html"   | 35 [32m++++++++++++++++++++++++++[m
+ "GTU/WebContent/pages/javascript/\350\247\270\347\231\274\344\272\213\344\273\266_triggerEvent.html"      |  7 [32m++++++[m
+ "GTU/WebContent/pages/javascript/\351\201\270\346\223\207_radio_button.html"                              | 34 [32m++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/AVChoicerUI.java                                                                     |  4 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/BrowserHistoryHandlerUI.java                                                         |  4 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/EnglishSearchUI.java                                                                 |  4 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                                                                   |  6 [32m++[m[31m---[m
+ GTU/src/gtu/_work/ui/FacebookVideoDownloader.java                                                         |  4 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                                                   |  8 [32m+++[m[31m---[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java                                                         |  2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_UpdateSqlArea.java                                                     |  2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java                                                             |  4 [32m+[m[31m--[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java                                                                   |  6 [32m++[m[31m---[m
+ GTU/src/gtu/jpg/FileToBmpUtilUI.java                                                                      |  4 [32m+[m[31m--[m
+ GTU/src/gtu/swing/util/HideInSystemTrayHelper.java                                                        |  6 [32m+++[m[31m--[m
+ GTU/src/gtu/swing/util/JFrameRGBColorPanel.java                                                           | 11 [32m+++++[m[31m----[m
+ 19 files changed, 230 insertions(+), 31 deletions(-)
+
+[33mcommit 12b7c383cbb28c02d3704553eafba98d96d0ea99[m
+Merge: 4d91d4d6 5166f588
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 20 15:52:31 2018 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 4d91d4d65d821b92a70f35f36c864588f19c62ef[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 20 15:51:04 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/WebContent/pages/javascript/\344\270\213\346\213\211_dropdown_list.html"                             |   85 [32m++++[m
+ .../pages/javascript/\351\241\257\347\244\272obj\345\220\253\346\234\211\347\232\204function.html"        |   15 [32m+[m
+ GTU/WebContent/pages/js_collection/popupWin/popupWin.css                                                  |  172 [32m+++++++[m
+ GTU/WebContent/pages/js_collection/popupWin/popupWin.js                                                   | 1384 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/WebContent/pages/js_collection/popupWin/popupWin_Example.txt                                          |   31 [32m++[m
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                                                                   |   10 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                                                                   |   11 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java                                                                   |   17 [32m+[m[31m-[m
+ GTU/src/gtu/swing/util/HideInSystemTrayHelper.java                                                        |  167 [32m+++++[m[31m--[m
+ 9 files changed, 1842 insertions(+), 50 deletions(-)
+
+[33mcommit 5166f58861bb69b4f7cd1d929fbf019433b4a53f[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Sun Nov 18 02:32:56 2018 +0800
+
+    ok
+
+ EnglishTester_new/app/src/main/java/com/example/englishtester/EpubReaderEpubActivity.java | 10 [32m+++++[m[31m-----[m
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+[33mcommit 7d64700181794086667b118f257e06639758709d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 16 13:51:02 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/BrowserHistoryHandlerUI.java | 21 [32m+++++++++++++++[m[31m------[m
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+[33mcommit 1c4bd716f8abb142aa8829e8d22c83409dba2904[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 16 10:44:32 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.py | 34 [32m++++++++++++++++++++++++++[m[31m--------[m
+ PythonGtu/gtu/io/fileUtil.py                         | 16 [32m++++++++++++[m[31m----[m
+ PythonGtu/gtu/string/stringUtil.py                   | 10 [32m++++++++++[m
+ 3 files changed, 48 insertions(+), 12 deletions(-)
+
+[33mcommit 7cc77d4fa3e659a78a6ba9a2a98579fa6c1edcab[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 15 23:29:19 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ EnglishTester_new/app/release/app-release.apk          | Bin [31m14698492[m -> [32m14700512[m bytes
+ PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.spec |   4 [32m++[m[31m--[m
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+[33mcommit bf65ec82ec794b9a14e76ddcf9091dd815c16898[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 15 17:39:56 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/RegexReplacer.java                | 45 [32m+++++++++++++++++++++++++++++++++++++++++++[m[31m--[m
+ PythonGtu/gtu/_tkinter/ex/ex7/pyinstaller_exe.bat      |  7 [32m++++++[m[31m-[m
+ PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.py   | 67 [32m++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------[m
+ PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.spec | 51 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ PythonGtu/gtu/_tkinter/ex/ex8/pyinstaller_exe.bat      | 27 [32m+++++++++++++++++++++++++++[m
+ PythonGtu/gtu/_tkinter/ex/ex8/pyinstaller_spec.bat     |  9 [32m+++++++++[m
+ PythonGtu/gtu/_tkinter/util/tkinterUtil.py             | 23 [32m+++++++++++++++++++[m[31m----[m
+ PythonGtu/gtu/buildexe/buildexe_import_scan_001.py     |  2 [32m+[m[31m-[m
+ PythonGtu/gtu/io/fileUtil.py                           |  8 [32m++++++++[m
+ PythonGtu/gtu/reflect/checkSelf.py                     |  5 [32m++++[m[31m-[m
+ 10 files changed, 218 insertions(+), 26 deletions(-)
+
+[33mcommit 573e59d116f7014612e8ad4a2eaa2202b28ff3ff[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Wed Nov 14 23:44:26 2018 +0800
+
+    ok
+
+ PythonGtu/gtu/_tkinter/ex/ex8/janna_rename_ui_001.py | 111 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ PythonGtu/gtu/io/fileUtil.py                         |  18 [32m++++++++++++++++[m[31m--[m
+ 2 files changed, 127 insertions(+), 2 deletions(-)
+
+[33mcommit cb2e8a0b37f99efe82df3f2c963eb008aef50851[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Nov 14 17:41:34 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/BrowserHistoryHandlerUI.java         |   3 [31m--[m
+ GTU/src/gtu/_work/ui/ScheduleBatRunnerUI.java             | 109 [32m+++++++++++++++++++++++++++[m[31m-----------[m
+ GTU/src/gtu/_work/ui/ScheduleBatRunnerUI_SwingAntDlg.java | 296 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/swing/util/SwingActionUtil.java               |   4 [32m++[m
+ PythonGtu/gtu/flask/ex1/flask_test_001.py                 |  11 [32m++++[m
+ "PythonGtu/txt/flask/flask_\346\225\231\345\255\270.txt"  |   9 [32m++++[m
+ 6 files changed, 399 insertions(+), 33 deletions(-)
+
+[33mcommit 3db8bdee35d79549921dcc09ee33ce8060abbefe[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Wed Nov 14 01:19:06 2018 +0800
+
+    ok
+
+ GTU/ant/swing_jar/build_swing_jar(41).xml             | 246 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/AVChoicerUI.java                 |  10 [32m+++[m
+ GTU/src/gtu/_work/ui/FacebookVideoDownloader.java     |  22 [32m++++[m[31m--[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java               |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_CrudDlgUI.java     |   4 [32m++[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI_UpdateSqlArea.java |   4 [32m++[m
+ GTU/src/gtu/_work/ui/ScheduleBatRunnerUI.java         | 411 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/SwingTemplateUI.java             |   9 [32m+[m[31m--[m
+ GTU/src/gtu/jpg/FileToBmpUtilUI.java                  |  10 [32m+++[m
+ 9 files changed, 707 insertions(+), 11 deletions(-)
+
+[33mcommit bf124c87e12b47944c97ba835a5299c5cd2b750c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 13 17:52:33 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java     | 56 [32m++++++++++++++++++++++++++++++[m[31m--------------------------[m
+ GTU/src/gtu/swing/util/JCommonUtil.java     |  3 [32m++[m[31m-[m
+ GTU/src/gtu/swing/util/SwingActionUtil.java | 48 [32m++++++++++++++++++++++++++++++++++++++++++[m[31m------[m
+ 3 files changed, 74 insertions(+), 33 deletions(-)
+
+[33mcommit 1c395c61cfa80ae5f484bd24a0df8e9381de9736[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 13 16:54:00 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java | 86 [32m++++++++++++++++++++++++++++++++++++++++++++++++[m[31m--------------------------------------[m
+ 1 file changed, 48 insertions(+), 38 deletions(-)
+
+[33mcommit bde080bebece33185deb79ffccd4c04a6e4b1cdc[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 13 15:50:43 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar(37).xml              | 22 [32m+++++++++++[m[31m-----------[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java                | 42 [32m++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java          | 11 [32m++++++++[m[31m---[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java                | 15 [32m+++++++++++++++[m
+ GTU/src/gtu/properties/PropertiesGroupUtils_ByKey.java | 11 [32m++++++++++[m[31m-[m
+ GTU/src/gtu/swing/util/JFrameRGBColorPanel.java        | 44 [32m+++++++++++++++++++++++++++++++++++++[m[31m-------[m
+ 6 files changed, 123 insertions(+), 22 deletions(-)
+
+[33mcommit d50c065ba06048a13ca9360d0e0c96c66e4af9ea[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Nov 13 13:34:04 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar(35).xml     |   2 [32m+[m[31m-[m
+ GTU/ant/swing_jar/build_swing_jar(37).xml     |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FastDBQueryUI.java       |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FreemarkerReplaceUI.java |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java       |   6 [32m++++++[m
+ GTU/src/resource/images/ico/cheater.ico       | Bin [31m0[m -> [32m32988[m bytes
+ GTU/src/resource/images/ico/monster.ico       | Bin [31m0[m -> [32m32988[m bytes
+ 7 files changed, 10 insertions(+), 4 deletions(-)
+
+[33mcommit a2161ec15b106406133f491b90e089f89a292218[m
+Author: gtu001@gmail.com <gtu001@gmail.com>
+Date:   Mon Nov 12 20:01:02 2018 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                                                                   |  23 [32m++[m[31m-------[m
+ GTU/src/gtu/_work/ui/ExecuteOpener_restoreBackProcess.java                                                | 142 [32m+++++++++++++++++++++++++++++++++++++++++++[m[31m-----------[m
+ GTU/src/gtu/_work/ui/SwingTemplateUI.java                                                                 |  57 [32m+++++++++++++++++++[m[31m---[m
+ GTU/src/gtu/swing/util/SwingActionUtil.java                                                               |  70 [32m++++++++++++++++++++++++[m[31m---[m
+ GTU/src/gtu/swing/util/SwingActionUtil_Tester.java                                                        |  48 [31m------------------[m
+ ...Tampermonkey \347\266\262\351\240\201\350\207\252\345\213\225\345\214\226\350\205\263\346\234\254.txt" |  21 [32m++++++++[m
+ "GTU/txt/linux/linux_\346\252\224\346\241\210\346\257\224\345\260\215diff.txt"                            |  12 [32m+++++[m
+ GTU/txt/windows/etc/format_fat32.txt                                                                      |   2 [32m+[m
+ 8 files changed, 266 insertions(+), 109 deletions(-)
+
+[33mcommit 319120fb0cc0d1db5836748e898168b3b6d2f6ea[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Nov 12 17:59:41 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java | 89 [32m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------[m
+ 1 file changed, 78 insertions(+), 11 deletions(-)
+
+[33mcommit 46341a8184fa0bcec974542b0649155805b1486a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 9 11:50:51 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                                                 | 29 [32m+++++++++++++++++++++++++[m[31m----[m
+ GTU/src/gtu/properties/PropertiesUtil.java                                              |  4 [32m++[m[31m--[m
+ GTU/src/gtu/properties/PropertiesUtilBeanChinese.java                                   |  8 [32m++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/AppListFilterActivity.java | 27 [32m++++++++++++++++[m[31m-----------[m
+ 4 files changed, 51 insertions(+), 17 deletions(-)
+
+[33mcommit 222711cef98f3fca30c2f7f3b0a890bbb7ed1b64[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Nov 9 00:50:06 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/AppListFilterActivity.java   | 43 [32m+++++++++++++++++++++++++++++++[m[31m------------[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java   |  4 [32m++[m[31m--[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/LayoutViewHelper.java |  7 [32m+++++++[m
+ 3 files changed, 40 insertions(+), 14 deletions(-)
+
+[33mcommit 2a12ecfeedfe5c1616e98c8d5fd3f58f7e1e155e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 8 17:51:56 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/ExecuteOpener.java                    |  38 [32m++++++++++++[m
+ GTU/src/gtu/_work/ui/ExecuteOpener_restoreBackProcess.java | 331 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ GTU/src/gtu/properties/PropertiesUtilBean.java             |  12 [32m++[m[31m--[m
+ GTU/src/gtu/swing/util/JListUtil.java                      |  14 [32m+++++[m
+ 4 files changed, 388 insertions(+), 7 deletions(-)
+
+[33mcommit 0e89b225f2433b73242408c9240d664fb47437ff[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Nov 8 15:25:05 2018 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ EnglishTester_new/app/src/main/java/com/example/englishtester/common/SimpleAdapterDecorator.java |   5 [32m++[m
+ QRCodeMaker/app/src/main/AndroidManifest.xml                                                     |   5 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/AppListFilterActivity.java          | 157 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/MainActivity.java                   |   5 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/YoutubePlayerActivity.java          |   2 [32m+[m[31m-[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/AppListService.java          | 108 [32m+++++++++++++++++++++++++++++++++++++++++++[m
+ QRCodeMaker/app/src/main/java/com/example/gtu001/qrcodemaker/common/SimpleAdapterDecorator.java  |  35 [32m++++++++++++++[m
+ QRCodeMaker/app/src/main/res/menu/activity_main_drawer.xml                                       |   4 [32m++[m
+ 8 files changed, 317 insertions(+), 4 deletions(-)
