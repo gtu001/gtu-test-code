@@ -1,5 +1,6 @@
 package gtu.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Matcher;
@@ -46,12 +47,28 @@ public class StringUtil_ {
     private static class AppendReplacementEscaper {
         String content;
         String result;
+        private static final char[] ESCAPE_ARRY = new char[]{'t', 'b', 'n', 'r', 'f', '\'', '\"', '\\'};
 
         AppendReplacementEscaper(String content) {
             this.content = content;
             result = StringUtils.defaultString(content).toString();
-            result = replaceChar(result, '$');
-            result = replaceChar(result, '/');
+            if (StringUtils.isBlank(result)) {
+                return;
+            }
+            if (result.indexOf('$') != -1) {
+                result = replaceChar(result, '$');
+            }
+            if (result.indexOf('/') != -1) {
+                result = replaceChar(result, '/');
+            }
+            if ("\\".equals(result)) {
+                result = "\\\\";
+            }
+            /*
+            if (result.indexOf('\\') != -1) {
+                result = replaceChar(result, '\\');
+            }
+            */
         }
 
         private String replaceChar(String content, char from) {
@@ -63,10 +80,21 @@ public class StringUtil_ {
             for (int ii = 0; ii < arry.length; ii++) {
                 char a = arry[ii];
                 if (a == from) {
-                    if ((ii - 1) >= 0 && arry[ii - 1] != '\\') {
-                        sb.append("\\" + a);
-                    } else if (ii == 0) {
-                        sb.append("\\" + a);
+                    if (from != '\\') {
+                        if ((ii - 1) >= 0 && arry[ii - 1] != '\\') {
+                            sb.append("\\" + a);
+                        } else if (ii == 0) {
+                            sb.append("\\" + a);
+                        }
+                    } else if (from == '\\') {
+                        if (ii == arry.length - 1) {
+                            sb.append("\\\\");
+                        } else if ((ii + 1) < arry.length) {
+                            char b = arry[ii + 1];
+                            if (!ArrayUtils.contains(ESCAPE_ARRY, b)) {
+                                sb.append("\\\\");
+                            }
+                        }
                     }
                 } else {
                     sb.append(a);

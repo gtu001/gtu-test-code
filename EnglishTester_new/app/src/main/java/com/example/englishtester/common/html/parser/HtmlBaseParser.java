@@ -243,37 +243,48 @@ public abstract class HtmlBaseParser {
         }
 
         String apply(String content, boolean isPure) {
-            StringBuffer sb = new StringBuffer();
-            Matcher mth = ptn.matcher(content);
-            while (mth.find()) {
-                String size = mth.group(1);
-                String text = mth.group(2);
-                String tmpVal = "";
-                if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(text)) {
-                    tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(text) + "}}" + "";//NEW_LINE
-                    if (isPure) {
-                        tmpVal = StringUtil_.appendReplacementEscape(text);
+            String beforeVal = "";
+            String tmpVal = "";
+            try {
+                StringBuffer sb = new StringBuffer();
+                Matcher mth = ptn.matcher(content);
+                while (mth.find()) {
+                    String size = mth.group(1);
+                    beforeVal = mth.group(2);
+                    tmpVal = "";
+                    if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(beforeVal)) {
+                        tmpVal = "{{font size:" + size + ",text:" + StringUtil_.appendReplacementEscape(beforeVal) + "}}" + "";//NEW_LINE
+                        if (isPure) {
+                            tmpVal = StringUtil_.appendReplacementEscape(beforeVal);
+                        }
                     }
+                    mth.appendReplacement(sb, tmpVal);
                 }
-                mth.appendReplacement(sb, tmpVal);
+                mth.appendTail(sb);
+                return sb.toString();
+            } catch (Exception ex) {
+                throw new RuntimeException("FontSizeIndicateEnum Failed : " + beforeVal + " <-> " + tmpVal + " , ERR : " + ex.getMessage(), ex);
             }
-            mth.appendTail(sb);
-            return sb.toString();
         }
     }
 
     protected String _step1_fontSize_Indicate(String content, boolean isPure) {
-        Pattern ptn = Pattern.compile("\\<span(?:.|\n)*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
-        Matcher mth = ptn.matcher(content);
-        StringBuffer sb = new StringBuffer();
-        while (mth.find()) {
-            String spanContent = mth.group();
-            spanContent = HtmlBaseParser.FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
-            spanContent = StringUtil_.appendReplacementEscape(spanContent);
-            mth.appendReplacement(sb, spanContent);
+        Matcher mth = null;
+        try {
+            Pattern ptn = Pattern.compile("\\<span(?:.|\n)*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
+            mth = ptn.matcher(content);
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                String spanContent = mth.group();
+                spanContent = HtmlBaseParser.FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
+                spanContent = StringUtil_.appendReplacementEscape(spanContent);
+                mth.appendReplacement(sb, spanContent);
+            }
+            mth.appendTail(sb);
+            return sb.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("_step1_fontSize_Indicate Group : " + mth.group() + " , ERR : " + ex.getMessage(), ex);
         }
-        mth.appendTail(sb);
-        return sb.toString();
     }
 
     protected String _step4_fontSize_Indicate_4PTag(String content, boolean isPure) {

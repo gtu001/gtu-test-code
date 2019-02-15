@@ -15,14 +15,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class StringUtil_ {
 
     public static void main(String[] args) {
-        StringUtil_ test = new StringUtil_();
-
-        halfCharToFullChar();
+        StringBuffer sb = new StringBuffer();
+        Pattern ptn = Pattern.compile("\\<span(?:.|\\n)*?font\\-size\\:([\\d\\.]+)pt\\;(?:.|\\n)*?\\>((?:.|\\n)*?)\\<\\/span\\>");
+        Matcher mth = ptn.matcher("<span\n" + "    lang=EN-US style='mso-bidi-font-size:12.0pt;font-family:細明體;mso-bidi-font-family:\n" + "    細明體;mso-font-kerning:0pt'>\\3333e\n333\\</span>");
+        while (mth.find()) {
+            String text1 = mth.group(1);
+            String text2 = mth.group(2);
+            System.out.println("1>>> " + text1);
+            System.out.println("2>>> " + text2);
+            mth.appendReplacement(sb, appendReplacementEscape(text2));
+        }
+        mth.appendTail(sb);
+        System.out.println(">>>> " + sb);
         System.out.println("done...");
     }
 
@@ -632,12 +642,28 @@ public class StringUtil_ {
     private static class AppendReplacementEscaper {
         String content;
         String result;
+        private static final char[] ESCAPE_ARRY = new char[]{'t', 'b', 'n', 'r', 'f', '\'', '\"', '\\'};
 
         AppendReplacementEscaper(String content) {
             this.content = content;
             result = StringUtils.defaultString(content).toString();
-            result = replaceChar(result, '$');
-            result = replaceChar(result, '/');
+            if (StringUtils.isBlank(result)) {
+                return;
+            }
+            if (result.indexOf('$') != -1) {
+                result = replaceChar(result, '$');
+            }
+            if (result.indexOf('/') != -1) {
+                result = replaceChar(result, '/');
+            }
+            if ("\\".equals(result)) {
+                result = "\\\\";
+            }
+            /*
+            if (result.indexOf('\\') != -1) {
+                result = replaceChar(result, '\\');
+            }
+            */
         }
 
         private String replaceChar(String content, char from) {
@@ -649,10 +675,21 @@ public class StringUtil_ {
             for (int ii = 0; ii < arry.length; ii++) {
                 char a = arry[ii];
                 if (a == from) {
-                    if ((ii - 1) >= 0 && arry[ii - 1] != '\\') {
-                        sb.append("\\" + a);
-                    } else if (ii == 0) {
-                        sb.append("\\" + a);
+                    if (from != '\\') {
+                        if ((ii - 1) >= 0 && arry[ii - 1] != '\\') {
+                            sb.append("\\" + a);
+                        } else if (ii == 0) {
+                            sb.append("\\" + a);
+                        }
+                    } else if (from == '\\') {
+                        if (ii == arry.length - 1) {
+                            sb.append("\\\\");
+                        } else if ((ii + 1) < arry.length) {
+                            char b = arry[ii + 1];
+                            if (!ArrayUtils.contains(ESCAPE_ARRY, b)) {
+                                sb.append("\\\\");
+                            }
+                        }
                     }
                 } else {
                     sb.append(a);
