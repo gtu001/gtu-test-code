@@ -29,6 +29,7 @@ import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.ReaderCommonHelper;
+import com.example.englishtester.common.SimpleDialogHelper;
 import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
@@ -36,6 +37,7 @@ import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,11 +48,14 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -169,6 +174,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             listItem = new ArrayList<>();
             for (DropboxUtilV2.DropboxUtilV2_DropboxFile f : fileLst) {
                 Map<String, Object> map = new HashMap<String, Object>();
+                map.put("ItemImage", null);
                 map.put("ItemTitle", f.getName());
                 map.put("ItemDetail", DateFormatUtils.format(f.getClientModify(), "yyyy/MM/dd HH:mm:ss"));
                 map.put("ItemDetail2", transformer.transform(f.getName()));
@@ -186,6 +192,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             listItem = new ArrayList<>();
             for (DropboxHtmlDAO.DropboxHtml vo : lst) {
                 Map<String, Object> map = new HashMap<String, Object>();
+                map.put("ItemImage", null);
                 map.put("ItemTitle", vo.fileName);
                 map.put("ItemDetail", DateFormatUtils.format(vo.uploadDate, "yyyy/MM/dd HH:mm:ss"));
                 map.put("ItemDetail2", transformer.transform(vo.fileName));
@@ -198,8 +205,8 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         private void initList() {
             aryAdapter = new SimpleAdapter(context, listItem,// 資料來源
                     R.layout.subview_dropboxlist, //
-                    new String[]{"ItemTitle", "ItemDetail", "ItemDetail2", "ItemDetailRight"}, //
-                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetail2, R.id.ItemDetailRight}//
+                    new String[]{"ItemImage", "ItemTitle", "ItemDetail", "ItemDetail2", "ItemDetailRight"}, //
+                    new int[]{R.id.ItemImage, R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetail2, R.id.ItemDetailRight}//
             );
             listView.setAdapter(aryAdapter);
         }
@@ -251,6 +258,11 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             name = StringUtils.defaultString(name).replaceAll("\\.(txt|htm|html)$", "");
             return name;
         }
+
+        public String getHtmlFolder(Map<String, Object> map) {
+            String fullPath = (String) map.get("fullPath");
+            return fullPath.replaceAll("\\.(htm|html)", ".files");
+        }
     }
 
     private void initList() {
@@ -282,42 +294,22 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> l, View v, int position, long id) {
         final Map<String, Object> map = dropboxListItemLoader.listItem.get(position);
-
-        //返回
-        Intent intent = new Intent();
-        String fileName = (String) map.get("ItemTitle");
-        String fullPath = (String) map.get("fullPath");
-        intent.putExtra(BUNDLE_FILE, fullPath);
-        intent.putExtra(BUNDLE_FILENAME, fileName);
-        this.setResult(RESULT_OK, intent);
-        this.finish();
+        Log.v(TAG, "ItemImage : " + map.get("ItemImage"));
+        if (map.get("ItemImage") != null) {
+            map.put("ItemImage", null);
+            Log.v(TAG, "No check !!!");
+        } else {
+            map.put("ItemImage", R.drawable.icon_check);
+            Log.v(TAG, "checked !!!");
+        }
+        dropboxListItemLoader.aryAdapter.notifyDataSetChanged();
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         final Map<String, Object> map = dropboxListItemLoader.listItem.get(position);
 
-        class MyClz {
-            public void showConfirm(String message, DialogInterface.OnClickListener confirmListener) {
-                new AlertDialog.Builder(DropboxHtmlListActivity.this)//
-                        .setMessage(message)
-                        .setPositiveButton("確定", confirmListener)
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .show();
-            }
-
-            public String getHtmlFolder(Map<String, Object> map) {
-                String fullPath = (String) map.get("fullPath");
-                return fullPath.replaceAll("\\.(htm|html)", ".files");
-            }
-        }
-        final MyClz x = new MyClz();
-
-        String[] items = new String[]{"刪除"};
+        String[] items = new String[]{"開啟檔案", "刪除"};
 
         new AlertDialog.Builder(DropboxHtmlListActivity.this)//
                 .setTitle("操作清單")
@@ -326,10 +318,13 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                x.showConfirm("是否確認刪除", new DialogInterface.OnClickListener() {
+                                DropboxHtmlListActivityStarter.goBack(map, DropboxHtmlListActivity.this);
+                                break;
+                            case 1:
+                                SimpleDialogHelper.showConfirm("", "是否確認刪除", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        String htmlFolderPath = x.getHtmlFolder(map);
+                                        String htmlFolderPath = dropboxListItemLoader.getHtmlFolder(map);
                                         String fullPath = (String) map.get("fullPath");
 
                                         int existsCount = 0;
@@ -347,7 +342,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
 
                                         Toast.makeText(DropboxHtmlListActivity.this, String.format("路徑數 : %d , 刪除數 : %d", existsCount, deleteCount), Toast.LENGTH_SHORT).show();
                                     }
-                                });
+                                }, DropboxHtmlListActivity.this);
                                 break;
                         }
                     }
@@ -356,7 +351,85 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         return true;
     }
 
+    private void deleteAllCheckedFiles() {
+        final Handler handler = new Handler();
+
+        final List<Pair<String, String>> delLst = new ArrayList<>();
+        for (Map<String, Object> map : dropboxListItemLoader.listItem) {
+            if (map.get("ItemImage") != null) {
+                String htmlFolderPath = dropboxListItemLoader.getHtmlFolder(map);
+                String fullPath = (String) map.get("fullPath");
+                delLst.add(Pair.of(htmlFolderPath, fullPath));
+            }
+        }
+
+        if (delLst.isEmpty()) {
+            Toast.makeText(this, "未勾選刪除檔案!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final AtomicBoolean isStop = new AtomicBoolean(false);
+
+        final ProgressDialog dialog02 = new ProgressDialog(DropboxHtmlListActivity.this);
+        dialog02.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog02.setMessage("刪除中...");
+        dialog02.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isStop.set(true);
+            }
+        });
+        dialog02.setCancelable(true);
+        dialog02.setMax(delLst.size());
+        dialog02.show();
+
+        Thread deleteThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+            @Override
+            public void run() {
+                final AtomicInteger existsCount = new AtomicInteger(0);
+                final AtomicInteger deleteCount = new AtomicInteger(0);
+
+                for (Pair<String, String> p : delLst) {
+                    if (isStop.get()) {
+                        break;
+                    }
+
+                    if (dropboxFileLoadService.isPathExists(p.getLeft())) {
+                        existsCount.addAndGet(1);
+                        deleteCount.addAndGet(dropboxFileLoadService.deletePath(p.getLeft()) ? 1 : 0);
+                    }
+
+                    if (dropboxFileLoadService.isPathExists(p.getRight())) {
+                        existsCount.addAndGet(1);
+                        deleteCount.addAndGet(dropboxFileLoadService.deletePath(p.getRight()) ? 1 : 0);
+                    }
+
+                    dialog02.incrementProgressBy(1);
+                }
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog02.dismiss();
+                        SimpleDialogHelper.showMessage("刪除結果", String.format("路徑數 : %d , 刪除數 : %d", existsCount.get(), deleteCount.get()), DropboxHtmlListActivity.this);
+                    }
+                });
+            }
+        }, "deleteThread..");
+        deleteThread.start();
+    }
+
     public static class DropboxHtmlListActivityStarter {
+        public static void goBack(Map<String, Object> map, Activity activity) {
+            Intent intent = new Intent();
+            String fileName = (String) map.get("ItemTitle");
+            String fullPath = (String) map.get("fullPath");
+            intent.putExtra(BUNDLE_FILE, fullPath);
+            intent.putExtra(BUNDLE_FILENAME, fileName);
+            activity.setResult(RESULT_OK, intent);
+            activity.finish();
+        }
+
         public static String getFile(Intent data) {
             return data.getExtras().getString(BUNDLE_FILE);
         }
@@ -381,6 +454,11 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         RECENT_SEARCH("重新讀取Dropbox", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(DropboxHtmlListActivity activity, Intent intent, Bundle bundle) {
                 activity.dropboxListItemLoader.initListFromDropbox();
+            }
+        }, //
+        DELETE_ALL_CHECKED("刪除勾選檔案", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(DropboxHtmlListActivity activity, Intent intent, Bundle bundle) {
+                activity.deleteAllCheckedFiles();
             }
         }, //
         ;
