@@ -1,0 +1,7 @@
+{date}_{channel}_{title}_{res}.mp4
+
+Twitch Leecher
+
+https://github.com/Franiac/TwitchLeecher/releases
+
+https://www.twitch.tv/videos/375049343
