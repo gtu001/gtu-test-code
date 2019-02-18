@@ -2,6 +2,7 @@ package gtu.youtube;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +31,7 @@ public class DownloadProgressHandler {
     private InputStream instream;
     private OutputStream outstream;
     private List<DownloadProgress> processLst = new ArrayList<DownloadProgress>();
+    private long skipLength = 0;
 
     public static class DownloadProgress {
         long currentLength;
@@ -176,7 +178,7 @@ public class DownloadProgressHandler {
         return 3;
     }
 
-    public DownloadProgressHandler(long totalLength, InputStream instream, OutputStream outstream, Integer percentScale) throws IOException {
+    public DownloadProgressHandler(long totalLength, InputStream instream, OutputStream outstream, Integer percentScale, long skipLength) throws IOException {
         this.totalLength = totalLength;
         this.totalLengthDescription = FileUtil.getSizeDescription(totalLength);
 
@@ -184,6 +186,8 @@ public class DownloadProgressHandler {
         this.outstream = outstream;
 
         this.processLst = new ArrayList<DownloadProgress>();
+
+        this.skipLength = skipLength;// 續傳
 
         // 計算percent敏銳度
         if (percentScale == null) {
@@ -221,17 +225,22 @@ public class DownloadProgressHandler {
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
 
-            long currentTotal = 0;
+            long currentTotal = this.skipLength;
             int count = -1;
 
             this.startTime = System.currentTimeMillis();
+
+            if (skipLength > 0) {
+                instream.skip(skipLength);
+            }
+            System.out.println("跳過長度(stream skip) : " + skipLength);
 
             while ((count = instream.read(buffer)) != -1) {
                 // 目前進行總長度
                 currentTotal += count;
                 this.setCurrentTotal(currentTotal);
 
-                outstream.write(buffer, 0, count);
+                (outstream).write(buffer, 0, count);
             }
 
             outstream.flush();

@@ -156,19 +156,21 @@ public class FacebookVideoDownloader extends JFrame {
                             // "", vo });
                             Vector vec = downloadListModel.getDataVector();
 
+                            updateStatusToTable(description);
+
                             // 更新下載狀態
-                            for (int row = 0; row < downloadListModel.getRowCount(); row++) {
-                                if (downloadListModel.getValueAt(row, 5) == DownloadGOGO.this.vo) {
-                                    downloadListModel.setValueAt(description, row, 4);
-                                }
-                            }
 
                             if (proc.isComplete()) {
-                                // 完成顯示訊息
-                                showCompleteMessage();
+                                if (DownloadGOGO.this.vo.downloadToFile.length() == proc.getTotalLength()) {
+                                    // 完成顯示訊息
+                                    showCompleteMessage();
 
-                                // 完成下載要清除
-                                downloadLog.processCompleteLog(DownloadGOGO.this.vo);
+                                    // 完成下載要清除
+                                    downloadLog.processCompleteLog(DownloadGOGO.this.vo);
+                                } else {
+
+                                    updateStatusToTable(String.format("失敗(%d/%d)", DownloadGOGO.this.vo.downloadToFile.length(), proc.getTotalLength()));
+                                }
                             }
                         }
 
@@ -194,9 +196,31 @@ public class FacebookVideoDownloader extends JFrame {
                             }
                         }
                     });
-                    downloader.processDownload(this.vo.orign, this.vo.downloadToFile.getParentFile(), null);
+
+                    if (this.vo.orign != null) {
+                        // 一般下載
+                        downloader.processDownload(this.vo.orign, this.vo.downloadToFile.getParentFile(), null);
+                    } else {
+                        // 續傳下載
+                        downloader.processDownload(this.vo.url, this.vo.downloadToFile, null);
+                    }
                 } catch (Throwable e) {
                     JCommonUtil.handleException(this.vo.getFileName() + "失敗!", e);
+
+                    // 更新下載失敗狀態
+                    this.updateStatusToTable("失敗!");
+                }
+            }
+
+            private void updateStatusToTable(String description) {
+                JTableUtil jTab = JTableUtil.newInstance(downloadListTable);
+                DefaultTableModel model = (DefaultTableModel) downloadListTable.getModel();
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    int realRow = JTableUtil.getRealRowPos(row, downloadListTable);
+                    final VideoUrlConfigZ vo2 = (VideoUrlConfigZ) jTab.getModel().getValueAt(realRow, DownloadTableConfig.VO.ordinal());
+                    if (vo2 == this.vo) {
+                        downloadListTable.setValueAt(description, realRow, DownloadTableConfig.進度.ordinal());
+                    }
                 }
             }
         }
@@ -455,6 +479,35 @@ public class FacebookVideoDownloader extends JFrame {
         });
         panel_11.add(cleanDownloadListBtn);
 
+        JButton manualContinueBtn = new JButton("續傳檔案");
+        manualContinueBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    File aviFile = JCommonUtil._jFileChooser_selectFileOnly();
+                    if (aviFile == null || !aviFile.exists()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("選擇檔案失敗!");
+                        return;
+                    }
+
+                    String videoUrl = JCommonUtil._jOptionPane_showInputDialog("請輸入下載URL(明確串流URL)");
+                    if (StringUtils.isBlank(videoUrl)) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("不可為空!");
+                        return;
+                    }
+
+                    File downloadToFile = aviFile;
+                    String url = StringUtils.trimToEmpty(videoUrl);
+
+                    VideoUrlConfigZ vo = new VideoUrlConfigZ(downloadToFile, url);
+
+                    appendToDownloadBar4Continue(vo);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_11.add(manualContinueBtn);
+
         JPanel panel_12 = new JPanel();
         panel_10.add(panel_12, BorderLayout.WEST);
 
@@ -484,7 +537,7 @@ public class FacebookVideoDownloader extends JFrame {
                         final VideoUrlConfigZ vo = (VideoUrlConfigZ) jTab.getModel().getValueAt(row, DownloadTableConfig.VO.ordinal());
 
                         JPopupMenuUtil.newInstance(downloadListTable)//
-                                .addJMenuItem("重新下載", new ActionListener() {
+                                .addJMenuItem("重新下載/繼續下載", new ActionListener() {
 
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
@@ -535,7 +588,8 @@ public class FacebookVideoDownloader extends JFrame {
         URL(20f), //
         大小(8f), //
         進度(7f), //
-        VO(0f),//
+        VO(0f), //
+        來源網址(0f),//
         ;
 
         final float width;
@@ -608,7 +662,8 @@ public class FacebookVideoDownloader extends JFrame {
                         @Override
                         public int compare(VideoUrlConfig o1, VideoUrlConfig o2) {
                             int result = FileUtil.getSizeDescriptionCompare(o1.getFizeSize(), o2.getFizeSize()) * -1;
-                            //System.out.println("# compare : " + result + "\t" + o1.getFizeSize() + "\t" + o2.getFizeSize());
+                            // System.out.println("# compare : " + result + "\t"
+                            // + o1.getFizeSize() + "\t" + o2.getFizeSize());
                             return result;
                         }
                     });
@@ -663,6 +718,36 @@ public class FacebookVideoDownloader extends JFrame {
         }
     }
 
+    private void appendToDownloadBar4Continue(VideoUrlConfigZ vo2) {
+        if (downloadPool == null || downloadPool.getState() == Thread.State.TERMINATED) {
+            downloadPool = new DownloadThreadPoolWatcher();
+            downloadPool.start();
+        }
+        try {
+            long length = Porn91Downloader.getContentLength(Porn91Downloader.DEFAULT_USER_AGENT, vo2.url);
+            vo2.fileSize = String.valueOf(length);
+            vo2.length = length;
+            vo2.fileName = vo2.downloadToFile.getName();
+
+            // add to pool
+            downloadPool.downloadLst.add(vo2);
+
+            // append jtable
+            {
+                int serail = downloadListModel.getRowCount() + 1;
+                Vector vec = getDownloadRow(serail, vo2);
+                downloadListModel.addRow(vec);
+            }
+
+            // 每次下載紀錄
+            downloadLog.appendDownloadVO(vo2);
+
+            sysutil.displayMessage("開始下載", vo2.getFileName(), MessageType.INFO);
+        } catch (Throwable ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     private void appendToDownloadBar(VideoUrlConfig vo, boolean forceDownload, boolean throwEx) {
         if (downloadPool == null || downloadPool.getState() == Thread.State.TERMINATED) {
             downloadPool = new DownloadThreadPoolWatcher();
@@ -682,7 +767,7 @@ public class FacebookVideoDownloader extends JFrame {
                 }
             }
             for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
-                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
+                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, DownloadTableConfig.VO.ordinal());
                 if (StringUtils.equals(vo2.getUrl(), vo.getUrl())) {
                     findOk2 = true;
                     break;
@@ -708,14 +793,10 @@ public class FacebookVideoDownloader extends JFrame {
 
             // append jtable
             {
-                int serail = downloadListModel.getRowCount() + 1;
-                Vector vec = new Vector();
-                vec.add(serail);
-                vec.add(vo.getFileName());
-                vec.add(vo.getUrl());
-                vec.add(vo.getFizeSize());
-                vec.add("");
-                vec.add(vo2);
+                int serial = downloadListModel.getRowCount() + 1;
+
+                Vector vec = getDownloadRow(serial, vo2);
+
                 downloadListModel.addRow(vec);
             }
 
@@ -730,6 +811,18 @@ public class FacebookVideoDownloader extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案已正在下載!");
             }
         }
+    }
+
+    private Vector getDownloadRow(int serial, VideoUrlConfigZ vo2) {
+        Vector vec = new Vector();
+        vec.add(serial);
+        vec.add(vo2.getFileName());
+        vec.add(vo2.getUrl());
+        vec.add(FileUtil.getSizeDescription(vo2.getLength()));
+        vec.add("");
+        vec.add(vo2);
+        vec.add(vo2.getHtmlUrl());
+        return vec;
     }
 
     private void clearUrlConfigBtnAction() {
@@ -758,8 +851,8 @@ public class FacebookVideoDownloader extends JFrame {
             VideoUrlConfig tempVo = null;
             JButton btn = new JButton();
             for (int ii = 0; ii < model.getRowCount(); ii++) {
-                final VideoUrlConfig vo = (VideoUrlConfig) model.getValueAt(ii, 4);
-                final JButton btn2 = (JButton) model.getValueAt(ii, 3);
+                final VideoUrlConfig vo = (VideoUrlConfig) model.getValueAt(ii, DownloadTableConfig.進度.ordinal());
+                final JButton btn2 = (JButton) model.getValueAt(ii, DownloadTableConfig.大小.ordinal());
                 if (tempVo != null) {
                     maxSize = tempVo.getLength();
                 }
@@ -823,13 +916,15 @@ public class FacebookVideoDownloader extends JFrame {
             // "順序", "檔名", "URL", "大小", "進度", "VO" });
             StringBuffer sb = new StringBuffer();
             for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
-                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, 5);
-                String percent = (String) downloadListModel.getValueAt(ii, 4);
+                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, DownloadTableConfig.VO.ordinal());
+                String percent = (String) downloadListModel.getValueAt(ii, DownloadTableConfig.進度.ordinal());
                 sb.append( //
                         vo2.getOrign().getOrignConfig().getOrignUrl() + "\t" + //
                                 vo2.getFileName() + "\t" + //
                                 vo2.getFileSize() + "\t" + //
-                                percent + "\n"//
+                                percent + "\t" + //
+                                vo2.getHtmlUrl() + "\n" + //
+                                ""//
                 );
             }
             String logFileName = this.getClass().getSimpleName() + "_crash_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".log";
@@ -860,7 +955,7 @@ public class FacebookVideoDownloader extends JFrame {
         try {
             Pattern ptn = Pattern.compile("100\\%.*");
             for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
-                String percent = (String) downloadListModel.getValueAt(ii, 4);
+                String percent = (String) downloadListModel.getValueAt(ii, DownloadTableConfig.進度.ordinal());
                 if (ptn.matcher(percent).find()) {
                     downloadListModel.removeRow(ii);
                     ii--;
@@ -908,7 +1003,11 @@ public class FacebookVideoDownloader extends JFrame {
         private void appendDownloadVO(VideoUrlConfigZ vo) {
             config = new PropertiesUtilBean(logFile);
             String key = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + "_" + vo.getFileName();
-            String valueUrl = vo.getOrign().getOrignConfig().getOrignUrl();
+            String valueUrl = vo.getUrl();
+            try {
+                valueUrl = vo.getOrign().getOrignConfig().getOrignUrl();
+            } catch (Exception ex) {
+            }
             config.getConfigProp().setProperty(key, valueUrl);
             config.store();
         }
@@ -918,7 +1017,12 @@ public class FacebookVideoDownloader extends JFrame {
             for (Enumeration enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String url = config.getConfigProp().getProperty(key);
-                if (StringUtils.equals(vo.getOrign().getOrignConfig().getOrignUrl(), url)) {
+                boolean isEq = StringUtils.equals(vo.getUrl(), url);
+                try {
+                    isEq = StringUtils.equals(vo.getOrign().getOrignConfig().getOrignUrl(), url);
+                } catch (Exception ex) {
+                }
+                if (isEq) {
                     config.getConfigProp().remove(key);
                     config.store();
                 }
@@ -965,6 +1069,7 @@ public class FacebookVideoDownloader extends JFrame {
         String title;
         String url;
         long length = 0;
+        String htmlUrl;
 
         VideoUrlConfigZ(VideoUrlConfig orign) {
             this.orign = orign;
@@ -973,6 +1078,13 @@ public class FacebookVideoDownloader extends JFrame {
             this.title = orign.getTitle();
             this.url = orign.getUrl();
             this.length = orign.getLength();
+            this.htmlUrl = orign.getOrignConfig().getHtmlUrl();
+        }
+
+        public VideoUrlConfigZ(File downloadToFile, String url) {
+            super();
+            this.downloadToFile = downloadToFile;
+            this.url = url;
         }
 
         public VideoUrlConfig getOrign() {
@@ -1001,6 +1113,10 @@ public class FacebookVideoDownloader extends JFrame {
 
         public long getLength() {
             return length;
+        }
+
+        public String getHtmlUrl() {
+            return htmlUrl;
         }
     }
 }

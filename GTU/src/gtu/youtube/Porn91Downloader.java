@@ -1,7 +1,6 @@
 package gtu.youtube;
 
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,7 +59,7 @@ public class Porn91Downloader {
 
     private static final DecimalFormat commaFormatNoPrecision = new DecimalFormat("###,###");
     private static final String DEFAULT_ENCODING = "UTF-8";
-    private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
+    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
 
     /**
      * 下載進度調處理
@@ -73,9 +72,10 @@ public class Porn91Downloader {
 
     public static void main(String[] args) throws Throwable {
         Porn91Downloader p = new Porn91Downloader();
-        String url = "https://xvideos-im-24e6ee00-31316667-mp4.s.loris.llnwd.net/videos/mp4/4/2/d/xvideos.com_42d3bf243bc1136883a43d1ddcf19676.mp4?e=1524945829&ri=1024&rs=85&h=3258734aeecfc622cfa30c9c994aefb4";
-        File testMp4 = new File(FileUtil.DESKTOP_DIR, "xxxxxx.mp4");
+        String url = "https://cv.phncdn.com/videos/201712/16/145725732/720P_1500K_145725732.mp4?tspvPrbGK4RKHpQlm9WcrmDaXMPohjyzrnP5tRQNSM6FY09_qkzhLqhjsFyEJv3n0IpfTrvcBqub4BBpzepkqa85aQmZFlPNZY93qR7yXSkw3lqTcD2nrTiDI0zhc2kUeWcR3_eOfgaC2Xk8wlJTDQVcbuTJ4paKjM3KHunZjPW-1Qmv40gxDcJqp2L0qLZA6Zv6OLHuhMM";
+        File testMp4 = new File(FileUtil.DESKTOP_DIR, "Chinese Girl is Playing with her Teddy Bear Part2 - Pornhub.com_720P_1500K_145725732.mp4");
         long length = p.getContentLength(DEFAULT_USER_AGENT, url);
+        p.downloadWithHttpClient(DEFAULT_USER_AGENT, url, testMp4, null);
         SystemZ.out.println("length = " + length);
         SystemZ.out.println("done...");
     }
@@ -123,7 +123,7 @@ public class Porn91Downloader {
 
     public List<VideoUrlConfig> processVideoLst(String videoUrl) {
         PornVideoUrlDetection p2 = new PornVideoUrlDetection(videoUrl);
-        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain();
+        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain(videoUrl);
         String title = this.getClass().getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
         List<VideoUrlConfig> videoLst = this.getVideoList(title, videoOrignLst);
         return videoLst;
@@ -144,12 +144,16 @@ public class Porn91Downloader {
         String title = getTitleForFileName(content);
 
         PornVideoUrlDetection p2 = new PornVideoUrlDetection(content);
-        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain();
+        List<SingleVideoUrlConfig> videoOrignLst = p2.processMain(url);
 
         List<VideoUrlConfig> videoLst = this.getVideoList(title, videoOrignLst);
         content = String.format("<!-- Detect URL :%s -->\n\n", url) + content;
         this.debugSaveHtml(title, content, videoLst.isEmpty());
         return videoLst;
+    }
+
+    public void processDownload(String videoUrl, File saveVideoFile, Integer percentScale) throws Throwable {
+        downloadWithHttpClient(DEFAULT_USER_AGENT, videoUrl, saveVideoFile, percentScale);
     }
 
     public void processDownload(VideoUrlConfig v, File destDir, Integer percentScale) throws Throwable {
@@ -430,15 +434,19 @@ public class Porn91Downloader {
             }
             InputStream instream2 = entity2.getContent();
             SystemZ.out.println("Writing " + commaFormatNoPrecision.format(length) + " bytes to " + outputfile);
-            if (outputfile.exists()) {
-                outputfile.delete();
-            }
-            
+
             String fixFilePath = outputfile.getParentFile().toString() + File.separator + FileUtil.escapeFilename_replaceToFullChar(outputfile.getName(), false);
-            BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(fixFilePath));
+            File $fixFilePath = new File(fixFilePath);
+
+            long skipLength = $fixFilePath.length();
+            boolean isAppend = skipLength > 0;
+
+            SystemZ.out.println("續傳(continue download) : " + isAppend + " , " + (isAppend ? "是" : "否"));
             SystemZ.out.println("outputfile " + outputfile);
 
-            DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale);
+            FileOutputStream outstream = new FileOutputStream($fixFilePath, isAppend);// BufferedOutputStream
+
+            DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale, skipLength);
             if (progressPerformd != null) {
                 downloadHandler.setProgressPerformd(progressPerformd);
             }

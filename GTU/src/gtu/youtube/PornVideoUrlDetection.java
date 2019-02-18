@@ -39,19 +39,21 @@ public class PornVideoUrlDetection {
             filenamePtn = Pattern.compile("\\/((.*)\\.(" + fileExtenstion + "))", Pattern.CASE_INSENSITIVE);
         }
     }
-    
+
     private static Logger logger = JdkLoggerUtil.getLogger(PornVideoUrlDetection.class, true);
     static {
-//        JdkLoggerUtil.setupRootLogLevel(Level.FINE);
+        // JdkLoggerUtil.setupRootLogLevel(Level.FINE);
     }
 
     PatternConfig ptn;
     String htmlContent;
+    String htmlUrl;
 
     public PornVideoUrlDetection(String fileExtension, String htmlContent) {
         ptn = new PatternConfig(fileExtension);
         this.htmlContent = htmlContent;
     }
+
     public PornVideoUrlDetection(String htmlContent) {
         ptn = new PatternConfig(FILE_EXTENSTION_VIDEO_PATTERN);
         this.htmlContent = htmlContent;
@@ -59,8 +61,9 @@ public class PornVideoUrlDetection {
 
     public static class SingleVideoUrlConfig {
         List<String> possibleLst = new ArrayList<String>();
-        String orignUrl;
+        String orignUrl;// 影片網址(已分析)
         String finalFileName;
+        String htmlUrl;// 影片HTML網址(粗略未分析)
 
         public List<String> getPossibleLst() {
             return possibleLst;
@@ -72,6 +75,10 @@ public class PornVideoUrlDetection {
 
         public String getFinalFileName() {
             return finalFileName;
+        }
+
+        public String getHtmlUrl() {
+            return htmlUrl;
         }
 
         public SingleVideoUrlConfig() {
@@ -151,6 +158,7 @@ public class PornVideoUrlDetection {
     public SingleVideoUrlConfig transforToSingleVideoUrl(String singleUrl) {
         SingleVideoUrlConfig conf = new SingleVideoUrlConfig();
 
+        conf.htmlUrl = this.htmlUrl;
         conf.orignUrl = this.fixUrlIfNeed(singleUrl);
         conf.possibleLst = this.getPossibableSubName(singleUrl);
 
@@ -184,22 +192,23 @@ public class PornVideoUrlDetection {
         String content = p.getVideoInfo(URI.create(url), "", "", "");
 
         PornVideoUrlDetection p2 = new PornVideoUrlDetection(FILE_EXTENSTION_VIDEO_PATTERN, content);
-        p2.processMain();
+        p2.processMain(url);
         System.out.println("done...");
     }
-    
-    public List<SingleVideoUrlConfig> processMain(){
+
+    public List<SingleVideoUrlConfig> processMain(String htmlContentURL) {
         List<String> urlLst = filterVideoURL(htmlContent);
         List<SingleVideoUrlConfig> videoLst = new ArrayList<SingleVideoUrlConfig>();
         for (String singleUrl : urlLst) {
             SingleVideoUrlConfig singleVO = null;
             try {
                 singleVO = transforToSingleVideoUrl(singleUrl);
-            }catch(Exception ex) {
+                singleVO.htmlUrl = htmlContentURL;
+            } catch (Exception ex) {
                 logger.severe("無法取得singleVO : " + ex.getMessage());
                 continue;
             }
-            if(videoLst.contains(singleVO)) {
+            if (videoLst.contains(singleVO)) {
                 continue;
             }
             videoLst.add(singleVO);
@@ -242,16 +251,16 @@ public class PornVideoUrlDetection {
 
         return urlLst;
     }
-    
+
     private String unescapeJavaSilent(String url) {
         try {
             return StringEscapeUtils.unescapeJava(url);
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             System.err.println("unescapeJavaSilent ERR : " + ex.getMessage() + " -> " + url);
         }
         return url;
     }
-    
+
     public static boolean isVideo(String fileName) {
         return fileName.matches("^.*\\." + FILE_EXTENSTION_VIDEO_PATTERN + "$");
     }
