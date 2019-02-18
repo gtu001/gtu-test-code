@@ -89,11 +89,17 @@ public class DropboxUtilV2 {
         Map<String, String> fileMap = new LinkedHashMap<String, String>();
         try {
             ListFolderResult result = client.files().listFolder(path);
-            List<Metadata> entries = result.getEntries();
-            for (int ii = 0; ii < entries.size(); ii++) {
-                Metadata ent = entries.get(ii);
-                System.out.println(ent.getPathDisplay());
-                fileMap.put(ent.getName(), ent.getPathDisplay());
+            for (; true;) {
+                List<Metadata> entries = result.getEntries();
+                for (int ii = 0; ii < entries.size(); ii++) {
+                    Metadata ent = entries.get(ii);
+                    System.out.println(ent.getPathDisplay());
+                    fileMap.put(ent.getName(), ent.getPathDisplay());
+                }
+                if (!result.getHasMore()) {
+                    break;
+                }
+                result = client.files().listFolderContinue(result.getCursor());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -106,10 +112,16 @@ public class DropboxUtilV2 {
         List<DropboxUtilV2_DropboxFile> fileMap = new ArrayList<DropboxUtilV2_DropboxFile>();
         try {
             ListFolderResult result = client.files().listFolder(path);
-            List<Metadata> entries = result.getEntries();
-            for (int ii = 0; ii < entries.size(); ii++) {
-                Metadata ent = entries.get(ii);
-                fileMap.add(new DropboxUtilV2_DropboxFile(ent));
+            for (; true;) {
+                List<Metadata> entries = result.getEntries();
+                for (int ii = 0; ii < entries.size(); ii++) {
+                    Metadata ent = entries.get(ii);
+                    fileMap.add(new DropboxUtilV2_DropboxFile(ent));
+                }
+                if (!result.getHasMore()) {
+                    break;
+                }
+                result = client.files().listFolderContinue(result.getCursor());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

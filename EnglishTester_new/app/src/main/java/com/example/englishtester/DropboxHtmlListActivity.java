@@ -156,6 +156,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
                 Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             Collections.sort(fileLst, new Comparator<DropboxUtilV2.DropboxUtilV2_DropboxFile>() {
                 @Override
                 public int compare(DropboxUtilV2.DropboxUtilV2_DropboxFile o1, DropboxUtilV2.DropboxUtilV2_DropboxFile o2) {
