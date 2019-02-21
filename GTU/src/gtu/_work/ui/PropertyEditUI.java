@@ -591,10 +591,23 @@ public class PropertyEditUI extends javax.swing.JFrame {
 
             if (sourceFileLst.isEmpty()) {
                 loadCurrentDirectory(PropertiesUtil.getJarCurrentPath(this.getClass()));
-            } else if (sourceFileLst.size() == 1) {
-                loadCurrentDirectory(sourceFileLst.get(0));
             } else {
-                loadCurrentFileLst(sourceFileLst);
+                if (sourceFileLst.size() == 1) {
+                    File file = sourceFileLst.get(0);
+                    if (file.isDirectory()) {
+                        loadCurrentDirectory(file);
+                    } else {
+                        loadCurrentFileLst(sourceFileLst);
+                    }
+                } else {
+                    loadCurrentFileLst(sourceFileLst);
+                }
+            }
+
+            if (!backupFileList.isEmpty() && backupFileList.size() == 1) {
+                loadPropertiesToModel(new File_(backupFileList.get(0)));
+            } else {
+                jTabbedPane1.setSelectedIndex(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
