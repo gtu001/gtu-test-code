@@ -282,7 +282,7 @@ public class JTableUtil {
             table.setToolTipText(content);
         }
     }
-    
+
     public static DefaultTableModel createModelIndicateType(final boolean readonly, List<?> header, final List<Class<?>> typeLst) {
         DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header.toArray()) {
             private static final long serialVersionUID = 1L;
@@ -1270,6 +1270,38 @@ public class JTableUtil {
             titles.add(col.getHeaderValue());
         }
         return titles;
+    }
+
+    // onblur 修改
+    public void applyOnBlurEvent(DefaultTableModel model, final ActionListener listener) {
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        if (model == null) {
+            model = (DefaultTableModel) table.getModel();
+        }
+        model.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int row = e.getFirstRow();
+                int col = e.getColumn();
+                Object orignVal = null;
+                String strVal = "ERR";
+                try {
+                    orignVal = JTableUtil.newInstance(table).getRealValueAt(row, col);
+                    strVal = orignVal != null ? (orignVal + " -> " + orignVal.getClass()) : "null";
+                } catch (Exception ex) {
+                    ex.getMessage();
+                }
+                System.out.println(String.format("## table change -> row[%d], col[%d] -----> %s", row, col, strVal));
+                // 刷新table紀錄！！！ onBlur !!!!!
+                if (listener != null) {
+                    Map<String, Object> data = new LinkedHashMap<String, Object>();
+                    data.put("row", row);
+                    data.put("col", col);
+                    data.put("value", orignVal);
+                    listener.actionPerformed(new ActionEvent(data, -1, "Map"));
+                }
+            }
+        });
     }
 
     public static class ColumnSearchFilter {

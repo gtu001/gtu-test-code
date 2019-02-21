@@ -2,6 +2,10 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -19,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -39,20 +44,22 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
-import gtu._work.HermannEbbinghaus_Memory;
-import gtu._work.HermannEbbinghaus_Memory.MemData;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
+import gtu.runtime.DesktopUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import taobe.tec.jcc.JChineseConvertor;
@@ -64,8 +71,8 @@ import taobe.tec.jcc.JChineseConvertor;
  * whatever) then you should purchase a license for each developer using Jigloo.
  * Please visit www.cloudgarden.com for details. Use of Jigloo implies
  * acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN
- * PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR
- * ANY CORPORATE OR COMMERCIAL PURPOSE.
+ * PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY
+ * FORquery ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 public class PropertyEditUI extends javax.swing.JFrame {
     private static final long serialVersionUID = 1L;
@@ -91,6 +98,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
     List<File> backupFileList = new ArrayList<File>();
 
     static File currentFile;
+    List<Triple<Integer, String, String>> backupModel;
 
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(PropertyEditUI.class);
 
@@ -98,21 +106,31 @@ public class PropertyEditUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
+        final List<File> sourceFileLst = new ArrayList<File>();
+        if (args != null) {
+            for (String val : args) {
+                File f = new File(val);
+                if (f.exists() && f.getName().endsWith(".properties")) {
+                    sourceFileLst.add(f);
+                }
+            }
+        }
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                PropertyEditUI inst = new PropertyEditUI();
+                PropertyEditUI inst = new PropertyEditUI(sourceFileLst);
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
 
-    public PropertyEditUI() {
+    public PropertyEditUI(List<File> sourceFileLst) {
         super();
-        initGUI();
+        initGUI(sourceFileLst);
     }
 
-    private void initGUI() {
+    private void initGUI(List<File> sourceFileLst) {
         try {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             BorderLayout thisLayout = new BorderLayout();
@@ -132,7 +150,11 @@ public class PropertyEditUI extends javax.swing.JFrame {
                         jMenuItem1.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 File file = JCommonUtil._jFileChooser_selectDirectoryOnly();
-                                loadCurrentFile(file);
+                                if (file == null) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("請選擇正確目錄!");
+                                    return;
+                                }
+                                loadCurrentDirectory(file);
                             }
                         });
                     }
@@ -141,25 +163,17 @@ public class PropertyEditUI extends javax.swing.JFrame {
                         jMenu1.add(openDirectoryAndChildren);
                         openDirectoryAndChildren.setText("open directory and children");
                         openDirectoryAndChildren.addActionListener(new ActionListener() {
+
                             public void actionPerformed(ActionEvent evt) {
                                 System.out.println("openDirectoryAndChildren.actionPerformed, event=" + evt);
                                 File file = JCommonUtil._jFileChooser_selectDirectoryOnly();
                                 if (file == null) {
-                                    // file =
-                                    // PropertiesUtil.getJarCurrentPath(getClass());//XXX
-                                    file = new File("D:\\my_tool\\english");
-                                    JCommonUtil._jOptionPane_showMessageDialog_info("load C:\\L-CONFIG !");
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("目錄有誤!");
                                 }
                                 DefaultListModel model = new DefaultListModel();
                                 List<File> list = new ArrayList<File>();
                                 FileUtil.searchFileMatchs(file, ".*\\.properties", list);
-                                for (File f : list) {
-                                    File_ ff = new File_();
-                                    ff.file = f;
-                                    model.addElement(ff);
-                                }
-                                backupFileList = list;
-                                fileList.setModel(model);
+                                loadCurrentFileLst(list);
                             }
                         });
                     }
@@ -194,6 +208,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             }
                         });
                     }
+
                     {
                         jMenuItem3 = new JMenuItem();
                         jMenu1.add(jMenuItem3);
@@ -298,28 +313,6 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 return new StringUtil_().getChineseWord(val, true).length() > 0;
                             }
 
-                            private Properties loadFromMemoryBank() {
-                                try {
-                                    Properties prop = new Properties();
-                                    File f1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties");
-                                    File f2 = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config/EnglishSearchUI_MemoryBank.properties");
-                                    for (File f : new File[] { f1, f2 }) {
-                                        if (f.exists()) {
-                                            HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
-                                            memory.init(f);
-                                            List<MemData> memLst = memory.getAllMemData(true);
-                                            for (MemData d : memLst) {
-                                                prop.setProperty(d.getKey(), getChs2Big5(d.getRemark()));
-                                            }
-                                            break;
-                                        }
-                                    }
-                                    return prop;
-                                } catch (Exception ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                            }
-
                             public void actionPerformed(ActionEvent evt) {
                                 if (currentFile == null) {
                                     return;
@@ -401,12 +394,14 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             propTable.setModel(propTableModel);
                             propTable.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
-                                    JTableUtil xxxxxx = JTableUtil.newInstance(propTable);
-                                    int[] rows = xxxxxx.getSelectedRows();
-                                    for (int ii : rows) {
-                                        System.out.println(xxxxxx.getModel().getValueAt(ii, 1));
+                                    if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                                        JTableUtil jTabUtil = JTableUtil.newInstance(propTable);
+                                        int[] rows = jTabUtil.getSelectedRows();
+                                        for (int ii : rows) {
+                                            System.out.println(jTabUtil.getModel().getValueAt(ii, 1));
+                                        }
+                                        JPopupMenuUtil.newInstance(propTable).applyEvent(evt).addJMenuItem(JTableUtil.newInstance(propTable).getDefaultJMenuItems()).show();
                                     }
-                                    JPopupMenuUtil.newInstance(propTable).applyEvent(evt).addJMenuItem(JTableUtil.newInstance(propTable).getDefaultJMenuItems()).show();
                                 }
                             });
                         }
@@ -421,43 +416,18 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 if (currentFile == null) {
                                     return;
                                 }
-                                Properties prop = new Properties();
-                                try {
-                                    prop.load(new FileInputStream(currentFile));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    JCommonUtil.handleException(e);
-                                    return;
-                                }
-                                loadPropertiesToModel(prop);
-                                String text = JCommonUtil.getDocumentText(event);
-                                Pattern pattern = null;
-                                try {
-                                    pattern = Pattern.compile(text);
-                                } catch (Exception ex) {
-                                }
 
-                                DefaultTableModel model = JTableUtil.newInstance(propTable).getModel();
-                                for (int ii = 0; ii < model.getRowCount(); ii++) {
-                                    String key = (String) model.getValueAt(ii, 1);
-                                    String value = (String) model.getValueAt(ii, 2);
-                                    if (key.contains(text)) {
-                                        continue;
+                                String text = StringUtils.trimToEmpty(queryText.getText()).toLowerCase();
+                                DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+                                for (Triple<Integer, String, String> p : backupModel) {
+                                    if (StringUtils.isBlank(text)) {
+                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+                                    } else if (p.getMiddle().toLowerCase().contains(text) || p.getRight().toLowerCase().contains(text)) {
+                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
                                     }
-                                    if (value.contains(text)) {
-                                        continue;
-                                    }
-                                    if (pattern != null) {
-                                        if (pattern.matcher(key).find()) {
-                                            continue;
-                                        }
-                                        if (pattern.matcher(value).find()) {
-                                            continue;
-                                        }
-                                    }
-                                    model.removeRow(propTable.convertRowIndexToModel(ii));
-                                    ii--;
                                 }
+                                propTable.setModel(model);
+                                applyPropTableOnBlurEvent();
                             }
                         }));
                     }
@@ -483,41 +453,38 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 public void mouseClicked(MouseEvent evt) {
                                     final File_ file = JListUtil.getLeadSelectionObject(fileList);
 
-                                    if (evt.getButton() == MouseEvent.BUTTON1) {
-                                        Properties prop = new Properties();
-                                        currentFile = file.file;
-                                        setTitle(currentFile.getName());
-                                        try {
-                                            prop.load(new FileInputStream(file.file));
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                        loadPropertiesToModel(prop);
-                                    }
-
                                     if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
                                         try {
-                                            Runtime.getRuntime().exec(String.format("cmd /c \"%s\"", file.file));
+                                            DesktopUtil.browse(file.file.toURL().toString());
                                         } catch (IOException e1) {
                                             e1.printStackTrace();
                                         }
+                                        return;
                                     }
 
-                                    final File parent = file.file.getParentFile();
-                                    JMenuItem openTargetDir = new JMenuItem();
-                                    openTargetDir.setText("open : " + parent);
-                                    openTargetDir.addActionListener(new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            try {
-                                                Desktop.getDesktop().open(parent);
-                                            } catch (IOException e1) {
-                                                JCommonUtil.handleException(e1);
-                                            }
-                                        }
-                                    });
+                                    if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 1) {
+                                        loadPropertiesToModel(file);
+                                        return;
+                                    }
 
-                                    JPopupMenuUtil.newInstance(fileList).addJMenuItem(openTargetDir).applyEvent(evt).show();
+                                    if (evt.getButton() == MouseEvent.BUTTON3) {
+                                        final File parent = file.file.getParentFile();
+                                        JMenuItem openTargetDir = new JMenuItem();
+                                        openTargetDir.setText("open : " + parent);
+                                        openTargetDir.addActionListener(new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                try {
+                                                    Desktop.getDesktop().open(parent);
+                                                } catch (IOException e1) {
+                                                    JCommonUtil.handleException(e1);
+                                                }
+                                            }
+                                        });
+
+                                        JPopupMenuUtil.newInstance(fileList).addJMenuItem(openTargetDir).applyEvent(evt).show();
+                                        return;
+                                    }
                                 }
                             });
                         }
@@ -532,8 +499,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 DefaultListModel model = new DefaultListModel();
                                 for (File f : backupFileList) {
                                     if (f.getName().contains(text)) {
-                                        File_ ff = new File_();
-                                        ff.file = f;
+                                        File_ ff = new File_(f);
                                         model.addElement(ff);
                                     }
                                 }
@@ -547,8 +513,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                         contentQueryText.addActionListener(new ActionListener() {
 
                             void addModel(File f, DefaultListModel model) {
-                                File_ ff = new File_();
-                                ff.file = f;
+                                File_ ff = new File_(f);
                                 model.addElement(ff);
                             }
 
@@ -603,21 +568,90 @@ public class PropertyEditUI extends javax.swing.JFrame {
             pack();
             this.setSize(571, 408);
 
-            loadCurrentFile(null);
+            // 設定jframe 拖曳檔案
+            setDropTarget(new DropTarget() {
+                public synchronized void drop(DropTargetDropEvent evt) {
+                    try {
+                        evt.acceptDrop(DnDConstants.ACTION_COPY);
+                        List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                        loadCurrentFileLst(droppedFiles);
+
+                        for (File file : droppedFiles) {
+                            if (file.getName().endsWith(".properties")) {
+                                System.out.println(">>Loding dropFile : " + file);
+                                loadPropertiesToModel(new File_(file));
+                                break;
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+
+            if (sourceFileLst.isEmpty()) {
+                loadCurrentDirectory(PropertiesUtil.getJarCurrentPath(this.getClass()));
+            } else if (sourceFileLst.size() == 1) {
+                loadCurrentDirectory(sourceFileLst.get(0));
+            } else {
+                loadCurrentFileLst(sourceFileLst);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void loadPropertiesToModel(Properties prop) {
+    void loadPropertiesToModel(File_ file) {
+        Properties prop = new Properties();
+        currentFile = file.file;
+        setTitle(currentFile.getName());
+        try {
+            prop.load(new FileInputStream(file.file));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+        backupModel = new ArrayList<Triple<Integer, String, String>>();
         String value = null;
         int index = 0;
         for (String key : prop.stringPropertyNames()) {
+            index++;
             value = prop.getProperty(key);
-            model.addRow(new Object[] { index++, key, getChs2Big5(value) });
+            model.addRow(new Object[] { index, key, getChs2Big5(value) });
+            backupModel.add(Triple.of(index, key, getChs2Big5(value)));
         }
         propTable.setModel(model);
+        applyPropTableOnBlurEvent();
+    }
+
+    void applyPropTableOnBlurEvent() {
+        JTableUtil.newInstance(propTable).applyOnBlurEvent(null, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Map<String, Object> map = (Map<String, Object>) e.getSource();
+
+                int row = (Integer) map.get("row");
+                int fixCol = (Integer) map.get("col");
+                int index = (Integer) propTable.getValueAt(row, JTableUtil.getRealColumnPos(0, propTable));
+                String strVal = (String) map.get("value");
+
+                A: for (int ii = 0; ii < backupModel.size(); ii++) {
+                    Triple<Integer, String, String> p = backupModel.get(ii);
+                    if (p.getLeft() == index) {
+                        switch (fixCol) {
+                        case 1:
+                            backupModel.set(ii, Triple.of(p.getLeft(), strVal, p.getRight()));
+                            break;
+                        case 2:
+                            backupModel.set(ii, Triple.of(p.getLeft(), p.getMiddle(), strVal));
+                            break;
+                        }
+                        break A;
+                    }
+                }
+            }
+        });
     }
 
     void loadModelToProperties(Properties prop) {
@@ -653,21 +687,37 @@ public class PropertyEditUI extends javax.swing.JFrame {
         return value;
     }
 
-    void loadCurrentFile(File file) {
+    void loadCurrentDirectory(File file) {
         if (file == null) {
             file = PropertiesUtil.getJarCurrentPath(getClass());
-            JCommonUtil._jOptionPane_showMessageDialog_info("load current !");
+        }
+        if (!file.isDirectory() || file.listFiles() == null) {
+            return;
         }
         DefaultListModel model = new DefaultListModel();
         backupFileList.clear();
-        for (File f : file.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".properties");
+        for (File f : file.listFiles()) {
+            if (!(f.isFile() && f.getName().endsWith(".properties"))) {
+                continue;
             }
-        })) {
-            File_ ff = new File_();
-            ff.file = f;
+            File_ ff = new File_(f);
+            model.addElement(ff);
+            backupFileList.add(f);
+        }
+        fileList.setModel(model);
+    }
+
+    void loadCurrentFileLst(List<File> fileLst) {
+        if (fileLst == null) {
+            return;
+        }
+        DefaultListModel model = new DefaultListModel();
+        backupFileList.clear();
+        for (File f : fileLst) {
+            if (!(f.isFile() && f.getName().endsWith(".properties"))) {
+                continue;
+            }
+            File_ ff = new File_(f);
             model.addElement(ff);
             backupFileList.add(f);
         }
@@ -676,6 +726,10 @@ public class PropertyEditUI extends javax.swing.JFrame {
 
     static class File_ {
         File file;
+
+        File_(File f) {
+            this.file = f;
+        }
 
         @Override
         public String toString() {
