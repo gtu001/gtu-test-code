@@ -1,0 +1,297 @@
+@import 'https://fonts.googleapis.com/css?family=Alegreya+Sans';
+
+* {
+	margin : 0;
+	padding : 0;
+	border : 0;
+}
+
+body {
+	background: #F5F5F5;
+	color : #67727A;
+	font-family: 'Alegreya', sans-serif;
+	margin : 0;
+}
+
+h2 {
+	font-size: 250%;
+	font-weight: : 700;
+	text-align: center;
+	padding-top: 2%;
+	color: #F5F5F5;
+}
+
+h3 {
+	font-size:  175%;
+	line-height: 155%;
+	padding:5% 0;
+	font-weight:  400;
+	color: #F5F5F5;
+}
+
+p {
+	font-family: 'Alegreya', sans-serif;
+	color: #F5F5F5;
+	font-size: 160%;
+	line-height: 150%;
+	padding: 3%;
+	text-indent:  2%;
+	text-align: justify;
+}
+
+img {
+	max-width: 100%;
+	height: auto
+	width: auto;
+	margin-bottom: -4px;
+	background-size: cover; /* 等比例縮放 */
+}
+
+header {
+	background-color: #6991AC;
+	width: 100%;
+	height: 86px;
+}
+
+#header-inner {
+	max-width: 1200px;
+	margin:0 auto;
+}
+
+#logo {
+	margin: 20px;
+	float: left;
+	width: 60px;
+	height: 60px;
+	background: url(img/RD.png) no-repeat center;
+	background-size: cover; /* 等比例縮放 */
+}
+
+/*--- Start Navigation ---*/
+nav {
+	float: right;
+	padding: 25px 20px 0 0;/*上右下左 順時鐘*/
+}
+a#menu-icon {
+	display: hidden; 
+	width: 40px;
+	height: 40px;
+	background: url(img/menu.png) center;
+	background-size: cover; /* 等比例縮放 */
+}
+a:hover#menu-icon {
+	border-radius: 4px 4px 0 0;
+}
+ul {
+	list-style-type: none; /*隱藏黑點*/
+}
+nav ul li {
+	font-family: 'Alegreya Sans', sans-serif
+	font-size: 150%;
+	display: inline-block; /*併成一行*/
+	float: left;
+	padding: 10px;
+}
+nav ul li a {
+	color: #F5F5F5;
+	text-decoration: none; /*去底線*/
+}
+nav ul li a:hover {
+	color: #C3D7DF;
+}
+.current {
+	color: #C3D7DF;
+}
+/*--- End Navigation ---*/
+
+.banner {
+	widows: 100%;
+	background-color: #6991AC;
+}
+.banner-inner {
+	max-width: 1100px;
+	margin: 0 auto;,/*會自動致中*/
+}
+.one-fourth {
+	width:25%;
+	float:left;
+	text-align:  center;s
+}
+#html {
+	background-color: #F1AA90;
+}
+#css {
+	background-color: #BEB9AD;
+}
+#seo {
+	background-color: #AADCD2;
+}
+#social {
+	background-color: #A2B2C1;
+}
+.one-fourth i {
+	color: #F0F0F0;
+	font-size: 500%;
+	padding: 13% 0 4% 0;
+}
+.inner-wrapper {
+	float: left;
+	width: 100%;
+	background-color: #C3D7DF;
+}
+article {
+	float:left;
+	margin:0 auto;
+	width:50%;
+	height: auto;
+}
+#tablet {
+	background-color: #C3D7DF;
+}
+aside {
+	float: right;
+	margin: 0 auto;
+	width: 50%;
+	height: auto;
+}
+#tablet2 {
+	background-color: #A2B1C1;
+}
+#mobile {
+	background-color: #BEB9AD;
+}
+#desktop {
+	background-color: #F1AA90;
+}
+.inner-wrapper-2 {
+	float:left;
+	width: 100%;
+	background-color: #C3D7DF;
+}
+.inner-wrapper-3 {
+	float:left;
+	width: 100%;
+	background-color: #AADCD2;
+}
+
+.one-third {
+	width: 33.333333333%;
+	float: left;
+	text-align: center;
+}
+#google {
+	background-color: #A2B1C1;
+}
+#marketing {
+	background-color: #BEB9AD;
+}
+#customers {
+	background-color: #AADCD2;
+}
+#smiley {
+	background-color: #AADCD2;
+	padding: 0 0 1%;
+	clear: both;
+}
+
+/*--- Start Footer ---*/
+footer {
+	background-color: #6991AC;
+	width: 100%;
+}
+.social {
+	list-style-type: none;
+	text-align: center;
+}
+.social li {
+	display : inline;
+}
+.social i {
+	font-size: 460%;
+	margin: 1%;
+	padding 5% 5% 5% 4%;
+	color: #C3D7DF;
+}
+.social i:hover {
+	color: #F5F5F5;
+}
+footer.second {
+	border-top: 1px solid #AADCD2;
+	background-color: #544B59;
+	max-height: 55px;
+	text-align: center;
+	margin:0;
+}
+footer.second p {
+	padding : 5px 0 9px 0 ;
+	text-align: center;
+}
+/*-------------------------------MEDIA!!! 以下為手機板----------------------*/
+@media screen and (max-width: 768px) { /* 小於768px 會套以下版 */
+	h2 {
+		font-size: 150%;
+	}
+	h3 {
+		font-size: 125%;
+	}
+	p {
+		font-size: 120%;
+	}
+	header {
+		position: absolute;
+	}
+	#logo {
+		margin: 15px 0 20px 5px; /* 重新設定邊界 */
+		background: url(img/RD_mobile.png) no-repeat center;
+		background-size: cover; /* 等比例縮放 */
+	}
+	#menu-icon {
+		display: inline-block;
+	}
+	nav ul, nav:active ul {
+		display: none;
+		z-index: 1000; /* 最上層 */
+		position: absolute;
+		padding: 20px;
+		background: #6991AC;
+		right: 20px;
+		top: 60px;
+		border: 1px solid #FFF;
+		border-radius: 10px 0 10px 10px; /* 圓角 (左上 開始順時針)*/
+		width: 50%;
+	}
+	nav:hover ul { /* 顯示menu選單 */
+		display: block;
+	}
+	nav li {
+		text-align: center;
+		width: 100%;
+		padding: 10px 0;
+	}
+	.banner {
+			padding-top: 86px;
+	}
+	.one-fourth {
+		float: left;
+		width: 100%;
+	}
+	.one-fourth i {
+		font-size: 350%;
+		padding: 4% 0 1% 0;
+	}
+	article {
+		width: 100%;
+	}
+	aside {
+		width: 100%;
+	}
+	.hand_mobile { /* 因為不連續, 隱藏一張圖 */
+		display: none;
+	}
+	.one-third {
+		width: 100%;
+	}
+	.social i {
+		font-size: 180%;
+	}
+}
