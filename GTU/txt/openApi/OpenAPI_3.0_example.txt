@@ -1,0 +1,107 @@
+paths :
+  /employees:
+    get:
+      description: Obtain information about employees from the HR database
+      parameters: 
+        - name: bodyLimit
+          in: query
+          description: The amount of employees returned
+          schema:
+            type: integer
+            minium: 10
+            maxium: 10
+            example: 15
+        - name: pageLimit
+          in: query
+          description: The pages to return employees info
+          schema:
+            type: integer
+            minium: 1
+            maxium: 5
+            example: 2
+      responses:
+        200:
+          description: Successful pull of employee info
+          content:
+            application/json:
+              schema:
+                type: array  --->  可換成 '$ref: "#/components/schemas/Employees"
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 4
+                    exployee name:
+                      type: string
+                      example: Ryan Pinkham
+                    employee title:
+                      type: string
+                      example: Market Manager
+                     
+    post:
+      description: Creates a new employee in database
+      requetBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: <--可替換為 $ref: '#/components/schemas/Employee'
+                id:
+                  type: integer
+                  example: 4
+                exployee name:
+                  type: string
+                  example: Ryan Pinkham
+                employee title:
+                  type: string
+                  example: Market Manager
+        request:
+          200:
+            description: Successfully created a new employee
+                  
+  /employees/{id}
+    get:
+      description: Obtain information about specific employee
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the employee
+          schema:
+            type: integer
+            example: 54
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/Employee'
+            application/xml:
+              type: object
+              $ref: '#/components/schemas/Employee'
+          
+  components: 
+    schemas:
+      Employees:
+        description: Array of employee info
+        type: array
+        items:
+          $ref: '#/components/schemas/Employee'
+    
+      Employee:
+        description: Model containing employee info
+        properties:
+          id:
+            type: integer
+            example: 4
+          exployee name:
+            type: string
+            example: Ryan Pinkham
+          employee title:
+            type: string
+            example: Market Manager
+      
+      

@@ -215,7 +215,13 @@ public class DownloadProgressHandler {
                     motherCount++;
                 }
             }
-            long avgKbps = (totalKbps / motherCount);
+            long avgKbps = 0;
+            try {
+                avgKbps = (totalKbps / motherCount);
+            } catch (Exception ex) {
+                System.err.println("getSummaryAverageKbps ERR : " + ex.getMessage());
+                ex.printStackTrace();
+            }
             return "(avg :" + avgKbps + "KB/s)";
         }
         return "";

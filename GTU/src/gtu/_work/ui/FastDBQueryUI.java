@@ -58,6 +58,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.text.JTextComponent;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -167,6 +168,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton nextConnBtn;
     private JComboBox dbNameIdText;
     private AutoComboBox dbNameIdText_Auto;
+    private AutoComboBox sqlMappingFilterText_Auto;
     private AutoComboBox refSearchCategoryCombobox_Auto;
     private JLabel lblDbName;
     private JTextField sqlQueryText;
@@ -237,7 +239,7 @@ public class FastDBQueryUI extends JFrame {
 
     private static SwingTabTemplateUI TAB_UI1;
     private JLabel lblDb;
-    private JTextField sqlMappingFilterText;
+    private JComboBox sqlMappingFilterText;
     private JButton sqlFilterClearBtn;
     private JLabel lblNewLabel_8;
     private JLabel lblNewLabel_9;
@@ -256,7 +258,11 @@ public class FastDBQueryUI extends JFrame {
     private JButton executeSqlButton2;
     private JButton refConfigPathYamlExportBtn;
     private JTabbedPane tabbedPane;
+    private JTextArea sqlParamCommentArea;
+    private JTextArea sqlIdCommentArea;
     private EditColumnHistoryHandler editColumnHistoryHandler;
+    private JLabel lblNewLabel_11;
+    private JLabel lblNewLabel_12;
 
     /**
      * Launch the application.
@@ -349,13 +355,15 @@ public class FastDBQueryUI extends JFrame {
         lblDb = new JLabel("DB名稱過濾");
         newPanel1.add(lblDb);
 
-        sqlMappingFilterText = new JTextField();
+        sqlMappingFilterText = new JComboBox();
         sqlMappingFilterText.setToolTipText("SQL ID標籤過濾");
-        sqlMappingFilterText.setColumns(15);
+        // dbNameIdText.setColumns(10);
+        sqlMappingFilterText_Auto = AutoComboBox.applyAutoComboBox(sqlMappingFilterText);
+        sqlMappingFilterText_Auto.setMatchType(MatchType.Contains);
 
         newPanel1.add(sqlMappingFilterText);
 
-        for (JTextField text : new JTextField[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText }) {
+        for (JTextComponent text : new JTextComponent[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText_Auto.getTextComponent() }) {
             text.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -385,7 +393,7 @@ public class FastDBQueryUI extends JFrame {
             public void actionPerformed(ActionEvent e1) {
                 sqlQueryText.setText("");
                 sqlContentFilterText.setText("");
-                sqlMappingFilterText.setText("");
+                sqlMappingFilterText_Auto.getTextComponent().setText("");
                 try {
                     // 初始化 sqlList
                     initLoadSqlListConfig();
@@ -452,7 +460,6 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText = new JTextField();
         sqlIdPanel.add(sqlIdText);
         sqlIdText.setToolTipText("設定SQL ID");
-        panel_2.add(sqlIdPanel, BorderLayout.NORTH);
         sqlIdText.setColumns(40);
         sqlIdText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
@@ -460,6 +467,33 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextAreaChange();
             }
         }));
+
+        {// 多包一層
+            JPanel innerPanel1 = new JPanel();
+            innerPanel1.setLayout(new BorderLayout(0, 0));
+            innerPanel1.add(sqlIdPanel, BorderLayout.NORTH);
+
+            {// 多包一層
+                JPanel innerPanel11 = new JPanel();
+
+                sqlIdCommentArea = new JTextArea();
+                sqlIdCommentArea.setToolTipText("SQL註解");
+                JTextAreaUtil.applyCommonSetting(sqlIdCommentArea);
+
+                innerPanel1.add(innerPanel11, BorderLayout.CENTER);
+                innerPanel11.setLayout(new FormLayout(
+                        new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                                FormFactory.RELATED_GAP_COLSPEC, },
+                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));
+
+                lblNewLabel_11 = new JLabel("註解");
+                innerPanel11.add(lblNewLabel_11, "2, 2");
+
+                innerPanel11.add(sqlIdCommentArea, "4, 2, fill, fill");
+            }
+
+            panel_2.add(innerPanel1, BorderLayout.NORTH);
+        }
 
         sqlIdFixNameBtn = new JButton("選擇功能");
         sqlIdFixNameBtn.addActionListener(new ActionListener() {
@@ -539,7 +573,31 @@ public class FastDBQueryUI extends JFrame {
         panel_1.setLayout(new BorderLayout(0, 0));
 
         scrollPane_1 = new JScrollPane();
-        panel_1.add(scrollPane_1, BorderLayout.CENTER);
+
+        JPanel innerPanel2 = new JPanel();
+        innerPanel2.setLayout(new BorderLayout(0, 0));
+        innerPanel2.add(scrollPane_1, BorderLayout.CENTER);
+
+        {// 多包一層
+            JPanel innerPanel11 = new JPanel();
+
+            sqlParamCommentArea = new JTextArea();
+            sqlParamCommentArea.setToolTipText("SQL參數註解");
+            JTextAreaUtil.applyCommonSetting(sqlParamCommentArea);
+
+            innerPanel11.setLayout(new FormLayout(
+                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                            FormFactory.RELATED_GAP_COLSPEC, },
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));
+
+            lblNewLabel_12 = new JLabel("註解");
+            innerPanel11.add(lblNewLabel_12, "2, 2");
+            innerPanel11.add(sqlParamCommentArea, "4, 2, fill, fill");
+
+            innerPanel2.add(innerPanel11, BorderLayout.SOUTH);
+        }
+
+        panel_1.add(innerPanel2, BorderLayout.CENTER);
 
         parametersTable = new JTable();
         parametersTable.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -1326,7 +1384,7 @@ public class FastDBQueryUI extends JFrame {
 
         String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
         String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
-        String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText.getText()).toLowerCase();
+        String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText_Auto.getTextComponent().getText()).toLowerCase();
 
         List<SqlIdConfigBean> sqlIdList = new ArrayList<SqlIdConfigBean>();
         for (SqlIdConfigBean enu : sqlIdConfigBeanHandler.lst) {
@@ -1334,6 +1392,7 @@ public class FastDBQueryUI extends JFrame {
             String category = StringUtils.trimToEmpty(enu.category).toLowerCase();
             String sqlIdCompare = sqlId.toLowerCase().toLowerCase();
             String content = StringUtils.trimToEmpty(enu.sql).toLowerCase();
+            String comment = StringUtils.trimToEmpty(enu.sqlComment).toLowerCase();
 
             boolean findOk = false;
 
@@ -1341,10 +1400,10 @@ public class FastDBQueryUI extends JFrame {
                 findOk = true;
             } else {
                 if (StringUtils.isNotBlank(queryText) && StringUtils.isNotBlank(contentFilterText)) {
-                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText)) && content.contains(contentFilterText)) {
+                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText)) && content.contains(contentFilterText)) {
                         findOk = true;
                     }
-                } else if (StringUtils.isNotBlank(queryText) && (category.contains(queryText) || sqlIdCompare.contains(queryText))) {
+                } else if (StringUtils.isNotBlank(queryText) && (category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText))) {
                     findOk = true;
                 } else if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
                     findOk = true;
@@ -1395,6 +1454,7 @@ public class FastDBQueryUI extends JFrame {
 
     private void reload_DataSourceConfig_autoComplete() {
         dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
+        sqlMappingFilterText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
     }
 
     /**
@@ -1468,10 +1528,11 @@ public class FastDBQueryUI extends JFrame {
      */
     private void saveSqlButtonClick(boolean saveSqlIdConfig) {
         try {
-            String sqlId = sqlIdText.getText().toString();
+            String sqlId = sqlIdText.getText();
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
-            String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
-            String sql = sqlTextArea.getText().toString();
+            String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
+            String sql = sqlTextArea.getText();
+            String sqlComment = sqlIdCommentArea.getText();
             JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
 
@@ -1486,6 +1547,7 @@ public class FastDBQueryUI extends JFrame {
             bean.category = category;
             bean.sqlId = sqlId;
             bean.sql = sql;
+            bean.sqlComment = sqlComment;
 
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
@@ -1645,7 +1707,7 @@ public class FastDBQueryUI extends JFrame {
                 }
                 try {
                     // 一般儲存參數處理
-                    sqlParameterConfigLoadHandler.saveConfig(paramMap2);
+                    sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
                 } catch (Exception ex) {
                     // 出現異常詢問是否重設
                     boolean resetOk = false;
@@ -1653,7 +1715,7 @@ public class FastDBQueryUI extends JFrame {
                         boolean resetConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(ex.getMessage(), "是否要重設?");
                         if (resetConfirm) {
                             sqlParameterConfigLoadHandler.clear();
-                            sqlParameterConfigLoadHandler.saveConfig(paramMap2);
+                            sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
                             resetOk = true;
                         }
                     }
@@ -1964,6 +2026,9 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.setText(sqlBean.sql);
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
         sqlIdColorComboBox.setSelectedItem(RefSearchColor.valueFrom(sqlBean.color));
+        sqlIdCommentArea.setText(sqlBean.sqlComment);
+
+        sqlList.setToolTipText(StringUtils.trimToEmpty(sqlBean.sqlComment));
 
         // 載入參數設定
         sqlParameterConfigLoadHandler.init(sqlBean.getUniqueKey());
@@ -2021,6 +2086,7 @@ public class FastDBQueryUI extends JFrame {
             paramSet = param.getOrderParametersLst();
         }
 
+        sqlParamCommentArea.setText(sqlParameterConfigLoadHandler.loadComment());
         Map<String, String> paramMap = sqlParameterConfigLoadHandler.loadConfig();
         initParametersTable();
         DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
@@ -2623,6 +2689,7 @@ public class FastDBQueryUI extends JFrame {
                 b2.color = b.color;
                 b2.sql = b.sql;
                 b2.sqlId = b.sqlId;
+                b2.sqlComment = b.sqlComment;
             } else {
                 lst.add(b);
             }
@@ -2665,13 +2732,14 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public static class SqlIdConfigBean {
-        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId" };
+        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId", "sqlComment" };
         private static String[] VALUES_DEF = new String[] { "sql" };
 
         String color;
         String category;
         String sqlId;
         String sql;
+        String sqlComment;
 
         public String getCategory() {
             return category;
@@ -3287,10 +3355,11 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            String sqlId = sqlIdText.getText().toString();
+            String sqlId = sqlIdText.getText();
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
-            String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
-            String sql = sqlTextArea.getText().toString();
+            String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
+            String sql = sqlTextArea.getText();
+            String sqlComment = sqlIdCommentArea.getText();
 
             JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
@@ -3302,6 +3371,7 @@ public class FastDBQueryUI extends JFrame {
             bean.sqlId = sqlId;
             bean.category = category;
             bean.color = color.colorCode;
+            bean.sqlComment = sqlComment;
 
             File newFile = sqlParameterConfigLoadHandler.getFile(bean.getUniqueKey());
             File oldFile = sqlParameterConfigLoadHandler.getFile(sqlBean.getUniqueKey());
@@ -3410,12 +3480,20 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private class SqlParameterConfigLoadHandler {
+    private static class SqlParameterConfigLoadHandler {
+        private static final String PARAM_COMMENT_KEY = "#PARAM_COMMENT_KEY#";
+
         private PropertiesGroupUtils sqlParameterConfigLoad;
         private File configFile;
 
         private Map<String, String> loadConfig() {
-            return sqlParameterConfigLoad.loadConfig();
+            Map<String, String> clone = new HashMap<String, String>(sqlParameterConfigLoad.loadConfig());
+            clone.remove(PARAM_COMMENT_KEY);
+            return clone;
+        }
+
+        private String loadComment() {
+            return StringUtils.trimToEmpty(sqlParameterConfigLoad.loadConfig().get(PARAM_COMMENT_KEY));
         }
 
         public void clear() {
@@ -3426,7 +3504,8 @@ public class FastDBQueryUI extends JFrame {
             sqlParameterConfigLoad.next();
         }
 
-        private void saveConfig(Map<String, String> currentConfig) {
+        private void saveConfig(Map<String, String> currentConfig, String paramComment) {
+            currentConfig.put(PARAM_COMMENT_KEY, StringUtils.trimToEmpty(paramComment));
             sqlParameterConfigLoad.saveConfig(currentConfig);
         }
 

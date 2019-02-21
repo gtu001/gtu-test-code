@@ -43,6 +43,7 @@ public class KeyEventExecuteHandler {
                         }
                     });
                 } catch (Exception e) {
+                    System.err.println("AddKeyEvent Failed : " + f.getName());
                     e.printStackTrace();
                 }
             }

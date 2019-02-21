@@ -308,8 +308,8 @@ if __name__ == '__main__':
 #     fileC = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_C8_1.XLSX"
 #     fileI = fileUtil.getDesktopDir() + os.sep + "/janna/善良瓜新工作/RCRP0C210_I8_1.XLSX"
     
-    fileC = 'C:/Users/wistronits/Desktop/RCRP0C210/RCRP0C210/A0/RCRP0C210_1027-cognos.XLSX'
-    fileI = 'C:/Users/wistronits/Desktop/RCRP0C210/RCRP0C210/A0/RCRP0C210_1027-itext.XLSX'
+    fileC = 'C:/Users/wistronits/Desktop/新增資料夾/TX0CRC1902181339357041_RCRP0C210_C2.xlsx'
+    fileI = 'C:/Users/wistronits/Desktop/新增資料夾/TX0CRC1902181339357041_RCRP0C210_I2.xlsx'
 
     mainDetail(fileC, fileI)
     print("done...")
