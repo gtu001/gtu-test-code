@@ -1,0 +1,37 @@
+﻿Tampermonkey 網頁自動化腳本
+
+// ==UserScript==
+// @name         New Userscript
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://event.mi.com/tw/sales2018/super-sales-day/?utm_source=pc&utm_medium=banner&utm_campaign=super-sales-day
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+  function checkForMoniDisplayChange() {
+    $(".J_couponArea").removeAttr("disabled");
+    $(".J_couponArea").click();
+  }
+  window.setInterval(checkForMoniDisplayChange, 10);
+  alert = {}
+})();
+
+
+
+
+以下按 Ctrl + S 就儲存
+
+這裡修改腳本名稱  
+// @name         New Userscript
+
+
+這是要完全符合網址
+// @match        https://www.jvid.com/v/bkQ3KbXg
+
+
+這是可以用regex
+// @include        /https\:\/\/www\.jvid\.com\/v\/.*/
