@@ -3,12 +3,20 @@ package gtu.swing.util;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
+import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import gtu.file.OsInfoUtil;
@@ -88,7 +96,7 @@ public class JFrameUtil {
             }
         });
     }
-    
+
     public static Frame getFrame(Component c) {
         Component w = c;
         while (!(w instanceof Frame) && (w != null)) {

@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.DisplayMode;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -16,6 +15,10 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -1051,6 +1054,25 @@ public class JCommonUtil {
             @Override
             public void componentShown(ComponentEvent ce) {
                 target.requestFocusInWindow();
+            }
+        });
+    }
+
+    /*
+     * 設定 拖曳檔案
+     */
+    public static void applyDropFiles(Component jcomp, final ActionListener listener) {
+        jcomp.setDropTarget(new DropTarget() {
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    if (listener != null) {
+                        listener.actionPerformed(new ActionEvent(droppedFiles, -1, "files"));
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }

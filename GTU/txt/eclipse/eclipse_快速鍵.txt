@@ -1,0 +1,20 @@
+ctrl + shift + L  開啟快捷鍵清單
+ctrl + F10  開啟當前倒三角按鈕視窗
+
+alt + shift + W   快速開啟導覽視窗A
+alt + shift + Q   快速開啟導覽視窗B
+alt + shift + Z   自動程式碼視窗(先圈範圍)
+
+ctrl + Q  回到最後編輯點
+ctrl + E  快速切到別的檔案(已開過的Tab)
+
+ctrl + , or .  移動到有問題的點(上一個下一個)
+
+ctrl + shift + P  移動到對應括號 ({ <-> })
+ctrl + shift + 上下   在每個method 快速移動
+
+alt + shift + I  將method inline處理
+alt + shift + L  抽成變數
+alt + shift + M  抽成method
+
+ctrl + alt + B  所有中斷點(啟用/關閉)

@@ -2,10 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -17,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -28,6 +23,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -44,7 +40,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.etc.EnglishTester_Diectory;
@@ -463,7 +458,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     }
 
                                     if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 1) {
-                                        loadPropertiesToModel(file);
+                                        file.loadPropertiesToModel(PropertyEditUI.this);
                                         return;
                                     }
 
@@ -568,74 +563,40 @@ public class PropertyEditUI extends javax.swing.JFrame {
             pack();
             this.setSize(571, 408);
 
-            // 設定jframe 拖曳檔案
-            setDropTarget(new DropTarget() {
-                public synchronized void drop(DropTargetDropEvent evt) {
-                    try {
-                        evt.acceptDrop(DnDConstants.ACTION_COPY);
-                        List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                        loadCurrentFileLst(droppedFiles);
-
-                        for (File file : droppedFiles) {
-                            if (file.getName().endsWith(".properties")) {
-                                System.out.println(">>Loding dropFile : " + file);
-                                loadPropertiesToModel(new File_(file));
-                                break;
-                            }
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+            JCommonUtil.applyDropFiles(this, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    loadInitDragFiles((List<File>) e.getSource());
                 }
             });
 
-            if (sourceFileLst.isEmpty()) {
-                loadCurrentDirectory(PropertiesUtil.getJarCurrentPath(this.getClass()));
-            } else {
-                if (sourceFileLst.size() == 1) {
-                    File file = sourceFileLst.get(0);
-                    if (file.isDirectory()) {
-                        loadCurrentDirectory(file);
-                    } else {
-                        loadCurrentFileLst(sourceFileLst);
-                    }
-                } else {
-                    loadCurrentFileLst(sourceFileLst);
-                }
-            }
-
-            if (!backupFileList.isEmpty() && backupFileList.size() == 1) {
-                loadPropertiesToModel(new File_(backupFileList.get(0)));
-            } else {
-                jTabbedPane1.setSelectedIndex(1);
-            }
+            this.loadInitDragFiles(sourceFileLst);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void loadPropertiesToModel(File_ file) {
-        Properties prop = new Properties();
-        currentFile = file.file;
-        setTitle(currentFile.getName());
-        try {
-            prop.load(new FileInputStream(file.file));
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void loadInitDragFiles(List<File> sourceFileLst) {
+        if (sourceFileLst.isEmpty()) {
+            loadCurrentDirectory(PropertiesUtil.getJarCurrentPath(this.getClass()));
+        } else {
+            if (sourceFileLst.size() == 1) {
+                File file = sourceFileLst.get(0);
+                if (file.isDirectory()) {
+                    loadCurrentDirectory(file);
+                } else {
+                    loadCurrentFileLst(sourceFileLst);
+                }
+            } else {
+                loadCurrentFileLst(sourceFileLst);
+            }
         }
-
-        DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
-        backupModel = new ArrayList<Triple<Integer, String, String>>();
-        String value = null;
-        int index = 0;
-        for (String key : prop.stringPropertyNames()) {
-            index++;
-            value = prop.getProperty(key);
-            model.addRow(new Object[] { index, key, getChs2Big5(value) });
-            backupModel.add(Triple.of(index, key, getChs2Big5(value)));
+        if (!backupFileList.isEmpty() && backupFileList.size() == 1) {
+            new File_(backupFileList.get(0)).loadPropertiesToModel(this);
+            jTabbedPane1.setSelectedIndex(0);
+        } else {
+            jTabbedPane1.setSelectedIndex(1);
         }
-        propTable.setModel(model);
-        applyPropTableOnBlurEvent();
     }
 
     void applyPropTableOnBlurEvent() {
@@ -747,6 +708,30 @@ public class PropertyEditUI extends javax.swing.JFrame {
         @Override
         public String toString() {
             return file.getName();
+        }
+
+        void loadPropertiesToModel(PropertyEditUI propertyEditUI) {
+            Properties prop = new Properties();
+            PropertyEditUI.currentFile = this.file;
+            propertyEditUI.setTitle(PropertyEditUI.currentFile.getName());
+            try {
+                prop.load(new FileInputStream(this.file));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        
+            DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+            propertyEditUI.backupModel = new ArrayList<Triple<Integer, String, String>>();
+            String value = null;
+            int index = 0;
+            for (String key : prop.stringPropertyNames()) {
+                index++;
+                value = prop.getProperty(key);
+                model.addRow(new Object[] { index, key, propertyEditUI.getChs2Big5(value) });
+                propertyEditUI.backupModel.add(Triple.of(index, key, propertyEditUI.getChs2Big5(value)));
+            }
+            propertyEditUI.propTable.setModel(model);
+            propertyEditUI.applyPropTableOnBlurEvent();
         }
     }
 }
