@@ -582,6 +582,7 @@ public class FastDBQueryUI extends JFrame {
         panel_3.add(maxRowsText);
 
         sqlSaveButton = new JButton("儲存");
+        sqlSaveButton.setToolTipText("快速鍵 Ctrl+S");
         panel_3.add(sqlSaveButton);
 
         clearButton = new JButton("清除");
@@ -602,6 +603,7 @@ public class FastDBQueryUI extends JFrame {
         panel_3.add(updateSqlRadio);
 
         executeSqlButton = new JButton("執行Sql");
+        executeSqlButton.setToolTipText("快速鍵 F5");
         executeSqlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 executeSqlButtonClick();
@@ -779,12 +781,12 @@ public class FastDBQueryUI extends JFrame {
         panel_13.add(columnFilterText);
         columnFilterText.setColumns(20);
         columnFilterText.setToolTipText("分隔符號為\"^\"");
-        columnFilterText.addFocusListener(new FocusAdapter() {
 
+        columnFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             ColumnSearchFilter columnFilter;
 
             @Override
-            public void focusLost(FocusEvent e) {
+            public void process(DocumentEvent event) {
                 try {
                     if (distinctHasClicked) {
                         queryModeProcess(queryList, true, null);
@@ -799,18 +801,19 @@ public class FastDBQueryUI extends JFrame {
                     JCommonUtil.handleException(ex);
                 }
             }
-        });
+        }));
 
         lblNewLabel_3 = new JLabel("資料過濾");
         panel_13.add(lblNewLabel_3);
 
         rowFilterText = new JTextField();
-        rowFilterText.setToolTipText("多值用\"^\"分隔");
+        rowFilterText.setToolTipText("多值用\"^\"分隔, 請按Enter執行");
         panel_13.add(rowFilterText);
         rowFilterText.setColumns(20);
-        rowFilterText.addFocusListener(new FocusAdapter() {
+
+        final Runnable rowFilterTextDoFilter = new Runnable() {
             @Override
-            public void focusLost(FocusEvent e) {
+            public void run() {
                 try {
                     if (queryList == null || queryList.getRight().isEmpty()) {
                         return;
@@ -848,6 +851,19 @@ public class FastDBQueryUI extends JFrame {
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
+            }
+        };
+
+        rowFilterText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                rowFilterTextDoFilter.run();
+            }
+        });
+        rowFilterText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rowFilterTextDoFilter.run();
             }
         });
 
@@ -1238,6 +1254,7 @@ public class FastDBQueryUI extends JFrame {
         panel_4.add(deleteParameterBtn);
 
         executeSqlButton2 = new JButton("執行Sql");
+        executeSqlButton2.setToolTipText("快速鍵 F5");
         executeSqlButton2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 executeSqlButtonClick();
@@ -2208,62 +2225,70 @@ public class FastDBQueryUI extends JFrame {
 
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
-            if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
-                    fastDBQueryUI_CrudDlgUI.dispose();
-                }
-
-                // 一般查詢
-                if (this.queryList != null && !this.queryList.getRight().isEmpty() && StringUtils.isBlank(importExcelSheetName)) {
-
-                    JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
-                    int[] orignRowPosArry = queryResultTable.getSelectedRows();
-
-                    List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
-                    for (int orignRowPos : orignRowPosArry) {
-                        System.out.println("orignRowPos " + orignRowPos);
-                        int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
-                        System.out.println("rowPos " + rowPos);
-
-                        int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
-                        Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
-                        rowMapLst.add(rowMap);
+            class StartEditProcess {
+                void start() throws Exception {
+                    if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
+                        fastDBQueryUI_CrudDlgUI.dispose();
                     }
 
-                    Triple<List<String>, List<Class<?>>, List<Object[]>> allRows = null;
-                    if (filterRowsQueryList != null) {
-                        allRows = filterRowsQueryList;
+                    // 一般查詢
+                    if (queryList != null && !queryList.getRight().isEmpty() && StringUtils.isBlank(importExcelSheetName)) {
+
+                        JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
+                        int[] orignRowPosArry = queryResultTable.getSelectedRows();
+
+                        List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
+                        for (int orignRowPos : orignRowPosArry) {
+                            System.out.println("orignRowPos " + orignRowPos);
+                            int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
+                            System.out.println("rowPos " + rowPos);
+
+                            int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
+                            Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
+                            rowMapLst.add(rowMap);
+                        }
+
+                        Triple<List<String>, List<Class<?>>, List<Object[]>> allRows = null;
+                        if (filterRowsQueryList != null) {
+                            allRows = filterRowsQueryList;
+                        } else {
+                            allRows = queryList;
+                        }
+
+                        fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, FastDBQueryUI.this);
                     } else {
-                        allRows = queryList;
+                        // 如果是用 excel 匯入 使用excel資料開啟
+                        String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸\"資料表名稱\",格視為 : Schema.TableName", importExcelSheetName);
+                        if (StringUtils.isBlank(shemaTable)) {
+                            Validate.isTrue(false, "查詢結果為空!");
+                        }
+
+                        Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(//
+                                String.format(" select * from %s where 1=1 ", shemaTable), //
+                                new Object[0], getDataSource().getConnection(), true, 1);
+
+                        Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex(orignQueryResult);
+
+                        int selectRowIndex = queryResultTable.getSelectedRow();
+
+                        FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
                     }
-
-                    fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, this);
-                } else {
-                    // 如果是用 excel 匯入 使用excel資料開啟
-                    String shemaTable = JCommonUtil._jOptionPane_showInputDialog("請輸入 schema.table 名稱", importExcelSheetName);
-                    if (StringUtils.isBlank(shemaTable)) {
-                        Validate.isTrue(false, "查詢結果為空!");
-                    }
-
-                    Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(//
-                            String.format(" select * from %s where 1=1 ", shemaTable), //
-                            new Object[0], getDataSource().getConnection(), true, 1);
-
-                    Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex(orignQueryResult);
-
-                    int selectRowIndex = queryResultTable.getSelectedRow();
-
-                    FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
                 }
+            }
+
+            final StartEditProcess d = new StartEditProcess();
+
+            if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                d.start();
             }
 
             if (JMouseEventUtil.buttonRightClick(1, e)) {
                 JPopupMenuUtil.newInstance(queryResultTable)//
-                        .addJMenuItem("TODO", new ActionListener() {
+                        .addJMenuItem("以此筆資料為基準進行操作", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-
+                                    d.start();
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                 }

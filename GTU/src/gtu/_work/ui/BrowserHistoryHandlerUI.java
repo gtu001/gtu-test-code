@@ -73,6 +73,7 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -1225,21 +1226,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             // 設定欄位顏色
             tableUtil.setColumnColor_byCondition(UrlTableConfigEnum.title.ordinal(), new JTableUtil.TableColorDef() {
-                public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     int clickTime = getClickTime(row);
-                    return getColorByClickTimes(clickTime);
+                    return Pair.of(getColorByClickTimes(clickTime), null);
                 }
             });
 
             tableUtil.setColumnColor_byCondition(UrlTableConfigEnum.url.ordinal(), new JTableUtil.TableColorDef() {
-                public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                     String url = (String) tableUtil.getRealValueAt(row, UrlTableConfigEnum.url.ordinal());
                     if (DesktopUtil.getFile_ignoreFailed(url) != null) {
-                        return JColorUtil.rgb("#b3f0ff");
+                        return Pair.of(JColorUtil.rgb("#b3f0ff"), null);
                     } else if (StringUtil_.isUUID(url)) {
-                        return JColorUtil.rgb("#ffeba5");
+                        return Pair.of(JColorUtil.rgb("#ffeba5"), null);
                     } else {
-                        return JColorUtil.rgb("#c6ffb3");
+                        return Pair.of(JColorUtil.rgb("#c6ffb3"), null);
                     }
                 }
             });

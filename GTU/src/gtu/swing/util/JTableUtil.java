@@ -1206,17 +1206,22 @@ public class JTableUtil {
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component ret = wrappedRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            Color color = tableColorDef.getTableBackgroundColour(table, value, isSelected, hasFocus, row, column);
-            ret.setBackground(color);
+            Pair<Color, Color> colorPair = tableColorDef.getTableColour(table, value, isSelected, hasFocus, row, column);
+            if (colorPair == null) {
+                colorPair = Pair.of(null, Color.BLACK);
+            }
+            Color bgColor = colorPair.getRight() != null ? colorPair.getRight() : Color.BLACK;
+            ret.setBackground(colorPair.getLeft());
+            ret.setForeground(bgColor);
             return ret;
         }
     }
 
     /**
-     * 設定欄被景色
+     * 設定欄被景色, 前景色
      */
     public interface TableColorDef {
-        Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column);
+        Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column);
     }
 
     /**

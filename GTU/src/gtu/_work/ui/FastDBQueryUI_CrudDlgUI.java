@@ -46,6 +46,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -222,9 +223,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             System.out.println("-------------init size : " + dialog.rowMap.get().size());
 
-            dialog.searchText.addFocusListener(new FocusAdapter() {
+            dialog.searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                 @Override
-                public void focusLost(FocusEvent e) {
+                public void process(DocumentEvent event) {
                     try {
                         dialog.updateJTableToRowMap();
                         dialog.searchTextFilter();
@@ -233,7 +234,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         JCommonUtil.handleException(ex);
                     }
                 }
-            });
+            }));
 
             dialog.okButton.addActionListener(new ActionListener() {
 
@@ -532,7 +533,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         JTableUtil.defaultSetting(rowTable);
 
-        DefaultTableModel model = JTableUtil.createModel(false, "column", "value", "data type", "where condition", "insert ignore");
+        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "值", "資料類型", "過濾條件", "省略");
         rowTable.setModel(model);
 
         resetColumnWidth();
@@ -1058,6 +1059,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             contentPanel.add(panel, BorderLayout.SOUTH);
             {
                 dbTypeComboBox = new JComboBox();
+                dbTypeComboBox.setToolTipText("資料庫類型");
                 panel.add(dbTypeComboBox);
                 DefaultComboBoxModel model = new DefaultComboBoxModel();
                 for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
@@ -1135,17 +1137,20 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             ex.printStackTrace();
                         }
 
-                        List<JMenuItem> menuList = JTableUtil.newInstance(rowTable).getDefaultJMenuItems_Mask(//
-                                JTableUtil_DefaultJMenuItems_Mask._加列 | //
-                        JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
-                        JTableUtil_DefaultJMenuItems_Mask._移除列 | //
-                        JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
-                        JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
-                        JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
-                        JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 //
-                        );
+                        /*
+                         * List<JMenuItem> menuList =
+                         * JTableUtil.newInstance(rowTable)
+                         * .getDefaultJMenuItems_Mask(//
+                         * JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._移除列 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._清除已選儲存格 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._貼上多行記事本 | //
+                         * JTableUtil_DefaultJMenuItems_Mask._貼上單格記事本 // );
+                         */
                         JPopupMenuUtil inst = JPopupMenuUtil.newInstance(rowTable);
-                        inst.addJMenuItem(menuList);
+                        // inst.addJMenuItem(menuList);
                         System.out.println("valueLst --- " + valueLst + " / " + valueLst.get().size());
                         if (valueLst.get().size() > 0) {
                             JMenuAppender chdMenu = JMenuAppender.newInstance("參考Value");
@@ -1260,6 +1265,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     }
 
     private void resetColumnWidth() {
-        JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 20, 5 });
+        JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 13, 12 });
     }
 }

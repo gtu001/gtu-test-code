@@ -22,11 +22,10 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
@@ -45,7 +44,7 @@ public class LogCatFilterUI extends JFrame {
             public void run() {
                 try {
                     LogCatFilterUI frame = new LogCatFilterUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -192,12 +191,12 @@ public class LogCatFilterUI extends JFrame {
         JTableUtil.setColumnWidths_ByDataContent(logTable, null);
 
         JTableUtil.newInstance(logTable).setColumnColor_byCondition(0, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 String valStr = String.valueOf(value);
-                if(valStr.equals("W")){
-                    return Color.GREEN;
-                }else if(valStr.equals("E")){
-                    return Color.pink;
+                if (valStr.equals("W")) {
+                    return Pair.of(Color.GREEN, null);
+                } else if (valStr.equals("E")) {
+                    return Pair.of(Color.pink, null);
                 }
                 return null;
             }

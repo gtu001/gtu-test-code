@@ -1,0 +1,82 @@
+* {
+	margin:0;
+	padding:0;
+}
+
+.grid {
+	display: grid;
+	grid-template-rows: 1fr 1fr 1fr 1fr;
+	grid-template-areas: 
+	" title title "
+	" header header "
+	" content content "
+	" sidebar sidebar "
+	" footer footer "
+	;
+	grid-gap: 10px;
+}
+
+.title {
+	/* 計算方式同substring */
+	/*
+	grid-column-start: 1; 同A
+	grid-column-end: 3;
+	*/
+	/*
+	grid-column: 1/3; 同A
+	*/
+	/* grid-column-end: span 1; *//* 類似 colspan=1 */
+	/* grid-row-end: span 2; *//* 類似 rowspan=2 */
+	grid-area: title;
+}
+
+.header {
+	grid-area: header;
+}
+.sidebar {
+	grid-area: sidebar;
+}
+.content {
+	grid-area: content;
+	justify-self: start; /* 空間減縮 三種值 start center end */
+}
+.footer {
+	grid-area: footer;
+}
+
+
+.grid div:nth-child(even){
+	background-color: red;
+}
+
+.grid div:nth-child(odd){
+	background-color: green;
+}
+
+#currentStyle {
+	background-color: blue;
+}
+
+/*以上為手機板*/
+@media screen and (min-width: 736px){
+	/*以下為電腦版*/
+	.grid {
+		display: grid;
+		/* grid-template-columns: 1fr 1fr; */
+		/* grid-template-columns: 200px 1fr; */
+		/* grid-template-columns: 20% 1fr; */
+		/* grid-template-columns: auto 1fr; */
+		grid-template-columns: 1fr 500px 500px 1fr;/* col=2, row=4 */
+		grid-template-rows: 1fr 1fr 1fr 1fr;
+		grid-template-areas: 
+		". title title ."
+		". header header ." /* . 表示放空 */
+		". sidebar content ."
+		". footer footer ."
+		;
+	}
+
+	#currentStyle {
+		background-color: yellow;
+	}
+}

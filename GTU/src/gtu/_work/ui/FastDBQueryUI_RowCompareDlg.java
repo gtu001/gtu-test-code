@@ -2,7 +2,9 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,6 +33,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -54,6 +57,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTable importRowTable;
+    private JTabbedPane tabbedPane;
 
     /**
      * Launch the application.
@@ -76,17 +80,18 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
      * Create the dialog.
      */
     public FastDBQueryUI_RowCompareDlg() {
+        setTitle("匯入資料與目前資料庫資料比對");
         setBounds(100, 100, 685, 463);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(new BorderLayout(0, 0));
         {
-            JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+            tabbedPane = new JTabbedPane(JTabbedPane.TOP);
             contentPanel.add(tabbedPane, BorderLayout.CENTER);
             {
                 JPanel panel = new JPanel();
-                tabbedPane.addTab("Import Row", null, panel, null);
+                tabbedPane.addTab("匯入資料[左]<->當前資料庫[右]", null, panel, null);
                 panel.setLayout(new BorderLayout(0, 0));
                 {
                     JPanel panel_1 = new JPanel();
@@ -103,7 +108,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                         panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
                     }
                     {
-                        JButton syncQueryConditionBtn = new JButton("同步SQL");
+                        JButton syncQueryConditionBtn = new JButton("產生SQL");
                         syncQueryConditionBtn.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 syncQueryConditionBtnAction(true);
@@ -112,7 +117,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                         panel_1.add(syncQueryConditionBtn);
                     }
                     {
-                        JButton queryBtn = new JButton("執行SQL");
+                        JButton queryBtn = new JButton("以SQL查詢");
                         queryBtn.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 queryBtnAction();
@@ -130,6 +135,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                     panel.add(panel_1, BorderLayout.SOUTH);
                     {
                         dbTypeComboBox = new JComboBox();
+                        dbTypeComboBox.setToolTipText("資料庫類型");
                         DefaultComboBoxModel model = new DefaultComboBoxModel();
                         for (DBDateUtil.DBDateFormat e : DBDateUtil.DBDateFormat.values()) {
                             model.addElement(e);
@@ -143,19 +149,19 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                         panel_1.add(onlyNotEqualChk);
                     }
                     {
-                        importRowToCompareRowRadio = new JRadioButton("轉 Import Row");
+                        importRowToCompareRowRadio = new JRadioButton("產生匯入資料SQL");
                         importRowToCompareRowRadio.setSelected(true);
                         panel_1.add(importRowToCompareRowRadio);
                     }
                     {
-                        otherRowToImportRowRadio = new JRadioButton("轉 Compare Row");
+                        otherRowToImportRowRadio = new JRadioButton("產生當前資料庫SQL");
                         panel_1.add(otherRowToImportRowRadio);
                     }
                     {
                         createRadioButtonGroup = JButtonGroupUtil.createRadioButtonGroup(importRowToCompareRowRadio, otherRowToImportRowRadio);
                     }
                     {
-                        JButton importRowToOtherRowBtn = new JButton("執行update SQL");
+                        JButton importRowToOtherRowBtn = new JButton("執行Update SQL");
                         importRowToOtherRowBtn.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
                                 importRowToOtherRowBtnAction();
@@ -176,7 +182,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             }
             {
                 JPanel panel = new JPanel();
-                tabbedPane.addTab("Other Rows", null, panel, null);
+                tabbedPane.addTab("選取資料庫資料", null, panel, null);
                 panel.setLayout(new BorderLayout(0, 0));
                 {
                     JPanel panel_1 = new JPanel();
@@ -235,7 +241,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
     }
 
     private DefaultTableModel initImportRowTable() {
-        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "Import Row", "Compare Row", "where Condition");
+        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "匯入資料", "目前資料庫資料", "PK");
         importRowTable.setModel(model);
         JTableUtil.setColumnWidths_Percent(importRowTable, new float[] { 30, 30, 30, 5 });
 
@@ -244,36 +250,36 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         sportColumn4.setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
         JTableUtil.newInstance(importRowTable).setColumnColor_byCondition(0, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2)) {
-                    return Color.RED;
+                    return Pair.of(Color.RED, null);
                 }
                 return null;
             }
         });
 
         JTableUtil.newInstance(importRowTable).setColumnColor_byCondition(1, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v1))) {
-                    return Color.GREEN;
+                    return Pair.of(Color.GREEN, null);
                 }
                 return null;
             }
         });
 
         JTableUtil.newInstance(importRowTable).setColumnColor_byCondition(2, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v2))) {
-                    return Color.GREEN;
+                    return Pair.of(Color.GREEN, null);
                 }
                 return null;
             }
@@ -392,6 +398,13 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             for (int ii = 0; ii < queryList.getRight().size(); ii++) {
                 model.addRow(queryList.getRight().get(ii));
             }
+            if (queryList.getRight().isEmpty()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("此SQL無資料,查無比對來源!");
+                return;
+            } else {
+                tabbedPane.setSelectedIndex(1);
+                JCommonUtil._jOptionPane_showMessageDialog_info("請選擇比對資料!");
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -411,6 +424,8 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 String value = getImportValue(column, selectRow, Pair.of(queryList.getLeft(), queryList.getRight()));
                 importRowTable.setValueAt(value, row, colPos);
             }
+
+            tabbedPane.setSelectedIndex(0);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }

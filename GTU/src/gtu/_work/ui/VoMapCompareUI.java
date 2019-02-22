@@ -33,6 +33,7 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -362,36 +363,36 @@ public class VoMapCompareUI extends JFrame {
 
     private void initTableConfig() {
         JTableUtil.newInstance(compareTable).setColumnColor_byCondition(0, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(compareTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2)) {
-                    return Color.RED;
+                    return Pair.of(Color.RED, null);
                 }
                 return null;
             }
         });
 
         JTableUtil.newInstance(compareTable).setColumnColor_byCondition(1, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(compareTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v1)) && !"NA".equals(v1)) {
-                    return Color.GREEN;
+                    return Pair.of(Color.GREEN, null);
                 }
                 return null;
             }
         });
 
         JTableUtil.newInstance(compareTable).setColumnColor_byCondition(2, new JTableUtil.TableColorDef() {
-            public Color getTableBackgroundColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(compareTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
                 if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v2)) && !"NA".equals(v2)) {
-                    return Color.GREEN;
+                    return Pair.of(Color.GREEN, null);
                 }
                 return null;
             }
