@@ -538,14 +538,23 @@ public class FacebookVideoDownloader extends JFrame {
 
                         JPopupMenuUtil.newInstance(downloadListTable)//
                                 .addJMenuItem("重新下載/繼續下載", new ActionListener() {
-
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         try {
                                             ((DefaultTableModel) downloadListTable.getModel()).removeRow(row);
                                             appendToDownloadBar(vo.orign, true, true);
                                         } catch (Exception ex) {
-
+                                            JCommonUtil.handleException(ex);
+                                        }
+                                    }
+                                })//
+                                .addJMenuItem("移除此筆資料", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            ((DefaultTableModel) downloadListTable.getModel()).removeRow(row);
+                                        } catch (Exception ex) {
+                                            JCommonUtil.handleException(ex);
                                         }
                                     }
                                 })//
@@ -778,9 +787,11 @@ public class FacebookVideoDownloader extends JFrame {
                 if (throwEx) {
                     throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
                 } else {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在目的!");
+                    boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在目的,是否要繼續下載?", "繼續下載");
+                    if (!isContinue) {
+                        return;
+                    }
                 }
-                return;
             }
         }
 
