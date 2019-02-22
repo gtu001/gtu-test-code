@@ -441,6 +441,12 @@ public class FastDBQueryUI extends JFrame {
         sqlIdColorComboBox = new JComboBox();
         sqlIdColorComboBox.setModel(RefSearchColor.getModel());
         sqlIdPanel.add(sqlIdColorComboBox);
+        sqlIdColorComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sqlTextAreaChange();
+            }
+        });
 
         lblNewLabel_9 = new JLabel("類別");
         sqlIdPanel.add(lblNewLabel_9);
@@ -479,6 +485,21 @@ public class FastDBQueryUI extends JFrame {
                 sqlIdCommentArea = new JTextArea();
                 sqlIdCommentArea.setToolTipText("SQL註解");
                 JTextAreaUtil.applyCommonSetting(sqlIdCommentArea);
+                sqlIdCommentArea.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
+                        e.getKeyCode() == KeyEvent.VK_S) {
+                            JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
+                        }
+                    }
+                });
+                sqlIdCommentArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                    @Override
+                    public void process(DocumentEvent event) {
+                        sqlTextAreaChange();
+                    }
+                }));
 
                 innerPanel1.add(innerPanel11, BorderLayout.CENTER);
                 innerPanel11.setLayout(new FormLayout(
@@ -2786,15 +2807,6 @@ public class FastDBQueryUI extends JFrame {
         }
 
         @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((category == null) ? 0 : category.hashCode());
-            result = prime * result + ((sqlId == null) ? 0 : sqlId.hashCode());
-            return result;
-        }
-
-        @Override
         public boolean equals(Object obj) {
             if (this == obj)
                 return true;
@@ -2807,6 +2819,42 @@ public class FastDBQueryUI extends JFrame {
                 if (other.category != null)
                     return false;
             } else if (!category.equals(other.category))
+                return false;
+            if (sqlId == null) {
+                if (other.sqlId != null)
+                    return false;
+            } else if (!sqlId.equals(other.sqlId))
+                return false;
+            return true;
+        }
+
+        public boolean equalsAll(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            SqlIdConfigBean other = (SqlIdConfigBean) obj;
+            if (category == null) {
+                if (other.category != null)
+                    return false;
+            } else if (!category.equals(other.category))
+                return false;
+            if (color == null) {
+                if (other.color != null)
+                    return false;
+            } else if (!color.equals(other.color))
+                return false;
+            if (sql == null) {
+                if (other.sql != null)
+                    return false;
+            } else if (!sql.equals(other.sql))
+                return false;
+            if (sqlComment == null) {
+                if (other.sqlComment != null)
+                    return false;
+            } else if (!sqlComment.equals(other.sqlComment))
                 return false;
             if (sqlId == null) {
                 if (other.sqlId != null)
@@ -3535,16 +3583,18 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private SqlIdConfigBean getCurrentEditSqlIdConfigBean() {
-        String sqlId = sqlIdText.getText().toString();
+        String sqlId = sqlIdText.getText();
         RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
-        String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText().toString();
-        String sql = sqlTextArea.getText().toString();
+        String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
+        String sql = sqlTextArea.getText();
+        String sqlComment = sqlIdCommentArea.getText();
 
         SqlIdConfigBean bean = new SqlIdConfigBean();
         bean.sql = sql;
         bean.sqlId = sqlId;
         bean.category = category;
         bean.color = color.colorCode;
+        bean.sqlComment = sqlComment;
         return bean;
     }
 
@@ -3553,9 +3603,7 @@ public class FastDBQueryUI extends JFrame {
             String text = sqlTextArea.getText();
             boolean isNotEqual = false;
             if (sqlBean != null) {
-                if (!StringUtils.equals(StringUtils.trimToEmpty(text), StringUtils.trimToEmpty(sqlBean.sql))) {
-                    isNotEqual = true;
-                } else if (!StringUtils.equals(sqlBean.getUniqueKey(), getCurrentEditSqlIdConfigBean().getUniqueKey())) {
+                if (!sqlBean.equalsAll(getCurrentEditSqlIdConfigBean())) {
                     isNotEqual = true;
                 }
             } else {
