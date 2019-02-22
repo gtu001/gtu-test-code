@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -11,7 +10,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -1861,31 +1859,7 @@ public class FastDBQueryUI extends JFrame {
                 return sqlParam;
             }
         }
-
-        // 一般處理
-        Pattern ptn = Pattern.compile("\\:(\\w+)");
-        Matcher mth = ptn.matcher(sql);
-
-        List<String> paramList = new ArrayList<String>();
-        Set<String> paramSet = new LinkedHashSet<String>();
-
-        StringBuffer sb2 = new StringBuffer();
-
-        while (mth.find()) {
-            String key = mth.group(1);
-            paramList.add(key);
-            paramSet.add(key);
-            mth.appendReplacement(sb2, "?");
-        }
-        mth.appendTail(sb2);
-
-        SqlParam sqlParam = new SqlParam();
-        sqlParam.orginialSql = sql;
-        sqlParam.paramSet = paramSet;
-        sqlParam.questionSql = sb2.toString();
-        sqlParam.paramList = paramList;
-        sqlParam.parseToSqlInjectionMap(sql);
-        return sqlParam;
+        return SqlParam.parseToSqlParam(sql);
     }
 
     private static class SqlParam {
@@ -1926,6 +1900,33 @@ public class FastDBQueryUI extends JFrame {
             lst.addAll(paramSet);
             lst.addAll(sqlInjectionMap.keySet());
             return lst;
+        }
+
+        public static SqlParam parseToSqlParam(String sql) {
+            // 一般處理
+            Pattern ptn = Pattern.compile("\\:(\\w+)");
+            Matcher mth = ptn.matcher(sql);
+
+            List<String> paramList = new ArrayList<String>();
+            Set<String> paramSet = new LinkedHashSet<String>();
+
+            StringBuffer sb2 = new StringBuffer();
+
+            while (mth.find()) {
+                String key = mth.group(1);
+                paramList.add(key);
+                paramSet.add(key);
+                mth.appendReplacement(sb2, "?");
+            }
+            mth.appendTail(sb2);
+
+            SqlParam sqlParam = new SqlParam();
+            sqlParam.orginialSql = sql;
+            sqlParam.paramSet = paramSet;
+            sqlParam.questionSql = sb2.toString();
+            sqlParam.paramList = paramList;
+            sqlParam.parseToSqlInjectionMap(sql);
+            return sqlParam;
         }
     }
 
@@ -3290,6 +3291,43 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    private static class HardcodeParamDetecter {
+        Map<String, String> values = new HashMap<String, String>();
+        Pattern ptn1 = Pattern.compile("([\\w\\.]+)[\\s|\\t]*\\=[\\s|\\t]*(\'[^\n]*?\'|[\\-\\d\\.]+)", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern ptn2 = Pattern.compile("(\'[^\n]*?\'|[\\-\\d\\.]+)[\\s|\\t]*\\=[\\s|\\t]*([\\w\\.]+)", Pattern.MULTILINE | Pattern.DOTALL);
+
+        HardcodeParamDetecter(String sql) {
+            sql = StringUtils.defaultString(sql);
+            Matcher mth = ptn1.matcher(sql);
+            while (mth.find()) {
+                String param = getParam(mth.group(1));
+                String value = getVal(mth.group(2));
+                System.out.println("\t detect : K:" + param + " \t V:" + value);
+                values.put(param, value);
+            }
+            mth = ptn2.matcher(sql);
+            while (mth.find()) {
+                String param = getParam(mth.group(2));
+                String value = getVal(mth.group(1));
+                System.out.println("\t detect : K:" + param + " \t V:" + value);
+                values.put(param, value);
+            }
+        }
+
+        private String getParam(String value) {
+            return StringUtils.defaultString(value).replaceAll("^\\w+\\.", "").toUpperCase();
+        }
+
+        private String getVal(String value) {
+            String tmpVal = StringUtils.defaultString(value).replaceAll("^\'|\'$", "");
+            if (!tmpVal.contains("'")) {
+                return tmpVal;
+            } else {
+                return tmpVal.substring(tmpVal.lastIndexOf("'") + 1);
+            }
+        }
+    }
+
     private class FakeDataModelHandler {
         private Map<String, String> getParametersTable_Map() {
             Map<String, String> paramMap = new LinkedHashMap<String, String>();
@@ -3302,10 +3340,15 @@ public class FastDBQueryUI extends JFrame {
             return paramMap;
         }
 
+        private Map<String, String> getHardcodeParameters() {
+            return new HardcodeParamDetecter(sqlTextArea.getText()).values;
+        }
+
         TableInfo tabInfo = new TableInfo();
         DefaultTableModel model = JTableUtil.createModel(true, new Object[0]);
         List<Object[]> queryLst = new ArrayList<Object[]>();
         Map<String, String> parameterTableMap;
+        Map<String, String> hardcodeMap;
         List<String> columns;
         Triple<List<String>, List<Class<?>>, List<Object[]>> queryList;
 
@@ -3345,6 +3388,7 @@ public class FastDBQueryUI extends JFrame {
         public FakeDataModelHandler(Pair<SqlParam, List<Object>> pair, DataSource ds) {
             try {
                 this.parameterTableMap = getParametersTable_Map();
+                this.hardcodeMap = getHardcodeParameters();
 
                 tabInfo.execute(pair.getLeft().getQuestionSql(), pair.getRight().toArray(), ds.getConnection());
                 columns = new ArrayList<String>(tabInfo.getColumns());
@@ -3359,7 +3403,10 @@ public class FastDBQueryUI extends JFrame {
                     Class<?> typeClz = null;
 
                     // 用 參數表的 值來當作預設值
-                    if (parameterTableMap.containsKey(col)) {
+                    if (hardcodeMap.containsKey(col)) {
+                        val = hardcodeMap.get(col);
+                        editColumnHistoryHandler.addColumnDef(col, val);
+                    } else if (parameterTableMap.containsKey(col)) {
                         val = parameterTableMap.get(col);
                         editColumnHistoryHandler.addColumnDef(col, val);
                     } else if (editColumnHistoryHandler.hasColumnDef(col)) {
