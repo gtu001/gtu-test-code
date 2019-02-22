@@ -31,7 +31,15 @@ public class DropboxHtmlService {
         dao.insert(vo);
     }
 
-    public List<DropboxHtmlDAO.DropboxHtml> findAll(){
+    public List<DropboxHtmlDAO.DropboxHtml> findAll() {
         return dao.queryAll();
+    }
+
+    public boolean deleteByFileName(String fileName) {
+        return 0 != dao.deleteByPk(fileName);
+    }
+
+    public boolean deleteByFullPath(String fullPath) {
+        return 0 != dao.deleteByFullPath(fullPath);
     }
 }

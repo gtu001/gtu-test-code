@@ -264,6 +264,14 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             String fullPath = (String) map.get("fullPath");
             return fullPath.replaceAll("\\.(htm|html)", ".files");
         }
+
+        public boolean deleteByFileName(String fileName) {
+            return this.dropboxHtmlService.deleteByFileName(fileName);
+        }
+
+        public boolean deleteByFullPath(String fileName) {
+            return this.dropboxHtmlService.deleteByFullPath(fileName);
+        }
     }
 
     private void initList() {
@@ -306,6 +314,15 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
         dropboxListItemLoader.aryAdapter.notifyDataSetChanged();
     }
 
+    //刪除　dropbox HTML 檔案
+    private boolean deleteHtmlFile(String fullPath) {
+        if (dropboxFileLoadService.deletePath(fullPath)) {
+            dropboxHtmlService.deleteByFullPath(fullPath);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         final Map<String, Object> map = dropboxListItemLoader.listItem.get(position);
@@ -322,7 +339,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
                                 DropboxHtmlListActivityStarter.goBack(map, DropboxHtmlListActivity.this);
                                 break;
                             case 1:
-                                SimpleDialogHelper.showConfirm("", "是否確認刪除", new DialogInterface.OnClickListener() {
+                                SimpleDialogHelper.showConfirm("是否刪除?", (String) map.get("ItemTitle"), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         String htmlFolderPath = dropboxListItemLoader.getHtmlFolder(map);
@@ -333,7 +350,7 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
 
                                         if (dropboxFileLoadService.isPathExists(fullPath)) {
                                             existsCount++;
-                                            deleteCount += dropboxFileLoadService.deletePath(fullPath) ? 1 : 0;
+                                            deleteCount += deleteHtmlFile(fullPath) ? 1 : 0;
                                         }
 
                                         if (dropboxFileLoadService.isPathExists(htmlFolderPath)) {
@@ -369,55 +386,60 @@ public class DropboxHtmlListActivity extends Activity implements AdapterView.OnI
             return;
         }
 
-        final AtomicBoolean isStop = new AtomicBoolean(false);
-
-        final ProgressDialog dialog02 = new ProgressDialog(DropboxHtmlListActivity.this);
-        dialog02.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog02.setMessage("刪除中...");
-        dialog02.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        SimpleDialogHelper.showConfirm("是否刪除檔案?", "刪除檔案數 : " + delLst.size(), new DialogInterface.OnClickListener() {
             @Override
-            public void onCancel(DialogInterface dialog) {
-                isStop.set(true);
-            }
-        });
-        dialog02.setCancelable(true);
-        dialog02.setMax(delLst.size());
-        dialog02.show();
+            public void onClick(DialogInterface dialog, int which) {
+                final AtomicBoolean isStop = new AtomicBoolean(false);
 
-        Thread deleteThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
-            @Override
-            public void run() {
-                final AtomicInteger existsCount = new AtomicInteger(0);
-                final AtomicInteger deleteCount = new AtomicInteger(0);
-
-                for (Pair<String, String> p : delLst) {
-                    if (isStop.get()) {
-                        break;
-                    }
-
-                    if (dropboxFileLoadService.isPathExists(p.getLeft())) {
-                        existsCount.addAndGet(1);
-                        deleteCount.addAndGet(dropboxFileLoadService.deletePath(p.getLeft()) ? 1 : 0);
-                    }
-
-                    if (dropboxFileLoadService.isPathExists(p.getRight())) {
-                        existsCount.addAndGet(1);
-                        deleteCount.addAndGet(dropboxFileLoadService.deletePath(p.getRight()) ? 1 : 0);
-                    }
-
-                    dialog02.incrementProgressBy(1);
-                }
-
-                handler.post(new Runnable() {
+                final ProgressDialog dialog02 = new ProgressDialog(DropboxHtmlListActivity.this);
+                dialog02.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog02.setMessage("刪除中...");
+                dialog02.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
-                    public void run() {
-                        dialog02.dismiss();
-                        SimpleDialogHelper.showMessage("刪除結果", String.format("路徑數 : %d , 刪除數 : %d", existsCount.get(), deleteCount.get()), DropboxHtmlListActivity.this);
+                    public void onCancel(DialogInterface dialog) {
+                        isStop.set(true);
                     }
                 });
+                dialog02.setCancelable(true);
+                dialog02.setMax(delLst.size());
+                dialog02.show();
+
+                Thread deleteThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+                    @Override
+                    public void run() {
+                        final AtomicInteger existsCount = new AtomicInteger(0);
+                        final AtomicInteger deleteCount = new AtomicInteger(0);
+
+                        for (Pair<String, String> p : delLst) {
+                            if (isStop.get()) {
+                                break;
+                            }
+
+                            if (dropboxFileLoadService.isPathExists(p.getLeft())) {
+                                existsCount.addAndGet(1);
+                                deleteCount.addAndGet(dropboxFileLoadService.deletePath(p.getLeft()) ? 1 : 0);
+                            }
+
+                            if (dropboxFileLoadService.isPathExists(p.getRight())) {
+                                existsCount.addAndGet(1);
+                                deleteCount.addAndGet(deleteHtmlFile(p.getRight()) ? 1 : 0);
+                            }
+
+                            dialog02.incrementProgressBy(1);
+                        }
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog02.dismiss();
+                                SimpleDialogHelper.showMessage("刪除結果", String.format("路徑數 : %d , 刪除數 : %d", existsCount.get(), deleteCount.get()), DropboxHtmlListActivity.this);
+                            }
+                        });
+                    }
+                }, "deleteThread..");
+                deleteThread.start();
             }
-        }, "deleteThread..");
-        deleteThread.start();
+        }, this);
     }
 
     public static class DropboxHtmlListActivityStarter {

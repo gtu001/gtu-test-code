@@ -187,6 +187,16 @@ public class DropboxHtmlDAO {
         return result;
     }
 
+    public int deleteByFullPath(String fullPath) {
+        SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
+        String where = DropboxHtmlSchema.FULL_PATH + " = ? ";
+        String[] condition = new String[]{fullPath};
+        int result = db.delete(DropboxHtmlSchema.TABLE_NAME, where, condition);
+        db.close();
+        return result;
+    }
+
+
     public int deleteByCondition(String whereCondition, String[] properties) {
         SQLiteDatabase db = DBConnection.getInstance(context).getWritableDatabase();
         int result = db.delete(DropboxHtmlSchema.TABLE_NAME, whereCondition, properties);
