@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -40,6 +41,11 @@ import javax.swing.table.TableModel;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
@@ -95,6 +101,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
     List<Triple<Integer, String, String>> backupModel;
 
     private static final boolean DEBUG = !PropertiesUtil.isClassInJar(PropertyEditUI.class);
+    private JLabel lblNewLabel;
+    private JLabel lblNewLabel_1;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -483,68 +491,82 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             });
                         }
                     }
-                    {
-                        fileQueryText = new JTextField();
-                        fileQueryText.setToolTipText("檔名過濾");
-                        jPanel3.add(fileQueryText, BorderLayout.NORTH);
-                        fileQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-                            @Override
-                            public void process(DocumentEvent event) {
-                                String text = JCommonUtil.getDocumentText(event);
-                                System.out.println("fileQueryText : [" + text + "]");
-                                text = text.toLowerCase();
-                                DefaultListModel model = new DefaultListModel();
-                                for (File f : backupFileList) {
-                                    if (StringUtils.isBlank(text) || f.getName().replaceAll("\\.properties", "").toLowerCase().contains(text)) {
-                                        File_ ff = new File_(f);
-                                        model.addElement(ff);
-                                    }
-                                }
-                                fileList.setModel(model);
-                            }
-                        }));
-                    }
-                    {
-                        contentQueryText = new JTextField();
-                        contentQueryText.setToolTipText("內容過濾(按Enter生效)");
-                        jPanel3.add(contentQueryText, BorderLayout.SOUTH);
-                        contentQueryText.addActionListener(new ActionListener() {
-
-                            void addModel(File f, DefaultListModel model) {
-                                File_ ff = new File_(f);
-                                model.addElement(ff);
-                            }
-
-                            void resetAllData() {
-                                DefaultListModel model = new DefaultListModel();
-                                for (File f : backupFileList) {
-                                    model.addElement(new File_(f));
-                                }
-                                fileList.setModel(model);
-                            }
-
-                            public void actionPerformed(ActionEvent evt) {
-                                DefaultListModel model = new DefaultListModel();
-                                String text = contentQueryText.getText();
-                                if (StringUtils.isBlank(contentQueryText.getText())) {
-                                    resetAllData();
-                                    return;
-                                }
-                                text = text.toLowerCase();
-                                for (File f : backupFileList) {
-                                    Properties p = PropertiesUtil.loadProperties(f, null, false);
-                                    for (Entry e : p.entrySet()) {
-                                        if (StringUtils.defaultString((String) e.getKey()).toLowerCase().contains(text) || //
-                                        StringUtils.defaultString((String) e.getValue()).toLowerCase().contains(text)) {
-                                            model.addElement(new File_(f));
+                    {// 搜尋列 -----------------------↓↓↓↓↓↓↓
+                        JPanel filterPanel = new JPanel();
+                        {
+                            fileQueryText = new JTextField();
+                            fileQueryText.setToolTipText("檔名過濾");
+                            jPanel3.add(fileQueryText, BorderLayout.NORTH);
+                            fileQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                @Override
+                                public void process(DocumentEvent event) {
+                                    String text = JCommonUtil.getDocumentText(event);
+                                    System.out.println("fileQueryText : [" + text + "]");
+                                    text = text.toLowerCase();
+                                    DefaultListModel model = new DefaultListModel();
+                                    for (File f : backupFileList) {
+                                        if (StringUtils.isBlank(text) || f.getName().replaceAll("\\.properties", "").toLowerCase().contains(text)) {
+                                            File_ ff = new File_(f);
+                                            model.addElement(ff);
                                         }
                                     }
+                                    fileList.setModel(model);
                                 }
-                                fileList.setModel(model);
-                                JCommonUtil._jOptionPane_showMessageDialog_info("符合檔案筆數 : " + model.getSize());
-                            }
-                        });
-                    }
+                            }));
+
+                            contentQueryText = new JTextField();
+                            contentQueryText.setToolTipText("內容過濾(按Enter生效)");
+                            contentQueryText.addActionListener(new ActionListener() {
+
+                                void addModel(File f, DefaultListModel model) {
+                                    File_ ff = new File_(f);
+                                    model.addElement(ff);
+                                }
+
+                                void resetAllData() {
+                                    DefaultListModel model = new DefaultListModel();
+                                    for (File f : backupFileList) {
+                                        model.addElement(new File_(f));
+                                    }
+                                    fileList.setModel(model);
+                                }
+
+                                public void actionPerformed(ActionEvent evt) {
+                                    DefaultListModel model = new DefaultListModel();
+                                    String text = contentQueryText.getText();
+                                    if (StringUtils.isBlank(contentQueryText.getText())) {
+                                        resetAllData();
+                                        return;
+                                    }
+                                    text = text.toLowerCase();
+                                    for (File f : backupFileList) {
+                                        Properties p = PropertiesUtil.loadProperties(f, null, false);
+                                        for (Entry e : p.entrySet()) {
+                                            if (StringUtils.defaultString((String) e.getKey()).toLowerCase().contains(text) || //
+                                            StringUtils.defaultString((String) e.getValue()).toLowerCase().contains(text)) {
+                                                model.addElement(new File_(f));
+                                            }
+                                        }
+                                    }
+                                    fileList.setModel(model);
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("符合檔案筆數 : " + model.getSize());
+                                }
+                            });
+                        }
+                        {
+                            filterPanel.setLayout(
+                                    new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                            new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                    FormFactory.DEFAULT_ROWSPEC, FormFactory.LINE_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                            lblNewLabel = new JLabel("檔名過濾");
+                            filterPanel.add(lblNewLabel, "2, 2, right, default");
+                            filterPanel.add(fileQueryText, "4, 2, fill, default");
+                            lblNewLabel_1 = new JLabel("內容過濾(需按Enter)");
+                            filterPanel.add(lblNewLabel_1, "2, 4, right, default");
+                            filterPanel.add(contentQueryText, "4, 4, fill, default");
+                            jPanel3.add(filterPanel, BorderLayout.NORTH);
+                        }
+                    } // 搜尋列 -----------------------↑↑↑↑↑↑↑
                 }
             }
 
