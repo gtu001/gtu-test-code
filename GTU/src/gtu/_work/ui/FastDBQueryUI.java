@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -10,6 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -327,6 +329,13 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void keyReleased(KeyEvent e) {
                 sqlListKeyPressAction(e);
+            }
+        });
+        JListUtil.newInstance(sqlList).applyOnHoverEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SqlIdConfigBean sqlBean = (SqlIdConfigBean) e.getSource();
+                sqlList.setToolTipText(StringUtils.trimToNull(sqlBean.sqlComment));
             }
         });
 
@@ -1010,7 +1019,6 @@ public class FastDBQueryUI extends JFrame {
                     }
                     if (JMouseEventUtil.buttonLeftClick(1, e)) {
                         refSearchText.setText(bean.searchKey);
-                        refSearchList.setToolTipText(bean.content);
                         refContentArea.setText(bean.content);
                         refSearchCategoryCombobox_Auto.getTextComponent().setText(bean.category);
                         refSearchColorComboBox.setSelectedItem(RefSearchColor.valueFrom(bean.categoryColor));
@@ -1037,6 +1045,14 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        JListUtil.newInstance(refSearchList).applyOnHoverEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RefSearchListConfigBean bean = (RefSearchListConfigBean) e.getSource();
+                refSearchList.setToolTipText(StringUtils.trimToNull(bean.content));
+            }
+        });
+
         panel_18.add(JCommonUtil.createScrollComponent(refSearchList), BorderLayout.CENTER);
 
         panel_6 = new JPanel();
@@ -2048,8 +2064,6 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
         sqlIdColorComboBox.setSelectedItem(RefSearchColor.valueFrom(sqlBean.color));
         sqlIdCommentArea.setText(sqlBean.sqlComment);
-
-        sqlList.setToolTipText(StringUtils.trimToEmpty(sqlBean.sqlComment));
 
         // 載入參數設定
         sqlParameterConfigLoadHandler.init(sqlBean.getUniqueKey());

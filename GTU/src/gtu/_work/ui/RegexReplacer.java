@@ -331,8 +331,6 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 repToText.setText(config.toVal);
                                 tradeOffArea.setText(config.tradeOff);
 
-                                templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
-
                                 // 放入執行紀錄 並 載入預設
                                 simpleConfigHandler.put(configKeyText.getText());
                                 simpleConfigHandler.load(configKeyText.getText());
@@ -363,6 +361,14 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 } catch (Exception e) {
                                     JCommonUtil.handleException(e);
                                 }
+                            }
+                        });
+
+                        JListUtil.newInstance(templateList).applyOnHoverEvent(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                PropConfigHandler.Config config = (PropConfigHandler.Config) e.getSource();
+                                templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
                             }
                         });
 

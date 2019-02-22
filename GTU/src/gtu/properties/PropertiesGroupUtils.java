@@ -68,7 +68,12 @@ public class PropertiesGroupUtils {
     private void setParametersToTable(int index, Map<String, String> param) {
         for (String column : param.keySet()) {
             String columnKey = column + "_" + index;
-            String value = param.get(column);
+            String value = "";
+            if (param.containsKey(column)) {
+                value = param.get(column);
+            } else {
+                System.out.println("[setParametersToTable] 找不到Key : " + column);
+            }
             configProp.put(columnKey, value);
         }
     }

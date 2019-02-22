@@ -2,8 +2,12 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -219,5 +223,27 @@ public class JListUtil {
             }
         });
         return this;
+    }
+
+    /**
+     * 設定選項hover事件
+     */
+    public void applyOnHoverEvent(final ActionListener listener) {
+        jList1.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (listener == null) {
+                    return;
+                }
+                final int i = jList1.locationToIndex(e.getPoint());
+                if (i > -1) {
+                    final Rectangle bounds = jList1.getCellBounds(i, i + 1);
+                    if (bounds.contains(e.getPoint())) {
+                        Object hoverObj = jList1.getModel().getElementAt(i);
+                        listener.actionPerformed(new ActionEvent(hoverObj, i, "selectIndex"));
+                    }
+                }
+            }
+        });
     }
 }
