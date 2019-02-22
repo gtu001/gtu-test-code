@@ -7,5 +7,5 @@ sublime
 
 <快捷>
 按ctrl + shift + p 輸入 key bindings
-右邊 user 視窗加入以下
-{ "keys": ["ctrl+shift+r"], "command": "reindent" , "args": { "single_line": false } },
+右邊 user 視窗內中括號加入以下
+{ "keys": ["alt+shift+F"], "command": "reindent" , "args": { "single_line": false } },
