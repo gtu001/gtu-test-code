@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -206,9 +207,9 @@ public class FastDBQueryUI extends JFrame {
     private JLabel queryResultCountLabel;
     private JButton deleteParameterBtn;
 
-    private JFrameRGBColorPanel jFrameRGBColorPanel = null;
+    private static AtomicReference<JFrameRGBColorPanel> jFrameRGBColorPanel = new AtomicReference<JFrameRGBColorPanel>();
+    private static AtomicReference<HideInSystemTrayHelper> hideInSystemTrayHelper = new AtomicReference<HideInSystemTrayHelper>();
     private JButton prevConnBtn;
-    private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
     private JLabel lblNewLabel_4;
     private JTextField sqlContentFilterText;
     private JLabel lblNewLabel_5;
@@ -279,7 +280,24 @@ public class FastDBQueryUI extends JFrame {
             System.out.println("=====" + info.getClassName());
             // javax.swing.UIManager.setLookAndFeel(info.getClassName());
         }
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "big_boobs.ico", FastDBQueryUI.class, true);
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "big_boobs.ico", FastDBQueryUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+                if (jFrameRGBColorPanel.get() == null) {
+                    jFrameRGBColorPanel.set(new JFrameRGBColorPanel(self.getJframe()));
+                }
+                if (hideInSystemTrayHelper.get() == null) {
+                    hideInSystemTrayHelper.set(HideInSystemTrayHelper.newInstance());
+                    hideInSystemTrayHelper.get().apply(self.getJframe());
+                }
+                self.getTempalteHoldingContainMap().put("jFrameRGBColorPanel", jFrameRGBColorPanel);
+                self.getTempalteHoldingContainMap().put("hideInSystemTrayHelper", hideInSystemTrayHelper);
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
+            }
+        });
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
@@ -1292,12 +1310,17 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/big_boobs.ico");
             this.setTitle("You Set My World On Fire");
 
-            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            if (jFrameRGBColorPanel.get() == null) {
+                jFrameRGBColorPanel.set(new JFrameRGBColorPanel(this));
+            }
             //
-            panel_17.add(jFrameRGBColorPanel.getToggleButton(false));
+            panel_17.add(jFrameRGBColorPanel.get().getToggleButton(false));
 
-            hideInSystemTrayHelper.apply(this);
-            panel_17.add(hideInSystemTrayHelper.getToggleButton(false));
+            if (hideInSystemTrayHelper.get() == null) {
+                hideInSystemTrayHelper.set(HideInSystemTrayHelper.newInstance());
+                hideInSystemTrayHelper.get().apply(this);
+            }
+            panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
         }
     }
 
@@ -2683,7 +2706,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public JFrameRGBColorPanel getjFrameRGBColorPanel() {
-        return jFrameRGBColorPanel;
+        return jFrameRGBColorPanel.get();
     }
 
     private void connTestBtnAction() {

@@ -240,7 +240,7 @@ public class JCommonUtil {
      */
     public static String getDocumentText(DocumentEvent doc) {
         try {
-            return doc.getDocument().getText(0, doc.getDocument().getEndPosition().getOffset());
+            return doc.getDocument().getText(0, doc.getDocument().getEndPosition().getOffset() - 1);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }

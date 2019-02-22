@@ -106,7 +106,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             System.out.println("=====" + info.getClassName());
             // javax.swing.UIManager.setLookAndFeel(info.getClassName());
         }
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "cheater.ico", RegexReplacer.class, true);
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "cheater.ico", RegexReplacer.class, true, null);
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {

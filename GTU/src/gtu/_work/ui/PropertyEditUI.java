@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -486,14 +485,17 @@ public class PropertyEditUI extends javax.swing.JFrame {
                     }
                     {
                         fileQueryText = new JTextField();
+                        fileQueryText.setToolTipText("檔名過濾");
                         jPanel3.add(fileQueryText, BorderLayout.NORTH);
                         fileQueryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                             @Override
                             public void process(DocumentEvent event) {
                                 String text = JCommonUtil.getDocumentText(event);
+                                System.out.println("fileQueryText : [" + text + "]");
+                                text = text.toLowerCase();
                                 DefaultListModel model = new DefaultListModel();
                                 for (File f : backupFileList) {
-                                    if (f.getName().contains(text)) {
+                                    if (StringUtils.isBlank(text) || f.getName().replaceAll("\\.properties", "").toLowerCase().contains(text)) {
                                         File_ ff = new File_(f);
                                         model.addElement(ff);
                                     }
@@ -504,6 +506,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                     }
                     {
                         contentQueryText = new JTextField();
+                        contentQueryText.setToolTipText("內容過濾(按Enter生效)");
                         jPanel3.add(contentQueryText, BorderLayout.SOUTH);
                         contentQueryText.addActionListener(new ActionListener() {
 
@@ -512,52 +515,40 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 model.addElement(ff);
                             }
 
+                            void resetAllData() {
+                                DefaultListModel model = new DefaultListModel();
+                                for (File f : backupFileList) {
+                                    model.addElement(new File_(f));
+                                }
+                                fileList.setModel(model);
+                            }
+
                             public void actionPerformed(ActionEvent evt) {
                                 DefaultListModel model = new DefaultListModel();
                                 String text = contentQueryText.getText();
-                                if (StringUtils.isEmpty(contentQueryText.getText())) {
+                                if (StringUtils.isBlank(contentQueryText.getText())) {
+                                    resetAllData();
                                     return;
                                 }
-                                Pattern pattern = Pattern.compile(text);
-                                Properties pp = null;
+                                text = text.toLowerCase();
                                 for (File f : backupFileList) {
-                                    pp = new Properties();
-                                    try {
-                                        pp.load(new FileInputStream(f));
-                                        for (String key : pp.stringPropertyNames()) {
-                                            if (key.isEmpty()) {
-                                                continue;
-                                            }
-                                            if (pp.getProperty(key) == null || pp.getProperty(key).isEmpty()) {
-                                                continue;
-                                            }
-                                            if (key.contains(text)) {
-                                                addModel(f, model);
-                                                break;
-                                            }
-                                            if (pp.getProperty(key).contains(text)) {
-                                                addModel(f, model);
-                                                break;
-                                            }
-                                            if (pattern.matcher(key).find()) {
-                                                addModel(f, model);
-                                                break;
-                                            }
-                                            if (pattern.matcher(pp.getProperty(key)).find()) {
-                                                addModel(f, model);
-                                                break;
-                                            }
+                                    Properties p = PropertiesUtil.loadProperties(f, null, false);
+                                    for (Entry e : p.entrySet()) {
+                                        if (StringUtils.defaultString((String) e.getKey()).toLowerCase().contains(text) || //
+                                        StringUtils.defaultString((String) e.getValue()).toLowerCase().contains(text)) {
+                                            model.addElement(new File_(f));
                                         }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
                                     }
                                 }
                                 fileList.setModel(model);
+                                JCommonUtil._jOptionPane_showMessageDialog_info("符合檔案筆數 : " + model.getSize());
                             }
                         });
                     }
                 }
             }
+
+            JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/english.ico");
             JCommonUtil.setJFrameCenter(this);
             pack();
@@ -719,7 +710,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        
+
             DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
             propertyEditUI.backupModel = new ArrayList<Triple<Integer, String, String>>();
             String value = null;

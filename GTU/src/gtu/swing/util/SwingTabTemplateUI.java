@@ -10,7 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
@@ -32,6 +34,7 @@ public class SwingTabTemplateUI {
     private List<JFrame> jframeKeeperLst = new ArrayList<JFrame>();
     private ChangeTabHandlerGtu001 changeTabHandlerGtu001;
     private FocusTabHandlerGtu001 focusTabHandlerGtu001;
+    private Map<String, Object> tempalteHoldingContainMap = new HashMap<String, Object>();
 
     /**
      * Launch the application.
@@ -39,18 +42,21 @@ public class SwingTabTemplateUI {
     public static void main(String[] args) {
     }
 
-    public static SwingTabTemplateUI newInstance(String title, String iconPath, Class<?> uiJframeClass, boolean initOneTab) {
-        return new SwingTabTemplateUI(title, iconPath, uiJframeClass, initOneTab);
+    public static SwingTabTemplateUI newInstance(String title, String iconPath, Class<?> uiJframeClass, boolean initOneTab, SwingTabTemplateUI_Callback callback) {
+        return new SwingTabTemplateUI(title, iconPath, uiJframeClass, initOneTab, callback);
     }
 
     /**
      * @wbp.parser.entryPoint
      */
-    public SwingTabTemplateUI(String title, String iconPath, Class<?> uiJframeClass, boolean initOneTab) {
+    public SwingTabTemplateUI(String title, String iconPath, Class<?> uiJframeClass, boolean initOneTab, SwingTabTemplateUI_Callback callback) {
         {
             this.uiJframeClass = uiJframeClass;
         }
         jframe = new JFrame();
+        if (callback != null) {
+            callback.beforeInit(this);
+        }
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jframe.setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
@@ -173,6 +179,10 @@ public class SwingTabTemplateUI {
                 this.addTab("New Tab");
             }
         }
+
+        if (callback != null) {
+            callback.afterInit(this);
+        }
     }
 
     private void setUITitle(String title) {
@@ -202,6 +212,12 @@ public class SwingTabTemplateUI {
                 }
             }
         });
+    }
+
+    public interface SwingTabTemplateUI_Callback {
+        void beforeInit(SwingTabTemplateUI self);
+
+        void afterInit(SwingTabTemplateUI self);
     }
 
     public interface ChangeTabHandlerGtu001 {
@@ -240,5 +256,9 @@ public class SwingTabTemplateUI {
 
     public JFrame getJframe() {
         return jframe;
+    }
+
+    public Map<String, Object> getTempalteHoldingContainMap() {
+        return tempalteHoldingContainMap;
     }
 }
