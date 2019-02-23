@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,6 +82,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
+import gtu.db.ExternalJDBCDriverJarLoader;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
@@ -207,8 +210,10 @@ public class FastDBQueryUI extends JFrame {
     private JLabel queryResultCountLabel;
     private JButton deleteParameterBtn;
 
+    private static AtomicReference<ExternalJDBCDriverJarLoader> externalJDBCDriverJarLoader = new AtomicReference<ExternalJDBCDriverJarLoader>();
     private static AtomicReference<JFrameRGBColorPanel> jFrameRGBColorPanel = new AtomicReference<JFrameRGBColorPanel>();
     private static AtomicReference<HideInSystemTrayHelper> hideInSystemTrayHelper = new AtomicReference<HideInSystemTrayHelper>();
+
     private JButton prevConnBtn;
     private JLabel lblNewLabel_4;
     private JTextField sqlContentFilterText;
@@ -290,12 +295,11 @@ public class FastDBQueryUI extends JFrame {
                     hideInSystemTrayHelper.set(HideInSystemTrayHelper.newInstance());
                     hideInSystemTrayHelper.get().apply(self.getJframe());
                 }
-                self.getTempalteHoldingContainMap().put("jFrameRGBColorPanel", jFrameRGBColorPanel);
-                self.getTempalteHoldingContainMap().put("hideInSystemTrayHelper", hideInSystemTrayHelper);
             }
 
             @Override
             public void afterInit(SwingTabTemplateUI self) {
+                loadExternalJars();
             }
         });
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
@@ -2220,7 +2224,26 @@ public class FastDBQueryUI extends JFrame {
         bds.setUsername(user);
         bds.setPassword(pwd);
         bds.setDriverClassName(driver);
+        if (externalJDBCDriverJarLoader.get() != null) {
+            System.out.println("## use custom class loader");
+            externalJDBCDriverJarLoader.get().registerDriver(driver);
+            bds.setDriverClassLoader(externalJDBCDriverJarLoader.get().getUrlClassLoader());
+        }
         return bds;
+    }
+
+    private static void loadExternalJars() {
+        File jarDir = PropertiesUtil.getJarCurrentPath(FastDBQueryUI.class);
+        if (jarDir.list() == null) {
+            return;
+        }
+        if (externalJDBCDriverJarLoader.get() == null) {
+            externalJDBCDriverJarLoader.set(new ExternalJDBCDriverJarLoader());
+        }
+        ExternalJDBCDriverJarLoader tool = externalJDBCDriverJarLoader.get();
+        for (File jar : jarDir.listFiles()) {
+            tool.addJar(jar);
+        }
     }
 
     private void queryResultTableMouseClickAction(MouseEvent e) {
