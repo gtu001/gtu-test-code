@@ -72,8 +72,8 @@ import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
 import com.example.englishtester.common.WindowSingleInputDialog;
-import com.gtu.example.englishtester.BuildConfig;
-import com.gtu.example.englishtester.R;
+import com.example.englishtester.BuildConfig;
+import com.example.englishtester.R;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.ArrayUtils;
