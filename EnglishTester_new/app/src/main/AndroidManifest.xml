@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.englishtester"
+    package="com.gtu.example.englishtester"
     android:versionCode="39"
     android:versionName="1.0.7.11">
 
@@ -38,6 +38,9 @@
     <!-- 震動權限 ↓↓↓↓↓↓↓↓↓↓ -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 震動權限 ↑↑↑↑↑↑↑↑↑↑ -->
+    <!-- 關掉其他程序 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <!-- 關掉其他程序 ↑↑↑↑↑↑↑↑↑↑ -->
 
     <application
         android:name="com.example.englishtester.common.MyApplication"

@@ -84,7 +84,7 @@ public class Mp3PlayerHandler {
             mediaplayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.line(TAG, "onError : " + what + " / " + extra);
+                    Log.e(TAG, "onError : " + what + " / " + extra);
                     return false;
                 }
             });
@@ -187,7 +187,6 @@ public class Mp3PlayerHandler {
                     this.currentName = lst.get(findIndex).getName();
                 }
             } catch (Exception ex) {
-                Log.line(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
                 Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
             } finally {
                 Log.v(TAG, "onCompletion end ...");

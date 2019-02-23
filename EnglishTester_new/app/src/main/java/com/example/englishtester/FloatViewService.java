@@ -64,6 +64,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
 import com.example.englishtester.common.PomodoroClockHandler;
+import com.example.englishtester.common.ProcessHandler;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.RepeatMoveListener;
 import com.example.englishtester.common.SharedPreferencesUtil;
@@ -71,6 +72,8 @@ import com.example.englishtester.common.TextToSpeechComponent;
 import com.example.englishtester.common.WindowItemListDialog;
 import com.example.englishtester.common.WindowItemListIconDialog;
 import com.example.englishtester.common.WindowSingleInputDialog;
+import com.gtu.example.englishtester.BuildConfig;
+import com.gtu.example.englishtester.R;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -308,6 +311,11 @@ public class FloatViewService extends Service {
      * 開啟/關閉輸入框
      */
     private void doOpenCloseEditPanel(boolean isOpen) {
+        // 開啟通知
+        if (isOpen) {
+            ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper.sendOpenStatusMessage(isOpen, this);
+        }
+
         // 檢查剪貼簿是否有內容
         if (isOpen) {
             //查詢記事本的單字
@@ -1618,13 +1626,11 @@ public class FloatViewService extends Service {
      */
     public void stopThisService() {
         Log.v(TAG, "#### stopThisService");
-        // uninstallApp("com.phicomm.hu");
-        // 终止FxService
-//        Intent intent = new Intent(FloatViewService.this, FloatViewService.class);
-//        stopService(intent);
         stopSelf();
         //強制重開關閉
         FloatServiceHolderBroadcastReceiver.setFloatViewServiceEnable(false);
+
+        ProcessHandler.killProcessByPackage2(this, this.getPackageName(), false);
         Log.v(TAG, "# stopThisService !");
     }
 

@@ -157,7 +157,7 @@ public class UrlPlayerService extends Service {
         try {
             return mp3Helper.isPlaying();
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("isPlaying ERR : " + ex.getMessage(), ex);
         }
     }
@@ -166,7 +166,7 @@ public class UrlPlayerService extends Service {
         try {
             mp3Helper.pauseAndResume();
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
         }
     }
@@ -175,7 +175,7 @@ public class UrlPlayerService extends Service {
         try {
             mp3Helper.backwardOrBackward(second);
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("backwardOrBackward ERR : " + ex.getMessage(), ex);
         }
     }
@@ -184,7 +184,7 @@ public class UrlPlayerService extends Service {
         try {
             return mp3Helper != null;
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("isInitDone ERR : " + ex.getMessage(), ex);
         }
     }
@@ -209,7 +209,7 @@ public class UrlPlayerService extends Service {
                 mp3Helper.setReplayMode(this.currentBean.getName(), this.totalLst);
             }
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("setReplayMode ERR : " + ex.getMessage(), ex);
         }
     }
@@ -243,7 +243,7 @@ public class UrlPlayerService extends Service {
                 return currentBean.toMap();
             }
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("getCurrentBean ERR : " + ex.getMessage(), ex);
         }
     }
@@ -252,7 +252,7 @@ public class UrlPlayerService extends Service {
         try {
             mp3Helper.onProgressChange(percent);
         } catch (Exception ex) {
-            Log.line(TAG, "ERR : " + ex.getMessage(), ex);
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("onProgressChange ERR : " + ex.getMessage(), ex);
         }
     }

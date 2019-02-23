@@ -1,6 +1,6 @@
 package com.example.englishtester;
 
-import android.app.Activity;
+eimport android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
