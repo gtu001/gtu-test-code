@@ -106,7 +106,7 @@ public class AVChoicerUI extends JFrame {
     private MoveToHandler moveToHandler = new MoveToHandler();
     private JCheckBox moveToChkJpgChkBox;
     private HideInSystemTrayHelper trayUtil;
-    
+
     private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
@@ -342,7 +342,7 @@ public class AVChoicerUI extends JFrame {
 
         moveToList = new JList();
         panel_11.add(JCommonUtil.createScrollComponent(moveToList), BorderLayout.CENTER);
-        
+
         JPanel panel_16 = new JPanel();
         tabbedPane.addTab("Config", null, panel_16, null);
         moveToList.addKeyListener(new KeyAdapter() {
@@ -370,16 +370,16 @@ public class AVChoicerUI extends JFrame {
 
         trayUtil = HideInSystemTrayHelper.newInstance();
         trayUtil.apply(this);
-        
+
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        
+
         panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 
     private class MoveToHandler {
         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(MoveToHandler.class, AVChoicerUI.class.getSimpleName() + "_" + MoveToHandler.class.getSimpleName());
-//         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(new
-//         File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_MoveToHandler_config.properties"));
+        // private PropertiesUtilBean moveConfig = new PropertiesUtilBean(new
+        // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_MoveToHandler_config.properties"));
 
         private void add() {
             try {
@@ -769,7 +769,17 @@ public class AVChoicerUI extends JFrame {
             try {
                 File exe = getMediaPlayerExe();
                 File avFile = tempFile.get();
-                Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile));
+                if (isWindows) {
+                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile);
+                    System.out.println(command);
+                    Runtime.getRuntime().exec(command);
+                } else {
+                    RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
+                    String command = String.format("%s \"%s\"", exe, avFile);
+                    System.out.println(command);
+                    t.command(command);
+                    t.apply("tmpVlc_", "UTF8");
+                }
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }
