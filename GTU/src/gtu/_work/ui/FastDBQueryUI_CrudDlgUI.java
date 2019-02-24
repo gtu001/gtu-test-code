@@ -417,6 +417,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                         int updateResult = 0;
                                         try {
                                             updateResult = JdbcDBUtil.executeUpdate(sql, new Object[0], _parent.getDataSource().getConnection());
+                                            _parent.updateLogger.debug(String.format("SQL : %d \t : %s", updateResult, sql));
                                         } catch (Exception ex) {
                                             ex1 = ex;
                                         }
@@ -996,6 +997,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     public FastDBQueryUI_CrudDlgUI(final FastDBQueryUI _parent) {
         this._parent = _parent;
         this.dBTypeFormatHandler = new DBTypeFormatHandler(_parent);
+        
+        this.setTitle("CRUD處理");
 
         setBounds(100, 100, 680, 463);
         getContentPane().setLayout(new BorderLayout());

@@ -14,8 +14,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -88,6 +86,7 @@ import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
+import gtu.log.LoggerAppender;
 import gtu.poi.hssf.ExcelUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
@@ -142,10 +141,10 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdConfigBeanHandler sqlIdConfigBeanHandler;
     private SqlIdListDSMappingHandler sqlIdListDSMappingHandler;
     private SqlParameterConfigLoadHandler sqlParameterConfigLoadHandler = new SqlParameterConfigLoadHandler();
+    public LoggerAppender updateLogger = new LoggerAppender(new File(JAR_PATH_FILE, "updateLog_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".txt"));
 
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
 
-    private FastDBQueryUI_CrudDlgUI fastDBQueryUI_CrudDlgUI;
     private JPanel contentPane;
     private JList sqlList;
     private JButton sqlSaveButton;
@@ -2249,19 +2248,22 @@ public class FastDBQueryUI extends JFrame {
     private void queryResultTableMouseClickAction(MouseEvent e) {
         try {
             class StartEditProcess {
+                private FastDBQueryUI_CrudDlgUI fastDBQueryUI_CrudDlgUI;
+                private FastDBQueryUI_RowCompareDlg fastDBQueryUI_RowCompareDlg;
+
                 String openType = "";
-                String menuTitle = "";
 
                 StartEditProcess() {
                     if (queryList != null && !queryList.getRight().isEmpty() && StringUtils.isBlank(importExcelSheetName)) {
                         openType = "CRUD";
-                        menuTitle = "以此筆資料為基準進行CRUD操作";
                     } else {
                         openType = "XLS_COMPARE";
-                        menuTitle = "以此筆匯入資料為基準進行比對操作";
                     }
                     if (fastDBQueryUI_CrudDlgUI != null && fastDBQueryUI_CrudDlgUI.isShowing()) {
                         fastDBQueryUI_CrudDlgUI.dispose();
+                    }
+                    if (fastDBQueryUI_RowCompareDlg != null && fastDBQueryUI_RowCompareDlg.isShowing()) {
+                        fastDBQueryUI_RowCompareDlg.disable();
                     }
                 }
 
@@ -2306,7 +2308,7 @@ public class FastDBQueryUI extends JFrame {
 
                     int selectRowIndex = queryResultTable.getSelectedRow();
 
-                    FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
+                    fastDBQueryUI_RowCompareDlg = FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
                 }
 
                 void start() throws Exception {
@@ -2326,11 +2328,21 @@ public class FastDBQueryUI extends JFrame {
 
             if (JMouseEventUtil.buttonRightClick(1, e)) {
                 JPopupMenuUtil.newInstance(queryResultTable)//
-                        .addJMenuItem(d.menuTitle, new ActionListener() {
+                        .addJMenuItem("進行CRUD操作", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-                                    d.start();
+                                    d.openCRUD();
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                }
+                            }
+                        })//
+                        .addJMenuItem("進行比對操作", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    d.openXLS_COMPARE();
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
                                 }
