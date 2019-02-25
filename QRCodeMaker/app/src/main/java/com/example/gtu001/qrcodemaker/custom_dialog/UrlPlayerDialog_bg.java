@@ -59,7 +59,7 @@ public class UrlPlayerDialog_bg {
                 Map currentBeanMap = this.urlPlayerServiceHander.get().getMService().getCurrentBean();
                 this.bean = Mp3Bean.valueOf(currentBeanMap);
             } catch (Exception e) {
-                Log.line(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
+                Log.e(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
                 Toast.makeText(context, "開啟失敗" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 this.bean = new Mp3Bean();
             }
@@ -310,7 +310,7 @@ public class UrlPlayerDialog_bg {
             urlPlayerServiceHander.get().startStopService(false, context);
             Toast.makeText(context, "停止服務!!", Toast.LENGTH_SHORT).show();
         } catch (Exception ex) {
-            Log.line(TAG, ex.getMessage(), ex);
+            Log.e(TAG, ex.getMessage(), ex);
         }
     }
 
@@ -398,14 +398,14 @@ public class UrlPlayerDialog_bg {
         }
 
         private boolean initNotDone(Context context) {
-            Log.line(TAG, "#...initNotDone...start");
+            Log.e(TAG, "#...initNotDone...start");
             if (!ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
-                Log.line(TAG, "\tServiceUtil.isServiceRunning : off");
+                Log.e(TAG, "\tServiceUtil.isServiceRunning : off");
                 return true;
             }
             if (mService == null || mConnection == null) {
-                Log.line(TAG, "\tmService : " + mService);
-                Log.line(TAG, "\tmConnection : " + mConnection);
+                Log.e(TAG, "\tmService : " + mService);
+                Log.e(TAG, "\tmConnection : " + mConnection);
                 return true;
             }
             return false;

@@ -65,15 +65,16 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
     public static void main(String[] args) {
     }
 
-    public static void newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) {
+    public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) {
+        FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
         try {
-            FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.initTab1(schemaTable, selectRowIndex, excelImportLst, _parent);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return dialog;
     }
 
     /**
@@ -241,13 +242,16 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
     }
 
     private DefaultTableModel initImportRowTable() {
-        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "匯入資料", "目前資料庫資料", "PK");
+        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "匯入資料", "目前資料庫資料", "PK", "忽略");
         importRowTable.setModel(model);
-        JTableUtil.setColumnWidths_Percent(importRowTable, new float[] { 30, 30, 30, 5 });
+        JTableUtil.setColumnWidths_Percent(importRowTable, new float[] { 25, 30, 30, 5, 5 });
 
         // column = "where condition"
         TableColumn sportColumn4 = importRowTable.getColumnModel().getColumn(3);
         sportColumn4.setCellEditor(new DefaultCellEditor(new JCheckBox()));
+
+        TableColumn ignoreColumn = importRowTable.getColumnModel().getColumn(4);
+        ignoreColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
         JTableUtil.newInstance(importRowTable).setColumnColor_byCondition(0, new JTableUtil.TableColorDef() {
             public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -309,7 +313,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         boolean isModify = false;
 
         Object[] toArry() {
-            Object[] arry = new Object[] { columnName, value1, value2, isPk };
+            Object[] arry = new Object[] { columnName, value1, value2, isPk, isIgnore };
             System.out.println(Arrays.toString(arry));
             return arry;
         }
@@ -361,6 +365,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             df.isPk = isPK(col, tableInfo);
             df.value1 = value;
             df.value2 = null;
+            df.isIgnore = false;
             rowMapForBackup.put(col, df);
 
             model.addRow(df.toArry());
@@ -378,6 +383,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             String value2 = (String) util.getRealValueAt(row, 2);
             String realValue = isExcelData ? value1 : value2;
             boolean isPk = (Boolean) util.getRealValueAt(row, 3);
+            boolean isIgnore = (Boolean) util.getRealValueAt(row, 4);
             whereMap.put(column, realValue);
             if (isPk) {
                 pkColumns.add(column);
@@ -445,6 +451,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 String value1 = (String) util.getRealValueAt(row, 1);
                 String value2 = (String) util.getRealValueAt(row, 2);
                 boolean isPk = (Boolean) util.getRealValueAt(row, 3);
+                boolean isIgnore = (Boolean) util.getRealValueAt(row, 4);
 
                 String realValue = null;
                 String pkValue = null;
@@ -456,12 +463,14 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                     pkValue = value2;
                 }
 
-                if (onlyNotEqualChk.isSelected()) {
-                    if (!StringUtils.equals(value1, value2)) {
+                if (!isIgnore) {
+                    if (onlyNotEqualChk.isSelected()) {
+                        if (!StringUtils.equals(value1, value2)) {
+                            valueMap.put(column, realValue);
+                        }
+                    } else {
                         valueMap.put(column, realValue);
                     }
-                } else {
-                    valueMap.put(column, realValue);
                 }
 
                 if (isPk) {
@@ -471,11 +480,13 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             }
 
             tableInfo.setPkColumns(pkColumns);
+            tableInfo.setDbDateDateFormat((DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem());//設定DB type
             String updateSQL = tableInfo.createUpdateSql(valueMap, pkMap, false, null);
             updateSQL = JCommonUtil._jOptionPane_showInputDialog("執行SQL", updateSQL);
 
             if (StringUtils.isNotBlank(updateSQL)) {
                 int updateResult = JdbcDBUtil.executeUpdate(updateSQL, new Object[0], _parent.getDataSource().getConnection());
+                _parent.updateLogger.debug(String.format("SQL : %d \t : %s", updateResult, updateSQL));
                 JCommonUtil._jOptionPane_showMessageDialog_info("update result : " + updateResult);
             }
         } catch (Exception ex) {
