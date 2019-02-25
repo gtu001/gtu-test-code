@@ -2357,7 +2357,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private String getRandom_TableNSchema() {
-        Pattern ptn = Pattern.compile("from\\s+(\\w+\\.\\w+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern ptn = Pattern.compile("from\\s+(\\w+[\\.\\w]+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
         String sql = StringUtils.trimToEmpty(sqlTextArea.getText());
         Matcher mth = ptn.matcher(sql);
         if (mth.find()) {
