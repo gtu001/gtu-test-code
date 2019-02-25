@@ -28,6 +28,14 @@
     <!--網路-->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 手機電話 -->
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- 藍芽 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/qr_code_icon"
