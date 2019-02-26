@@ -261,15 +261,24 @@ public class DbSqlCreater {
             schemaName = StringUtils.trimToEmpty(schemaName);
             catalogName = StringUtils.trimToEmpty(catalogName);
 
-            DatabaseMetaData dbmd = conn.getMetaData();
-            ResultSet pk = dbmd.getPrimaryKeys(catalogName, schemaName, tableName);
-            System.out.println("============================================================pk start");
-            while (pk.next()) {
-                Map<String, String> pkMap = getResultSetToMap(pk);
-                System.out.println(pkMap);
-                System.out.println(pkMap);
+            System.out.println("catalogName : " + catalogName);
+            System.out.println("schemaName : " + schemaName);
+            System.out.println("tableName : " + tableName);
+
+            try {
+                DatabaseMetaData dbmd = conn.getMetaData();
+                ResultSet pk = dbmd.getPrimaryKeys(catalogName, schemaName, tableName);
+                System.out.println("============================================================pk start");
+                while (pk.next()) {
+                    Map<String, String> pkMap = getResultSetToMap(pk);
+                    System.out.println(pkMap);
+                    System.out.println(pkMap);
+                }
+                System.out.println("============================================================pk end");
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            System.out.println("============================================================pk end");
+            
             // ResultSet rs2 = dbmd.getIndexInfo(catalogName, schemaName,
             // tableName, false, true);
             // // unique - 該參數為 true 時，僅返回唯一值的索引；該參數為 false
