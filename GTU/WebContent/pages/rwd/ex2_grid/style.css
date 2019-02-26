@@ -17,16 +17,16 @@
 }
 
 .title {
-	/* è¨ˆç®—æ–¹å¼åŒsubstring */
+	/* ­pºâ¤è¦¡¦Psubstring */
 	/*
-	grid-column-start: 1; åŒA
+	grid-column-start: 1; ¦PA
 	grid-column-end: 3;
 	*/
 	/*
-	grid-column: 1/3; åŒA
+	grid-column: 1/3; ¦PA
 	*/
-	/* grid-column-end: span 1; *//* é¡ä¼¼ colspan=1 */
-	/* grid-row-end: span 2; *//* é¡ä¼¼ rowspan=2 */
+	/* grid-column-end: span 1; *//* Ãş¦ü colspan=1 */
+	/* grid-row-end: span 2; *//* Ãş¦ü rowspan=2 */
 	grid-area: title;
 }
 
@@ -38,7 +38,7 @@
 }
 .content {
 	grid-area: content;
-	justify-self: start; /* ç©ºé–“æ¸›ç¸® ä¸‰ç¨®å€¼ start center end */
+	justify-self: start; /* ªÅ¶¡´îÁY ¤TºØ­È start center end */
 }
 .footer {
 	grid-area: footer;
@@ -57,9 +57,9 @@
 	background-color: blue;
 }
 
-/*ä»¥ä¸Šç‚ºæ‰‹æ©Ÿæ¿*/
+/*¥H¤W¬°¤â¾÷ªO*/
 @media screen and (min-width: 736px){
-	/*ä»¥ä¸‹ç‚ºé›»è…¦ç‰ˆ*/
+	/*¥H¤U¬°¹q¸£ª©*/
 	.grid {
 		display: grid;
 		/* grid-template-columns: 1fr 1fr; */
@@ -70,7 +70,7 @@
 		grid-template-rows: 1fr 1fr 1fr 1fr;
 		grid-template-areas: 
 		". title title ."
-		". header header ." /* . è¡¨ç¤ºæ”¾ç©º */
+		". header header ." /* . ªí¥Ü©ñªÅ */
 		". sidebar content ."
 		". footer footer ."
 		;
