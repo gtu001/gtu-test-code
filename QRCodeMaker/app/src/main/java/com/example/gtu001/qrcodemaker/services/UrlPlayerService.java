@@ -2,6 +2,7 @@ package com.example.gtu001.qrcodemaker.services;
 
 import android.app.NotificationManager;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -71,7 +72,6 @@ public class UrlPlayerService extends Service {
     private Mp3Bean currentBean;
     private CurrentBeanHandler currentBeanHandler;
     private List<Mp3Bean> totalLst = new ArrayList<>();
-    private MyBoardcastClass myBoardcastClass;
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -90,9 +90,6 @@ public class UrlPlayerService extends Service {
         Log.i(TAG, "oncreat");
         context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
-
-        myBoardcastClass = new MyBoardcastClass(this);
-        myBoardcastClass.register(this);
     }
 
     @Override
@@ -102,7 +99,6 @@ public class UrlPlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        this.myBoardcastClass.unregister(this);
 
         this.stopPlay();
         //-----------------------------------------------------------------
@@ -316,88 +312,5 @@ public class UrlPlayerService extends Service {
     @Override
     public void onStart(Intent intent, int startid) {
         Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
-    }
-
-    private static class MyBoardcastClass extends BroadcastReceiver {
-        private boolean isResume = false;
-
-        UrlPlayerService urlPlayerService;
-
-        private MyBoardcastClass(UrlPlayerService urlPlayerService) {
-            this.urlPlayerService = urlPlayerService;
-        }
-
-        private void doMusicPause(Context context) {
-            Log.line(TAG, "_____________Broadcast_Pause");
-            if (isResume == true) {
-                urlPlayerService.pauseAndResume();
-                isResume = false;
-            }
-        }
-
-        private void doMusicContinue(Context context) {
-            Log.line(TAG, "_____________Broadcast_Continue");
-            if (urlPlayerService.isPlaying()) {
-                urlPlayerService.pauseAndResume();
-                isResume = true;
-            }
-        }
-
-        public void onReceive(Context context, Intent intent) {
-            //We listen to two intents.  The new outgoing call only tells us of an outgoing call.  We use it to get the number.
-            String savedNumber = "";
-            if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
-                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
-            } else {
-                String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-                String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                int state = 0;
-                if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-                    state = TelephonyManager.CALL_STATE_IDLE;
-                } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-                    state = TelephonyManager.CALL_STATE_OFFHOOK;
-                    doMusicPause(context);
-                } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-                    state = TelephonyManager.CALL_STATE_RINGING;
-                    doMusicContinue(context);
-                }
-            }
-
-            //TEST
-            BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra("android.bluetooth.device.extra.DEVICE");
-
-            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction())) {
-                final int state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR);
-                final int prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR);
-
-                if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
-                    Log.v(TAG, "Paired");
-                    doMusicContinue(context);
-                } else if (state == BluetoothDevice.BOND_NONE && prevState == BluetoothDevice.BOND_BONDED) {
-                    Log.v(TAG, "Unpaired");
-                    doMusicPause(context);
-                }
-            }
-        }
-
-        public void register(Context context) {
-            IntentFilter intent = new IntentFilter();
-            //手機來電
-            intent.addAction("android.intent.action.PHONE_STATE");
-            intent.addAction("android.intent.action.NEW_OUTGOING_CALL");
-
-            //藍芽1
-            intent.addAction("android.bluetooth.device.action.ACL_CONNECTED");
-            intent.addAction("android.bluetooth.device.action.ACL_DISCONNECT_REQUESTED");
-            intent.addAction("android.bluetooth.device.action.ACL_DISCONNECTED");
-
-            //藍芽2
-            intent.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-            context.registerReceiver(this, intent);
-        }
-
-        public void unregister(Context context) {
-            context.unregisterReceiver(this);
-        }
     }
 }

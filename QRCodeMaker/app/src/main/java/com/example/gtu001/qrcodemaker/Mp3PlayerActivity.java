@@ -3,51 +3,33 @@ package com.example.gtu001.qrcodemaker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
+import com.example.gtu001.qrcodemaker.common.MyBroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.PermissionUtil;
-import com.example.gtu001.qrcodemaker.common.PingUtil;
 import com.example.gtu001.qrcodemaker.common.ProcessHandler;
 import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;
-import com.example.gtu001.qrcodemaker.dao.YoutubeVideoDAO;
-import com.example.gtu001.qrcodemaker.services.JavaYoutubeVideoUrlHandler;
-import com.example.gtu001.qrcodemaker.services.YoutubeVideoService;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class Mp3PlayerActivity extends Activity {
 
@@ -401,5 +383,9 @@ public class Mp3PlayerActivity extends Activity {
             menu.add(0, e.option, 0, e.title);
         }
         return true;
+    }
+
+    public void onDestory() {
+        super.onDestroy();
     }
 }

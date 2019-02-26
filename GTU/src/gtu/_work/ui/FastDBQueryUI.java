@@ -1585,7 +1585,11 @@ public class FastDBQueryUI extends JFrame {
             dataSourceConfig.saveConfig(param);
             reload_DataSourceConfig_autoComplete();
 
-            Class.forName(driver);
+            if (externalJDBCDriverJarLoader.get() != null) {
+                System.out.println("## use custom class loader");
+                externalJDBCDriverJarLoader.get().registerDriver(driver);
+                Class.forName(driver, true, externalJDBCDriverJarLoader.get().getUrlClassLoader());
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
