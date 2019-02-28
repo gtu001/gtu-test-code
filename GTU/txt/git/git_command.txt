@@ -15,6 +15,16 @@
 取得異動狀態
 
 	git status
+	
+
+顯示完整路徑 (PS : for linux 做 merge處理)
+
+	git status | awk -v P="$(pwd)" '{ if ($1 != "modified:") {print P "/" $1} } '
+	
+只印要merge的檔案 (PS : for linux 做 merge處理)
+
+	git status -s | grep ^UU | awk -v P="$(pwd)" '{print P "/" $2}'
+	
 
 --------------------------------------------------------------------------
 改變檔案狀態
