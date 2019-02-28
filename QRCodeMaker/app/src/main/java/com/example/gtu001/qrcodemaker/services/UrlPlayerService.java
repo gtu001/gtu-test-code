@@ -22,6 +22,7 @@ import com.example.gtu001.qrcodemaker.Mp3Bean;
 import com.example.gtu001.qrcodemaker.Mp3PlayerActivity;
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.Log;
+import com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceKeepAliveHelper;
 import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
@@ -87,6 +88,8 @@ public class UrlPlayerService extends Service {
 
         //-----------------------------------------------------------------
 
+        this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
+
         Log.i(TAG, "oncreat");
         context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
@@ -101,6 +104,8 @@ public class UrlPlayerService extends Service {
     public void onDestroy() {
 
         this.stopPlay();
+
+        this.unregisterReceiver(mMp3BroadcastReceiver);
         //-----------------------------------------------------------------
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
@@ -162,6 +167,24 @@ public class UrlPlayerService extends Service {
     public void pauseAndResume() {
         try {
             mp3Helper.pauseAndResume();
+        } catch (Exception ex) {
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public void start() {
+        try {
+            mp3Helper.start();
+        } catch (Exception ex) {
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public void pause() {
+        try {
+            mp3Helper.pause();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
@@ -304,6 +327,16 @@ public class UrlPlayerService extends Service {
             UrlPlayerService.this.onDestroy();
         }
 
+        @Override
+        public void start() throws RemoteException {
+            UrlPlayerService.this.start();
+        }
+
+        @Override
+        public void pause() throws RemoteException {
+            UrlPlayerService.this.pause();
+        }
+
         UrlPlayerService getService() {
             return UrlPlayerService.this;
         }
@@ -313,4 +346,22 @@ public class UrlPlayerService extends Service {
     public void onStart(Intent intent, int startid) {
         Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
     }
+
+    private Mp3BroadcastReceiver mMp3BroadcastReceiver = new Mp3BroadcastReceiver() {
+        private boolean isResume = false;
+
+        public void doMusicPause(Context context) {
+            Log.v(TAG, "_____________Broadcast_Pause", 20);
+            pause();
+            isResume = true;
+        }
+
+        public void doMusicContinue(Context context) {
+            Log.v(TAG, "_____________Broadcast_Continue", 20);
+            if (isResume == true) {
+                isResume = false;
+                start();
+            }
+        }
+    };
 }

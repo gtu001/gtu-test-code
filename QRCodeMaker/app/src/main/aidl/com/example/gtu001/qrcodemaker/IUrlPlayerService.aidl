@@ -24,4 +24,8 @@ interface IUrlPlayerService {
     void onProgressChange(int percent);
 
     void stopSelf();
+
+    void start();
+
+    void pause();
 }

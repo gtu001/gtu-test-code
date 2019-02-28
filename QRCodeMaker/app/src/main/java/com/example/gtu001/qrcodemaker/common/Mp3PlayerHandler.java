@@ -99,13 +99,21 @@ public class Mp3PlayerHandler {
         return mediaplayer.isPlaying();
     }
 
+    public void start() {
+        int length = mediaplayer.getCurrentPosition();
+        mediaplayer.seekTo(length);
+        mediaplayer.start();
+    }
+
+    public void pause() {
+        mediaplayer.pause();
+    }
+
     public void pauseAndResume() {
         if (mediaplayer.isPlaying()) {
-            mediaplayer.pause();
+            pause();
         } else {
-            int length = mediaplayer.getCurrentPosition();
-            mediaplayer.seekTo(length);
-            mediaplayer.start();
+            start();
         }
     }
 

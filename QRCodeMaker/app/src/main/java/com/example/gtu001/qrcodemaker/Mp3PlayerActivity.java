@@ -20,7 +20,6 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
-import com.example.gtu001.qrcodemaker.common.MyBroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.PermissionUtil;
 import com.example.gtu001.qrcodemaker.common.ProcessHandler;
 import com.example.gtu001.qrcodemaker.custom_dialog.UrlPlayerDialog_bg;

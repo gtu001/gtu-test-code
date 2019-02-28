@@ -8,29 +8,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 
-public class MyBroadcastReceiver extends BroadcastReceiver {
+public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
-    private static final String TAG = MyBroadcastReceiver.class.getSimpleName();
-    private boolean isResume = false;
+    private static final String TAG = Mp3BroadcastReceiver.class.getSimpleName();
 
-    private void doMusicPause(Context context) {
-        Log.line(TAG, "_____________Broadcast_Pause");
-//        if (isResume == true) {
-//            pauseAndResume();
-//            isResume = false;
-//        }
-    }
+    public abstract void doMusicPause(Context context);
 
-    private void doMusicContinue(Context context) {
-        Log.line(TAG, "_____________Broadcast_Continue");
-//        if (isPlaying()) {
-//            pauseAndResume();
-//            isResume = true;
-//        }
-    }
+    public abstract void doMusicContinue(Context context);
 
     public void onReceive(Context context, Intent intent) {
-        Log.line(TAG, "# " + intent.getAction());
+        Log.v(TAG, "# " + intent.getAction(), 30);
         this.onReceive_PhoneCall(context, intent);
         this.onReceive_Bluetooth(context, intent);
     }
@@ -68,12 +55,12 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
             String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
             int state = 0;
-            if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+            if (TelephonyManager.EXTRA_STATE_IDLE.equals(stateStr)) {
                 state = TelephonyManager.CALL_STATE_IDLE;
-            } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+            } else if (TelephonyManager.EXTRA_STATE_OFFHOOK.equals(stateStr)) {
                 state = TelephonyManager.CALL_STATE_OFFHOOK;
                 doMusicPause(context);
-            } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+            } else if (TelephonyManager.EXTRA_STATE_RINGING.equals(stateStr)) {
                 state = TelephonyManager.CALL_STATE_RINGING;
                 doMusicContinue(context);
             }
@@ -83,25 +70,25 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     private void onReceive_Bluetooth(Context context, Intent intent) {
         String action = intent.getAction(); //获取蓝牙设备实例【如果无设备链接会返回null，如果在无实例的状态下调用了实例的方法，会报空指针异常】 //主要与蓝牙设备有关系
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        Log.line(TAG, "监听蓝牙变化");
+        Log.v(TAG, "监听蓝牙变化");
         switch (action) {
             case BluetoothDevice.ACTION_ACL_CONNECTED:
-                Log.line(TAG, "蓝牙设备:" + device.getName() + "已链接");
+                Log.v(TAG, "蓝牙设备:" + device.getName() + "已链接");
                 this.doMusicContinue(context);
                 break;
             case BluetoothDevice.ACTION_ACL_DISCONNECTED:
-                Log.line(TAG, "蓝牙设备:" + device.getName() + "断开链接");
+                Log.v(TAG, "蓝牙设备:" + device.getName() + "断开链接");
                 this.doMusicPause(context);
                 break; //上面的两个链接监听，其实也可以BluetoothAdapter实现，修改状态码即可
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
                 switch (blueState) {
                     case BluetoothAdapter.STATE_OFF:
-                        Log.line(TAG, "蓝牙关闭");
+                        Log.v(TAG, "蓝牙关闭");
                         this.doMusicPause(context);
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        Log.line(TAG, "蓝牙开启");
+                        Log.v(TAG, "蓝牙开启");
                         this.doMusicContinue(context);
                         break;
                 }
