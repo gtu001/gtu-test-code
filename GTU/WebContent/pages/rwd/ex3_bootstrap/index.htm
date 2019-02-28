@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Bootstrap Webstie Tutorial</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+	.navbar { /*導覽Bar*/
+		margin-bottom:0;
+		border-radius:0;
+		background-color: #5E4485;
+		color: #FFF;
+		padding: 1% 0;
+		font-size: 1.2em;
+		border:0;
+	}
+	.navbar-brand { /*導覽Bar*/
+		float: left;
+		min-height: 55px;
+		padding:0 15px 5px;
+	}
+	.navbar-inverse .navbar-nav .active a,.navbar-inverse .navbar-nav .active a:focus, .navbar-inverse .navbar-nav .active a:hover { /*導覽BarMenu*/
+		color: #FFF;
+		background-color: #5E4485
+	}
+	img#logo { /*導覽Bar圖*/
+		background-size: cover; /*等比例縮放 */
+		max-height: 70px;
+	}
+	.navbar-inverse .navbar-nav li a {
+		color:#D5D5D5;
+	}
+	img#carousel-pic01,img#carousel-pic02,img#carousel-pic03 { /*旋轉木馬圖*/
+		width: 100%;
+	}
+	.carousel-caption { /* 旋轉木馬標題文字置中 */
+		top:50%;
+		transform: translateY(-50%);
+		text-transform:uppercase;
+	}
+	.btn { /*旋轉木馬按鈕*/
+		font-size:18px;
+		color:#FFF;
+		padding: 12px 22px;
+		background-color: #5E4485;
+		border:2px solid #FFF;
+	}
+	img#icon1,img#icon2,img#icon3 {
+		max-width:200px;
+		margin: 1% auto;
+	}
+	.container { /* 三大圖上面墊一層 */
+		margin: 4% auto;
+	}
+	footer { /* 頁尾 */
+		width:100%;
+		background-color: #5E4485;
+		color:#FFF;
+	}
+	.fa { /* 社群圖 */
+		padding:20px;
+		font-size:30px;
+		color:#FFF;
+	}
+	.fa:hover { /* 社群圖 */
+		color:#D5D5D5;
+		text-decoration: none; /*去底線*/
+	}
+
+	@media (max-width: 900px) {
+		.fa {
+			font-size: 20px;
+			padding:10px;
+		}
+	}
+
+	@media (max-width: 600px){
+		.carousel-caption {
+			display:none;
+		}
+		img#icon1,img#icon2,img#icon3 {
+			max-width:150px;
+		}
+		h2 {
+			font-size: 1.7em
+		}
+	}
+</style>
+</head>
+<body>
+	<!--導覽Bar -->
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><img id="logo" src="img/page_logo.png"></a>
+			</div>
+
+			<div class="collapse navbar-collapse" id="myNavBar">
+				<ul class="nav navbar-nav navbar-right">
+					<li class="active"><a href="#">Home</a></li>
+					<li><a href="#">About</a></li>
+					<li><a href="#">Services</a></li>
+					<li><a href="#">Testimonals</a></li>
+					<li><a href="#">Contact</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	<!--旋轉木馬按鈕 -->
+	<div id="myCarousel" class="carousel slide" data-ride="carousel">
+		<!--order list-->
+		<ol class="carousel-indicators">
+			<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+			<li data-target="#myCarousel" data-slide-to="1"></li>
+			<li data-target="#myCarousel" data-slide-to="2"></li>
+		</ol>
+		<div class="carousel-inner" role="listbox">
+			<div class="item active">
+				<img id="carousel-pic01" src="img/mountain01.jpg">
+				<div class="carousel-caption">
+					<h1>get to know bootstrap</h1>
+					<br>
+					<button type="button" class="btn bt-default">Get Started</button>
+				</div>
+			</div><!--- End Active --->
+
+			<div class="item">
+				<img id="carousel-pic02" src="img/mountain02.jpg">
+			</div>
+
+			<div class="item">
+				<img id="carousel-pic03" src="img/mountain03.jpg">
+			</div>
+		</div>
+		<!--- Start Slider Controls --->
+		<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+			<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+			<span class="sr-only">Previous</span>
+		</a>
+		<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+			<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+			<span class="sr-only">Next</span>
+		</a>
+	</div> <!--- End Slider --->
+
+	<div class="container text-center">
+		<h2>What We're Using</h2>
+		<div class="row">
+			<div class="col-sm-4">
+				<img src="img/html5.png" id="icon1">
+				<h4>HTML5</h4>
+			</div>
+			<div class="col-sm-4">
+				<img src="img/bootstrap.png" id="icon2">
+				<h4>Bootstrap</h4>
+			</div>
+			<div class="col-sm-4">
+				<img src="img/css3.png" id="icon3">
+				<h4>CSS3</h4>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h4>Here's the cool thing about Bootstrap...</h4>
+				<p>
+					think it's safe to say that bras are annoying for every woman. But when you've got big boobs, the struggle is so much more real. Sigh no more, though, my fellow chesty ladies: here are eight bra hacks for big boobs that just might change your life (or at least your undergarment routine.)
+
+					Finding a bra is an incredible pain as it is, but finding the perfect fit in a large size is like playing the hardest game ever on challenge mode. Many of us have a tendency to settle when it comes to choosing a bra: We've strapped on, like, 24 of them, have seen enough of our shirtless bods under dressing room lighting, and for the love of God, someone please just feed us already because we're hungry and give up on bras.
+
+					I've chosen more than one bra out of exhaustion and exasperation, which hasn't really done me any favors. But hey, high-quality bras in DD sizes and higher aren't cheap, so we live with it.
+
+					Even if bra shopping is the worst part of your year, or putting on a bra is the worst part of your day, you don't have to resign yourself to brassiere purgatory. Here are 8 tips to help you out.
+				</p>
+				<p>
+					BiggerBras.com brought this piece of advice into my life, and I swear I'll do this every day from now on. When you're putting on your bra, slip the straps over your arms and lean forward so your breasts fall into the cups, then hook it on — it gives you a way better fit than just strapping it on over them.
+
+					Once you've put your bra on, you've gotta position your girls. Use your opposite hand to "scoop" up your breast and "bring it forward into the cup," says BiggerBras.com, then repeat on the other side.
+				</p>
+			</div>
+			<div class="col-md-6">
+				<img src="img/boobstrap2.jpg" class="img-responsive"><!--img-responsive 圖片會回應 row 設定-->
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<h4>
+					'We're gonna impeach the motherfucker': the Democrats' new street fighters 
+				</h4>
+				<p>
+					Progressives cheer as Congress’s new intake pledge to take the fight to Trump
+				</p>
+				<p>
+					The 116th Congress, sworn in on Thursday, made history. It included the first Muslim and Native American women elected to Congress, two of the youngest women, a record number of women overall, and becomes the most racially diverse lawmaking body ever in America.
+				</p>
+			</div>
+
+
+			<div class="col-md-3">
+				<img src="img/boobstrap3.jpg" class="img-responsive"><!--img-responsive 圖片會回應 row 設定-->
+			</div>
+
+			<div class="col-md-3">
+				<p>
+					And the incoming class has shown they’re unlike establishment Democrats in recent years in another important way: they’re willing and capable of fighting Trump’s fire with fire.
+				</p>
+				<p>
+					Among them has been the Michigan congresswoman Rashida Tlaib, who had some strong words for the president. Speaking at an event shortly after being sworn in, Tlaib, the first Palestinian American elected to Congress, recalled a conversation she had after she won.
+				</p>
+			</div>
+
+			<div class="col-md-3">
+				<img src="img/cute_girl1.jpg" class="img-responsive"><!--img-responsive 圖片會回應 row 設定-->
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="col-md-3">
+				<img src="img/cute_girl2.jpg" class="img-responsive"><!--img-responsive 圖片會回應 row 設定-->
+			</div>
+
+			<div class="col-md-3">
+				<p>
+					She said: “And when your son looks at you and says, ‘Mama, look, you won. Bullies don’t win,’ and I said, ‘Baby, they don’t’ – because we’re gonna go in there and we’re going to impeach the motherfucker.”
+
+					Tlaib had been clear about her intentions in impeaching Trump throughout her campaign. She tweeted in March: “Why am I running? Because this is about electing the jury to impeach (POTUS) and I will make a heck of juror.”
+				</p>
+				<p>
+					Tlaib came under swift criticism from Republicans and what the new Democratic party rebels often see as the old brand of milquetoast Democrats, for so-called incivility, but for supporters on the left it’s exactly the type of opposition to Trump they have been waiting for.
+				</p>
+			</div>
+
+			<div class="col-md-3">
+				<img src="img/cute_girl3.jpg" class="img-responsive"><!--img-responsive 圖片會回應 row 設定-->
+			</div>
+
+			<div class="col-md-3">
+				<p>
+					Congresswoman Ilhan Omar, who was born in Somalia, spent four years in a refugee camp and became the first member of Congress to wear a hijab, was, like Tlaib, sworn in on a copy of the Qur’an. She sounded a spirited tone on Thursday when she tweeted: “Sworn in and ready to throw down for the people.” She added an emoji of a clenched fist.
+				</p>
+				<p>
+					Alexandria Ocasio-Cortez, the youngest woman ever elected to Congress, and already beloved for her willingness to punch back at critics and regressive Republican policies, was booed on the floor when casting her vote for Nancy Pelosi as House speaker.
+				</p>
+				<p>
+					Like many of the new, younger members of Congress for whom social media sparring is their natural lingua franca, Ocasio-Cortez fired back a swift rebuke.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- 展開式標題 -->
+	<div class="container">
+		<div class="row">
+			<h4>
+				<a href="#hidden" data-toggle="collapse">
+					The Trump Administration Has Reportedly Banned the CDC From Using Words Such as 'Transgender' and 'Fetus' [Update]
+				</a>
+			</h4>
+			<div id="hidden" class="collapse">
+				<p>
+					In its signature dictatorship[REDACTED] authoritarian preference of democratic governing style, the Trump administration has reportedly banned the Centers for Disease Control and Prevention from using seven words in their budget documents. The words are: “entitlement,” “diversity,” “transgender,” “fetus,” “evidence-based,” “science-based,” and “vulnerable.” This could cause problems because scientists might need some of those words, like “fetus,” to study fetal brain development to make sure your fetus doesn’t get fucking microcephaly. It’s times like this that I imagine I’ll look back in 10 years (if humans are still alive) and think, “hmm, that was probably the time to move.”
+
+					Or was August the time to go, when the Department of Agriculture banned phrases like “climate change” and “reduce greenhouse gasses” and replaced them with “weather extremes” and “increase nutrient use efficiency”?
+
+					Or was it June, when the “travel ban” was actually “extreme vetting” until it wasn’t?
+
+					Anyway, here we are again. According to the Washington Post, policy analysts at the CDC in Atlanta report that “senior officials” briefed them on Thursday to replace phrases like “science-based” or ­“evidence-based,” with “CDC bases its recommendations on science in consideration with community standards and wishes.” Which essentially means “science”–the one major thing the CDC needs to make sure we’re not all going to die–is now subject to approval by any ole schmo who has an opinion about it.
+
+					Fuck.
+
+					As the Post points out, several federal agencies, including the Department of Health and Human Services, which oversees the CDC, have been quietly dropping mentions of the LGBT community altogether. For example, HHS has “removed information about LGBT Americans from its website.”
+
+					One tactic to get around bald censorship has been to out-word the government. An NPR study from earlier this year found that scientists applying for public funding have been cutting down on mentions of “climate change” and referencing “extreme weather” instead.
+
+					Last year before the election, Obama blocked the use of words “negro” and “oriental,” with CNN writing, “Welcome to 2016.” Now it’s 2017, and Errol Louis is on CNN quoting 1984.  
+
+					Fetus fetus fetus fetus fetus fetus fetus!!!!!!!! 
+				</p>
+				<p><b>Update:</b> Planned Parenthood has returned request for comment with a statement:
+
+					It is unimaginably dangerous to forbid the Centers for Disease Control and Prevention from speaking about things essential to Americans’ health. This edict doesn’t just mean a change in vocabulary. It means the Trump-Pence administration is trying to make a radical change in the focus of the entire agency.
+
+					You cannot fight against the Zika virus, or improve women’s and fetal health, if you are unable to use the word ‘fetus.’ You must be able to talk about science and evidence if you are to research cures for infectious diseases such as Ebola. You must be able to acknowledge the humanity of transgender people in order to address their health care needs. You cannot erase health inequities faced by people of color simply by forbidding the use of the words ‘vulnerable’ or ‘diversity’.
+
+					This move is reckless, and will put millions of lives in danger. The Trump-Pence administration should be ashamed, and must end this dictate immediately.
+				</p>
+				<p><b>Update:</b> David Stacy, Director of Government Affairs for the Human Rights Campaign, draws parallels to the Reagan administration’s willful blindness to the AIDS crisis. He adds that the HRC plans to fight the move:
+
+					The Trump-Pence administration’s effort to eliminate entire communities from its vocabulary is a dangerous attack on LGBTQ people, women, and fact-based policy making. The move is reminiscent of a time not long ago when the government tried to ignore the reality of the HIV and AIDS crisis to the detriment of millions. This kind of erasure has potentially catastrophic consequences beyond the words used by the CDC — it could impact the very programs most vital to the health of women, transgender people, and others. But we will not be erased. The Human Rights Campaign will fight this and other politically-motivated policies, and this decision will ultimately backfire on the Trump-Pence administration.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<footer class="container-fluid text-center">
+		<div class="row">
+			<div class="col-sm-4">
+				<h3>Contact Us</h3>
+				<br/>
+				<h4>Our address and contact info here.</h4>
+			</div>
+
+			<div class="col-sm-4">
+				<h3>Connect</h3>
+				<a href="#" class="fa fa-facebook"></a>
+				<a href="#" class="fa fa-twitter"></a>
+				<a href="#" class="fa fa-google"></a>
+				<a href="#" class="fa fa-linkedin"></a>
+				<a href="#" class="fa fa-youtube"></a>
+			</div>
+
+			<div class="col-sm-4">
+				<img src="img/bunny.png" class="icon">
+			</div>
+		</div>
+
+	</footer>
+</body>
+</html>
