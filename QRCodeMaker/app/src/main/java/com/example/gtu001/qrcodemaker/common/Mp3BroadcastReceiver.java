@@ -51,6 +51,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         String savedNumber = "";
         if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
             savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
+            doMusicPause(context);
         } else {
             String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
             String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -59,10 +60,10 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 state = TelephonyManager.CALL_STATE_IDLE;
             } else if (TelephonyManager.EXTRA_STATE_OFFHOOK.equals(stateStr)) {
                 state = TelephonyManager.CALL_STATE_OFFHOOK;
-                doMusicPause(context);
+                doMusicContinue(context);
             } else if (TelephonyManager.EXTRA_STATE_RINGING.equals(stateStr)) {
                 state = TelephonyManager.CALL_STATE_RINGING;
-                doMusicContinue(context);
+                doMusicPause(context);
             }
         }
     }
