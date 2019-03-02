@@ -4,7 +4,6 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Robot;
 import java.awt.TrayIcon.MessageType;
@@ -59,6 +58,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -91,6 +91,7 @@ import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
+import gtu.binary.StringUtil4FullChar;
 import gtu.clipboard.ClipboardListener;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
@@ -108,7 +109,6 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import taobe.tec.jcc.JChineseConvertor;
-import javax.swing.JToggleButton;
 
 public class EnglishSearchUI extends JFrame {
 
@@ -184,14 +184,14 @@ public class EnglishSearchUI extends JFrame {
     private static volatile EnglishSearchUI FRAME;
 
     private static void startNewUI() {
-//        EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                try {
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        // EventQueue.invokeLater(new Runnable() {
+        // public void run() {
+        // try {
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // });
         synchronized (EnglishSearchUI.class) {
             if (FRAME == null) {
                 FRAME = new EnglishSearchUI();
@@ -240,7 +240,6 @@ public class EnglishSearchUI extends JFrame {
                 }
             });
 
-            
             panel_10.add(jFrameRGBColorPanel.getToggleButton(false));
         }
     }
@@ -462,6 +461,7 @@ public class EnglishSearchUI extends JFrame {
      * Create the frame.
      */
     public EnglishSearchUI() {
+        JCommonUtil.defaultToolTipDelay();
         addWindowFocusListener(new WindowFocusListener() {
             public void windowGainedFocus(WindowEvent e) {
                 focusSearchEnglishIdText();
@@ -594,44 +594,14 @@ public class EnglishSearchUI extends JFrame {
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("設定", null, panel, null);
-        panel.setLayout(new FormLayout(new ColumnSpec[] {
-                FormFactory.RELATED_GAP_COLSPEC,
-                FormFactory.DEFAULT_COLSPEC,
-                FormFactory.RELATED_GAP_COLSPEC,
-                ColumnSpec.decode("default:grow"),},
-            new RowSpec[] {
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,
-                FormFactory.RELATED_GAP_ROWSPEC,
-                FormFactory.DEFAULT_ROWSPEC,}));
+        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblNewLabel = new JLabel("new_word.txt路徑");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -837,7 +807,7 @@ public class EnglishSearchUI extends JFrame {
         robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
         lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
-        
+
         panel_10 = new JPanel();
         panel.add(panel_10, "4, 32, fill, fill");
 
@@ -874,6 +844,7 @@ public class EnglishSearchUI extends JFrame {
                 googleTranslateArea.setText("");
             }
         });
+
         panel_8.add(googleTranslateClearBtn);
 
         panel_9 = new JPanel();
@@ -881,7 +852,89 @@ public class EnglishSearchUI extends JFrame {
 
         googleTranslateArea = new JTextArea();
         JTextAreaUtil.applyCommonSetting(googleTranslateArea);
-        panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea), BorderLayout.CENTER);
+
+        googleTranslateArea.setLineWrap(true);
+        googleTranslateArea.addMouseListener(new MouseAdapter() {
+
+            final String PTN = "[\\w\\-\\_]+";
+
+            private String getSearchWord() {
+                StringBuilder wordSb = new StringBuilder();
+                try {
+                    int startPos = googleTranslateArea.getSelectionStart();
+                    int endPos = googleTranslateArea.getSelectionEnd();
+                    String googleText = StringUtils.defaultString(googleTranslateArea.getText());
+                    char[] arry = googleText.toCharArray();
+
+                    if (startPos != -1 && endPos != -1) {
+                        if (startPos == endPos) {
+                            A: for (int ii = startPos; ii > 0; ii--) {
+                                char c = arry[ii];
+                                if (!String.valueOf(c).matches(PTN)) {
+                                    break A;
+                                } else {
+                                    wordSb.insert(0, c);
+                                }
+                            }
+                        } else if (startPos - 1 >= 0) {
+                            A: for (int ii = startPos - 1; ii > 0; ii--) {
+                                char c = arry[ii];
+                                if (!String.valueOf(c).matches(PTN)) {
+                                    break A;
+                                } else {
+                                    wordSb.insert(0, c);
+                                }
+                            }
+                        }
+
+                        wordSb.append(StringUtils.substring(googleText, startPos, endPos));
+
+                        if (startPos == endPos) {
+                            if (endPos + 1 <= arry.length) {
+                                A: for (int ii = endPos + 1; ii < arry.length; ii++) {
+                                    char c = arry[ii];
+                                    if (!String.valueOf(c).matches(PTN)) {
+                                        break A;
+                                    } else {
+                                        wordSb.append(c);
+                                    }
+                                }
+                            }
+                        } else {
+                            A: for (int ii = endPos; ii < arry.length; ii++) {
+                                char c = arry[ii];
+                                if (!String.valueOf(c).matches(PTN)) {
+                                    break A;
+                                } else {
+                                    wordSb.append(c);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                System.out.println("SearchWord =  " + wordSb);
+                return wordSb.toString();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                try {
+                    String searchWord = getSearchWord();
+                    if (StringUtils.isBlank(searchWord)) {
+                        googleTranslateArea_SetTooltip(null, null);
+                        return;
+                    }
+                    searchEnglishIdTextController.setInputText(searchWord);
+                    queryButtonAction(false);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
+        panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea, false, true), BorderLayout.CENTER);
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -1055,12 +1108,30 @@ public class EnglishSearchUI extends JFrame {
         if (offlineProp.containsKey(text)) {
             String content = offlineProp.getProperty(text);
             meaningText.setText(content);
+            googleTranslateArea_SetTooltip(text, content);
             this.appendMemoryBank(text, content);
             return true;
         } else {
             meaningText.setText("查無此字!!");
+            googleTranslateArea_SetTooltip(text, "查無此字!!");
             return false;
         }
+    }
+
+    private void googleTranslateArea_SetTooltip(String text, String meaning) {
+        if (StringUtils.isBlank(text) || StringUtils.isBlank(meaning)) {
+            googleTranslateArea.setToolTipText(null);
+            return;
+        }
+        List<String> lst = StringUtil4FullChar.fixLength(meaning, 50);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        sb.append("<font color='blue'><b>" + text + "</b></font><br/>");
+        for (String s : lst) {
+            sb.append(s + "<br/>");
+        }
+        sb.append("</html>");
+        googleTranslateArea.setToolTipText(sb.toString());
     }
 
     private void queryButtonAction_online(final String text) {
@@ -1088,6 +1159,7 @@ public class EnglishSearchUI extends JFrame {
                 sb.append("\n");
 
                 meaningText.setText(info.getMeaning());
+                googleTranslateArea_SetTooltip(text, info.getMeaning());
 
                 if (StringUtils.isNotBlank(info.getMeaning())) {
                     findOk.set(true);
@@ -1110,6 +1182,9 @@ public class EnglishSearchUI extends JFrame {
                     }
 
                     meaningSet.add(info2.getMeaning2());
+                    if (ii == 0) {
+                        googleTranslateArea_SetTooltip(text, info2.getMeaning2());
+                    }
 
                     if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
                         findOk.set(true);
