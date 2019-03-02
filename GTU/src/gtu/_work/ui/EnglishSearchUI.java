@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -58,11 +59,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
@@ -103,6 +108,7 @@ import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFontChooserHelper;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -451,11 +457,12 @@ public class EnglishSearchUI extends JFrame {
     private JPanel panel_7;
     private JPanel panel_8;
     private JPanel panel_9;
-    private JTextArea googleTranslateArea;
+    private JTextPane googleTranslateArea;
     private JButton googleTranslateBtn;
     private JButton googleTranslateClearBtn;
     private JPanel panel_10;
     private JToggleButton tglbtnNewToggleButton;
+    private JButton googleTranslateChangeFontBtn;
 
     /**
      * Create the frame.
@@ -792,22 +799,6 @@ public class EnglishSearchUI extends JFrame {
         });
         panel_4.add(reviewMemoryMergeBtn);
 
-        // ----------------------------------------------------------------------------------------------------------
-
-        // 置中
-        JCommonUtil.setJFrameCenter(this);
-        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
-        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
-        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
-        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
-        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
-        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
-        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
-        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
-        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
-        lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
-        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
-
         panel_10 = new JPanel();
         panel.add(panel_10, "4, 32, fill, fill");
 
@@ -836,6 +827,18 @@ public class EnglishSearchUI extends JFrame {
                 }
             }
         });
+
+        googleTranslateChangeFontBtn = new JButton("改字形");
+        googleTranslateChangeFontBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Font font = JFontChooserHelper.showChooser(getGoogleTranslateArea());
+                if (font != null) {
+                    JTextAreaUtil.setJTextPaneFont(googleTranslateArea, font, Color.BLACK);
+                }
+            }
+        });
+
+        panel_8.add(googleTranslateChangeFontBtn);
         panel_8.add(googleTranslateBtn);
 
         googleTranslateClearBtn = new JButton("清除");
@@ -850,10 +853,13 @@ public class EnglishSearchUI extends JFrame {
         panel_9 = new JPanel();
         panel_5.add(panel_9, BorderLayout.EAST);
 
-        googleTranslateArea = new JTextArea();
+        googleTranslateArea = new JTextPane();
         JTextAreaUtil.applyCommonSetting(googleTranslateArea);
 
-        googleTranslateArea.setLineWrap(true);
+        MutableAttributeSet set = new SimpleAttributeSet();
+        StyleConstants.setLineSpacing(set, 1);
+        googleTranslateArea.setParagraphAttributes(set, true);
+
         googleTranslateArea.addMouseListener(new MouseAdapter() {
 
             final String PTN = "[\\w\\-\\_]+";
@@ -935,6 +941,22 @@ public class EnglishSearchUI extends JFrame {
         });
 
         panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea, false, true), BorderLayout.CENTER);
+
+        // ----------------------------------------------------------------------------------------------------------
+
+        // 置中
+        JCommonUtil.setJFrameCenter(this);
+        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
+        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
+        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
+        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
+        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
+        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
+        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
+        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
+        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
+        lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
+        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -1789,6 +1811,10 @@ public class EnglishSearchUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private JTextPane getGoogleTranslateArea() {
+        return googleTranslateArea;
     }
 
     private enum TabIndexOrder {

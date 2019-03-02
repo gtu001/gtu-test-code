@@ -1,6 +1,8 @@
 package gtu.swing.util;
 
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -18,6 +20,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -94,6 +99,7 @@ public class JTextAreaUtil {
 
     /**
      * 可把 TextArea當成console, 程式必須放在 Thread
+     * 
      * @param consoleArea
      * @param encode
      * @return
@@ -243,7 +249,44 @@ public class JTextAreaUtil {
 
     public static void applyCommonSetting(JTextComponent jTextComponent) {
         JTextAreaUtil.applyFont(jTextComponent);
-        JTextUndoUtil.applyUndoProcess1(jTextComponent);
+        try {
+            JTextUndoUtil.applyUndoProcess1(jTextComponent);
+        } catch (Exception ex) {
+            JTextUndoUtil.applyUndoProcess2(jTextComponent);
+        }
         JTextAreaUtil.applyTabKey(jTextComponent);
+    }
+
+    /**
+     * Utility method for setting the font and color of a JTextPane. The result
+     * is roughly equivalent to calling setFont(...) and setForeground(...) on
+     * an AWT TextArea.
+     */
+    public static void setJTextPaneFont(JTextPane jtp, Font font, Color c) {
+        // Start with the current input attributes for the JTextPane. This
+        // should ensure that we do not wipe out any existing attributes
+        // (such as alignment or other paragraph attributes) currently
+        // set on the text area.
+        MutableAttributeSet attrs = jtp.getInputAttributes();
+
+        // Set the font family, size, and style, based on properties of
+        // the Font object. Note that JTextPane supports a number of
+        // character attributes beyond those supported by the Font class.
+        // For example, underline, strike-through, super- and sub-script.
+        StyleConstants.setFontFamily(attrs, font.getFamily());
+        StyleConstants.setFontSize(attrs, font.getSize());
+        StyleConstants.setItalic(attrs, (font.getStyle() & Font.ITALIC) != 0);
+        StyleConstants.setBold(attrs, (font.getStyle() & Font.BOLD) != 0);
+
+        // Set the font color
+        StyleConstants.setForeground(attrs, c);
+
+        // Retrieve the pane's document object
+        StyledDocument doc = jtp.getStyledDocument();
+
+        // Replace the style for the entire document. We exceed the length
+        // of the document by 1 so that text entered at the end of the
+        // document uses the attributes.
+        doc.setCharacterAttributes(0, doc.getLength() + 1, attrs, false);
     }
 }
