@@ -114,6 +114,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JTextFieldUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishSearchUI extends JFrame {
@@ -869,7 +870,7 @@ public class EnglishSearchUI extends JFrame {
                 try {
                     int startPos = googleTranslateArea.getSelectionStart();
                     int endPos = googleTranslateArea.getSelectionEnd();
-                    String googleText = StringUtils.defaultString(googleTranslateArea.getText());
+                    String googleText = StringUtils.defaultString(JTextFieldUtil.getText(googleTranslateArea));
                     char[] arry = googleText.toCharArray();
 
                     if (startPos != -1 && endPos != -1) {
@@ -928,7 +929,10 @@ public class EnglishSearchUI extends JFrame {
             public void mouseReleased(MouseEvent e) {
                 try {
                     if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        String searchWord = getSearchWord();
+                        String searchWord = googleTranslateArea.getSelectedText();
+                        if (StringUtils.isBlank(searchWord)) {
+                            searchWord = getSearchWord();
+                        }
                         if (StringUtils.isBlank(searchWord)) {
                             googleTranslateArea_SetTooltip(null, null);
                             return;

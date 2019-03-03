@@ -11,9 +11,18 @@ import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 public class JTextFieldUtil {
+
+    public static String getText(final JTextComponent jText) {
+        try {
+            return jText.getDocument().getText(0, jText.getDocument().getLength());
+        } catch (Exception e) {
+            throw new RuntimeException("getText ERR : " + e.getMessage(), e);
+        }
+    }
 
     public static void setText(final JTextField textField, final String strValue) {
         SwingUtilities.invokeLater(new Runnable() {
