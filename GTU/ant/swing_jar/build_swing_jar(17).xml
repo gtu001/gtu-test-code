@@ -76,6 +76,7 @@
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 
 			<packagename mode="small">org.json.JSONObject</packagename>
+			<packagename mode="small">say.swing.JFontChooser</packagename>
 
 			<packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
 			<packagename mode="small">org/springframework/util/Assert</packagename>

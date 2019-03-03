@@ -496,7 +496,7 @@ public class EnglishSearchUI extends JFrame {
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (tabbedPane.getSelectedIndex() == TabIndexOrder.googleTranslate.ordinal()) {
-                    googleTranslateArea.setText(searchEnglishIdTextController.getText());
+                    // googleTranslateArea.setText(searchEnglishIdTextController.getText());
                 }
             }
         });
@@ -927,13 +927,15 @@ public class EnglishSearchUI extends JFrame {
             @Override
             public void mouseReleased(MouseEvent e) {
                 try {
-                    String searchWord = getSearchWord();
-                    if (StringUtils.isBlank(searchWord)) {
-                        googleTranslateArea_SetTooltip(null, null);
-                        return;
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        String searchWord = getSearchWord();
+                        if (StringUtils.isBlank(searchWord)) {
+                            googleTranslateArea_SetTooltip(null, null);
+                            return;
+                        }
+                        searchEnglishIdTextController.setInputText(searchWord);
+                        queryButtonAction(false);
                     }
-                    searchEnglishIdTextController.setInputText(searchWord);
-                    queryButtonAction(false);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
