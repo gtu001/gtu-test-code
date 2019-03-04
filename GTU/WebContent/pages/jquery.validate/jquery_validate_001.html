@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/screen.css">
+	<link rel="stylesheet" href="css/styles.css">
+
+	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="js/jquery.validate.js"></script>
+
+	<script src="js/localization/messages_zh_TW.js"></script><!-- 要換不同語系要自己換js -->	
+
+	<script type="text/javascript">
+		$("#commentForm").validate();
+	</script>
+
+	<style>
+		span.required::before {
+			content: "*";
+			color:#FF0000;
+		}
+	</style>
+</head>
+
+<body>
+	<form id="commentForm">
+		<p>
+			<label for="cname"><span class="required" />Name </label>
+			<input id="cname" name="name" minlength="2" type="text" required />
+		</p>
+
+		<p>
+			<label for="cemail"><span class="required" />E-Mail</label>
+			<input id="cemail" type="email" name="name" required />
+		</p>
+
+		<p>
+			<label for="curl">URL (optional)</label>
+			<input id="curl" type="url" name="url" required />
+		</p>
+
+		<p>
+			<label for="ccomment"><span class="required" />備註 </label>
+			<input id="ccomment" name="comment" required />
+		</p>
+
+		<p>
+			<input class="submit" type="submit" value="送出" />
+		</p>
+	</form>
+</body>
+</html>

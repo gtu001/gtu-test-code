@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/screen.css">
+	<link rel="stylesheet" href="css/styles.css">
+
+	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="js/jquery.validate.js"></script>
+
+	<script src="js/localization/messages_zh_TW.js"></script><!-- 要換不同語系要自己換js -->	
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			//自訂驗證條件
+			jQuery.validator.addMethod("customRule001", function(value, element) {
+				var test1 = this.optional(element);
+				console.log("customRule001自訂驗證條件 : ", test1, value);
+				if($.trim(value) != '' && /^[a-zA-Z]+$/.test(value)){
+					return true;
+				}
+				return false;
+			}, "自訂驗證條件錯誤訊息(1)!!");
+
+			$("#signupForm").validate({
+				rules: {
+					firstname: "required",
+					lastname: "required",
+					username: {
+						required: true,
+						minlength: 2
+					},
+					password: {
+						required: true,
+						minlength: 5
+					},
+					confirm_password: {
+						required: true,
+						minlength: 5,
+						equalTo: "#password"
+					},
+					email: {
+						required: true,
+						email: true
+					},
+					topic: {
+						required: "#newsletter:checked",
+						minlength: 2
+					},
+					agree: "required",
+					customRule001Test: {
+						customRule001: true,
+						required: true
+					}
+				},
+				messages: {
+					firstname: "請輸入姓氏",
+					lastname: "請輸入名字",
+					username: {
+						required: "請輸入使用者名稱",
+						minlength: "請輸入最少兩個字元"
+					},
+					password: {
+						required: "請輸入密碼",
+						minlength: "請輸入最少5個字元"
+					},
+					confrim_password: {
+						required: "請輸入密碼確認",
+						minlength: "請輸入最少5個字元",
+						equalTo: "兩個密碼必須相同"
+					},
+					agree: "請勾選同意",
+					topic: "請選擇至少兩項",
+					customRule001Test: "請輸入純英文"
+				},
+				
+				//自訂錯誤位置方法2
+				errorPlacement: function(error, element) {
+					if (element.attr("name") == "agree") {
+						error.appendTo("#agreeMsgLabel");//客製位置
+					} else {
+						error.insertAfter(element);//預設錯誤訊息顯示
+					}
+				}
+			});
+		});
+
+		function doSubmit(){
+			$("#signupForm").submit();
+		}
+	</script>
+
+	<style>
+	span.required::before {
+		content: "*";
+		color:#FF0000;
+	}
+</style>
+</head>
+
+<body>
+	<form id="signupForm">
+		<p>
+			<label for="firstname"> 姓氏 </label>
+			<input id="firstname" name="firstname" type="text" />
+		</p>
+
+		<p>
+			<label for="lastname"> 名字</label>
+			<input id="lastname" name="lastname" type="text" />
+		</p>
+
+		<p>
+			<label for="username"> 使用者名稱</label>
+			<input id="username" name="username" type="text" />
+		</p>
+
+		<p>
+			<label for="password"> 密碼</label>
+			<input id="password" name="password" type="password" />
+		</p>
+
+		<p>
+			<label for="confirm_password"> 確認密碼</label>
+			<input id="confirm_password" name="confirm_password" type="password" />
+		</p>
+
+		<p>
+			<label for="email"> Email</label>
+			<input id="email" name="email" type="email" />
+		</p>
+
+		<p>
+			<label for="agree"> 請勾選同意</label>
+			<input id="agree" name="agree" type="checkbox" />
+			<div id="agreeMsgLabel">客製位置2</div>
+		</p>
+
+		<p>
+			<label for="newsletter"> 我要收信</label>
+			<input id="newsletter" name="newsletter" type="checkbox" />
+		</p>
+
+		<fieldset id="newsletter_topics">
+			<legend>主題 (請選擇兩個)</legend>
+
+			<label for="topic_marketflash">
+				<input type="checkbox" id="topic_marketflash" value="marketflash" name="topic">市場</label>
+			</label>
+
+			<label for="topic_fuzz">
+				<input type="checkbox" id="topic_fuzz" value="fuzz" name="topic">最新消息</label>
+			</label>
+
+			<label for="topic_digester">
+				<input type="checkbox" id="topic_digester" value="digester" name="topic">文摘</label>
+			</label>
+
+			<p>
+				<label for="topic" generated="true" class="error" /><!-- 自訂錯誤位置方法1 要有 for, class="error" 兩屬性 -->
+			</p>
+		</fieldset>
+
+		<p>
+			<label for="customRule001Test"> 客製驗證 </label>
+			<input id="customRule001Test" name="customRule001Test" type="text" />
+		</p>
+
+		<p>
+			<input class="submit" type="button" value="送出" onclick="doSubmit();" />
+		</p>
+	</form>
+</body>
+</html>
