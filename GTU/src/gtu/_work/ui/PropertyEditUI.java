@@ -613,7 +613,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
     }
 
     void applyPropTableOnBlurEvent() {
-        JTableUtil.newInstance(propTable).applyOnBlurEvent(null, new ActionListener() {
+        JTableUtil.newInstance(propTable).applyOnCellBlurEvent(null, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Map<String, Object> map = (Map<String, Object>) e.getSource();

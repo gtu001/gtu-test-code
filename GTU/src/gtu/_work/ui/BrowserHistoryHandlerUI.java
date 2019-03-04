@@ -438,6 +438,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     urlTableClickAction(e);
                 }
             });
+            JTableUtil.newInstance(urlTable).applyOnHoverEvent(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
+                        JTableUtil jtab = JTableUtil.newInstance(urlTable);
+                        int rowPos = pair.getLeft();
+                        int colPos = UrlTableConfigEnum.VO.ordinal();
+                        UrlConfig d = (UrlConfig) jtab.getRealValueAt(rowPos, colPos);
+                        urlTable.setToolTipText(d.url);
+                    } catch (Exception ex) {
+                    }
+                }
+            });
 
             JPanel panel_3 = new JPanel();
             tabbedPane.addTab("設定", null, panel_3, null);
@@ -1460,7 +1474,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("click 選取");
             this.setUrlConfigToUI(d, true);
 
-            urlTable.setToolTipText(d.url);
             System.out.println("[open]<<<" + d.title + " = " + d.url);
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {

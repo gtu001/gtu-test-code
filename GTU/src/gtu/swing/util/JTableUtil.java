@@ -9,12 +9,14 @@ package gtu.swing.util;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -1247,26 +1249,6 @@ public class JTableUtil {
         }
     }
 
-    public static void addOnblurCellEvent(DefaultTableModel model, final Runnable runnable, final JTableUtil jTableUtil) {
-        model.addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int col = e.getColumn();
-                String valueStr = "<ERR>";
-                try {
-                    Object value = jTableUtil.getRealValueAt(row, col);
-                    valueStr = value != null ? (value + " -> " + value.getClass()) : "null";
-                } catch (Exception ex) {
-                    ex.getMessage();
-                }
-                System.out.println(String.format("## table change -> row[%d], col[%d] -----> %s", row, col, valueStr));
-                // 要處理的event
-                runnable.run();
-            }
-        });
-    }
-
     public List<Object> getColumnTitleArray() {
         List<Object> titles = new ArrayList<Object>();
         TableColumnModel titleModel = table.getTableHeader().getColumnModel();
@@ -1278,7 +1260,7 @@ public class JTableUtil {
     }
 
     // onblur 修改
-    public void applyOnBlurEvent(DefaultTableModel model, final ActionListener listener) {
+    public void applyOnCellBlurEvent(DefaultTableModel model, final ActionListener listener) {
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         if (model == null) {
             model = (DefaultTableModel) table.getModel();
@@ -1374,5 +1356,28 @@ public class JTableUtil {
             removeAll();
             __filterText(filterText);
         }
+    }
+
+    /**
+     * 設定選項hover事件
+     */
+    public void applyOnHoverEvent(final ActionListener listener) {
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (listener == null) {
+                    return;
+                }
+                int rowPos = table.rowAtPoint(e.getPoint());
+                if (rowPos > -1) {
+                    for (int col = 0; col < table.getColumnCount(); col++) {
+                        Rectangle bounds = table.getCellRect(rowPos, col, true);
+                        if (bounds.contains(e.getPoint())) {
+                            listener.actionPerformed(new ActionEvent(Pair.of(rowPos, col), rowPos, "left:row, right:col"));
+                        }
+                    }
+                }
+            }
+        });
     }
 }
