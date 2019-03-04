@@ -1,0 +1,101 @@
+﻿    <script th:src="@{/js/bootstrap/bootstrap.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap/css/bootstrap.min.css}">
+
+
+
+
+
+
+$('#product_dialog').modal('toggle');
+
+
+
+<!-- Modal 商品選擇 start -->
+	<div class="modal fade" id="product_dialog" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="title-leftline">商品選擇</h4>
+				</div>
+
+				<div class="modal-body">
+					<div class="row padding-left25 padding-right25">
+						<div class="col-sm-5">
+							<div class="box_line">
+								<div class="line_title">商品代碼</div>
+								<div class="line_content">
+									<input class="form-control" type="text" placeholder="ex:0010"
+										id="product_dialog_bondsId">
+								</div>
+							</div>
+							<div class="box_line"></div>
+						</div>
+						<div class="col-sm-1"></div>
+						<div class="col-sm-6">
+							<div class="box_line">
+								<div class="line_title">計價幣別</div>
+								<div class="line_content">
+									<select class="form-control" id="product_dialog_ccy"><option
+											value="" label="">
+										<option th:each="code : ${T(cub.inv.web.etf.enums.CurrencyCodeEnum).values()}"
+											th:value="${code}" th:text="${code.code}"></option></select>
+								</div>
+							</div>
+
+							<div class="box_line">
+								<div class="line_title">商品名稱</div>
+								<div class="line_content">
+									<input class="form-control" type="text" placeholder="ex: 新興市場"
+										id="product_dialog_bondsName">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="text-center">
+						<span class="btn btn_g" onclick="productQuery()">搜尋</span>
+					</div>
+
+
+					<hr>
+					<div class="scroll_table">
+						<table class="table">
+							<thead>
+								<tr>
+									<th class="w20">商品代碼</th>
+									<th class="w40">商品名稱</th>
+									<th class="w20">計價幣別</th>
+									<th class="w20">限專業投資人</th>
+									<th class="th_scrollbar"></th>
+								</tr>
+							</thead>
+						</table>
+						<div class="tbody-scroll scrollbar">
+							<table id="productQueryTable" class="table text-center">
+								<thead>
+									<tr>
+										<th class="w20"></th>
+										<th class="w40"></th>
+										<th class="w20"></th>
+										<th class="w20"></th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+
+					<div class="modal-footer">
+						<a class="btn btn_o" data-dismiss="modal">關閉</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- Modal 商品選擇 End -->

@@ -1,0 +1,6 @@
+<select class="form-control" id="product_dialog_ccy">
+	<option
+	value="" label="">
+	<option th:each="code : ${T(cub.inv.web.etf.enums.CurrencyCodeEnum).values()}"
+	th:value="${code}" th:text="${code.code}"></option>
+</select>

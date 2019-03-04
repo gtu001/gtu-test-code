@@ -1,0 +1,23 @@
+Maven. 
+
+<dependencies>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-devtools</artifactId>
+		<optional>true</optional>
+	</dependency>
+</dependencies>
+
+
+--------------------------------------------------------------------------------------
+Gradle. 
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+dependencies {
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+}

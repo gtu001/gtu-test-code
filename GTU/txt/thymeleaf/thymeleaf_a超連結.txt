@@ -1,0 +1,1 @@
+<a th:href="@{/fund/qryTrustAcct/} + ${ctf.trustAcct} + '/' + ${ctf.shoreTypeCode}" th:text="${ctf.trustAcct}"></a>

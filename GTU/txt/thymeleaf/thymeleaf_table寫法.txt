@@ -1,0 +1,37 @@
+                    <div class="content_table" th:if="${not #lists.isEmpty(roiEntity.recordResultListCtf0)}">
+                        <table>
+                            <tbody>
+	                            <tr>
+	                            	<!-- class 對 資料庫欄位(因下列有智能投資的Table，因此設class非用id) -->
+	                                <th class="AcctInitDate">信託起始日</th>
+	                                <th class="TrustAcct_Res">信託帳號</th>
+	                                <th class="TrustType_Res">信託別</th>
+	                                <th class="ProjectDesc">專案</th>
+	                                <th class="FundID">商品代碼</th>
+	                                <th class="FundCName"><span style="color: red">(境外 台幣)</span> 商品名稱</th>
+	                                <th class="CountCapital_Total">信託金額</th>
+	                                <th class="Units">單位數</br>(不含在途)</th>
+	                                <th class="Net">損益試算</th>
+	                                <th class="CountCapital1">未分配金額</br>(申購)</th>
+	                                <th class="CountCapital23">未分配單位數</br>(贖回/轉換)</th>
+	                                <th class="ROI">報酬率</br>(不含息)</th>
+	                                <th class="divROI">報酬率</br>(含息)</th>
+	                            </tr>
+	                            <tr th:each="ctf : ${roiEntity.recordResultListCtf0}">
+	                                <td th:text="${ctf.acctInitDate}"></td>
+	                                <td><a th:href="@{/fund/qryTrustAcct/} + ${ctf.trustAcct} + '/' + ${ctf.shoreTypeCode}" th:text="${ctf.trustAcct}"></a></td>
+	                                <td th:text="${ctf.trustType}"></td>
+	                                <td th:text="${ctf.projectDesc}"></td>
+	                                <td><span style="color: red" th:text="${ctf.fundId}"></span></td>
+	                                <td th:text="${ctf.fundCname}"></td>
+									<td th:text="${ctf.countCapitalCcy} + ' ' + ${ctf.countCapital}"></td>
+	                                <td th:text="${ctf.units}"></td>
+									<td th:text="${ctf.net}"></td>
+									<td th:text="${ctf.countCapital1Ccy} + ' ' + ${ctf.countCapital1}"></td>
+									<td th:text="${ctf.countCapital23}"></td>
+									<td th:text="${ctf.roi}"></td>
+									<td th:text="${ctf.divRoi}"></td>
+	                            </tr>		
+                        	</tbody>
+                        </table>
+                    </div>
