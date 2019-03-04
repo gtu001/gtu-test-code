@@ -346,12 +346,14 @@ public class EnglishSearchUI extends JFrame {
                                     choiceDialog.closeDialog();
                                 }
                             }
-                        }, new ActionListener() {// choice one
+                        }, new ActionListener() {// choice
+                                                 // one
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 choiceDialog.closeDialog();
                             }
-                        }, new ActionListener() {// modify desc
+                        }, new ActionListener() {// modify
+                                                 // desc
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 String newMeaning = JCommonUtil._jOptionPane_showInputDialog("請輸入新解釋  : " + d.getKey(), meaning.get());
@@ -375,7 +377,8 @@ public class EnglishSearchUI extends JFrame {
                                 checkChoiceEqual.set(false);
                                 choiceDialog.closeDialog();
                             }
-                        }, new ActionListener() {// skip all
+                        }, new ActionListener() {// skip
+                                                 // all
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
@@ -398,7 +401,9 @@ public class EnglishSearchUI extends JFrame {
                                 mouseMarkQueryHandler.after();
                                 dialogObervable.remove(choiceDialog);
                             }
-                        }, new ActionListener() { // append new word
+                        }, new ActionListener() { // append
+                                                  // new
+                                                  // word
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
@@ -415,7 +420,8 @@ public class EnglishSearchUI extends JFrame {
                                     JCommonUtil.handleException(ex);
                                 }
                             }
-                        }, new ActionListener() { // suspend key
+                        }, new ActionListener() { // suspend
+                                                  // key
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 boolean confirmDel = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定終止 : " + d.getKey(), "從設定檔中停止");
@@ -928,11 +934,16 @@ public class EnglishSearchUI extends JFrame {
             @Override
             public void mouseReleased(MouseEvent e) {
                 try {
-                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                    if (JMouseEventUtil.buttonLeftClick(1, e)) {
                         String searchWord = googleTranslateArea.getSelectedText();
                         if (StringUtils.isBlank(searchWord)) {
-                            searchWord = getSearchWord();
+                            googleTranslateArea_SetTooltip(null, null);
+                            return;
                         }
+                        searchEnglishIdTextController.setInputText(searchWord);
+                        queryButtonAction(false);
+                    } else if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        String searchWord = getSearchWord();
                         if (StringUtils.isBlank(searchWord)) {
                             googleTranslateArea_SetTooltip(null, null);
                             return;
