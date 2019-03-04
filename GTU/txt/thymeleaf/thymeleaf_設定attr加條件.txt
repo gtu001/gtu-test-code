@@ -1,0 +1,11 @@
+設定屬性加條件
+
+	<p th:attr="customattr=${flag}?'attr'></p>
+
+	若flag = true
+
+		<p customattr="attr"></p>
+
+	否則
+
+		<p></p>
