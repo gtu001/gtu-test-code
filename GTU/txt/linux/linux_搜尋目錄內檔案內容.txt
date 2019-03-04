@@ -1,0 +1,12 @@
+
+
+	grep -rli '<text>' <dir_path>
+	
+	    r - recursive
+	    i - case insensitive
+	    l - only print out file names
+	
+	Ex : 
+		grep -rli 'SpringApplication' ./
+		
+	

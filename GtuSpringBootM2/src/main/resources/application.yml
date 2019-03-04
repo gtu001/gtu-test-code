@@ -1,0 +1,62 @@
+server:
+  port: 8080
+---
+spring:
+  profiles:
+    active: ut
+---
+spring:
+  datasource:
+    oracle:
+      url: jdbc:oracle:thin:@88.8.111.91:1521:OINVINST
+      username: IVTLXIVP01FUND
+      password: IVTLXIVP01FUND
+      driver-class-name: oracle.jdbc.OracleDriver
+      test-on-borrow: true
+    
+    sqlserver-CTF:
+      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTF
+      username: IVTNTCTF01_NT14850
+      password: '@0075@@Fa7Bj@Nm'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      test-on-borrow: true
+      
+    sqlserver-CTFHistory:
+      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTFHistory
+      username: IVTNTCTF01_NT14850
+      password: '@0075@@Fa7Bj@Nm'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      test-on-borrow: true
+      
+    sqlserver-CTFL:
+      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTF
+      username: IVTNTCTF01_NT14850
+      password: '@0075@@Fa7Bj@Nm'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      test-on-borrow: true
+      
+    sqlserver-CTFLHistory:
+      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTFHistory
+      username: IVTNTCTF01_NT14850
+      password: '@0075@@Fa7Bj@Nm'
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      test-on-borrow: true
+      
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    hibernate:
+      dialect: org.hibernate.dialect.SQLServer2012Dialect
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+---
+spring:
+  cache:
+    caffeine:
+      spec:
+        maximumSize: 500 
+        expireAfterWrite: 6s
+---
+servicePackage: com.cathaybk.invf.rest.service.impl
+---
