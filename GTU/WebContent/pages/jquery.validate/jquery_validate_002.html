@@ -51,6 +51,13 @@
 					customRule001Test: {
 						customRule001: true,
 						required: true
+					},
+					contact: {
+						required: { //條件相依 : 若true則執行rule required
+							depends: function(element) {
+								return $("#contact_check").is(":checked");
+							}
+						}
 					}
 				},
 				messages: {
@@ -81,7 +88,14 @@
 					} else {
 						error.insertAfter(element);//預設錯誤訊息顯示
 					}
+				},
+				
+				//自訂sumit方式
+				submitHandler: function(form) {
+					alert("trigger submit!");
+					$(form).ajaxSubmit();
 				}
+				
 			});
 		});
 
@@ -131,6 +145,17 @@
 		</p>
 
 		<p>
+			<label for="customRule001Test"> 客製驗證 </label>
+			<input id="customRule001Test" name="customRule001Test" type="text" />
+		</p>
+
+		<p>
+			<label for="contact"> 條件相依 </label>
+			<input id="contact_check" name="contact_check" type="checkbox" />
+			<input id="contact" name="contact" type="text" />
+		</p>
+
+		<p>
 			<label for="agree"> 請勾選同意</label>
 			<input id="agree" name="agree" type="checkbox" />
 			<div id="agreeMsgLabel">客製位置2</div>
@@ -160,11 +185,6 @@
 				<label for="topic" generated="true" class="error" /><!-- 自訂錯誤位置方法1 要有 for, class="error" 兩屬性 -->
 			</p>
 		</fieldset>
-
-		<p>
-			<label for="customRule001Test"> 客製驗證 </label>
-			<input id="customRule001Test" name="customRule001Test" type="text" />
-		</p>
 
 		<p>
 			<input class="submit" type="button" value="送出" onclick="doSubmit();" />

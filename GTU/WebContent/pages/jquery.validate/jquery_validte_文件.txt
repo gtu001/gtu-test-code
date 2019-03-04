@@ -1,0 +1,5 @@
+官方文件
+
+	https://jqueryvalidation.org/validate/
+	
+	
