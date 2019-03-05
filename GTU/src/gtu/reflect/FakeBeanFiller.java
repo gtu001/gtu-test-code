@@ -3,6 +3,7 @@ package gtu.reflect;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -43,6 +44,7 @@ public class FakeBeanFiller {
     public static void fillBean(Object bean) {
         Date d = new Date();
         java.sql.Date d2 = new java.sql.Date(d.getTime());
+        Timestamp d3 = new Timestamp(d.getTime());
         BigDecimal b = BigDecimal.ZERO;
         for (Field f : bean.getClass().getDeclaredFields()) {
             if (f.getType() == String.class) {
@@ -98,6 +100,11 @@ public class FakeBeanFiller {
             } else if (f.getType() == java.sql.Date.class) {
                 try {
                     FieldUtils.writeDeclaredField(bean, f.getName(), d2, true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == Timestamp.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), d3, true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == BigDecimal.class) {
