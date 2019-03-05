@@ -57,7 +57,7 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
             public void run() {
                 DbFieldJavaFieldUI inst = new DbFieldJavaFieldUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -146,7 +146,7 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
             dbToJavaRadio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     System.out.println("dbToJavaRadio.actionPerformed, event=" + evt);
-                    //TODO add your code for dbToJavaRadio.actionPerformed
+                    // TODO add your code for dbToJavaRadio.actionPerformed
                     execute(DbJava.DB_TO_JAVA);
                 }
             });
@@ -154,14 +154,14 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
             javaToDbRadio.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt) {
                     System.out.println("javaToDbRadio.actionPerformed, event=" + evt);
-                    //TODO add your code for javaToDbRadio.actionPerformed
+                    // TODO add your code for javaToDbRadio.actionPerformed
                     execute(DbJava.JAVA_TO_DB);
                 }
             });
             pack();
             setSize(400, 300);
         } catch (Exception e) {
-            //add your error handling code here
+            // add your error handling code here
             e.printStackTrace();
         }
     }
@@ -175,9 +175,10 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
         DB_TO_JAVA() {
             @Override
             public String operation(String content) {
-                content = StringUtils.defaultString(content);
                 StringBuffer sb = new StringBuffer();
                 Pattern ptn = Pattern.compile("[\\w-_]*");
+                // --------------------------------------------------------------------------
+                content = StringUtils.defaultString(content);
                 StringTokenizer tok = new StringTokenizer(content, "\n");
                 while (tok.hasMoreElements()) {
                     String value = (String) tok.nextElement();
@@ -193,6 +194,15 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
                         }
                     }
                 }
+                sb.append("\n\n");
+                sb.append("=======================================================");
+                sb.append("\n\n");
+                // --------------------------------------------------------------------------
+                Matcher mth = ptn.matcher(content);
+                while (mth.find()) {
+                    mth.appendReplacement(sb, StringUtilForDb.dbFieldToJava(mth.group()));
+                }
+                mth.appendTail(sb);
                 return sb.toString();
             }
         },
@@ -240,7 +250,7 @@ public class DbFieldJavaFieldUI extends javax.swing.JFrame {
         };
 
         static String[] IGNORE_GETTER_SETTER = //
-        { "private", "int", "Integer", "List", "Map", "Set", "String", "Boolean", "boolean", "Double", "double", "Float", "float", "Date", "Long", "long", "Byte", "byte", "Short", "short" };
+                { "private", "int", "Integer", "List", "Map", "Set", "String", "Boolean", "boolean", "Double", "double", "Float", "float", "Date", "Long", "long", "Byte", "byte", "Short", "short" };
 
         DbJava() {
         }
