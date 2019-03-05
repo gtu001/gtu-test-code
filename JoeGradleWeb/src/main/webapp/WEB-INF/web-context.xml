@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+<beans:beans
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:task="http://www.springframework.org/schema/task"	
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="    
         http://www.springframework.org/schema/beans     
         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd    
@@ -14,34 +16,64 @@
         http://www.springframework.org/schema/task 
         http://www.springframework.org/schema/task/spring-task-4.2.xsd">
 
-	<context:component-scan base-package="com.gtu.web" />
-	
+	<context:component-scan
+		base-package="com.gtu.web" />
+
 	<mvc:annotation-driven />
 	<task:annotation-driven />
-	
-	<!-- <context:property-placeholder location="classpath:/ScheduledJob.properties" />-->
-	
+
+	<!-- <context:property-placeholder location="classpath:/ScheduledJob.properties" 
+		/> -->
+
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
 		up static resources in the ${webappRoot}/resources directory -->
-	<!-- 
-	<mvc:resources mapping="/js/**" location="/js/" />
-	<mvc:resources mapping="/img/**" location="/img/" />
-	<mvc:resources mapping="/css/**" location="/css/" />
-	<mvc:resources mapping="/test/**" location="/test/" />
-	-->
+	<!-- <mvc:resources mapping="/js/**" location="/js/" /> <mvc:resources mapping="/img/**" 
+		location="/img/" /> <mvc:resources mapping="/css/**" location="/css/" /> 
+		<mvc:resources mapping="/test/**" location="/test/" /> -->
 	<mvc:resources mapping="/**" location="/" />
-	
+
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
 	<beans:bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<!--支持JSTL -->
 		<beans:property name="viewClass"
 			value="org.springframework.web.servlet.view.JstlView" />
-		<!--模板的路径 -->
 		<beans:property name="prefix" value="/views/" />
-		<!--模板文件后缀 -->
-		<beans:property name="suffix" value=".jsp" />
+		<!-- <beans:property name="suffix" value=".jsp" /> -->
+		<beans:property name="viewNames" value="*.jsp" />
 	</beans:bean>
-	
+
+	<!--↓↓↓↓↓↓ 支持Thymeleaf ↓↓↓↓↓↓ -->
+	<beans:bean id="templateResolver"
+		class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+		<beans:property name="prefix" value="/views/" />
+		<!-- <beans:property name="suffix" value=".html" /> -->
+		<beans:property name="templateMode" value="HTML5" />
+	</beans:bean>
+
+	<beans:bean id="templateEngine"
+		class="org.thymeleaf.spring4.SpringTemplateEngine">
+		<beans:property name="templateResolver"
+			ref="templateResolver" />
+	</beans:bean>
+
+	<beans:bean
+		class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+		<beans:property name="templateEngine"
+			ref="templateEngine" />
+		<beans:property name="characterEncoding" value="utf-8" />
+		<beans:property name="viewNames" value="*.html" />
+	</beans:bean>
+
+	<beans:bean name="main"
+		class="org.thymeleaf.spring4.view.ThymeleafView">
+		<beans:property name="staticVariables">
+			<beans:map>
+				<beans:entry key="footer"
+					value="Some company: &lt;b&gt;ACME&lt;/b&gt;" />
+			</beans:map>
+		</beans:property>
+	</beans:bean>
+	<!--↑↑↑↑↑↑ 支持Thymeleaf ↑↑↑↑↑↑ -->
+
 </beans:beans>

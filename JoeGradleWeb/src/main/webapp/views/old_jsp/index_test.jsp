@@ -7,14 +7,14 @@
 %>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<link rel="stylesheet" href="css2/bootstrap.min.css">
-<link rel="stylesheet" href="css2/font-awesome.min.css">
-<link rel="stylesheet" href="css2/animate.css">
-<link rel="stylesheet" href="css2/jquery-ui.min.css">
-<link rel="stylesheet" href="css2/main.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<link rel="stylesheet" href="css2/bootstrap.min.css" />
+<link rel="stylesheet" href="css2/font-awesome.min.css" />
+<link rel="stylesheet" href="css2/animate.css" />
+<link rel="stylesheet" href="css2/jquery-ui.min.css" />
+<link rel="stylesheet" href="css2/main.css" />
 
 <style>
 .horizontal_center_clz {
