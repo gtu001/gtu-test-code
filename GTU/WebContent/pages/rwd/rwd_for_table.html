@@ -1,0 +1,113 @@
+<html>
+<head>
+	<title>Bootstrap Webstie Tutorial</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+	.rwd-table {
+		background: #fff;
+		overflow: hidden;
+	}
+
+	.rwd-table tr:nth-of-type(2n){
+		background: #eee;
+	}
+	.rwd-table th, 
+	.rwd-table td {
+		margin: 0.5em 1em;
+	}
+	.rwd-table {
+		min-width: 100%;
+	}
+
+	.rwd-table th {
+		display: none;
+	}
+
+	.rwd-table td {
+		display: block;
+	}
+
+	.rwd-table td:before {
+		content: attr(data-th) " : ";
+		font-weight: bold;
+		width: 6.5em;
+		display: inline-block;
+	}
+
+	.rwd-table th, .rwd-table td {
+		text-align: left;
+	}
+
+	.rwd-table th, .rwd-table td:before {
+		color: #D20B2A;
+		font-weight: bold;
+	}
+
+	@media (min-width: 768px) {
+		.rwd-table td:before {
+			display: none;
+		}
+		.rwd-table th, .rwd-table td {
+			display: table-cell;
+			padding: 0.25em 0.5em;
+		}
+		.rwd-table th:first-child, 
+		.rwd-table td:first-child {
+			padding-left: 0;
+		}
+		.rwd-table th:last-child, 
+		.rwd-table td:last-child {
+			padding-right: 0;
+		}
+		.rwd-table th, 
+		.rwd-table td {
+			padding: 1em !important;
+		}
+	}
+</style>
+</head>
+<body>
+	<div class="container">
+		<table class="rwd-table">
+			<tr>
+				<th>旅遊名稱</th>
+				<th>出發日</th>
+				<th>售價</th>
+				<th>機位</th>
+				<th>可售</th>
+			</tr>
+			　
+			<tr>
+				<td data-th="旅遊名稱">【早鳥送、最高再省8000】亞德里亞海之珠、克斯蒙三國、雙國家公園、世界遺產遊13日(含稅) </td>
+				<td data-th="出發日">03/23〔三〕 </td>
+				<td data-th="售價">$119,900</td>
+				<td data-th="機位">26</td>
+				<td data-th="可售">6</td>
+			</tr>
+
+			<tr>
+				<td data-th="旅遊名稱">【早鳥送、最高再省8000】亞德里亞海之珠、克斯蒙三國、雙國家公園、世界遺產遊13日(含稅) </td>
+				<td data-th="出發日">03/23〔三〕 </td>
+				<td data-th="售價">$119,900</td>
+				<td data-th="機位">26</td>
+				<td data-th="可售">6</td>
+			</tr>
+
+			<tr>
+				<td data-th="旅遊名稱">【早鳥送、最高再省8000】亞德里亞海之珠、克斯蒙三國、雙國家公園、世界遺產遊13日(含稅) </td>
+				<td data-th="出發日">03/23〔三〕 </td>
+				<td data-th="售價">$119,900</td>
+				<td data-th="機位">26</td>
+				<td data-th="可售">6</td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

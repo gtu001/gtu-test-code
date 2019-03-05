@@ -1,0 +1,7 @@
+最高優先層級css, 會蓋過其他css設定 
+方法 : 在後面加 !important
+
+	.input_text {
+		padding: 5px 10px !important;
+		background-color: #FFF !important;
+	}

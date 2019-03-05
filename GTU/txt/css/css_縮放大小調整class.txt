@@ -1,0 +1,38 @@
+﻿jquery
+
+	$( window ).resize(function() {
+	  if($(window).width() <=1000) $('.fa-iconname').addClass("lg-2x");
+	  else $('.fa-iconname').removeClass("lg-2x");
+	});
+
+
+javacript
+
+	var homeIcon = document.querySelector('.fa-home');
+
+	window.onResize = function() {
+	  if (window.innerWidth <= 1000) homeIcon.classList.add("lg-2x");
+	  else homeIcon.classList.remove("lg-2x");
+	};
+
+
+或是
+	/* 手機版 */
+	@media (max-width: 1000px) {
+	  .bigScreen {
+	    display:none;
+	  }
+	  .smallScreen {
+	    display:block;
+	  }
+	}
+
+	/* 電腦版 */
+	@media (min-width: 1001px) {
+	  .bigScreen {
+	    display:block;
+	  }
+	  .smallScreen {
+	    display:none;
+	  }
+	}

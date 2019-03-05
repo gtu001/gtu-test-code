@@ -1,0 +1,211 @@
+/*
+ * @ V1.0.0
+ * @(#)table.css Apr 21, 2017
+ * by Mia
+ *
+ * Copyright (c) 2017- Business Intelligence Info. Tech.
+ * 8F, No.222, Sec.1, FuXing S. Road,
+ * Taipei, Taiwan
+ * All rights reserved.
+ *
+ * Use bootstrap v3.3.6.
+ */
+ .table{ color: #4d4d4d; background: transparent!important  }
+ .table caption{    
+   color: #4eae30;
+   font-size: 16px;
+   font-weight: bold;
+   margin: 5px 0;
+ }
+ 
+ .table thead tr th {text-align: center;}
+ .table thead tr th, 
+ .table tbody tr th, 
+ .table tfoot tr th, 
+ .table thead tr td, 
+ .table tbody tr td, 
+ .table tfoot tr td {  vertical-align: middle;  border-top:0; border-bottom: 1px solid #eee;  padding:6px 10px;}
+ .table thead tr th ,
+ .table tbody tr th,
+ .table tfoot tr th {   color: #858585;     border-bottom: 1px solid #eee; font-size: 12px}
+ .table tbody tr td>button{line-height: 12px;}
+ .table td.td-show-RWD{display:none;}
+ /** table caption has icon **/
+ .table caption:before {font-family: 'ElegantIcons'; content: "\45";} 
+ /** table-hover **/
+ .table-hover tbody tr:hover {background-color: rgba(232, 232, 232, .7);}
+ /** table-top-line **/
+ .table-top-line{
+  border-collapse: collapse;
+  text-rendering: optimizeLegibility;
+  border-top: 3px solid #1689bd;}
+
+  .padding-0.table tbody tr td{padding:0px!important;}
+  /*table-info*/
+  .table_info{ margin-bottom: 10px; background: #fff!important ; }
+  .table_info thead tr th,
+  .table_info tbody tr th,
+  .table_info tfoot tr th{   font-size: 12px; color: #4eae30;  font-weight: normal;padding: 8px 10px 0; text-align: left; border-bottom: none}
+  .table_info > tbody > tr > td{ color: #4d4d4d;; font-size: 14px; text-align: left; padding:5px 10px 10px; border-bottom: 1px solid #eee;}
+  .table_info tr td a{ color: #638BEA; text-decoration: underline; }
+  .table_info tr td img{ width: 28px; height: 28px;}
+
+  /*右側有滾動*/
+  .scroll_table{ margin-bottom: 20px;}
+  .scroll_table table{ margin-bottom: 0}
+  .scroll_table .th_scrollbar{width: 12px;}
+
+  .tbody-scroll{ height:300px; overflow-x: hidden; overflow-y: auto; }
+
+  .tbody-scroll > table{ border-top: 0; }
+  .tbody-scroll thead{ opacity: 0; height: 0; }
+  .tbody-scroll .table > thead > tr > th { 
+   padding: 0; border-bottom: 0
+ }
+ /*table 換行*/
+ .table-RWD td .content{white-space: pre !important ;}
+ 
+
+ /*小計總和*/
+ .sum { background: #fcf8e3 !important;}/*#F9DF9E*/
+ .sum1 { background: rgba(236, 201, 137, 0.36) !important;}
+ .sum2 { background: #dbdbdb !important;}
+
+ /*table level 縮排*/
+ .table .td-level{padding-left: 20px !important;}
+ .table .td-level2{padding-left: 35px !important;}
+
+ /*table-collapse*/
+ .accordion-toggle{ cursor: pointer;}
+
+ /**頁碼**/
+/*
+.form-inline {
+	margin-bottom: 10px;
+}
+*/
+.title-radius-all .form-inline {
+	margin-bottom:0px;
+}
+
+.bi-pagination{  padding: 8px } 
+.bi-pagination .search-input{ float: left; max-width: 200px; margin-right: 10px}
+.page-label{ line-height: 34px; margin-right: 5px  }
+.pagination { margin: 0px; display: inline-block; min-width: 180px;} 
+.pagination>li>a{ float: none; border: 0; padding: 5px 15px; color: #f60} 
+.pagination select{
+  height: 34px;
+  padding: 5px 10px; 
+  color: #4d4d4d; 
+  border: 1px solid #ddd;}
+  
+  .pagination > li.First-left-etc a {background: url(../../../images/icon/page_first.png) no-repeat center}
+  .pagination > li.left-etc a  {background: url(../../../images/icon/page_prev.png) no-repeat  center}
+
+  .pagination > li.Last-right-etc a { background: url(../../../images/icon/page_end.png) no-repeat  center}
+  .pagination > li.right-etc a{ background: url(../../../images/icon/page_next.png) no-repeat  center}
+
+  /** table 裝置小於767px時顯示樣式 **/
+  @media screen and (max-width: 767px) {
+    .table-RWD caption {background-image: none; }
+    .table-RWD thead {display: none; }
+    .table-RWD tbody td {display: block;padding: .9rem; }
+    .table-RWD tbody tr td { border: 0px; border-bottom: 1px solid #ddd; padding: 6px;}
+    .table-RWD tbody tr td:first-of-type {background: rgba(137, 141, 142, 0.1); color: #444;}
+    .table-RWD tbody tr th {display: block;}
+    .table-RWD:not(.table-horizontal-RWD) tbody tr td:before,
+    .table-RWD:not(.table-horizontal-RWD) tbody tr td.sm:before,
+    .table-RWD:not(.table-horizontal-RWD) tbody tr td.md:before,
+    .table-RWD:not(.table-horizontal-RWD) tbody tr td.lg:before {content: attr(data-th);font-weight: bold;text-align: left!important;display: inline-table;width: 30%;
+      margin-right: 5px;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.sm:before {width: 20%;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.md:before {width: 50%;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.lg:before {width: 75%;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td{display: flex;display: -webkit-flex;width: 100%;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.flex {display: -webkit-flex;display: flex;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>span{display: flex;display: -webkit-flex;flex: 1;width: 1px;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.sm>span{display: flex;display: -webkit-flex;flex: 1;width: 1px;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.md>span{display: flex;display: -webkit-flex;flex: 1;width: 1px;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.lg>span{display: flex;display: -webkit-flex;flex: 1;width: 1px;}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.word-break:before{word-break: keep-all!important;}/*搭配全角空格可換行*/
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.no-th:before{content:;display: inline-table;width: 0px;margin-right: 0px}
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td.no-th {display: -webkit-box !important;display: box!important}/*小計時選項縮小時移除左列標題空白*/
+      .table-RWD tbody tr td:empty {display: -webkit-flex;display: flex;}/*空值時不造成錯亂*/
+      .table-RWD tbody tr td>button {line-height: 18px;}
+      .table-RWD .form-group.has-feedback {margin-bottom: 0px;display: flex;flex: 1;}
+      /*強迫內容不斷行*/
+      .table-RWD th .content,.table-RWD td .content{
+        display: inline-table !important ;
+        white-space: nowrap !important;}
+        .table-RWD:not(.table-horizontal-RWD) tbody tr.subtotal td:before {
+          content: ;
+          font-weight: bold;
+          text-align: left!important;
+          display: inline-table;
+          width: 0px;
+          margin-right: 0px
+        }
+      }
+
+      /** table 其他元素及於裝置小於767px時顯示樣式**/
+      @media screen and (max-width: 767px) {
+        .table-RWD td.td-show-RWD {display: flex;background: #cecece;color: #000;}
+        .table-RWD td.td-hide-RWD {display: none !important;}
+        .table-RWD tbody td.text-alignCenter,.table tbody td.text-alignRight {text-align: left!important;}
+        .table-RWD td.td-level {padding-left: 6px !important;}
+        .table-RWD td.td-level2 {padding-left: 6px !important;}
+      }
+
+      /** table-horizontal-RWD 於裝置小於767px時horizontal顯示樣式 **/
+      @media screen and (max-width: 767px) {
+        .table-horizontal-RWD .merge-title{background: #28292a;color: #fff;}
+        .table-horizontal-RWD tbody td:before { width: 0em;  }
+        .table-horizontal-RWD tbody td {display: block; padding: 0em;}  
+        .table-horizontal-RWD tbody tr td:first-of-type {background: none; color: #676763; }
+        .table td.td-hide-RWD {display: none;}
+        .table-horizontal-RWD.table-striped tbody tr:nth-of-type(odd) {background-color: rgba(255, 255, 255, 0.01);}
+        .table-RWD tbody td.number{text-align: left;}
+      }
+      @media screen and (max-width: 750px){
+        .multiple-table table.table-top-line{border-top: 1px solid #dddddd; }
+        .multiple-table .table-bordered {border-bottom: 0px;}
+        .multiple-table div[class*="col-"]:last-child .table-bordered {border-bottom: 1px solid #dddddd;}
+      }
+      @media screen and (max-width: 767px) {
+       /*th 斷行*/
+       .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th {display: block!important;}
+       .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th,
+       .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.sm,
+       .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.md,
+       .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.lg {
+        font-weight: bold;
+        text-align: left!important;
+        width: 30%;
+        margin-right: 5px;
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.sm {
+        width: 20%;
+      } 
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.md {
+        width: 50%;
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-th.lg {
+        width: 75%;
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td .break-data {
+        width: 65%
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-data.sm {
+        width: 75%;
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-data.md {
+        width: 45%;
+      }
+      .table-RWD:not(.table-horizontal-RWD) tbody tr td>.break-data.lg {
+        width: 20%;
+      }
+    }
+    /*for table中checkbox list 對齊*/
+    .table-checkbox tbody tr td:input {vertical-align: top;}
+    /*for table中 多個相連的btn 時有間距*/
+    .table .btn+.btn{margin-left: 3px}

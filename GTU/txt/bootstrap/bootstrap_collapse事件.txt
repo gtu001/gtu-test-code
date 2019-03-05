@@ -1,0 +1,29 @@
+	function BootstrapHandler() {
+		var collapseDiv = $("#myNavBar");
+		
+		collapseDiv.on('shown.bs.collapse', function() {
+			console.log("Opened");
+			alert("Opened");
+		});
+
+		collapseDiv.on('hidden.bs.collapse', function() {
+			console.log("Closed");
+			alert("Closed");
+		});
+		
+		this.checkStatus = function(){
+			//Will return true if uncollapsed
+			var a1 = collapseDiv.hasClass('in');
+
+			//Will return true if in the process of collapsing
+			var a2 = collapseDiv.hasClass('collapsing');
+
+			//Will return true if collapsed
+			var a3 = collapseDiv.hasClass('collapse');
+			alert(
+					"uncollapsed : " + a1 + "\n"+
+					"collapsing : " + a2 + "\n"+
+					"collapsed : " + a3 + "\n"
+					);
+		};
+	}
