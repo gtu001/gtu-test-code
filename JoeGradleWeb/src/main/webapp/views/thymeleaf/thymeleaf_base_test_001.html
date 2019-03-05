@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
 <meta charset="UTF-8" />
@@ -32,23 +33,74 @@ xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thyme
 
 	<table border="1" width="80%">
 		<tr>
-			<td class="tbYellow" width="10%">表單種類</td>
-			<td class="tbYellow2" width="40%"><select id="formTp"
-				class="form-control" th:field="${formTp}">
+			<td>標籤</td>
+			<td><span id="testLabel" th:text="${entity.testLabel}"></span></td>
+			<td>文字方塊</td>
+			<td><input id="testText" name="testText" title="文字方塊"
+				tx:field="${entity.testText}"
+				type="text" class="textBox2" th:text="${entity.testText}" /></td>
+			<td>隱藏</td>
+			<td><input id="testHidden" name="testHidden" type="hidden"
+				th:field="${entity.testHidden}" /></td>
+		</tr>
+		<tr>
+			<td>選項1</td>
+			<td><span th:each="data, iterStat : ${XXXXXXXX_List}">
+					<input type="radio"
+					id="#{${'testRadio1'} + '_' + ${iterStat.count}}"
+					th:field="${entity.testRadio1}" th:value="${data.XXXXXX_value}"
+					th:checked="#{${data.XXXXXX_value} == ${entity.testRadio1}}" /> <label
+					th:for="#{${'testRadio1'} + '_' + ${iterStat.count}}"
+					th:text="${data.XXXXXX_label}"></label>
+			</span></td>
+			<td>選項2</td>
+			<td><input class="testRadio2_0" type="radio"
+				th:field="${entity.testRadio2}" value="1" checked="true" /> <input
+				class="testRadio2_1" type="radio" th:field="${entity.testRadio2}"
+				value="2" /></td>
+		</tr>
+		<tr>
+			<td>下拉1</td>
+			<td><select id="testSelect1" class="form-control"
+				th:field="${entity.testSelect1}">
 					<option value=''>請選擇</option>
 					<option th:each="record : ${XXXXXXXX_List}"
 						th:value="${record.XXXXXX_value.trim()}"
-						th:text="${record.XXXXXX_label.trim()}"></option>
+						th:text="${record.XXXXXX_label.trim()}"
+						th:selected="#{${record.XXXXXX_value} == ${entity.testSelect1}}">
+					</option>
 			</select></td>
-			<td class="tbYellow" width="10%">狀態</td>
-			<td class="tbYellow2" width="40%"><span id="statusNm"
-				th:text="${statusNm}"> </span> <input id="status"
-				name="status" type="hidden" th:field="${status}" /></td>
-			<td class="tbYellow" width="10%">修正設定編號</td>
-			<td class="tbYellow2" width="40%"><span id="modNo"
-				th:text="${modNo}"> </span></td>
+			<td>下拉2</td>
+			<td><select id="testSelect2" th:field="${entity.testSelect2}"
+				class="form-control">
+					<option value='' selected="true">請選擇</option>
+					<option value='1'>1</option>
+					<option value='2'>2</option>
+					<option value='3'>3</option>
+			</select></td>
+		</tr>
+		<tr>
+			<td>核選1</td>
+			<td><span th:each="record, iterStat : ${XXXXXXXX_List}">
+					<input type="chekcbox" name="${entity.testChk1}"
+					id="#{${'testChk1'} + '_' + ${iterStat.count}}"
+					value="${record.XXXXXX_value}" /> <span
+					for="#{${'testChk1'} + '_' + ${iterStat.count}}"
+					th:text="${record.XXXXXX_label}"></span>
+			</span></td>
+			<td>核選2</td>
+			<td><input type="checkbox" name="${entity.testChk2}"
+				id="testChk2_0" value="1" title="核選2" />chk1 <input type="checkbox"
+				name="${entity.testChk2}" id="testChk2_1" value="2" title="核選2" />chk2
+				<input type="checkbox" name="${entity.testChk2}" id="testChk2_2"
+				value="3" title="核選2" />chk3</td>
+		</tr>
+		<tr>
+			<td>區塊</td>
+			<td><textarea id="testArea" name="testArea"
+					th:field="${entity.testArea}" cols="90" rows="5"></textarea></td>
 		</tr>
 	</table>
-	
+
 </body>
 </html>

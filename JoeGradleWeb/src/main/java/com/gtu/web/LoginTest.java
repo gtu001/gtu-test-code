@@ -43,11 +43,101 @@ public class LoginTest {
         ModelAndView model = new ModelAndView("/thymeleaf/thymeleaf_base_test_001.html");
         model.addObject("XXXXXXXX_MapList", lst);
         model.addObject("XXXXXXXX_List", lst2);
-        model.addObject("formTp", "formTp");
-        model.addObject("statusNm", "statusNm");
-        model.addObject("status", "status");
-        model.addObject("modNo", "modNo");
+        model.addObject("entity", new EntityBean());
         return model;
+    }
+
+    public static class EntityBean {
+        String testLabel;
+        String testText;
+        String testHidden;
+        String testRadio1;
+        String testRadio2;
+        String testSelect1;
+        String testSelect2;
+        String testChk1;
+        String testChk2;
+        String testArea;
+
+        public String getTestLabel() {
+            return testLabel;
+        }
+
+        public void setTestLabel(String testLabel) {
+            this.testLabel = testLabel;
+        }
+
+        public String getTestText() {
+            return testText;
+        }
+
+        public void setTestText(String testText) {
+            this.testText = testText;
+        }
+
+        public String getTestHidden() {
+            return testHidden;
+        }
+
+        public void setTestHidden(String testHidden) {
+            this.testHidden = testHidden;
+        }
+
+        public String getTestRadio1() {
+            return testRadio1;
+        }
+
+        public void setTestRadio1(String testRadio1) {
+            this.testRadio1 = testRadio1;
+        }
+
+        public String getTestRadio2() {
+            return testRadio2;
+        }
+
+        public void setTestRadio2(String testRadio2) {
+            this.testRadio2 = testRadio2;
+        }
+
+        public String getTestSelect1() {
+            return testSelect1;
+        }
+
+        public void setTestSelect1(String testSelect1) {
+            this.testSelect1 = testSelect1;
+        }
+
+        public String getTestSelect2() {
+            return testSelect2;
+        }
+
+        public void setTestSelect2(String testSelect2) {
+            this.testSelect2 = testSelect2;
+        }
+
+        public String getTestChk1() {
+            return testChk1;
+        }
+
+        public void setTestChk1(String testChk1) {
+            this.testChk1 = testChk1;
+        }
+
+        public String getTestChk2() {
+            return testChk2;
+        }
+
+        public void setTestChk2(String testChk2) {
+            this.testChk2 = testChk2;
+        }
+
+        public String getTestArea() {
+            return testArea;
+        }
+
+        public void setTestArea(String testArea) {
+            this.testArea = testArea;
+        }
     }
 
     public static class TestBean {

@@ -1,0 +1,14 @@
+標籤 testLabel[L]
+文字方塊 testText[t]
+隱藏 testHidden[h]
+
+選項1 testRadio1[R]
+選項2 testRadio2[RS]
+
+下拉1 testSelect1[s]
+下拉2 testSelect2[ss]
+
+核選1 testChk1[c]
+核選2 testChk2[cs]
+
+區塊 testArea[area]

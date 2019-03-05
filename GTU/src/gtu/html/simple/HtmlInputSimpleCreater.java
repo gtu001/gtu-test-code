@@ -114,7 +114,11 @@ public class HtmlInputSimpleCreater {
         String template;
 
         public String toHtml(String tagName, String title) {
-            return String.format(template, tagName, title);
+            try {
+                return String.format(template, tagName, title);
+            } catch (Exception ex) {
+                throw new RuntimeException("錯誤 : " + tagId + "\n" + template + "\nERR : " + ex.getMessage(), ex);
+            }
         }
     }
 
