@@ -1,108 +1,110 @@
-  - tagId : L 
-    template : |
-      <span id="%1$s" th:text="${entity.%1$s}"></span>
+  td1 : XXXX__TD1
+  td2 : XXXX__TD2
+  tagLst : 
+    - tagId : L 
+      template : |
+        <span id="%1$s" th:text="${entity.%1$s}"></span>
 
-  - tagId : t
-    template : |
-      <input id="%1$s" name="%1$s" title="%2$s" type="text" 
-        class="textBox2"  th:text="${entity.%1$s}" />
-      
-  - tagId : h
-    template : |
-      <input id="%1$s" name="%1$s" type="hidden" th:field="${entity.%1$s}"/>
-       
+    - tagId : t
+      template : |
+        <input id="%1$s" name="%1$s" title="%2$s" type="text" 
+          class="textBox2"  th:text="${entity.%1$s}" />
+        
+    - tagId : h
+      template : |
+        <input id="%1$s" name="%1$s" type="hidden" th:field="${entity.%1$s}"/>
+         
 
-      
-  - tagId : R
-    template : |
-      <span th:each="data, iterStat : ${XXXXXXXX_List}">
-        <input type="radio" id="#{${'%1$s'} + '_' + ${iterStat.count}}" 
-          th:field="${entity.%1$s}" th:value="${data.XXXXXX_value}" 
-          th:checked="#{${data.XXXXXX_value} == ${entity.%1$s}}" />
-        <label th:for="#{${'%1$s'} + '_' + ${iterStat.count}}" 
-          th:text="${data.XXXXXX_label}">
-            </label>
-      </span>
+        
+    - tagId : R
+      template : |
+        <span th:each="data, iterStat : ${XXXXXXXX_List}">
+          <input type="radio" id="#{${'%1$s'} + '_' + ${iterStat.count}}" 
+            th:field="${entity.%1$s}" th:value="${data.XXXXXX_value}" 
+            th:checked="#{${data.XXXXXX_value} == ${entity.%1$s}}" />
+          <label th:for="#{${'%1$s'} + '_' + ${iterStat.count}}" 
+            th:text="${data.XXXXXX_label}">
+              </label>
+        </span>
 
-       
-  - tagId : Rs
-    template : |
-      <input id="%1$s_0" type="radio" th:field="${entity.%1$s}" value="1" checked="true" />
-         <span for="%1$s_0">選項1</span>
-      <input id="%1$s_1" type="radio" th:field="${entity.%1$s}" value="2" />
-         <span for="%1$s_1">選項2</span>
-      <input id="%1$s_2" type="radio" th:field="${entity.%1$s}" value="3" />
-         <span for="%1$s_2">選項3</span>
-#        
-#  - tagId : Rm
-#    template : |
-#      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">                 
-#          <input type="radio" id="%1$s_${status.index}" name="%1$s" value="${map.key}" 
-#              <c:if test="${map.key eq rtnMap.%1$s}">checked</c:if> />                 
-#          <label for="%1$s_${status.index}">${map.value}</label>                             
-#      </c:forEach>                                                                                 
-#        
-  - tagId : s
-    template : |
-      <select id="%1$s" class="form-control" th:field="${entity.%1$s}">
-          <option value=''>請選擇</option> 
-          <option th:each="record : ${XXXXXXXX_List}"
-            th:value="${record.XXXXXX_value.trim()}"
-            th:text="${record.XXXXXX_label.trim()}"
-            th:selected="#{${record.XXXXXX_value} == ${entity.%1$s}}">
-          </option>
-      </select>  
-       
-  - tagId : ss
-    template : |
-        <select id="%1$s" th:field="${entity.%1$s}" class="form-control">
-          <option value='' selected="true">請選擇</option>   
-          <option value='1'>1</option>                            
-          <option value='2'>2</option>                            
-          <option value='3'>3</option> 
-        </select>                                                                                                                         
-#      
-#  - tagId : sm
-#    template : |
-#      <select id="%1$s" name="%1$s" title="%2$s" value="${rtnMap.%1$s}">                                       
-#          <option value=''>請選擇</option>                                                   
-#          <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">         
-#              <option value="<c:out value='${map.key}' />"                     
-#                  <c:if test="${map.key eq rtnMap.%1$s}">selected</c:if>>  
-#              <c:out value='${map.value}' /></option>                            
-#          </c:forEach>                                                                       
-#      </select>  
-#      
-  - tagId : c
-    template : | 
-      <span th:each="record, iterStat : ${XXXXXXXX_List}">
-          <input type="chekcbox" name="${entity.%1$s}" 
-            id="#{${'%1$s'} + '_' + ${iterStat.count}}"
-            value="${record.XXXXXX_value}" />
-          <span for="#{${'%1$s'} + '_' + ${iterStat.count}}"
-            th:text="${record.XXXXXX_label}"></span>
-      </span>
-                                                                
-    
-  - tagId : cs
-    template : |
-      <input type="checkbox" name="${entity.%1$s}" id="%1$s_0" value="1" title="%2$s" />chk1
-      <input type="checkbox" name="${entity.%1$s}" id="%1$s_1" value="2" title="%2$s" />chk2
-      <input type="checkbox" name="${entity.%1$s}" id="%1$s_2" value="3" title="%2$s" />chk3
-      
-#  - tagId : cm
-#    template : |
-#      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">        
-#         <input type="checkbox"                                                 
-#                 name="%1$s"                                                    
-#                 id="%1$s_${status.index}"                   
-#             value="<c:out value='${map.key}'/>" title="%2$s" />  
-#         <c:out value='${map.value}' />                                   
-#      </c:forEach> 
-#                                                                       
-  - tagId : area
-    template : |
-      <textarea id="%1$s" name="%1$s" th:field="${entity.%1$s}" cols="90" rows="5"></textarea>
-                                                                                                 
-      
-                                                                                           
+
+    - tagId : Rs
+      template : |
+        <input id="%1$s_0" type="radio" th:field="${entity.%1$s}" value="1" checked="true" />
+           <span for="%1$s_0">選項1</span>
+        <input id="%1$s_1" type="radio" th:field="${entity.%1$s}" value="2" />
+           <span for="%1$s_1">選項2</span>
+        <input id="%1$s_2" type="radio" th:field="${entity.%1$s}" value="3" />
+           <span for="%1$s_2">選項3</span>
+  #        
+  #  - tagId : Rm
+  #    template : |
+  #      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">                 
+  #          <input type="radio" id="%1$s_${status.index}" name="%1$s" value="${map.key}" 
+  #              <c:if test="${map.key eq rtnMap.%1$s}">checked</c:if> />                 
+  #          <label for="%1$s_${status.index}">${map.value}</label>                             
+  #      </c:forEach>                                                                                 
+  #        
+    - tagId : s
+      template : |
+        <select id="%1$s" class="form-control" th:field="${entity.%1$s}">
+            <option value=''>請選擇</option> 
+            <option th:each="record : ${XXXXXXXX_List}"
+              th:value="${record.XXXXXX_value.trim()}"
+              th:text="${record.XXXXXX_label.trim()}"
+              th:selected="#{${record.XXXXXX_value} == ${entity.%1$s}}">
+            </option>
+        </select>  
+
+    - tagId : ss
+      template : |
+          <select id="%1$s" th:field="${entity.%1$s}" class="form-control">
+            <option value='' selected="true">請選擇</option>   
+            <option value='1'>1</option>                            
+            <option value='2'>2</option>                            
+            <option value='3'>3</option> 
+          </select>                                                                                                                         
+  #      
+  #  - tagId : sm
+  #    template : |
+  #      <select id="%1$s" name="%1$s" title="%2$s" value="${rtnMap.%1$s}">                                       
+  #          <option value=''>請選擇</option>                                                   
+  #          <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">         
+  #              <option value="<c:out value='${map.key}' />"                     
+  #                  <c:if test="${map.key eq rtnMap.%1$s}">selected</c:if>>  
+  #              <c:out value='${map.value}' /></option>                            
+  #          </c:forEach>                                                                       
+  #      </select>  
+  #      
+    - tagId : c
+      template : | 
+        <span th:each="record, iterStat : ${XXXXXXXX_List}">
+            <input type="chekcbox" name="${entity.%1$s}" 
+              id="#{${'%1$s'} + '_' + ${iterStat.count}}"
+              value="${record.XXXXXX_value}" />
+            <span for="#{${'%1$s'} + '_' + ${iterStat.count}}"
+              th:text="${record.XXXXXX_label}"></span>
+        </span>
+
+
+    - tagId : cs
+      template : |
+        <input type="checkbox" name="${entity.%1$s}" id="%1$s_0" value="1" title="%2$s" />chk1
+        <input type="checkbox" name="${entity.%1$s}" id="%1$s_1" value="2" title="%2$s" />chk2
+        <input type="checkbox" name="${entity.%1$s}" id="%1$s_2" value="3" title="%2$s" />chk3
+
+  #  - tagId : cm
+  #    template : |
+  #      <c:forEach var="map" items="${XXXXXXXX_MapList}" varStatus="status">        
+  #         <input type="checkbox"                                                 
+  #                 name="%1$s"                                                    
+  #                 id="%1$s_${status.index}"                   
+  #             value="<c:out value='${map.key}'/>" title="%2$s" />  
+  #         <c:out value='${map.value}' />                                   
+  #      </c:forEach> 
+  #                                                                       
+    - tagId : area
+      template : |
+        <textarea id="%1$s" name="%1$s" th:field="${entity.%1$s}" cols="90" rows="5"></textarea>
+
+

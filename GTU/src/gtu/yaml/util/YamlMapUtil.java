@@ -1,9 +1,13 @@
 package gtu.yaml.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import gtu.file.FileUtil;
 import gtu.json.JSONObject2CollectionUtil2;
@@ -35,9 +39,9 @@ public class YamlMapUtil {
             YamlMapUtil.getInstance().saveToFile(yamlFile2, new YamlMapUtil_Test_Bean(), false);
         }
         if (true) {
-            List<YamlMapUtil_Test_Bean> vvvv1 = YamlMapUtil.getInstance().loadFromFile(yamlFile1, YamlMapUtil_Test_Bean.class);
+            List<YamlMapUtil_Test_Bean> vvvv1 = YamlMapUtil.getInstance().loadFromFile(yamlFile1, YamlMapUtil_Test_Bean.class, null);
             System.out.println(vvvv1);
-            YamlMapUtil_Test_Bean vvvv2 = YamlMapUtil.getInstance().loadFromFile(yamlFile2, YamlMapUtil_Test_Bean.class);
+            YamlMapUtil_Test_Bean vvvv2 = YamlMapUtil.getInstance().loadFromFile(yamlFile2, YamlMapUtil_Test_Bean.class, null);
             System.out.println(vvvv2);
         }
         System.out.println("done...");
@@ -66,20 +70,28 @@ public class YamlMapUtil {
         }
     }
 
-    public <T> T loadFromFile(File file, Class<?> clz) {
+    public <T> T loadFromFile(InputStream inputStream, Class<?> clz, Map<String, Class<?>> classMap) {
         try {
-            Object yamlObj = YamlUtil.loadFromFile(file);
+            Object yamlObj = YamlUtil.loadInputStream(inputStream);
             if (yamlObj == null) {
                 return null;
             }
             if (Collection.class.isAssignableFrom(yamlObj.getClass())) {
                 JSONArray arry = JSONArray.fromObject(yamlObj);
-                return (T) JSONArray.toList(arry, clz);
+                return (T) JSONArray.toList(arry, clz, classMap);
             } else {
                 JSONObject jsonObj = JSONObject.fromObject(yamlObj);
-                return (T) JSONObject.toBean(jsonObj, clz);
+                return (T) JSONObject.toBean(jsonObj, clz, classMap);
             }
         } catch (Exception e) {
+            throw new RuntimeException("loadFromFile ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public <T> T loadFromFile(File file, Class<?> clz, Map<String, Class<?>> classMap) {
+        try {
+            return loadFromFile(new FileInputStream(file), clz, classMap);
+        } catch (FileNotFoundException e) {
             throw new RuntimeException("loadFromFile ERR : " + e.getMessage(), e);
         }
     }

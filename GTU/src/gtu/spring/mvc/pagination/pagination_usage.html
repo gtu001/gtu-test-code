@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}" />
+	<link rel="bookmark" th:href="@{/img/favicon.ico}" />
+	<title>投資平台前台系統</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+	<script th:src="@{/js/jquery/jquery-2.2.3.min.js}"></script>
+
+	<script th:src="@{/js/plugins/pagination.min.js}"></script>
+	<script th:src="@{/js/plugins/custom_pagination.js}"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/pagination.css}">
+
+	<style>
+</style>
+
+<!--[if lt IE 9]>
+    <script th:src="@{/js/html5.js}"></script>
+<![endif]-->=
+<script type="text/javascript">
+
+	var ApplicationMain = new function() {
+		return {
+			initApp : function() {
+				paginationInit(/*[[${paginationAreaJSON}]]*/);
+			}
+		}
+	};
+	$(ApplicationMain.initApp);
+</script>
+</head>
+<body>
+	<form id="form1">
+		<input id="pageNo" name="pageInfo.pageNo" type="hidden" th:field="*{pageInfo.pageNo}" />
+		<input id="pageSize" name="pageInfo.pageSize" type="hidden" th:field="*{pageInfo.pageSize}" />
+	</form>
+
+	<div id="pagination-container"></div>
+
+</body>
+</html>

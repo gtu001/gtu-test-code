@@ -1,37 +1,71 @@
-                    <div class="content_table" th:if="${not #lists.isEmpty(roiEntity.recordResultListCtf0)}">
-                        <table>
-                            <tbody>
-	                            <tr>
-	                            	<!-- class 對 資料庫欄位(因下列有智能投資的Table，因此設class非用id) -->
-	                                <th class="AcctInitDate">信託起始日</th>
-	                                <th class="TrustAcct_Res">信託帳號</th>
-	                                <th class="TrustType_Res">信託別</th>
-	                                <th class="ProjectDesc">專案</th>
-	                                <th class="FundID">商品代碼</th>
-	                                <th class="FundCName"><span style="color: red">(境外 台幣)</span> 商品名稱</th>
-	                                <th class="CountCapital_Total">信託金額</th>
-	                                <th class="Units">單位數</br>(不含在途)</th>
-	                                <th class="Net">損益試算</th>
-	                                <th class="CountCapital1">未分配金額</br>(申購)</th>
-	                                <th class="CountCapital23">未分配單位數</br>(贖回/轉換)</th>
-	                                <th class="ROI">報酬率</br>(不含息)</th>
-	                                <th class="divROI">報酬率</br>(含息)</th>
-	                            </tr>
-	                            <tr th:each="ctf : ${roiEntity.recordResultListCtf0}">
-	                                <td th:text="${ctf.acctInitDate}"></td>
-	                                <td><a th:href="@{/fund/qryTrustAcct/} + ${ctf.trustAcct} + '/' + ${ctf.shoreTypeCode}" th:text="${ctf.trustAcct}"></a></td>
-	                                <td th:text="${ctf.trustType}"></td>
-	                                <td th:text="${ctf.projectDesc}"></td>
-	                                <td><span style="color: red" th:text="${ctf.fundId}"></span></td>
-	                                <td th:text="${ctf.fundCname}"></td>
-									<td th:text="${ctf.countCapitalCcy} + ' ' + ${ctf.countCapital}"></td>
-	                                <td th:text="${ctf.units}"></td>
-									<td th:text="${ctf.net}"></td>
-									<td th:text="${ctf.countCapital1Ccy} + ' ' + ${ctf.countCapital1}"></td>
-									<td th:text="${ctf.countCapital23}"></td>
-									<td th:text="${ctf.roi}"></td>
-									<td th:text="${ctf.divRoi}"></td>
-	                            </tr>		
-                        	</tbody>
-                        </table>
-                    </div>
+						<table class="rwd-table">
+							<thead>
+								<tr>
+									<!-- class 對 資料庫欄位(因資料多列，因此設class非用id且放在Header表示，資料部分在看要怎麼處理) -->
+									<th width="7%" class="ApplicationDate">撤銷作業</th>
+									<th width="10%" class="OrderDate">下單日</th>
+									<th width="10%" class="CustomerID_Res">申請日 <br /> 申請時間
+									</th>
+									<th width="10%" class="ApplicationID">申請書編號</th>
+									<th width="6%" class="DealType_Res">交易別</th>
+									<th width="6%" class="TrustType_Res">信託別</th>
+									<th width="6%" class="ShoreType_Res">商品代碼</th>
+									<th width="7%" class="FundID">商品名稱</th>
+									<th width="10%" class="FundCName">信託金額/手續費</th>
+									<th width="7%" class="TrustCapital">面額/價格</th>
+									<th width="10%" class="WithDrawAcct_Res">扣款帳戶</th>
+									<th width="7%" class="FundID">申請書狀態<br />信託帳號
+									</th>
+									<th width="7%" class="FundID">交易分行</th>
+									<th width="7%" class="FundID">交易通路</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="entity : ${applicationMainEntity.roboList}">
+									<td data-th="撤銷作業" width="7%" class="ApplicationDate">
+										<a th:text="${entity.applicationDate}"
+											th:href="${'javascript:cancelDialogHanlder.openCancelDailog('''} + ${entity.applicationId} + '/' + ${entity.shoreTypeCode} + ${''');'}"></a>	
+									</td>
+									<td data-th="下單日" width="10%" class="OrderDate"
+										th:text="${entity.orderDate}"></td>
+									<td data-th="申請日/申請時間" width="10%" class="CustomerID_Res"><span
+										th:text="${entity.customerIdRes}"></span><br> <span
+										th:text="${entity.customerNameRes}"></span>
+									</th>
+									<td data-th="申請書編號" width="10%" class="ApplicationID"><a
+										th:href="@{/fund/qryApplicationDetail/} + ${entity.applicationId} + '/' + ${entity.shoreTypeCode}"
+										th:text="${entity.applicationId}"></a></td>
+									<td data-th="交易別" width="6%" class="DealType_Res"
+										th:text="${entity.dealTypeRes}"></td>
+									<td data-th="信託別" width="6%" class="TrustType_Res"
+										th:text="${entity.trustTypeRes}"></td>
+									<td data-th="商品代碼" width="6%" class="ShoreType_Res"
+										th:text="${entity.shoreTypeRes}"></td>
+									<td data-th="商品名稱" width="7%" class="FundID"><span
+										style="color: red" th:text="${entity.fundId}"></span></td>
+									<td data-th="信託金額/手續費" width="10%" class="FundCName"
+										th:text="${entity.fundCname}"></td>
+									<td data-th="面額/價格" width="7%" class="TrustCapital"
+										th:text="${entity.currencyCodeRes + ' ' + entity.trustCapital}"></td>
+									<td data-th="扣款帳戶" width="10%" class="WithDrawAcct_Res"
+										th:text="${entity.withDrawAcctRes}"></td>
+									<td data-th="申請書狀態/信託帳號" width="10%"><span
+										class="ApplicationStauts_Res"
+										th:switch="${entity.applicationStautsRes}"> <span
+											th:case="'已建檔'" style="color: yellow"
+											th:text="${entity.applicationStautsRes} + '●'"></span> <span
+											th:case="'申請書未覆核'" style="color: red"
+											th:text="${entity.applicationStautsRes} + '●'"></span> <span
+											th:case="'憑證未覆核'" style="color: green"
+											th:text="${entity.applicationStautsRes} + '●'"></span> <span
+											th:case="*" th:text="${entity.applicationStautsRes}"></span>
+									</span> </br> <a class="TrustAcct_Res"
+										th:href="@{/fund/qryTrustAcct/} + ${entity.trustAcctRes} + '/' + ${entity.shoreTypeCode}"
+										th:text="${entity.trustAcctRes}"></a></td>
+									<td data-th="交易分行" width="5%" class="BranchID"
+										th:text="${entity.branchId}"></td>
+									<td data-th="交易通路" width="6%" class="TradeType_Res"
+										th:text="${entity.tradeTypeRes}"></td>
+								</tr>
+							</tbody>
+						</table>
