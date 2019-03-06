@@ -1,0 +1,4 @@
+	<button id="search" class="btn_g" type="submit"
+		th:onclick="${'javascript:cancelDialogHanlder.openCancelDailog('''} + ${entity.applicationId} + '/' + ${entity.shoreTypeCode} + ${''');'}">
+		撤銷
+	</button>
