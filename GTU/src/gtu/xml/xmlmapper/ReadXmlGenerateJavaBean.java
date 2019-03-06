@@ -1,4 +1,4 @@
-package gtu.xml;
+package gtu.xml.xmlmapper;
 
 import gtu.string.StringUtilForDb;
 
