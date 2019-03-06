@@ -90,7 +90,6 @@
 			<!-- xml
 			<packagename mode="new">org.dom4j.DocumentException</packagename>
 			<packagename mode="new">org.jaxen.JaxenException</packagename>
-			<packagename mode="new">org/saxpath/SAXPathException</packagename>
 			-->
 			<!-- informix jdbc driver
 			<packagename mode="small">com.informix.jdbcx.IfxConnectionPoolDataSource</packagename>
