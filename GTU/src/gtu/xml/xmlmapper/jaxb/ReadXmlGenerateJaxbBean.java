@@ -87,7 +87,7 @@ public class ReadXmlGenerateJaxbBean {
         List<Element> elist = element.elements();
         StringBuilder sb = new StringBuilder();
         sb.append(fetchClassAnnotation(element, isRoot) + "\n");
-        sb.append("private static class " + StringUtils.capitalize(StringUtilForDb.dbFieldToJava(element.getName())) + " { \n");
+        sb.append("public static class " + StringUtils.capitalize(StringUtilForDb.dbFieldToJava(element.getName())) + " { \n");
         Map<String, String> paramMap = new LinkedHashMap<String, String>();
         for (Element ie : elist) {
             int size = ie.elements().size();
@@ -130,13 +130,18 @@ public class ReadXmlGenerateJaxbBean {
             String elementType = StringUtilForDb.dbFieldToJava(ie.getName());
             propOderLst.add("\"" + elementType + "\"");
         }
-        sb.append(String.format("@XmlType(propOrder={%s})\n", StringUtils.join(propOderLst, " , ")));
+        String xmlTypeName = "";
+        if (!isRoot) {
+            xmlTypeName = String.format("name = \"%s\", ", element.getName());
+        }
+
         sb.append("@XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)\n");
-        sb.append("@XmlAccessorType(XmlAccessType.NONE)\n");
+        sb.append("@XmlAccessorType(XmlAccessType.FIELD)\n");
+
+        sb.append(String.format("@XmlType(" + xmlTypeName + " propOrder={%s})\n", StringUtils.join(propOderLst, " , ")));
+
         if (isRoot) {
             sb.append(String.format("@XmlRootElement(name=\"%s\")", element.getName()));
-        } else {
-            sb.append(String.format("@XmlElement(name=\"%s\")", element.getName()));
         }
         return sb.toString();
     }

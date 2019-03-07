@@ -1,10 +1,9 @@
 package gtu._work.ui;
 
-import gtu.swing.util.JTableUtil;
-
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +22,9 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+
+import gtu.spring.SimilarityUtil;
+import gtu.swing.util.JTableUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -57,7 +59,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             public void run() {
                 FuzzyCompareUI inst = new FuzzyCompareUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -112,7 +114,8 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     jTabbedPane1.addTab("result", null, jPanel3, null);
                     {
                         jPanel4 = new JPanel();
-                        jslider = new JSlider(JSlider.HORIZONTAL, 30, 100, 30);//最小值 ,最大值,default值
+                        jslider = new JSlider(JSlider.HORIZONTAL, 30, 100, 30);// 最小值
+                                                                               // ,最大值,default值
                         jslider.setMajorTickSpacing(10);
                         jslider.setMinorTickSpacing(5);
                         jslider.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -181,16 +184,13 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             }
             Collections.sort(compareList, comparator);
             String compare2Str = "";
-            String sameWord = "";
+            BigDecimal sameWord = BigDecimal.ZERO;
             if (!compareList.isEmpty()) {
                 compare2Str = compareList.get(0).compareStr;
-                sameWord = compareList.get(0).result;
-                float length = ((float) (compare1.length() + compare2Str.length())) / 2;
-                float fuzzyPersent = ((float) compareList.get(0).result.length()) / length;
-                fuzzyPersent = fuzzyPersent * 100;
+                sameWord = compareList.get(0).getParcent();
+                float fuzzyPersent = compareList.get(0).getParcent().floatValue();
                 if (fuzzyPersent < sliderValue) {
                     compare2Str = "";
-                    sameWord = "";
                 }
             }
             model.addRow(new Object[] { compare1, compare2Str, sameWord });
@@ -198,51 +198,29 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
     }
 
     Comparator<CompareResult> comparator = new Comparator<CompareResult>() {
-        float compareResult(CompareResult o1) {
-            return ((float) o1.result.length()) / ((float) o1.compareStr.length());
-        }
-
         @Override
         public int compare(CompareResult o1, CompareResult o2) {
-            if (compareResult(o1) > compareResult(o2)) {
-                return -1;
-            }
-            if (compareResult(o1) < compareResult(o2)) {
-                return 1;
-            }
-            return 0;
+            return Double.valueOf(o1.result).compareTo(o2.result) * -1;
         }
     };
 
     static class CompareResult {
         String compareStr;
-        String result;
+        Double result;
+
+        public BigDecimal getParcent() {
+            BigDecimal b = new BigDecimal(result);
+            b = b.multiply(new BigDecimal(100));
+            b = b.setScale(2, BigDecimal.ROUND_HALF_UP);
+            return b;
+        }
     }
 
-    static String fuzzyCompare(String compare1, String compare2, boolean ignoreCase) {
+    static double fuzzyCompare(String compare1, String compare2, boolean ignoreCase) {
         if (ignoreCase) {
             compare1 = compare1.toLowerCase();
             compare2 = compare2.toLowerCase();
         }
-        char[] c1 = compare1.toCharArray();
-        char[] c2 = compare2.toCharArray();
-        char tmp = ' ';
-        int c2Pos = 0;
-        StringBuilder sb = new StringBuilder();
-        f1: for (int ii = 0; ii < c1.length; ii++) {
-            tmp = c1[ii];
-            f2: for (int jj = c2Pos; jj < c2.length; jj++) {
-                if (tmp == c2[jj]) {
-                    sb.append(tmp);
-                    if (jj + 1 <= c2.length - 1) {
-                        c2Pos = jj + 1;
-                    } else {
-                        break f1;
-                    }
-                    break f2;
-                }
-            }
-        }
-        return sb.toString();
+        return SimilarityUtil.sim(compare1, compare2);
     }
 }

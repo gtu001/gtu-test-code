@@ -27,6 +27,8 @@ import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.xml.xmlmapper.jaxb.ReadXmlGenerateJaxbBean;
+import javax.swing.JLabel;
+import java.awt.Color;
 
 public class ReadXmlGenerateJaxbBeanUI extends JFrame {
 
@@ -49,6 +51,7 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
     private JPanel panel_9;
     private JPanel panel_10;
     private JTextArea resultBeanArea;
+    private JLabel lblNewLabel;
 
     /**
      * Launch the application.
@@ -108,6 +111,10 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
                 swingUtil.invokeAction("executeBtn.click", e);
             }
         });
+        
+        lblNewLabel = new JLabel("＊List 在 propOrder 會有問題須自行調整");
+        lblNewLabel.setForeground(Color.RED);
+        panel_6.add(lblNewLabel);
         panel_6.add(executeBtn);
 
         clearBtn = new JButton("清除");
