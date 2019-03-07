@@ -138,9 +138,9 @@ public class ReadXmlGenerateJaxbBean {
         sb.append("@XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)\n");
         sb.append("@XmlAccessorType(XmlAccessType.FIELD)\n");
 
-        sb.append(String.format("@XmlType(" + xmlTypeName + " propOrder={%s})\n", StringUtils.join(propOderLst, " , ")));
-
+        sb.append(String.format("@XmlType(" + xmlTypeName + " propOrder={%s})", StringUtils.join(propOderLst, " , ")));
         if (isRoot) {
+            sb.append("\n");
             sb.append(String.format("@XmlRootElement(name=\"%s\")", element.getName()));
         }
         return sb.toString();
@@ -150,7 +150,7 @@ public class ReadXmlGenerateJaxbBean {
         String parent = element.getParent() == null ? "" : element.getParent().getName();
         String tag = element.getName();
         String val = element.getTextTrim();
-        return String.format("@XmlElement(name = \"%s\")", tag);
+        return String.format("@XmlElement(name = \"%s\", nillable = true)", tag);
     }
 
     // ==========================================================================================================

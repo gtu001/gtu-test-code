@@ -58,6 +58,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -630,10 +631,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton exeucte;
     private JPanel jPanel2;
 
-    // static File propFile = new
-    // File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class),
-    // "RegexReplacer_NEW.properties");
-    static File propFile = new File("C:/Users/wistronits/Desktop/RegexReplacer_NEW.properties");
+    static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class), "RegexReplacer_NEW.properties");
     static Properties prop = new Properties();
 
     private PropConfigHandler configHandler;
@@ -914,8 +912,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 lst.add(reg);
             }
 
-            // configFile.getParentFile()
-            File yamlFile = new File(FileUtil.DESKTOP_DIR, FileUtil.getNameNoSubName(configFile) + ".yaml");
+            File yamlFile = new File(configFile.getParentFile(), FileUtil.getNameNoSubName(configFile) + ".yaml");
             YamlMapUtil.getInstance().saveToFile(yamlFile, lst, false);
             System.out.println("YAML SAVE!!!!");
         }
