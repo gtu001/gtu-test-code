@@ -17,7 +17,7 @@ import com.google.gson.JsonParser;
 import net.sf.json.JSONSerializer;
 import net.sf.json.util.JSONUtils;
 
-public class JSONPrettyUtil {
+public class JSONPrettyFormatUtil {
 
     public static String formatByGSON(String uglyJSONString) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
