@@ -81,11 +81,11 @@ public class HtmlInputSimpleCreater {
     }
 
     public static class HtmlInputSimpleCreater_HtmlTypeHandler {
-        String td1;
-        String td2;
+        protected String td1;
+        protected String td2;
         List<HtmlInputSimpleCreater_HtmlType> tagLst = new ArrayList<HtmlInputSimpleCreater_HtmlType>();
 
-        private static HtmlInputSimpleCreater_HtmlTypeHandler load(InputStream is) {
+        public static HtmlInputSimpleCreater_HtmlTypeHandler load(InputStream is) {
             Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
             classMap.put("tagLst", HtmlInputSimpleCreater_HtmlType.class);
             HtmlInputSimpleCreater_HtmlTypeHandler self = YamlMapUtil.getInstance().loadFromFile(is, HtmlInputSimpleCreater_HtmlTypeHandler.class, classMap);
