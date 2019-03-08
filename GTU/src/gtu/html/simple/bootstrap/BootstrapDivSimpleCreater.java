@@ -100,13 +100,13 @@ public class BootstrapDivSimpleCreater {
                     String divTag = boot.getTD(BOOTSTRAP_DIV_PREFIX + left, BOOTSTRAP_DIV_PREFIX + right);
                     String realDivTag = String.format(divTag, div.label, StringUtils.join(inputLst, "\n"));
 
-                    sb.append(realDivTag).append("\n\n");
+                    sb.append(realDivTag);
                 } else {
                     String bt1 = BOOTSTRAP_DIV_PREFIX + 12;
                     String divFormat = "\t<div class=\"%1$s\">%2$s</div> \n";
                     String realDivTag = String.format(divFormat, bt1, div.label);
 
-                    sb.append(realDivTag).append("\n\n");
+                    sb.append(realDivTag);
                 }
             }
             sb.append("</div>\n");
