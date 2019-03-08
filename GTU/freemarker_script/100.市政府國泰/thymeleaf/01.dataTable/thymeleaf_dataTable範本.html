@@ -1,0 +1,56 @@
+			<#assign dataLstNameAndQuote = "${r'${'} ${dataLstName} }" />
+			<#assign dataLstNameIfNotEmpty = "${'${'} not #lists.isEmpty(${dataLstName})}" />
+			<!-- ↓↓↓↓↓↓ DataTable ↓↓↓↓↓↓  -->
+			<div class="content_col1" th:if="${dataLstNameIfNotEmpty}">
+				<div class="content_title">國外ETF(即時單)</div>
+				<div style="background: #d7dde2; text-align: center;">
+					註記說明：已建檔[<span style="color: yellow"> ● </span>] 申請書未覆核 [<span
+						style="color: red"> ● </span>] 憑證未覆核 [<span style="color: green">
+						● </span>]
+				</div>
+				<hr class="content_title_hr"></hr>
+				<div class="content_box">
+					<div class="content_table content_table table-xh-140">
+						<table class="rwd-table">
+							<thead>
+								<tr>
+									<!-- class 對 資料庫欄位(因資料多列，因此設class非用id且放在Header表示，資料部分在看要怎麼處理) -->
+									<#list dataLst as item>
+									<th>${item.label}</th>
+									</#list>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="entity : ${dataLstNameAndQuote}">
+									<#list dataLst as item>
+										<#assign itemVal = "${r'${'} entity.${item.value} }" />
+									<td data-th="${item.label}" th:text="${itemVal}">
+										<#if item.type == 'link'>
+											<a
+											th:href="@{/fund/qryApplicationDetail/} + ${itemVal}"
+											th:text="${itemVal}"></a>
+										<#elseif item.type == 'btn'>
+											<button id="search" class="btn_g" type="submit"
+												th:onclick="javascript:alert(' + ${itemVal} + ');">
+												XXXX</button>
+										<#elseif item.type == 'switch'>
+											<span th:switch="${itemVal}"> 
+												<span th:case="'1'" style="color: yellow"
+												th:text="'已建檔'"></span> 
+												<span th:case="'2'" style="color: red"
+												th:text="'申請書未覆核'"></span> 
+												<span th:case="'3'" style="color: green"
+												th:text="'憑證未覆核'"></span>
+												<span th:case="*" 
+													th:text="${itemVal}"></span>
+										<#else>
+										</#if>
+									</td>
+									</#list>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- ↑↑↑↑↑↑ DataTable  ↑↑↑↑↑↑  -->
