@@ -32,16 +32,18 @@ public class BootstrapDivSimpleCreater {
     }
 
     private static final String BOOTSTRAP_DIV_PREFIX = "col-sm-";
-    
+
     public String execute(InputStream yamlConfigInputStream, String htmlContent) {
         BootstrapDivCrater_DivRoot boot = BootstrapDivCrater_DivRoot.load(yamlConfigInputStream);
         List<String> lst = StringUtil_.readContentToList(htmlContent, true, false, false);
 
-        Pattern ptn = Pattern.compile("(.*?)\\s+(\\w+)\\[(\\w+)\\]");
+        Pattern ptn = Pattern.compile("(.*?)[\\s\\t]+?(.*)");
+        Pattern ptn2 = Pattern.compile("(\\w+)\\[(\\w+)\\]");
 
         List<List<Div>> totalLst = new ArrayList<List<Div>>();
 
         Matcher mth = null;
+        Matcher mth2 = null;
         List<Div> tmpLst = null;
         for (String line : lst) {
             if (tmpLst == null) {
@@ -49,16 +51,22 @@ public class BootstrapDivSimpleCreater {
             }
             mth = ptn.matcher(line);
             if (mth.find()) {
-                Div d = new Div();
-                d.label = mth.group(1);
-                d.name = mth.group(2);
-                d.tagId = mth.group(3);
-                tmpLst.add(d);
+                Div d1 = new Div();
+                d1.label = mth.group(1);
+                String others = mth.group(2);
+                if (StringUtils.isNotBlank(others)) {
+                    mth2 = ptn2.matcher(others);
+                    while (mth2.find()) {
+                        DivDtl d2 = new DivDtl();
+                        d2.name = mth2.group(1);
+                        d2.tagId = mth2.group(2);
+                        d1.divLst.add(d2);
+                    }
+                }
+                tmpLst.add(d1);
             } else if (StringUtils.isNotBlank(line)) {
                 Div d = new Div();
                 d.label = StringUtils.trimToEmpty(line);
-                d.name = "";
-                d.tagId = "";
                 tmpLst.add(d);
             } else {
                 if (tmpLst != null && !tmpLst.isEmpty()) {
@@ -80,13 +88,17 @@ public class BootstrapDivSimpleCreater {
             for (int jj = 0, size = tmpLst.size() * 2; jj < tmpLst.size(); jj++) {
                 Div div = tmpLst.get(jj);
 
-                if (div.isNoInputTag == false) {
+                if (!div.divLst.isEmpty()) {
                     int left = getDivNumber(size, jj);
                     int right = getDivNumber(size, jj + 1);
-                    String htmlTag = boot.getTagTemplate(div.tagId);
-                    String realHtmlTag = String.format(htmlTag, div.name, div.label);
+                    List<String> inputLst = new ArrayList<String>();
+                    for (DivDtl d2 : div.divLst) {
+                        String htmlTag = boot.getTagTemplate(d2.tagId);
+                        String realHtmlTag = String.format(htmlTag, d2.name, div.label);
+                        inputLst.add(realHtmlTag);
+                    }
                     String divTag = boot.getTD(BOOTSTRAP_DIV_PREFIX + left, BOOTSTRAP_DIV_PREFIX + right);
-                    String realDivTag = String.format(divTag, div.label, realHtmlTag);
+                    String realDivTag = String.format(divTag, div.label, StringUtils.join(inputLst, "\n"));
 
                     sb.append(realDivTag).append("\n\n");
                 } else {
@@ -188,8 +200,11 @@ public class BootstrapDivSimpleCreater {
 
     private static class Div {
         String label;
+        List<DivDtl> divLst = new ArrayList<DivDtl>();
+    }
+
+    private static class DivDtl {
         String name;
         String tagId;
-        boolean isNoInputTag = false;
     }
 }
