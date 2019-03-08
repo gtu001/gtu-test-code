@@ -48,6 +48,7 @@ import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.json.JSONObject2CollectionUtil2;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -244,6 +245,8 @@ public class FreemarkerReplaceUI extends JFrame {
             }
         });
 
+        filePathList.addMouseListener(fileMouseAdapter);
+
         panel_1.add(JCommonUtil.createScrollComponent(filePathList), BorderLayout.CENTER);
 
         JPanel panel_10 = new JPanel();
@@ -277,6 +280,9 @@ public class FreemarkerReplaceUI extends JFrame {
                 }
             }
         });
+
+        recentFileList.addMouseListener(fileMouseAdapter);
+
         panel_10.add(JCommonUtil.createScrollComponent(recentFileList), BorderLayout.CENTER);
 
         JPanel panel_15 = new JPanel();
@@ -560,4 +566,52 @@ public class FreemarkerReplaceUI extends JFrame {
             return title;
         }
     }
+
+    private MouseAdapter fileMouseAdapter = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent arg0) {
+            try {
+                Object obj = JListUtil.getLeadSelectionObject(filePathList);
+                final AtomicReference<File> file = new AtomicReference<File>();
+                if (obj == null) {
+                    return;
+                }
+                if (obj instanceof FileZ) {
+                    file.set(((FileZ) obj).file);
+                } else {
+                    file.set((File) obj);
+                }
+                if (file.get() == null || !file.get().exists()) {
+                    return;
+                }
+                if (JMouseEventUtil.buttonRightClick(1, arg0)) {
+                    JPopupMenuUtil.newInstance(filePathList)//
+                            .addJMenuItem("開啟檔案", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        DesktopUtil.browse(file.get().toURL().toString());
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("開啟目錄", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        DesktopUtil.openDir(file.get().getParentFile());
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            })//
+                            .applyEvent(arg0)//
+                            .show();
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+    };
 }
