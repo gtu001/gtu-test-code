@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -86,6 +88,7 @@ public class FacebookVideoDownloader extends JFrame {
     private DownloadLogKeeper downloadLog = new DownloadLogKeeper();
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JPanel panel_23;
+    private AutoDownloadBtnActionThread autoDownloadBtnActionThread;
 
     private class DownloadThreadPoolWatcher extends Thread {
         LinkedList<VideoUrlConfigZ> downloadLst = new LinkedList<VideoUrlConfigZ>();
@@ -300,7 +303,9 @@ public class FacebookVideoDownloader extends JFrame {
         JButton autoDownloadBtn = new JButton("自動");
         autoDownloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                autoDownload(false);
+                // autoDownload(false);
+                autoDownloadBtnActionThread.appendUrl(urlText.getText());
+                urlText.setText("");
             }
         });
         panel.add(autoDownloadBtn);
@@ -568,6 +573,8 @@ public class FacebookVideoDownloader extends JFrame {
         });
         JTableUtil.defaultSetting_AutoResize(downloadListTable);
         panel_10.add(JCommonUtil.createScrollComponent(downloadListTable), BorderLayout.CENTER);
+
+        autoDownloadBtnActionThread = new AutoDownloadBtnActionThread(this);
 
         JCommonUtil.setJFrameDefaultSetting(this);
         JCommonUtil.setLocationToRightBottomCorner(this);
@@ -880,6 +887,43 @@ public class FacebookVideoDownloader extends JFrame {
                 throw new RuntimeException(ex);
             } else {
                 JCommonUtil.handleException(ex);
+            }
+        }
+    }
+
+    private static class AutoDownloadBtnActionThread extends TimerTask {
+        private FacebookVideoDownloader self;
+        private Timer timer = new Timer();
+        private List<String> urlLinkLst = new ArrayList<String>();
+
+        public AutoDownloadBtnActionThread(FacebookVideoDownloader self) {
+            this.self = self;
+            timer.schedule(this, 1000L, 1000L);
+        }
+
+        public void appendUrl(String url) {
+            url = StringUtils.trimToEmpty(url);
+            if (!urlLinkLst.contains(url)) {
+                this.urlLinkLst.add(url);
+            }
+        }
+
+        @Override
+        public void run() {
+            boolean start = false;
+            try {
+                if (!urlLinkLst.isEmpty()) {
+                    String url = urlLinkLst.get(0);
+                    start = true;
+                    this.self.urlText.setText(url);
+                    this.self.autoDownload(true);
+                }
+            } catch (Throwable ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                if (start) {
+                    urlLinkLst.remove(0);
+                }
             }
         }
     }
