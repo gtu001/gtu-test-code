@@ -3,6 +3,7 @@ package gtu.yaml.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import gtu.log.JdkLoggerUtil;
@@ -14,6 +15,7 @@ public class YamlUtilBean<T> {
     private File yamlFile;
     private Class<T> yamlClz;
     private List<T> yamlLst;
+    private Map<String, Class<?>> classMap;
 
     private static final Logger logger = JdkLoggerUtil.getLogger(YamlUtilBean.class, true);
 
@@ -22,13 +24,14 @@ public class YamlUtilBean<T> {
     }
 
     public void reload() {
-        init(yamlFile, yamlClz);
+        init(yamlFile, yamlClz, classMap);
     }
 
-    public void init(File customFile, Class<T> targetClz) {
+    public void init(File customFile, Class<T> targetClz, Map<String, Class<?>> classMap) {
         try {
             this.yamlFile = customFile;
             this.yamlClz = targetClz;
+            this.classMap = classMap;
             logger.info("configFile : " + yamlFile);
             if (!yamlFile.exists()) {
                 if (!yamlFile.getParentFile().exists()) {
@@ -37,7 +40,7 @@ public class YamlUtilBean<T> {
                 logger.info("!!!!! 設定檔不存在建立新檔 : " + yamlFile);
                 yamlFile.createNewFile();
             }
-            yamlLst = YamlMapUtil.getInstance().loadFromFile(this.yamlFile, this.yamlClz);
+            yamlLst = YamlMapUtil.getInstance().loadFromFile(this.yamlFile, this.yamlClz, this.classMap);
             if (yamlLst == null) {
                 yamlLst = new ArrayList<T>();
                 store();
@@ -49,20 +52,20 @@ public class YamlUtilBean<T> {
         }
     }
 
-    public YamlUtilBean(File customFile, Class<T> targetClz) {
-        this.init(customFile, targetClz);
+    public YamlUtilBean(File customFile, Class<T> targetClz, Map<String, Class<?>> classMap) {
+        this.init(customFile, targetClz, classMap);
     }
 
-    public YamlUtilBean(Class<?> clz, Class<T> targetClz) {
-        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.yaml"), targetClz);
+    public YamlUtilBean(Class<?> clz, Class<T> targetClz, Map<String, Class<?>> classMap) {
+        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_config.yaml"), targetClz, classMap);
     }
 
-    public YamlUtilBean(Class<?> clz, String fileName, Class<T> targetClz) {
-        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), fileName + "_config.yaml"), targetClz);
+    public YamlUtilBean(Class<?> clz, String fileName, Class<T> targetClz, Map<String, Class<?>> classMap) {
+        this.init(new File(PropertiesUtil.getJarCurrentPath(clz), fileName + "_config.yaml"), targetClz, classMap);
     }
 
-    public YamlUtilBean(File parentDir, String fileName, Class<T> targetClz) {
-        this.init(new File(parentDir, fileName + "_config.yaml"), targetClz);
+    public YamlUtilBean(File parentDir, String fileName, Class<T> targetClz, Map<String, Class<?>> classMap) {
+        this.init(new File(parentDir, fileName + "_config.yaml"), targetClz, classMap);
     }
 
     public boolean contains(T bean) {

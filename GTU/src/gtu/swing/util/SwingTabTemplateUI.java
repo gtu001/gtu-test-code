@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
@@ -260,5 +261,13 @@ public class SwingTabTemplateUI {
 
     public Map<String, Object> getTempalteHoldingContainMap() {
         return tempalteHoldingContainMap;
+    }
+
+    public int getSelectTabIndex() {
+        return tabbedPane.getSelectedIndex();
+    }
+
+    public List<JFrame> getJframeKeeperLst() {
+        return jframeKeeperLst;
     }
 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -71,8 +73,12 @@ import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.swing.util.SwingTabTemplateUI.FocusTabHandlerGtu001;
+import gtu.swing.util.SwingTabTemplateUI.SwingTabTemplateUI_Callback;
+import gtu.yaml.util.YamlMapUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+import net.sf.json.util.JSONUtils;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -106,7 +112,29 @@ public class RegexReplacer extends javax.swing.JFrame {
             System.out.println("=====" + info.getClassName());
             // javax.swing.UIManager.setLookAndFeel(info.getClassName());
         }
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "cheater.ico", RegexReplacer.class, true, null);
+        final SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "cheater.ico", RegexReplacer.class, true, new SwingTabTemplateUI_Callback() {
+
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(final SwingTabTemplateUI self) {
+                self.getJframe().addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent paramWindowEvent) {
+                        try {
+                            RegexReplacer ui = (RegexReplacer) self.getJframeKeeperLst().get(self.getSelectTabIndex());
+                            ui.configHandler.saveProp();
+                        } catch (Exception e) {
+                            JCommonUtil.handleException("properties store error!", e);
+                        }
+                        self.getJframe().setVisible(false);
+                        self.getJframe().dispose();
+                    }
+                });
+            }
+        });
+
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
@@ -129,6 +157,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
         });
+
         tabUI.setSize(700, 550);
         tabUI.startUI();
     }
@@ -571,7 +600,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
                     try {
-                        prop.store(new FileOutputStream(propFile), "regexText");
+                        configHandler.saveProp();
                     } catch (Exception e) {
                         JCommonUtil.handleException("properties store error!", e);
                     }
@@ -846,7 +875,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
 
             this.prop.remove(configKey);
-            this.prop.store(new FileOutputStream(propFile), "remove - " + configKey);
+            this.saveProp();
         }
 
         private void put(String configKey, String fromVal, String toVal, String tradeOff) throws FileNotFoundException, IOException {
@@ -863,7 +892,44 @@ public class RegexReplacer extends javax.swing.JFrame {
             tradeOff = StringUtils.trimToEmpty(tradeOff);
             prop.setProperty(configKey, fromVal + delimit + toVal + delimit + tradeOff);
 
-            this.prop.store(new FileOutputStream(propFile), "remove - " + configKey);
+            this.saveProp();
+        }
+
+        private void saveProp() throws FileNotFoundException, IOException {
+            this.prop.store(new FileOutputStream(propFile), "");
+
+            List<RegexReplacer_ForSaveYaml> lst = new ArrayList<RegexReplacer_ForSaveYaml>();
+            for (Enumeration<?> enu = this.prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = this.prop.getProperty(key);
+                Config conf = new Config(key, value);
+
+                RegexReplacer_ForSaveYaml reg = new RegexReplacer_ForSaveYaml();
+                reg.configKeyText = conf.configKeyText;
+                reg.fromVal = conf.fromVal;
+                reg.toVal = conf.toVal;
+                reg.tradeOff = formatByNetSf(conf.tradeOff);
+                lst.add(reg);
+            }
+
+            File yamlFile = new File(configFile.getParentFile(), FileUtil.getNameNoSubName(configFile) + ".yaml");
+            YamlMapUtil.getInstance().saveToFile(yamlFile, lst, false);
+            System.out.println("YAML SAVE!!!!");
+        }
+
+        private static String formatByNetSf(Object jsonObject) {
+            try {
+                if (StringUtils.isBlank((String) jsonObject)) {
+                    return "";
+                }
+                if (jsonObject instanceof String) {
+                    return JSONUtils.valueToString(JSONSerializer.toJSON(jsonObject), 8, 4);
+                } else {
+                    return net.sf.json.util.JSONUtils.valueToString(jsonObject, 8, 4);
+                }
+            } catch (Throwable ex) {
+                throw new RuntimeException("formatByNetSf ERR : " + ex.getMessage() + " --> " + jsonObject, ex);
+            }
         }
 
         void reloadTemplateList() {
@@ -1081,5 +1147,44 @@ public class RegexReplacer extends javax.swing.JFrame {
         tradeOffArea.setText("");
         multiLineCheckBox.setSelected(false);
         autoPasteToClipboardCheckbox.setSelected(false);
+    }
+
+    public static class RegexReplacer_ForSaveYaml {
+        String tradeOff;
+        String toVal;
+        String fromVal;
+        String configKeyText;
+
+        public String getTradeOff() {
+            return tradeOff;
+        }
+
+        public void setTradeOff(String tradeOff) {
+            this.tradeOff = tradeOff;
+        }
+
+        public String getToVal() {
+            return toVal;
+        }
+
+        public void setToVal(String toVal) {
+            this.toVal = toVal;
+        }
+
+        public String getFromVal() {
+            return fromVal;
+        }
+
+        public void setFromVal(String fromVal) {
+            this.fromVal = fromVal;
+        }
+
+        public String getConfigKeyText() {
+            return configKeyText;
+        }
+
+        public void setConfigKeyText(String configKeyText) {
+            this.configKeyText = configKeyText;
+        }
     }
 }

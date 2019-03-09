@@ -82,6 +82,7 @@
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
 				
 			<packagename mode="pom">freemarker.template</packagename>
+			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->

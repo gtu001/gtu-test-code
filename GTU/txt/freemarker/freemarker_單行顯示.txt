@@ -1,0 +1,9 @@
+<@compress single_line=true>  <--- 包這行
+private 
+<#if arry[2]?starts_with('X')>
+   String 
+<#elseif arry[2]?starts_with('9')>
+   BigDecimal 
+</#if>
+${arry[1]?uncap_first} ; // ${arry[5]}
+</@compress> 					<--- 包這行
