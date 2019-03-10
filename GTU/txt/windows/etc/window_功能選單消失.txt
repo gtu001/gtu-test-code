@@ -1,0 +1,11 @@
+試了好幾個方式以下是用了有效的~
+
+
+1、在鍵盤上按下win+R鍵，或在開始菜單圖標上點擊右鍵選擇執行;
+
+2、輸入powershell，按下“確定”;
+
+3、在窗口裡輸入或複制粘貼以下命令，注意只有一行：
+Get-AppxPackage | % { Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppxManifest.xml" -verbose }
+
+4、點擊enter鍵，等待修復命令運行完成，完成之後BUG就被修復了
