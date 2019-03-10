@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.reflect.FieldUtils;
+
 import gtu.file.FileUtil;
 import gtu.json.JSONObject2CollectionUtil2;
 import net.sf.json.JSONArray;
@@ -95,7 +97,11 @@ public class YamlMapUtil {
                             if (v != null) {
                                 if (v.getClass() == String.class) {
                                     v = YamlUtil.getPlainString((String) v);
-                                    d.getWriteMethod().invoke(targetObj, new Object[] { v });
+                                    if (d.getWriteMethod() != null) {
+                                        d.getWriteMethod().invoke(targetObj, new Object[] { v });
+                                    } else {
+                                        FieldUtils.writeDeclaredField(targetObj, d.getName(), v, true);
+                                    }
                                 } else if (classMap != null && classMap.containsValue(v.getClass())) {
                                     go1(v);
                                 }

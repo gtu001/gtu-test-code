@@ -889,9 +889,15 @@ public class RegexReplacer extends javax.swing.JFrame {
         JTextArea resultArea;
 
         List<RegexReplacer_Config> orignLst = Collections.EMPTY_LIST;
+        
+        private String fixKey(String fixKey) {
+            return StringUtils.trimToEmpty(StringUtils.trimToEmpty(fixKey).replaceAll("\n", ""));
+        }
 
         private RegexReplacer_Config getProperty(String configKey) {
+            configKey = fixKey(configKey);
             for (RegexReplacer_Config d : orignLst) {
+                d.configKeyText = fixKey(d.configKeyText);
                 if (StringUtils.equals(configKey, d.configKeyText)) {
                     return d;
                 }
@@ -923,6 +929,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         private void deleteConfig(String configKey) {
+            configKey = fixKey(configKey);
             RegexReplacer_Config d = getProperty(configKey);
             if (d == null) {
                 Validate.isTrue(false, "找不到:" + configKey);
@@ -940,6 +947,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         private void put(String configKey, String fromVal, String toVal, String tradeOff) throws FileNotFoundException, IOException {
+            configKey = fixKey(configKey);
             RegexReplacer_Config d = getProperty(configKey);
             if (d != null) {
                 boolean saveConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("設定:" + configKey + " 已存在,是否要覆蓋!", "儲存確認");
@@ -966,6 +974,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public void putExample(String key) {
+            key = fixKey(key);
             if (StringUtils.equals(resultArea.getText(), replaceArea.getText())) {
                 return;
             }
@@ -979,6 +988,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public void loadExample(String key) {
+            key = fixKey(key);
             RegexReplacer_Config d = getProperty(key);
             if (d == null) {
                 return;
@@ -989,6 +999,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public void deleteExample(String configKeyText) {
+            configKeyText = fixKey(configKeyText);
             RegexReplacer_Config d = getProperty(configKeyText);
             if (d != null) {
                 d.exampleArea = "";
