@@ -1,5 +1,8 @@
 package gtu.yaml.util;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.BeanUtils;
 
 import gtu.file.FileUtil;
 import gtu.json.JSONObject2CollectionUtil2;
@@ -85,21 +86,26 @@ public class YamlMapUtil {
             }
 
             void go2(Object targetObj) {
-                PropertyDescriptor[] desc = BeanUtils.getPropertyDescriptors(targetObj.getClass());
-                for (PropertyDescriptor d : desc) {
-                    try {
-                        Object v = d.getReadMethod().invoke(targetObj, new Object[0]);
-                        if (v != null) {
-                            if (v.getClass() == String.class) {
-                                v = YamlUtil.getPlainString((String) v);
-                                d.getWriteMethod().invoke(targetObj, new Object[] { v });
-                            } else if (classMap != null && classMap.containsValue(v.getClass())) {
-                                go1(v);
+                try {
+                    BeanInfo beanInfo = Introspector.getBeanInfo(targetObj.getClass(), Introspector.USE_ALL_BEANINFO);
+                    PropertyDescriptor[] desc = beanInfo.getPropertyDescriptors();
+                    for (PropertyDescriptor d : desc) {
+                        try {
+                            Object v = d.getReadMethod().invoke(targetObj, new Object[0]);
+                            if (v != null) {
+                                if (v.getClass() == String.class) {
+                                    v = YamlUtil.getPlainString((String) v);
+                                    d.getWriteMethod().invoke(targetObj, new Object[] { v });
+                                } else if (classMap != null && classMap.containsValue(v.getClass())) {
+                                    go1(v);
+                                }
                             }
+                        } catch (Exception e) {
+                            throw new RuntimeException("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage(), e);
                         }
-                    } catch (Exception e) {
-                        throw new RuntimeException("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage(), e);
                     }
+                } catch (Exception e1) {
+                    throw new RuntimeException("saveToFilePlain, ERR : " + e1.getMessage(), e1);
                 }
             }
         }
