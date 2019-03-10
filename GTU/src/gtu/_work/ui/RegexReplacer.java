@@ -12,21 +12,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +33,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -60,6 +57,7 @@ import gtu.file.FileUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -67,6 +65,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JListUtil.ItemColorTextHandler;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
@@ -354,15 +353,14 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 if (templateList.getLeadSelectionIndex() == -1) {
                                     return;
                                 }
-                                PropConfigHandler.Config config = (PropConfigHandler.Config) JListUtil.getLeadSelectionObject(templateList);
+                                RegexReplacer_Config config = (RegexReplacer_Config) JListUtil.getLeadSelectionObject(templateList);
                                 configKeyText.setText(config.configKeyText);
                                 repFromText.setText(config.fromVal);
                                 repToText.setText(config.toVal);
                                 tradeOffArea.setText(config.tradeOff);
 
                                 // 放入執行紀錄 並 載入預設
-                                simpleConfigHandler.put(configKeyText.getText());
-                                simpleConfigHandler.load(configKeyText.getText());
+                                configHandler.loadExample(configKeyText.getText());
 
                                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                                     String replaceText = StringUtils.defaultString(replaceArea.getText());
@@ -376,7 +374,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         });
                         templateList.addKeyListener(new KeyAdapter() {
                             public void keyPressed(KeyEvent evt) {
-                                PropConfigHandler.Config config = (PropConfigHandler.Config) JListUtil.getLeadSelectionObject(templateList);
+                                RegexReplacer_Config config = (RegexReplacer_Config) JListUtil.getLeadSelectionObject(templateList);
                                 JListUtil.newInstance(templateList).defaultJListKeyPressed(evt, false);
                                 try {
                                     if (config != null) {
@@ -384,7 +382,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                             configHandler.deleteConfig(config.configKeyText);
                                             configHandler.reloadTemplateList();
 
-                                            simpleConfigHandler.delete(config.configKeyText);
+                                            configHandler.deleteExample(config.configKeyText);
                                         }
                                     }
                                 } catch (Exception e) {
@@ -396,7 +394,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         JListUtil.newInstance(templateList).applyOnHoverEvent(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                PropConfigHandler.Config config = (PropConfigHandler.Config) e.getSource();
+                                RegexReplacer_Config config = (RegexReplacer_Config) e.getSource();
                                 templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
                             }
                         });
@@ -404,7 +402,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         // 改變顏色 ↓↓↓↓↓↓
                         JListUtil.newInstance(templateList).setItemColorTextProcess(new ItemColorTextHandler() {
                             public Pair<String, Color> setColorAndText(Object value) {
-                                PropConfigHandler.Config config = (PropConfigHandler.Config) value;
+                                RegexReplacer_Config config = (RegexReplacer_Config) value;
                                 if (config.tradeOffScore != 0) {
                                     return Pair.of(null, Color.GREEN);
                                 }
@@ -469,18 +467,50 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                     }
                 }
+                //
+                panel_1 = new JPanel();
+                //
+                {
+                    yamlConfigFileText = new JTextField();
+                    JCommonUtil.jTextFieldSetFilePathMouseEvent(yamlConfigFileText, false);
+                    panel_1.add(yamlConfigFileText);
+                    yamlConfigFileText.setColumns(40);
+                }
+                {
+                    saveConfigBtn = new JButton("儲存設定");
+                    panel_1.add(saveConfigBtn);
+                }
+                {
+                    yamlOpenFileBtn = new JButton("開啟yaml");
+                    yamlOpenFileBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                final File file = new File(yamlConfigFileText.getText());
+                                final AtomicReference<String> fileURL = new AtomicReference<String>(file.toURL().toString());
+                                JPopupMenuUtil.newInstance(yamlOpenFileBtn)//
+                                        .addJMenuItem("開啟目錄", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                DesktopUtil.openDir(file);
+                                            }
+                                        }).addJMenuItem("開啟檔案", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                DesktopUtil.browse(fileURL.get());
+                                            }
+                                        }).applyEvent(e)//
+                                        .show();
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
+                    panel_1.add(yamlOpenFileBtn);
+                }
             }
-
-            // config init
-            {
-                configHandler = new PropConfigHandler(prop, propFile, templateList, replaceArea);
-                simpleConfigHandler = new SimpleConfigHandler();
-            }
-
             {
                 JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
-                    panel_1 = new JPanel();
                     jTabbedPane1.addTab("config", null, panel_1, null);
                     panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
                 }
@@ -575,6 +605,19 @@ public class RegexReplacer extends javax.swing.JFrame {
                     }
                     jPanel3.add(JCommonUtil.createScrollComponent(tradeOffArea), "4, 10, fill, fill");
                 }
+            }
+
+            // ui init
+            {
+                configBean.reflectInit(this);
+                if (StringUtils.isBlank(yamlConfigFileText.getText())) {
+                    yamlConfigFileText.setText(yamlFile.getAbsolutePath());
+                }
+            }
+            // config init
+            {
+                File configFile = new File(yamlConfigFileText.getText());
+                configHandler = new PropConfigHandler(configFile, templateList, replaceArea, resultArea);
                 configHandler.reloadTemplateList();
             }
 
@@ -595,6 +638,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
             panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
+
             this.setTitle("You Set My World On Fire");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -631,11 +675,10 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton exeucte;
     private JPanel jPanel2;
 
-    static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class), "RegexReplacer_NEW.properties");
-    static Properties prop = new Properties();
+    static File yamlFile = new File(PropertiesUtil.getJarCurrentPath(RegexReplacer.class), RegexReplacer.class.getSimpleName() + "_NEW.yml");
 
     private PropConfigHandler configHandler;
-    private SimpleConfigHandler simpleConfigHandler;
+    private PropertiesUtilBean configBean = new PropertiesUtilBean(RegexReplacer.class);
 
     private JLabel lblNewLabel;
     private JLabel lblNewLabel_1;
@@ -659,6 +702,9 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton resultAreaClearBtn;
     private JLabel lblNewLabel_4;
     private JTextField templateListFilterText;
+    private JTextField yamlConfigFileText;
+    private JButton saveConfigBtn;
+    private JButton yamlOpenFileBtn;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         try {
@@ -676,7 +722,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             pasteTextToClipboard();
 
             // 放入執行紀錄
-            simpleConfigHandler.put(configKeyText.getText());
+            configHandler.putExample(configKeyText.getText());
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -693,7 +739,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
         DefaultListModel model = (DefaultListModel) templateList.getModel();
         for (int ii = 0; ii < model.getSize(); ii++) {
-            PropConfigHandler.Config entry = (PropConfigHandler.Config) model.getElementAt(ii);
+            RegexReplacer_Config entry = (RegexReplacer_Config) model.getElementAt(ii);
             replaceText = replacerDetail(entry.fromVal, entry.toVal, replaceText);
         }
         resultArea.setText(replaceText);
@@ -837,49 +883,65 @@ public class RegexReplacer extends javax.swing.JFrame {
     }
 
     private static class PropConfigHandler {
-        Properties prop;
         File configFile;
         JList templateList;
         JTextArea replaceArea;
+        JTextArea resultArea;
 
-        private static String delimit = "#^#";
-        private static String delimit_Pattern = "\\Q#^#\\E";
+        List<RegexReplacer_Config> orignLst = Collections.EMPTY_LIST;
 
-        PropConfigHandler(Properties prop, File configFile, JList templateList, JTextArea replaceArea) {
-            this.prop = prop;
+        private RegexReplacer_Config getProperty(String configKey) {
+            for (RegexReplacer_Config d : orignLst) {
+                if (StringUtils.equals(configKey, d.configKeyText)) {
+                    return d;
+                }
+            }
+            return null;
+        }
+
+        PropConfigHandler(File configFile, JList templateList, JTextArea replaceArea, JTextArea resultArea) {
             this.configFile = configFile;
             this.templateList = templateList;
             this.replaceArea = replaceArea;
+            this.resultArea = resultArea;
+            this.reloadInit();
+        }
+
+        private void reloadInit() {
             try {
-                if (!propFile.exists()) {
-                    propFile.createNewFile();
+                System.out.println(configFile + " == " + configFile.exists());
+                if (!configFile.exists()) {
+                    configFile.createNewFile();
                 }
-                this.configFile = propFile;
-                System.out.println(propFile + " == " + propFile.exists());
-                prop.load(new FileInputStream(propFile));
+                orignLst = YamlMapUtil.getInstance().loadFromFile(configFile, RegexReplacer_Config.class, null);
+                if (orignLst == null) {
+                    orignLst = new ArrayList<RegexReplacer_Config>();
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
 
-        private void deleteConfig(String configKey) throws FileNotFoundException, IOException {
-            if (!this.prop.containsKey(configKey)) {
+        private void deleteConfig(String configKey) {
+            RegexReplacer_Config d = getProperty(configKey);
+            if (d == null) {
                 Validate.isTrue(false, "找不到:" + configKey);
             }
 
-            if (prop.containsKey(configKey)) {
+            if (d != null) {
                 boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("設定:" + configKey + " 是否要刪除!", "刪除確認");
                 if (!deleteConfirm) {
                     return;
                 }
             }
 
-            this.prop.remove(configKey);
+            orignLst.remove(d);
             this.saveProp();
         }
 
         private void put(String configKey, String fromVal, String toVal, String tradeOff) throws FileNotFoundException, IOException {
-            if (prop.containsKey(configKey)) {
+            RegexReplacer_Config d = getProperty(configKey);
+            if (d != null) {
                 boolean saveConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("設定:" + configKey + " 已存在,是否要覆蓋!", "儲存確認");
                 if (!saveConfirm) {
                     return;
@@ -890,30 +952,53 @@ public class RegexReplacer extends javax.swing.JFrame {
             Validate.notEmpty(fromVal, "fromVal 不可為空!");
             Validate.notEmpty(toVal, "toVal 不可為空!");
             tradeOff = StringUtils.trimToEmpty(tradeOff);
-            prop.setProperty(configKey, fromVal + delimit + toVal + delimit + tradeOff);
+
+            if (d == null) {
+                d = new RegexReplacer_Config();
+                orignLst.add(d);
+            }
+            d.configKeyText = configKey;
+            d.fromVal = fromVal;
+            d.toVal = toVal;
+            d.tradeOff = tradeOff;
 
             this.saveProp();
         }
 
-        private void saveProp() throws FileNotFoundException, IOException {
-            this.prop.store(new FileOutputStream(propFile), "");
-
-            List<RegexReplacer_ForSaveYaml> lst = new ArrayList<RegexReplacer_ForSaveYaml>();
-            for (Enumeration<?> enu = this.prop.keys(); enu.hasMoreElements();) {
-                String key = (String) enu.nextElement();
-                String value = this.prop.getProperty(key);
-                Config conf = new Config(key, value);
-
-                RegexReplacer_ForSaveYaml reg = new RegexReplacer_ForSaveYaml();
-                reg.configKeyText = conf.configKeyText;
-                reg.fromVal = conf.fromVal;
-                reg.toVal = conf.toVal;
-                reg.tradeOff = formatByNetSf(conf.tradeOff);
-                lst.add(reg);
+        public void putExample(String key) {
+            if (StringUtils.equals(resultArea.getText(), replaceArea.getText())) {
+                return;
             }
+            if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(replaceArea.getText())) {
+                RegexReplacer_Config d = getProperty(key);
+                if (d != null) {
+                    d.exampleArea = replaceArea.getText();
+                }
+                saveProp();
+            }
+        }
 
-            File yamlFile = new File(configFile.getParentFile(), FileUtil.getNameNoSubName(configFile) + ".yaml");
-            YamlMapUtil.getInstance().saveToFile(yamlFile, lst, false);
+        public void loadExample(String key) {
+            RegexReplacer_Config d = getProperty(key);
+            if (d == null) {
+                return;
+            }
+            if (StringUtils.isBlank(replaceArea.getText()) && StringUtils.isNotBlank(d.exampleArea)) {
+                replaceArea.setText(d.exampleArea);
+            }
+        }
+
+        public void deleteExample(String configKeyText) {
+            RegexReplacer_Config d = getProperty(configKeyText);
+            if (d != null) {
+                d.exampleArea = "";
+                saveProp();
+            }
+        }
+
+        private void saveProp() {
+            File yamlFile = new File(configFile.getParentFile(), FileUtil.getNameNoSubName(configFile) + ".yml");
+            YamlMapUtil.getInstance().saveToFilePlain(yamlFile, orignLst, false, null);
             System.out.println("YAML SAVE!!!!");
         }
 
@@ -937,12 +1022,13 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         void reloadTemplateList(String filterText) {
+            reloadInit();
+
             filterText = StringUtils.trimToEmpty(filterText).toLowerCase();
             String repAreaText = StringUtils.trimToEmpty(replaceArea.getText());
 
-            List<Config> lst = new ArrayList<Config>();
-            for (Entry<Object, Object> entry : prop.entrySet()) {
-                Config conf = new Config(entry);
+            List<RegexReplacer_Config> lst = new ArrayList<RegexReplacer_Config>();
+            for (RegexReplacer_Config conf : orignLst) {
                 boolean findOk = false;
                 if (StringUtils.isBlank(filterText)) {
                     findOk = true;
@@ -956,13 +1042,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
 
-            for (Config conf : lst) {
+            for (RegexReplacer_Config conf : lst) {
                 conf.processTradeOff(repAreaText);
             }
 
-            Collections.sort(lst, new Comparator<Config>() {
+            Collections.sort(lst, new Comparator<RegexReplacer_Config>() {
                 @Override
-                public int compare(Config c1, Config c2) {
+                public int compare(RegexReplacer_Config c1, RegexReplacer_Config c2) {
                     if (c1.tradeOffScore > c2.tradeOffScore) {
                         return -1;
                     } else if (c1.tradeOffScore < c2.tradeOffScore) {
@@ -988,130 +1074,125 @@ public class RegexReplacer extends javax.swing.JFrame {
             });
 
             DefaultListModel templateListModel = new DefaultListModel();
-            for (Config conf : lst) {
+            for (RegexReplacer_Config conf : lst) {
                 System.out.println("tradeoff conf : " + conf.configKeyText + "\tscore:" + conf.tradeOffScore);
                 templateListModel.addElement(conf);
             }
             templateList.setModel(templateListModel);
         }
+    }
 
-        private static class Config {
-            Config(Object key, Object value) {
-                configKeyText = String.valueOf(key);
-                String tmpVal = String.valueOf(value);
-                String[] tmpVals = tmpVal.split(delimit_Pattern, -1);
-                fromVal = getArry(tmpVals, 0);
-                toVal = getArry(tmpVals, 1);
-                tradeOff = getArry(tmpVals, 2);
-            }
+    public static class RegexReplacer_Config {
 
-            private String getArry(String[] arry, int pos) {
-                if (arry.length > pos) {
-                    return arry[pos];
-                }
-                return "";
-            }
+        String exampleArea;// 1
+        String configKeyText;// 1
+        String fromVal;// 1
+        String toVal;// 1
+        String tradeOff;// 1
 
-            Config(Entry<Object, Object> entry) {
-                this(entry.getKey(), entry.getValue());
-            }
+        int tradeOffScore = 0;
+        boolean isModify = false;
+        String message;
 
-            String configKeyText;
-            String fromVal;
-            String toVal;
-            String tradeOff;
-            int tradeOffScore = 0;
-            boolean isModify = false;
-            String message;
+        Pattern use_ptn = Pattern.compile("^\\/(.*)\\/$");
 
-            Pattern use_ptn = Pattern.compile("^\\/(.*)\\/$");
+        private void __tradeOffProcess(String key, int offset, JSONObject json, String script, List<String> messageLst) {
+            if (json.containsKey(key)) {
+                JSONArray arry = json.getJSONArray(key);
 
-            private void __tradeOffProcess(String key, int offset, JSONObject json, String script, List<String> messageLst) {
-                if (json.containsKey(key)) {
-                    JSONArray arry = json.getJSONArray(key);
+                for (int ii = 0; ii < arry.size(); ii++) {
+                    String string = arry.getString(ii);
 
-                    for (int ii = 0; ii < arry.size(); ii++) {
-                        String string = arry.getString(ii);
+                    boolean matchOk = false;
 
-                        boolean matchOk = false;
-
-                        if (string.matches("^\\/.*\\/$")) {
-                            Matcher mth = use_ptn.matcher(string);
-                            mth.find();
-                            Pattern ptn = Pattern.compile(mth.group(1), Pattern.MULTILINE | Pattern.DOTALL);
-                            mth = ptn.matcher(script);
-                            if (mth.find()) {
-                                matchOk = true;
-                            }
-                        }
-
-                        if (!matchOk && script.toLowerCase().contains(string.toLowerCase())) {
+                    if (string.matches("^\\/.*\\/$")) {
+                        Matcher mth = use_ptn.matcher(string);
+                        mth.find();
+                        Pattern ptn = Pattern.compile(mth.group(1), Pattern.MULTILINE | Pattern.DOTALL);
+                        mth = ptn.matcher(script);
+                        if (mth.find()) {
                             matchOk = true;
                         }
+                    }
 
-                        if (matchOk) {
-                            tradeOffScore += offset;
-                            String prefix = offset < 0 ? "[扣分項]" : "";
-                            messageLst.add(prefix + string);
-                            isModify = true;
-                        }
+                    if (!matchOk && script.toLowerCase().contains(string.toLowerCase())) {
+                        matchOk = true;
+                    }
+
+                    if (matchOk) {
+                        tradeOffScore += offset;
+                        String prefix = offset < 0 ? "[扣分項]" : "";
+                        messageLst.add(prefix + string);
+                        isModify = true;
                     }
                 }
             }
-
-            public void processTradeOff(String script) {
-                tradeOffScore = 0;
-                message = "";
-                isModify = false;// 為改過
-
-                if (StringUtils.isBlank(script) || StringUtils.isBlank(tradeOff)) {
-                    return;
-                }
-                try {
-                    JSONObject json = JSONObject.fromObject(tradeOff);
-                    List<String> messageLst = new ArrayList<String>();
-
-                    __tradeOffProcess(SelectionObj.equal.key, 2, json, script, messageLst);
-                    __tradeOffProcess(SelectionObj.not_equal.key, -1, json, script, messageLst);
-
-                    message = StringUtils.join(messageLst, ",");
-
-                } catch (Exception ex) {
-                    JCommonUtil.handleException("錯誤 :" + configKeyText + " -> " + ex.getMessage(), ex);
-                }
-            }
-
-            public String toString() {
-                return configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/";
-            }
-        }
-    }
-
-    private class SimpleConfigHandler {
-
-        private PropertiesUtilBean config = new PropertiesUtilBean(RegexReplacer.class, RegexReplacer.class.getSimpleName() + "_" + SimpleConfigHandler.class.getSimpleName());
-
-        public void load(String key) {
-            String value = config.getConfigProp().getProperty(key);
-            if (StringUtils.isBlank(replaceArea.getText()) && StringUtils.isNotBlank(value)) {
-                replaceArea.setText(value);
-            }
         }
 
-        public void delete(String configKeyText) {
-            if (config.getConfigProp().containsKey(configKeyText)) {
-                config.getConfigProp().remove(configKeyText);
-                config.store();
-            }
-        }
+        public void processTradeOff(String script) {
+            tradeOffScore = 0;
+            message = "";
+            isModify = false;// 為改過
 
-        public void put(String key) {
-            if (StringUtils.equals(resultArea.getText(), replaceArea.getText())) {
+            if (StringUtils.isBlank(script) || StringUtils.isBlank(tradeOff)) {
                 return;
             }
-            if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(replaceArea.getText())) {
-                config.getConfigProp().setProperty(key, replaceArea.getText());
+            try {
+                JSONObject json = JSONObject.fromObject(tradeOff);
+                List<String> messageLst = new ArrayList<String>();
+
+                __tradeOffProcess(SelectionObj.equal.key, 2, json, script, messageLst);
+                __tradeOffProcess(SelectionObj.not_equal.key, -1, json, script, messageLst);
+
+                message = StringUtils.join(messageLst, ",");
+
+            } catch (Exception ex) {
+                JCommonUtil.handleException("錯誤 :" + configKeyText + " -> " + ex.getMessage(), ex);
             }
+        }
+
+        public String toString() {
+            return configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/";
+        }
+
+        public String getExampleArea() {
+            return exampleArea;
+        }
+
+        public void setExampleArea(String exampleArea) {
+            this.exampleArea = exampleArea;
+        }
+
+        public String getConfigKeyText() {
+            return configKeyText;
+        }
+
+        public void setConfigKeyText(String configKeyText) {
+            this.configKeyText = configKeyText;
+        }
+
+        public String getFromVal() {
+            return fromVal;
+        }
+
+        public void setFromVal(String fromVal) {
+            this.fromVal = fromVal;
+        }
+
+        public String getToVal() {
+            return toVal;
+        }
+
+        public void setToVal(String toVal) {
+            this.toVal = toVal;
+        }
+
+        public String getTradeOff() {
+            return tradeOff;
+        }
+
+        public void setTradeOff(String tradeOff) {
+            this.tradeOff = tradeOff;
         }
     }
 
@@ -1147,44 +1228,5 @@ public class RegexReplacer extends javax.swing.JFrame {
         tradeOffArea.setText("");
         multiLineCheckBox.setSelected(false);
         autoPasteToClipboardCheckbox.setSelected(false);
-    }
-
-    public static class RegexReplacer_ForSaveYaml {
-        String tradeOff;
-        String toVal;
-        String fromVal;
-        String configKeyText;
-
-        public String getTradeOff() {
-            return tradeOff;
-        }
-
-        public void setTradeOff(String tradeOff) {
-            this.tradeOff = tradeOff;
-        }
-
-        public String getToVal() {
-            return toVal;
-        }
-
-        public void setToVal(String toVal) {
-            this.toVal = toVal;
-        }
-
-        public String getFromVal() {
-            return fromVal;
-        }
-
-        public void setFromVal(String fromVal) {
-            this.fromVal = fromVal;
-        }
-
-        public String getConfigKeyText() {
-            return configKeyText;
-        }
-
-        public void setConfigKeyText(String configKeyText) {
-            this.configKeyText = configKeyText;
-        }
     }
 }

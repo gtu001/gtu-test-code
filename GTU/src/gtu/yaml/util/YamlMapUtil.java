@@ -1,5 +1,6 @@
 package gtu.yaml.util;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.BeanUtils;
 
 import gtu.file.FileUtil;
 import gtu.json.JSONObject2CollectionUtil2;
@@ -30,20 +33,13 @@ public class YamlMapUtil {
 
     public static void main(String[] args) {
         File yamlFile1 = new File(FileUtil.DESKTOP_DIR, "test001.yml");
-        File yamlFile2 = new File(FileUtil.DESKTOP_DIR, "test002.yml");
-        if (true) {
-            List<YamlMapUtil_Test_Bean> lst = new ArrayList<YamlMapUtil_Test_Bean>();
-            lst.add(new YamlMapUtil_Test_Bean());
 
-            YamlMapUtil.getInstance().saveToFile(yamlFile1, lst, false);
-            YamlMapUtil.getInstance().saveToFile(yamlFile2, new YamlMapUtil_Test_Bean(), false);
-        }
-        if (true) {
-            List<YamlMapUtil_Test_Bean> vvvv1 = YamlMapUtil.getInstance().loadFromFile(yamlFile1, YamlMapUtil_Test_Bean.class, null);
-            System.out.println(vvvv1);
-            YamlMapUtil_Test_Bean vvvv2 = YamlMapUtil.getInstance().loadFromFile(yamlFile2, YamlMapUtil_Test_Bean.class, null);
-            System.out.println(vvvv2);
-        }
+        List<YamlMapUtil_Test_Bean> lst = new ArrayList<YamlMapUtil_Test_Bean>();
+        YamlMapUtil_Test_Bean b1 = new YamlMapUtil_Test_Bean();
+        b1.xxxx1 = "aaa   \n dddddd \n sadsfafsdf   |n  dfdf             \n\n";
+        lst.add(b1);
+        lst.add(new YamlMapUtil_Test_Bean());
+        YamlMapUtil.getInstance().saveToFilePlain(yamlFile1, lst, false, null);
         System.out.println("done...");
     }
 
@@ -68,6 +64,47 @@ public class YamlMapUtil {
         } catch (Exception e) {
             throw new RuntimeException("saveToFile ERR : " + e.getMessage(), e);
         }
+    }
+
+    public void saveToFilePlain(File file, Object targetObj, boolean append, final Map<String, Class<?>> classMap) {
+        class PlainSetter {
+            void go1(Object targetObj) {
+                if (targetObj != null) {
+                    if (Collection.class.isAssignableFrom(targetObj.getClass())) {
+                        for (Object v : (Collection) targetObj) {
+                            go1(v);
+                        }
+                    } else if (Map.class.isAssignableFrom(targetObj.getClass())) {
+                        for (Object k : ((Map) targetObj).keySet()) {
+                            go1(((Map) targetObj).get(k));
+                        }
+                    } else {
+                        go2(targetObj);
+                    }
+                }
+            }
+
+            void go2(Object targetObj) {
+                PropertyDescriptor[] desc = BeanUtils.getPropertyDescriptors(targetObj.getClass());
+                for (PropertyDescriptor d : desc) {
+                    try {
+                        Object v = d.getReadMethod().invoke(targetObj, new Object[0]);
+                        if (v != null) {
+                            if (v.getClass() == String.class) {
+                                v = YamlUtil.getPlainString((String) v);
+                                d.getWriteMethod().invoke(targetObj, new Object[] { v });
+                            } else if (classMap != null && classMap.containsValue(v.getClass())) {
+                                go1(v);
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage(), e);
+                    }
+                }
+            }
+        }
+        new PlainSetter().go1(targetObj);
+        saveToFile(file, targetObj, append);
     }
 
     public <T> T loadFromFile(InputStream inputStream, Class<?> clz, Map<String, Class<?>> classMap) {

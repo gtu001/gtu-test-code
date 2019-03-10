@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
@@ -122,6 +121,7 @@ public class YamlUtil {
 
     /**
      * 字串要把結尾空白trim掉不然格式會跑掉
+     * 
      * @param orignStr
      * @return
      */
@@ -132,7 +132,7 @@ public class YamlUtil {
             reader = new BufferedReader(new StringReader(orignStr));
             for (String line = null; (line = reader.readLine()) != null;) {
                 line = StringUtils.defaultString(line).replaceAll("[\\s\\t]+$", "");
-                sb.append(line + File.separator);
+                sb.append(line + "\n");
             }
             return sb.toString();
         } catch (Exception ex) {

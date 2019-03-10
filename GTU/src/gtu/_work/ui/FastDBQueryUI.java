@@ -1236,9 +1236,9 @@ public class FastDBQueryUI extends JFrame {
         exportYamlConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    File sqlIdFile = new File(FileUtil.DESKTOP_PATH, FastDBQueryUI.class.getSimpleName() + "_sqlList.yaml");
+                    File sqlIdFile = new File(FileUtil.DESKTOP_PATH, FastDBQueryUI.class.getSimpleName() + "_sqlList.yml");
                     sqlIdConfigBeanHandler.init("");
-                    YamlMapUtil.getInstance().saveToFile(sqlIdFile, sqlIdConfigBeanHandler.lst, false);
+                    YamlMapUtil.getInstance().saveToFilePlain(sqlIdFile, sqlIdConfigBeanHandler.lst, false, null);
                     JCommonUtil._jOptionPane_showMessageDialog_info("done...");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -1283,8 +1283,8 @@ public class FastDBQueryUI extends JFrame {
                         lst.add(bean);
                     }
 
-                    File destYamlFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_Ref.yaml");
-                    YamlMapUtil.getInstance().saveToFile(destYamlFile, lst, false);
+                    File destYamlFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_Ref.yml");
+                    YamlMapUtil.getInstance().saveToFilePlain(destYamlFile, lst, false, null);
                     JCommonUtil._jOptionPane_showMessageDialog_info("ok!");
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -3190,9 +3190,9 @@ public class FastDBQueryUI extends JFrame {
             String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.yaml";
             File configFile = new File(refConfigPathText.getText());
             if (configFile == null || !configFile.exists()) {
-                config = new YamlUtilBean<RefSearchListConfigBean>(new File(JAR_PATH_FILE, fileName), RefSearchListConfigBean.class);
+                config = new YamlUtilBean<RefSearchListConfigBean>(new File(JAR_PATH_FILE, fileName), RefSearchListConfigBean.class, null);
             } else {
-                config = new YamlUtilBean<RefSearchListConfigBean>(configFile, RefSearchListConfigBean.class);
+                config = new YamlUtilBean<RefSearchListConfigBean>(configFile, RefSearchListConfigBean.class, null);
             }
             refConfigPathText.setText(config.getPropFile().getAbsolutePath());
 
