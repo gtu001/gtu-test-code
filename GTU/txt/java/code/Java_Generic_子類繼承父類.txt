@@ -1,0 +1,24 @@
+    private static class AAAA {
+    }
+
+    private static class BBBB {
+    }
+
+    private static class AAAA1 extends AAAA {
+    }
+
+    private static class BBBB1 extends BBBB {
+    }
+
+    public interface ParentClass<T extends AAAA, R extends BBBB> {
+        public abstract R get(T t);
+    }
+
+    private class ChildClass
+            implements ParentClass<AAAA1, BBBB1>
+    {
+        @Override
+        public BBBB1 get(AAAA1 t) {
+            return null;
+        }
+    }
