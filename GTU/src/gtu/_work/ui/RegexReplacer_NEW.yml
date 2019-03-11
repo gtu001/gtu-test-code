@@ -1,0 +1,164 @@
+---
+- configKeyText: |
+    Bootstrap_Modal 模板
+  exampleArea: ''
+  fromVal: |
+    (\w+)\s+(.*)
+  toVal: |2
+                <!-- ↓↓↓↓↓↓ #2# #1#Modal ↓↓↓↓↓↓  -->
+                <button id="#1#_dialog_btn" onclick="javascript:#1#_dialog.toggle();">#1#_dialog 開啟</button>
+                <div class="modal fade" id="#1#_dialog"
+                    tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="title-leftline">#2#</h4>
+                            </div>
+                            <div class="modal-body">
+                                                    <form id="#1#_form">
+                                                    <!-- TODO HERE -->
+                                                    </form>
+                            </div>
+                            <div class="text-center"></div>
+                            <div class="row text-center">
+                                <div id="#1#_error_msg"></div>
+                            </div>
+                            <hr>
+                            <div class="modal-footer" style="margin: 0 0 0 0;">
+                                <!-- <a class="btn btn_o" data-dismiss="modal">關閉</a> -->
+                                <a class="btn" style="background-color: #00b050"
+                                    onclick="#1#_dialog.submit();">確認</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- ↑↑↑↑↑↑ #2# #1#Modal  ↑↑↑↑↑↑  -->
+
+
+
+
+        function #1#_DialogHanlder() {
+            var dialog = $("##1#_dialog");
+            var form = $("##1#_form");
+
+            form.validate({
+                rules : {},
+                messages : {},
+                submitHandler : function(form) {
+                    alert("dddddddddddd");
+                    /* 送出 ajax form  */
+                    dialog.hide();
+
+                    $("#form1").submit();
+                }
+            });
+
+            //show.bs.modal
+            //hide.bs.modal
+
+            dialog.on('show.bs.modal', function() {
+                console.log("Opened");
+                if (!dialog.hasClass("fade")) {
+                    dialog.addClass("fade");
+                }
+            });
+
+            this.toggle = function() {
+                dialog.modal('toggle');
+            };
+
+            this.confirm = function() {
+                dialog.removeClass("fade");
+                dialog.modal('hide');
+                cfmDialog.modal("show");
+            };
+
+            this.submit = function() {
+                form.submit();
+            };
+        };
+  tradeOff: ''
+- configKeyText: |
+    word電文下行_Jaxb 抓 Java變數
+  exampleArea: ''
+  fromVal: |
+    String\s+(\w+)
+  toVal: |
+    #1#
+  tradeOff: ''
+- configKeyText: |
+    word電文下行_轉PropMapping ENUM
+  exampleArea: ''
+  fromVal: |
+    (\w+)\s+(\w+)
+  toVal: |
+    #1#("#1#", "#2#"),//
+  tradeOff: ''
+- configKeyText: |
+    word電文下行_Bean加上@JsonProperty
+  exampleArea: ''
+  fromVal: |
+    public\s+\w+\s+(?:get|set)(\w+)
+  toVal: |
+    @JsonProperty("${arry[1]?uncap_first}")
+    ${arry[0]}
+  tradeOff: |2
+        {
+                "arry": [],
+                "not_arry": [],
+                "ftl": "arry"
+        }
+- configKeyText: |
+    word電文下行_只抓Java變數
+  exampleArea: ''
+  fromVal: |
+    (\w+)\t(.*?)\t(\d+)\t(.*?)\t(.*)
+  toVal: |
+    ${arry[1]?uncap_first}
+  tradeOff: |2
+        {
+                "arry": [],
+                "not_arry": [],
+                "ftl": "arry"
+        }
+- configKeyText: |
+    word電文下行
+  exampleArea: ''
+  fromVal: |
+    (\w+)\t(.*?)\t(\d+)\t(.*?)\t(.*)
+  toVal: |
+    <@compress single_line=true>
+    private
+    <#if arry[2]?starts_with('X')>
+       String
+    <#elseif arry[2]?starts_with('9')>
+       BigDecimal
+    </#if>
+    ${arry[1]?uncap_first} ; // ${arry[5]}
+    </@compress>
+  tradeOff: |2
+        {
+                "arry": [],
+                "not_arry": [],
+                "ftl": "arry"
+        }
+- configKeyText: |
+    word電文下行_轉ToString
+  exampleArea: ''
+  fromVal: |
+    private\s+\w+?\s+(\w+)\;\s*\/\/\s*(.*)
+  toVal: |
+    sb.append("#1#(#2#) = ").append(#1#).append(", "); //
+  tradeOff: |2
+        {
+                "arry": [],
+                "not_arry": [],
+                "prefix": "@Override     public String toString() {         StringBuilder sb = new StringBuilder();",
+                "suffix": "\n return \"XXXXXXXXXXX [ \" + sb.toString() + \"]\";     }"
+        }
+...

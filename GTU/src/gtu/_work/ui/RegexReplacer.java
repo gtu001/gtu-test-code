@@ -478,6 +478,17 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
                 {
                     saveConfigBtn = new JButton("儲存設定");
+                    saveConfigBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                configBean.reflectSetConfig(RegexReplacer.this);
+                                configBean.store();
+                                JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
                     panel_1.add(saveConfigBtn);
                 }
                 {
@@ -889,7 +900,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         JTextArea resultArea;
 
         List<RegexReplacer_Config> orignLst = Collections.EMPTY_LIST;
-        
+
         private String fixKey(String fixKey) {
             return StringUtils.trimToEmpty(StringUtils.trimToEmpty(fixKey).replaceAll("\n", ""));
         }

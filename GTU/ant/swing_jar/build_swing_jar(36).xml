@@ -88,6 +88,9 @@
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
 			
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
+			
+			<!-- 不知為何要這個 -->
+			<packagename mode="pom">freemarker.template</packagename>
 
 		</jarfinder>
 

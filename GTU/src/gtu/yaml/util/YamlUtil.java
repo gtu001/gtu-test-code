@@ -10,7 +10,10 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.DumperOptions;
@@ -20,23 +23,22 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 
+import gtu._work.ui.RegexReplacer.RegexReplacer_Config;
 import gtu.file.FileUtil;
-import gtu.html.simple.HtmlInputSimpleCreater.HtmlInputSimpleCreater_HtmlType;
-import gtu.html.simple.HtmlInputSimpleCreater.HtmlInputSimpleCreater_HtmlTypeHandler;
 
 public class YamlUtil {
 
     public static void main(String[] args) {
-        File fromFile = new File("/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/src/gtu/html/simple/HtmlInputSimpleCreater_Thymeleaf.yaml");
+        File fromFile = new File("D:/workstuff/gtu-test-code/GTU/src/gtu/_work/ui/RegexReplacer_NEW.yml");
         Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
-        classMap.put("tagLst", HtmlInputSimpleCreater_HtmlType.class);
-        HtmlInputSimpleCreater_HtmlTypeHandler self = YamlMapUtil.getInstance().loadFromFile(fromFile, HtmlInputSimpleCreater_HtmlTypeHandler.class, classMap);
-        for (HtmlInputSimpleCreater_HtmlType t : self.getTagLst()) {
-            System.out.println(t.getTagId());
-            System.out.println(t.getTemplate());
+        List<RegexReplacer_Config> lst = YamlMapUtil.getInstance().loadFromFile(fromFile, RegexReplacer_Config.class, classMap);
+        for (RegexReplacer_Config t : lst) {
+            String tmpToVal = getPlainString(t.getToVal());
+            System.out.println(tmpToVal);
+            t.setToVal(tmpToVal);
             System.out.println("=======================================");
         }
-        YamlMapUtil.getInstance().saveToFile(new File(FileUtil.DESKTOP_DIR, "test_yaml.yml"), self, false);
+        YamlMapUtil.getInstance().saveToFile(new File(FileUtil.DESKTOP_DIR, "test111.yml"), lst, false);
         System.out.println("done...");
     }
 
@@ -120,7 +122,7 @@ public class YamlUtil {
     }
 
     /**
-     * 字串要把結尾空白trim掉不然格式會跑掉
+     * 前不可以有tab 後不可以有tab和space
      * 
      * @param orignStr
      * @return
@@ -129,10 +131,23 @@ public class YamlUtil {
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = null;
         try {
+            Matcher mth = null;
+            Pattern ptn = Pattern.compile("^[\\t\\s]+");
+            String tmpSpace = null;
             reader = new BufferedReader(new StringReader(orignStr));
             for (String line = null; (line = reader.readLine()) != null;) {
                 line = StringUtils.defaultString(line).replaceAll("[\\s\\t]+$", "");
-                sb.append(line + "\n");
+
+                mth = ptn.matcher(line);
+                StringBuffer sb2 = new StringBuffer();
+                while (mth.find()) {
+                    tmpSpace = mth.group();
+                    tmpSpace = StringUtils.defaultString(tmpSpace).replaceAll("\t", "    ");
+                    mth.appendReplacement(sb2, tmpSpace);
+                }
+                mth.appendTail(sb2);
+
+                sb.append(sb2.toString() + "\n");
             }
             return sb.toString();
         } catch (Exception ex) {

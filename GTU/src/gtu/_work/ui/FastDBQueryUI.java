@@ -3187,7 +3187,7 @@ public class FastDBQueryUI extends JFrame {
         private JTextField refConfigPathText;
 
         private RefSearchListConfigHandler(JTextField refConfigPathText, JList jList, JComboBox refSearchCategoryCombobox) {
-            String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.yaml";
+            String fileName = FastDBQueryUI.class.getSimpleName() + "_Ref.yml";
             File configFile = new File(refConfigPathText.getText());
             if (configFile == null || !configFile.exists()) {
                 config = new YamlUtilBean<RefSearchListConfigBean>(new File(JAR_PATH_FILE, fileName), RefSearchListConfigBean.class, null);
