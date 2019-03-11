@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -16,23 +17,14 @@ import org.springframework.beans.BeanUtils;
 
 public class FakeBeanFiller {
 
-    public static void createFakeData(Object bean, int size) {
-        fillBean(bean);
-        for (Field f : bean.getClass().getDeclaredFields()) {
-            if (Collection.class.isAssignableFrom(f.getType())) {
-                createFakeList(bean, f.getName(), size);
-            }
-        }
-    }
-
-    public static void createFakeList(Object bean, String fieldName, int size) {
+    private static void createFakeList(Object bean, String fieldName, int size) {
         try {
             List lst = new ArrayList();
             Field field = bean.getClass().getDeclaredField(fieldName);
             Class clz = getFieldGenericType_4Collection(field);
             for (int ii = 0; ii < size; ii++) {
                 Object inst = BeanUtils.instantiate(clz);
-                fillBean(inst);
+                fillBean(inst, size);
                 lst.add(inst);
             }
             FieldUtils.writeDeclaredField(bean, fieldName, lst, true);
@@ -41,7 +33,7 @@ public class FakeBeanFiller {
         }
     }
 
-    public static void fillBean(Object bean) {
+    public static void fillBean(Object bean, int size) {
         Date d = new Date();
         java.sql.Date d2 = new java.sql.Date(d.getTime());
         Timestamp d3 = new Timestamp(d.getTime());
@@ -112,8 +104,12 @@ public class FakeBeanFiller {
                     FieldUtils.writeDeclaredField(bean, f.getName(), b, true);
                 } catch (Exception e) {
                 }
+            } else if (Collection.class.isAssignableFrom(f.getType())) {
+                createFakeList(bean, f.getName(), size);
+            } else if (Map.class.isAssignableFrom(f.getType())) {
+                throw new UnsupportedOperationException("不支援Map操作!");
             } else {
-                System.err.println("æçç¡ : " + f.getName() + "\t" + f.getType());
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
             }
         }
     }

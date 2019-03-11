@@ -1,9 +1,5 @@
 package gtu.xml;
 
-import freemarker.template.TemplateException;
-import gtu.freemarker.FreeMarkerSimpleUtil;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,6 +7,8 @@ import java.util.Set;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+
+import gtu.freemarker.FreeMarkerSimpleUtil;
 
 
 public class XmlInfoUtil {

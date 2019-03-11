@@ -1,4 +1,17 @@
+Ex1:
+
 	<button id="search" class="btn_g" type="submit"
 		th:onclick="${'javascript:cancelDialogHanlder.openCancelDailog('''} + ${entity.applicationId} + '/' + ${entity.shoreTypeCode} + ${''');'}">
 		撤銷
 	</button>
+	
+	
+-----------------------------------------------------------------------------------------------------------------------------
+Ex2:
+
+	<button id="search" class="btn_g" type="submit"
+			th:onclick="${'javascript:foreignEtfCancelDialogHanlder.toggle(''' + entity.tradedate + ''',''' +  entity.opentxcode + ''' );'}">
+			撤銷</button>
+	
+	結果
+	<button class="btn_g" id="search" onclick="javascript:foreignEtfCancelDialogHanlder.toggle('20180508','005800000038' );" type="submit">撤銷</button>

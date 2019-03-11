@@ -130,7 +130,11 @@ public class BootstrapDivSimpleCreater {
             for (HtmlInputSimpleCreater_HtmlType h : getTagLst()) {
                 String tagId2 = StringUtils.trimToEmpty(h.getTagId());
                 if (StringUtils.equalsIgnoreCase(tagId, tagId2)) {
-                    return h.getTemplate();
+                    String matchTemplate = h.getTemplate();
+                    if (StringUtils.isBlank(matchTemplate)) {
+                        throw new RuntimeException("TagId : " + tagId2 + ", template 為空錯誤!!");
+                    }
+                    return matchTemplate;
                 }
             }
             throw new RuntimeException("不支援tagId : " + tagId);
