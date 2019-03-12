@@ -316,6 +316,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     System.out.println("tradeOff : " + tradeOff);
 
                                     configHandler.put(configKey, repFrom, repTo, tradeOff, tempComboLst);
+                                    
                                     configHandler.reloadTemplateList();
                                 } catch (Exception e) {
                                     JCommonUtil.handleException(e);
@@ -374,6 +375,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                                 // 暫放組合技
                                 tempComboLst = config.comboLst;
+                                resetComboReplaceBtnText();
 
                                 // 放入執行紀錄 並 載入預設
                                 configHandler.loadExample(configKeyText.getText());
@@ -639,6 +641,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                                 for (RegexReplacer_Config d : dlg.getChoiceLst()) {
                                                     tempComboLst.add(d.configKeyText);
                                                 }
+                                                resetComboReplaceBtnText();
                                                 dlg.dispose();
                                             }
                                         });
@@ -1162,6 +1165,16 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
     }
 
+    private void resetComboReplaceBtnText() {
+        String color = "black";
+        String text = "組合技";
+        if (tempComboLst != null && !tempComboLst.isEmpty()) {
+            color = "red";
+            text = "組合技" + tempComboLst.size();
+        }
+        comboReplaceBtn.setText(String.format("<html><font color='%s'>%s</font></html>", color, text));
+    }
+
     public static class RegexReplacer_Config {
 
         String exampleArea;// 1
@@ -1233,7 +1246,11 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public String toString() {
-            return configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/";
+            String prefix = "";
+            if (comboLst != null && !comboLst.isEmpty()) {
+                prefix = " Combo ";
+            }
+            return String.format("<html><font color='red'>%1$s</font>%2$s</html>", prefix, configKeyText + " = /" + StringUtils.trimToEmpty(message) + "/");
         }
 
         public String getExampleArea() {

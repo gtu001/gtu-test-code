@@ -236,12 +236,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     urlTextOnblur();
                 }
             });
-            urlText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-                @Override
-                public void process(DocumentEvent event) {
-                    urlTextOnblur();
-                }
-            }));
             panel.add(urlText, "4, 4, fill, default");
             urlText.setColumns(10);
 
@@ -392,7 +386,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     JChangeInputMethodUtil.toEnglish();
                 }
             });
-
+            
             JButton allOpenBtn = new JButton("全開");
             allOpenBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
