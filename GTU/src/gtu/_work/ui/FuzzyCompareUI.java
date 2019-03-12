@@ -3,6 +3,8 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,20 +13,31 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang.StringUtils;
+
 import gtu.spring.SimilarityUtil;
+import gtu.swing.util.JButtonGroupUtil;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTextAreaUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -50,6 +63,8 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
     private JPanel jPanel3;
     private JPanel jPanel2;
     JSlider jslider;
+    private JCheckBox isIgnoreCaseChk;
+    private ButtonGroup buttonGroup;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -144,6 +159,83 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                             jScrollPane3.setViewportView(resultTable);
                             resultTable.setModel(model);
                         }
+                        isIgnoreCaseChk = new JCheckBox("忽略大小寫");
+                        isIgnoreCaseChk.setSelected(true);
+                        jPanel3.add(isIgnoreCaseChk, BorderLayout.SOUTH);
+                    }
+                }
+                {
+                    panel = new JPanel();
+                    jTabbedPane1.addTab("get set", null, panel, null);
+                    panel.setLayout(new BorderLayout(0, 0));
+                    {
+                        panel_1 = new JPanel();
+                        panel.add(panel_1, BorderLayout.NORTH);
+                        {
+                            compare1ToCompare2Radio = new JRadioButton("1->2");
+                            compare1ToCompare2Radio.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    compare12Action();
+                                }
+                            });
+                            panel_1.add(compare1ToCompare2Radio);
+                        }
+                        {
+                            compare2ToCompare1Radio = new JRadioButton("2->1");
+                            compare2ToCompare1Radio.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    compare12Action();
+                                }
+                            });
+                            panel_1.add(compare2ToCompare1Radio);
+                        }
+                        {
+                            compare1NameText = new JTextField();
+                            compare1NameText.setToolTipText("compare1Name");
+                            panel_1.add(compare1NameText);
+                            compare1NameText.setColumns(10);
+                            compare1NameText.setText("entity1");
+                            compare1NameText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                @Override
+                                public void process(DocumentEvent event) {
+                                    compare12Action();
+                                }
+                            }));
+                        }
+                        {
+                            compare2NameText = new JTextField();
+                            compare2NameText.setToolTipText("compare2Name");
+                            compare2NameText.setColumns(10);
+                            panel_1.add(compare2NameText);
+                            compare2NameText.setText("entity2");
+                            compare2NameText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                                @Override
+                                public void process(DocumentEvent event) {
+                                    compare12Action();
+                                }
+                            }));
+                        }
+                    }
+                    {
+                        panel_2 = new JPanel();
+                        panel.add(panel_2, BorderLayout.WEST);
+                    }
+                    {
+                        panel_3 = new JPanel();
+                        panel.add(panel_3, BorderLayout.EAST);
+                    }
+                    {
+                        panel_4 = new JPanel();
+                        panel.add(panel_4, BorderLayout.SOUTH);
+                    }
+                    {
+                        getterSetterTextarea = new JTextArea();
+                        JTextAreaUtil.applyCommonSetting(getterSetterTextarea);
+                        panel.add(JCommonUtil.createScrollComponent(getterSetterTextarea), BorderLayout.CENTER);
+                        getterSetterTextarea.setColumns(10);
+                    }
+                    {
+                        buttonGroup = JButtonGroupUtil.createRadioButtonGroup(compare1ToCompare2Radio, compare2ToCompare1Radio);
                     }
                 }
             }
@@ -163,7 +255,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
         DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2", "same word");
         resultTable.setModel(model);
 
-        Pattern pattern = Pattern.compile("[\\w_-]+");
+        Pattern pattern = Pattern.compile("[\\$\\w_-]+");
         Matcher matcher = pattern.matcher(text1);
         Matcher matcher2 = pattern.matcher(text2);
         List<String> text1List = new ArrayList<String>();
@@ -178,7 +270,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             List<CompareResult> compareList = new ArrayList<CompareResult>();
             for (String compare2 : text2List) {
                 CompareResult result = new CompareResult();
-                result.result = fuzzyCompare(compare1, compare2, false);
+                result.result = fuzzyCompare(compare1, compare2, isIgnoreCaseChk.isSelected());
                 result.compareStr = compare2;
                 compareList.add(result);
             }
@@ -203,6 +295,16 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             return Double.valueOf(o1.result).compareTo(o2.result) * -1;
         }
     };
+    private JPanel panel;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JPanel panel_4;
+    private JTextArea getterSetterTextarea;
+    private JRadioButton compare1ToCompare2Radio;
+    private JRadioButton compare2ToCompare1Radio;
+    private JTextField compare1NameText;
+    private JTextField compare2NameText;
 
     static class CompareResult {
         String compareStr;
@@ -222,5 +324,32 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             compare2 = compare2.toLowerCase();
         }
         return SimilarityUtil.sim(compare1, compare2);
+    }
+
+    private void compare12Action() {
+        try {
+            String compare1Name = compare1NameText.getText();
+            String compare2Name = compare2NameText.getText();
+
+            StringBuilder sb = new StringBuilder();
+            final String pattern = "%s.set%s(%s.get%s());\n";
+
+            DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                String compare1Str = (String) model.getValueAt(ii, JTableUtil.getRealColumnPos(0, resultTable));
+                String compare2Str = (String) model.getValueAt(ii, JTableUtil.getRealColumnPos(1, resultTable));
+
+                String tmpStr = "";
+                if (JButtonGroupUtil.getSelectedButton(buttonGroup) == compare2ToCompare1Radio) {
+                    tmpStr = String.format(pattern, compare1Name, StringUtils.capitalise(compare1Str), compare2Name, StringUtils.capitalise(compare2Str));
+                } else if (JButtonGroupUtil.getSelectedButton(buttonGroup) == compare1ToCompare2Radio) {
+                    tmpStr = String.format(pattern, compare2Name, StringUtils.capitalise(compare2Str), compare1Name, StringUtils.capitalise(compare1Str));
+                }
+                sb.append(tmpStr);
+            }
+            getterSetterTextarea.setText(sb.toString());
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 }

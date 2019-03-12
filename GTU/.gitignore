@@ -1,4 +1,10 @@
 /target/
 **/node_modules/**
+<<<<<<< Updated upstream
 /ant/swing_jar/build/**
 /ant/swing_jar/jars/**
+=======
+/ant/swing_jar/**.jar
+/ant/swing_jar/**.class
+
+>>>>>>> Stashed changes

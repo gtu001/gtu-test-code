@@ -9,9 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,22 +20,19 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 
-import gtu._work.ui.RegexReplacer.RegexReplacer_Config;
-import gtu.file.FileUtil;
-
 public class YamlUtil {
 
     public static void main(String[] args) {
-        File fromFile = new File("D:/workstuff/gtu-test-code/GTU/src/gtu/_work/ui/RegexReplacer_NEW.yml");
-        Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
-        List<RegexReplacer_Config> lst = YamlMapUtil.getInstance().loadFromFile(fromFile, RegexReplacer_Config.class, classMap);
-        for (RegexReplacer_Config t : lst) {
-            String tmpToVal = getPlainString(t.getToVal());
-            System.out.println(tmpToVal);
-            t.setToVal(tmpToVal);
-            System.out.println("=======================================");
-        }
-        YamlMapUtil.getInstance().saveToFile(new File(FileUtil.DESKTOP_DIR, "test111.yml"), lst, false);
+//        File fromFile = new File("D:/workstuff/gtu-test-code/GTU/src/gtu/_work/ui/RegexReplacer_NEW.yml");
+//        Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
+//        List<RegexReplacer_Config> lst = YamlMapUtil.getInstance().loadFromFile(fromFile, RegexReplacer_Config.class, classMap);
+//        for (RegexReplacer_Config t : lst) {
+//            String tmpToVal = getPlainString(t.getToVal());
+//            System.out.println(tmpToVal);
+//            t.setToVal(tmpToVal);
+//            System.out.println("=======================================");
+//        }
+//        YamlMapUtil.getInstance().saveToFile(new File(FileUtil.DESKTOP_DIR, "test111.yml"), lst, false);
         System.out.println("done...");
     }
 
