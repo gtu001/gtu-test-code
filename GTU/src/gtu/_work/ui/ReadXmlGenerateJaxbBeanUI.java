@@ -29,6 +29,7 @@ import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.xml.xmlmapper.jaxb.ReadXmlGenerateJaxbBean;
 import javax.swing.JLabel;
 import java.awt.Color;
+import javax.swing.JCheckBox;
 
 public class ReadXmlGenerateJaxbBeanUI extends JFrame {
 
@@ -52,6 +53,7 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
     private JPanel panel_10;
     private JTextArea resultBeanArea;
     private JLabel lblNewLabel;
+    private JCheckBox isXmlDbTypeChk;
 
     /**
      * Launch the application.
@@ -96,6 +98,10 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
         panel_3 = new JPanel();
         panel.add(panel_3, BorderLayout.NORTH);
 
+        isXmlDbTypeChk = new JCheckBox("xml的tag為是否為底線分隔");
+        isXmlDbTypeChk.setSelected(true);
+        panel_3.add(isXmlDbTypeChk);
+
         panel_4 = new JPanel();
         panel.add(panel_4, BorderLayout.WEST);
 
@@ -111,7 +117,7 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
                 swingUtil.invokeAction("executeBtn.click", e);
             }
         });
-        
+
         lblNewLabel = new JLabel("＊List 在 propOrder 會有問題須自行調整");
         lblNewLabel.setForeground(Color.RED);
         panel_6.add(lblNewLabel);
@@ -192,7 +198,7 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 ReadXmlGenerateJaxbBean b = new ReadXmlGenerateJaxbBean();
-                Map<String, String> javaBeanMap = b.executeXmlStr(xmlArea.getText());
+                Map<String, String> javaBeanMap = b.executeXmlStr(xmlArea.getText(), isXmlDbTypeChk.isSelected());
                 StringBuilder sb = new StringBuilder();
                 for (String key : javaBeanMap.keySet()) {
                     sb.append(javaBeanMap.get(key) + "\n\n");

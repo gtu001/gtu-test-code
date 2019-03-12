@@ -32,7 +32,7 @@ public class ReadXmlGenerateJaxbBean {
 
         Document doc = reader.read(file);
         Map<String, String> javaBeanMap = new LinkedHashMap<String, String>();
-        showElementTree_toJavaBean(doc.getRootElement(), javaBeanMap, true);
+        showElementTree_toJavaBean(doc.getRootElement(), javaBeanMap, true, false);
         for (String key : javaBeanMap.keySet()) {
             System.out.println(javaBeanMap.get(key));
         }
@@ -40,12 +40,12 @@ public class ReadXmlGenerateJaxbBean {
         System.out.println("done...");
     }
 
-    public Map<String, String> executeXmlStr(String xmlContent) {
+    public Map<String, String> executeXmlStr(String xmlContent, boolean isXmlDbType) {
         SAXReader reader = new SAXReader();
         try {
             Document doc = reader.read(new StringReader(xmlContent));
             Map<String, String> javaBeanMap = new LinkedHashMap<String, String>();
-            showElementTree_toJavaBean(doc.getRootElement(), javaBeanMap, true);
+            showElementTree_toJavaBean(doc.getRootElement(), javaBeanMap, true, isXmlDbType);
             for (String key : javaBeanMap.keySet()) {
                 System.out.println(javaBeanMap.get(key));
             }
@@ -79,19 +79,27 @@ public class ReadXmlGenerateJaxbBean {
         }
     }
 
+    private static String getElementParam(String name, boolean isXmlDbType) {
+        if (isXmlDbType) {
+            return StringUtilForDb.dbFieldToJava(name);
+        } else {
+            return StringUtils.uncapitalize(name);
+        }
+    }
+
     /**
      * 以xml產出javaBean
      */
-    private static void showElementTree_toJavaBean(Element element, Map<String, String> javaBeans, boolean isRoot) {
+    private static void showElementTree_toJavaBean(Element element, Map<String, String> javaBeans, boolean isRoot, boolean isXmlDbType) {
         List<Element> needTraceList = new ArrayList<Element>();
         List<Element> elist = element.elements();
         StringBuilder sb = new StringBuilder();
         sb.append(fetchClassAnnotation(element, isRoot) + "\n");
-        sb.append("public static class " + StringUtils.capitalize(StringUtilForDb.dbFieldToJava(element.getName())) + " { \n");
+        sb.append("public static class " + StringUtils.capitalize(getElementParam(element.getName(), isXmlDbType)) + " { \n");
         Map<String, String> paramMap = new LinkedHashMap<String, String>();
         for (Element ie : elist) {
             int size = ie.elements().size();
-            String elementType = StringUtilForDb.dbFieldToJava(ie.getName());
+            String elementType = getElementParam(ie.getName(), isXmlDbType);
             String annoStr = "\t" + fetchAnnotation(ie) + "\n";
             String val = null;
             if (size > 0) {
@@ -118,7 +126,7 @@ public class ReadXmlGenerateJaxbBean {
         String parentName = element.getParent() != null ? element.getParent().getName() + "." : "";
         javaBeans.put(parentName + element.getName(), sb.toString());
         for (Element ie : needTraceList) {
-            showElementTree_toJavaBean(ie, javaBeans, false);
+            showElementTree_toJavaBean(ie, javaBeans, false, isXmlDbType);
         }
     }
 
