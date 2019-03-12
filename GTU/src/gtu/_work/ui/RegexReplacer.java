@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -231,6 +232,99 @@ public class RegexReplacer extends javax.swing.JFrame {
                     }
                 }
                 {
+                    jPanel2 = new JPanel();
+                    BorderLayout jPanel2Layout = new BorderLayout();
+                    jPanel2.setLayout(jPanel2Layout);
+                    jTabbedPane1.addTab("param", null, jPanel2, null);
+                    {
+                        JPanel pppPanel = new JPanel();
+                        jPanel2.add(pppPanel, BorderLayout.SOUTH);
+                        exeucte = new JButton();
+                        exeucte.setText("exeucte");
+                        exeucte.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                exeucteActionPerformed(evt);
+                            }
+                        });
+                        pppPanel.add(exeucte);
+
+                        JButton clearTemplateBtn = new JButton();
+                        clearTemplateBtn.setText("清除");
+                        clearTemplateBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                clearTemplateBtnAction();
+                            }
+                        });
+                        pppPanel.add(clearTemplateBtn);
+                    }
+                    {
+                        jPanel3 = new JPanel();
+                        jPanel2.add(JCommonUtil.createScrollComponent(jPanel3), BorderLayout.CENTER);
+                        jPanel3.setLayout(
+                                new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        {
+                            lblNewLabel = new JLabel("key");
+                            jPanel3.add(lblNewLabel, "2, 2, right, default");
+                        }
+                        {
+                            configKeyText = new JTextField();
+                            JTextUndoUtil.applyUndoProcess1(configKeyText);
+                            jPanel3.add(configKeyText, "4, 2, fill, default");
+                            configKeyText.setColumns(10);
+                        }
+                        {
+                            lblNewLabel_1 = new JLabel("from");
+                            jPanel3.add(lblNewLabel_1, "2, 4, right, default");
+                        }
+                        {
+                            repFromText = new JTextArea();
+                            JTextAreaUtil.applyCommonSetting(repFromText);
+                            repFromText.setRows(4);
+                            jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
+                            repFromText.setColumns(10);
+                        }
+                        {
+                            lblNewLabel_2 = new JLabel("to");
+                            jPanel3.add(lblNewLabel_2, "2, 6, right, default");
+                        }
+                        {
+                            repToText = new JTextArea();
+                            JTextAreaUtil.applyCommonSetting(repToText);
+                            repToText.setRows(10);
+                            // repToText.setPreferredSize(new Dimension(0, 50));
+                            jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
+                        }
+                    }
+                    {
+                        addToTemplate = new JButton();
+                        jPanel2.add(addToTemplate, BorderLayout.NORTH);
+                        addToTemplate.setText("add to template");
+                        addToTemplate.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                try {
+                                    String configKey = configKeyText.getText();
+                                    String repFrom = repFromText.getText();
+                                    String repTo = repToText.getText();
+                                    String tradeOff = tradeOffArea.getText();
+
+                                    System.out.println("configKey : " + configKey);
+                                    System.out.println("repFrom : " + repFrom);
+                                    System.out.println("repTo : " + repTo);
+                                    System.out.println("tradeOff : " + tradeOff);
+
+                                    configHandler.put(configKey, repFrom, repTo, tradeOff, tempComboLst);
+                                    configHandler.reloadTemplateList();
+                                } catch (Exception e) {
+                                    JCommonUtil.handleException(e);
+                                }
+                            }
+                        });
+                    }
+                }
+                {
                     jPanel5 = new JPanel();
                     BorderLayout jPanel5Layout = new BorderLayout();
                     jPanel5.setLayout(jPanel5Layout);
@@ -276,16 +370,18 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 repToText.setText(config.toVal);
                                 tradeOffArea.setText(config.tradeOff);
 
+                                System.out.println("configKey : " + configKeyText.getText());
+
+                                // 暫放組合技
+                                tempComboLst = config.comboLst;
+
                                 // 放入執行紀錄 並 載入預設
                                 configHandler.loadExample(configKeyText.getText());
 
                                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
-                                    String replaceText = StringUtils.defaultString(replaceArea.getText());
-                                    replaceText = replacerDetail(config.fromVal, config.toVal, replaceText);
-                                    resultArea.setText(replaceText);
+                                    exeucteActionPerformed(null);
+
                                     jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
-                                    // 貼到記事本
-                                    pasteTextToClipboard();
                                 }
                             }
                         });
@@ -329,14 +425,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                         // 改變顏色 ↑↑↑↑↑↑
                     }
                     {
-                        scheduleExecute = new JButton();
-                        jPanel5.add(scheduleExecute, BorderLayout.SOUTH);
-                        scheduleExecute.setText("schedule execute");
-                        scheduleExecute.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                scheduleExecuteActionPerformed(evt);
-                            }
-                        });
+                        JPanel jpanel = new JPanel();
+                        jPanel5.add(jpanel, BorderLayout.SOUTH);
                     }
                 }
                 {
@@ -437,11 +527,142 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
             {
+                JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
                 {
                     jTabbedPane1.addTab("config", null, panel_1, null);
                     panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
                 }
+                {
+                    tradeOffArea = new JTextArea();
+                    JTextAreaUtil.applyCommonSetting(tradeOffArea);
+                    tradeOffArea.setRows(3);
+                    // tradeOffArea.setPreferredSize(new Dimension(0, 50));
+                    tradeOffArea.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                                    String tradeOff = StringUtils.trimToEmpty(tradeOffArea.getText());
+                                    JSONObject json = null;
+                                    if (StringUtils.isBlank(tradeOff)) {
+                                        json = new JSONObject();
+                                        json.put(SelectionObj.equal.key, new JSONArray());
+                                        json.put(SelectionObj.not_equal.key, new JSONArray());
+                                        tradeOff = json.toString();
+                                    } else {
+                                        json = JSONObject.fromObject(tradeOff);
+                                    }
+
+                                    // 加入新的
+                                    SelectionObj selectItem = (SelectionObj) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", SelectionObj.values(), SelectionObj.NA);
+                                    if (selectItem == null || selectItem == selectItem.NA) {
+                                        return;
+                                    }
+
+                                    String string = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入新項目:"));
+                                    string = StringUtils.trimToEmpty(string);
+
+                                    if (StringUtils.isBlank(string)) {
+                                        tradeOffArea.setText(json.toString());
+                                        return;
+                                    }
+
+                                    if (StringUtils.equals(selectItem.type, "arryKey")) {
+                                        String arryKey = selectItem.key;
+                                        if (!json.containsKey(arryKey)) {
+                                            json.put(arryKey, new JSONArray());
+                                        }
+                                        JSONArray arry = (JSONArray) json.get(arryKey);
+                                        boolean findOk = false;
+                                        for (int ii = 0; ii < arry.size(); ii++) {
+                                            if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
+                                                findOk = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!findOk) {
+                                            arry.add(string);
+                                        }
+                                    } else if (StringUtils.equals(selectItem.type, "boolKey")) {
+                                        String boolKey = selectItem.key;
+                                        json.put(boolKey, Boolean.valueOf(string));
+                                    } else if (StringUtils.equals(selectItem.type, "strKey")) {
+                                        String strKey = selectItem.key;
+                                        json.put(strKey, string);
+                                    } else if (StringUtils.equals(selectItem.type, "intKey")) {
+                                        String intKey = selectItem.key;
+                                        json.put(intKey, Integer.parseInt(string));
+                                    } else {
+                                        throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
+                                    }
+
+                                    tradeOffArea.setText(json.toString());
+
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("新增完成!");
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
+                    {
+                        panel = new JPanel();
+                        jPanel3.add(panel, "4, 8, fill, fill");
+                        {
+                            multiLineCheckBox = new JCheckBox("多行");
+                            panel.add(multiLineCheckBox);
+                        }
+                        {
+                            autoPasteToClipboardCheckbox = new JCheckBox("自動貼記事本");
+                            panel.add(autoPasteToClipboardCheckbox);
+                        }
+                        {
+                            comboReplaceBtn = new JButton("組合技");
+                            comboReplaceBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent arg0) {
+                                    try {
+                                        List<RegexReplacer_Config> rightLst = new ArrayList<RegexReplacer_Config>();
+                                        if (tempComboLst != null) {
+                                            for (String key : tempComboLst) {
+                                                RegexReplacer_Config d = configHandler.getProperty(key);
+                                                if (d != null) {
+                                                    rightLst.add(d);
+                                                }
+                                            }
+                                        }
+
+                                        final RegexReplacer_ComboDlg<RegexReplacer_Config> dlg = new RegexReplacer_ComboDlg<RegexReplacer_Config>();
+                                        dlg.apply(configHandler.orignLst, rightLst, new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent arg0) {
+                                                tempComboLst = new ArrayList<String>();
+                                                for (RegexReplacer_Config d : dlg.getChoiceLst()) {
+                                                    tempComboLst.add(d.configKeyText);
+                                                }
+                                                dlg.dispose();
+                                            }
+                                        });
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            });
+                            panel.add(comboReplaceBtn);
+                        }
+                    }
+                    {
+                        lblNewLabel_3 = new JLabel("權重 ");
+                        jPanel3.add(lblNewLabel_3, "2, 10");
+                    }
+                    jPanel3.add(JCommonUtil.createScrollComponent(tradeOffArea), "4, 10, fill, fill");
+                }
             }
+
+            // zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+
+            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+            panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
+            panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
 
             // ui init
             {
@@ -470,220 +691,6 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             });
 
-            jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-
-            panel_1.add(jFrameRGBColorPanel.getToggleButton(false));
-            panel_1.add(hideInSystemTrayHelper.getToggleButton(false));
-            {
-                jPanel2 = new JPanel();
-                BorderLayout jPanel2Layout = new BorderLayout();
-                jPanel2.setLayout(jPanel2Layout);
-                jTabbedPane1.addTab("param", null, jPanel2, null);
-                {
-                    JPanel pppPanel = new JPanel();
-                    jPanel2.add(pppPanel, BorderLayout.SOUTH);
-                    exeucte = new JButton();
-                    exeucte.setText("exeucte");
-                    exeucte.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent evt) {
-                            exeucteActionPerformed(evt);
-                        }
-                    });
-                    pppPanel.add(exeucte);
-
-                    JButton clearTemplateBtn = new JButton();
-                    clearTemplateBtn.setText("清除");
-                    clearTemplateBtn.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent evt) {
-                            clearTemplateBtnAction();
-                        }
-                    });
-                    pppPanel.add(clearTemplateBtn);
-                }
-                {
-                    jPanel3 = new JPanel();
-                    jPanel2.add(JCommonUtil.createScrollComponent(jPanel3), BorderLayout.CENTER);
-                    jPanel3.setLayout(
-                            new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                                            FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                                            FormFactory.DEFAULT_ROWSPEC, RowSpec.decode("default:grow"), }));
-                    {
-                        lblNewLabel = new JLabel("key");
-                        jPanel3.add(lblNewLabel, "2, 2, right, default");
-                    }
-                    {
-                        configKeyText = new JTextField();
-                        JTextUndoUtil.applyUndoProcess1(configKeyText);
-                        jPanel3.add(configKeyText, "4, 2, fill, default");
-                        configKeyText.setColumns(10);
-                    }
-                    {
-                        lblNewLabel_1 = new JLabel("from");
-                        jPanel3.add(lblNewLabel_1, "2, 4, right, default");
-                    }
-                    {
-                        repFromText = new JTextArea();
-                        JTextAreaUtil.applyCommonSetting(repFromText);
-                        repFromText.setRows(4);
-                        jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 4, fill, default");
-                        repFromText.setColumns(10);
-                    }
-                    {
-                        lblNewLabel_2 = new JLabel("to");
-                        jPanel3.add(lblNewLabel_2, "2, 6, right, default");
-                    }
-                    {
-                        repToText = new JTextArea();
-                        JTextAreaUtil.applyCommonSetting(repToText);
-                        repToText.setRows(10);
-                        // repToText.setPreferredSize(new Dimension(0, 50));
-                        jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 6, fill, default");
-                    }
-                }
-                {
-                    addToTemplate = new JButton();
-                    jPanel2.add(addToTemplate, BorderLayout.NORTH);
-                    addToTemplate.setText("add to template");
-                    addToTemplate.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent evt) {
-                            try {
-                                configHandler.put(configKeyText.getText(), repFromText.getText(), repToText.getText(), tradeOffArea.getText());
-                                configHandler.reloadTemplateList();
-                            } catch (Exception e) {
-                                JCommonUtil.handleException(e);
-                            }
-                        }
-                    });
-                }
-            }
-            JCommonUtil.setFont(repToText, repFromText, replaceArea, templateList);
-            {
-                tradeOffArea = new JTextArea();
-                JTextAreaUtil.applyCommonSetting(tradeOffArea);
-                tradeOffArea.setRows(3);
-                // tradeOffArea.setPreferredSize(new Dimension(0, 50));
-                tradeOffArea.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        try {
-                            if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                                String tradeOff = StringUtils.trimToEmpty(tradeOffArea.getText());
-                                JSONObject json = null;
-                                if (StringUtils.isBlank(tradeOff)) {
-                                    json = new JSONObject();
-                                    json.put(SelectionObj.equal.key, new JSONArray());
-                                    json.put(SelectionObj.not_equal.key, new JSONArray());
-                                    tradeOff = json.toString();
-                                } else {
-                                    json = JSONObject.fromObject(tradeOff);
-                                }
-
-                                // 加入新的
-                                SelectionObj selectItem = (SelectionObj) JCommonUtil._JOptionPane_showInputDialog("請選擇類型!", "請選擇", SelectionObj.values(), SelectionObj.NA);
-                                if (selectItem == null || selectItem == selectItem.NA) {
-                                    return;
-                                }
-
-                                String string = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入新項目:"));
-                                string = StringUtils.trimToEmpty(string);
-
-                                if (StringUtils.isBlank(string)) {
-                                    tradeOffArea.setText(json.toString());
-                                    return;
-                                }
-
-                                if (StringUtils.equals(selectItem.type, "arryKey")) {
-                                    String arryKey = selectItem.key;
-                                    if (!json.containsKey(arryKey)) {
-                                        json.put(arryKey, new JSONArray());
-                                    }
-                                    JSONArray arry = (JSONArray) json.get(arryKey);
-                                    boolean findOk = false;
-                                    for (int ii = 0; ii < arry.size(); ii++) {
-                                        if (StringUtils.equalsIgnoreCase(arry.getString(ii), string)) {
-                                            findOk = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!findOk) {
-                                        arry.add(string);
-                                    }
-                                } else if (StringUtils.equals(selectItem.type, "boolKey")) {
-                                    String boolKey = selectItem.key;
-                                    json.put(boolKey, Boolean.valueOf(string));
-                                } else if (StringUtils.equals(selectItem.type, "strKey")) {
-                                    String strKey = selectItem.key;
-                                    json.put(strKey, string);
-                                } else if (StringUtils.equals(selectItem.type, "intKey")) {
-                                    String intKey = selectItem.key;
-                                    json.put(intKey, Integer.parseInt(string));
-                                } else {
-                                    throw new RuntimeException("無法判斷的新增類型 : " + selectItem);
-                                }
-
-                                tradeOffArea.setText(json.toString());
-
-                                JCommonUtil._jOptionPane_showMessageDialog_info("新增完成!");
-                            }
-                        } catch (Exception ex) {
-                            JCommonUtil.handleException(ex);
-                        }
-                    }
-                });
-                {
-                    panel = new JPanel();
-                    jPanel3.add(panel, "4, 8, fill, fill");
-                    {
-                        multiLineCheckBox = new JCheckBox("多行");
-                        panel.add(multiLineCheckBox);
-                    }
-                    {
-                        autoPasteToClipboardCheckbox = new JCheckBox("自動貼記事本");
-                        panel.add(autoPasteToClipboardCheckbox);
-                    }
-                    {
-                        comboReplaceBtn = new JButton("組合技");
-                        comboReplaceBtn.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent arg0) {
-                                try {
-                                    List<RegexReplacer_Config> rightLst = new ArrayList<RegexReplacer_Config>();
-                                    if (tempComboLst != null) {
-                                        for (String key : tempComboLst) {
-                                            RegexReplacer_Config d = configHandler.getProperty(key);
-                                            if (d != null) {
-                                                rightLst.add(d);
-                                            }
-                                        }
-                                    }
-
-                                    final RegexReplacer_ComboDlg<RegexReplacer_Config> dlg = new RegexReplacer_ComboDlg<RegexReplacer_Config>();
-                                    dlg.apply(configHandler.orignLst, rightLst, new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent arg0) {
-                                            tempComboLst = new ArrayList<String>();
-                                            for (RegexReplacer_Config d : dlg.getChoiceLst()) {
-                                                tempComboLst.add(d.configKeyText);
-                                                
-                                                //TODO xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                                            }
-                                        }
-                                    });
-                                } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
-                                }
-                            }
-                        });
-                        panel.add(comboReplaceBtn);
-                    }
-                }
-                {
-                    lblNewLabel_3 = new JLabel("權重 ");
-                    jPanel3.add(lblNewLabel_3, "2, 10");
-                }
-                jPanel3.add(JCommonUtil.createScrollComponent(tradeOffArea), "4, 10, fill, fill");
-            }
-
             this.setTitle("You Set My World On Fire");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
@@ -708,7 +715,6 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JScrollPane jScrollPane1;
     private JTextArea repFromText;
     private JScrollPane jScrollPane2;
-    private JButton scheduleExecute;
     private JButton addToTemplate;
     private JScrollPane jScrollPane3;
     private JList templateList;
@@ -752,25 +758,45 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton yamlOpenFileBtn;
     private JButton comboReplaceBtn;
 
-    private void exeucteActionPerformed(ActionEvent evt) {
-        try {
-            String replaceText = null;
-            String fromPattern = null;
-            String configkeytext = null;
-            String toFormat = repToText.getText();
-            Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
-            Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
-            Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
-            resultArea.setText(replacerDetail(fromPattern, toFormat, replaceText));
-            // 切換到結果
-            jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
-            // 貼到記事本
-            pasteTextToClipboard();
+    AtomicBoolean replaceLock = new AtomicBoolean(false);
 
-            // 放入執行紀錄
-            configHandler.putExample(configKeyText.getText());
+    private void exeucteActionPerformed(ActionEvent evt) {
+        if (replaceLock.get()) {
+            return;
+        }
+        replaceLock.set(true);
+        try {
+            if (tempComboLst != null && !tempComboLst.isEmpty()) {
+                String replaceText = replaceArea.getText();
+                for (String comboKey : tempComboLst) {
+                    RegexReplacer_Config d = configHandler.getProperty(comboKey);
+                    if (d != null) {
+                        replaceText = replacerDetail(d.fromVal, d.toVal, replaceText, d.tradeOff);
+                    }
+                }
+                resultArea.setText(replaceText);
+            } else {
+                // !!!!NORMAL PROCESS HERE!!!!
+                String replaceText = null;
+                String fromPattern = null;
+                String configkeytext = null;
+                String toFormat = repToText.getText();
+                Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
+                Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
+                Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
+                resultArea.setText(replacerDetail(fromPattern, toFormat, replaceText, tradeOffArea.getText()));
+                // 切換到結果
+                jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
+                // 貼到記事本
+                pasteTextToClipboard();
+
+                // 放入執行紀錄
+                configHandler.putExample(configKeyText.getText());
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        } finally {
+            replaceLock.set(false);
         }
     }
 
@@ -778,17 +804,6 @@ public class RegexReplacer extends javax.swing.JFrame {
         if (autoPasteToClipboardCheckbox.isSelected()) {
             ClipboardUtil.getInstance().setContents(resultArea.getText());
         }
-    }
-
-    private void scheduleExecuteActionPerformed(ActionEvent evt) {
-        String replaceText = null;
-        Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
-        DefaultListModel model = (DefaultListModel) templateList.getModel();
-        for (int ii = 0; ii < model.getSize(); ii++) {
-            RegexReplacer_Config entry = (RegexReplacer_Config) model.getElementAt(ii);
-            replaceText = replacerDetail(entry.fromVal, entry.toVal, replaceText);
-        }
-        resultArea.setText(replaceText);
     }
 
     /**
@@ -799,8 +814,8 @@ public class RegexReplacer extends javax.swing.JFrame {
      * @param replaceText
      *            要替換的本文
      */
-    String replacerDetail(String fromPattern, String $toFormat, String replaceText) {
-        TradeOffConfig config = this.getTradeOffConfig();
+    String replacerDetail(String fromPattern, String $toFormat, String replaceText, String tradeOffAreaText) {
+        TradeOffConfig config = this.getTradeOffConfig(tradeOffAreaText);
 
         List<String> toFormatLst = new ArrayList<String>();
         if (StringUtils.isNotBlank(config.split)) {
@@ -915,13 +930,13 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
     }
 
-    private TradeOffConfig getTradeOffConfig() {
+    private TradeOffConfig getTradeOffConfig(String tradeOffAreaText) {
         TradeOffConfig EMPTY = new TradeOffConfig(new JSONObject());
         try {
-            if (StringUtils.isBlank(tradeOffArea.getText())) {
+            if (StringUtils.isBlank(tradeOffAreaText)) {
                 return EMPTY;
             }
-            return new TradeOffConfig(JSONObject.fromObject(tradeOffArea.getText()));
+            return new TradeOffConfig(JSONObject.fromObject(tradeOffAreaText));
         } catch (Exception ex) {
             JCommonUtil.handleException("getTradeOffObject ERR : " + ex, ex);
             return EMPTY;
@@ -992,7 +1007,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             this.saveProp();
         }
 
-        private void put(String configKey, String fromVal, String toVal, String tradeOff) throws FileNotFoundException, IOException {
+        private void put(String configKey, String fromVal, String toVal, String tradeOff, List<String> comboLst) throws FileNotFoundException, IOException {
             configKey = fixKey(configKey);
             RegexReplacer_Config d = getProperty(configKey);
             if (d != null) {
@@ -1004,7 +1019,14 @@ public class RegexReplacer extends javax.swing.JFrame {
 
             Validate.notEmpty(configKey, "configKey 不可為空!");
             Validate.notEmpty(fromVal, "fromVal 不可為空!");
-            Validate.notEmpty(toVal, "toVal 不可為空!");
+            if (StringUtils.isBlank(toVal) && !JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("toVal 為空?", "check")) {
+                return;
+            }
+
+            if ((comboLst != null && comboLst.isEmpty()) && StringUtils.isNotBlank(toVal)) {
+                Validate.isTrue(false, "comboLst不為空!!");
+            }
+
             tradeOff = StringUtils.trimToEmpty(tradeOff);
 
             if (d == null) {
@@ -1015,6 +1037,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             d.fromVal = fromVal;
             d.toVal = toVal;
             d.tradeOff = tradeOff;
+            d.comboLst = comboLst;
 
             this.saveProp();
         }

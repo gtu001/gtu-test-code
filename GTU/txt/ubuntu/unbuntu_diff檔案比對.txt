@@ -1,0 +1,3 @@
+在Ubuntu Software右上角放大鏡
+輸入 
+	Meld

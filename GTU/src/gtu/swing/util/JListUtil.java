@@ -19,6 +19,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -245,5 +246,16 @@ public class JListUtil {
                 }
             }
         });
+    }
+    
+    /**
+     * 設定選全部
+     */
+    public void setSelectedAll() {
+        List<Integer> lst = new ArrayList<Integer>();
+        for (int ii = 0; ii < jList1.getModel().getSize(); ii++) {
+            lst.add(ii);
+        }
+        jList1.setSelectedIndices(ArrayUtils.toPrimitive(lst.toArray(new Integer[0])));
     }
 }

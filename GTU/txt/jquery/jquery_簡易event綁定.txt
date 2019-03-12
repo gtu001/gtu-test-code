@@ -1,0 +1,3 @@
+$(document).on("blur [, keydown, keyup]", "#inputName [, #something]", function(){
+	
+});

@@ -17,6 +17,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 
@@ -142,6 +144,16 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                         listObjectMoveTo(leftMenuLst, rightMenuLst);
                     }
                 });
+                {
+                    JButton addAllBtn = new JButton(">>");
+                    addAllBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            JListUtil.newInstance(leftMenuLst).setSelectedAll();
+                            listObjectMoveTo(leftMenuLst, rightMenuLst);
+                        }
+                    });
+                    panel.add(addAllBtn);
+                }
                 panel.add(addMenuBtn);
             }
             {
@@ -153,6 +165,16 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                     }
                 });
                 panel.add(removeMenuBtn);
+            }
+            {
+                JButton removeAllBtn = new JButton("<<");
+                removeAllBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JListUtil.newInstance(rightMenuLst).setSelectedAll();
+                        listObjectMoveTo(rightMenuLst, leftMenuLst);
+                    }
+                });
+                panel.add(removeAllBtn);
             }
         }
         {
@@ -193,10 +215,12 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
     private void listObjectMoveTo(JList fromLst, JList toLst) {
         DefaultListModel rModel = (DefaultListModel) toLst.getModel();
         DefaultListModel lModel = (DefaultListModel) fromLst.getModel();
-        Object obj = JListUtil.getLeadSelectionObject(fromLst);
-        if (obj != null) {
-            lModel.removeElement(obj);
-            rModel.addElement(obj);
+        List<T> lst = JListUtil.getLeadSelectionArry(fromLst);
+        for (T obj : lst) {
+            if (obj != null) {
+                lModel.removeElement(obj);
+                rModel.addElement(obj);
+            }
         }
     }
 }
