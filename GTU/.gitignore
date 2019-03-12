@@ -1,3 +1,4 @@
 /target/
 **/node_modules/**
-/ant/swing_jar/**
+/ant/swing_jar/build/**
+/ant/swing_jar/jars/**
