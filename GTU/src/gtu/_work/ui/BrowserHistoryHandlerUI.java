@@ -64,6 +64,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -117,6 +118,7 @@ import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -234,6 +236,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     urlTextOnblur();
                 }
             });
+            urlText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                @Override
+                public void process(DocumentEvent event) {
+                    urlTextOnblur();
+                }
+            }));
             panel.add(urlText, "4, 4, fill, default");
             urlText.setColumns(10);
 
