@@ -1430,6 +1430,9 @@ public class FloatViewService extends Service {
     private void checkClipboardContentForNoteText() {
         String text = ClipboardHelper.copyFromClipboard(getApplication());
         try {
+            text = StringUtils.defaultString(text);
+            text = text.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+            text = text.replaceAll("\\+", "%2B");
             text = URLDecoder.decode(text, "UTF-8");
         } catch (UnsupportedEncodingException e) {
         }

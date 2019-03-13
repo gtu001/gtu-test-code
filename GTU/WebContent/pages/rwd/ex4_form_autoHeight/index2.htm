@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Bootstrap Webstie Tutorial</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	function divTableResizeHandler() {
+		var fixHeight = function() {
+			$("div.row").each(function(i, v) {
+				var divs = $(" > div", v);
+				for (var ii = 0; ii < divs.length; ii++) {
+					divs[ii].style.height = "auto";
+				}
+				var mHeight = -1;
+				for (var ii = 0; ii < divs.length; ii++) {
+					mHeight = Math.max(divs[ii].clientHeight, mHeight);
+				}
+				for (var ii = 0; ii < divs.length; ii++) {
+					if (divs[ii].clientHeight < mHeight) {
+						divs[ii].style.height = mHeight + "px";
+					}
+				}
+			});
+		};
+		$(document).ready(function() {
+			fixHeight();
+		});
+		window.addEventListener("resize", function(e) {
+			var width = e.target.outerWidth;
+			fixHeight();
+		});
+	};
+
+	$(document).ready(function() {
+		divTableResizeHandler();
+	});
+</script>
+<style type="text/css">
+</style>
+</head>
+<body>
+	<div class="row" style="">
+		<div class="col-sm-4" style="background-color: #999999; height: flex;">
+			XXXXXXXXXXXXXXXXX</div>
+		<div class="col-sm-4" style="background-color: #777777; height: flex;">
+			XXXXXXXXXXXXXXXXX<br /> XXXXXXXXXXXXXXXXX<br /> XXXXXXXXXXXXXXXXX<br />
+			XXXXXXXXXXXXXXXXX<br />
+		</div>
+		<div class="col-sm-4" style="background-color: #BBBBBB; height: flex;">
+			XXXXXXXXXXXXXXXXX<br /> XXXXXXXXXXXXXXXXX<br />
+		</div>
+	</div>
+</body>
+</html>

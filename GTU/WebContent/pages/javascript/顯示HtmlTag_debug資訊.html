@@ -9,7 +9,7 @@
 
 <script type="text/javascript">
 	<!-- 顯示input資訊 -->
-	document.addEventListener("DOMContentLoaded", function(){
+		document.addEventListener("DOMContentLoaded", function(){
 		function getType(node){
 			return node ? {}.toString.call(node) : "undefined";
 		}
@@ -64,7 +64,7 @@
 				ele.after(div1);
 			
                 var rect = ele.getBoundingClientRect();
-                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px; font-size: 12px;");
+                div1.setAttribute("style", "border-width:3px;border-style:dashed;border-color:" + color + ";padding:5px; font-size: 12px; opacity : 1.0; filter: alpha(opacity=100); z-index: 10000;");
                 div1.style.position = "absolute";
                 div1.style.backgroundColor = "WHITE"; 
                 
@@ -78,6 +78,7 @@
 	            ele.addEventListener("mouseout", function(e){
 		       		//div1.style.visibility = "hidden";
 		       		//div1.style.display = "none";
+
 		       		div1.removeChild1();
 		        });
 	        });
@@ -88,6 +89,18 @@
 			var arry = document.getElementsByTagName(singleChkArry1[i]);
 			for(var ii = 0 ; ii < arry.length; ii ++){
 				var obj = arry[ii];
+				
+				//Ignore Bootstrap !!
+				if(obj.tagName == "DIV"){
+					var ignore = false;
+					if(obj.getAttribute("id") == "container"){
+						ignore = true;
+					}else if(obj.classList.contains("content")){
+						ignore = true;
+					}
+					continue;
+				}
+				
 				if(obj.getAttribute("id") || obj.getAttribute("name")){
 					hoverShow(obj, "#FFAC55", getMsg);
 				}
