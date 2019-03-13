@@ -1,20 +1,25 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -113,8 +118,33 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     jPanel2.setLayout(jPanel2Layout);
                     jTabbedPane1.addTab("compare2", null, jPanel2, null);
                     {
+                        JPanel j2Panel = new JPanel();
                         jScrollPane2 = new JScrollPane();
-                        jPanel2.add(jScrollPane2, BorderLayout.CENTER);
+                        jPanel2.add(j2Panel, BorderLayout.CENTER);
+                        j2Panel.setLayout(new BorderLayout(0, 0));
+                        j2Panel.add(jScrollPane2, BorderLayout.CENTER);
+                        {
+                            panel_5 = new JPanel();
+                            j2Panel.add(panel_5, BorderLayout.NORTH);
+                        }
+                        {
+                            panel_6 = new JPanel();
+                            j2Panel.add(panel_6, BorderLayout.WEST);
+                        }
+                        {
+                            panel_7 = new JPanel();
+                            j2Panel.add(panel_7, BorderLayout.SOUTH);
+                            {
+                                lblNewLabel = new JLabel("特殊format為=>  \\{c\\:(.*?),v\\:(.*?)\\}");
+                                lblNewLabel.setFont(new Font("新細明體", Font.PLAIN, 14));
+                                lblNewLabel.setForeground(Color.RED);
+                                panel_7.add(lblNewLabel);
+                            }
+                        }
+                        {
+                            panel_8 = new JPanel();
+                            j2Panel.add(panel_8, BorderLayout.EAST);
+                        }
                         jScrollPane2.setPreferredSize(new java.awt.Dimension(527, 309));
                         {
                             jTextArea2 = new JTextArea();
@@ -155,7 +185,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                         {
                             DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2");
                             resultTable = new JTable();
-                            JTableUtil.defaultSetting(resultTable);
+                            JTableUtil.defaultSetting_AutoResize(resultTable);
                             jScrollPane3.setViewportView(resultTable);
                             resultTable.setModel(model);
                         }
@@ -238,6 +268,43 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                         buttonGroup = JButtonGroupUtil.createRadioButtonGroup(compare1ToCompare2Radio, compare2ToCompare1Radio);
                     }
                 }
+                {
+                    panel_9 = new JPanel();
+                    jTabbedPane1.addTab("補正", null, panel_9, null);
+                    panel_9.setLayout(new BorderLayout(0, 0));
+                    {
+                        panel_10 = new JPanel();
+                        panel_9.add(panel_10, BorderLayout.NORTH);
+                        {
+                            lblNewLabel_1 = new JLabel("format");
+                            panel_10.add(lblNewLabel_1);
+                        }
+                        {
+                            fixFormatText = new JTextArea();
+                            JTextAreaUtil.applyCommonSetting(fixFormatText);
+                            fixFormatText.setText("#compare1# #compare2# #comment#");
+                            panel_10.add(JCommonUtil.createScrollComponent(fixFormatText));
+                            fixFormatText.setColumns(40);
+                            fixFormatText.setRows(2);
+                        }
+                    }
+                    {
+                        panel_11 = new JPanel();
+                        panel_9.add(panel_11, BorderLayout.WEST);
+                    }
+                    {
+                        panel_12 = new JPanel();
+                        panel_9.add(panel_12, BorderLayout.SOUTH);
+                    }
+                    {
+                        panel_13 = new JPanel();
+                        panel_9.add(panel_13, BorderLayout.EAST);
+                    }
+                    {
+                        fixTextArea = new JTextArea();
+                        panel_9.add(JCommonUtil.createScrollComponent(fixTextArea), BorderLayout.CENTER);
+                    }
+                }
             }
             pack();
             this.setSize(548, 376);
@@ -252,22 +319,38 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
         int sliderValue = jslider.getValue();
         System.out.println("sliderValue = " + sliderValue);
 
-        DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2", "same word");
+        FixTextAreaHandler fix = new FixTextAreaHandler();
+
+        DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2", "百分比", "comment");
         resultTable.setModel(model);
 
-        Pattern pattern = Pattern.compile("[\\$\\w_-]+");
+        Pattern pattern = Pattern.compile("[^\\s\\t]+");
+        Pattern pattern2 = Pattern.compile("\\{c\\:(.*?),v\\:(.*?)\\}");
         Matcher matcher = pattern.matcher(text1);
         Matcher matcher2 = pattern.matcher(text2);
+        Matcher matcher3 = pattern2.matcher(text2);
         List<String> text1List = new ArrayList<String>();
         List<String> text2List = new ArrayList<String>();
+        Map<String, String> text2Map = new HashMap<String, String>();
+
         while (matcher.find()) {
-            text1List.add(matcher.group());
+            text1List.add(StringUtils.trimToEmpty(matcher.group()));
+        }
+        while (matcher3.find()) {
+            text2Map.put(StringUtils.trimToEmpty(matcher3.group(1)), StringUtils.trimToEmpty(matcher3.group(2)));
         }
         while (matcher2.find()) {
-            text2List.add(matcher2.group());
+            text2List.add(StringUtils.trimToEmpty(matcher2.group()));
         }
+        for (String text2Key : text2Map.keySet()) {
+            if (!text2List.contains(text2Key)) {
+                text2List.add(text2Key);
+            }
+        }
+
         for (String compare1 : text1List) {
             List<CompareResult> compareList = new ArrayList<CompareResult>();
+            String comment = "";
             for (String compare2 : text2List) {
                 CompareResult result = new CompareResult();
                 result.result = fuzzyCompare(compare1, compare2, isIgnoreCaseChk.isSelected());
@@ -276,16 +359,63 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             }
             Collections.sort(compareList, comparator);
             String compare2Str = "";
-            BigDecimal sameWord = BigDecimal.ZERO;
+            BigDecimal percent = BigDecimal.ZERO;
             if (!compareList.isEmpty()) {
                 compare2Str = compareList.get(0).compareStr;
-                sameWord = compareList.get(0).getParcent();
+                percent = compareList.get(0).getParcent();
                 float fuzzyPersent = compareList.get(0).getParcent().floatValue();
                 if (fuzzyPersent < sliderValue) {
                     compare2Str = "";
                 }
+                if (text2Map.containsKey(compare2Str)) {
+                    comment = text2Map.get(compare2Str);
+                }
             }
-            model.addRow(new Object[] { compare1, compare2Str, sameWord });
+            model.addRow(new Object[] { compare1, compare2Str, percent, comment });
+
+            // 設定補正資料
+            fix.append(compare1, compare2Str, comment);
+        }
+
+        // 設定補正資料
+        fix.setFixTextArea(fixFormatText.getText(), text1);
+    }
+
+    private class FixTextAreaHandler {
+        Map<String, Data> fixMap = new HashMap<String, Data>();
+
+        class Data {
+            String compare1;
+            String compare2;
+            String comment;
+        }
+
+        void append(String compare1, String compare2Str, String comment) {
+            Data d = new Data();
+            d.compare1 = compare1;
+            d.compare2 = compare2Str;
+            d.comment = comment;
+            fixMap.put(compare1, d);
+        }
+
+        void setFixTextArea(String format, String text1) {
+            format = StringUtils.defaultString(format);
+            Pattern pattern = Pattern.compile("[^\\s\\t]+");
+            Matcher mth = pattern.matcher(StringUtils.defaultString(text1));
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                String key = mth.group();
+                String tmpValue = format.toString();
+                if (fixMap.containsKey(key)) {
+                    Data d = fixMap.get(key);
+                    tmpValue = tmpValue.replaceAll(Pattern.quote("#compare1#"), d.compare1);
+                    tmpValue = tmpValue.replaceAll(Pattern.quote("#compare2#"), d.compare2);
+                    tmpValue = tmpValue.replaceAll(Pattern.quote("#comment#"), d.comment);
+                }
+                mth.appendReplacement(sb, tmpValue);
+            }
+            mth.appendTail(sb);
+            fixTextArea.setText(sb.toString());
         }
     }
 
@@ -305,6 +435,19 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
     private JRadioButton compare2ToCompare1Radio;
     private JTextField compare1NameText;
     private JTextField compare2NameText;
+    private JPanel panel_5;
+    private JPanel panel_6;
+    private JPanel panel_7;
+    private JPanel panel_8;
+    private JLabel lblNewLabel;
+    private JPanel panel_9;
+    private JPanel panel_10;
+    private JPanel panel_11;
+    private JPanel panel_12;
+    private JPanel panel_13;
+    private JTextArea fixTextArea;
+    private JLabel lblNewLabel_1;
+    private JTextArea fixFormatText;
 
     static class CompareResult {
         String compareStr;

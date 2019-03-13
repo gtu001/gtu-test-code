@@ -39,7 +39,7 @@ war {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf") // for Thymeleaf
     compile("org.springframework.boot:spring-boot-devtools")
     
     compile 'ch.qos.logback:logback-classic:1.2.3'

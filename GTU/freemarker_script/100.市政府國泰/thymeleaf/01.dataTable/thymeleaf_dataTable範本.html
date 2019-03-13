@@ -23,29 +23,58 @@
 							<tbody>
 								<tr th:each="entity : ${dataLstNameAndQuote}">
 									<#list dataLst as item>
-										<#assign itemVal = "${r'${'} entity.${item.value} }" />
-									<td data-th="${item.label}" th:text="${itemVal}">
-										<#if item.type == 'link'>
-											<a
-											th:href="@{/fund/qryApplicationDetail/} + ${itemVal}"
-											th:text="${itemVal}"></a>
-										<#elseif item.type == 'btn'>
-											<button id="search" class="btn_g" type="submit"
-												th:onclick="javascript:alert(' + ${itemVal} + ');">
-												XXXX</button>
-										<#elseif item.type == 'switch'>
-											<span th:switch="${itemVal}"> 
-												<span th:case="'1'" style="color: yellow"
-												th:text="'已建檔'"></span> 
-												<span th:case="'2'" style="color: red"
-												th:text="'申請書未覆核'"></span> 
-												<span th:case="'3'" style="color: green"
-												th:text="'憑證未覆核'"></span>
-												<span th:case="*" 
-													th:text="${itemVal}"></span>
+										<#if !item.value?is_enumerable>
+											<#assign itemVal = "${r'${'} entity.${item.value} }" />
+											<td data-th="${item.label}" th:text="${itemVal}">
+												<#if item.type == 'link'>
+													<a
+													th:href="@{/fund/qryApplicationDetail/} + ${itemVal}"
+													th:text="${itemVal}"></a>
+												<#elseif item.type == 'btn'>
+													<button id="search" class="btn_g" type="submit"
+														th:onclick="javascript:alert(' + ${itemVal} + ');">
+														XXXX</button>
+												<#elseif item.type == 'switch'>
+													<span th:switch="${itemVal}"> 
+														<span th:case="'1'" style="color: yellow"
+														th:text="'已建檔'"></span> 
+														<span th:case="'2'" style="color: red"
+														th:text="'申請書未覆核'"></span> 
+														<span th:case="'3'" style="color: green"
+														th:text="'憑證未覆核'"></span>
+														<span th:case="*" 
+															th:text="${itemVal}"></span>
+												<#else>
+												</#if>
+											</td>
 										<#else>
+											<td data-th="${item.label}">
+											<#list item.value as val1>
+												<#assign itemVal = "${r'${'} entity.${val1} }" />
+												<#if item.type == 'link'>
+													<a
+													th:href="@{/fund/qryApplicationDetail/} + ${itemVal}"
+													th:text="${itemVal}"></a>
+												<#elseif item.type == 'btn'>
+													<button id="search" class="btn_g" type="submit"
+														th:onclick="javascript:alert(' + ${itemVal} + ');">
+														XXXX</button>
+												<#elseif item.type == 'switch'>
+													<span th:switch="${itemVal}"> 
+														<span th:case="'1'" style="color: yellow"
+														th:text="'已建檔'"></span> 
+														<span th:case="'2'" style="color: red"
+														th:text="'申請書未覆核'"></span> 
+														<span th:case="'3'" style="color: green"
+														th:text="'憑證未覆核'"></span>
+														<span th:case="*" 
+															th:text="${itemVal}"></span>
+												<#else>
+													<span th:text="${itemVal}"></span>
+												</#if>
+											</#list>
+											</td>
 										</#if>
-									</td>
 									</#list>
 								</tr>
 							</tbody>

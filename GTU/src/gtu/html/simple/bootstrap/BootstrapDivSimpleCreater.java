@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,8 +38,8 @@ public class BootstrapDivSimpleCreater {
         BootstrapDivCrater_DivRoot boot = BootstrapDivCrater_DivRoot.load(yamlConfigInputStream);
         List<String> lst = StringUtil_.readContentToList(htmlContent, true, false, false);
 
-        Pattern ptn = Pattern.compile("(.*?)[\\s\\t]+?(.*)");
-        Pattern ptn2 = Pattern.compile("(\\w+)\\[(\\w+)\\]");
+        Pattern ptnLineDef = Pattern.compile("(.*?)[\\s\\t]+?(.*)");
+        Pattern ptnTagDef = Pattern.compile("(\\w+)\\[(\\w+)\\]");
 
         List<List<Div>> totalLst = new ArrayList<List<Div>>();
 
@@ -49,13 +50,13 @@ public class BootstrapDivSimpleCreater {
             if (tmpLst == null) {
                 tmpLst = new ArrayList<Div>();
             }
-            mth = ptn.matcher(line);
+            mth = ptnLineDef.matcher(line);
             if (mth.find()) {
                 Div d1 = new Div();
                 d1.label = mth.group(1);
                 String others = mth.group(2);
                 if (StringUtils.isNotBlank(others)) {
-                    mth2 = ptn2.matcher(others);
+                    mth2 = ptnTagDef.matcher(others);
                     while (mth2.find()) {
                         DivDtl d2 = new DivDtl();
                         d2.name = mth2.group(1);
@@ -67,6 +68,7 @@ public class BootstrapDivSimpleCreater {
             } else if (StringUtils.isNotBlank(line)) {
                 Div d = new Div();
                 d.label = StringUtils.trimToEmpty(line);
+                setCustomColRowConfig(d.label, d);
                 tmpLst.add(d);
             } else {
                 if (tmpLst != null && !tmpLst.isEmpty()) {
@@ -85,12 +87,20 @@ public class BootstrapDivSimpleCreater {
             sb.append("<!-- row[" + (ii + 1) + "] -->\n");
             sb.append("<div class=\"row\">\n");
             tmpLst = totalLst.get(ii);
-            for (int jj = 0, size = tmpLst.size() * 2; jj < tmpLst.size(); jj++) {
+
+            int size = caculateSize(tmpLst);
+            for (int jj = 0; jj < tmpLst.size(); jj++) {
                 Div div = tmpLst.get(jj);
 
+                if ("授權註記".equals(div.label)) {
+                    System.out.println("ddddddddddddddd");
+                }
+
+                AtomicInteger bootstrap = new AtomicInteger(12);
+
                 if (!div.divLst.isEmpty()) {
-                    int left = getDivNumber(size, jj);
-                    int right = getDivNumber(size, jj + 1);
+                    int left = getDivNumber(size, jj, false, bootstrap);
+                    int right = getDivNumber(size, jj + 1, false, bootstrap);
                     List<String> inputLst = new ArrayList<String>();
                     for (DivDtl d2 : div.divLst) {
                         String htmlTag = boot.getTagTemplate(d2.tagId);
@@ -102,7 +112,13 @@ public class BootstrapDivSimpleCreater {
 
                     sb.append(realDivTag);
                 } else {
-                    String bt1 = BOOTSTRAP_DIV_PREFIX + 12;
+                    int col = 0;
+                    if (div.col != 0) {
+                        col = div.col;
+                    } else {
+                        col = getDivNumber(size, jj, true, bootstrap);
+                    }
+                    String bt1 = BOOTSTRAP_DIV_PREFIX + col;
                     String divFormat = "\t<div class=\"%1$s\">%2$s</div> \n";
                     String realDivTag = String.format(divFormat, bt1, div.label);
 
@@ -112,6 +128,32 @@ public class BootstrapDivSimpleCreater {
             sb.append("</div>\n");
         }
         return sb.toString();
+    }
+
+    private void setCustomColRowConfig(String str, ColRowConfig div) {
+        Pattern ptnCol = Pattern.compile("\\[[cC](\\d+)\\]");
+        Pattern ptnRow = Pattern.compile("\\[[rR](\\d+)\\]");
+        str = StringUtils.defaultString(str);
+        Matcher mth = ptnCol.matcher(str);
+        if (mth.find()) {
+            div.col = Integer.valueOf(mth.group(1));
+        }
+        mth = ptnRow.matcher(str);
+        if (mth.find()) {
+            div.row = Integer.valueOf(mth.group(1));
+        }
+    }
+
+    private int caculateSize(List<Div> tmpLst) {
+        int total = 0;
+        for (Div d : tmpLst) {
+            if (d.divLst.isEmpty()) {
+                total += 1;
+            } else {
+                total += 2;
+            }
+        }
+        return total;
     }
 
     public static class BootstrapDivCrater_DivRoot extends HtmlInputSimpleCreater_HtmlTypeHandler {
@@ -167,48 +209,69 @@ public class BootstrapDivSimpleCreater {
         }
     }
 
-    private int getDivNumber(int size, int index) {
+    private int getDivNumber(int size, int index, boolean isLabelOnly, final AtomicInteger bootstrap) {
         if (size > 12) {
             throw new RuntimeException("欄位不可超過12個 ! ,  index : " + index + ", size : " + size);
         }
         if (index + 1 > size) {
             throw new RuntimeException("index不可超過size , index : " + index + ", size : " + size);
         }
+
+        int rtnVal = 0;
         switch (size) {
         case 1:
-            return 12;
+            rtnVal = 12;
+            break;
         case 2:
-            return 6;
+            rtnVal = 6;
+            break;
         case 3:
-            return 4;
+            rtnVal = 4;
+            break;
         case 4:
-            return 3;
+            rtnVal = 3;
+            break;
         case 5:
-            switch (index) {
-            case 0:
-            case 1:
-                return 3;
-            default:
-                return 2;
+            if (isLabelOnly) {
+                rtnVal = 4;
+            } else {
+                rtnVal = 2;
             }
+            break;
         case 6:
-            return 2;
+            rtnVal = 2;
+            break;
         default:
             int fix = (12 - size) % 6;
             if (index + 1 > fix) {
-                return 1;
+                rtnVal = 1;
+            } else {
+                rtnVal = 2;
             }
-            return 2;
+            break;
         }
+
+        if (rtnVal > bootstrap.get()) {
+            rtnVal = bootstrap.get();
+        }
+        bootstrap.set(bootstrap.get() - rtnVal);
+        return rtnVal;
     }
 
-    private static class Div {
+    private static class ColRowConfig {
+        int col = 0;
+        int row = 0;
+    }
+
+    private static class Div extends ColRowConfig {
         String label;
         List<DivDtl> divLst = new ArrayList<DivDtl>();
+
     }
 
-    private static class DivDtl {
+    private static class DivDtl extends ColRowConfig {
         String name;
         String tagId;
+        String customValue = "";
     }
 }
