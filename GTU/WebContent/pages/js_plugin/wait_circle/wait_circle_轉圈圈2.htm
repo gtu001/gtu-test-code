@@ -32,44 +32,15 @@
 	z-index: 19999;
 	top: 0;
 	background: #fff;
-	background: rgba(255,255,255,.65);
+	background: rgba(255, 255, 255, .65);
 }
-
-/* 設定動畫圈條 */
-.loading {
-	left: 50%;
-	top: 50%;
-	position: absolute;
-	margin-left: -45px;
-	margin-top: -45px;
-	border-bottom: 3px solid transparent;
-	border-left: 3px solid transparent;
-	border-right: 3px solid transparent;
-	border-top: 2px solid #4eae30;
-	border-radius: 100%;
-	height: 90px;
-	width: 90px;
-	-webkit-animation: spin .6s infinite linear;
-	-moz-animation: spin .6s infinite linear;
-	-ms-animation: spin .6s infinite linear;
-	-o-animation: spin .6s infinite linear;
-	animation: spin .6s infinite linear;
-}
-
 /*設定讀取圖片*/
 .loading-logo {
-	left: 50%;
-	top: 50%;
-	position: absolute;
-	margin-left: -45px;
-	margin-top: -45px;
-    border-radius: 100%;
-    box-shadow: inset 0 0 20px 1px #e3dfdf;
-	height: 90px;
-	width: 90px;
 	background: url(wait_circle.gif) no-repeat center center;
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
 }
-
 
 /*電腦版*/
 @media all and (min-width:768px) {
@@ -86,9 +57,9 @@
 	function showLoader() {
 		console.log("do showLoader");
 		$('body').append(//
-		'<div id="loader" class="preloader">'+//
-			'<div class="loading"></div>'+//
-			'<div class="loading-logo"></div>'+//
+		'<div id="loader" class="preloader">' + //
+		'<div class="loading"></div>' + //
+		'<div class="loading-logo"></div>' + //
 		'</div>');//
 		$('body').find('#loader').show();
 	}
@@ -108,6 +79,10 @@
 </head>
 <body>
 	<input type="button" onclick="doCircleThing();" value="轉圈圈"></input>
+
+	<div style="width: 200px; height: 200px;">
+		<img clss="loading-logo " />
+	</div>
 </body>
 </html>
 
