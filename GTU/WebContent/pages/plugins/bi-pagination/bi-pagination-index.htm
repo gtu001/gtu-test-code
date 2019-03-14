@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}" />
+	<link rel="bookmark" th:href="@{/img/favicon.ico}" />
+	<title>投資平台前台系統</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	
+	<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="pagination.js"></script>
+	<link rel="stylesheet" href="bi-pagination.css">
+
+	<style>
+	/*電腦版*/
+	@media all and (min-width:768px) {
+	}
+
+	/*手機板*/
+	@media ( max-width : 767px) {
+	}
+</style>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#pagination-container").pagination({
+			"pagingOnInit" : false,
+			"callback" : function(pageable){ // <-- 點按鈕 trigger
+				console.log("pageable : " + JSON.stringify(pageable));
+			}},
+			{"page":180,"size":10,"sort":[],"number":177,"totalPages":188,"totalElements":1870} //<--init 給值
+			);
+	});
+</script>
+</head>
+<body>
+	<div id="pagination-container">
+	</div>
+</body>
+</html>

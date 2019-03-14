@@ -1,0 +1,16 @@
+.bi-pagination{  padding: 8px } 
+.bi-pagination .search-input{ float: left; max-width: 200px; margin-right: 10px}
+.page-label{ line-height: 34px; margin-right: 5px  }
+.pagination { margin: 0px; display: inline-block; min-width: 180px;} 
+.pagination>li>a{ float: none; border: 0; padding: 5px 15px; color: #f60} 
+.pagination select{
+    height: 34px;
+    padding: 5px 10px; 
+    color: #4d4d4d; 
+    border: 1px solid #ddd;}
+ 
+.pagination > li.First-left-etc a {background: url(images/icon/page_first.png) no-repeat center}
+.pagination > li.left-etc a  {background: url(images/icon/page_prev.png) no-repeat  center}
+
+.pagination > li.Last-right-etc a { background: url(images/icon/page_end.png) no-repeat  center}
+.pagination > li.right-etc a{ background: url(images/icon/page_next.png) no-repeat  center}

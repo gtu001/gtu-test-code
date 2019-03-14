@@ -16,16 +16,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -64,7 +61,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
-import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -118,7 +114,6 @@ import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -386,7 +381,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     JChangeInputMethodUtil.toEnglish();
                 }
             });
-            
+
             JButton allOpenBtn = new JButton("全開");
             allOpenBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -570,11 +565,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             @Override
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
-                    UrlConfig d = UrlConfig.parseTo(url, _this.bookmarkConfig.getConfigProp().getProperty(url));
-                    if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
-                        DesktopUtil.browse(url);
+                    String dValue = _this.bookmarkConfig.getConfigProp().getProperty(url);
+                    if (StringUtils.isNotBlank(dValue)) {
+                        UrlConfig d = UrlConfig.parseTo(url, dValue);
+                        if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                            DesktopUtil.browse(url);
+                        } else {
+                            _this.doOpenWithRemark(d, false);
+                        }
                     } else {
-                        _this.doOpenWithRemark(d, false);
+                        DesktopUtil.browse(url);
                     }
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -593,7 +593,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_IE)) {
                         exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_IE;
                     }
-                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
                     Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -608,7 +608,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_FIREFOX)) {
                         exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_FIREFOX;
                     }
-                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
                     Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -623,7 +623,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_CHROME)) {
                         exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_CHROME;
                     }
-                    String command = String.format("cmd /c call \"%s\" %s ", exePath, url);
+                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
                     Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -1423,7 +1423,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         String title = "";
         try {
-            String content = __doGetRequest_UserAgent(url, "UTF-8", DEFAULT_USER_AGENT);
+            String content = __doGetRequest_UserAgent(url, DEFAULT_USER_AGENT);
             System.out.println("-----------------------------------------------------------------------");
             // System.out.println(content);
 
@@ -1951,7 +1951,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     // -----------------------------------------------------------------------------------------------------------------------
 
-    private static String __doGetRequest_UserAgent(String url, String encoding, String userAgent) {
+    private static String __doGetRequest_UserAgent(String url, String userAgent) {
         try {
             if (!url.startsWith("http")) {
                 url = "http://" + url;
@@ -1973,23 +1973,33 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 httpget.setHeader("User-Agent", userAgent);
             }
 
+            Pattern charsetPtn = Pattern.compile("\\<meta\\s+.*?charset=\"(.*?)\"\\>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
             HttpResponse response = httpclient.execute(httpget, localContext);
             HttpEntity entity = response.getEntity();
             if (entity != null && response.getStatusLine().getStatusCode() == 200) {
                 InputStream instream = entity.getContent();
-                Writer writer = new StringWriter();
-                char[] buffer = new char[1024];
-                try {
-                    Reader reader = new BufferedReader(new InputStreamReader(instream, encoding));
-                    int n;
-                    while ((n = reader.read(buffer)) != -1) {
-                        writer.write(buffer, 0, n);
-                    }
-                } finally {
-                    instream.close();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                byte[] arr = new byte[1024 * 1024];
+                int available = -1;
+                while ((available = instream.read(arr)) > 0) {
+                    baos.write(arr, 0, available);
                 }
-                String result = writer.toString();
-                return result;
+                baos.flush();
+                baos.close();
+
+                String content = new String(baos.toByteArray(), "UTF-8");
+                Matcher mth = charsetPtn.matcher(content);
+                if (mth.find()) {
+                    String realCharset = mth.group(1);
+                    if (StringUtils.contains(realCharset.toUpperCase(), "BIG")) {
+                        content = new String(baos.toByteArray(), "BIG5");
+                    } else if (StringUtils.contains(realCharset.toUpperCase(), "GBK")) {
+                        content = new String(baos.toByteArray(), "GBK");
+                    }
+                }
+                return content;
             } else {
                 String errMsg = "StatusCode : " + response.getStatusLine().getStatusCode() + ", " + response.getStatusLine().getReasonPhrase();
                 throw new RuntimeException(errMsg);
