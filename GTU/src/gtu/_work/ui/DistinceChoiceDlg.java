@@ -22,7 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 
-public class RegexReplacer_ComboDlg<T> extends JDialog {
+public class DistinceChoiceDlg<T> extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JList leftMenuLst;
@@ -37,7 +37,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
      */
     public static void main(String[] args) {
         try {
-            RegexReplacer_ComboDlg dialog = new RegexReplacer_ComboDlg();
+            DistinceChoiceDlg dialog = new DistinceChoiceDlg();
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
         } catch (Exception e) {
@@ -65,8 +65,13 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
         this.allLst = allLst;
         this.rightLst = rightLst;
         List<Object> leftLst = new ArrayList<Object>();
-        DefaultListModel leftModel = new DefaultListModel();
         for (Object v : this.allLst) {
+            if (!this.rightLst.contains(v)) {
+                leftLst.add(v);
+            }
+        }
+        DefaultListModel leftModel = new DefaultListModel();
+        for (Object v : leftLst) {
             leftModel.addElement(v);
         }
         DefaultListModel rightModel = new DefaultListModel();
@@ -80,7 +85,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
     /**
      * Create the dialog.
      */
-    public RegexReplacer_ComboDlg() {
+    public DistinceChoiceDlg() {
         setBounds(100, 100, 689, 462);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -136,7 +141,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                 addMenuBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        listObjectMoveTo(leftMenuLst, rightMenuLst, false);
+                        listObjectMoveTo(leftMenuLst, rightMenuLst);
                         JListUtil.setUnselected(leftMenuLst);
                         JListUtil.setUnselected(rightMenuLst);
                     }
@@ -146,7 +151,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                     addAllBtn.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             JListUtil.newInstance(leftMenuLst).setSelectedAll();
-                            listObjectMoveTo(leftMenuLst, rightMenuLst, false);
+                            listObjectMoveTo(leftMenuLst, rightMenuLst);
                             JListUtil.setUnselected(leftMenuLst);
                             JListUtil.setUnselected(rightMenuLst);
                         }
@@ -160,7 +165,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                 removeMenuBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        removeChoice(rightMenuLst);
+                        listObjectMoveTo(rightMenuLst, leftMenuLst);
                         JListUtil.setUnselected(leftMenuLst);
                         JListUtil.setUnselected(rightMenuLst);
                     }
@@ -172,7 +177,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                 removeAllBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         JListUtil.newInstance(rightMenuLst).setSelectedAll();
-                        removeChoice(rightMenuLst);
+                        listObjectMoveTo(rightMenuLst, leftMenuLst);
                         JListUtil.setUnselected(leftMenuLst);
                         JListUtil.setUnselected(rightMenuLst);
                     }
@@ -204,7 +209,7 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
                 cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
-                        RegexReplacer_ComboDlg.this.dispose();
+                        DistinceChoiceDlg.this.dispose();
                     }
                 });
                 buttonPane.add(cancelButton);
@@ -215,25 +220,13 @@ public class RegexReplacer_ComboDlg<T> extends JDialog {
         JCommonUtil.defaultToolTipDelay();
     }
 
-    private void removeChoice(JList fromLst) {
-        DefaultListModel rModel = (DefaultListModel) fromLst.getModel();
-        List<T> lst = JListUtil.getLeadSelectionArry(fromLst);
-        for (T obj : lst) {
-            if (obj != null) {
-                rModel.removeElement(obj);
-            }
-        }
-    }
-
-    private void listObjectMoveTo(JList fromLst, JList toLst, boolean removeOrign) {
+    private void listObjectMoveTo(JList fromLst, JList toLst) {
         DefaultListModel rModel = (DefaultListModel) toLst.getModel();
         DefaultListModel lModel = (DefaultListModel) fromLst.getModel();
         List<T> lst = JListUtil.getLeadSelectionArry(fromLst);
         for (T obj : lst) {
             if (obj != null) {
-                if (removeOrign) {
-                    lModel.removeElement(obj);
-                }
+                lModel.removeElement(obj);
                 rModel.addElement(obj);
             }
         }
