@@ -309,14 +309,16 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     String repFrom = repFromText.getText();
                                     String repTo = repToText.getText();
                                     String tradeOff = tradeOffArea.getText();
+                                    boolean isMultiLine = multiLineCheckBox.isSelected();
 
                                     System.out.println("configKey : " + configKey);
                                     System.out.println("repFrom : " + repFrom);
                                     System.out.println("repTo : " + repTo);
                                     System.out.println("tradeOff : " + tradeOff);
+                                    System.out.println("isMultiLine : " + isMultiLine);
 
-                                    configHandler.put(configKey, repFrom, repTo, tradeOff, tempComboLst);
-                                    
+                                    configHandler.put(configKey, repFrom, repTo, isMultiLine, tradeOff, tempComboLst);
+
                                     configHandler.reloadTemplateList();
                                 } catch (Exception e) {
                                     JCommonUtil.handleException(e);
@@ -370,6 +372,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 repFromText.setText(config.fromVal);
                                 repToText.setText(config.toVal);
                                 tradeOffArea.setText(config.tradeOff);
+                                multiLineCheckBox.setSelected(config.isMultiLine);
 
                                 System.out.println("configKey : " + configKeyText.getText());
 
@@ -774,7 +777,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 for (String comboKey : tempComboLst) {
                     RegexReplacer_Config d = configHandler.getProperty(comboKey);
                     if (d != null) {
-                        replaceText = replacerDetail(d.fromVal, d.toVal, replaceText, d.tradeOff);
+                        replaceText = replacerDetail(d.fromVal, d.toVal, replaceText, d.isMultiLine, d.tradeOff);
                     }
                 }
                 resultArea.setText(replaceText);
@@ -787,7 +790,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
                 Validate.notEmpty((replaceText = replaceArea.getText()), "source can't empty");
                 Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
-                resultArea.setText(replacerDetail(fromPattern, toFormat, replaceText, tradeOffArea.getText()));
+                resultArea.setText(replacerDetail(fromPattern, toFormat, replaceText, multiLineCheckBox.isSelected(), tradeOffArea.getText()));
                 // 切換到結果
                 jTabbedPane1.setSelectedIndex(TabIndex.RESULT.ordinal());
                 // 貼到記事本
@@ -817,7 +820,7 @@ public class RegexReplacer extends javax.swing.JFrame {
      * @param replaceText
      *            要替換的本文
      */
-    String replacerDetail(String fromPattern, String $toFormat, String replaceText, String tradeOffAreaText) {
+    String replacerDetail(String fromPattern, String $toFormat, String replaceText, boolean isMultiLine, String tradeOffAreaText) {
         TradeOffConfig config = this.getTradeOffConfig(tradeOffAreaText);
 
         List<String> toFormatLst = new ArrayList<String>();
@@ -834,7 +837,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 int patternFlag = 0;
 
                 // 多行判斷
-                if (multiLineCheckBox.isSelected()) {
+                if (isMultiLine) {
                     patternFlag = Pattern.DOTALL | Pattern.MULTILINE;
                 }
 
@@ -1010,7 +1013,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             this.saveProp();
         }
 
-        private void put(String configKey, String fromVal, String toVal, String tradeOff, List<String> comboLst) throws FileNotFoundException, IOException {
+        private void put(String configKey, String fromVal, String toVal, boolean isMultiLine, String tradeOff, List<String> comboLst) throws FileNotFoundException, IOException {
             configKey = fixKey(configKey);
             RegexReplacer_Config d = getProperty(configKey);
             if (d != null) {
@@ -1026,7 +1029,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 return;
             }
 
-            if ((comboLst != null && comboLst.isEmpty()) && StringUtils.isNotBlank(toVal)) {
+            if ((comboLst != null && !comboLst.isEmpty()) && StringUtils.isNotBlank(toVal)) {
                 Validate.isTrue(false, "comboLst不為空!!");
             }
 
@@ -1041,6 +1044,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             d.toVal = toVal;
             d.tradeOff = tradeOff;
             d.comboLst = comboLst;
+            d.isMultiLine = isMultiLine;
 
             this.saveProp();
         }
@@ -1177,6 +1181,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     public static class RegexReplacer_Config {
 
+        boolean isMultiLine;// 1
         String exampleArea;// 1
         String configKeyText;// 1
         String fromVal;// 1
@@ -1299,6 +1304,14 @@ public class RegexReplacer extends javax.swing.JFrame {
 
         public void setComboLst(List<String> comboLst) {
             this.comboLst = comboLst;
+        }
+
+        public boolean isMultiLine() {
+            return isMultiLine;
+        }
+
+        public void setMultiLine(boolean isMultiLine) {
+            this.isMultiLine = isMultiLine;
         }
     }
 

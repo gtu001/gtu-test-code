@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="shortcut icon" href="/img/favicon.ico" />
+<link rel="bookmark" href="/img/favicon.ico" />
+<title>投資平台前台系統</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!--[if lt IE 9]>
+    <script src="/js/html5.js"></script>
+    <![endif]-->
+<style type="text/css">
+.title_col {
+	text-align: center;
+	background-color: #7f7f7f;
+	color: #FFF;
+	height: 100%;
+}
+
+.title_col_2 {
+	text-align: center;
+	background-color: #a6a6a6;
+	color: #FFF;
+	height: 100%;
+}
+
+.line_title {
+	background-color: #f2f2f2;
+	height: 100%;
+}
+
+.line_content {
+	background-color: #FFF;
+	height: 100%;
+}
+
+/*-----------------------------------*/
+</style>
+
+<script type="text/javascript">
+	function divTableResizeHandler(){
+		var fixHeight = function(isMax) {
+			$("div.row").each(function(i, v) {
+				var divs = $(" > div", v);
+				for (var ii = 0; ii < divs.length; ii++) {
+					divs[ii].style.height = "auto";
+				}
+				var mHeight = -1;
+				for (var ii = 0; ii < divs.length; ii++) {
+					mHeight = Math.max(divs[ii].clientHeight, mHeight);	
+				}
+				for (var ii = 0; ii < divs.length; ii++) {
+					if (divs[ii].clientHeight < mHeight) {
+						divs[ii].style.height = mHeight + "px";
+					}
+				}
+			});
+		};
+		$(document).ready(function() {
+			fixHeight();
+		});
+		var onresize = function(e) {
+			var width = e.target.outerWidth;
+			fixHeight();
+		}
+		window.addEventListener("resize", onresize);
+	};
+	
+	$(document).ready(function(){
+		divTableResizeHandler();
+	});
+</script>
+</head>
+<body>
+	<div class="has_client_menu" id="container">
+		<div class="content has_sidebar">
+			<!--  INVF_A3Z084 MSGID=API_QryPreTrustAcct 的電文交易 -->
+			<div class="content_col1">
+				<div class="content_box">
+					<div class="content_table">
+						<!-- ↓↓↓↓↓↓↓ 網頁內容 ↓↓↓↓↓↓↓ -->
+
+						<!-- row[1] -->
+						<!-- row[1] -->
+						<div class="row">
+							<div class="col-sm-12 title_col">客戶申請書查詢</div>
+						</div>
+						<!-- row[2] -->
+						<div class="row">
+							<div class="col-sm-4 title_col_2">客戶基本資料</div>
+							<div class="col-sm-4 title_col_2">商品交易條件</div>
+							<div class="col-sm-4 title_col_2">理專/服務人員/轉介</div>
+						</div>
+						<!-- row[3] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">客戶身分證字號/統編</div>
+							<div class="col-sm-2 line_content">
+								<span id="idnote">          </span>
+							</div>
+							<div class="col-sm-2 line_title">信託帳戶狀態</div>
+							<div class="col-sm-2 line_content">
+								<span id="status">-</span>
+							</div>
+							<div class="col-sm-2 line_title">服務人員所屬分行</div>
+							<div class="col-sm-2 line_content">
+								<span id="servicememberbranchid">     </span>
+							</div>
+						</div>
+						<!-- row[4] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">客戶姓名</div>
+							<div class="col-sm-2 line_content">
+								<span id="custname">測試　　　　　　　　　　　　　　　　　　                              </span>
+							</div>
+							<div class="col-sm-2 line_title">交易別</div>
+							<div class="col-sm-2 line_content">
+								<span id="tradetype">申購</span>
+							</div>
+							<div class="col-sm-2 line_title">服務人員</div>
+							<div class="col-sm-2 line_content">
+								<span id="servicemember">03077     </span>
+							</div>
+						</div>
+						<!-- row[5] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">申購身分註記</div>
+							<div class="col-sm-2 line_content">
+								<span id="isemployee">0</span>
+							</div>
+							<div class="col-sm-2 line_title">信託業務</div>
+							<div class="col-sm-2 line_content">
+								<span id="trusttype">Y</span>
+							</div>
+							<div class="col-sm-2 line_title">理專行員代碼</div>
+							<div class="col-sm-2 line_content">
+								<span id="tellermember">WEBMB     </span>
+							</div>
+						</div>
+						<!-- row[6] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">身分別代碼</div>
+							<div class="col-sm-2 line_content">
+								<span id="idtype">          </span>
+							</div>
+							<div class="col-sm-2 line_title">商品名稱</div>
+							<div class="col-sm-2 line_content" style="display: table-cell;">
+								<span id="bondsname">ＥＥＭ－ＭＳＣＩ新興市場指數股票型基金                                 </span>
+							</div>
+							<div class="col-sm-2 line_title">理專艦購時間(hhmm)</div>
+							<div class="col-sm-2 line_content" style="display: table-cell;">
+								<span id="confirmtime"></span>
+							</div>
+						</div>
+						<!-- row[7] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">行員身分註記</div>
+							<div class="col-sm-2 line_content">
+								<span id="isemployee">0</span>
+							</div>
+							<div class="col-sm-2 line_title">委託價格</div>
+							<div class="col-sm-2 line_content">
+								<span id="bondsccy">USD</span> <span
+									id="tradeprice">460,000.00</span>
+							</div>
+							<div class="col-sm-2 line_title">轉介人員所屬分行(轉介人員單位為C01)</div>
+							<div class="col-sm-2 line_content">
+								<span id="introductionmemberbranchid">     </span>
+							</div>
+						</div>
+						<!-- row[8] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">近一年特定金錢信託商品申購總量</div>
+							<div class="col-sm-2 line_content">
+								<span id="totalbuyrecentyear">000000000000000</span>
+							</div>
+							<div class="col-sm-2 line_title">委託股數</div>
+							<div class="col-sm-2 line_content">
+								<span id="tradeprice">460,000.00</span>
+							</div>
+							<div class="col-sm-2 line_title">轉介人員</div>
+							<div class="col-sm-2 line_content">
+								<span id="introductionmember">          </span>
+							</div>
+						</div>
+						<!-- row[9] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">授權序號</div>
+							<div class="col-sm-2 line_content">
+								<span id="authno">            </span>
+							</div>
+							<div class="col-sm-2 line_title">狀態</div>
+							<div class="col-sm-2 line_content">
+								<span id="status">-</span>
+							</div>
+							<div class="col-sm-2 line_title">轉介人員單位</div>
+							<div class="col-sm-2 line_content">
+								<span id="introductionmember">          </span>
+							</div>
+						</div>
+						<!-- row[10] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">授權註記</div>
+							<div class="col-sm-2 line_content">
+								<span id="authnote"> </span>
+							</div>
+							<div class="col-sm-2 line_title">信託金額</div>
+							<div class="col-sm-2 line_content">
+								<span id="trustamt">23,000,000.00</span>
+							</div>
+							<div class="col-sm-4 title_col_2">CPC錄音註記</div>
+						</div>
+						<!-- row[11] -->
+						<div class="row">
+							<div class="col-sm-4 title_col_2">申購書資訊(一致性)</div>
+							<div class="col-sm-2 line_title">手續費</div>
+							<div class="col-sm-2 line_content">
+								<span id="feeamount">448,500.00</span>
+							</div>
+							<div class="col-sm-2 line_title">CPC執行狀態</div>
+							<div class="col-sm-2 line_content">
+								<span id="cpcstatus">-1</span>
+							</div>
+						</div>
+						<!-- row[12] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">委託單編號</div>
+							<div class="col-sm-2 line_content">
+								<span id="opentxcode">005800000031                        </span>
+							</div>
+							<div class="col-sm-2 line_title">專案</div>
+							<div class="col-sm-2 line_content">
+								<span id="projectcode">                                                  </span>
+							</div>
+							<div class="col-sm-2 line_title">CPC取消原因</div>
+							<div class="col-sm-2 line_content">
+								<span id="cpccancelreason">                                                  </span>
+							</div>
+						</div>
+						<!-- row[13] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">下單日</div>
+							<div class="col-sm-2 line_content">
+								<span id="tradedate">20180507</span>
+							</div>
+							<div class="col-sm-2 line_title">扣款人ID</div>
+							<div class="col-sm-2 line_content">
+								<span id="custid">A101770888 </span>
+							</div>
+							<div class="col-sm-2 line_title">CPC錄音員編</div>
+							<div class="col-sm-2 line_content">
+								<span id="cpcempid">          </span>
+							</div>
+						</div>
+						<!-- row[14] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">申購日</div>
+							<div class="col-sm-2 line_content">
+								<span id="tradedate">20180507</span>
+							</div>
+							<div class="col-sm-2 line_title">扣款帳號/信用卡號</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">CPC執行時間</div>
+							<div class="col-sm-2 line_content">
+								<span id="cpcstatus">-1</span>
+							</div>
+						</div>
+						<!-- row[15] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">申購時間</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">扣款狀態</div>
+							<div class="col-sm-2 line_content">
+								<span id="chargestatus">0</span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[16] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">覆核日</div>
+							<div class="col-sm-2 line_content">
+								<span id="tradedate">20180507</span>
+							</div>
+							<div class="col-sm-2 line_title">[續回/收益分配]銀行代碼</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[17] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">覆核時間</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">[續回/收益分配]指定帳號</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[18] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">申請書狀態</div>
+							<div class="col-sm-2 line_content">
+								<span id="confirmstatus">31</span>
+							</div>
+							<div class="col-sm-2 line_title">議價等級</div>
+							<div class="col-sm-2 line_content">
+								<span id="discountlevel"> </span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[19] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">交易通路</div>
+							<div class="col-sm-2 line_content">
+								<span id="transource">網銀</span>
+							</div>
+							<div class="col-sm-2 line_title">議價折扣率</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[20] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">分行別</div>
+							<div class="col-sm-2 line_content">
+								<span id="branchid">005  </span>
+							</div>
+							<div class="col-sm-2 line_title">原費率(%)</div>
+							<div class="col-sm-2 line_content">
+								<span id="buyfeerate">00003000</span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+						<!-- row[21] -->
+						<div class="row">
+							<div class="col-sm-2 line_title">經辦/覆核行員代碼</div>
+							<div class="col-sm-2 line_content">
+								<span id="confirmmembercode">WEBMB     </span>
+							</div>
+							<div class="col-sm-2 line_title">匯率優惠註記</div>
+							<div class="col-sm-2 line_content">
+								<span id="discountfxratenote">                                                  </span>
+							</div>
+							<div class="col-sm-2 line_title">XXX</div>
+							<div class="col-sm-2 line_content">
+								<span id="xxxx1">XXXXXXX</span>
+							</div>
+						</div>
+
+
+						<!-- ↑↑↑↑↑↑↑ 網頁內容 ↑↑↑↑↑↑↑ -->
+					</div>
+				</div>
+				<form action="/fund/qryApplicationMain" method="post">
+					<div style="text-align: center">
+						<button class="btn_g" type="submit">返回</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<footer></footer>
+</body>
+</html>
