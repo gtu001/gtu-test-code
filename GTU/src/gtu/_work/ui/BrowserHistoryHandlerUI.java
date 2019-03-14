@@ -217,6 +217,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel.add(lblTitle, "2, 2, right, default");
 
             titleText = new JTextField();
+            titleText.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        JPopupMenuUtil.newInstance(titleText)//
+                                .addJMenuItem("刷新", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        urlTextOnblur(true);
+                                    }
+                                }).applyEvent(e).show();
+                    }
+                }
+            });
             panel.add(titleText, "4, 2, fill, default");
             titleText.setColumns(10);
 
@@ -228,7 +242,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             urlText.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
-                    urlTextOnblur();
+                    urlTextOnblur(false);
                 }
             });
             panel.add(urlText, "4, 4, fill, default");
@@ -1293,7 +1307,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
-    private void urlTextOnblur() {
+    private void urlTextOnblur(boolean forceReloadTitle) {
         try {
             if (StringUtils.isBlank(urlText.getText())) {
                 return;
@@ -1314,10 +1328,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     titleText.setText(file.getName());
                 }
                 return;
-            }
-
-            // 超連結
-            if (StringUtils.isBlank(titleText.getText())) {
+            } else if (StringUtils.isBlank(titleText.getText()) || forceReloadTitle) {
+                // 超連結
                 String title = getHtmlTitle(urlText.getText());
                 titleText.setText(title);
             }
@@ -1973,7 +1985,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 httpget.setHeader("User-Agent", userAgent);
             }
 
-            Pattern charsetPtn = Pattern.compile("\\<meta\\s+.*?charset=\"(.*?)\"\\>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            Pattern charsetPtn = Pattern.compile("\\<meta\\s+.*?charset=\"?(.*?)\"?\\>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
             HttpResponse response = httpclient.execute(httpget, localContext);
             HttpEntity entity = response.getEntity();
@@ -1993,6 +2005,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 Matcher mth = charsetPtn.matcher(content);
                 if (mth.find()) {
                     String realCharset = mth.group(1);
+                    System.out.println("!!!! Charset => " + realCharset);
                     if (StringUtils.contains(realCharset.toUpperCase(), "BIG")) {
                         content = new String(baos.toByteArray(), "BIG5");
                     } else if (StringUtils.contains(realCharset.toUpperCase(), "GBK")) {
