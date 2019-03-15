@@ -159,7 +159,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     jTabbedPane1.addTab("result", null, jPanel3, null);
                     {
                         jPanel4 = new JPanel();
-                        jslider = new JSlider(JSlider.HORIZONTAL, 30, 100, 30);// 最小值
+                        jslider = new JSlider(JSlider.HORIZONTAL, 0, 100, 30);// 最小值
                                                                                // ,最大值,default值
                         jslider.setMajorTickSpacing(10);
                         jslider.setMinorTickSpacing(5);
@@ -321,7 +321,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
 
         FixTextAreaHandler fix = new FixTextAreaHandler();
 
-        DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2", "百分比", "comment");
+        DefaultTableModel model = JTableUtil.createModel(false, "compare1", "compare2", "相似度", "comment");
         resultTable.setModel(model);
 
         Pattern pattern = Pattern.compile("[^\\s\\t]+");

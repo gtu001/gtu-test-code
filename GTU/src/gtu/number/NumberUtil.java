@@ -177,4 +177,27 @@ public class NumberUtil {
         // System.out.println("二進位表示\t" + 0b110);
         System.out.println("十六進位表示\t" + 0x10);
     }
+
+    /**
+     * 電文數值format
+     * 電文格式應為 000003000000000 小數位為 六位
+     * data = 000003000000000
+     * V9Length = 6
+     * 
+     * @param data
+     * @param V9Length
+     * @param scaleFormat
+     * @param toCurrency
+     * @return
+     */
+    public static String format09V9(String data, int V9Length, String scaleFormat, boolean isCurrency) {
+        data = StringUtils.trimToEmpty(data);
+        String prefix = StringUtils.substring(data, 0, V9Length * -1);
+        String suffix = StringUtils.substring(data, V9Length * -1);
+        double d = Double.parseDouble(prefix + "." + suffix);
+        String format = (!isCurrency ? "########################." : "###,###,###,###,###,###,###,###.") + scaleFormat;
+        DecimalFormat df = new DecimalFormat(format);
+        String result = df.format(d);
+        return result;
+    }
 }

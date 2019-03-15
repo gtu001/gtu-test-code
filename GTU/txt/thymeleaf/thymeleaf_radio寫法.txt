@@ -1,0 +1,4 @@
+    <label th:each="item : *{productTypeLst}">
+    	<input type="radio" th:field="*{productTypeReq}" th:value="${item.right}" th:checked="*{productTypeReq} == ${item.right}" />
+    	<span th:text="${item.left}"></span>
+    </label>

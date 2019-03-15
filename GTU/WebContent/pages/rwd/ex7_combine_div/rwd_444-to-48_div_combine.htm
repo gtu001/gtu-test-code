@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="shortcut icon" href="/img/favicon.ico" />
+	<link rel="bookmark" href="/img/favicon.ico" />
+	<title>投資平台前台系統</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!--[if lt IE 9]>
+    <script src="/js/html5.js"></script>
+<![endif]-->
+<style type="text/css">
+
+#cancelErrorMsg {
+	color: #FF0000;
+}
+
+.input_text {
+	padding: 5px 10px !important;
+	background-color: #FFF !important;
+}
+
+/*電腦版*/
+@media all and (min-width:768px) {
+	.search_bar.container {
+		width: 100%;
+	}
+	.SpecialFix_SearchType_Req {
+		padding-left: 80px;
+		margin-top: -25px;
+	}
+}
+
+/*手機板*/
+@media ( max-width : 767px) {
+	#container .has_sidebar.content {
+		padding-left: 0;
+	}
+	[type='text'], select {
+		width: 90% !important;
+	}
+}
+
+/*-----------------------------------*/
+</style>
+
+<script type="text/javascript">
+	/**
+	標籤 div 不加 class=smallScreen
+	欄位 div 加入 class=smallScreen
+	外包的 div class=row 要加 layout="\d,\d..." 用逗號分隔, 不含標籤div
+	**/
+
+	function RwdInputHandler(){
+		var getWidthHeight = function(){
+			var w = window,
+			d = document,
+			e = d.documentElement,
+			g = d.getElementsByTagName('body')[0],
+			x = w.innerWidth || e.clientWidth || g.clientWidth,
+			y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+			return [x, y];
+		}
+		var rowMap = {};
+		var onresize = function(e) {
+			var width;
+			try{
+				width = e.target.outerWidth;
+			}catch(e){
+				width = getWidthHeight()[0];
+			}
+			
+			$(".row").each(function(i, obj){
+				if(width > 768){
+					var labelDiv = $(".line_title.col-sm-4", obj);
+					var newDiv = $("<div class='line_content col-sm-8 bigScreen'></div>");
+					
+					var elArry = $(".smallScreen", obj);
+					if(elArry.length > 0){
+						for(var ii = 0; ii < elArry.length; ii ++){
+							$(elArry[ii]).children().each(function(ch){
+								$(this).attr("group", ii);
+							});
+							newDiv.append($(elArry[ii]).children());
+						}
+						
+						$(obj).empty();
+						
+						$(obj).append(labelDiv);
+						$(obj).append(newDiv);
+					}
+				} else {
+					var labelDiv = $(".line_title.col-sm-4", obj);
+					if($(".bigScreen", obj).length > 0){
+						
+						var layoutArry = $(obj).attr("layout").split(",");
+						var tmpIdx = 0;
+						var tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+						var childs = $(".bigScreen [group]", obj);
+						
+						if(childs.length > 0){
+							for(var ii = 0 ; ii < childs.length; ii ++){
+								var ch = $(childs[ii]);
+								if(tmpIdx == ch.attr("group")){
+									tmpDiv.append(ch);
+								}else{
+									$(obj).append(tmpDiv);
+									tmpIdx = ch.attr("group");
+									tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+									tmpDiv.append(ch);
+								}
+							}
+							$(obj).append(tmpDiv);
+						}
+					}
+				}
+			});
+			
+		}
+		onresize();
+		window.addEventListener("resize", onresize);
+	}
+
+	
+	$(document).ready(function(){
+		new RwdInputHandler();
+	});
+</script>
+</head>
+<body>
+
+
+	<div class="content has_sidebar">
+		<div class="content_col1">
+			<!--  INVF_A3Z086 MSGID=API_QryApplicationMain 的電文交易 -->
+			<div class="content_title">查詢項目與條件</div>
+			<div class="search_bar container">
+				<div class=" row " layout="4,4">
+					<!-- box_line -->
+					<div class="line_title col-sm-4">
+						商品<span style="color: red">*</span>
+					</div>
+
+					<div class="line_content col-sm-4  smallScreen">
+						<label> <input name="productTypeReq" type="radio"
+							value="0" id="productTypeReq1" /> <span>全部</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="1" id="productTypeReq2" checked="checked" /> <span>基金</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="4" id="productTypeReq3" /> <span>智能投資</span>
+						</label>
+					</div>
+					<div class="line_content col-sm-4 smallScreen  ">
+						<label> <input name="productTypeReq" type="radio"
+							value="2" id="productTypeReq4" /> <span>ETF</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="3" id="productTypeReq5" /> <span>債券</span>
+						</label>
+					</div>
+				</div>
+
+				<div class=" row ">
+					<!-- style="float: left;" -->
+					<!-- box_line -->
+					<div class="line_title col-sm-4">以ID/帳號搜尋</div>
+					<!-- style="margin-top: 10px;" -->
+					<div class="line_content col-sm-4">
+						<input type="text" class="input_text" id="searchKeyReq" name="searchKeyReq" value=""></input>
+					</div>
+					<div class="line_title col-sm-4">搜尋別</div>
+					<!--  -->
+					<div class="line_content col-sm-4 SpecialFix_SearchType_Req ">
+						<select id="SearchType_Req" name="searchTypeReq">
+							<option id="" value="" selected="selected"></option>
+							<option id="CustomerID" value="0">ID</option>
+							<option id="TrustAcct_Req" value="1">信託帳號</option>
+							<option id="ApplicationID_Req" value="2">申請書編號</option>
+							<option id="WithdrawAcct_Req" value="3">扣款帳號</option>
+							<option id="DistributeAcct_Req" value="4">分配帳號</option>
+						</select>
+					</div>
+				</div>
+
+				<div class=" detail row"  layout="3,3,2">
+					<!-- box_line -->
+					<div class="line_title col-sm-4">交易日</div>
+					<!--  -->
+					<div class="line_content col-sm-3 smallScreen">
+						<span class="p-t-0 datepicker"><input
+							id="ApplicationDateFrom_Req" type="text" class="input_text " name="orderDateFromReq" value="2019/03/15" /><img
+							src="/img/datepicker.png"></span>
+						</div>
+						<div class="line_content col-sm-3 smallScreen">
+							<span class="p-t-0 datepicker"><input
+								id="ApplicationDateTo_Req" type="text" class="input_text " name="orderDateToReq" value="2019/03/15" /><img
+								src="/img/datepicker.png"></span>
+							</div>
+							<div class="line_content col-sm-2 smallScreen">
+								<span style="color: red">
+									僅限12個月
+								</span>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">申請書狀態</div>
+
+							<!-- 手機板 -->
+							<div class="line_content col-sm-4 smallScreen ">
+								<label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="0"
+									checked="checked" id="applicationStautsReq1" /> <span>全部</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="1" id="applicationStautsReq2" /> <span>已建檔</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="2" id="applicationStautsReq3" /> <span>已確認</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen ">
+								<label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="3" id="applicationStautsReq4" /> <span>已覆核</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="4" id="applicationStautsReq5" /> <span>已撤銷</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="5" id="applicationStautsReq6" /> <span>未成交</span>
+								</label>
+							</div>
+						</div>
+
+
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">信託幣別</div>
+							<div class="line_content col-sm-8">
+								<label> <input class="CurrencyCode_Req" type="radio"
+									value="0" checked="checked" id="currencyCodeReq1" name="currencyCodeReq" /> <span>全部</span>
+								</label> <label> <input class="CurrencyCode_Req" type="radio"
+									value="1" id="currencyCodeReq2" name="currencyCodeReq" /> <span>臺幣</span>
+								</label> <label> <input class="CurrencyCode_Req" type="radio"
+									value="2" id="currencyCodeReq3" name="currencyCodeReq" /> <span>外幣</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">境內/外</div>
+							<div class="line_content col-sm-8">
+								<label> <input class="ShoreType_Req" type="radio"
+									value="0" checked="checked" id="shoreTypeReq1" name="shoreTypeReq" /> <span>全部</span>
+								</label> <label> <input class="ShoreType_Req" type="radio"
+									value="1" id="shoreTypeReq2" name="shoreTypeReq" /> <span>境內</span>
+								</label> <label> <input class="ShoreType_Req" type="radio"
+									value="2" id="shoreTypeReq3" name="shoreTypeReq" /> <span>境外</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">交易別</div>
+
+							<!-- 手機版 -->
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="DealType_Req" type="radio"
+									value="0" checked="checked" id="dealTypeReq1" name="dealTypeReq" /> <span>全部</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="1" id="dealTypeReq2" name="dealTypeReq" /> <span>申購</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="2" id="dealTypeReq3" name="dealTypeReq" /> <span>贖回</span>
+								</label>
+							</div>
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="DealType_Req" type="radio"
+									value="3" id="dealTypeReq4" name="dealTypeReq" /> <span>轉換</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="4" id="dealTypeReq5" name="dealTypeReq" /> <span>異動</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">信託別</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TrustType_Req" type="radio"
+									value="0" checked="checked" id="trustTypeReq1" name="trustTypeReq" /> <span>全部</span>
+								</label> <label> <input class="TrustType_Req" type="radio"
+									value="1" id="trustTypeReq2" name="trustTypeReq" /> <span>一般</span>
+								</label>
+							</div>
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TrustType_Req" type="radio"
+									value="2" id="trustTypeReq3" name="trustTypeReq" /> <span>定期定額</span>
+								</label> <label> <input class="TrustType_Req" type="radio"
+									value="3" id="trustTypeReq4" name="trustTypeReq" /> <span>定期不定額</span>
+								</label>
+							</div>
+						</div>
+
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">交易時間</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="SameDay_Req" type="radio"
+									value="0" checked="checked" id="sameDayReq1" name="sameDayReq" /> <span>全部</span>
+								</label> <label> <input class="SameDay_Req" type="radio"
+									value="1" id="sameDayReq2" name="sameDayReq" /> <span>(一般) 當日交易</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="SameDay_Req" type="radio"
+									value="2" id="sameDayReq3" name="sameDayReq" /> <span>(一般)
+									次一營業日交易</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">交易通路</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TradeType_Req" type="radio"
+									value="0" checked="checked" id="tradeTypeReq1" name="tradeTypeReq" /> <span>全部</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="1" id="tradeTypeReq2" name="tradeTypeReq" /> <span>臨櫃</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="2" id="tradeTypeReq3" name="tradeTypeReq" /> <span>網銀</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TradeType_Req" type="radio"
+									value="3" id="tradeTypeReq4" name="tradeTypeReq" /> <span>MMB</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="4" id="tradeTypeReq5" name="tradeTypeReq" /> <span>電話</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="5" id="tradeTypeReq6" name="tradeTypeReq" /> <span>語音</span>
+								</label>
+							</div>
+						</div>
+
+						<!-- BRANCH為自己本身所屬分行，因此目前寫假資料 -->
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4">分行別</div>
+							<div class="line_content col-sm-8">
+								<select id="BranchID_Req" name="branchIdReq">
+								</select>
+							</div>
+						</div>
+
+						<div style="float: right; text-align: right;">
+							<button id="searchBtn" class="btn_g" type="button">
+								搜尋<img src="/img/icon_search.png">
+							</button>
+						</div>
+
+						<div class="box_line detail">
+							<!--                             <div class="line_title" style="color: red" th:object="${applicationMainEntity}" th:text="${applicationMainEntity.returnDesc}"></div> -->
+							<div class="line_content"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</body>
+		</html>
