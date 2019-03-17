@@ -40,6 +40,10 @@ public class PropertiesGroupUtils_ByKey {
 
     public PropertiesGroupUtils_ByKey(File configFile) {
         this.configFile = configFile;
+        this.init();
+    }
+
+    public void init() {
         FileInputStream fis = null;
         try {
             if (!configFile.exists()) {
@@ -197,6 +201,10 @@ public class PropertiesGroupUtils_ByKey {
         }
         ListUtil.sortIgnoreCase(list);
         return list;
+    }
+
+    public int getSize() {
+        return this.getSaveKeys().size();
     }
 
     /**

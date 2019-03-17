@@ -773,7 +773,6 @@ public class FacebookVideoDownloader extends JFrame {
         boolean findOk1 = false;
         boolean findOk2 = false;
         File willingDownloadFile = new File(targetDirectory, vo.getFileName());
-
         if (!forceDownload) {
             for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
                 VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);
@@ -792,6 +791,9 @@ public class FacebookVideoDownloader extends JFrame {
 
             if (willingDownloadFile.exists()) {
                 if (throwEx) {
+                    VideoUrlConfigZ vo2 = new VideoUrlConfigZ(vo);
+                    vo2.downloadToFile = willingDownloadFile;
+                    crashProcessSaveLogToFile(vo2, "檔案已存在目的!");
                     throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
                 } else {
                     boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在目的,是否要繼續下載?", "繼續下載");
@@ -963,6 +965,22 @@ public class FacebookVideoDownloader extends JFrame {
             crashProcess(null, false);
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private void crashProcessSaveLogToFile(VideoUrlConfigZ vo2, String errMsg) {
+        // downloadListModel = JTableUtil.createModel(true, new String[] {
+        // "順序", "檔名", "URL", "大小", "進度", "VO" });
+        StringBuffer sb = new StringBuffer();
+        sb.append( //
+                vo2.getOrign().getOrignConfig().getOrignUrl() + "\t" + //
+                        vo2.getFileName() + "\t" + //
+                        vo2.getFileSize() + "\t" + //
+                        errMsg + "\t" + //
+                        vo2.getHtmlUrl() + "\n" + //
+                        ""//
+        );
+        String logFileName = this.getClass().getSimpleName() + "_crash_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmssSSSSS") + ".log";
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH, logFileName), sb.toString(), "UTF-8");
     }
 
     private void crashProcess(String filename, boolean throwEx) {

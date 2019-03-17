@@ -17,8 +17,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,6 +56,8 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.jdk8.ex1.StreamUtil;
+import gtu.properties.PropertiesGroupUtils_ByKey;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
@@ -91,9 +95,9 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
-    // private PropertiesUtilBean config = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+    // private PropertiesUtilBean config = new
+    // PropertiesUtilBean(AVChoicerUI.class);
+    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
@@ -108,6 +112,9 @@ public class AVChoicerUI extends JFrame {
     private HideInSystemTrayHelper trayUtil;
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private JTextField avExeFormatText;
+    private JTextField avExeAliasText;
+    private AvExeConfigHandler avExeConfigHandler;
 
     /**
      * Launch the application.
@@ -267,23 +274,48 @@ public class AVChoicerUI extends JFrame {
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+
+        JLabel lblNewLabel_1 = new JLabel("別名");
+        panel_2.add(lblNewLabel_1, "2, 2, right, default");
+
+        avExeAliasText = new JTextField();
+        panel_2.add(avExeAliasText, "4, 2, fill, default");
+        avExeAliasText.setColumns(10);
 
         JLabel label = new JLabel("撥放器");
-        panel_2.add(label, "2, 2, right, default");
+        panel_2.add(label, "2, 4, right, default");
 
         avExeText = new JTextField();
-        panel_2.add(avExeText, "4, 2, fill, default");
+        panel_2.add(avExeText, "4, 4, fill, default");
         avExeText.setColumns(10);
         JCommonUtil.jTextFieldSetFilePathMouseEvent(avExeText, true);
 
-        JButton saveConfigBtn2 = new JButton("save");
-        saveConfigBtn2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                saveConfigBtnAction();
+        JLabel lblNewLabel = new JLabel("format");
+        panel_2.add(lblNewLabel, "2, 6, right, default");
+
+        avExeFormatText = new JTextField();
+        avExeFormatText.setColumns(10);
+        panel_2.add(avExeFormatText, "4, 6, fill, default");
+
+        JPanel panel_17 = new JPanel();
+        panel_2.add(panel_17, "4, 20, fill, fill");
+
+        JButton nextConfigBtn = new JButton("下一組");
+        nextConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                avExeConfigHandler.nextConfig();
             }
         });
-        panel_2.add(saveConfigBtn2, "2, 20");
+        panel_17.add(nextConfigBtn);
+
+        JButton saveConfigBtn2 = new JButton("儲存");
+        panel_17.add(saveConfigBtn2);
+        saveConfigBtn2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                avExeConfigHandler.saveConfig();
+            }
+        });
 
         JPanel panel_11 = new JPanel();
         tabbedPane.addTab("MoveTo", null, panel_11, null);
@@ -363,6 +395,8 @@ public class AVChoicerUI extends JFrame {
 
         config.reflectInit(this);
         initAvDirList();
+        avExeConfigHandler = new AvExeConfigHandler();
+        avExeConfigHandler.nextConfig();
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
@@ -469,13 +503,14 @@ public class AVChoicerUI extends JFrame {
         private void reload() {
             try {
                 DefaultListModel model = JListUtil.createModel();
-                List<File> flst = new ArrayList<>();
+                List<File> flst = new ArrayList<File>();
+
                 StreamUtil.of(moveConfig.getConfigProp().keys())//
                         .map(key -> new File(String.valueOf(key)))//
                         .filter(file -> ((File) file).exists())//
                         .sorted(Comparator.comparing(File::getAbsolutePath))//
                         .forEach(file -> model.addElement(((File) file).getAbsolutePath()));
-                moveToList.setModel(model);
+
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }
@@ -803,24 +838,67 @@ public class AVChoicerUI extends JFrame {
 
     private void choiceAVBtnAction() {
         try {
-            File exe = getMediaPlayerExe();
+            // File exe = getMediaPlayerExe();
+            File exe = new File(avExeText.getText());
+            String commandFormat = avExeFormatText.getText();
 
             File avFile = getRandomAvFile();
             currentFileHandler.setFile(avFile);
 
             if (isWindows) {
-                String command = String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile);
-                System.out.println(command);
+                String command = String.format("cmd /c call  " + commandFormat, exe, avFile);
+                System.out.println("CMD ==> " + command);
                 Runtime.getRuntime().exec(command);
             } else {
                 RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-                String command = String.format("%s \"%s\"", exe, avFile);
-                System.out.println(command);
+                String command = String.format(commandFormat, exe, avFile);
+                System.out.println("CMD ==> " + command);
                 t.command(command);
                 t.apply("tmpVlc_", "UTF8");
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private class AvExeConfigHandler {
+        private PropertiesGroupUtils_ByKey avExeConfig = new PropertiesGroupUtils_ByKey(
+                new File(PropertiesUtil.getJarCurrentPath(AVChoicerUI.class), AVChoicerUI.class.getSimpleName() + "_avExeConfig.properties"));
+
+        private final String AV_EXE_KEY = "avExe";
+        private final String AV_EXE_FORMAT_KEY = "avExeFormat";
+
+        public void AvExeConfigHandler() {
+        }
+
+        private void nextConfig() {
+            for (int ii = 0, size = avExeConfig.getSaveKeys().size(); ii < size; ii++) {
+                Map<String, String> config = avExeConfig.loadConfig();
+
+                avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
+                avExeText.setText(config.get(AV_EXE_KEY));
+                avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
+
+                avExeConfig.next();
+
+                if (new File(avExeText.getText()).exists()) {
+                    break;
+                }
+            }
+        }
+
+        private void saveConfig() {
+            Map<String, String> config = new HashMap<String, String>();
+
+            Validate.notBlank(avExeAliasText.getText(), "alias不可為空!");
+            Validate.notBlank(avExeText.getText(), "exe不可為空!");
+            Validate.notBlank(avExeFormatText.getText(), "format不可為空!");
+
+            config.put(PropertiesGroupUtils_ByKey.SAVE_KEYS, avExeAliasText.getText());
+            config.put(AV_EXE_KEY, avExeText.getText());
+            config.put(AV_EXE_FORMAT_KEY, avExeFormatText.getText());
+
+            avExeConfig.saveConfig(config);
         }
     }
 }
