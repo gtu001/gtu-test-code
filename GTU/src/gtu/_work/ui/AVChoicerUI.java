@@ -872,7 +872,6 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void nextConfig() {
-            for (int ii = 0, size = avExeConfig.getSaveKeys().size(); ii < size; ii++) {
                 Map<String, String> config = avExeConfig.loadConfig();
 
                 avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
@@ -880,11 +879,6 @@ public class AVChoicerUI extends JFrame {
                 avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
 
                 avExeConfig.next();
-
-                if (new File(avExeText.getText()).exists()) {
-                    break;
-                }
-            }
         }
 
         private void saveConfig() {
