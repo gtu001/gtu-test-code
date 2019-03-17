@@ -95,9 +95,9 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    // private PropertiesUtilBean config = new
-    // PropertiesUtilBean(AVChoicerUI.class);
-    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
+    // private PropertiesUtilBean config = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
