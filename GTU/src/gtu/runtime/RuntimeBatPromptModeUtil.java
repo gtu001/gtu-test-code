@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ public class RuntimeBatPromptModeUtil {
     private static boolean isWindows = false;
     private static String prefix = "  ";
     private static String chgLine = "\r\n";
+    private static final String BAT_FORAT;
 
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
@@ -28,17 +30,23 @@ public class RuntimeBatPromptModeUtil {
             prefix = "";
             chgLine = "\n";
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.setLength(0);
+        sb.append("   REM @echo off \n");
+        sb.append("   for /f \"tokens=2 delims=:.\" %%x in ('chcp') do set cp=%%x \n");
+        sb.append("   chcp {0}  >nul \n");
+        sb.append("    \n");
+        sb.append("   {1} \n");
+        sb.append("    \n");
+        sb.append("   chcp %cp%>nul    \n");
+        BAT_FORAT = sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
         RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-
-        t.command("cd /media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU");
-        t.command("sh /media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn dependency:build-classpath -DincludeScope=runtime");
-
-        String console = ProcessLinuxConsoleReader.getConsole(t.apply());
-        System.out.println(console);
-
+        String result = MessageFormat.format(BAT_FORAT, new Object[] {"555555", "command here" });
+        System.out.println(result);
         System.out.println("done...");
     }
 
@@ -102,6 +110,17 @@ public class RuntimeBatPromptModeUtil {
         return this.apply("tmp_", encoding);
     }
 
+    private String getBatChcpMapping(String encode) {
+        if (StringUtils.equalsIgnoreCase("big5", encode) || StringUtils.equalsIgnoreCase("big-5", encode)) {
+            return "950";
+        } else if (StringUtils.equalsIgnoreCase("gbk", encode)) {
+            return "936";
+        } else if (StringUtils.equalsIgnoreCase("utf8", encode) || StringUtils.equalsIgnoreCase("utf-8", encode)) {
+            return "65001";
+        }
+        return "";
+    }
+
     public Process apply(String prefix, String encode) {
         try {
             if (StringUtils.isBlank(cmd)) {
@@ -110,14 +129,22 @@ public class RuntimeBatPromptModeUtil {
             prefix = StringUtils.isBlank(prefix) ? "tmp_" : prefix;
 
             if (isWindows) {
+                String fixCommand = __fixCommand(cmd.toString());
+                String chcpMapping = getBatChcpMapping(encode);
+                if (StringUtils.isNotBlank(chcpMapping)) {
+                    fixCommand = MessageFormat.format(BAT_FORAT, new Object[] { chcpMapping, fixCommand});
+                    System.out.println("Fix chcp : " + chcpMapping + " ### start !");
+                    System.out.println(fixCommand);
+                    System.out.println("Fix chcp : " + chcpMapping + " ### end !");
+                }
                 if (runInBatFile) {
                     File tmpBat = File.createTempFile(prefix, ".bat");
-                    FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
+                    FileUtil.saveToFile(tmpBat, fixCommand, encode);
                     System.out.println("tempBat : " + tmpBat);
                     return Runtime.getRuntime().exec(String.format("cmd /C start cmd /K \"%s\" ", tmpBat));
                 } else {
                     File tmpBat = File.createTempFile(prefix, ".bat");
-                    FileUtil.saveToFile(tmpBat, __fixCommand(cmd.toString()), encode);
+                    FileUtil.saveToFile(tmpBat, fixCommand, encode);
                     System.out.println("tempBat : " + tmpBat);
                     return Runtime.getRuntime().exec(String.format("cmd /C \"%s\" ", tmpBat));
                 }
@@ -144,5 +171,5 @@ public class RuntimeBatPromptModeUtil {
         String tmpCmd = __fixCommand(cmd.toString());
         return tmpCmd != null ? tmpCmd.toString() : "";
     }
-    
+
 }

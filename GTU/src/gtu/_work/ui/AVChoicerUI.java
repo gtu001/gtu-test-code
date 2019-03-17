@@ -115,6 +115,7 @@ public class AVChoicerUI extends JFrame {
     private JTextField avExeFormatText;
     private JTextField avExeAliasText;
     private AvExeConfigHandler avExeConfigHandler;
+    private JTextField avExeEncodeText;
 
     /**
      * Launch the application.
@@ -272,9 +273,9 @@ public class AVChoicerUI extends JFrame {
         tabbedPane.addTab("設定", null, panel_2, null);
         panel_2.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         JLabel lblNewLabel_1 = new JLabel("別名");
         panel_2.add(lblNewLabel_1, "2, 2, right, default");
@@ -297,6 +298,13 @@ public class AVChoicerUI extends JFrame {
         avExeFormatText = new JTextField();
         avExeFormatText.setColumns(10);
         panel_2.add(avExeFormatText, "4, 6, fill, default");
+
+        JLabel lblNewLabel_2 = new JLabel("encoding");
+        panel_2.add(lblNewLabel_2, "2, 8, right, default");
+
+        avExeEncodeText = new JTextField();
+        panel_2.add(avExeEncodeText, "4, 8, fill, default");
+        avExeEncodeText.setColumns(10);
 
         JPanel panel_17 = new JPanel();
         panel_2.add(panel_17, "4, 20, fill, fill");
@@ -801,23 +809,7 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void replay() {
-            try {
-                File exe = getMediaPlayerExe();
-                File avFile = tempFile.get();
-                if (isWindows) {
-                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exe, avFile);
-                    System.out.println(command);
-                    Runtime.getRuntime().exec(command);
-                } else {
-                    RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-                    String command = String.format("%s \"%s\"", exe, avFile);
-                    System.out.println(command);
-                    t.command(command);
-                    t.apply("tmpVlc_", "UTF8");
-                }
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
-            }
+            playAvFile(tempFile.get());
         }
     }
 
@@ -837,25 +829,25 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void choiceAVBtnAction() {
+        playAvFile(getRandomAvFile());
+    }
+
+    private void playAvFile(File avFile) {
         try {
             // File exe = getMediaPlayerExe();
             File exe = new File(avExeText.getText());
             String commandFormat = avExeFormatText.getText();
+            String encoding = avExeEncodeText.getText();
 
-            File avFile = getRandomAvFile();
             currentFileHandler.setFile(avFile);
 
-            if (isWindows) {
-                String command = String.format("cmd /c call  " + commandFormat, exe, avFile);
-                System.out.println("CMD ==> " + command);
-                Runtime.getRuntime().exec(command);
-            } else {
-                RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-                String command = String.format(commandFormat, exe, avFile);
-                System.out.println("CMD ==> " + command);
-                t.command(command);
-                t.apply("tmpVlc_", "UTF8");
-            }
+            RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
+            String command = String.format(commandFormat, exe, avFile);
+            System.out.println("CMD ==> " + command);
+            System.out.println("encoding ==> " + encoding);
+            t.command(command);
+            t.runInBatFile(false);
+            t.apply("tmpVlc_", encoding);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -867,18 +859,20 @@ public class AVChoicerUI extends JFrame {
 
         private final String AV_EXE_KEY = "avExe";
         private final String AV_EXE_FORMAT_KEY = "avExeFormat";
+        private final String AV_EXE_ENCODE_KEY = "avExeEncode";
 
         public void AvExeConfigHandler() {
         }
 
         private void nextConfig() {
-                Map<String, String> config = avExeConfig.loadConfig();
+            Map<String, String> config = avExeConfig.loadConfig();
 
-                avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
-                avExeText.setText(config.get(AV_EXE_KEY));
-                avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
+            avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
+            avExeText.setText(config.get(AV_EXE_KEY));
+            avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
+            avExeEncodeText.setText(config.get(AV_EXE_ENCODE_KEY));
 
-                avExeConfig.next();
+            avExeConfig.next();
         }
 
         private void saveConfig() {
@@ -887,10 +881,12 @@ public class AVChoicerUI extends JFrame {
             Validate.notBlank(avExeAliasText.getText(), "alias不可為空!");
             Validate.notBlank(avExeText.getText(), "exe不可為空!");
             Validate.notBlank(avExeFormatText.getText(), "format不可為空!");
+            Validate.notBlank(avExeEncodeText.getText(), "encoding不可為空!");
 
             config.put(PropertiesGroupUtils_ByKey.SAVE_KEYS, avExeAliasText.getText());
             config.put(AV_EXE_KEY, avExeText.getText());
             config.put(AV_EXE_FORMAT_KEY, avExeFormatText.getText());
+            config.put(AV_EXE_ENCODE_KEY, avExeEncodeText.getText());
 
             avExeConfig.saveConfig(config);
         }
