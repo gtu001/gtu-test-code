@@ -44,6 +44,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -68,6 +69,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextUndoUtil;
+import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
@@ -413,7 +415,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 RegexReplacer_Config config = (RegexReplacer_Config) e.getSource();
-                                templateList.setToolTipText(config.fromVal + " <----> " + config.toVal);
+                                String tip = "<html>" + JTooltipUtil.escapeHtml(config.toVal) + "</html>";
+                                templateList.setToolTipText(tip);
                             }
                         });
 
@@ -1347,5 +1350,6 @@ public class RegexReplacer extends javax.swing.JFrame {
         tradeOffArea.setText("");
         multiLineCheckBox.setSelected(false);
         autoPasteToClipboardCheckbox.setSelected(false);
+        this.tempComboLst = new ArrayList<String>();
     }
 }
