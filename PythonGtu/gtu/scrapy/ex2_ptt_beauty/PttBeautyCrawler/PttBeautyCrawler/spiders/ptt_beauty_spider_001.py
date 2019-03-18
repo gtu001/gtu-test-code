@@ -26,7 +26,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
     
     BASE_URL = 'https://www.ptt.cc'
     FETCH_SINCE_DATE = dateUtil.getDatetimeByJavaFormat("2018/11/01", "yyyy/MM/dd", True)
-    FETCH_PREFIX_YEAR = "2018/"
+    FETCH_PREFIX_YEAR = "2019/"
     
     rules = (
         Rule(LinkExtractor(
@@ -103,7 +103,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
             yield self.download(scraped_info);
 
     def download(self, scraped_info):
-        dateObj = dateUtil.getDatetimeByJavaFormat("2018/" + scraped_info['date'], "yyyy/MM/dd", True)
+        dateObj = dateUtil.getDatetimeByJavaFormat(PttBeautyCrawlerSpider.FETCH_PREFIX_YEAR + scraped_info['date'], "yyyy/MM/dd", True)
         dateStr = dateUtil.formatDatetimeByJavaFormat(dateObj, "yyyyMMdd")
         
         fileDir = fileUtil.getDesktopDir() + os.sep + "ptt_beauty_pics" + os.sep + dateStr + os.sep + scraped_info['title']
