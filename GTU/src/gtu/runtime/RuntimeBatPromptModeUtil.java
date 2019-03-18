@@ -33,13 +33,13 @@ public class RuntimeBatPromptModeUtil {
 
         StringBuilder sb = new StringBuilder();
         sb.setLength(0);
-        sb.append("   REM @echo off \n");
-        sb.append("   for /f \"tokens=2 delims=:.\" %%x in ('chcp') do set cp=%%x \n");
-        sb.append("   chcp {0}  >nul \n");
-        sb.append("    \n");
-        sb.append("   {1} \n");
-        sb.append("    \n");
-        sb.append("   chcp %cp%>nul    \n");
+        sb.append(prefix + "REM @echo off \n");
+        sb.append(prefix + "for /f \"tokens=2 delims=:.\" %%x in ('chcp') do set cp=%%x \n");
+        sb.append(prefix + "chcp {0}  >nul \n");
+        sb.append(prefix + " \n");
+        sb.append(prefix + "{1} \n");
+        sb.append(prefix + " \n");
+        sb.append(prefix + "chcp %cp%>nul    \n");
         BAT_FORAT = sb.toString();
     }
 
