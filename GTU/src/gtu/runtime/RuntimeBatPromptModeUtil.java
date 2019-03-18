@@ -23,7 +23,7 @@ public class RuntimeBatPromptModeUtil {
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
             isWindows = true;
-            prefix = "  ";
+            prefix = StringUtils.leftPad("", Integer.parseInt(System.getProperty("spaceLength", "50")));
             chgLine = "\r\n";
         } else if ("Linux".equals(System.getProperty("os.name"))) {
             isWindows = false;
@@ -45,7 +45,7 @@ public class RuntimeBatPromptModeUtil {
 
     public static void main(String[] args) throws IOException {
         RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-        String result = MessageFormat.format(BAT_FORAT, new Object[] {"555555", "command here" });
+        String result = MessageFormat.format(BAT_FORAT, new Object[] { "555555", "command here" });
         System.out.println(result);
         System.out.println("done...");
     }
@@ -126,13 +126,16 @@ public class RuntimeBatPromptModeUtil {
             if (StringUtils.isBlank(cmd)) {
                 throw new Exception("請設定 bat / sh 內容!");
             }
+            if (StringUtils.isBlank(encode)) {
+                encode = isWindows ? "BIG5" : "UTF8";
+            }
             prefix = StringUtils.isBlank(prefix) ? "tmp_" : prefix;
 
             if (isWindows) {
                 String fixCommand = __fixCommand(cmd.toString());
                 String chcpMapping = getBatChcpMapping(encode);
                 if (StringUtils.isNotBlank(chcpMapping)) {
-                    fixCommand = MessageFormat.format(BAT_FORAT, new Object[] { chcpMapping, fixCommand});
+                    fixCommand = MessageFormat.format(BAT_FORAT, new Object[] { chcpMapping, fixCommand });
                     System.out.println("Fix chcp : " + chcpMapping + " ### start !");
                     System.out.println(fixCommand);
                     System.out.println("Fix chcp : " + chcpMapping + " ### end !");
@@ -156,7 +159,7 @@ public class RuntimeBatPromptModeUtil {
                 Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));
                 return Runtime.getRuntime().exec(String.format("sh %s ", tmpSh));
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             throw new RuntimeException("batRun ERR : " + ex.getMessage(), ex);
         }
     }

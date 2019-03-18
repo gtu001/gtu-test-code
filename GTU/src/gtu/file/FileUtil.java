@@ -345,12 +345,18 @@ public class FileUtil {
      * @param encode
      */
     public static void saveToFile(File file, String content, String encode) {
+        BufferedWriter writer = null;
         try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encode));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encode));
             writer.write(content);
             writer.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new RuntimeException("saveToFile ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex1) {
+            }
         }
     }
 

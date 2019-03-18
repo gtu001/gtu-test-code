@@ -62,6 +62,7 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.runtime.DesktopUtil;
+import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -273,9 +274,9 @@ public class AVChoicerUI extends JFrame {
         tabbedPane.addTab("設定", null, panel_2, null);
         panel_2.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         JLabel lblNewLabel_1 = new JLabel("別名");
         panel_2.add(lblNewLabel_1, "2, 2, right, default");
@@ -518,7 +519,7 @@ public class AVChoicerUI extends JFrame {
                         .filter(file -> ((File) file).exists())//
                         .sorted(Comparator.comparing(File::getAbsolutePath))//
                         .forEach(file -> model.addElement(((File) file).getAbsolutePath()));
-
+                moveToList.setModel(model);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }
@@ -847,8 +848,17 @@ public class AVChoicerUI extends JFrame {
             System.out.println("encoding ==> " + encoding);
             t.command(command);
             t.runInBatFile(false);
-            t.apply("tmpVlc_", encoding);
-        } catch (Exception ex) {
+
+            ProcessWatcher watcher = ProcessWatcher.newInstance(t.apply("tmpPlayer_", encoding));
+            String str1 = watcher.getInputStreamToString();
+            String err1 = watcher.getErrorStreamToString();
+            System.out.println("Input=============================================Start");
+            System.out.println(str1);
+            System.out.println("Input=============================================End");
+            System.out.println("Error=============================================Start");
+            System.out.println(err1);
+            System.out.println("Error=============================================End");
+        } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
     }
@@ -865,30 +875,39 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void nextConfig() {
-            Map<String, String> config = avExeConfig.loadConfig();
+            try {
+                Map<String, String> config = avExeConfig.loadConfig();
 
-            avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
-            avExeText.setText(config.get(AV_EXE_KEY));
-            avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
-            avExeEncodeText.setText(config.get(AV_EXE_ENCODE_KEY));
+                avExeAliasText.setText(config.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
+                avExeText.setText(config.get(AV_EXE_KEY));
+                avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
+                avExeEncodeText.setText(config.get(AV_EXE_ENCODE_KEY));
 
-            avExeConfig.next();
+                avExeConfig.next();
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
         }
 
         private void saveConfig() {
-            Map<String, String> config = new HashMap<String, String>();
+            try {
+                Map<String, String> config = new HashMap<String, String>();
 
-            Validate.notBlank(avExeAliasText.getText(), "alias不可為空!");
-            Validate.notBlank(avExeText.getText(), "exe不可為空!");
-            Validate.notBlank(avExeFormatText.getText(), "format不可為空!");
-            Validate.notBlank(avExeEncodeText.getText(), "encoding不可為空!");
+                Validate.notBlank(avExeAliasText.getText(), "alias不可為空!");
+                Validate.notBlank(avExeText.getText(), "exe不可為空!");
+                Validate.notBlank(avExeFormatText.getText(), "format不可為空!");
+                // Validate.notBlank(avExeEncodeText.getText(),
+                // "encoding不可為空!");
 
-            config.put(PropertiesGroupUtils_ByKey.SAVE_KEYS, avExeAliasText.getText());
-            config.put(AV_EXE_KEY, avExeText.getText());
-            config.put(AV_EXE_FORMAT_KEY, avExeFormatText.getText());
-            config.put(AV_EXE_ENCODE_KEY, avExeEncodeText.getText());
+                config.put(PropertiesGroupUtils_ByKey.SAVE_KEYS, StringUtils.trimToEmpty(avExeAliasText.getText()));
+                config.put(AV_EXE_KEY, StringUtils.trimToEmpty(avExeText.getText()));
+                config.put(AV_EXE_FORMAT_KEY, StringUtils.trimToEmpty(avExeFormatText.getText()));
+                config.put(AV_EXE_ENCODE_KEY, StringUtils.trimToEmpty(avExeEncodeText.getText()));
 
-            avExeConfig.saveConfig(config);
+                avExeConfig.saveConfig(config);
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
         }
     }
 }
