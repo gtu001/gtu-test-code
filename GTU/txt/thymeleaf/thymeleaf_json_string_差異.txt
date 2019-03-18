@@ -1,0 +1,12 @@
+這種寫法放 json string 正常  
+	Ex : JSON.parse(/*[[${returnMsg}]]*/)
+
+	<script th:inline="javascript">
+	</script>
+
+
+
+這種寫法放 json string 失敗  
+	<script type="text/javascript">
+	</script>:
+
