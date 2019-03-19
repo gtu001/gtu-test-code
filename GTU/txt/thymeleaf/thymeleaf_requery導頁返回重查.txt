@@ -1,0 +1,90 @@
+來源頁 html
+	導頁連結
+	th:href="${'javascript:etlDtailPageForward('''', '''', ''' + entity.opentxcode + ''');'}"
+
+	<script th:inline="javascript">
+		
+		function etlDtailPageForward(tranDate, tranTime, openTxCode){
+			var lastestQueryJSON = /*[[${lastestQueryJSON}]]*/;
+			var lastestQueryURL = /*[[@{/fund/qryApplicationMain}]]*/
+			var actionUrl = /*[[@{/fund/qryFundCustomApplyDetail/}]]*/;
+			var $form = $("<form id=\'form2' method='POST' action='"+actionUrl+"'></form>");
+			$('body').append($form)
+			$form.append($("<input type='text' name='tranDate'/>").val(tranDate));
+			$form.append($("<input type='text' name='tranTime'/>").val(tranTime));
+			$form.append($("<input type='text' name='openTxCode'/>").val(openTxCode));
+			$form.append($("<textarea name='lastestQueryURL'/>").text(lastestQueryURL));
+			$form.append($("<textarea name='lastestQueryJSON'/>").text(lastestQueryJSON));
+			$form.submit();
+		};
+
+	</script>
+
+
+明細頁 html
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".btn_g").click(function(){
+				showLoader();
+				$("#form2").attr("action", $("[name=lastestQueryURL]").val());
+				$("#form2").submit();
+			});
+		});
+	</script>
+
+	返回重查
+	<form id="form2" th:action="@{/fund/qryApplicationMain}" method="post">
+		<textarea name="lastestQueryJSON" th:text="${lastestQueryJSON}" style="display : none;"></textarea>
+		<input type="text" name="lastestQueryURL" th:value="${lastestQueryURL}" style="display : none;"></input>
+		<div style="text-align: center">
+			<button class="btn_g" type="button">返回</button>
+		</div>
+	</form>
+
+
+來源頁 java
+	import org.springframework.beans.BeanUtils;
+	import net.sf.json.JSONObject;
+	public class ResetFormAndQueryUtil {
+	    public static <T> void resetQueryForm(String lastestQueryJSON, T form) {
+	        T form1 = (T) JSONObject
+	            .toBean(JSONObject.fromObject(lastestQueryJSON), form.getClass());
+	        BeanUtils.copyProperties(form1, form);
+	    }
+	}
+
+
+	@RequestMapping(value = "/qryApplicationMain", method = { RequestMethod.GET, RequestMethod.POST })
+    public String qryApplicationMain(
+            @ModelAttribute(value = "fundQryApplicationMainWebRequestDto") FundQryApplicationMainWebRequestDto webRequestDto,
+            @RequestParam(name = "lastestQueryJSON", required = false) String lastestQueryJSON,
+            ModelMap modelMap) {
+
+        logger.debug("in qryApplicationMain, webRequestDto = {}", webRequestDto);
+
+        if (StringUtils.isNotBlank(lastestQueryJSON)) {
+            ResetFormAndQueryUtil.resetQueryForm(lastestQueryJSON, webRequestDto);
+        }
+
+        // do your stuff here...
+
+        modelMap.addAttribute("lastestQueryJSON", JsonUtil_forWeb.toJsonStr(webRequestDto));
+        return FundViewEnum.QRY_APPLICATION_MAIN.getValue();
+    }
+
+明細頁 java
+
+	// 客戶申請書查詢 畫面
+    @RequestMapping(value = "/qryFundCustomApplyDetail", method = { RequestMethod.GET, RequestMethod.POST })
+    public String qryCustomApplyDetail(
+            @ModelAttribute(value = "fundCustomApplyDetailWebRequestDto") FundCustomApplyDetailWebRequestDto webRequestDto,
+            @RequestParam(name = "lastestQueryJSON", required = false) String lastestQueryJSON,
+            @RequestParam(name = "lastestQueryURL", required = false) String lastestQueryURL,
+            Model model) {
+
+        // do your stuff here...
+
+        model.addAttribute("lastestQueryJSON", lastestQueryJSON);
+        model.addAttribute("lastestQueryURL", lastestQueryURL);
+        return FundViewEnum.QRY_CUSTOM_APPLY_DETAIL.getValue();
+    }

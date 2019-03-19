@@ -179,10 +179,8 @@ public class NumberUtil {
     }
 
     /**
-     * 電文數值format
-     * 電文格式應為 000003000000000 小數位為 六位 --> 3,000
-     * data = 000003000000000
-     * V9Length = 6
+     * 電文數值format 電文格式應為 000003000000000 小數位為 六位 --> 3,000 data =
+     * 000003000000000 V9Length = 6
      * 
      * @param data
      * @param V9Length
@@ -191,13 +189,18 @@ public class NumberUtil {
      * @return
      */
     public static String format09V9(String data, int V9Length, String scaleFormat, boolean isCurrency) {
-        data = StringUtils.trimToEmpty(data);
-        String prefix = StringUtils.substring(data, 0, V9Length * -1);
-        String suffix = StringUtils.substring(data, V9Length * -1);
-        double d = Double.parseDouble(prefix + "." + suffix);
-        String format = (!isCurrency ? "########################." : "###,###,###,###,###,###,###,###.") + scaleFormat;
-        DecimalFormat df = new DecimalFormat(format);
-        String result = df.format(d);
-        return result;
+        String orignData = StringUtils.trimToEmpty(data).toString();
+        try {
+            data = StringUtils.trimToEmpty(data);
+            String prefix = StringUtils.substring(data, 0, V9Length * -1);
+            String suffix = StringUtils.substring(data, V9Length * -1);
+            double d = Double.parseDouble(prefix + "." + suffix);
+            String format = (!isCurrency ? "########################." : "###,###,###,###,###,###,###,###.") + scaleFormat;
+            DecimalFormat df = new DecimalFormat(format);
+            String result = df.format(d);
+            return result;
+        } catch (Exception ex) {
+            throw new RuntimeException("format09V9 錯誤 , 原始資料 : " + orignData + " , ERR : " + ex.getMessage(), ex);
+        }
     }
 }
