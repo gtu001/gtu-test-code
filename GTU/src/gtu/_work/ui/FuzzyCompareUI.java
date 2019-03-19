@@ -38,8 +38,10 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 
 import gtu.spring.SimilarityUtil;
+import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
@@ -160,7 +162,7 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     {
                         jPanel4 = new JPanel();
                         jslider = new JSlider(JSlider.HORIZONTAL, 0, 100, 30);// 最小值
-                                                                               // ,最大值,default值
+                                                                              // ,最大值,default值
                         jslider.setMajorTickSpacing(10);
                         jslider.setMinorTickSpacing(5);
                         jslider.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -306,6 +308,12 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     }
                 }
             }
+
+            {
+                JCommonUtil.setJFrameCenter(this);
+                JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+                JCommonUtil.defaultToolTipDelay();
+            }
             pack();
             this.setSize(548, 376);
         } catch (Exception e) {
@@ -326,9 +334,11 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
 
         Pattern pattern = Pattern.compile("[^\\s\\t]+");
         Pattern pattern2 = Pattern.compile("\\{c\\:(.*?),v\\:(.*?)\\}");
+        Pattern pattern21 = Pattern.compile("\\{v\\:(.*?),c\\:(.*?)\\}");
         Matcher matcher = pattern.matcher(text1);
         Matcher matcher2 = pattern.matcher(text2);
         Matcher matcher3 = pattern2.matcher(text2);
+        Matcher matcher31 = pattern21.matcher(text2);
         List<String> text1List = new ArrayList<String>();
         List<String> text2List = new ArrayList<String>();
         Map<String, String> text2Map = new HashMap<String, String>();
@@ -338,6 +348,9 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
         }
         while (matcher3.find()) {
             text2Map.put(StringUtils.trimToEmpty(matcher3.group(1)), StringUtils.trimToEmpty(matcher3.group(2)));
+        }
+        while (matcher31.find()) {
+            text2Map.put(StringUtils.trimToEmpty(matcher31.group(2)), StringUtils.trimToEmpty(matcher31.group(1)));
         }
         while (matcher2.find()) {
             text2List.add(StringUtils.trimToEmpty(matcher2.group()));
