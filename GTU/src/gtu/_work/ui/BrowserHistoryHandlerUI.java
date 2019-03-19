@@ -1017,6 +1017,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     url.toLowerCase().contains(singleText) //
                     ) {
                         return true;
+                    } else {
+                        if (singleText.contains("*")) {
+                            singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
+                            if (d.title.toLowerCase().matches(singleText) || //
+                            tag.toLowerCase().matches(singleText) || //
+                            remark.toLowerCase().matches(singleText) || //
+                            d.timestamp.toLowerCase().matches(singleText) || //
+                            url.toLowerCase().matches(singleText) //
+                            ) {
+                                return true;
+                            }
+                        }
                     }
                     return false;
                 }

@@ -374,6 +374,28 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             }
                         });
                     }
+
+                    {
+                        JMenuItem jMenuItem7 = new JMenuItem();
+                        jMenu1.add(jMenuItem7);
+                        jMenuItem7.setText("只顯示有錯英文");
+                        jMenuItem7.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                if (currentFile == null) {
+                                    return;
+                                }
+                                DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+                                for (Triple<Integer, String, String> p : backupModel) {
+                                    String desc = StringUtils.defaultString(p.getRight());
+                                    if (!StringUtil_.hasChineseWord(desc)) {
+                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+                                    }
+                                }
+                                propTable.setModel(model);
+                                applyPropTableOnBlurEvent();
+                            }
+                        });
+                    }
                 }
             }
             {
@@ -554,10 +576,10 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             });
                         }
                         {
-                            filterPanel.setLayout(
-                                    new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                                            new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                                                    FormFactory.DEFAULT_ROWSPEC, FormFactory.LINE_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                            filterPanel.setLayout(new FormLayout(
+                                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                            FormFactory.DEFAULT_ROWSPEC, FormFactory.LINE_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
                             lblNewLabel = new JLabel("檔名過濾");
                             filterPanel.add(lblNewLabel, "2, 2, right, default");
                             filterPanel.add(fileQueryText, "4, 2, fill, default");

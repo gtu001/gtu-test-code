@@ -1,0 +1,7 @@
+安裝
+	$ npm install -g electron
+	$ npm install electron --save
+	$ electron .
+
+執行 
+	$ npm start
