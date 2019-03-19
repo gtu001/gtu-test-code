@@ -8,14 +8,19 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.cache.URLTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -85,6 +90,41 @@ public class FreeMarkerSimpleUtil {
             stringTemplatge.putTemplate("aaa", templateSource);
 
             cfg.setTemplateLoader(stringTemplatge);
+            cfg.setObjectWrapper(new DefaultObjectWrapper());
+            Template temp = cfg.getTemplate("aaa");
+
+            out = new StringWriter();
+            temp.process(root, out);
+            out.flush();
+            return out.getBuffer().toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("replace ERR : " + ex.getMessage(), ex);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
+    public static String replace(File projectDir, String templateSource, Map<String, Object> root) {
+        StringWriter out = null;
+        try {
+            Configuration cfg = new Configuration();
+
+            StringTemplateLoader stringTemplatge = new StringTemplateLoader();
+            stringTemplatge.putTemplate("aaa", templateSource);
+
+            List<TemplateLoader> tempLst = new ArrayList<TemplateLoader>();
+            tempLst.add(stringTemplatge);
+            if (projectDir != null && projectDir.exists()) {
+                FileTemplateLoader ftl = new FileTemplateLoader(projectDir);
+                tempLst.add(ftl);
+            }
+            MultiTemplateLoader mtl = new MultiTemplateLoader(tempLst.toArray(new TemplateLoader[0]));
+            cfg.setTemplateLoader(mtl);
             cfg.setObjectWrapper(new DefaultObjectWrapper());
             Template temp = cfg.getTemplate("aaa");
 

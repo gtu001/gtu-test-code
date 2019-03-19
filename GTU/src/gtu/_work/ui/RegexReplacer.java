@@ -44,7 +44,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -487,6 +486,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 //
                 {
                     yamlConfigFileText = new JTextField();
+                    yamlConfigFileText.setToolTipText("設定yaml設定擋路徑");
                     JCommonUtil.jTextFieldSetFilePathMouseEvent(yamlConfigFileText, false);
                     panel_1.add(yamlConfigFileText);
                     yamlConfigFileText.setColumns(40);
@@ -504,6 +504,13 @@ public class RegexReplacer extends javax.swing.JFrame {
                             }
                         }
                     });
+                    {
+                        freemarkerProjectDirText = new JTextField();
+                        freemarkerProjectDirText.setToolTipText("設定freemarker專案目錄");
+                        JCommonUtil.jTextFieldSetFilePathMouseEvent(freemarkerProjectDirText, true);
+                        freemarkerProjectDirText.setColumns(40);
+                        panel_1.add(freemarkerProjectDirText);
+                    }
                     panel_1.add(saveConfigBtn);
                 }
                 {
@@ -768,6 +775,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton comboReplaceBtn;
 
     AtomicBoolean replaceLock = new AtomicBoolean(false);
+    private JTextField freemarkerProjectDirText;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         if (replaceLock.get()) {
@@ -878,7 +886,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                             }
                             root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
                             System.out.println("template Map : " + root);
-                            tempStr = FreeMarkerSimpleUtil.replace(tempStr, root);
+                            tempStr = FreeMarkerSimpleUtil.replace(new File(freemarkerProjectDirText.getText()), tempStr, root);
                         }
                         // ----------------------------------------------
 
