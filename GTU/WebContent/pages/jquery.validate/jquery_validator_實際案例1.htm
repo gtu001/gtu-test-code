@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<link rel="shortcut icon" href="/img/favicon.ico" />
+	<link rel="bookmark" href="/img/favicon.ico" />
+	<title>投資平台前台系統</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="js/jquery.validate.js"></script>
+	<script src="js/localization/messages_zh_TW.js"></script>
+
+<!--[if lt IE 9]>
+    <script src="/js/html5.js"></script>
+<![endif]-->
+<style type="text/css">
+.title_col {
+	text-align: center;
+	background-color: #7f7f7f;
+	color: #FFF;
+	height: 100%;
+	padding:10px;
+	vertical-align: middle ;
+}
+
+.title_col_2 {
+	text-align: center;
+	background-color: #d7dde2;
+	color: #858585;
+	height: 100%;
+	padding:10px;
+	vertical-align: middle ;
+}
+
+.line_title {
+	background-color: #f2f2f2;
+	height: 100%;
+	font-size: 14px;
+	color:#4d4d4d;
+	padding:10px;
+	border-bottom:1px solid #eee;
+	font-weight: normal;
+	vertical-align: middle ;
+}
+
+.line_content {
+	background-color: #FFF;
+	height: 100%;
+	font-size: 14px;
+	color:#4d4d4d;
+	padding:10px;
+	border-bottom:1px solid #eee;
+	font-weight: normal;
+	vertical-align: middle ;
+}
+
+/*電腦版*/
+@media all and (min-width:768px) {
+	.row {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+
+/*手機板*/
+@media ( max-width : 767px) {
+	.content.has_sidebar {
+		padding: 20px 0 20px 0 !important;
+	}
+}
+
+/*-----------------------------------*/
+</style>
+
+<script type="text/javascript">
+	var ApplicationMain = new function() {
+		return {
+			initApp : function() {
+				var javascriptDate = new Date();
+				if ($("#ApplicationDateTo_Req").val() == '') {
+					$("#ApplicationDateTo_Req").datepicker().datepicker(
+						"setDate", javascriptDate);
+				}
+
+				//javascriptDate.setMonth(javascriptDate.getMonth() - 12);
+				if ($("#ApplicationDateFrom_Req").val() == '') {
+					$("#ApplicationDateFrom_Req").datepicker().datepicker(
+						"setDate", javascriptDate);
+				}
+
+				if ($("#AcctInitDateFrom2_Req").val() == '') {
+					$("#AcctInitDateFrom2_Req").datepicker().datepicker(
+						"setDate", javascriptDate);
+				}
+
+				$("#detailSearch").click(function() {
+					$("#detailSearch_DIV").toggle();
+				});
+
+				$("#searchBtn").click(function() {
+					$("#form1").submit();
+				});
+				
+				new RwdInputHandler();
+				new FormValidate();
+			}
+		}
+	};
+	$(ApplicationMain.initApp);
+
+	function RwdInputHandler(){
+		var getWidthHeight = function(){
+			var w = window,
+			d = document,
+			e = d.documentElement,
+			g = d.getElementsByTagName('body')[0],
+			x = w.innerWidth || e.clientWidth || g.clientWidth,
+			y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+			return [x, y];
+		}
+		var rowMap = {};
+		var onresize = function(e) {
+			var width;
+			try{
+				width = e.target.outerWidth;
+			}catch(e){
+				width = getWidthHeight()[0];
+			}
+
+			$(".row").each(function(i, obj){
+				var labelDiv = $(".line_title.col-sm-4", obj);
+				if($(labelDiv).length != 0){
+					if(width > 768){
+						var newDiv = $("<div class='line_content col-sm-8 bigScreen'></div>");
+
+						var elArry = $(".smallScreen", obj);
+						if(elArry.length > 0){
+							for(var ii = 0; ii < elArry.length; ii ++){
+								$(elArry[ii]).children().each(function(ch){
+									$(this).attr("group", ii);
+								});
+								newDiv.append($(elArry[ii]).children());
+							}
+
+							$(obj).empty();
+
+							$(obj).append(labelDiv);
+							$(obj).append(newDiv);
+						}
+					} else {
+						if($(".bigScreen", obj).length > 0){
+							var layoutArry = $(obj).attr("layout").split(",");
+							var tmpIdx = 0;
+							var tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+							var childs = $(".bigScreen [group]", obj);
+
+							if(childs.length > 0){
+								for(var ii = 0 ; ii < childs.length; ii ++){
+									var ch = $(childs[ii]);
+									if(tmpIdx == ch.attr("group")){
+										tmpDiv.append(ch);
+									}else{
+										$(obj).append(tmpDiv);
+										tmpIdx = ch.attr("group");
+										tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+										tmpDiv.append(ch);
+									}
+								}
+								$(obj).append(tmpDiv);
+							}
+						}
+					}
+				}
+			});
+
+		}
+		onresize();
+		window.addEventListener("resize", onresize);
+	}
+
+	function FormValidate() {
+		var form = $("#form1");
+		
+		$(".required", form).each(function(){
+			$(this).append("<span style=\"color: red\">*</span>");
+		});
+		
+		$.fn["getDate"] = function() {
+			var value = $(this).val();
+			var re = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+			if( re.test(value)){
+				var adata = value.split('/');
+				var yyyy = parseInt(adata[0],10);
+				var dd = parseInt(adata[2],10);
+				var mm = parseInt(adata[1],10);
+				var xdata = new Date(yyyy,mm-1,dd);
+				if ( ( xdata.getFullYear() === yyyy ) && ( xdata.getMonth () === mm - 1 ) && ( xdata.getDate() === dd ) ) {
+					return xdata;
+				}
+			}
+			return null;
+		};
+		
+		jQuery.validator.addMethod("searchKeyTypeChk", function(value, element) {
+			var text1 = $("#searchTypeReq").val();
+			var text2 = $("#searchKeyReq").val();
+			if((text1 == '' && text2 != '') || (text1 != '' && text2 == '')){
+				return false;
+			}
+			return true;
+		}, "");
+		
+		jQuery.validator.addMethod("dateFormatChk", function(value, element) {
+			return this.optional(element) || ($(element).getDate() != null ? true : false);
+		}, "日期格式錯誤");
+		
+		jQuery.validator.addMethod("dateFormatChk_between", function(value, element, options) {
+			var begin = $(options[0]).getDate();
+			var end = $(options[1]).getDate();
+			if(begin == null || end == null){
+				return true;
+			}else if(begin != null && end != null && begin <= end){
+				return true;
+			}
+			return false;
+		}, "開始日期必須小於結束日期");
+		
+		jQuery.validator.addMethod("orderDateRequired", function(value, element) {
+			var begin = $("[name=orderDateFromReq]").getDate();
+			var end = $("[name=orderDateToReq]").getDate();
+			if(begin == null && end == null){
+				return false;
+			}
+			return true;
+		}, "交易日必須輸入");
+		
+		jQuery.validator.addMethod("simple_Required", function(value, element) {
+			return this.optional(element) || /\w+/.test(value);
+		}, "");
+		
+		jQuery.validator.setDefaults({
+			highlight: function(element) {
+				jQuery(element).closest('.form-group').addClass('has-error');
+			},
+			unhighlight: function(element) {
+				jQuery(element).closest('.form-group').removeClass('has-error');
+			},
+			errorElement: 'span',
+			errorClass: 'label label-danger',
+		});
+
+		form.validate({
+			rules : {
+				searchKeyReq : {
+					required : {
+						depends : function(element){
+							return $("[name=searchTypeReq]").val() != ''; //
+						}
+					}
+				},
+				searchTypeReq : {
+					required : {
+						depends : function(element){
+							return $("[name=searchKeyReq]").val() != ''; //
+						}
+					}
+				},
+				orderDateFromReq : {
+					orderDateRequired : true,
+					dateFormatChk : true,
+					dateFormatChk_between : ["[name=orderDateFromReq]", "[name=orderDateToReq]"],
+				},
+				orderDateToReq : {
+					orderDateRequired : true,
+					dateFormatChk : true,
+					dateFormatChk_between : ["[name=orderDateFromReq]", "[name=orderDateToReq]"],
+				},
+				branchIdReq : {
+					simple_Required : true,
+				},
+				tradeTypeReq : {
+					required : true,
+				},
+				sameDayReq : {
+					required : true,
+				},
+				trustTypeReq : {
+					required : true,
+				},
+				dealTypeReq : {
+					required : true,
+				},
+				shoreTypeReq : {
+					required : true,
+				},
+				currencyCodeReq : {
+					required : true,
+				},
+				applicationStatusReq : {
+					required : true,
+				},
+				productTypeReq : {
+					required : true,
+				},				
+			},
+			messages : {
+				searchKeyReq : {
+					required : function(params, element){
+						return "以ID/帳號搜尋必須輸入";
+					}
+				},
+				searchTypeReq : {
+					required : function(params, element){
+						return "搜尋別必須輸入";
+					}
+				},
+				branchIdReq : {
+					simple_Required : "分行別必須輸入",
+				},
+				tradeTypeReq : {
+					required : "交易通路必須輸入",
+				},
+				sameDayReq : {
+					required : "交易時間必須輸入",
+				},
+				trustTypeReq : {
+					required : "信託別必須輸入",
+				},
+				dealTypeReq : {
+					required : "交易別必須輸入",
+				},
+				shoreTypeReq : {
+					required : "境內/外必須輸入",
+				},
+				currencyCodeReq : {
+					required : "信託幣別必須輸入",
+				},
+				applicationStatusReq : {
+					required : "申請書狀態必須輸入",
+				},
+				productTypeReq : {
+					required : "商品必須輸入",
+				},
+			},
+			errorPlacement : function(error, element) {
+				console.log("errMsg --> " + element.attr("name"));
+				console.log("errMsg --> " + $(element).html());
+				$("#formErrorMsg").empty();
+				error.appendTo($("#formErrorMsg"));
+			},
+			submitHandler : function(form) {
+				showLoader();
+				form.submit();
+			}
+		});
+	};
+</script>
+</head>
+<body>
+	<div class="has_client_menu" id="container">
+		<form id="form1" action="/fund/qryApplicationMain"
+		method="post">
+		<input id="userInfoBranchId" name="userInfoBranchId" type="hidden" value="004" /> <input id="userInfoBranchName"
+		name="userInfoBranchName" type="hidden" value="信託分行" /> <input id="userInfoEmpId"
+		name="userInfoEmpId" type="hidden" value="09901" /> <input
+		id="userInfoEmpName" name="userInfoEmpName" type="hidden" value="測試人員" /> <input id="userInfoRoleCode"
+		name="userInfoRoleCode" type="hidden" value="1" />
+		<input id="userInfoRoleName" name="userInfoRoleName" type="hidden" value="基金分行理專" /> <input id="userInfoRoleType"
+		name="userInfoRoleType" type="hidden" value="RM" />
+		<input id="custId" name="custId" type="hidden" value="A101770888" />
+		<input id="selectedBranchId" name="selectedBranchId" type="hidden"
+		value="" /> <input id="pageNo"
+		name="pageInfo.pageNo" type="hidden" value="1" />
+		<input id="pageSize" name="pageInfo.pageSize" type="hidden" value="10" />
+
+		<div class="content has_sidebar">
+			<div class="content_col1">
+
+				<!--  INVF_A3Z086 MSGID=API_QryApplicationMain 的電文交易 -->
+				<div class="content_title">查詢項目與條件</div>
+				<div class="search_bar container">
+					<div class=" row ">
+						<div id="formErrorMsg"
+						class="line_content col-sm-12  smallScreen " style="color: red;">
+					</div>
+				</div>
+
+				<div class=" row " layout="4,4">
+					<!-- box_line -->
+					<div class="line_title col-sm-4 required">
+						商品
+					</div>
+
+					<div class="line_content col-sm-4  smallScreen">
+						<label> <input name="productTypeReq" type="radio"
+							value="0" id="productTypeReq1" checked="checked" /> <span>全部</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="1" id="productTypeReq2" /> <span>基金</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="4" id="productTypeReq3" /> <span>智能投資</span>
+						</label>
+					</div>
+					<div class="line_content col-sm-4 smallScreen  ">
+						<label> <input name="productTypeReq" type="radio"
+							value="2" id="productTypeReq4" /> <span>ETF</span>
+						</label> <label> <input name="productTypeReq" type="radio"
+							value="3" id="productTypeReq5" /> <span>債券</span>
+						</label>
+					</div>
+				</div>
+
+				<div class=" row ">
+					<!-- style="float: left;" -->
+					<!-- box_line -->
+					<div class="line_title col-sm-4">以ID/帳號搜尋</div>
+					<!-- style="margin-top: 10px;" -->
+					<div class="line_content col-sm-4">
+						<input type="text" class="input_text" id="searchKeyReq" name="searchKeyReq" value=""></input>
+					</div>
+					<div class="line_title col-sm-4">搜尋別</div>
+					<!--  -->
+					<div class="line_content col-sm-4 SpecialFix_SearchType_Req ">
+						<select id="searchTypeReq" name="searchTypeReq">
+							<option id="" value="" selected="selected"></option>
+							<option id="CustomerID" value="0">ID</option>
+							<option id="TrustAcct_Req" value="1">信託帳號</option>
+							<option id="ApplicationID_Req" value="2">申請書編號</option>
+							<option id="WithdrawAcct_Req" value="3">扣款帳號</option>
+							<option id="DistributeAcct_Req" value="4">分配帳號</option>
+						</select>
+					</div>
+				</div>
+
+				<div class=" detail row" layout="3,3,2">
+					<!-- box_line -->
+					<div class="line_title col-sm-4  required">交易日</div>
+					<!--  -->
+					<div class="line_content col-sm-3 smallScreen">
+						<span class="p-t-0 datepicker"><input
+							id="ApplicationDateFrom_Req" type="text" class="input_text " name="orderDateFromReq" value="2019/03/20" /><img
+							src="/img/datepicker.png"></span>
+						</div>
+						<div class="line_content col-sm-3 smallScreen">
+							<span class="p-t-0 datepicker"><input
+								id="ApplicationDateTo_Req" type="text" class="input_text " name="orderDateToReq" value="2019/03/20" /><img
+								src="/img/datepicker.png"></span>
+							</div>
+							<div class="line_content col-sm-2 smallScreen">
+								<span style="color: red"> 僅限12個月 </span>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">申請書狀態</div>
+
+							<!-- 手機板 -->
+							<div class="line_content col-sm-4 smallScreen ">
+								<label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="0"
+									checked="checked" id="applicationStautsReq1" /> <span>全部</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="1" id="applicationStautsReq2" /> <span>已建檔</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="2" id="applicationStautsReq3" /> <span>已確認</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen ">
+								<label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="3" id="applicationStautsReq4" /> <span>已覆核</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="4" id="applicationStautsReq5" /> <span>已撤銷</span>
+								</label> <label> <input class="ApplicationStauts_Req"
+									name="applicationStautsReq" type="radio" value="5" id="applicationStautsReq6" /> <span>未成交</span>
+								</label>
+							</div>
+						</div>
+
+
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">信託幣別</div>
+							<div class="line_content col-sm-8">
+								<label> <input class="CurrencyCode_Req" type="radio"
+									value="0" checked="checked" id="currencyCodeReq1" name="currencyCodeReq" /> <span>全部</span>
+								</label> <label> <input class="CurrencyCode_Req" type="radio"
+									value="1" id="currencyCodeReq2" name="currencyCodeReq" /> <span>臺幣</span>
+								</label> <label> <input class="CurrencyCode_Req" type="radio"
+									value="2" id="currencyCodeReq3" name="currencyCodeReq" /> <span>外幣</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">境內/外</div>
+							<div class="line_content col-sm-8">
+								<label> <input class="ShoreType_Req" type="radio"
+									value="0" checked="checked" id="shoreTypeReq1" name="shoreTypeReq" /> <span>全部</span>
+								</label> <label> <input class="ShoreType_Req" type="radio"
+									value="1" id="shoreTypeReq2" name="shoreTypeReq" /> <span>境內</span>
+								</label> <label> <input class="ShoreType_Req" type="radio"
+									value="2" id="shoreTypeReq3" name="shoreTypeReq" /> <span>境外</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">交易別</div>
+
+							<!-- 手機版 -->
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="DealType_Req" type="radio"
+									value="0" checked="checked" id="dealTypeReq1" name="dealTypeReq" /> <span>全部</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="1" id="dealTypeReq2" name="dealTypeReq" /> <span>申購</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="2" id="dealTypeReq3" name="dealTypeReq" /> <span>贖回</span>
+								</label>
+							</div>
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="DealType_Req" type="radio"
+									value="3" id="dealTypeReq4" name="dealTypeReq" /> <span>轉換</span>
+								</label> <label> <input class="DealType_Req" type="radio"
+									value="4" id="dealTypeReq5" name="dealTypeReq" /> <span>異動</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">信託別</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TrustType_Req" type="radio"
+									value="0" checked="checked" id="trustTypeReq1" name="trustTypeReq" /> <span>全部</span>
+								</label> <label> <input class="TrustType_Req" type="radio"
+									value="1" id="trustTypeReq2" name="trustTypeReq" /> <span>一般</span>
+								</label>
+							</div>
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TrustType_Req" type="radio"
+									value="2" id="trustTypeReq3" name="trustTypeReq" /> <span>定期定額</span>
+								</label> <label> <input class="TrustType_Req" type="radio"
+									value="3" id="trustTypeReq4" name="trustTypeReq" /> <span>定期不定額</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">交易時間</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="SameDay_Req" type="radio"
+									value="0" checked="checked" id="sameDayReq1" name="sameDayReq" /> <span>全部</span>
+								</label> <label> <input class="SameDay_Req" type="radio"
+									value="1" id="sameDayReq2" name="sameDayReq" /> <span>(一般) 當日交易</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="SameDay_Req" type="radio"
+									value="2" id="sameDayReq3" name="sameDayReq" /> <span>(一般)
+									次一營業日交易</span>
+								</label>
+							</div>
+						</div>
+
+						<div class=" detail row" layout="4,4">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">交易通路</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TradeType_Req" type="radio"
+									value="0" checked="checked" id="tradeTypeReq1" name="tradeTypeReq" /> <span>全部</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="1" id="tradeTypeReq2" name="tradeTypeReq" /> <span>臨櫃</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="2" id="tradeTypeReq3" name="tradeTypeReq" /> <span>網銀</span>
+								</label>
+							</div>
+
+							<div class="line_content col-sm-4 smallScreen">
+								<label> <input class="TradeType_Req" type="radio"
+									value="3" id="tradeTypeReq4" name="tradeTypeReq" /> <span>MMB</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="4" id="tradeTypeReq5" name="tradeTypeReq" /> <span>電話</span>
+								</label> <label> <input class="TradeType_Req" type="radio"
+									value="5" id="tradeTypeReq6" name="tradeTypeReq" /> <span>語音</span>
+								</label>
+							</div>
+						</div>
+
+						<!-- BRANCH為自己本身所屬分行，因此目前寫假資料 -->
+						<div class=" detail row">
+							<!-- box_line -->
+							<div class="line_title col-sm-4 required">分行別</div>
+							<div class="line_content col-sm-8">
+								<select id="BranchID_Req" name="branchIdReq">
+								</select>
+							</div>
+						</div>
+
+						<div style="text-align: right;">
+							<button id="searchBtn" class="btn_g" type="button">
+								搜尋<img src="/img/icon_search.png">
+							</button>
+							<a href="javascript:testGetUser();">.</a>
+						</div>
+
+						<div class="box_line detail">
+							<!--                             <div class="line_title" style="color: red" th:object="${applicationMainEntity}" th:text="${applicationMainEntity.returnDesc}"></div> -->
+							<div class="line_content"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</form>
+	</div>
+	<footer></footer>
+</body>
+</html>

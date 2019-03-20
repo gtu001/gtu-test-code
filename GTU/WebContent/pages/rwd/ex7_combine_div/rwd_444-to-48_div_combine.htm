@@ -85,46 +85,46 @@
 			}
 			
 			$(".row").each(function(i, obj){
-				if(width > 768){
-					var labelDiv = $(".line_title.col-sm-4", obj);
-					var newDiv = $("<div class='line_content col-sm-8 bigScreen'></div>");
-					
-					var elArry = $(".smallScreen", obj);
-					if(elArry.length > 0){
-						for(var ii = 0; ii < elArry.length; ii ++){
-							$(elArry[ii]).children().each(function(ch){
-								$(this).attr("group", ii);
-							});
-							newDiv.append($(elArry[ii]).children());
-						}
+				var labelDiv = $(".line_title.col-sm-4", obj);
+				if($(labelDiv).length != 0){
+					if(width > 768){
+						var newDiv = $("<div class='line_content col-sm-8 bigScreen'></div>");
 						
-						$(obj).empty();
-						
-						$(obj).append(labelDiv);
-						$(obj).append(newDiv);
-					}
-				} else {
-					var labelDiv = $(".line_title.col-sm-4", obj);
-					if($(".bigScreen", obj).length > 0){
-						
-						var layoutArry = $(obj).attr("layout").split(",");
-						var tmpIdx = 0;
-						var tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
-						var childs = $(".bigScreen [group]", obj);
-						
-						if(childs.length > 0){
-							for(var ii = 0 ; ii < childs.length; ii ++){
-								var ch = $(childs[ii]);
-								if(tmpIdx == ch.attr("group")){
-									tmpDiv.append(ch);
-								}else{
-									$(obj).append(tmpDiv);
-									tmpIdx = ch.attr("group");
-									tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
-									tmpDiv.append(ch);
-								}
+						var elArry = $(".smallScreen", obj);
+						if(elArry.length > 0){
+							for(var ii = 0; ii < elArry.length; ii ++){
+								$(elArry[ii]).children().each(function(ch){
+									$(this).attr("group", ii);
+								});
+								newDiv.append($(elArry[ii]).children());
 							}
-							$(obj).append(tmpDiv);
+							
+							$(obj).empty();
+							
+							$(obj).append(labelDiv);
+							$(obj).append(newDiv);
+						}
+					} else {
+						if($(".bigScreen", obj).length > 0){
+							var layoutArry = $(obj).attr("layout").split(",");
+							var tmpIdx = 0;
+							var tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+							var childs = $(".bigScreen [group]", obj);
+							
+							if(childs.length > 0){
+								for(var ii = 0 ; ii < childs.length; ii ++){
+									var ch = $(childs[ii]);
+									if(tmpIdx == ch.attr("group")){
+										tmpDiv.append(ch);
+									}else{
+										$(obj).append(tmpDiv);
+										tmpIdx = ch.attr("group");
+										tmpDiv = $("<div class='line_content col-sm-" + layoutArry[tmpIdx] + " smallScreen'></div>");
+										tmpDiv.append(ch);
+									}
+								}
+								$(obj).append(tmpDiv);
+							}
 						}
 					}
 				}
