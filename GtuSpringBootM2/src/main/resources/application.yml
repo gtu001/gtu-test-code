@@ -3,53 +3,71 @@ server:
 ---
 spring:
   profiles:
-    active: ut
----
-spring:
-  datasource:
-    oracle:
-      url: jdbc:oracle:thin:@88.8.111.91:1521:OINVINST
-      username: IVTLXIVP01FUND
-      password: IVTLXIVP01FUND
-      driver-class-name: oracle.jdbc.OracleDriver
-      test-on-borrow: true
+    active: dev
     
-    sqlserver-CTF:
-      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTF
-      username: IVTNTCTF01_NT14850
-      password: '@0075@@Fa7Bj@Nm'
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      test-on-borrow: true
       
-    sqlserver-CTFHistory:
-      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTFHistory
-      username: IVTNTCTF01_NT14850
-      password: '@0075@@Fa7Bj@Nm'
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      test-on-borrow: true
+# jpa:
+#   - database-platform: org.hibernate.dialect.MySQL5Dialect
+#     show-sql: true
+#     hibernate:
+#       dialect: org.hibernate.dialect.HSQLDialect
+#       ddl-auto: create-drop #none
+#       naming:
+#         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#     properties:
+#       hibernate.jdbc.batch_size: 20
+#       hibernate.cache.use_query_cache: false
+#       hibernate.cache.use_second_level_cache: false
+#       hibernate.cache.use_structured_entries: false
+#       hibernate.cache.use_minimal_puts: false
+#       hibernate.dialect: org.hibernate.dialect.HSQLDialec
+#       
+#   - database-platform: org.hibernate.dialect.HSQLDialect
+#     show-sql: true
+#     hibernate:
+#       dialect: org.hibernate.dialect.HSQLDialect
+#       ddl-auto: create-drop #none
+#       naming:
+#         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#     properties:
+#       hibernate.jdbc.batch_size: 20
+#       hibernate.cache.use_query_cache: false
+#       hibernate.cache.use_second_level_cache: false
+#       hibernate.cache.use_structured_entries: false
+#       hibernate.cache.use_minimal_puts: false
+#       hibernate.dialect: org.hibernate.dialect.HSQLDialec
+
+---
+
+datasource:
+#    oracle:
+#      url: jdbc:oracle:thin:@88.8.111.91:1521:OINVINST
+#      username: IVTLXIVP01FUND
+#      password: IVTLXIVP01FUND
+#      driver-class-name: oracle.jdbc.OracleDriver
+#      test-on-borrow: true
+    
+#    sqlserver-CTF:
+#      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTF
+#      username: IVTNTCTF01_NT14850
+#      password: '@0075@@Fa7Bj@Nm'
+#      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#      test-on-borrow: true
       
-    sqlserver-CTFL:
-      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTF
-      username: IVTNTCTF01_NT14850
-      password: '@0075@@Fa7Bj@Nm'
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      test-on-borrow: true
-      
-    sqlserver-CTFLHistory:
-      url: jdbc:sqlserver://DD2BIN02:1433;databaseName=CTFHistory
-      username: IVTNTCTF01_NT14850
-      password: '@0075@@Fa7Bj@Nm'
-      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      test-on-borrow: true
-      
-  jpa:
-    show-sql: true
-    database-platform: org.hibernate.dialect.Oracle10gDialect
-    hibernate:
-      dialect: org.hibernate.dialect.SQLServer2012Dialect
-      ddl-auto: none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  hsqlDB : 
+    url : jdbc:hsqldb:hsql://localhost/testdb 
+    username : sa 
+    password : 
+    driver-class-name : org.hsqldb.jdbc.JDBCDriver 
+    test-on-borrow: true
+   
+  mysql :
+    uri: jdbc:mysql://127.0.0.1:3306/test
+    username: root
+    password: roo
+    driver-class-name: com.mysql.jdbc.Driver
+    test-on-borrow: true
+    
 ---
 spring:
   cache:
@@ -58,5 +76,5 @@ spring:
         maximumSize: 500 
         expireAfterWrite: 6s
 ---
-servicePackage: com.cathaybk.invf.rest.service.impl
+servicePackage: com.gtu
 ---

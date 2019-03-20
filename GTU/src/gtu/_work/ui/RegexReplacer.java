@@ -44,6 +44,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -486,10 +487,10 @@ public class RegexReplacer extends javax.swing.JFrame {
                 //
                 {
                     yamlConfigFileText = new JTextField();
-                    yamlConfigFileText.setToolTipText("設定yaml設定擋路徑");
                     JCommonUtil.jTextFieldSetFilePathMouseEvent(yamlConfigFileText, false);
                     panel_1.add(yamlConfigFileText);
                     yamlConfigFileText.setColumns(40);
+                    yamlConfigFileText.setToolTipText("設定yaml設定檔路徑");
                 }
                 {
                     saveConfigBtn = new JButton("儲存設定");
@@ -505,11 +506,11 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                     });
                     {
-                        freemarkerProjectDirText = new JTextField();
-                        freemarkerProjectDirText.setToolTipText("設定freemarker專案目錄");
-                        JCommonUtil.jTextFieldSetFilePathMouseEvent(freemarkerProjectDirText, true);
-                        freemarkerProjectDirText.setColumns(40);
-                        panel_1.add(freemarkerProjectDirText);
+                        freemarkBaseDirText = new JTextField();
+                        JCommonUtil.jTextFieldSetFilePathMouseEvent(freemarkBaseDirText, true);
+                        freemarkBaseDirText.setToolTipText("設定freemark專案目錄");
+                        freemarkBaseDirText.setColumns(40);
+                        panel_1.add(freemarkBaseDirText);
                     }
                     panel_1.add(saveConfigBtn);
                 }
@@ -775,7 +776,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     private JButton comboReplaceBtn;
 
     AtomicBoolean replaceLock = new AtomicBoolean(false);
-    private JTextField freemarkerProjectDirText;
+    private JTextField freemarkBaseDirText;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         if (replaceLock.get()) {
@@ -886,7 +887,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                             }
                             root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
                             System.out.println("template Map : " + root);
-                            tempStr = FreeMarkerSimpleUtil.replace(new File(freemarkerProjectDirText.getText()), tempStr, root);
+                            tempStr = FreeMarkerSimpleUtil.replace(new File(freemarkBaseDirText.getText()), tempStr, root);
                         }
                         // ----------------------------------------------
 

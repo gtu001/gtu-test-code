@@ -1003,6 +1003,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     return false;
                 }
 
+                class InnerMatch {
+                    Pattern ptn;
+
+                    InnerMatch(String singleText) {
+                        singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
+                        ptn = Pattern.compile(singleText, Pattern.CASE_INSENSITIVE);
+                    }
+
+                    boolean find(String value) {
+                        Matcher mth = ptn.matcher(title_tag_remark_time);
+                        return mth.find();
+                    }
+                }
+
                 private boolean isNormalMatch_detail(String singleText) {
                     String tag = s2t(d.tag);
                     String remark = s2t(d.remark);
@@ -1019,12 +1033,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         return true;
                     } else {
                         if (singleText.contains("*")) {
-                            singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
-                            if (d.title.toLowerCase().matches(singleText) || //
-                            tag.toLowerCase().matches(singleText) || //
-                            remark.toLowerCase().matches(singleText) || //
-                            d.timestamp.toLowerCase().matches(singleText) || //
-                            url.toLowerCase().matches(singleText) //
+                            InnerMatch m = new InnerMatch(singleText);
+                            if (m.find(d.title) || //
+                            m.find(tag) || //
+                            m.find(remark) || //
+                            m.find(d.timestamp) || //
+                            m.find(url) //
                             ) {
                                 return true;
                             }

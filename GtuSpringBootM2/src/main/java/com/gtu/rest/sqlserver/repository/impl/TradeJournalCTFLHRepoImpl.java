@@ -11,18 +11,17 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.gtu.rest.sqlserver.dto.TradeJournalDTO;
 import com.gtu.rest.sqlserver.repository.interf.TradeJournalCTFLHRepoCustom;
-import com.gtu.util.SqlAction;
+import com.gtu.util.JdbcTemplateHelper;
 
 public class TradeJournalCTFLHRepoImpl implements TradeJournalCTFLHRepoCustom {
 
     @Autowired
-    private SqlAction sqlAction;
+    private JdbcTemplateHelper sqlAction;
 
     @Autowired
     @Qualifier("sqlserverCTFLHistoryJdbcTemplate")
     private NamedParameterJdbcTemplate sqlserverCTFLHJdbcTemplate;
 
-    @Override
     public List<TradeJournalDTO> findTradeJournalByDynamicParam(Map<String, Object> queryMap) {
         String type = "CTFLHistory";
 

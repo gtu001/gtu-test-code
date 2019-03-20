@@ -11,18 +11,17 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.gtu.rest.sqlserver.dto.ApplicationDTO;
 import com.gtu.rest.sqlserver.repository.interf.ApplicationCTFLHRepoCustom;
-import com.gtu.util.SqlAction;
+import com.gtu.util.JdbcTemplateHelper;
 
 public class ApplicationCTFLHRepoImpl implements ApplicationCTFLHRepoCustom {
 
     @Autowired
-    private SqlAction sqlAction;
+    private JdbcTemplateHelper sqlAction;
 
     @Autowired
     @Qualifier("sqlserverCTFLHistoryJdbcTemplate")
     private NamedParameterJdbcTemplate sqlserverCTFLHJdbcTemplate;
 
-    @Override
     public List<ApplicationDTO> findApplicationByDynamicParam(Map<String, Object> queryMap) {
         String type = "CTFLHistory";
         StringBuilder sb = new StringBuilder();

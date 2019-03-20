@@ -21,7 +21,7 @@ import org.springframework.util.ClassUtils;
  *
  */
 @Configuration
-public class SqlAction {
+public class JdbcTemplateHelper {
 
     // /** 自動注入NamedParameterJdbcTemplate */
     // @Autowired
@@ -29,8 +29,8 @@ public class SqlAction {
     // private NamedParameterJdbcTemplate jdbcTemplate;
 
     /** log4j2 */
-    private static final Logger LOG = LogManager.getLogger(SqlAction.class);
-
+    private static final Logger LOG = LogManager.getLogger(JdbcTemplateHelper.class);
+    
     /**
      * 查詢
      * 

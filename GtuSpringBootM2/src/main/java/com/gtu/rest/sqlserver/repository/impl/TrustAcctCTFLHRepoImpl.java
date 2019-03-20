@@ -11,18 +11,17 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import com.gtu.rest.sqlserver.dto.TrustAcctDTO;
 import com.gtu.rest.sqlserver.repository.interf.TrustAcctCTFLHRepoCustom;
-import com.gtu.util.SqlAction;
+import com.gtu.util.JdbcTemplateHelper;
 
 public class TrustAcctCTFLHRepoImpl implements TrustAcctCTFLHRepoCustom {
 
     @Autowired
-    private SqlAction sqlAction;
+    private JdbcTemplateHelper sqlAction;
 
     @Autowired
     @Qualifier("sqlserverCTFLJdbcTemplate")
     private NamedParameterJdbcTemplate sqlserverCTFLJdbcTemplate;
 
-    @Override
     public List<TrustAcctDTO> findTrustAcctByDynamicParam(Map<String, Object> queryMap) {
         String type = "CTFLHistory";
 
