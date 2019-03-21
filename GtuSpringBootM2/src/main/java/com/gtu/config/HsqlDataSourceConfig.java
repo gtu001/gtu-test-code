@@ -29,36 +29,36 @@ public class HsqlDataSourceConfig {
 
     private static Logger logger = LoggerFactory.getLogger(INVFAppliaction.class);
 
-    @Autowired
-    @Qualifier("hsqlDataSource")
-    private DataSource hsqlDataSource;
-
-    @Bean(name = "entityManagerHsql")
-    public EntityManager entityManager(EntityManagerFactoryBuilder builder) {
-        return entityManagerFactoryHsql(builder).getObject().createEntityManager();
-    }
-
-    @Bean(name = "entityManagerFactoryHsql")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryHsql(EntityManagerFactoryBuilder builder) {
-        return builder.dataSource(hsqlDataSource)//
-                .properties(getVendorProperties(hsqlDataSource))//
-                .packages("com.cathaybk.invf.rest.sqlserver.CTFL")//
-                .persistenceUnit("primaryPersistenceUnit")//
-                .build();
-    }
-
-    @Autowired
-    private JpaProperties jpaProperties;
-
-    private Map getVendorProperties(DataSource dataSource) {
-        Map config = jpaProperties.getHibernateProperties(dataSource);
-        logger.info("### getVendorProperties = {}", config);
-        return config;
-    }
-
-    @Primary
-    @Bean(name = "transactionManagerHsql")
-    public PlatformTransactionManager transactionManagerHsql(EntityManagerFactoryBuilder builder) {
-        return new JpaTransactionManager(entityManagerFactoryHsql(builder).getObject());
-    }
+//    @Autowired
+//    @Qualifier("hsqlDataSource")
+//    private DataSource hsqlDataSource;
+//
+//    @Bean(name = "entityManagerHsql")
+//    public EntityManager entityManager(EntityManagerFactoryBuilder builder) {
+//        return entityManagerFactoryHsql(builder).getObject().createEntityManager();
+//    }
+//
+//    @Bean(name = "entityManagerFactoryHsql")
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactoryHsql(EntityManagerFactoryBuilder builder) {
+//        return builder.dataSource(hsqlDataSource)//
+//                .properties(getVendorProperties(hsqlDataSource))//
+//                .packages("com.cathaybk.invf.rest.sqlserver.CTFL")//
+//                .persistenceUnit("primaryPersistenceUnit")//
+//                .build();
+//    }
+//
+//    @Autowired
+//    private JpaProperties jpaProperties;
+//
+//    private Map getVendorProperties(DataSource dataSource) {
+//        Map config = jpaProperties.getHibernateProperties(dataSource);
+//        logger.info("### getVendorProperties = {}", config);
+//        return config;
+//    }
+//
+//    @Primary
+//    @Bean(name = "transactionManagerHsql")
+//    public PlatformTransactionManager transactionManagerHsql(EntityManagerFactoryBuilder builder) {
+//        return new JpaTransactionManager(entityManagerFactoryHsql(builder).getObject());
+//    }
 }

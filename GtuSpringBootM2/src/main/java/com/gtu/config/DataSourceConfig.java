@@ -3,12 +3,10 @@ package com.gtu.config;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration
@@ -16,7 +14,7 @@ public class DataSourceConfig {
     
     @Bean(name = "hsqlDataSource")
     @Qualifier("hsqlDataSource")
-    @ConfigurationProperties(prefix = "datasource.hsqlDB")
+    @ConfigurationProperties(prefix = "app.datasource.hsqldb")
     public DataSource hsqlDataSource() {
         return DataSourceBuilder.create().build();
     }
