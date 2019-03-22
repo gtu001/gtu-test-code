@@ -1,61 +1,51 @@
 server:
   port: 8089
   
-  
----
 spring:
   profiles:
     active: dev
     
+  datasource:
+    hsqldb : 
+      url : jdbc:hsqldb:hsql://localhost/testdb 
+      username: sa 
+      password: 
+      driver-class-name: org.hsqldb.jdbc.JDBCDriver 
+      test-on-borrow: false
+     
+    mysql :
+      url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8
+      username: sa
+      password: 
+      driver-class-name: com.mysql.jdbc.Driver
+      test-on-borrow: false
       
-  jpa:
-    - database-platform: org.hibernate.dialect.MySQL5Dialect
-      show-sql: true
-      hibernate:
-        dialect: org.hibernate.dialect.HSQLDialect
-        ddl-auto: create-drop #none
-        naming:
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      properties:
-        hibernate.jdbc.batch_size: 20
-        hibernate.cache.use_query_cache: false
-        hibernate.cache.use_second_level_cache: false
-        hibernate.cache.use_structured_entries: false
-        hibernate.cache.use_minimal_puts: false
-        hibernate.dialect: org.hibernate.dialect.HSQLDialec
-#       
-#   - database-platform: org.hibernate.dialect.HSQLDialect
-#     show-sql: true
-#     hibernate:
-#       dialect: org.hibernate.dialect.HSQLDialect
-#       ddl-auto: create-drop #none
-#       naming:
-#         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-#     properties:
-#       hibernate.jdbc.batch_size: 20
-#       hibernate.cache.use_query_cache: false
-#       hibernate.cache.use_second_level_cache: false
-#       hibernate.cache.use_structured_entries: false
-#       hibernate.cache.use_minimal_puts: false
-#       hibernate.dialect: org.hibernate.dialect.HSQLDialec
+    derby :
+      url: jdbc:derby://localhost:1527/seconddb;create=true
+      username: test
+      password: 1234
+      driver-class-name: org.apache.derby.jdbc.ClientDriver
+      test-on-borrow: false
+      
 
----
-  app:
-    datasource:
-      hsqldb : 
-        url : jdbc:hsqldb:hsql://localhost/testdb 
-        username: sa 
-        password: 
-        driver-class-name: org.hsqldb.jdbc.JDBCDriver 
-        test-on-borrow: true
-       
-      mysql :
-        url: jdbc:mysql://127.0.0.1:3306/test
-        username: root
-        password: roo
-        driver-class-name: com.mysql.jdbc.Driver
-        test-on-borrow: true
+  jpa:
+    database : default 
     
+    database-platform: 
+      org.hibernate.dialect.HSQLDialect
+      # org.hibernate.dialect.MySQL5Dialect
+      
+    show-sql: true
+    
+    generate-ddl: false
+    
+    hibernate:
+      dialect: org.hibernate.dialect.HSQLDialect
+      ddl-auto: create-drop #none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+
 ---
 spring:
   cache:

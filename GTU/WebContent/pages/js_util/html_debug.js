@@ -1,15 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-</style>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="" />
-<script type="text/javascript" src=""></script>
-
-<script type="text/javascript">
-	<!-- 顯示input資訊 -->
-	document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function(){
 		function getType(node){
 			return node ? {}.toString.call(node) : "undefined";
 		}
@@ -166,47 +155,3 @@
 			} 
 		}
 	});
-</script>
-	
-</head>
-<body onload="">
-
-	<input type="hidden" name="test_hidden1" value="12345A" />
-	<input type="hidden" name="test_hidden2" value="12345B" />
-	<input type="hidden" name="test_hidden3" value="12345C" />
-	<span class="showHidden">顯示隱藏欄位資料</span>
-	<br/>
-	<br/>
-
-	<input type="text" name="test_input" value="test_input_value" />
-	<br/>
-
-	<input type="checkbox" id="chk1" name="test_chk" value="1" />
-	<br/>
-	<input type="checkbox" id="chk2" name="test_chk" value="2" />
-	<br/>
-	<input type="checkbox" id="chk3" name="test_chk" value="3" />
-	<br/>
-
-	<input type="radio" id="radio_1" name="test_radio" value="1" />
-	<br/>
-	<input type="radio" id="radio_2" name="test_radio" value="2" />
-	<br/>
-	<input type="radio" id="radio_3" name="test_radio" value="3" />
-	<br/>
-
-	<select name="test_select"  value="1">
-		<option value="1">a</option>
-		<option value="2">b</option>
-		<option value="3">c</option>
-	</select>
-	<br/>
-
-	<textarea name="test_area"></textarea>
-	<br/>
-	
-	<span id="testText_span">TEST_TEXT_SPAN_CONTENT</span><br/>
-</body>
-</html>
-
-	
