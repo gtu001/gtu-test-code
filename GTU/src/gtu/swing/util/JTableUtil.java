@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultCellEditor;
@@ -1326,29 +1327,54 @@ public class JTableUtil {
             }
         }
 
+        class InnerMatch {
+            Pattern ptn;
+
+            InnerMatch(String singleText) {
+                singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
+                ptn = Pattern.compile(singleText, Pattern.CASE_INSENSITIVE);
+            }
+
+            boolean find(String value) {
+                Matcher mth = ptn.matcher(value);
+                return mth.find();
+            }
+        }
+
         private void __filterText(String filterText) {
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
             String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(Pattern.quote(delimit), -1);
+            Map<String, TableColumn> addColumns = new LinkedHashMap<String, TableColumn>();
 
-            for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
-                Object key = headerDef.getLeft().get(ii);
-                String headerColumn = String.valueOf(key).toUpperCase();
+            for (String param : params) {
+                param = StringUtils.trimToEmpty(param);
+                InnerMatch m = new InnerMatch(param);
 
-                boolean findOk = false;
-                B: for (String param : params) {
-                    param = StringUtils.trimToEmpty(param);
+                for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
+                    Object key = headerDef.getLeft().get(ii);
+                    String headerColumn = String.valueOf(key).toUpperCase();
+
+                    boolean findOk = false;
+
                     if (headerColumn.contains(param)) {
                         System.out.println("Match------------" + headerColumn + " --> " + param);
                         findOk = true;
-                        break B;
+                    } else if (param.contains("*")) {
+                        if (m.find(headerColumn)) {
+                            findOk = true;
+                        }
+                    }
+
+                    if (findOk && !addColumns.containsKey(headerColumn)) {
+                        System.out.println("Add------------" + key);
+                        addColumns.put(headerColumn, headerDef.getRight().get(ii));
                     }
                 }
+            }
 
-                if (findOk) {
-                    System.out.println("Add------------" + key);
-                    columnModel.addColumn(headerDef.getRight().get(ii));
-                }
+            for (TableColumn column : addColumns.values()) {
+                columnModel.addColumn(column);
             }
         }
 

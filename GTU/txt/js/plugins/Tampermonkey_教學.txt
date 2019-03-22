@@ -34,4 +34,8 @@
 
 
 這是可以用regex
-// @include        /https\:\/\/www\.jvid\.com\/v\/.*/
+// @include        /https\:\/\/www\.jvid\.com\/v\/.*/\
+
+
+只用lib
+// @require http://code.jquery.com/jquery-3.3.1.min.js
