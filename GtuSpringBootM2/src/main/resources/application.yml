@@ -1,10 +1,13 @@
 server:
   port: 8089
   
+---
 spring:
   profiles:
     active: dev
-    
+---    
+
+spring:
   datasource:
     hsqldb : 
       url : jdbc:hsqldb:hsql://localhost/testdb 
@@ -27,7 +30,8 @@ spring:
       driver-class-name: org.apache.derby.jdbc.ClientDriver
       test-on-borrow: false
       
-
+---   
+spring: 
   jpa:
     database : default 
     

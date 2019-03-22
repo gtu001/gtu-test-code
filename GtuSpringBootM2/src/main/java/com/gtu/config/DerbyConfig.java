@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //    entityManagerFactoryRef = "entityManagerFactoryOracle", 
 //    transactionManagerRef = "transactionManagerOracle", 
 //    basePackages = {"com.gtu.rest.oracle" }) 
-//public class OracleConfig {
+//public class DerbyConfig {
 //
 //    @Autowired
 //    @Qualifier("oracleDataSource")

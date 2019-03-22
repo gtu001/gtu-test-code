@@ -49,7 +49,7 @@ public class INVFAppliaction  implements CommandLineRunner  {
         logger.info("## spring.config.name = " + System.getProperty("spring.config.name"));
         logger.info("scan bean ========================= start");
         for (String name : applicationContext.getBeanDefinitionNames()) {
-            logger.info("\tscan bean => {}", name);
+//            logger.info("\tscan bean => {}", name);
         }
         logger.info("scan bean ========================= end");
     }
