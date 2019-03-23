@@ -1,0 +1,3 @@
+無法重新啟動時
+
+	kill --> /usr/lib/wine/wineserver64 -p0
