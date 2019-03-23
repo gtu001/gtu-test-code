@@ -1,4 +1,3 @@
-import ustruct as struct
 from bottle import route, run, template
 port = 9099
 
@@ -9,6 +8,7 @@ def homepage(name):
 print("Try going to http://localhost:{}/personal/Tom".format(port))
 print("Try going to http://localhost:{}/personal/Carl".format(port))
 run(host='localhost', port=port)
+
 
 
 

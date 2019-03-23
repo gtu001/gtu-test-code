@@ -44,7 +44,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -59,6 +58,7 @@ import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.string.StringUtil_;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -467,6 +467,34 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 });
                                 panel_8.add(resultAreaClearBtn);
                             }
+                            {
+                                distinctResultBtn = new JButton("distinct");
+                                distinctResultBtn.addActionListener(new ActionListener() {
+                                    public void actionPerformed(ActionEvent e) {
+                                        try {
+                                            final List<String> lst = StringUtil_.readContentToList(resultArea.getText(), true, true, true);
+                                            JPopupMenuUtil.newInstance(distinctResultBtn).applyEvent(e)//
+                                                    .addJMenuItem("一般", new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
+                                                            resultArea.setText(StringUtils.join(lst, "\r\n"));
+                                                        }
+                                                    })//
+                                                    .addJMenuItem("排序", new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
+                                                            Collections.sort(lst);
+                                                            resultArea.setText(StringUtils.join(lst, "\r\n"));
+                                                        }
+                                                    })//
+                                                    .show();
+                                        } catch (Exception ex) {
+                                            JCommonUtil.handleException(ex);
+                                        }
+                                    }
+                                });
+                                panel_8.add(distinctResultBtn);
+                            }
                         }
                         {
                             panel_9 = new JPanel();
@@ -554,6 +582,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                     tradeOffArea.setRows(3);
                     // tradeOffArea.setPreferredSize(new Dimension(0, 50));
                     tradeOffArea.addMouseListener(new MouseAdapter() {
+
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             try {
@@ -702,6 +731,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             hideInSystemTrayHelper.apply(this);
 
             keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
+
                 @Override
                 public void run() {
                     exeucteActionPerformed(null);
@@ -721,7 +751,9 @@ public class RegexReplacer extends javax.swing.JFrame {
                     dispose();
                 }
             });
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
         }
     }
@@ -777,6 +809,7 @@ public class RegexReplacer extends javax.swing.JFrame {
 
     AtomicBoolean replaceLock = new AtomicBoolean(false);
     private JTextField freemarkBaseDirText;
+    private JButton distinctResultBtn;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         if (replaceLock.get()) {

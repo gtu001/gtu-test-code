@@ -1,0 +1,8 @@
+當apt header 壞掉執行以下指令
+
+
+	sudo rm /var/lib/apt/lists/* -vf
+		->移除壞掉的pkg
+
+	sudo apt-get update
+

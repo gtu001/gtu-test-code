@@ -13,7 +13,7 @@
 	        {
 	            "label": "python",
 	            "type": "shell",
-	            "command": "python",
+	            "command": "~/anaconda3/bin/python",
 	            "isShellCommand": true,
 	            "args": [
 	                "${file}"

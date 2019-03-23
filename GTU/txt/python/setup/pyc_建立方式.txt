@@ -1,0 +1,6 @@
+
+切到 project 根目錄
+
+＄ python3 -m compileall .
+
+
