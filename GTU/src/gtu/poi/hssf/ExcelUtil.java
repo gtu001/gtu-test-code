@@ -425,6 +425,14 @@ public class ExcelUtil {
         return rowMap;
     }
 
+    public String readCell(Row row, int cellPos) {
+        if (row == null) {
+            return "";
+        }
+        Cell cell = row.getCell(cellPos);
+        return readCell(cell);
+    }
+
     public String readCell(Row row, String cellStr) {
         int pos = cellEnglishToPos(cellStr);
         if (row == null) {

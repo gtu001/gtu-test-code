@@ -1012,7 +1012,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     }
 
                     boolean find(String value) {
-                        Matcher mth = ptn.matcher(title_tag_remark_time);
+                        Matcher mth = ptn.matcher(value);
                         return mth.find();
                     }
                 }
