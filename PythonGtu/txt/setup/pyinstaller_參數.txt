@@ -1,9 +1,0 @@
-
-若超出遞迴限制
-
-*.spec 上面加入 
-
-import sys  
-sys.setrecursionlimit(10000)  
-
-即可

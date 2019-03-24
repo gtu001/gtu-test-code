@@ -1,0 +1,6 @@
+輸入
+	Natural Reader Text to Speech
+	Read Aloud: 文字語音朗讀助理
+	
+	
+		

@@ -1,9 +1,0 @@
-
-簡易啟動
-
-	$ cd D:\workstuff\gtu-test-code\PythonGtu
-	$ set FLASK_APP=gtu.flask.ex1.flask_test_001.py
-	$ flask run
-
-
--------------------------------------------------------------------------------------------

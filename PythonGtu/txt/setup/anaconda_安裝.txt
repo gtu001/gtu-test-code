@@ -1,6 +1,0 @@
-
-	ubuntu 在 command line 輸入 conda --version
-	有顯示表示成功
-	
-	若無顯示必須手動加入PATH 
-		echo 'export PATH="~/anaconda3/bin:$PATH"'>>~/.bashrc

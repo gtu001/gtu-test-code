@@ -1,0 +1,399 @@
+<!DOCTYPE html public "-//W3C//DTD HTML 4.01 Transitional//EN"     "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+
+<html>
+<head>
+<title>ImageMagick使用心得</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="../main.css" media="screen">
+
+<style type="text/css">
+<!--
+
+BODY {
+	padding : 0.7in;
+	font-size : medium;
+	font-family : Times New Roman, Times, serif;
+	background : white;
+	border-style: solid;
+	border-width: 20pt;
+	border-color: midnightblue;
+	padding: 0.7in;
+}
+
+body.framed {
+              padding: 10pt;
+              border-style:none;
+              }
+
+body.ascii{
+            background-color : Black;
+            }
+
+P{
+   text-indent : 2em;
+   }
+
+p.banner {
+           text-align : center;
+           }
+
+P.mmix{
+        text-indent : 0;
+        font-size : medium;
+        }
+
+P.tip{
+       color: blue;
+       }
+
+p.ps{
+	color:gray
+}
+
+OL{
+    list-style-type: decimal;
+    padding-bottom : 8px;
+    text-indent : 0;
+    font-size : medium;
+    /*background: gray;*/
+    }
+
+OL.arabic {
+            list-style-type: decimal;
+            }
+OL.cjk {
+         list-style-type: cjk-ideographic;
+         }
+
+OL.roman{
+          list-style-type: lower-roman;
+          }
+
+A{
+	color: #813A66;
+	font-weight: bold;
+	text-decoration: none;
+   }
+
+A:Hover {
+	caption-side : left;
+	background-color: #FF80FF;
+	text-decoration: none;
+          }
+
+HR {
+     color: #2E8B57;
+     height: 1pt;
+     }
+
+UL {
+     list-style-type : circle;
+     }
+
+div{
+     border : 1pt;
+     border-color : white;
+     border-style : solid;
+     padding: 10pt;
+     }
+
+IMG{
+	border : 0;
+	margin: 2 2 2 2;
+     }
+
+img.formula {
+              border : thin;
+              border-color: blue;
+              border-style : solid;
+              }
+
+
+pre {
+      border: #777777 1px solid;
+      padding: 0.5em;
+      margin-left: 1em;
+      margin-right: 2em;
+      white-space: pre;
+      background-color: snow;
+      color: #006400 ;
+      font-family : Luxi Mono, Luxi Sans, Monospace, sans-serif, 冼极;    
+      font-size: 90%;
+      overflow: auto;
+      max-height: 3in;
+      }
+
+
+pre.syntax {
+             background: lightblue;
+             }
+
+pre.error {
+            background-color: pink;
+            }
+
+pre.url {
+          background: bisque;
+          }
+
+pre.verse { 
+            background: pink;}
+em {
+     color: #FF9900;
+     text-decoration:none;
+     font-style:normal;
+     }
+
+em.phrase {
+            color: blue;
+            text-decoration:none;
+            font-style:normal;
+            }
+
+h1 {
+	ont-size:  28px;
+	border-bottom: solid black 2pt;
+	padding: 0.1em;
+	padding-top: 0.2em;
+	padding-left: 0.3em;
+	padding-bottom: 2pt;
+     background: ;
+	color: #1E2A37;
+     }
+
+h1.home{
+         color: #102C4A;
+         font-size: 34px;
+         }
+
+h2 { 
+     color:#666;
+     font-size: 18px;
+     border-top: solid black 1px;
+     border-bottom: solid black 1px;
+     padding: 0.1em;
+     padding-top: 0.2em;
+     padding-left: 0.3em;
+     padding-bottom: 0.3em;
+     background:rgb(211,211,211)
+     }
+
+h3 { 
+     color:#666;
+     font-size: 16px;
+     border-left: solid black 1px;
+     border-bottom: solid black 1px;
+     padding: 0.1em;
+     padding-top: 0.2em;
+     padding-left: 0.3em;
+     padding-bottom: 0.3em;
+     width: 70%;
+     }
+
+h4 { 
+     color:#666;
+     font-size: 14px;
+     padding: 2px;
+     margin-top: 5px;
+     }
+
+H5 {
+     color: #666;
+     text-align: left;
+     font-size: 12px;
+     font-size: 12px;
+     }
+
+
+LI {
+     margin-top: 3ex;
+     }
+
+LI.explained {
+               }
+
+p.adage{ 
+         background: lightyellow; 
+         border: green; 
+         border-style: solid;
+         }
+
+p.script {
+           font-size: small;
+           text-align:right;
+           }
+
+
+div.tl{ 
+        position: fixed;
+        width: 7%;
+        top: .4cm;
+        right: 0;
+        left: .4cm;
+        bottom: auto;
+        margin:0;
+        padding: 5px;
+        font-size:  28px;
+        color:#666;
+        border-bottom: 5px solid #000;
+        margin: 0px;
+        margin-bottom: 8px;
+        }
+
+
+.example { border: 1pt solid black; padding: 10pt; background: rgb(240, 240, 255); overflow: auto }
+
+
+body {
+	background: url("../images/recbg.jpg");
+	border-width: 20pt;
+        border-color: midnightblue;
+}
+ol {list-style-image: url("../images/dance.gif");}
+
+-->
+</style>
+
+</head>
+<body>
+
+<h1 class="home">我的ImageMagick使用心得</h1>
+
+<p>文：Charry</p>
+
+<p>在认识ImageMagick之前，我使用的图像浏览软件是KuickShow，截图软件是KSnapShot，这两款软件都是KDE附带的软件，用起来也是蛮方便的。在一次偶然的机会中，我遇到了ImageMagick，才发现Linux竟然有如此功能强大的图像软件。</p>
+
+<p>你将会发现，大部分的操作，你只要在终端下动动键盘即可，省得你用鼠标点来点去。</p>
+
+<p>下面，我对ImageMagick的主要功能做一个简单的介绍，其中覆盖的大都是人们常用的一些功能，如果你要全面的了解它的知识，你可以看看它的man手册。</p>
+
+<h2>convert</h2>
+
+<p>convert顾名思义就是对图像进行转化，它主要用来对图像进行格式的转化，同时还可以做缩放、剪切、模糊、反转等操作。</p>
+
+<ul>
+<li>格式转化</li>
+<p>比如把 foo.jpg 转化为 foo.png：
+<pre>convert foo.jpg foo.png</pre>
+如果要想把目录下所有的jpg文件都转化为gif，我们可借助于shell的强大功能：
+<pre>find ./ -name "*.jpg" -exec convert {} {}.gif \;</pre>
+转化后的gif名称为 *.jpg.gif ，这样看起来不太自然，没关系，我们可以再来一步：
+<pre>rename .jpg.gif .gif *.jpg.gif</pre>
+本来，我想在find的时候，用basename来取得不带后缀的文件名的，这样就不会形成.jpg.gif这种丑陋的名子了，可是不知道为什么，就是不行，如果你知道的话，告诉我
+</p>
+
+<p>或者，你也可用shell script来完成上述的操作：<pre>for i in *.jpg
+do
+convert $i `basename $i .jpg`.gif
+done</pre></p>
+
+<p>我们还可用mogrify来完成同样的效果：<pre>mogrify -format png *.jpg</pre>上面命令将会把目录下面所有的jpg文件转化为png格式。</p>
+
+<p>convert还可以把多张照片转化成pdf格式：<pre>convert *.jpg foo.pdf</pre></p>
+
+<li>大小缩放</li>
+<p>比如我们要为一个普通大小的图片做一个缩略图，我们可以这样<pre>convert -resize 100x100 foo.jpg thumbnail.jpg</pre>你也可以用百分比，这样显的更为直观：<pre>convert -resize 50%x50% foo.jpg thumbnail.jpg</pre>convert会自动地考虑在缩放图像大小时图像的高宽的比例，也就是说着新的图像的高宽比与原图相同。</p>
+
+<p>我们还可以批量生成缩略图：<pre>mogrify -sample 80x60 *.jpg</pre>注意，这个命令会覆盖原来的图片，不过你可以在操作前，先把你的图片备份一下。</p>
+<li>加边框</li>
+<p>在一张照片的四周加上边框，可以用 -mattecolor 参数，比如某位同志牺牲了，我们需要为他做一张黑边框的遗像，可以这样：<pre>convert -mattecolor "#000000" -frame 60x60 yourname.jpg rememberyou.png</pre>其中，"#000000"是边框的颜色，边框的大小为60x60</p>
+
+<p>你也可以这样加边框:<pre>convert -border 60x60 -bordercolor "#000000" yourname.jpg rememberyou.png</pre></p>
+
+<li>在图片上加文字</li>
+<p><pre>convert -fill green -pointsize 40 -draw 'text 10,50 "charry.org"' foo.png bar.png</pre>上面的命令在距离图片的左上角10x50的位置，用绿色的字写下charry.org，如果你要指定别的字体，可以用-font参数。</p>
+
+<li>模糊</li>
+<p>高斯模糊:<pre>convert -blur 80 foo.jpg foo.png</pre> -blur参数还可以这样-blur 80x5。后面的那个5表示的是Sigma的值，这个是图像术语，我也不太清楚，总之，它的值对模糊的效果起关键的作用。</p>
+
+<li>翻转</li>
+<p>上下翻转：<pre>convert -flip foo.png bar.png</pre></p><p>左右翻转：<pre>convert -flop foo.png bar.png</pre></p>
+
+<li>反色</li>
+<p>形成底片的样子：<pre>convert -negate foo.png bar.png</pre></p>
+
+<li>单色</li>
+<p>把图片变为黑白颜色：<pre>convert -monochrome foo.png bar.png</pre></p>
+
+<li>加噪声</li>
+<p><pre>convert -noise 3 foo.png bar.png</pre></p>
+
+<li>油画效果</li>
+<p>我们可用这个功能，把一张普通的图片，变成一张油画，效果非常的逼真<pre>convert -paint 4 foo.png bar.png</pre></p>
+
+<li>旋转</li>
+<p>把一张图片，旋转一定的角度：<pre>convert -rotate 30 foo.png bar.png</pre>上面的30，表示向右旋转30度，如果要向左旋转，度数就是负数。</p>
+
+<li>炭笔效果</li>
+<p><pre>convert -charcoal 2 foo.png bar.png</pre>形成炭笔或者说是铅笔画的效果。</p>
+
+<li>散射</li>
+<p>毛玻璃效果：<pre>convert -spread 30 foo.png bar.png</pre></p>
+
+<li>漩涡</li>
+<p>以图片的中心作为参照，把图片扭转，形成漩涡的效果：<pre>convert -swirl 67 foo.png bar.png</pre></p>
+
+<li>凸起效果</li>
+<p>用-raise来创建凸边：<pre>convert -raise 5x5 foo.png bar.png</pre>执行后，你会看到，照片的四周会一个5x5的边，如果你要一个凹下去的边，把-raise改为+raise就可以了。其实凸边和凹边看起来区别并不是很大。</p>
+
+<li>其他</li>
+<p>其他功能都是不太常用的，如果你感兴趣的话，可以看它的联机文档</p>
+</ul>
+
+
+<h2>import</h2>
+<p>import是一个用于屏幕截图的组件，下面列出的是我们常用的功能，其他的功能，你参考它的man好了。</p>
+
+<ul>
+<li>截取屏幕的任一矩形区域</li>
+<p><pre>import foo.png</pre>在输入上述的命令后，你的鼠标会变成一个十字，这个时候，你只要在想要截取的地方划一个矩形就可以了</p>
+
+<li>截取程序的窗口</li>
+<p><pre>import -pause 3 -frame foo.png</pre>回车后，用鼠标在你想截的窗口上点一下即可。参数-frame的作用是告诉import，截图的时候把目标窗口的外框架带上，参数-pause的作用很重要，你可以试着把它去掉，对比一下，你会发现，目标窗口的标题栏是灰色的，pause就是让import稍微延迟一下，等你的目标窗口获得焦点了，才开始截图，这样的图才比较自然。</p>
+
+<li>截取一个倾斜的窗口</li>
+<p>如果想让你的截图比较cool，你可以把截取一个倾斜的窗口，方法如下：<pre>import -rotate 30 -pause 3 -frame foo.png</pre> </p>
+
+<li>截取整个屏幕</li>
+<p><pre>import -pause 3 -window root screen.png</pre>注意，暂停了3秒钟，你需要在3秒钟内切换到需要截取的画面噢。</p>
+</ul>
+
+<h2>display</h2>
+<p>display应该是我们使用的最为频繁的图像处理软件了，毕竟，还是看的多</p>
+<ul>
+
+<li>显示图片</li>
+<p><pre>display foo.png</pre>如果你要显示多个文件，你可以使用通配符<pre>display *.png</pre></p>
+
+<li>幻灯片</li>
+<p><pre>display -delay 5 *</pre>每隔5个百分之秒显示一张图片</p>
+
+<li>一些快捷键</li>
+<ol>
+<li>space(空格): 显示下一张图片</li>
+<li>backspace(回删键):显示上一张图片</li>
+<li>h: 水平翻转</li>
+<li>v: 垂直翻转</li>
+<li>/:顺时针旋转90度</li>
+<li>\:逆时针旋转90度</li>
+<li>>: 放大</li>
+<li><: 缩小</li>
+<li>F7:模糊图片</li>
+<li>Alt+s:把图片中间的像素旋转</li>
+<li>Ctrl+s:图象另存</li>
+<li>Ctrl+d:删除图片</li>
+<li>q: 退出</li>
+</ol>
+</ul>
+
+<h2>其他</h2>
+<p>ImageMagick还提供有丰富的编程接口，比如，你可以用php来调用它，用ImageMagick来生成验证码图片，效果非常棒。</p>
+
+<p>ImageMagick还有一个小工具identify，它可以用来显示一个图片文件的详悉信息，比如格式、分辨率、大小、色深等等，你都可用它来帮你的忙。</p>
+
+<p>如果你对命令行不太熟悉，你也可以在图片上单击，你会发现，通过鼠标你也可以完成图像的编辑。</p>
+<p>ImageMagick的网站：<a href="http://www.imagemagick.org">www.imagemagick.org</a>。<a href="http://www.imagemagick.org/image/examples.jpg">这里</a>是ImageMagick加工过的图片的例子。</p>
+<hr />
+<a href="/">回首页</a>
+</body>
+</html>
