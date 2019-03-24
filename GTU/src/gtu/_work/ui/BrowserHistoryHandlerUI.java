@@ -1533,7 +1533,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             titleText.setText(d.title);
             remarkArea.setText(d.remark);
             modifyTimeLabel.setText(d.timestamp);
-            tagComboBoxUtil.getTextComponent().setText(d.tag);
+            tagComboBoxUtil.setSelectItemAndText(d.tag);
             commandTypeSetting.setValue(d.commandType);
             useRemarkOpenChk.setSelected("Y".equals(d.isUseRemarkOpen));
             hiddenChk.setSelected("Y".equals(d.isHidden));

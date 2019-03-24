@@ -109,6 +109,15 @@ public class AutoComboBox extends PlainDocument {
         });
     }
 
+    public void setSelectItemAndText(final Object item) {
+        setSelectItem(item);
+        if (item == null) {
+            editor.setText("");
+        } else {
+            editor.setText(String.valueOf(item));
+        }
+    }
+
     private void triggerComboxBoxActionPerformed() {
         System.out.println("#. triggerComboxBoxActionPerformed start");
         for (ActionListener a : comboBox.getActionListeners()) {
