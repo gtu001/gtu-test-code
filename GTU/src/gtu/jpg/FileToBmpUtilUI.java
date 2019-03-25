@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -31,6 +33,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.file.FileUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -51,8 +54,11 @@ public class FileToBmpUtilUI extends JFrame {
     private JTextField sevenZipText;
     private JLabel sevenZipLabel;
     private JLabel fileSizeDescLabel;
-    
+
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private JRadioButton encryptRadio1;
+    private JRadioButton noEncryptRadio1;
+    private ButtonGroup buttonGroup;
 
     /**
      * Launch the application.
@@ -92,7 +98,8 @@ public class FileToBmpUtilUI extends JFrame {
         tabbedPane.addTab("file->bmp", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, }));
 
         JLabel lblSrcFile = new JLabel("src file");
         panel.add(lblSrcFile, "2, 2, right, default");
@@ -111,7 +118,11 @@ public class FileToBmpUtilUI extends JFrame {
                         String newFileName = srcFile.getName() + ".bmp";
                         File destFile = new File(FileUtil.DESKTOP_DIR, newFileName);
                         int width = FileToBmpUtilVer3.getInstance().getWidth(f);
-                        FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, destFile, true, width);
+                        if (JButtonGroupUtil.getSelectedButton(buttonGroup) == noEncryptRadio1) {
+                            FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, destFile, true, width);
+                        } else {
+                            FileToBmpUtilVer4_AES.getInstance().buildImageFromFile(srcFile, destFile, true, width);
+                        }
                         System.out.println("#-- " + srcFile.getName() + " -> " + destFile.getName());
                     }
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生圖檔成功[多檔] " + srcFileLst.size());
@@ -147,6 +158,13 @@ public class FileToBmpUtilUI extends JFrame {
             }
         }));
 
+        JLabel lblWidth = new JLabel("width");
+        panel.add(lblWidth, "2, 6, right, default");
+
+        widthText = new JTextField();
+        widthText.setColumns(10);
+        panel.add(widthText, "4, 6, fill, default");
+
         JButton btnGo = new JButton("go");
         btnGo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
@@ -160,21 +178,17 @@ public class FileToBmpUtilUI extends JFrame {
                         Validate.isTrue(false, "寬度有誤");
                     }
                     int width = Integer.parseInt(widthText.getText());
-                    FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
+                    if (JButtonGroupUtil.getSelectedButton(buttonGroup) == noEncryptRadio1) {
+                        FileToBmpUtilVer3.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
+                    } else {
+                        FileToBmpUtilVer4_AES.getInstance().buildImageFromFile(srcFile, toBmpFile, true, width);
+                    }
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生圖檔成功 : " + toBmpFile);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
-
-        JLabel lblWidth = new JLabel("width");
-        panel.add(lblWidth, "2, 6, right, default");
-
-        widthText = new JTextField();
-        widthText.setColumns(10);
-        panel.add(widthText, "4, 6, fill, default");
-        panel.add(btnGo, "2, 8");
 
         usePicNameCheckbox = new JCheckBox("使用圖片檔名");
         usePicNameCheckbox.addActionListener(new ActionListener() {
@@ -187,6 +201,19 @@ public class FileToBmpUtilUI extends JFrame {
             }
         });
         panel.add(usePicNameCheckbox, "4, 8");
+
+        JPanel panel_5 = new JPanel();
+        panel.add(panel_5, "4, 10, fill, fill");
+
+        encryptRadio1 = new JRadioButton("加密");
+        encryptRadio1.setSelected(true);
+        panel_5.add(encryptRadio1);
+
+        noEncryptRadio1 = new JRadioButton("一般");
+        panel_5.add(noEncryptRadio1);
+        panel.add(btnGo, "2, 12");
+
+        buttonGroup = JButtonGroupUtil.createRadioButtonGroup(encryptRadio1, noEncryptRadio1);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("bmp->file", null, panel_1, null);
@@ -211,7 +238,11 @@ public class FileToBmpUtilUI extends JFrame {
                     for (File f : fileLst) {
                         File srcBmpFile = f;
                         File toFile = new File(FileUtil.DESKTOP_DIR, FileUtil.getNameNoSubName(srcBmpFile));
-                        FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                        if (JButtonGroupUtil.getSelectedButton(buttonGroup) == noEncryptRadio1) {
+                            FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                        } else {
+                            FileToBmpUtilVer4_AES.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                        }
                         System.out.println("#-- " + srcBmpFile.getName() + " -> " + toFile.getName());
                     }
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 [多檔] " + fileLst.size());
@@ -282,7 +313,11 @@ public class FileToBmpUtilUI extends JFrame {
                     if (!toFile.getParentFile().exists()) {
                         toFile.getParentFile().mkdirs();
                     }
-                    FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                    if (JButtonGroupUtil.getSelectedButton(buttonGroup) == noEncryptRadio1) {
+                        FileToBmpUtilVer3.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                    } else {
+                        FileToBmpUtilVer4_AES.getInstance().getFileFromImage(srcBmpFile, toFile);// fileSize
+                    }
                     JCommonUtil._jOptionPane_showMessageDialog_info("產生檔案成功 : " + toFile);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -330,7 +365,7 @@ public class FileToBmpUtilUI extends JFrame {
         sevenZipLabel = new JLabel("");
         panel_2.add(sevenZipLabel);
         panel_1.add(btnGo_1, "2, 12");
-        
+
         JPanel panel_4 = new JPanel();
         tabbedPane.addTab("Config", null, panel_4, null);
 
@@ -338,9 +373,9 @@ public class FileToBmpUtilUI extends JFrame {
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/hacker.ico");
         hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
         hideInSystemTrayHelper.apply(this);
-        
+
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-        
+
         panel_4.add(jFrameRGBColorPanel.getToggleButton(false));
     }
 
