@@ -44,6 +44,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <receiver android:name="com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver$MediaKeyBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="com.example.gtu001.qrcodemaker.services.UrlPlayerService"
             android:exported="false"
@@ -86,7 +92,7 @@
             android:name=".BigFileActivity"
             android:label="大檔檢測" />
         <activity
-            android:name=".FileFindMultiiActivity"
+            android:name=".FileFindMultiActivity"
             android:label="檔案選擇(多選)" />
 
     </application>

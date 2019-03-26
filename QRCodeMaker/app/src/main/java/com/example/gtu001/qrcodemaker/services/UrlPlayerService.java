@@ -68,7 +68,6 @@ public class UrlPlayerService extends Service {
 
     private static final String TAG = UrlPlayerService.class.getSimpleName();
 
-    private Context context;
     private Handler handler = new Handler();
     private Mp3Bean currentBean;
     private CurrentBeanHandler currentBeanHandler;
@@ -89,9 +88,9 @@ public class UrlPlayerService extends Service {
         //-----------------------------------------------------------------
 
         this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
+        this.mMp3BroadcastReceiver.registerMediaBroadcast(this.getApplicationContext());
 
         Log.i(TAG, "oncreat");
-        context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
     }
 
@@ -106,6 +105,7 @@ public class UrlPlayerService extends Service {
         this.stopPlay();
 
         this.unregisterReceiver(mMp3BroadcastReceiver);
+        this.mMp3BroadcastReceiver.unregisterMediaBroadcast(this.getApplicationContext());
         //-----------------------------------------------------------------
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
@@ -139,7 +139,7 @@ public class UrlPlayerService extends Service {
         if (mp3Helper != null) {
             mp3Helper.release();
         }
-        mp3Helper = Mp3PlayerHandler.create(context);
+        mp3Helper = Mp3PlayerHandler.create(this.getApplicationContext());
         mp3Helper.of(url);
         mp3Helper.play();
         return "";
@@ -258,7 +258,7 @@ public class UrlPlayerService extends Service {
     private Map getCurrentBean() {
         try {
             if (currentBean == null) {
-                return currentBeanHandler.getBean(context).toMap();
+                return currentBeanHandler.getBean(this.getApplicationContext()).toMap();
             } else {
                 return currentBean.toMap();
             }
@@ -362,6 +362,10 @@ public class UrlPlayerService extends Service {
                 isResume = false;
                 start();
             }
+        }
+
+        public boolean isPlaying(Context context) {
+            return !isResume;
         }
     };
 }

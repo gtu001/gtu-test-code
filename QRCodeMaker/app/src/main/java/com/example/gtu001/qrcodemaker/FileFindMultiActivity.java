@@ -17,9 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.brightcove.player.captioning.TTMLParser;
 import com.example.gtu001.qrcodemaker.common.ExternalStorageV2;
 import com.example.gtu001.qrcodemaker.common.Log;
 
@@ -38,9 +36,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileFindMultiiActivity extends ListActivity {
+public class FileFindMultiActivity extends ListActivity {
 
-    private static final String TAG = FileFindMultiiActivity.class.getSimpleName();
+    private static final String TAG = FileFindMultiActivity.class.getSimpleName();
 
     private List<Map<String, Object>> pathList = null;
     private ArrayList<String> multiFilesLst = new ArrayList<>();
@@ -54,8 +52,8 @@ public class FileFindMultiiActivity extends ListActivity {
     private RootDirHolder rootDirHolder;
     private MyBaseAdapter myBaseAdapter;
 
-    public static final String FILE_PATTERN_KEY = FileFindMultiiActivity.class.getName() + "_FILE_PATTERN_KEY";
-    public static final String FILE_START_DIRS = FileFindMultiiActivity.class.getName() + "_FILE_START_DIRS";
+    public static final String FILE_PATTERN_KEY = FileFindMultiActivity.class.getName() + "_FILE_PATTERN_KEY";
+    public static final String FILE_START_DIRS = FileFindMultiActivity.class.getName() + "_FILE_START_DIRS";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -366,8 +364,8 @@ public class FileFindMultiiActivity extends ListActivity {
         String externalSdCardTitle = "SD Card";
 
         RootDirHolder(String[] extensionDirs) {
-            Map<String, File> externalLocations = ExternalStorageV2.getAllStorageLocations(FileFindMultiiActivity.this);
-            Pair<Integer, Integer> pair = ExternalStorageV2.getExternalSdCardRange(FileFindMultiiActivity.this);
+            Map<String, File> externalLocations = ExternalStorageV2.getAllStorageLocations(FileFindMultiActivity.this);
+            Pair<Integer, Integer> pair = ExternalStorageV2.getExternalSdCardRange(FileFindMultiActivity.this);
 
             sdCard = externalLocations.get(ExternalStorageV2.SD_CARD);
             externalSdCard = externalLocations.get(ExternalStorageV2.EXTERNAL_SD_CARD);

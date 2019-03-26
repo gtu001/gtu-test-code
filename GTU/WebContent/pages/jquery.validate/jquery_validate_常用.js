@@ -1,4 +1,4 @@
-44var formCommonValidate = new function() {
+var formCommonValidate = new function() {
 	$.fn["getDate"] = function() {
 		var value = $(this).val();
 		var re = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
@@ -50,6 +50,26 @@
 				}
 				return false;
 			}, "開始日期必須小於結束日期");
+			
+			jQuery.validator.addMethod("dateFormatChk_between_ByDays", function(value,
+					element, options) {
+				var begin = $(options[0]).getDate();
+				var end = $(options[1]).getDate();
+				var days = options[2] || 1;
+				if (begin == null || end == null) {
+					return true;
+				} else if (begin != null && end != null && begin <= end) {
+					var val = (end.getTime() - begin.getTime()) / 1000 / 60/ 60/ 24/ days;
+					if(val > 1){
+						return false;
+					}
+					return true;
+				}
+				return false;
+			}, function(params, element) {
+				var days = params && (params[2] || 1);
+				return "開始日期與結束日期不可超過" + days + "天";
+			});
 			
 			jQuery.validator.addMethod("isAnyInputChk", function(value,
 					element, options) {

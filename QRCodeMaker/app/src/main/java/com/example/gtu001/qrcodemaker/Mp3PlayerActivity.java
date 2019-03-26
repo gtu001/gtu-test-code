@@ -34,7 +34,7 @@ public class Mp3PlayerActivity extends Activity {
 
     private static final String TAG = Mp3PlayerActivity.class.getSimpleName();
 
-    private static final String FILE_TYPE_PTN = "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp|flac)";
+    private static final String FILE_TYPE_PTN = "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp|flac|webm)";
     private static final String[] EXTENSION_DIR = new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"};
 
     private ListView listView;
@@ -273,13 +273,13 @@ public class Mp3PlayerActivity extends Activity {
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
         }, //
-        LOAD_CONTENT_FROM_DIR("讀取目錄", MENU_FIRST++, REQUEST_CODE++, FileFindMultiiActivity.class) {
+        LOAD_CONTENT_FROM_DIR("讀取目錄", MENU_FIRST++, REQUEST_CODE++, FileFindMultiActivity.class) {
             protected void onActivityResult(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                File file = FileFindMultiiActivity.FileFindActivityStarter.getFile(intent);
+                File file = FileFindMultiActivity.FileFindActivityStarter.getFile(intent);
                 if (file != null) {
                     activity.initListViewHandler.add(file);
                 } else {
-                    List<File> fileLst = FileFindMultiiActivity.FileFindActivityStarter.getFiles(intent);
+                    List<File> fileLst = FileFindMultiActivity.FileFindActivityStarter.getFiles(intent);
                     for (File f : fileLst) {
                         if (f.isDirectory()) {
                             if (f.listFiles() != null) {
@@ -295,9 +295,9 @@ public class Mp3PlayerActivity extends Activity {
             }
 
             protected void onOptionsItemSelected(Mp3PlayerActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindMultiiActivity.FILE_PATTERN_KEY, FILE_TYPE_PTN);
+                bundle.putString(FileFindMultiActivity.FILE_PATTERN_KEY, FILE_TYPE_PTN);
                 if (BuildConfig.DEBUG) {
-                    bundle.putStringArray(FileFindMultiiActivity.FILE_START_DIRS, EXTENSION_DIR);
+                    bundle.putStringArray(FileFindMultiActivity.FILE_START_DIRS, EXTENSION_DIR);
                 }
                 super.onOptionsItemSelected(activity, intent, bundle);
             }
