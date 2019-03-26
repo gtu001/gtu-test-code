@@ -1,11 +1,14 @@
 package com.example.gtu001.qrcodemaker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Mp3PlayerActivity extends Activity {
+public class Mp3PlayerActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String TAG = Mp3PlayerActivity.class.getSimpleName();
 
@@ -45,8 +48,6 @@ public class Mp3PlayerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LinearLayout layout = LayoutViewHelper.createContentView_simple(this);
-
-        PermissionUtil.verifyStoragePermissions(this);
 
         //初始Btn狀態紐
         Button btn1 = new Button(this);
@@ -169,8 +170,28 @@ public class Mp3PlayerActivity extends Activity {
         });
 
         initServices();
+
+        PermissionUtil.verifyPermissions(this, new String[]{
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.PROCESS_OUTGOING_CALLS,
+        }, 9999);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        final int REQUEST_READ_PHONE_STATE = 9999;
+        switch (requestCode) {
+            case REQUEST_READ_PHONE_STATE:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    //TODO
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     private void initServices() {
         initListViewHandler = new InitListViewHandler();

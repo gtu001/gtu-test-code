@@ -1,5 +1,6 @@
 package com.example.gtu001.qrcodemaker.common;
 
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -8,8 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
+
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
@@ -21,22 +25,29 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
     public abstract boolean isPlaying(Context context);
 
-    private MediaKeyBroadcastReceiver mMediaKeyBroadcastReceiver;
 
     private static final String CUSTOM_KEYCODE_HEADSETHOOK = "custom.gtu001.KEYCODE_HEADSETHOOK";
+    private static final String CUSTOM_KEY = "custom.gtu001.KEY";
 
-    public void registerMediaBroadcast(Context context) {
-        MediaKeyBroadcastReceiver mMediaKeyBroadcastReceiver = new MediaKeyBroadcastReceiver();
+    private ComponentName mReceiverComponent;
+
+    private PhoneCallBroadcastReceviver mPhoneCallBroadcastReceviver = new PhoneCallBroadcastReceviver();
+
+    //--------------------------------------------------------------------------------------------------
+    //MediaKeyBroadcastReceiver
+    public void register1(Context context) {
         AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        mMediaKeyBroadcastReceiver.mReceiverComponent = new ComponentName(context, MediaKeyBroadcastReceiver.class);
-        mAudioManager.registerMediaButtonEventReceiver(mMediaKeyBroadcastReceiver.mReceiverComponent);
-
+        mReceiverComponent = new ComponentName(context, MediaKeyBroadcastReceiver.class);
+        mAudioManager.registerMediaButtonEventReceiver(mReceiverComponent);
     }
 
-    public void unregisterMediaBroadcast(Context context) {
+    //MediaKeyBroadcastReceiver
+    public void unregister1(Context context) {
         AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        mAudioManager.unregisterMediaButtonEventReceiver(mMediaKeyBroadcastReceiver.mReceiverComponent);
+        mAudioManager.unregisterMediaButtonEventReceiver(mReceiverComponent);
     }
+    //--------------------------------------------------------------------------------------------------
+
 
     /**
      * 1.boardcast 必須定義於 AndroidManifest.xml
@@ -44,8 +55,6 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
      * 3.One activity need to register an MediaButtonEventReceiver to listen for the button presses
      */
     public static class MediaKeyBroadcastReceiver extends BroadcastReceiver {
-
-        ComponentName mReceiverComponent;
 
         public MediaKeyBroadcastReceiver() {
         }
@@ -87,7 +96,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 }
                 if (KeyEvent.KEYCODE_HEADSETHOOK == keyCode) {
                     sb.append("KEYCODE_HEADSETHOOK, ");
-                    context.sendBroadcast(new Intent(CUSTOM_KEYCODE_HEADSETHOOK));
+                    Mp3BroadcastReceiver.sendBroadcast(context, "");
                 }
                 if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == keyCode) {
                     sb.append("KEYCODE_MEDIA_PREVIOUS, ");
@@ -101,9 +110,64 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    public static class PhoneCallBroadcastReceviver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            System.out.println("action" + intent.getAction());
+            if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
+                //如果是去电（拨出）
+                System.out.println("拨出");
+            } else {
+                //查了下android文档，貌似没有专门用于接收来电的action,所以，非去电即来电
+                System.out.println("来电");
+                TelephonyManager tm = (TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE);
+                tm.listen(new PhoneStateListener() {
+
+                    @Override
+                    public void onCallStateChanged(int state, String incomingNumber) {
+                        // TODO Auto-generated method stub
+                        //state 当前状态 incomingNumber,貌似没有去电的API
+                        super.onCallStateChanged(state, incomingNumber);
+                        System.out.println("来电 : " + state);
+                        switch (state) {
+                            case TelephonyManager.CALL_STATE_IDLE:
+                                System.out.println("挂断");
+
+                                Mp3BroadcastReceiver.sendBroadcast(context, "continue");
+
+                                break;
+                            case TelephonyManager.CALL_STATE_OFFHOOK:
+                                System.out.println("接听");
+
+                                Mp3BroadcastReceiver.sendBroadcast(context, "pause");
+                                break;
+                            case TelephonyManager.CALL_STATE_RINGING:
+                                System.out.println("响铃:来电号码" + incomingNumber);
+
+                                Mp3BroadcastReceiver.sendBroadcast(context, "pause");
+                                //输出来电号码
+                                break;
+                        }
+                    }
+
+                }, PhoneStateListener.LISTEN_CALL_STATE);
+                //设置一个监听器
+            }
+        }
+    }
+
+    public static void sendBroadcast(Context context, String command) {
+        Intent in = new Intent(CUSTOM_KEYCODE_HEADSETHOOK);
+        if (StringUtils.isNotBlank(command)) {
+            in.putExtra(CUSTOM_KEY, command);
+        }
+        context.sendBroadcast(in);
+    }
+
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "# " + intent.getAction(), 30);
-        this.onReceive_PhoneCall(context, intent);
         this.onReceive_Bluetooth(context, intent);
         this.onReceive_plug(context, intent);
         this.onReceive_pause(context, intent);
@@ -111,18 +175,12 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
     public IntentFilter getFilter() {
         IntentFilter intent = new IntentFilter();
-        this.appendPhonecall(intent);
         this.appendBluetoothIntent(intent);
         this.appendPlugIntent(intent);
         this.appendPauseIntent(intent);
         return intent;
     }
 
-    //手機來電
-    private void appendPhonecall(IntentFilter intent) {
-        intent.addAction("android.intent.action.PHONE_STATE");
-        intent.addAction("android.intent.action.NEW_OUTGOING_CALL");
-    }
 
     //藍芽
     private void appendBluetoothIntent(IntentFilter intentFilter) {
@@ -146,26 +204,6 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         intentFilter.addAction(CUSTOM_KEYCODE_HEADSETHOOK);
     }
 
-    private void onReceive_PhoneCall(Context context, Intent intent) {
-        String savedNumber = "";
-        if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
-            savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
-            doMusicPause(context);
-        } else if (intent.getAction().equals("android.intent.action.PHONE_STATE")) {
-            String stateStr = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-            String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-            int state = 0;
-            if (TelephonyManager.EXTRA_STATE_IDLE.equals(stateStr)) {
-                state = TelephonyManager.CALL_STATE_IDLE;
-            } else if (TelephonyManager.EXTRA_STATE_OFFHOOK.equals(stateStr)) {
-                state = TelephonyManager.CALL_STATE_OFFHOOK;
-                doMusicContinue(context);
-            } else if (TelephonyManager.EXTRA_STATE_RINGING.equals(stateStr)) {
-                state = TelephonyManager.CALL_STATE_RINGING;
-                doMusicPause(context);
-            }
-        }
-    }
 
     private void onReceive_Bluetooth(Context context, Intent intent) {
         String action = intent.getAction(); //获取蓝牙设备实例【如果无设备链接会返回null，如果在无实例的状态下调用了实例的方法，会报空指针异常】 //主要与蓝牙设备有关系
@@ -216,11 +254,21 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
     private void onReceive_pause(Context context, Intent intent) {
         if (intent.getAction().equals(CUSTOM_KEYCODE_HEADSETHOOK)) {
-            Log.v(TAG, "[onReceive_pause] : isPlaying : " + this.isPlaying(context));
-            if (this.isPlaying(context)) {
+            String command = intent.getStringExtra(CUSTOM_KEY);
+
+            if (StringUtils.isBlank(command)) {
+                Log.v(TAG, "[onReceive_pause] : isPlaying : " + this.isPlaying(context));
+                if (this.isPlaying(context)) {
+                    this.doMusicPause(context);
+                    Log.v(TAG, "[onReceive_pause] : doMusicPause ");
+                } else {
+                    this.doMusicContinue(context);
+                    Log.v(TAG, "[onReceive_pause] : doMusicContinue ");
+                }
+            } else if ("pause".equalsIgnoreCase(command)) {
                 this.doMusicPause(context);
                 Log.v(TAG, "[onReceive_pause] : doMusicPause ");
-            } else {
+            } else if ("continue".equalsIgnoreCase(command)) {
                 this.doMusicContinue(context);
                 Log.v(TAG, "[onReceive_pause] : doMusicContinue ");
             }

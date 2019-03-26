@@ -60,4 +60,25 @@ public class PermissionUtil {
         }
         return false;
     }
+
+    public static void verifyPermissions(Activity activity, String[] permissions, int requestCode) {
+        // Check if we have write permission
+        boolean isOk = true;
+        for (String permission : permissions) {
+            int permission1 = ActivityCompat.checkSelfPermission(activity, permission);
+            if (permission1 != PackageManager.PERMISSION_GRANTED) {
+                isOk = false;
+                break;
+            }
+        }
+
+        if (!isOk) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    permissions,
+                    requestCode
+            );
+        }
+    }
 }

@@ -88,7 +88,8 @@ public class UrlPlayerService extends Service {
         //-----------------------------------------------------------------
 
         this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
-        this.mMp3BroadcastReceiver.registerMediaBroadcast(this.getApplicationContext());
+        mMp3BroadcastReceiver.register1(this.getApplicationContext());
+
 
         Log.i(TAG, "oncreat");
         currentBeanHandler = new CurrentBeanHandler();
@@ -105,7 +106,7 @@ public class UrlPlayerService extends Service {
         this.stopPlay();
 
         this.unregisterReceiver(mMp3BroadcastReceiver);
-        this.mMp3BroadcastReceiver.unregisterMediaBroadcast(this.getApplicationContext());
+        mMp3BroadcastReceiver.unregister1(this.getApplicationContext());
         //-----------------------------------------------------------------
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
