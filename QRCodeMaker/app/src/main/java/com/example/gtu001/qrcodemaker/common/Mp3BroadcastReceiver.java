@@ -97,7 +97,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 }
                 if (KeyEvent.KEYCODE_HEADSETHOOK == keyCode) {
                     sb.append("KEYCODE_HEADSETHOOK, ");
-                    Mp3BroadcastReceiver.sendBroadcast(context, "NA", "KEYCODE_HEADSETHOOK");
+                    Mp3BroadcastReceiver.sendBroadcast(context, "toggle", "KEYCODE_HEADSETHOOK");
                 }
                 if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == keyCode) {
                     sb.append("KEYCODE_MEDIA_PREVIOUS, ");
