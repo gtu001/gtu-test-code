@@ -32,6 +32,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -207,6 +208,9 @@ public class UrlPlayerService extends Service {
     public boolean isInitDone() {
         try {
             return mp3Helper != null;
+        } catch (NullPointerException ex) {
+            Log.e(TAG, ex.getMessage(), ex);
+            return false;
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("isInitDone ERR : " + ex.getMessage(), ex);
@@ -355,24 +359,35 @@ public class UrlPlayerService extends Service {
 
         UrlPlayerService self;
 
-        private MyMp3BroadcastReceiver(UrlPlayerService self){
+        private MyMp3BroadcastReceiver(UrlPlayerService self) {
             this.self = self;
         }
 
         public void doMusicPause(Context context) {
-            Log.v(TAG, "_____________Broadcast_Pause", 20);
+            Log.v(TAG, "_____________Broadcast_Pause");
+            if (!self.isInitDone()) {
+                return;
+            }
             pause();
+
         }
 
         public void doMusicContinue(Context context) {
-            Log.v(TAG, "_____________Broadcast_Continue", 20);
+            Log.v(TAG, "_____________Broadcast_Continue");
+            if (!self.isInitDone()) {
+                return;
+            }
             if (!self.isPlaying()) {
                 start();
             }
         }
 
         public boolean isPlaying(Context context) {
+            Log.v(TAG, "_____________Broadcast_isPlaying");
+            if (!self.isInitDone()) {
+                return false;
+            }
             return self.isPlaying();
         }
-    };
+    }
 }
