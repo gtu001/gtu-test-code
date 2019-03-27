@@ -73,6 +73,8 @@ public class UrlPlayerService extends Service {
     private CurrentBeanHandler currentBeanHandler;
     private List<Mp3Bean> totalLst = new ArrayList<>();
 
+    private MyMp3BroadcastReceiver mMp3BroadcastReceiver;
+
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
     @Override
@@ -87,6 +89,7 @@ public class UrlPlayerService extends Service {
 
         //-----------------------------------------------------------------
 
+        mMp3BroadcastReceiver = new MyMp3BroadcastReceiver(this);
         this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
         mMp3BroadcastReceiver.register1(this.getApplicationContext());
 
@@ -348,25 +351,28 @@ public class UrlPlayerService extends Service {
         Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
     }
 
-    private Mp3BroadcastReceiver mMp3BroadcastReceiver = new Mp3BroadcastReceiver() {
-        private boolean isResume = false;
+    private class MyMp3BroadcastReceiver extends Mp3BroadcastReceiver {
+
+        UrlPlayerService self;
+
+        private MyMp3BroadcastReceiver(UrlPlayerService self){
+            this.self = self;
+        }
 
         public void doMusicPause(Context context) {
             Log.v(TAG, "_____________Broadcast_Pause", 20);
             pause();
-            isResume = true;
         }
 
         public void doMusicContinue(Context context) {
             Log.v(TAG, "_____________Broadcast_Continue", 20);
-            if (isResume == true) {
-                isResume = false;
+            if (!self.isPlaying()) {
                 start();
             }
         }
 
         public boolean isPlaying(Context context) {
-            return !isResume;
+            return self.isPlaying();
         }
     };
 }
