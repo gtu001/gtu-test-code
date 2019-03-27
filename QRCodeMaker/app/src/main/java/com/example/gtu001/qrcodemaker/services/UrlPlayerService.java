@@ -363,8 +363,8 @@ public class UrlPlayerService extends Service {
             this.self = self;
         }
 
-        public void doMusicPause(Context context) {
-            Log.v(TAG, "_____________Broadcast_Pause");
+        public void doMusicPause(Context context, String fromMsg) {
+            Log.line(TAG, fromMsg + "_____________Broadcast_Pause");
             if (!self.isInitDone()) {
                 return;
             }
@@ -372,8 +372,8 @@ public class UrlPlayerService extends Service {
 
         }
 
-        public void doMusicContinue(Context context) {
-            Log.v(TAG, "_____________Broadcast_Continue");
+        public void doMusicContinue(Context context, String fromMsg) {
+            Log.line(TAG, fromMsg + "_____________Broadcast_Continue");
             if (!self.isInitDone()) {
                 return;
             }
@@ -382,8 +382,8 @@ public class UrlPlayerService extends Service {
             }
         }
 
-        public boolean isPlaying(Context context) {
-            Log.v(TAG, "_____________Broadcast_isPlaying");
+        public boolean isPlaying(Context context, String fromMsg) {
+            Log.line(TAG, fromMsg + "_____________Broadcast_isPlaying");
             if (!self.isInitDone()) {
                 return false;
             }

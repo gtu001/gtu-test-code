@@ -19,15 +19,16 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = Mp3BroadcastReceiver.class.getSimpleName();
 
-    public abstract void doMusicPause(Context context);
+    public abstract void doMusicPause(Context context, String fromMsg);
 
-    public abstract void doMusicContinue(Context context);
+    public abstract void doMusicContinue(Context context, String fromMsg);
 
-    public abstract boolean isPlaying(Context context);
+    public abstract boolean isPlaying(Context context, String fromMsg);
 
 
     private static final String CUSTOM_KEYCODE_HEADSETHOOK = "custom.gtu001.KEYCODE_HEADSETHOOK";
     private static final String CUSTOM_KEY = "custom.gtu001.KEY";
+    private static final String CUSTOM_MSG_KEY = "custom.gtu001.MSG_KEY";
 
     private ComponentName mReceiverComponent;
 
@@ -96,7 +97,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 }
                 if (KeyEvent.KEYCODE_HEADSETHOOK == keyCode) {
                     sb.append("KEYCODE_HEADSETHOOK, ");
-                    Mp3BroadcastReceiver.sendBroadcast(context, "");
+                    Mp3BroadcastReceiver.sendBroadcast(context, "NA", "KEYCODE_HEADSETHOOK");
                 }
                 if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == keyCode) {
                     sb.append("KEYCODE_MEDIA_PREVIOUS, ");
@@ -139,18 +140,18 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                                     Thread.sleep(1000L);
                                 } catch (InterruptedException e) {
                                 }
-                                Mp3BroadcastReceiver.sendBroadcast(context, "continue");
+                                Mp3BroadcastReceiver.sendBroadcast(context, "continue", "来电挂断");
 
                                 break;
                             case TelephonyManager.CALL_STATE_OFFHOOK:
                                 System.out.println("接听");
 
-                                Mp3BroadcastReceiver.sendBroadcast(context, "pause");
+                                Mp3BroadcastReceiver.sendBroadcast(context, "pause", "来电接听");
                                 break;
                             case TelephonyManager.CALL_STATE_RINGING:
                                 System.out.println("响铃:来电号码" + incomingNumber);
 
-                                Mp3BroadcastReceiver.sendBroadcast(context, "pause");
+                                Mp3BroadcastReceiver.sendBroadcast(context, "pause", "响铃:来电号码" + incomingNumber);
                                 //输出来电号码
                                 break;
                         }
@@ -162,11 +163,12 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    public static void sendBroadcast(Context context, String command) {
+    public static void sendBroadcast(Context context, String command, String message) {
         Intent in = new Intent(CUSTOM_KEYCODE_HEADSETHOOK);
         if (StringUtils.isNotBlank(command)) {
-            in.putExtra(CUSTOM_KEY, command);
+            in.putExtra(CUSTOM_KEY, StringUtils.trimToEmpty(command));
         }
+        in.putExtra(CUSTOM_MSG_KEY, StringUtils.trimToEmpty(message));
         context.sendBroadcast(in);
     }
 
@@ -216,22 +218,22 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         switch (action) {
             case BluetoothDevice.ACTION_ACL_CONNECTED:
                 Log.v(TAG, "蓝牙设备:" + device.getName() + "已链接");
-                this.doMusicContinue(context);
+                this.doMusicContinue(context, "蓝牙设备:" + device.getName() + "已链接");
                 break;
             case BluetoothDevice.ACTION_ACL_DISCONNECTED:
                 Log.v(TAG, "蓝牙设备:" + device.getName() + "断开链接");
-                this.doMusicPause(context);
+                this.doMusicPause(context, "蓝牙设备:" + device.getName() + "断开链接");
                 break; //上面的两个链接监听，其实也可以BluetoothAdapter实现，修改状态码即可
             case BluetoothAdapter.ACTION_STATE_CHANGED:
                 int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
                 switch (blueState) {
                     case BluetoothAdapter.STATE_OFF:
                         Log.v(TAG, "蓝牙关闭");
-                        this.doMusicPause(context);
+                        this.doMusicPause(context, "蓝牙关闭");
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.v(TAG, "蓝牙开启");
-                        this.doMusicContinue(context);
+                        this.doMusicContinue(context, "蓝牙开启");
                         break;
                 }
                 break;
@@ -246,11 +248,11 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
             switch (state) {
                 case 0:
                     Log.d(TAG, "Headset unplugged");
-                    this.doMusicPause(context);
+                    this.doMusicPause(context, "Headset unplugged");
                     break;
                 case 1:
                     Log.d(TAG, "Headset plugged");
-                    this.doMusicContinue(context);
+                    this.doMusicContinue(context, "Headset plugged");
                     break;
             }
         }
@@ -259,21 +261,22 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
     private void onReceive_pause(Context context, Intent intent) {
         if (intent.getAction().equals(CUSTOM_KEYCODE_HEADSETHOOK)) {
             String command = intent.getStringExtra(CUSTOM_KEY);
+            String message = StringUtils.trimToEmpty(intent.getStringExtra(CUSTOM_MSG_KEY));
 
-            if (StringUtils.isBlank(command)) {
-                Log.v(TAG, "[onReceive_pause] : isPlaying : " + this.isPlaying(context));
-                if (this.isPlaying(context)) {
-                    this.doMusicPause(context);
+            if ("toggle".equalsIgnoreCase(command)) {
+                Log.v(TAG, "[onReceive_pause] : isPlaying : " + this.isPlaying(context, message));
+                if (this.isPlaying(context, message)) {
+                    this.doMusicPause(context, message);
                     Log.v(TAG, "[onReceive_pause] : doMusicPause ");
                 } else {
-                    this.doMusicContinue(context);
+                    this.doMusicContinue(context, message);
                     Log.v(TAG, "[onReceive_pause] : doMusicContinue ");
                 }
             } else if ("pause".equalsIgnoreCase(command)) {
-                this.doMusicPause(context);
+                this.doMusicPause(context, message);
                 Log.v(TAG, "[onReceive_pause] : doMusicPause ");
             } else if ("continue".equalsIgnoreCase(command)) {
-                this.doMusicContinue(context);
+                this.doMusicContinue(context, message);
                 Log.v(TAG, "[onReceive_pause] : doMusicContinue ");
             }
         }
