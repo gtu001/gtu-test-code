@@ -135,6 +135,10 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                             case TelephonyManager.CALL_STATE_IDLE:
                                 System.out.println("挂断");
 
+                                try {
+                                    Thread.sleep(1000L);
+                                } catch (InterruptedException e) {
+                                }
                                 Mp3BroadcastReceiver.sendBroadcast(context, "continue");
 
                                 break;
