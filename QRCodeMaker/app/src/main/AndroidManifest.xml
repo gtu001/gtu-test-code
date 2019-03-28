@@ -31,6 +31,7 @@
     <!-- 手機電話 -->
     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"></uses-permission>
 
     <!-- 藍芽 -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -43,6 +44,19 @@
         android:roundIcon="@drawable/qr_code_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <receiver android:name="com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver$MediaKeyBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver$PhoneCallBroadcastReceviver">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="com.example.gtu001.qrcodemaker.services.UrlPlayerService"
@@ -86,7 +100,7 @@
             android:name=".BigFileActivity"
             android:label="大檔檢測" />
         <activity
-            android:name=".FileFindMultiiActivity"
+            android:name=".FileFindMultiActivity"
             android:label="檔案選擇(多選)" />
 
     </application>

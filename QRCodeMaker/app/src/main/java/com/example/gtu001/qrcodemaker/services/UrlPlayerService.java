@@ -32,6 +32,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -68,11 +69,12 @@ public class UrlPlayerService extends Service {
 
     private static final String TAG = UrlPlayerService.class.getSimpleName();
 
-    private Context context;
     private Handler handler = new Handler();
     private Mp3Bean currentBean;
     private CurrentBeanHandler currentBeanHandler;
     private List<Mp3Bean> totalLst = new ArrayList<>();
+
+    private MyMp3BroadcastReceiver mMp3BroadcastReceiver;
 
     //↓↓↓↓↓↓↓↓ service logical ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -88,10 +90,12 @@ public class UrlPlayerService extends Service {
 
         //-----------------------------------------------------------------
 
+        mMp3BroadcastReceiver = new MyMp3BroadcastReceiver(this);
         this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
+        mMp3BroadcastReceiver.register1(this.getApplicationContext());
+
 
         Log.i(TAG, "oncreat");
-        context = this.getApplicationContext();
         currentBeanHandler = new CurrentBeanHandler();
     }
 
@@ -106,6 +110,7 @@ public class UrlPlayerService extends Service {
         this.stopPlay();
 
         this.unregisterReceiver(mMp3BroadcastReceiver);
+        mMp3BroadcastReceiver.unregister1(this.getApplicationContext());
         //-----------------------------------------------------------------
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
@@ -139,7 +144,7 @@ public class UrlPlayerService extends Service {
         if (mp3Helper != null) {
             mp3Helper.release();
         }
-        mp3Helper = Mp3PlayerHandler.create(context);
+        mp3Helper = Mp3PlayerHandler.create(this.getApplicationContext());
         mp3Helper.of(url);
         mp3Helper.play();
         return "";
@@ -203,6 +208,9 @@ public class UrlPlayerService extends Service {
     public boolean isInitDone() {
         try {
             return mp3Helper != null;
+        } catch (NullPointerException ex) {
+            Log.e(TAG, ex.getMessage(), ex);
+            return false;
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("isInitDone ERR : " + ex.getMessage(), ex);
@@ -258,7 +266,7 @@ public class UrlPlayerService extends Service {
     private Map getCurrentBean() {
         try {
             if (currentBean == null) {
-                return currentBeanHandler.getBean(context).toMap();
+                return currentBeanHandler.getBean(this.getApplicationContext()).toMap();
             } else {
                 return currentBean.toMap();
             }
@@ -347,21 +355,39 @@ public class UrlPlayerService extends Service {
         Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
     }
 
-    private Mp3BroadcastReceiver mMp3BroadcastReceiver = new Mp3BroadcastReceiver() {
-        private boolean isResume = false;
+    private class MyMp3BroadcastReceiver extends Mp3BroadcastReceiver {
 
-        public void doMusicPause(Context context) {
-            Log.v(TAG, "_____________Broadcast_Pause", 20);
-            pause();
-            isResume = true;
+        UrlPlayerService self;
+
+        private MyMp3BroadcastReceiver(UrlPlayerService self) {
+            this.self = self;
         }
 
-        public void doMusicContinue(Context context) {
-            Log.v(TAG, "_____________Broadcast_Continue", 20);
-            if (isResume == true) {
-                isResume = false;
+        public void doMusicPause(Context context, String fromMsg) {
+            Log.v(TAG, fromMsg + "_____________Broadcast_Pause");
+            if (!self.isInitDone()) {
+                return;
+            }
+            pause();
+
+        }
+
+        public void doMusicContinue(Context context, String fromMsg) {
+            Log.v(TAG, fromMsg + "_____________Broadcast_Continue");
+            if (!self.isInitDone()) {
+                return;
+            }
+            if (!self.isPlaying()) {
                 start();
             }
         }
-    };
+
+        public boolean isPlaying(Context context, String fromMsg) {
+            Log.v(TAG, fromMsg + "_____________Broadcast_isPlaying");
+            if (!self.isInitDone()) {
+                return false;
+            }
+            return self.isPlaying();
+        }
+    }
 }

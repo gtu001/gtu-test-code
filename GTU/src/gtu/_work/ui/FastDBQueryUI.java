@@ -109,6 +109,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
@@ -355,6 +356,14 @@ public class FastDBQueryUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 SqlIdConfigBean sqlBean = (SqlIdConfigBean) e.getSource();
                 sqlList.setToolTipText(StringUtils.trimToNull(sqlBean.sqlComment));
+            }
+        });
+        JListUtil.newInstance(sqlList).applyOnHoverEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SqlIdConfigBean bean = (SqlIdConfigBean) e.getSource();
+                String tooltip = "<html>" + JTooltipUtil.escapeHtml(bean.sql) + "</html>";
+                sqlList.setToolTipText(tooltip);
             }
         });
 
