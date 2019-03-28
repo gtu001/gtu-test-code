@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+focused {
+	background: #abcdef;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="jquery-3.3.1.js"></script>
+<link rel="stylesheet" href="" />
+</head>
+<body>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			test001();
+		});
+		
+		function test001(){
+			var chk1 = $.Deferred();
+			var chk2 = $.Deferred();
+			var chk3 = $.Deferred();
+
+			var chkA = chk1.then(function(val){
+				return val + " Done!";
+			});
+			var chkB = chk2.then(function(val){
+				return val + " Done!";
+			});
+			var chkC = chk3.then(function(val){
+				return val + " Done!";
+			});
+			
+			$.when(chkA, chkB, chkC).done(function(r1, r2, r3){
+				alert("done = " + r1 + " , " + r2 + " , " + r3);
+			}).fail(function(r1, r2, r3){
+				alert("fail = " + r1 + " , " + r2 + " , " + r3);
+			});
+
+			setTimeout(function(){
+				chk1.resolve("chk1");
+			}, 2000);
+
+			setTimeout(function(){
+				chk2.resolve("chk2");
+			}, 4000);
+
+			setTimeout(function(){
+				chk3.reject("chk3");
+			}, 3000);
+		}
+		
+	</script>
+</body>
+</html>
