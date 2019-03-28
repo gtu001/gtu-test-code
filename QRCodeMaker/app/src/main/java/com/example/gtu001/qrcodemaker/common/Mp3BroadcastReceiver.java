@@ -176,7 +176,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         Log.v(TAG, "# " + intent.getAction(), 30);
         this.onReceive_Bluetooth(context, intent);
         this.onReceive_plug(context, intent);
-        this.onReceive_pause(context, intent);
+        this.onReceive_forward(context, intent);
     }
 
     public IntentFilter getFilter() {
@@ -258,7 +258,8 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private void onReceive_pause(Context context, Intent intent) {
+    //轉發 broadcast
+    private void onReceive_forward(Context context, Intent intent) {
         if (intent.getAction().equals(CUSTOM_KEYCODE_HEADSETHOOK)) {
             String command = intent.getStringExtra(CUSTOM_KEY);
             String message = StringUtils.trimToEmpty(intent.getStringExtra(CUSTOM_MSG_KEY));
