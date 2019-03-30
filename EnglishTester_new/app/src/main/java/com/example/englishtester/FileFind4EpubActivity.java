@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.example.englishtester.common.ExternalStorage;
 import com.example.englishtester.common.ExternalStorageV2;
+import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.OOMHandler2;
 import com.example.englishtester.common.PixelMetricUtil;
@@ -337,7 +338,7 @@ public class FileFind4EpubActivity extends ListActivity {
 
         private boolean isMatch(File file) {
             if (file.isFile()) {
-                Matcher mth = ptn.matcher(file.getName());
+                Matcher mth = ptn.matcher(FileUtilGtu.getSubName(file.getName()));
                 return mth.find();
             }
             return false;

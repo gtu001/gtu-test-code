@@ -5,9 +5,6 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.example.englishtester.common.Log;
-
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ListView;
@@ -16,6 +13,8 @@ import android.widget.TextView;
 
 import com.example.englishtester.common.ExternalStorage;
 import com.example.englishtester.common.ExternalStorageV2;
+import com.example.englishtester.common.FileUtilGtu;
+import com.example.englishtester.common.Log;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -258,7 +257,7 @@ public class FileFindActivity extends ListActivity {
 
         private boolean isMatch(File file) {
             if (file.isFile()) {
-                Matcher mth = ptn.matcher(file.getName());
+                Matcher mth = ptn.matcher(FileUtilGtu.getSubName(file.getName()));
                 return mth.find();
             }
             return false;

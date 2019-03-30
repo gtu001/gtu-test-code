@@ -72,6 +72,7 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 // 获得KeyEvent对象
                 KeyEvent keyEvent = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 
+//                MediaKeyBroadcastReceiver.onReceive:75: Action ---->android.intent.action.MEDIA_BUTTON  KeyEvent----->KeyEvent { action=ACTION_UP, keyCode=KEYCODE_MEDIA_PLAY, scanCode=200, metaState=0, flags=0x8, repeatCount=0, eventTime=234273618, downTime=234273587, deviceId=15, source=0x101 }
                 Log.i(TAG, "Action ---->" + intent.getAction() + "  KeyEvent----->" + keyEvent.toString());
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     return;//忽略 ACTION_DOWN , 只處理 ACTION_UP
@@ -95,9 +96,13 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 if (KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE == keyCode) {
                     sb.append("KEYCODE_MEDIA_PLAY_PAUSE, ");
                 }
+                if (KeyEvent.KEYCODE_MEDIA_PLAY == keyCode) {
+                    sb.append("KEYCODE_MEDIA_PLAY, ");
+                    Mp3BroadcastReceiver.sendBroadcast(context, "toggle", "KEYCODE_MEDIA_PLAY");//for藍芽
+                }
                 if (KeyEvent.KEYCODE_HEADSETHOOK == keyCode) {
                     sb.append("KEYCODE_HEADSETHOOK, ");
-                    Mp3BroadcastReceiver.sendBroadcast(context, "toggle", "KEYCODE_HEADSETHOOK");
+                    Mp3BroadcastReceiver.sendBroadcast(context, "toggle", "KEYCODE_HEADSETHOOK");//for一般耳機
                 }
                 if (KeyEvent.KEYCODE_MEDIA_PREVIOUS == keyCode) {
                     sb.append("KEYCODE_MEDIA_PREVIOUS, ");

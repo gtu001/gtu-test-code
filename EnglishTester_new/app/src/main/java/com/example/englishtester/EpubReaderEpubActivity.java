@@ -1122,7 +1122,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             }
 
             protected void onOptionsItemSelected(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
-                bundle.putString(FileFindActivity.FILE_PATTERN_KEY, "(epub)");
+                bundle.putString(FileFind4EpubActivity.FILE_PATTERN_KEY, "(epub)");
                 if (BuildConfig.DEBUG) {
                     bundle.putStringArray(FileFind4EpubActivity.FILE_START_DIRS, new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"});
                 }
