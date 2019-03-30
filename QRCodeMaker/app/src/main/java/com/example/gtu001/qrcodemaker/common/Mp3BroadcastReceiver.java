@@ -98,7 +98,11 @@ public abstract class Mp3BroadcastReceiver extends BroadcastReceiver {
                 }
                 if (KeyEvent.KEYCODE_MEDIA_PLAY == keyCode) {
                     sb.append("KEYCODE_MEDIA_PLAY, ");
-                    Mp3BroadcastReceiver.sendBroadcast(context, "toggle", "KEYCODE_MEDIA_PLAY");//for藍芽
+                    Mp3BroadcastReceiver.sendBroadcast(context, "continue", "KEYCODE_MEDIA_PLAY");//for藍芽
+                }
+                if (KeyEvent.KEYCODE_MEDIA_PAUSE == keyCode) {
+                    sb.append("KEYCODE_MEDIA_PLAY, ");
+                    Mp3BroadcastReceiver.sendBroadcast(context, "pause", "KEYCODE_MEDIA_PAUSE");//for藍芽
                 }
                 if (KeyEvent.KEYCODE_HEADSETHOOK == keyCode) {
                     sb.append("KEYCODE_HEADSETHOOK, ");
