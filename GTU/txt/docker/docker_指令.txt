@@ -289,10 +289,22 @@ Volume 掛載測試
     d.查看服务
 
         sudo docker info
+    
+    ---
+    win7 重啟 docker
+    
+    	開啟 powershell
+    	$ restart-service *docker*
+        
+        
     ---
     win7 toolbox 處理方式
-    	開啟 Docker Quickstart Terminal
+    	開啟 Docker Quickstart Terminal 或  管理者權限開啟 bash (cmd很難用)
     	$ docker-machine ssh default
+    	
+    	取得 root 
+    	$ sudo -i
+    	
 		$ sudo vi /var/lib/boot2docker/profile
 			此时，我们在 --label provider=virtualbox 的下一行添加下述代码：
 			--insecure-registry xxx.xxx.xxx.xxx:yyy    	
