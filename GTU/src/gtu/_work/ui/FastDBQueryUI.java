@@ -95,6 +95,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.spring.SimilarityUtil;
 import gtu.string.StringNumberUtil;
+import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
@@ -694,6 +695,26 @@ public class FastDBQueryUI extends JFrame {
                             }).applyEvent(e)//
                             .show();
                 }
+            }
+        });
+
+        JTableUtil.newInstance(parametersTable).applyOnHoverEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
+                int row = pair.getLeft();
+                int col = pair.getRight();
+                String column = (String) parametersTable.getValueAt(row, 0);
+                SqlParam bean = parseSqlToParam(sqlBean.sql);
+                if (bean instanceof SqlParam_IfExists) {
+                    SqlParam_IfExists bean2 = (SqlParam_IfExists) bean;
+                    if (bean2.paramSetSentanceMap.containsKey(column)) {
+                        String sentance = bean2.paramSetSentanceMap.get(column);
+                        parametersTable.setToolTipText("<html>" + JTooltipUtil.escapeHtml(sentance) + "</html>");
+                        return;
+                    }
+                }
+                parametersTable.setToolTipText(null);
             }
         });
 
@@ -1988,6 +2009,7 @@ public class FastDBQueryUI extends JFrame {
 
     private static class SqlParam_IfExists extends SqlParam {
         List<Pair<List<String>, int[]>> paramListFix = new ArrayList<Pair<List<String>, int[]>>();
+        private Map<String, String> paramSetSentanceMap = new HashMap<String, String>();
 
         private boolean isParametersAllOk(List<String> paramLst, Map<String, Object> paramMap, Set<String> forceAddColumns) {
             List<Pair<String, Boolean>> paramBoolLst = new ArrayList<Pair<String, Boolean>>();
@@ -2042,7 +2064,9 @@ public class FastDBQueryUI extends JFrame {
 
                     List<String> params = new ArrayList<String>();
                     while (mth2.find()) {
-                        params.add(mth2.group(1));
+                        String para = mth2.group(1);
+                        params.add(para);
+                        sqlParam.paramSetSentanceMap.put(para, quoteLine);
                     }
                     sqlParam.paramSet.addAll(params);
 
@@ -2668,6 +2692,28 @@ public class FastDBQueryUI extends JFrame {
     private void sqlTextAreaMouseClickedAction(MouseEvent e) {
         if (JMouseEventUtil.buttonRightClick(1, e)) {
             JPopupMenuUtil.newInstance(sqlTextArea)//
+                    .addJMenuItem("SQL 格式化", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String sql = sqlTextArea.getText();
+                            sqlTextArea.setText(getSqlFormater(sql));
+                        }
+
+                        Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
+                                Pattern.CASE_INSENSITIVE);
+
+                        private String getSqlFormater(String sql) {
+                            List<String> lst = StringUtil_.readContentToList(sql, true, false, false);
+                            sql = StringUtils.join(lst, "  ");
+                            StringBuffer sb = new StringBuffer();
+                            Matcher mth = ptn.matcher(sql);
+                            while (mth.find()) {
+                                mth.appendReplacement(sb, "\r\n" + mth.group(1));
+                            }
+                            mth.appendTail(sb);
+                            return sb.toString();
+                        }
+                    })//
                     .addJMenuItem("插入系統日", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {

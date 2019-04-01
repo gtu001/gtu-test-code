@@ -93,6 +93,10 @@
 
 查詢container ip組態
 	$ docker inspect keen_swanson | findstr IPAddress
+	
+--------------------------------------------------------------------------
+預設docker IP 
+	192.168.99.100
 
 
 --------------------------------------------------------------------------
@@ -266,6 +270,34 @@ Volume 掛載測試
 	
 
 --------------------------------------------------------------------------
+修改docker設定
+
+	/etc/docker/daemon.json
+	
+	a.修改完成后reload配置文件
+
+        sudo systemctl daemon-reload
+
+    b.重启docker服务
+
+        sudo systemctl restartdocker.service
+
+    c.查看状态
+
+        sudo systemctl status docker -l
+
+    d.查看服务
+
+        sudo docker info
+    ---
+    win7 toolbox 處理方式
+    	開啟 Docker Quickstart Terminal
+    	$ docker-machine ssh default
+		$ sudo vi /var/lib/boot2docker/profile
+			此时，我们在 --label provider=virtualbox 的下一行添加下述代码：
+			--insecure-registry xxx.xxx.xxx.xxx:yyy    	
+    		
+    
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
