@@ -12,8 +12,7 @@ import android.view.View;
 import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
-
-import org.apache.commons.lang3.StringUtils;
+import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 
 public class TxtReaderAppenderSpanClass {
 
@@ -23,6 +22,7 @@ public class TxtReaderAppenderSpanClass {
             TxtReaderAppenderSpanClass.WordSpan.class, //
             TxtReaderAppenderSpanClass.SimpleUrlLinkSpan.class,//
             TxtReaderAppenderSpanClass.EpubUrlLinkSpan.class,//
+            TxtReaderAppenderSpanClass.MobiUrlLinkSpan.class,//
     };//
 
     public static ClickableSpan createLinkSpan(Context context, String url, ITxtReaderActivityDTO dto) {
@@ -32,6 +32,9 @@ public class TxtReaderAppenderSpanClass {
         } else if (dto instanceof EpubViewerMainHandler.EpubDTO) {
             Log.v(TAG, ">> create Link [EpubUrlLinkSpan] : " + url);
             return new EpubUrlLinkSpan(context, url, (EpubViewerMainHandler.EpubDTO) dto);
+        } else if (dto instanceof MobiViewerMainHandler.MobiDTO) {
+            Log.v(TAG, ">> create Link [MobiUrlLinkSpan] : " + url);
+            return new MobiUrlLinkSpan(context, url, (MobiViewerMainHandler.MobiDTO) dto);
         } else {
             throw new RuntimeException("createLinkSpan Unknow DTO !!");
         }
@@ -87,6 +90,35 @@ public class TxtReaderAppenderSpanClass {
 //            }
             Log.v(TAG, "realUrl " + " - " + tmpUrl);
             this.epubDTO.gotoLink(tmpUrl);
+        }
+    }
+
+    public static class MobiUrlLinkSpan extends ClickableSpan {
+        Context context;
+        String url;
+        MobiViewerMainHandler.MobiDTO mobiDTO;
+
+        public MobiUrlLinkSpan(Context context, String url, MobiViewerMainHandler.MobiDTO mobiDTO) {
+            this.context = context;
+            this.url = url;
+            this.mobiDTO = mobiDTO;
+        }
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            ds.setColor(Color.BLUE);
+            ds.setUnderlineText(true);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.v(TAG, "click " + " - " + url);
+            String tmpUrl = url;
+//            if (tmpUrl.indexOf("#") != -1) {
+//                tmpUrl = StringUtils.substring(tmpUrl, 0, url.indexOf("#"));
+//            }
+            Log.v(TAG, "realUrl " + " - " + tmpUrl);
+            this.mobiDTO.gotoLink(tmpUrl);
         }
     }
 

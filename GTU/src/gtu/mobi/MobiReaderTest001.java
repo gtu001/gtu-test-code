@@ -46,8 +46,6 @@ public class MobiReaderTest001 {
         private void initPages() {
             Pattern ptn = Pattern.compile("\\<\\/?mbp\\:pagebreak\\/?\\>", Pattern.DOTALL | Pattern.MULTILINE);
             Matcher mth = ptn.matcher(allContent);
-            File dir = new File(FileUtil.DESKTOP_DIR, "testBook");
-            dir.mkdirs();
             String tmpPage = "";
             int startPos = 0;
             while (mth.find()) {
