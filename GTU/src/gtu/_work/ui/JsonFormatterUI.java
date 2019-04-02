@@ -34,7 +34,6 @@ import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.xml.XmlFormatter;
-import gtu.xml.XmlFormatter2;
 
 public class JsonFormatterUI extends JFrame {
 

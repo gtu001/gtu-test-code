@@ -75,6 +75,7 @@
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 
 			<packagename mode="pom">org.json.JSONObject</packagename>
+			<packagename mode="pom">javax.xml.transform.OutputKeys</packagename>
 
 		</jarfinder>
 
