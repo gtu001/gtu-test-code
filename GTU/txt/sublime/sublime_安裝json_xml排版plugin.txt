@@ -1,0 +1,22 @@
+﻿<1>
+	下載 https://github.com/alek-sys/sublimetext_indentxml
+
+	ctrl + shift + p 
+	
+	輸入 browse packages 開啟目錄
+
+	將解壓縮目錄放入
+
+---
+<2>
+
+	開啟 console 貼上 https://packagecontrol.io/installation
+	
+	ctrl + shift + p
+	
+	輸入 install package
+	
+	輸入 indent xml
+	
+	
+PS : 注意, 此排版工具無法排版中文

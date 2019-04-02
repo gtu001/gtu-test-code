@@ -7,10 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EventObject;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
@@ -30,6 +33,8 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.xml.XmlFormatter;
+import gtu.xml.XmlFormatter2;
 
 public class JsonFormatterUI extends JFrame {
 
@@ -52,6 +57,9 @@ public class JsonFormatterUI extends JFrame {
     private JTextArea jsonToArea;
     private JButton clearBtn;
     private JButton clearBtn2;
+    private JRadioButton jsonRadio;
+    private JRadioButton xmlRadio;
+    private ButtonGroup buttonGroup;
 
     /**
      * Launch the application.
@@ -108,7 +116,16 @@ public class JsonFormatterUI extends JFrame {
                 swingUtil.invokeAction("clearBtn.action", e);
             }
         });
+
+        jsonRadio = new JRadioButton("json");
+        jsonRadio.setSelected(true);
+        panel_5.add(jsonRadio);
+
+        xmlRadio = new JRadioButton("xml");
+        panel_5.add(xmlRadio);
         panel_5.add(clearBtn);
+
+        buttonGroup = JButtonGroupUtil.createRadioButtonGroup(jsonRadio, xmlRadio);
 
         panel_6 = new JPanel();
         panel.add(panel_6, BorderLayout.EAST);
@@ -203,7 +220,16 @@ public class JsonFormatterUI extends JFrame {
                         if (StringUtils.isBlank(jsonFromText)) {
                             return;
                         }
-                        String resultStr = getFormatJSON(jsonFromText);
+
+                        String resultStr = "";
+                        if (JButtonGroupUtil.getSelectedButton(buttonGroup) == jsonRadio) {
+                            resultStr = getFormatJSON(jsonFromText);
+                        } else if (JButtonGroupUtil.getSelectedButton(buttonGroup) == xmlRadio) {
+                            // resultStr = new
+                            // XmlFormatter2().format(jsonFromText);
+                            resultStr = XmlFormatter.format(jsonFromText);
+                        }
+
                         jsonToArea.setText(resultStr);
                     }
                 } catch (Exception ex) {

@@ -270,6 +270,7 @@ public class FastDBQueryUI extends JFrame {
     private EditColumnHistoryHandler editColumnHistoryHandler;
     private JLabel lblNewLabel_11;
     private JLabel lblNewLabel_12;
+    private JLabel queryResultTimeLbl;
 
     /**
      * Launch the application.
@@ -930,6 +931,9 @@ public class FastDBQueryUI extends JFrame {
 
         panel_15 = new JPanel();
         panel_12.add(panel_15, BorderLayout.SOUTH);
+
+        queryResultTimeLbl = new JLabel("        ");
+        panel_15.add(queryResultTimeLbl);
 
         radio_import_excel = new JRadioButton("匯入excel");
         panel_15.add(radio_import_excel);
@@ -1715,12 +1719,14 @@ public class FastDBQueryUI extends JFrame {
      * 執行sql
      */
     private void executeSqlButtonClick() {
+        long startTime = System.currentTimeMillis();
         try {
             // init
             {
                 isResetQuery = true;
                 filterRowsQueryList = null;// rows 過濾清除
                 importExcelSheetName = null; // 清除匯入黨名
+                queryResultTimeLbl.setText("");
             }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
@@ -1851,6 +1857,8 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
             }
         } finally {
+            long duringTime = (System.currentTimeMillis() - startTime) / 1000;
+            queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
         }
     }
 
@@ -2699,7 +2707,7 @@ public class FastDBQueryUI extends JFrame {
                             sqlTextArea.setText(getSqlFormater(sql));
                         }
 
-                        Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
+                        Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\sunion|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
                                 Pattern.CASE_INSENSITIVE);
 
                         private String getSqlFormater(String sql) {

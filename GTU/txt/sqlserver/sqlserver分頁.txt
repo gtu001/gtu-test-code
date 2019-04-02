@@ -10,4 +10,7 @@ https://dotblogs.com.tw/jimmyyu/archive/2009/11/09/11499.aspx
 
 語法直接抄
 
-select *  FROM (SELECT  ROW_NUMBER() OVER (ORDER BY Id) AS RowNum, * FROM TableName) AS NewTable WHERE RowNum >= 1 AND RowNum <= 20
+select *  FROM (
+	SELECT  ROW_NUMBER() OVER (ORDER BY Id) AS RowNum, * 
+	FROM TableName
+) AS NewTable WHERE RowNum >= 1 AND RowNum <= 20
