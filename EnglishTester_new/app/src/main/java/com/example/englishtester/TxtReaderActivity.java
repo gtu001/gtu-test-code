@@ -1520,7 +1520,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         @Override
         public int getPageIndex() {
-            return -1;
+            return 0;
         }
 
         @Override

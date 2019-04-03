@@ -1,11 +1,11 @@
 package com.example.englishtester.common.html.image;
 
-import com.example.englishtester.common.Log;
-
 import com.example.englishtester.TxtReaderActivity;
+import com.example.englishtester.common.Log;
 import com.example.englishtester.common.OnlinePicLoader;
-import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
+import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 
 /**
  * Created by gtu001 on 2018/8/8.
@@ -37,6 +37,8 @@ public class ImageLoaderFactory {
             return new ImageLoaderCandidate4WordHtml(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
         } else if (this.dto instanceof EpubViewerMainHandler.EpubDTO) {
             return new ImageLoaderCandidate4EpubHtml(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
+        } else if (this.dto instanceof MobiViewerMainHandler.MobiDTO) {
+            return new ImageLoaderCandidate4MobiHtml(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
         }
         throw new RuntimeException("無法判斷的 ImageLoader : " + dto);
     }

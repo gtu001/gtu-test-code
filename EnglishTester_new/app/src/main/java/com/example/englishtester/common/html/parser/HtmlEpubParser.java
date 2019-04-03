@@ -3,7 +3,11 @@ package com.example.englishtester.common.html.parser;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.Log;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class HtmlEpubParser extends HtmlBaseParser {
@@ -65,7 +69,7 @@ public class HtmlEpubParser extends HtmlBaseParser {
     }
 
     @Override
-    protected String _stepFinal_customPlus(String content, boolean isPure) {
+    protected String _stepFinal_customPlus(String content, boolean isPure, String checkStr) {
 
 //        content = _stepFinal_customPlus_TagP_noAttribute(content, isPure);
 //        validateLog("_stepFinal_customPlus_TagP_noAttribute <epub 001>");
@@ -73,6 +77,37 @@ public class HtmlEpubParser extends HtmlBaseParser {
         return content;
     }
 
+//    @Override
+    protected String _step3_imageProc_custom(String content, boolean isPure, String checkStr) {
+        content = _step3_imageProc_4Epub(content, isPure, checkStr);
+        validateContent("_step3_imageProc_4Epub", content, checkStr);
+        return content;
+    }
+
+    protected String _step3_imageProc_4Epub(String content, boolean isPure, String checkPic) {
+        Pattern titleStylePtn = Pattern.compile("\\<image(?:.|\n)*?xlink\\:href\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\/?\\>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String srcDesc = mth.group(1);
+            String picLink = mth.group(1);
+
+            if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
+            }
+
+            filterImageDir(srcDesc);
+
+            String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
+            if (isPure) {
+                repStr = "";
+            }
+
+            mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
 
     public String getPicDirForDropbox() {
         return picDirForDropbox;

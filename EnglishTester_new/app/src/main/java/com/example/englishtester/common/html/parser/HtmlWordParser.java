@@ -78,7 +78,12 @@ public class HtmlWordParser extends HtmlBaseParser {
     }
 
     @Override
-    protected String _stepFinal_customPlus(String content, boolean isPure) {
+    protected String _stepFinal_customPlus(String content, boolean isPure, String checkStr) {
+        return content;
+    }
+
+//    @Override
+    protected String _step3_imageProc_custom(String content, boolean isPure, String checkStr) {
         return content;
     }
 

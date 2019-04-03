@@ -30,8 +30,11 @@ public abstract class HtmlBaseParser {
 
     public static void main(String[] args) {
         HtmlBaseParser t = new HtmlBaseParser() {
-            @Override
-            protected String _stepFinal_customPlus(String content, boolean isPure) {
+            protected String _step3_imageProc_custom(String content, boolean isPure, String checkStr) {
+                return content;
+            }
+
+            protected String _stepFinal_customPlus(String content, boolean isPure, String chkStr) {
                 return content;
             }
         };
@@ -47,7 +50,7 @@ public abstract class HtmlBaseParser {
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
     protected static final String NEW_LINE = "\r\n\r\n";
 
-    private static final String TAG = HtmlEpubParser.class.getSimpleName();
+    private static final String TAG = HtmlBaseParser.class.getSimpleName();
 
     protected HtmlBaseParser() {
     }
@@ -103,7 +106,7 @@ public abstract class HtmlBaseParser {
     protected void saveToFileDebug(String suffix, String context) {
         if (BuildConfig.DEBUG) {
             String dateStr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-            String name = HtmlEpubParser.class.getSimpleName();
+            String name = HtmlBaseParser.class.getSimpleName();
             if (StringUtils.isNotBlank(suffix)) {
                 name = name + "_" + suffix;
             }
@@ -146,8 +149,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step2$1_hrefTag", content, checkStr);
         content = _step3_imageProcMaster(content, isPure, checkStr);
         validateContent("_step3_imageProcMaster", content, checkStr);
-        content = _step3_imageProc_4Epub(content, isPure, checkStr);
-        validateContent("_step3_imageProc_4Epub", content, checkStr);
+        content = _step3_imageProc_custom(content, isPure, checkStr);
+        validateContent("_step3_imageProc_custom", content, checkStr);
         content = _step4_wordBlockCheck(content, isPure);
         validateContent("_step4_wordBlockCheck", content, checkStr);
         content = _step4_fontSize_Indicate_4PTag(content, isPure);
@@ -163,10 +166,11 @@ public abstract class HtmlBaseParser {
         content = _step8_endNote(content, isPure);
         validateContent("_step8_endNote", content, checkStr);
 
+        content = _stepFinal_customPlus(content, isPure, checkStr);
+        validateContent("_stepFinal_customPlus", content, checkStr);
+
         content = _step999_hiddenSomething(content, isPure, checkStr);
         validateContent("_step999_hiddenSomething", content, checkStr);
-        content = _stepFinal_customPlus(content, isPure);
-        validateContent("_stepFinal_customPlus", content, checkStr);
 
         content = _stepFinal_escapeTag(content, isPure);
         validateContent("_stepFinal_removeMultiChangeLine", content, checkStr);
@@ -177,12 +181,12 @@ public abstract class HtmlBaseParser {
         // 最後做這塊才會正常
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
-
         Log.v(TAG, "# getFromContentMain END...");
         return content;
     }
 
-    protected abstract String _stepFinal_customPlus(String content, boolean isPure);
+    protected abstract String _step3_imageProc_custom(String content, boolean isPure, String checkStr);
+    protected abstract String _stepFinal_customPlus(String content, boolean isPure, String checkStr);
 
     protected void logContent(String content) {
         BufferedReader reader = null;
@@ -659,31 +663,6 @@ public abstract class HtmlBaseParser {
             }
 
             String repStr = "{{img src:" + "" + ",alt:" + srcDesc + "}}";
-            if (isPure) {
-                repStr = "";
-            }
-
-            mth.appendReplacement(sb, repStr);
-        }
-        mth.appendTail(sb);
-        return sb.toString();
-    }
-
-    protected String _step3_imageProc_4Epub(String content, boolean isPure, String checkPic) {
-        Pattern titleStylePtn = Pattern.compile("\\<image(?:.|\n)*?xlink\\:href\\=\"((?:.|\n)*?)\"(?:.|\n)*?\\/?\\>", Pattern.DOTALL | Pattern.MULTILINE);
-        StringBuffer sb = new StringBuffer();
-        Matcher mth = titleStylePtn.matcher(content);
-        while (mth.find()) {
-            String srcDesc = mth.group(1);
-            String picLink = mth.group(1);
-
-            if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
-                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
-            }
-
-            filterImageDir(srcDesc);
-
-            String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
             if (isPure) {
                 repStr = "";
             }

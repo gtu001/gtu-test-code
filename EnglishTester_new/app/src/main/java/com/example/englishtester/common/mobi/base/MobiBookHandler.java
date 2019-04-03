@@ -51,7 +51,7 @@ public class MobiBookHandler {
     }
 
     public void next() {
-        if (pageIndex > pages.size() - 1) {
+        if (pageIndex >= pages.size() - 1) {
             pageIndex = pages.size() - 1;
         } else {
             pageIndex++;
@@ -59,7 +59,7 @@ public class MobiBookHandler {
     }
 
     public void previous() {
-        if (pageIndex < 0) {
+        if (pageIndex <= 0) {
             pageIndex = 0;
         } else {
             pageIndex--;
@@ -76,6 +76,10 @@ public class MobiBookHandler {
     }
 
     public boolean hasNext() {
-        return !(pageIndex > pages.size() - 1);
+        return !(pageIndex >= pages.size() - 1);
+    }
+
+    public byte[] getImage(String recindex){
+        return imgMap.get(recindex);
     }
 }

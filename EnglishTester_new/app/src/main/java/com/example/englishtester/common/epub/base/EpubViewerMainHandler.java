@@ -291,12 +291,6 @@ public class EpubViewerMainHandler {
         }
     }
 
-    public enum PageForwardEnum {
-        NEXT_PAGE(), //
-        PREVIOUS_PAGE(), //
-        JUMP_SPINE_SECTION(), //
-    }
-
     public static class PageContentHolder {
         private AtomicInteger spinePos = new AtomicInteger(-1);
         private List<TxtReaderAppender.TxtAppenderProcess> processPages;
@@ -441,14 +435,13 @@ public class EpubViewerMainHandler {
 
         private boolean bookmarkMode = false;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
-        private PageForwardEnum pageForwardEnum;
         private BookStatusHolder bookStatusHolder;
         private EpubActivityInterface epubActivityInterface;
         private EpubViewerMainHandler handler;
         private boolean goDirectLink;
         private Stack<Integer> goDirectLinkStack = new Stack<Integer>();
 
-        private int pageIndex = -1;
+        private int pageIndex = 0;
 
         public EpubDTO(EpubActivityInterface epubActivityInterface, EpubViewerMainHandler handler) {
             this.epubActivityInterface = epubActivityInterface;
@@ -560,14 +553,6 @@ public class EpubViewerMainHandler {
             return bookmarkIndexHolder;
         }
 
-        public PageForwardEnum getPageForwardEnum() {
-            return pageForwardEnum;
-        }
-
-        public void setPageForwardEnum(PageForwardEnum pageForwardEnum) {
-            this.pageForwardEnum = pageForwardEnum;
-        }
-
         public SpineRangeHolder getSpineRangeHolder() {
             return bookStatusHolder.spineRangeHolder;
         }
@@ -670,6 +655,7 @@ public class EpubViewerMainHandler {
     }
 
     public PageContentHolder gotoPosition(int position) {
+        Log.v(TAG, ">> gotoPosition " + position, 1);
         List keys = new ArrayList<Integer>(dto.bookStatusHolder.spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         for (int ii = 0; ii < keys.size(); ii++) {
@@ -678,7 +664,6 @@ public class EpubViewerMainHandler {
             if (pair != null) {
                 boolean b1 = pair.getLeft() <= position;
                 boolean b2 = pair.getRight() >= position;
-
                 if (b1 && b2) {
                     PageContentHolder pageContentHolder = dto.bookStatusHolder.spineRangeHolder.spineHolder.get().get(ii);
                     int currPos = position - pair.getLeft();

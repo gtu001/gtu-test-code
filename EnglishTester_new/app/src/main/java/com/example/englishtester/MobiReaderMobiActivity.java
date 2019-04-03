@@ -427,13 +427,13 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
                             } else {
                                 titleVal = title;
                             }
-                            titleVal = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(titleVal);
+                            titleVal = MobiViewerMainHandler.MobiPageTitleHandler.fixNameToTitle(titleVal);
                             setTitle(titleVal);
                         }
                     });
                 }
 
-                private void epubProcess() {
+                private void mobiProcess() {
                     try {
                         File file = epubFileZ.get();
 
@@ -486,7 +486,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
 
                         setTitleNameProcess();
 
-                        this.epubProcess();
+                        this.mobiProcess();
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     } finally {

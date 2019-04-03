@@ -12,6 +12,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
@@ -218,5 +219,15 @@ public class OOMHandler2 {
                 return Pair.of(fixWidth, newHeight);
             }
         };
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0 /* Ignored for PNGs */, blob);
+        return blob.toByteArray();
+    }
+
+    public static Bitmap byteArrayToBitmap(byte[] bitmapdata) {
+        return BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
     }
 }

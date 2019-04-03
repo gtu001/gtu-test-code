@@ -4,6 +4,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.html.parser.HtmlEpubParser;
+import com.example.englishtester.common.html.parser.HtmlMobiParser;
 import com.example.englishtester.common.interf.MobiActivityInterface;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -56,7 +57,7 @@ public class MobiNavigator {
         if (this.mMobiBookHandler.hasNext()) {
             MobiViewerMainHandler.PageContentHolder pageContentHolder = new MobiViewerMainHandler.PageContentHolder();
 
-            HtmlEpubParser wordParser = HtmlEpubParser.newInstance();
+            HtmlMobiParser wordParser = HtmlMobiParser.newInstance();
             String $tempResultContent = wordParser.getFromContent(htmlContent);
 
 
@@ -79,6 +80,7 @@ public class MobiNavigator {
     }
 
     public MobiViewerMainHandler.PageContentHolder gotoPosition(int position) {
+        Log.v(TAG, ">> gotoPosition " + position, 1);
         List keys = new ArrayList<Integer>(spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         for (int ii = 0; ii < keys.size(); ii++) {

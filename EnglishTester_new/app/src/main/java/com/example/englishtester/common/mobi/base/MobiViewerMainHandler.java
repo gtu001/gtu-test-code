@@ -4,13 +4,15 @@ import android.graphics.Bitmap;
 import android.text.SpannableString;
 import android.widget.TextView;
 
+import com.example.englishtester.DropboxFileLoadService;
 import com.example.englishtester.common.IFloatServiceAidlInterface;
 import com.example.englishtester.common.Log;
+import com.example.englishtester.common.OOMHandler2;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 import com.example.englishtester.common.epub.base.HTMLDocument;
 import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml;
-import com.example.englishtester.common.interf.ITxtReaderActivity;
+import com.example.englishtester.common.html.image.ImageLoaderCandidate4MobiHtml;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.interf.MobiActivityInterface;
 
@@ -36,16 +38,16 @@ public class MobiViewerMainHandler {
 
     private Object self;
     private MobiNavigator navigator;
-    private MobiActivityInterface epubActivityInterface;
+    private MobiActivityInterface mobiActivityInterface;
     private MobiBookHandler mMobiBookHandler;
 
 
     private MobiDTO dto;
 
-    public MobiViewerMainHandler(MobiActivityInterface epubActivityInterface) {
+    public MobiViewerMainHandler(MobiActivityInterface mobiActivityInterface) {
         this.self = this;
-        this.epubActivityInterface = epubActivityInterface;
-        this.dto = new MobiDTO(epubActivityInterface, this);
+        this.mobiActivityInterface = mobiActivityInterface;
+        this.dto = new MobiDTO(mobiActivityInterface, this);
     }
 
     public void setTextView(TextView textView) {
@@ -59,7 +61,7 @@ public class MobiViewerMainHandler {
             InputStream bookStream = new FileInputStream(bookFile);
             MobiDocument doc = new MobiReader().read(bookStream);
             this.mMobiBookHandler = new MobiBookHandler(doc);
-            this.navigator = new MobiNavigator(mMobiBookHandler, this.epubActivityInterface, this.dto);
+            this.navigator = new MobiNavigator(mMobiBookHandler, this.mobiActivityInterface, this.dto);
         } catch (Exception ex) {
             throw new RuntimeException("initBook ERR : " + ex.getMessage(), ex);
         }
@@ -77,12 +79,6 @@ public class MobiViewerMainHandler {
     }
 
     public void triggerEvent() {
-    }
-
-    public enum PageForwardEnum {
-        NEXT_PAGE(), //
-        PREVIOUS_PAGE(), //
-        JUMP_SPINE_SECTION(), //
     }
 
     public static class PageContentHolder {
@@ -233,18 +229,16 @@ public class MobiViewerMainHandler {
 
         private StringBuilder fileName;
         private TextView textView;
-        private HTMLDocument htmlDocument;
 
         private boolean bookmarkMode = false;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
-        private PageForwardEnum pageForwardEnum;
         //        private BookStatusHolder bookStatusHolder;
         private MobiActivityInterface epubActivityInterface;
         private MobiViewerMainHandler handler;
         private boolean goDirectLink;
         private Stack<Integer> goDirectLinkStack = new Stack<Integer>();
 
-        private int pageIndex = -1;
+        private int pageIndex = 0;
 
         public MobiDTO(MobiActivityInterface epubActivityInterface, MobiViewerMainHandler handler) {
             this.epubActivityInterface = epubActivityInterface;
@@ -296,15 +290,8 @@ public class MobiViewerMainHandler {
             return this.fileName;
         }
 
-        public Bitmap getBitmapForEpub(ImageLoaderCandidate4EpubHtml imgLoader) {
-            try {
-            } catch (OutOfMemoryError ex) {
-                Log.line(TAG, " !!! OutOfMemoryError : " + this.htmlDocument.getId() + " , " + this.htmlDocument.getTitle() + " , " + this.htmlDocument.getHref(), ex);
-            } catch (Throwable ex) {
-                Log.line(TAG, "getBitmapForEpub ERR : " + ex.getMessage(), ex);
-                throw new RuntimeException("getBitmapForEpub ERR : " + ex.getMessage(), ex);
-            }
-            return null;
+        public Bitmap getBitmapForMobi(ImageLoaderCandidate4MobiHtml imgLoader) {
+            return this.handler.getBitmapForMobi(imgLoader);
         }
 
         public File getBookFile() {
@@ -330,18 +317,6 @@ public class MobiViewerMainHandler {
             return bookmarkIndexHolder;
         }
 
-        public PageForwardEnum getPageForwardEnum() {
-            return pageForwardEnum;
-        }
-
-        public void setPageForwardEnum(PageForwardEnum pageForwardEnum) {
-            this.pageForwardEnum = pageForwardEnum;
-        }
-
-//        public SpineRangeHolder getSpineRangeHolder() {
-//            return bookStatusHolder.spineRangeHolder;
-//        }
-
         @Override
         public int getPageIndex() {
             return pageIndex;
@@ -366,6 +341,22 @@ public class MobiViewerMainHandler {
         public void setGoDirectLinkStack(Stack<Integer> goDirectLinkStack) {
             this.goDirectLinkStack = goDirectLinkStack;
         }
+    }
+
+    private Bitmap getBitmapForMobi(ImageLoaderCandidate4MobiHtml imgLoader) {
+        try {
+            if (StringUtils.isNotBlank(imgLoader.getAltData()) && StringUtils.isNotBlank(imgLoader.getSrcData())) {
+                byte[] imageByteArry = this.mMobiBookHandler.getImage(imgLoader.getSrcData());
+                return OOMHandler2.byteArrayToBitmap(imageByteArry);
+            }
+            throw new Exception("無法判斷的pic : [alt]" + imgLoader.getAltData() + ", [src]" + imgLoader.getSrcData());
+        } catch (OutOfMemoryError ex) {
+            Log.line(TAG, " !!! OutOfMemoryError : " + imgLoader.getAltData() + " , " + imgLoader.getSrcData() + " , ERR : " + ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            Log.line(TAG, "getBitmapForEpub ERR : " + imgLoader.getAltData() + " , " + imgLoader.getSrcData() + " , ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("getBitmapForEpub ERR : " + imgLoader.getAltData() + " , " + imgLoader.getSrcData() + " , ERR : " + ex.getMessage(), ex);
+        }
+        return null;
     }
 
 
@@ -417,7 +408,7 @@ public class MobiViewerMainHandler {
 
         public static String fixNameToTitle(String orignFileName) {
             orignFileName = StringUtils.trimToEmpty(orignFileName);
-            Pattern ptn = Pattern.compile("(.*?)\\.(?:epub)", Pattern.CASE_INSENSITIVE);
+            Pattern ptn = Pattern.compile("(.*?)\\.(?:mobi)", Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(orignFileName);
             if (mth.find()) {
                 return mth.group(1);
