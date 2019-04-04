@@ -21,9 +21,9 @@ public class MobiReaderTest001 {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // https://github.com/rrauschenbach/mobi-api4java
 
-        MobiDocument mobiDoc = new MobiReader().read(new File("C:/Users/wistronits/Desktop/The-Three-Body-Problem-Remembrance-of-Earth-s-Past-.mobi"));
+        MobiDocument mobiDoc = new MobiReader().read(new File("/media/gtu001/OLD_D/gtu001_dropbox/Dropbox/guava/電子書/Anthony Doerr-All the Light we Cannot See-Simon & Schuster Export (2014).mobi"));
         String text = mobiDoc.getTextContent();
-
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "xxxx.htm"), text, "UTF8");
         System.out.println("done...");
     }
 
