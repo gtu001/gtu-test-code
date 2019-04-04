@@ -37,6 +37,7 @@ public class RecentTxtMarkService {
      * 新增查詢單字
      */
     public RecentTxtMark addMarkWord(final String fileName, final String word, final int index, int pageIndex, boolean clickBookmark) {
+//        Log.line(TAG, "fileName = " + fileName + " , word = " + word + " , index = " + index + " , pageIndex = " + pageIndex + " , clickBookmark = " + clickBookmark);
         long currentTime = System.currentTimeMillis();
         RecentTxtMark bo = new RecentTxtMark();
         bo.fileName = fileName;

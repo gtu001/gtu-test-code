@@ -57,6 +57,7 @@ import com.example.englishtester.common.interf.MobiActivityInterface;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -623,7 +624,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
         }
 
         private void initReference() {
-            String fileName = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
+            String fileName = MobiViewerMainHandler.MobiPageTitleHandler.fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
 
             StringBuilder sb = new StringBuilder();
             sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");

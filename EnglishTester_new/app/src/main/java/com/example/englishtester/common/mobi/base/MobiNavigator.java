@@ -64,6 +64,7 @@ public class MobiNavigator {
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, this.dto.getTxtView());
             Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Mobi(currentInitSpinePos, $tempResultContent, epubActivityInterface.getFixScreenWidth());
 
+            dto.setFileName(dto.getBookFile().getName());
             pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
             pageContentHolder.setSpinePos(currentInitSpinePos);
 
