@@ -1,0 +1,11 @@
+安裝
+
+	$ sudo apt-get update
+	$ sudo apt-get install netcat
+
+
+檢查port開
+
+	$ nc -zv 127.0.0.1 1443 
+	
+	

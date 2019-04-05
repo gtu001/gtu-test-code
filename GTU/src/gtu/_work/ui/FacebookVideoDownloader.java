@@ -790,17 +790,18 @@ public class FacebookVideoDownloader extends JFrame {
             }
 
             if (willingDownloadFile.exists()) {
-                if (throwEx) {
-                    VideoUrlConfigZ vo2 = new VideoUrlConfigZ(vo);
-                    vo2.downloadToFile = willingDownloadFile;
-                    crashProcessSaveLogToFile(vo2, "檔案已存在目的!");
-                    throw new RuntimeException("檔案已存在目的! : " + willingDownloadFile);
-                } else {
-                    boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在目的,是否要繼續下載?", "繼續下載");
-                    if (!isContinue) {
-                        return;
-                    }
+                // if (throwEx) {
+                // VideoUrlConfigZ vo2 = new VideoUrlConfigZ(vo);
+                // vo2.downloadToFile = willingDownloadFile;
+                // crashProcessSaveLogToFile(vo2, "檔案已存在目的!");
+                // throw new RuntimeException("檔案已存在目的! : " +
+                // willingDownloadFile);
+                // } else {
+                boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在目的,是否要繼續下載?", "繼續下載");
+                if (!isContinue) {
+                    return;
                 }
+                // }
             }
         }
 

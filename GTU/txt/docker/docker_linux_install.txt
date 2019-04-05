@@ -73,9 +73,20 @@ sudo rm -rf /var/lib/docker
 
 
 
+-------------------------------------------------------------------------------------
+加入docker權限
 
+	$ sudo groupadd docker
+	$ sudo usermod -G docker -a gtu001
 
+	看目前group
+		$groups 
 
+	馬上起用新group
+		$ newgrp docker
+	
+	重起docker
+		$ sudo systemctl restart docker
 
 
 

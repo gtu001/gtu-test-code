@@ -281,6 +281,7 @@ Volume 掛載測試
     b.重启docker服务
 
         sudo systemctl restartdocker.service
+        sudo systemctl restart docker
 
     c.查看状态
 

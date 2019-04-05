@@ -1,0 +1,33 @@
+
+輸入 cat << EOF > 路徑名
+輸入完 下一行 輸入 EOF 結束
+	
+	
+	$ cat << EOF >/etc/docker/daemon.json
+	{  <--內文
+	 "insecure-registries": [  <--內文
+	 "172.30.0.0/16"  <--內文
+	 ]  <--內文
+	}  <--內文
+	EOF
+	
+---------------------------------------------------------------------------------------
+加入 sudo 權限
+	
+	$ sudo bash -c 'cat << EOF >/etc/docker/daemon.json
+	{  
+	 "insecure-registries": [
+	 "172.30.0.0/16"
+	 ]
+	}
+	EOF'
+或是
+
+	sudo bash -c 'cat > /etc/yum.repos.d/some-name.repo' << EOF
+	{
+	 "insecure-registries": [
+	 "172.30.0.0/16"
+	 ]
+	}
+	EOF
+---------------------------------------------------------------------------------------
