@@ -1,0 +1,34 @@
+--建立sequence
+CREATE SEQUENCE ISEQ$$_93729 INCREMENT BY 1 MAXVALUE 9999999999999999999999999999 MINVALUE 1 CACHE 20
+
+
+--取得目前seqence
+SELECT sequence_owner, sequence_name, last_number 
+  FROM all_sequences 
+  where sequence_name = 'ISEQ$$_93729';
+
+
+--刷新sequence最大值
+SET serveroutput on;
+DECLARE 
+    tableName varchar(30) := 'log_service';
+    pkName varchar(30) := 'tx_id';
+    sequenceName varchar(30) := 'ISEQ$$_93729';
+    maxVal number;
+    curVal number;
+    tmpVal number;
+    newVal number;
+BEGIN
+    EXECUTE IMMEDIATE 'select max(' || pkName || ')+1 as CNT from ' || tableName INTO maxVal;
+    dbms_output.put_line('newPk = ' || maxVal);
+    
+    EXECUTE IMMEDIATE 'SELECT last_number FROM all_sequences where sequence_name = ''' || sequenceName || '''' INTO curVal;
+    tmpVal := maxVal - curVal;
+    dbms_output.put_line('tmpVal = ' || tmpVal);
+    
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE ' || sequenceName || '  INCREMENT BY ' || tmpVal;
+    EXECUTE IMMEDIATE 'select ' || sequenceName || '.NEXTVAL from dual' INTO newVal;
+    dbms_output.put_line('newVal = ' || newVal);
+    EXECUTE IMMEDIATE 'ALTER SEQUENCE ' || sequenceName || '  INCREMENT BY ' || 1;
+END;
+/
