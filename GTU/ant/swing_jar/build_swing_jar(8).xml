@@ -3,7 +3,7 @@
 	<loadproperties srcFile="build_swing_jar.properties" />
 
 	<!--<property name="src_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\src" />
-		<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
+	<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
 	<property name="build_dir" location="build" />
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
@@ -11,7 +11,7 @@
 	<property name="main_class_full" value="gtu._work.ui.DropboxTestUI" />
 	<property name="main_class" value="DropboxTestUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="janna.ico" />
+	<property name="icon_name" value="tk_aiengine.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--${main_class}-->
 
@@ -28,6 +28,8 @@
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
+	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -44,28 +46,38 @@
 	</target>
 	-->
 
+	<target name="jarToExe" if="${enable}">
+		<echo># jarToExe = ${enable}</echo>
+		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
+			<icon enable="true">${src_dir}/resource/images/ico/${icon_name}</icon>
+			<singleton enable="true">${main_class}</singleton>
+		</jarToExe>
+	</target>
+
 	<target name="buildClassSet" if="${enable}">
 		<echo># buildClassSet = ${enable}</echo>
 		<mkdir dir="${jars_dir}" />
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
 
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
-			<packagename mode="small">org.apache.commons.lang.StringUtils</packagename>
+			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
-			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
-			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
-			<packagename mode="small">net.sf.image4j.codec.ico.ICODecoder</packagename>
-			<packagename mode="small">org.apache.commons.lang.reflect.FieldUtils</packagename>
-
+			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
+			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
+			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			
 			<packagename mode="small">org.apache.log4j.Logger</packagename>
 			<packagename mode="small">org/slf4j/MarkerFactory</packagename>
 			<packagename mode="small">org/slf4j/impl/StaticMarkerBinder</packagename>
 
 			<packagename mode="small">com.dropbox.core.v2.DbxClientV2</packagename>
 			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -106,7 +118,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -139,6 +151,16 @@
 		</antcall>
 	</target>
 
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
+		<exec executable="cmd">
+			<arg value="/c start echo create ${main_class}.jar complete!!" />
+		</exec>
+		-->
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
+	</target>
+
 	<target name="compiler">
 		<echo># compiler ...</echo>
 		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
@@ -161,16 +183,16 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-			<jar destfile="${main_class}.jar" basedir="${build_dir}">
-				<manifest>
-					<attribute name="Main-Class" value="${main_class_full}" />
-				</manifest>
-			</jar>
-			-->
+				<jar destfile="${main_class}.jar" basedir="${build_dir}">
+					<manifest>
+						<attribute name="Main-Class" value="${main_class_full}" />
+					</manifest>
+				</jar>
+				-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<include name="**/*" />
 			</zipfileset>
 			<manifest>
