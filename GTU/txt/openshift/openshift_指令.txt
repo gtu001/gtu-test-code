@@ -29,9 +29,23 @@
 				 ]
 				}
 				EOF
-		 
-		$ sudo systemctl daemon-reload
+---
+	設定完重起
+		$ sudo systemctl daemon-reload 
 		$ sudo systemctl restart docker
+---
+	設定另外一個路徑開啟daemon
+		$ dockerd --config-file <path>/daemon.json
+		$ dockerd 
+		
+
+---
+	window版		
+		https://vidhyachari.wordpress.com/2018/04/14/getting-started-with-openshift-oc-cluster-up/
+		https://medium.com/@maheshacharya_44641/install-openshift-origin-on-ubuntu-18-04-7b98773c2ee6
+		https://opensource.com/article/18/11/local-okd-cluster-linux
+		https://docs.okd.io/latest/getting_started/administrators.html
+		
 	 
 ---------------------------------------------------------------------------------------------------
 開啟 後點 Fork
@@ -42,6 +56,21 @@
 	$ cd nodejs-ex
 
 ---------------------------------------------------------------------------------------------------
+用官方管理界面部屬(可用版本)
+
+	點選右上角帳號圖示選 copy login command
+	
+	$ oc login https://api.starter-us-west-2.openshift.com --token=ibYSdYaRqxCOW-LKwMN-yKDQUB2ff26GyZGHelvRSe8
+
+	$ docker pull hello-world
+
+	$ oc tag --source=docker hello-world:latest   hello-world-ok:latest
+	
+	$ oc new-app   hello-world-ok:latest
+
+
+
+
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------

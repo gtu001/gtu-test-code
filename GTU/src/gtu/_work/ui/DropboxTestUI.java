@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -47,6 +46,8 @@ public class DropboxTestUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private static PropertiesUtilBean config = new PropertiesUtilBean(DropboxTestUI.class);
+    // private static PropertiesUtilBean config = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/DropboxTestUI_config.properties"));
     private static final String TOKEN;
     static {
         TOKEN = StringUtils.trimToEmpty(config.getConfigProp().getProperty("token"));
@@ -64,7 +65,6 @@ public class DropboxTestUI extends JFrame {
 
     private static final Logger logger = Logger.getLogger(DropboxTestUI.class);
     private final PrintStream out = new PrintStream(new PrintStreamAdapter("big5") {
-        @Override
         public void println(String message) {
             Log.debug(message);
             // if(StringUtils.length(logArea.getText()) > 500){
@@ -72,7 +72,7 @@ public class DropboxTestUI extends JFrame {
             // }
             logArea.append(message + "\n");
         }
-    }, true);
+    });
 
     private JPanel contentPane;
     private JTree downloadTree;
@@ -90,7 +90,7 @@ public class DropboxTestUI extends JFrame {
             public void run() {
                 try {
                     DropboxTestUI frame = new DropboxTestUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
