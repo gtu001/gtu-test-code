@@ -1,0 +1,47 @@
+			<!DOCTYPE html>
+			<html>
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+				<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+				<meta name="viewport"
+				content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+				<link rel="shortcut icon" th:href="@{/img/favicon.ico}" />
+				<link rel="bookmark" th:href="@{/img/favicon.ico}" />
+				<title>投資平台前台系統</title>
+				<meta name="keywords" content="">
+				<meta name="description" content="">
+				<meta name="viewport"
+				content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+
+				<style>
+			</style>
+
+			<script type="text/javascript">
+
+
+				$("[name=aa]").click(function(){
+					var previousValue = $(this).attr('previousValue');
+					var name = $(this).attr('name');
+			
+					if (previousValue == 'checked') {
+						$(this).removeAttr('checked');
+					    $(this).attr('previousValue', false);
+					} else {
+						$("input[name="+name+"]:radio").attr('previousValue', false);
+						$(this).attr('previousValue', 'checked');
+					}
+				});
+			</script>
+
+
+		</head>
+		<body>
+
+			<input type="radio" name="aa" id="a1"  /><br/>
+			<input type="radio" name="aa" id="a2"  /><br/>
+
+		</body>
+		</html>

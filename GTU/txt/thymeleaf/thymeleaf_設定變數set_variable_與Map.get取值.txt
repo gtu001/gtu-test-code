@@ -1,0 +1,33 @@
+
+設定變數寫法 th:with="summaryKey=${'境內 外幣'}" 
+	--> summaryKey = "境內 外幣"
+
+Map取直寫法 ${roiEntity.littleTotalSummaryShow.get(summaryKey)}
+
+<th:block th:with="summaryKey=${'境內 外幣'}">
+	<div th:if="${roiEntity.littleTotalSummaryShow.get(summaryKey)}">
+		<div class="content_table"
+			th:if="${not #lists.isEmpty(roiEntity.littleTotalSummary.get(summaryKey))}">
+			<table class="rwd-table littleTotalSummary">
+				<tbody>
+					<tr th:each="ctf : ${roiEntity.littleTotalSummary.get(summaryKey)}">
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td
+							th:text="${ctf.currencyType} + ' ' + ${ctf.countCapital}"></td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td
+							th:text="${ctf.currencyType} + ' ' + ${ctf.net}"></td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						<td th:text="${ctf.roi}"></td>
+						<td th:text="${ctf.divRoi}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</th:block>
