@@ -1,0 +1,98 @@
+<html>
+<head>
+
+<script type="text/javascript">
+	var logger = new function(){
+		var prefix = "%c"
+		return {
+			debug : function(message){
+				console.log(prefix + message, "color:blue;");
+			},
+			info : function(message){
+				console.info(prefix + message, "color:green;");
+			},
+			error : function(message){
+				console.error(prefix + message, "color:red; font-weight: bold;");
+			},
+			warn : function(message){
+				console.warn(prefix + message, "color:orange; font-weight: bold;");
+			},
+			fatal : function(message){
+				console.log(prefix + message, "color:red; font-weight: bold; font-size: 18; backgroud-color : yellow;");
+			},
+			json : function(jsonObj){//印出表格
+				console.table(jsonObj);
+			},
+			inspect : function(jsonObj){//印出詳細
+				console.dir(jsonObj);
+			},
+			inspectXml : function(jsonObj){//印出詳細
+				console.dirxml(jsonObj);
+			},
+			timeStart : function(label){//計時
+				console.time(label);
+			},
+			timeEnd : function(label){//計時
+				console.timeEnd(label);
+			},
+			printStack : function(message){
+				console.trace(message);
+			},
+			clear : function(){//清除主控台
+				console.clear();
+			},
+			count : function(label){//計算log出現次數
+				console.count(label);
+			},
+			groupStart : function(label){
+				console.groupCollapsed(label);
+			},
+			groupEnd : function(label){
+				console.groupEnd(label);
+			},
+			profileStart : function(label){//結果輸出到效能面板
+				console.profile(label);
+			},
+			profileEnd : function(label){//結果輸出到效能面板
+				console.profileEnd(label);
+			},
+			timeStamp : function(label){//會在時間軸面板壓時間
+				console.timeStamp(label);
+			},
+		}
+	};
+
+	function test(){
+		
+		logger.debug("debug");
+		logger.info("info");
+		logger.error("error");
+		logger.warn("warn");
+		logger.fatal("fatal");
+		
+		logger.json([{"id":"gtu001", "name":"張純毓"}, {"id":"janna", "name":"瓜仔"}]);
+		logger.json({"id":"gtu001", "name":"張純毓"});
+		logger.profileStart("測試profile");
+		logger.timeStart("lopper");
+		for(var ii = 0 ; ii < 1000000; ii ++){
+		}
+		logger.timeEnd("lopper");
+		logger.profileEnd("測試profile");
+
+		logger.printStack();
+		logger.timeStamp("壓時間!!");
+		logger.groupStart("測試群組");
+		logger.debug("AAA");
+		logger.debug("BBB");
+		logger.groupEnd("測試群組");
+
+		logger.inspect(document.querySelector("#testBtn"));
+		logger.inspectXml(document.querySelector("#testBtn"));
+	}
+	
+</script>
+</head>
+<body>
+	<input type="button" id="testBtn" value="test log" onclick="test()" />
+	</body>
+</html>
