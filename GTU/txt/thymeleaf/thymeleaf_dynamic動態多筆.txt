@@ -1,0 +1,27 @@
+           <div th:each="ingredient : *{ingredients}" class="ingredient-row">
+                <div class="prefix-20 grid-30">
+                    <input hidden th:field="*{ingredients[__${ingredientStat.index}__].id}"/>
+                    <input hidden th:field="*{ingredients[__${ingredientStat.index}__].version}"/>
+                    <p>
+                      <select th:field="*{ingredients[__${ingredientStat.index}__].name}">
+                        <option
+                                th:each="item : ${items}"
+                                th:value="${item}"
+                                th:text="${item}"
+                        >
+                        </option>
+                      </select>
+                        <!--<input th:field="*{ingredients[__${ingredientStat.index}__].name}"/>-->
+                    </p>
+                </div>
+                <div class="grid-30">
+                    <p>
+                        <input th:field="*{ingredients[__${ingredientStat.index}__].condition}"/> </input>
+                    </p>
+                </div>
+                <div class="grid-10 suffix-10">
+                    <p>
+                        <input th:field="*{ingredients[__${ingredientStat.index}__].quantity}"/> </input>
+                    </p>
+                </div>
+            </div>

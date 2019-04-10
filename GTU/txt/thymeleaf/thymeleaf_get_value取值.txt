@@ -1,0 +1,64 @@
+第十一節:Thymeleaf內置對象
+96 Reg8888
+2018.01.26 09:53 字數 357 閱讀 1406評論 0喜歡 0
+
+一：基礎物件
+1.ctx: the context object 
+    ctx物件繼承org.thymeleaf.context.IContext或者org.thymeleaf.context.IWebContext，取決於當前環境是不是web環境。
+    如果程式集成了spring，那麼將會是org.thymeleaf.spring[3|4].context.SpringWebContext
+    #org.thymeleaf.context.IContext
+    ${#ctx.locale}
+    ${#ctx.variables}
+    #org.thymeleaf.context.IWebContext
+    ${#ctx.applicationAttributes}
+    ${#ctx.httpServletRequest}
+    ${#ctx.httpServletResponse}
+    ${#ctx.httpSession}
+    ${#ctx.requestAttributes}
+    ${#ctx.requestParameters}
+    ${#ctx.servletContext}
+    ${#ctx.sessionAttributes}
+2.vars: the context variables
+    訪問VariablesMap所有上下文中的變數
+    #org.thymeleaf.context.VariablesMap
+    ${#vars.get('foo')}
+    ${#vars.containsKey('foo')}
+    ${#vars.size()}
+3.locale: the context locale
+    java.util.Locale對象的訪問
+4.request: (only in Web Contexts) the HttpServletRequest object
+5.response: (only in Web Contexts) the HttpServletResponse object
+6.session: (only in Web Contexts) the HttpSession object(需要contoller/action(HttpSession session))
+7.servletContext: (only in Web Contexts) the ServletContext object
+二：web環境物件
+1.#httpServletRequest :javax.servlet.http.HttpServletRequest物件實例
+    ${#httpServletRequest.getAttribute('foo')}
+    ${#httpServletRequest.getParameter('foo')}
+    ${#httpServletRequest.getContextPath()}
+    ${#httpServletRequest.getRequestName()}
+2.#httpSession(需要contoller/action(HttpSession session))
+    ${#httpSession.getAttribute('foo')}
+    ${#httpSession.id}
+    ${#httpSession.lastAccessedTime}
+三：spring環境物件
+    #themes : 提供和“ spring:theme JSP tag.”同樣的功能。
+    ${#themes.code('foo')}
+四：web環境中訪問request/session等屬性
+    1.param :獲取請求的參數.
+        ${param.foo} // Retrieves a String[] with the values of request parameter 'foo'
+        ${param.size()}
+        ${param.isEmpty()}
+        ${param.containsKey('foo')}
+    2.session:訪問session屬性
+        ${session.foo} // Retrieves the session atttribute 'foo'
+        ${session.size()}
+        ${session.isEmpty()}
+        ${session.containsKey('foo')}
+    3.application：獲取應用程式/ servlet內容屬性
+        ${application.foo} // Retrieves the ServletContext atttribute 'foo'
+        ${application.size()}
+        ${application.isEmpty()}
+        ${application.containsKey('foo')}
+五：直接訪問spring註冊物件
+    <div th:text="${@authService.getUserName()}">... 
+六：示例

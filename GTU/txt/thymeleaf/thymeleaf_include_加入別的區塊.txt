@@ -1,0 +1,19 @@
+主要網頁
+	PS : include/application_stauts 不可有大寫
+	<th:block th:replace="include/application_stauts :: applicationStatus(variable1=${entity.applicationStautsRes}, variable2='test')">
+										</th:block>
+
+被引用的網頁
+	--> 檔案位置 src\main\resources\templates\include\application_stauts.html
+
+	<th:block th:fragment="applicationStatus(variable1, variable2)">
+	 	<span class="ApplicationStauts_Res" th:switch="${variable1}">
+			<span th:case="'已存檔'" style="color: yellow" th:text="${variable1} + '●'"></span> 
+			<span th:case="'未覆核'" style="color: red" th:text="${variable1} + '●'"></span> 
+			<span th:case="'已覆核'" style="color: green" th:text="${variable1} + '●'"></span> 
+			<span th:case="'已撤銷'" style="color: blue" th:text="${variable1} + '●'"></span> 
+			<span th:case="'異動中'" style="color: #777777;" th:text="${variable1} + '●'"></span> 
+			<span th:case="'存檔未覆核'" style="color: #444444;" th:text="${variable1} + '●'"></span> 
+			<span th:case="*" style="color: #AAAAAA;"  th:text="${variable1}"></span>
+		</span>
+	</th:block>

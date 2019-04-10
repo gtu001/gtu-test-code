@@ -188,7 +188,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
+    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, final String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
             final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
@@ -253,6 +253,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         tableInfo.setDbDateDateFormat(dbDateDateFormat);
 
                         tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
+                        if (StringUtils.isBlank(tableInfo.getTableAndSchema())) {
+                            tableInfo.setTableName(tableNSchema);
+                        }
 
                         Set<String> pkColumns = new HashSet<String>();
                         Set<String> noNullsCol = new HashSet<String>();
@@ -997,7 +1000,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     public FastDBQueryUI_CrudDlgUI(final FastDBQueryUI _parent) {
         this._parent = _parent;
         this.dBTypeFormatHandler = new DBTypeFormatHandler(_parent);
-        
+
         this.setTitle("CRUD處理");
 
         setBounds(100, 100, 680, 463);

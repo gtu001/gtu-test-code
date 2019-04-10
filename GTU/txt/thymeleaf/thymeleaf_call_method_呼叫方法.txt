@@ -1,0 +1,18 @@
+java 端
+	model.addAttribute("PaddingUtils", PaddingUtils.class);
+
+	public final class PaddingUtils {
+		private PaddingUtils() {
+    	}
+    	public static String getNormalDate_yyyyMMdd(){
+    		return ...
+    	}
+    }
+
+
+畫面
+	<span th:text="${PaddingUtils.getNormalDate_yyyyMMdd(entity.maxNavDate)}" />
+
+
+
+https://www.thymeleaf.org/doc/articles/standarddialect5minutes.html

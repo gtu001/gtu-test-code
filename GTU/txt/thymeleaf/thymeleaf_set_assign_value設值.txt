@@ -1,0 +1,12 @@
+ 
+ 這種有範圍限制
+	 <th:block th:with="test=${'1'}">
+	 	可用範圍
+	 </th:block>
+ 
+	 <th:block th:with="test=${#httpServletRequest.getAttribute('test')}">
+	 	可用範圍
+	 </th:block>
+
+ 下面這個寫法可以重複assign (無範圍限制)
+ 		<th:block th:with="currencyType=${#httpServletRequest.setAttribute('currencyType', tradeJournal.trustCapitalCcyTradeJournal)}" />
