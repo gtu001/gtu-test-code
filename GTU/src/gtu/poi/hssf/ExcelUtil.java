@@ -19,6 +19,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -29,7 +30,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import gtu.file.FileUtil;
 
 public class ExcelUtil {
 
@@ -126,6 +130,15 @@ public class ExcelUtil {
             cell = row.createCell(colPos);
         }
         return cell;
+    }
+
+    public Workbook readExcelAll(File file) {
+        String ext = FileUtil.getSubName(file);
+        if ("xlsx".equalsIgnoreCase(ext)) {
+            return readExcel_xlsx(file);
+        } else {
+            return readExcel(file);
+        }
     }
 
     /**
@@ -526,21 +539,47 @@ public class ExcelUtil {
         }
     }
 
+    public void setCellValue(Row row, String cellStr, Object value) {
+        int pos = cellEnglishToPos(cellStr);
+        Cell cell = getCellChk(row, pos);
+        setCellValue(cell, value);
+    }
+
+    public void setCellValue(Row row, int pos, Object value) {
+        Cell cell = getCellChk(row, pos);
+        setCellValue(cell, value);
+    }
+
     /**
      * 設定儲存格內容
      */
     public void setCellValue(Cell cell, Object value) {
-        if (value instanceof Number) {
-            Number n = (Number) value;
-            cell.setCellValue(n.doubleValue());
-        } else if (value instanceof String) {
-            cell.setCellValue(new HSSFRichTextString(getLimitString32767((String) value)));
-        } else if (value instanceof IFormula) {
-            cell.setCellFormula(((IFormula) value).getFormula());
-        } else if (value == null) {
-            cell.setCellValue(new HSSFRichTextString(""));
+        if (cell instanceof HSSFCell) {
+            if (value instanceof Number) {
+                Number n = (Number) value;
+                cell.setCellValue(n.doubleValue());
+            } else if (value instanceof String) {
+                cell.setCellValue(new HSSFRichTextString(getLimitString32767((String) value)));
+            } else if (value instanceof IFormula) {
+                cell.setCellFormula(((IFormula) value).getFormula());
+            } else if (value == null) {
+                cell.setCellValue(new HSSFRichTextString(""));
+            } else {
+                cell.setCellValue(new HSSFRichTextString(getLimitString32767(value.toString())));
+            }
         } else {
-            cell.setCellValue(new HSSFRichTextString(getLimitString32767(value.toString())));
+            if (value instanceof Number) {
+                Number n = (Number) value;
+                cell.setCellValue(n.doubleValue());
+            } else if (value instanceof String) {
+                cell.setCellValue(new XSSFRichTextString(getLimitString32767((String) value)));
+            } else if (value instanceof IFormula) {
+                cell.setCellFormula(((IFormula) value).getFormula());
+            } else if (value == null) {
+                cell.setCellValue(new XSSFRichTextString(""));
+            } else {
+                cell.setCellValue(new XSSFRichTextString(getLimitString32767(value.toString())));
+            }
         }
     }
 
