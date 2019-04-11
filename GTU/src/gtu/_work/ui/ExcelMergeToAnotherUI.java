@@ -12,6 +12,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
@@ -85,6 +87,10 @@ public class ExcelMergeToAnotherUI extends JFrame {
     private JTextField columnToText;
     private JButton addColumnDefBtn;
     private ButtonGroup buttonGroup;
+    private JLabel lblNewLabel_5;
+    private JLabel lblNewLabel_6;
+    private JTextField includeRowsText;
+    private JTextField excludeRowsText;
 
     /**
      * Launch the application.
@@ -163,6 +169,20 @@ public class ExcelMergeToAnotherUI extends JFrame {
         panel.add(mergeToSheetIndexText, "4, 10, fill, default");
         mergeToSheetIndexText.setColumns(10);
         mergeToSheetIndexText.setText("0");
+
+        lblNewLabel_5 = new JLabel("include rows");
+        panel.add(lblNewLabel_5, "2, 14, right, default");
+
+        includeRowsText = new JTextField();
+        panel.add(includeRowsText, "4, 14, fill, default");
+        includeRowsText.setColumns(10);
+
+        lblNewLabel_6 = new JLabel("exclude rows");
+        panel.add(lblNewLabel_6, "2, 16, right, default");
+
+        excludeRowsText = new JTextField();
+        panel.add(excludeRowsText, "4, 16, fill, default");
+        excludeRowsText.setColumns(10);
 
         panel_3 = new JPanel();
         panel.add(panel_3, "4, 28, fill, fill");
@@ -290,13 +310,58 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 Sheet fromSheet = fromBook.getSheetAt(fromSheetIndex);
                 Sheet toSheet = toBook.getSheetAt(toSheetIndex);
 
-                this.mainProcess(fromSheet, toSheet);
+                List<Integer> processRowsArray = this.getProcessRowIndexes(toSheet);
+                this.mainProcess(fromSheet, toSheet, processRowsArray);
 
-                ExcelUtil.getInstance().writeExcel(FileUtil.DESKTOP_DIR  + "/"+ "test.xlsx", toBook);
-                JCommonUtil._jOptionPane_showMessageDialog_info("完成!");
+                String newName = FileUtil.getNameNoSubName(toExcelFile) + "[Merge]." + FileUtil.getSubName(toExcelFile);
+                File destExcelFile = new File(FileUtil.DESKTOP_DIR, newName);
+                ExcelUtil.getInstance().writeExcel(destExcelFile, toBook);
+                JCommonUtil._jOptionPane_showMessageDialog_info(destExcelFile + " 產生完成!");
             }
 
-            private void mainProcess(Sheet fromSheet, Sheet toSheet) {
+            private List<Integer> getProcessRowIndexes(Sheet toSheet) {
+                String include = includeRowsText.getText();
+                String exclude = excludeRowsText.getText();
+                List<Integer> allArray = getToSheetAllRows(toSheet);
+                if (StringUtils.isNotBlank(include)) {
+                    allArray = getRowsArray(include);
+                }
+                if (StringUtils.isNotBlank(exclude)) {
+                    List<Integer> excludeLst = getRowsArray(exclude);
+                    allArray.removeAll(excludeLst);
+                }
+                return allArray;
+            }
+
+            private List<Integer> getToSheetAllRows(Sheet toSheet) {
+                List<Integer> lst = new ArrayList<Integer>();
+                A: for (int ii = 0; ii <= toSheet.getLastRowNum(); ii++) {
+                    Row row = toSheet.getRow(ii);
+                    if (row == null) {
+                        continue A;
+                    }
+                    lst.add(ii);
+                }
+                return lst;
+            }
+
+            private List<Integer> getRowsArray(String text) {
+                Set<Integer> set = new TreeSet<Integer>();
+                String[] arry = StringUtils.trimToEmpty(text).split(",", -1);
+                for (String str : arry) {
+                    if (str.matches("\\s*\\d+\\s*")) {
+                        set.add(Integer.parseInt(str));
+                    } else if (str.matches("\\s*\\d+\\s*\\-\\s*\\d+\\s*")) {
+                        String[] vs = str.split("-");
+                        for (int ii = Integer.parseInt(vs[0]); ii <= Integer.parseInt(vs[1]); ii++) {
+                            set.add(ii);
+                        }
+                    }
+                }
+                return new ArrayList<Integer>(set);
+            }
+
+            private void mainProcess(Sheet fromSheet, Sheet toSheet, List<Integer> processRowsArray) {
                 List<AddInfo> pkLst = new ArrayList<AddInfo>();
                 List<AddInfo> mergeLst = new ArrayList<AddInfo>();
                 DefaultListModel model = (DefaultListModel) mergeColumnLst.getModel();
@@ -339,6 +404,8 @@ public class ExcelMergeToAnotherUI extends JFrame {
                         Row row = toSheet.getRow(ii);
                         if (row == null) {
                             continue A;
+                        } else if (!processRowsArray.contains(ii)) {
+                            continue A;
                         }
 
                         for (AddInfo ad2 : pkLst1) {
@@ -349,7 +416,11 @@ public class ExcelMergeToAnotherUI extends JFrame {
                         }
                         for (AddInfo ad2 : mergeLst1) {
                             System.out.println("\t更新 row " + ii + " -> " + ad2.fromValue);
-                            ExcelUtil.getInstance().setCellValue(row, ad2.toColumn, ad2.fromValue);
+                            String orignValue = ExcelUtil.getInstance().readCell(row, ad2.toColumn);
+                            if (StringUtils.isNotBlank(orignValue)) {
+                                orignValue = orignValue + " ";
+                            }
+                            ExcelUtil.getInstance().setCellValue(row, ad2.toColumn, orignValue + ad2.fromValue);
                         }
                     }
                 }
@@ -381,8 +452,8 @@ public class ExcelMergeToAnotherUI extends JFrame {
 
                 AddInfo ad = new AddInfo();
                 ad.addType = addType;
-                ad.fromColumn = columnFromText.getText();
-                ad.toColumn = columnToText.getText();
+                ad.fromColumn = StringUtils.trimToEmpty(columnFromText.getText()).toUpperCase();
+                ad.toColumn = StringUtils.trimToEmpty(columnToText.getText()).toUpperCase();
 
                 DefaultListModel model = (DefaultListModel) mergeColumnLst.getModel();
                 for (int ii = 0; ii < model.getSize(); ii++) {
@@ -407,9 +478,15 @@ public class ExcelMergeToAnotherUI extends JFrame {
             return super.clone();
         }
 
-        // public String toString() {
-        // return "[" + addType + "]" + fromColumn + " -> " + toColumn;
-        // }
+        public String toString() {
+            String prefix = "";
+            if ("PK".equalsIgnoreCase(addType)) {
+                prefix = "比較來源";
+            } else {
+                prefix = "設定內容";
+            }
+            return "<html>[" + prefix + "]&nbsp;&nbsp;<font color='blue'>" + fromColumn + "</font> -> <font color='green'>" + toColumn + "</font></html>";
+        }
 
         @Override
         public int hashCode() {
@@ -420,11 +497,6 @@ public class ExcelMergeToAnotherUI extends JFrame {
             result = prime * result + ((fromColumn == null) ? 0 : fromColumn.hashCode());
             result = prime * result + ((toColumn == null) ? 0 : toColumn.hashCode());
             return result;
-        }
-
-        @Override
-        public String toString() {
-            return "AddInfo [fromColumn=" + fromColumn + ", toColumn=" + toColumn + ", addType=" + addType + ", fromValue=" + fromValue + "]";
         }
 
         @Override

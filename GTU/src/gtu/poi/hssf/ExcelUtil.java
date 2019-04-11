@@ -540,6 +540,9 @@ public class ExcelUtil {
     }
 
     public void setCellValue(Row row, String cellStr, Object value) {
+        if (row == null) {
+            return;
+        }
         int pos = cellEnglishToPos(cellStr);
         Cell cell = getCellChk(row, pos);
         setCellValue(cell, value);
