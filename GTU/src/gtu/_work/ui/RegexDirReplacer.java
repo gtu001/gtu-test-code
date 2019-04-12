@@ -130,12 +130,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                                     panel.add(subFileNameText, "1, 2, fill, default"); 
                                     subFileNameText.setColumns(10); 
                                     subFileNameText.setText("(txt|java)"); 
-                                } 
-                                { 
-                                    replaceOldFileChkbox = new JCheckBox("備份舊檔"); 
-                                    replaceOldFileChkbox.setSelected(true); 
-                                    panel.add(replaceOldFileChkbox, "1, 3"); 
-                                } 
+                                }
                                 { 
                                     charsetText = new JTextField(); 
                                     panel.add(charsetText, "1, 5, fill, default"); 
@@ -229,10 +224,22 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                         // jPanel3.add(repFromText, "2, 2, fill, top"); 
                         // jPanel3.add(repToText, "2, 4, fill, center"); 
                         jPanel3.setLayout( 
-                                new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), }, 
-                                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, 
-                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, 
-                                                FormFactory.DEFAULT_ROWSPEC, })); 
+                                new FormLayout(new ColumnSpec[] {
+                                FormFactory.RELATED_GAP_COLSPEC,
+                                FormFactory.DEFAULT_COLSPEC,
+                                FormFactory.RELATED_GAP_COLSPEC,
+                                ColumnSpec.decode("default:grow"),},
+                            new RowSpec[] {
+                                FormFactory.RELATED_GAP_ROWSPEC,
+                                FormFactory.DEFAULT_ROWSPEC,
+                                FormFactory.RELATED_GAP_ROWSPEC,
+                                FormFactory.DEFAULT_ROWSPEC,
+                                FormFactory.RELATED_GAP_ROWSPEC,
+                                FormFactory.DEFAULT_ROWSPEC,
+                                FormFactory.RELATED_GAP_ROWSPEC,
+                                FormFactory.DEFAULT_ROWSPEC,
+                                FormFactory.RELATED_GAP_ROWSPEC,
+                                RowSpec.decode("default:grow"),})); 
                         { 
                             lblNewLabel = new JLabel("replace from"); 
                             jPanel3.add(lblNewLabel, "2, 2"); 
@@ -289,6 +296,15 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                             JTextAreaUtil.applyCommonSetting(repToText); 
                             jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 8, fill, fill"); 
                         } 
+                        {
+                            panel_1 = new JPanel();
+                            jPanel3.add(panel_1, "4, 10, fill, fill");
+                            {
+                                keepOldFileChk = new JCheckBox("保留原檔");
+                                keepOldFileChk.setSelected(true);
+                                panel_1.add(keepOldFileChk);
+                            }
+                        }
                     } 
                     { 
                         addToTemplate = new JButton(); 
@@ -512,7 +528,6 @@ public class RegexDirReplacer extends javax.swing.JFrame {
     private JComboBox comboBox; 
     private JCheckBox childrenDirChkbox; 
     private JTextField subFileNameText; 
-    private JCheckBox replaceOldFileChkbox; 
     private JTextField charsetText; 
     private JLabel lblNewLabel; 
     private JLabel lblNewLabel_3; 
@@ -524,6 +539,8 @@ public class RegexDirReplacer extends javax.swing.JFrame {
     private JLabel lblEndTag; 
     private JLabel lblPattern; 
     private JLabel lblPattern_1; 
+    private JPanel panel_1;
+    private JCheckBox keepOldFileChk;
  
     static { 
         try { 
@@ -577,15 +594,22 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                     } 
                     System.out.println("end   file : " + oldFile); 
                 } 
- 
+                
                 if (!bakupReplaceText.equals(replaceText)) { 
-                    newFile = new File(oldFile.getParent(), oldFile.getName() + ".rep_done"); 
+                    if (keepOldFileChk.isSelected()) { 
+                        oldFile.renameTo(new File(oldFile.getParentFile(), oldFile.getName() + ".bak")); 
+                    } 
+ 
+                    newFile = oldFile; 
+ 
                     FileUtil.saveToFile(newFile, replaceText, getCharset()); 
                     successMsg.append(newFile.getName() + "\n"); 
                     oldNewFile = new OldNewFile(); 
                     oldNewFile.oldFile = oldFile; 
                     oldNewFile.newFile = newFile; 
                     rmodel.addElement(oldNewFile); 
+ 
+                    successMsg.append(oldFile.getName() + "\n"); 
                 } 
             } 
  
@@ -631,7 +655,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
  
                 if (!bakupReplaceText.equals(replaceText)) { 
  
-                    if (replaceOldFileChkbox.isSelected()) { 
+                    if (keepOldFileChk.isSelected()) { 
                         oldFile.renameTo(new File(oldFile.getParentFile(), oldFile.getName() + ".bak")); 
                     } 
  
