@@ -18,7 +18,7 @@ public class TagMatcher2 {
     private static final String TAG = TagMatcher2.class.getSimpleName();
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\wistronits\\Desktop\\FundQryApplicationDetailWebRequestDto.java");
+        File file = new File("/home/gtu001/桌面/FundQryApplicationDetailWebRequestDto.java");
         String content = FileUtil.loadFromFile(file, "UTF8");
 
         String startTag = "@Override";
@@ -37,7 +37,7 @@ public class TagMatcher2 {
             System.out.println("startPad = " + t.startPad);
         }
         t.appendTail(sb);
-        
+
         System.out.println(sb);
 
         System.out.println("done...");
@@ -55,20 +55,20 @@ public class TagMatcher2 {
         this.content = content;
         this.startPtn = null;
         this.endPtn = null;
-        _initPatternReference(startPtnStr, endPtnStr, startTagOffset, endTagOffset);
+        _initPatternReference(startTag, endTag, startPtnStr, endPtnStr, startTagOffset, endTagOffset);
     }
 
-    private void _initPatternReference(String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset) {
+    private void _initPatternReference(String startTag, String endTag, String startPtnStr, String endPtnStr, Integer startTagOffset, Integer endTagOffset) {
         this.startTagOffset = 0;
         this.endTagOffset = 0;
         if (StringUtils.isNotBlank(startPtnStr)) {
-            this.startPtn = new StringUtilsByPattern(startPtnStr);
+            this.startPtn = new StringUtilsByPattern(startTag, startPtnStr);
             if (startTagOffset != null) {
                 this.startTagOffset = startTagOffset;
             }
         }
         if (StringUtils.isNotBlank(endPtnStr)) {
-            this.endPtn = new StringUtilsByPattern(endPtnStr);
+            this.endPtn = new StringUtilsByPattern(endTag, endPtnStr);
             if (endTagOffset != null) {
                 this.endTagOffset = endTagOffset;
             }
@@ -114,17 +114,17 @@ public class TagMatcher2 {
 
     public boolean find() {
         Log.v(TAG, "[find] ------------------------------------Start");
-//        startPad.setupStartPad();//這板不重設
+        startPad.setupStartPad();
 
         int startPos = getStartPos();
         if (startPos == -1) {
-//            info = null;
+            // info = null;
             return false;
         }
 
         int endPos = findMatchEnd(startPos);
         if (endPos == -1) {
-//            info = null;
+            // info = null;
             return false;
         }
 
@@ -155,6 +155,10 @@ public class TagMatcher2 {
                 Log.v(TAG, "[startPad] reset!!");
             } else {
                 startPad = startPad + startTagLength;
+
+                if (info != null) {
+                    startPad = info.getEndWithTag();
+                }
             }
             resetStartPad = false;
         }
@@ -189,14 +193,17 @@ public class TagMatcher2 {
         String prefix = content.substring(startPad.startPad, this.group().getStartWithTag());
         sb.append(prefix).append(replace);
         startPad.startPad = this.group().getEndWithTag();
-        System.out.println("<<<<<<<<" + content.substring(0, this.group().getEndWithTag()));
     }
 
     public void appendTail(StringBuffer sb) {
         // throw new UnsupportedOperationException();
         String content = this.content.toString();
-        String suffix = content.substring(this.group().getEndWithTag());
-        sb.append(suffix);
+        if (this.group() != null) {
+            String suffix = content.substring(this.group().getEndWithTag());
+            sb.append(suffix);
+        } else {
+            sb.append(content);
+        }
     }
 
     public TagMatcherInfo group() {
@@ -351,13 +358,17 @@ public class TagMatcher2 {
             if (pos == -1) {
                 return -1;
             } else {
-                // String tmpContent = StringUtils.substring(content, pos, pos +
-                // startPtn.ptn.pattern().length());
-                String tmpContent = StringUtils.substring(content, pos, pos + startPtn.group().length());
+                int startPos = pos + startPad.startPad;
+                int endPos = startPos + startPtn.group().length();
+                String tmpContent = StringUtils.substring(content, startPos, endPos);
                 int fixOffset = tmpContent.indexOf(startTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
                 int rtnPos = pos + fixOffset;
                 Log.v(TAG, "[startTagPtn] [pos " + rtnPos + "/auto_offset:" + fixOffset + "] : " + tmpContent);// ok
+
+                if (info != null) {
+                    rtnPos += startPad.startPad;
+                }
                 return rtnPos;
             }
         }
@@ -383,6 +394,7 @@ public class TagMatcher2 {
 
     public static class StringUtilsByPattern {
 
+        private String orignTag;
         private Pattern ptn = null;
         private String group;
         private Map<Integer, String> groupMap = new TreeMap<Integer, String>();
@@ -394,11 +406,13 @@ public class TagMatcher2 {
             }
         }
 
-        public StringUtilsByPattern(String ptnStr) {
+        public StringUtilsByPattern(String orignTag, String ptnStr) {
+            this.orignTag = orignTag;
             ptn = Pattern.compile(ptnStr, Pattern.MULTILINE | Pattern.DOTALL);
         }
 
-        public StringUtilsByPattern(Pattern ptn) {
+        public StringUtilsByPattern(String orignTag, Pattern ptn) {
+            this.orignTag = orignTag;
             this.ptn = ptn;
         }
 
@@ -430,6 +444,10 @@ public class TagMatcher2 {
                 return -1;
             }
             content = content.substring(startPad);
+            // 起碼要找到 startTag or endTag
+            if (!content.contains(this.orignTag)) {
+                return -1;
+            }
             Matcher mth = ptn.matcher(content);
             while (mth.find()) {
                 group = mth.group();

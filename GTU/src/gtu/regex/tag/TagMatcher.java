@@ -18,25 +18,21 @@ public class TagMatcher {
     private static final String TAG = TagMatcher.class.getSimpleName();
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\wistronits\\Desktop\\FundQryApplicationDetailWebRequestDto.java");
+        File file = new File("e:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt/A Life-Changing Exercise to Make You a Better Writer.htm");
         String content = FileUtil.loadFromFile(file, "UTF8");
 
-        String startTag = "@Override";
-        String endTag = "}";
-        String startPtn = "\\@Override(?:.|\\n)*?public\\s*String\\s*toString\\(\\)";
-        String endPtn = "return\\s*sb\\.toString\\(\\)\\;(?:.|\\n)*?\\}";
+        String startTag = "<head";
+        String endTag = "</head>";
+        String startPtn = "\\<head[\r\n\\s\t\\>]{1}";
+        String endPtn = "\\<\\/head\\>";
 
         TagMatcher t = new TagMatcher(startTag, endTag, startPtn, endPtn, 0, 0, content);
-        StringBuffer sb = new StringBuffer();
         while (t.find()) {
-
-            System.out.println("Find -----> " + t.group().groupWithTag());
-
-            t.appendReplacement(sb, "XXXXXXXXX");
-
+            System.out.println(t.group());
             System.out.println("startPad = " + t.startPad);
         }
-        t.appendTail(sb);
+
+        System.out.println("unique = " + t.findUnique());
 
         System.out.println("done...");
     }
@@ -182,11 +178,11 @@ public class TagMatcher {
     }
 
     public void appendReplacement(StringBuffer sb, String replace) {
-         throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     public void appendTail(StringBuffer sb) {
-         throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     public TagMatcherInfo group() {
