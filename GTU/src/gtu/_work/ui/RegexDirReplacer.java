@@ -19,27 +19,31 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.tuple.Triple;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -49,11 +53,13 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
+import gtu.regex.tag.TagMatcher;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTextAreaUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -76,7 +82,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             public void run() {
                 RegexDirReplacer inst = new RegexDirReplacer();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -169,8 +175,8 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                         addDirFiles.addActionListener(new ActionListener() {
 
                             public void actionPerformed(ActionEvent evt) {
-                                File file = JFileChooserUtil.newInstance().selectDirectoryOnly().showOpenDialog().getApproveSelectedFile();
-                                if (file == null || !file.isDirectory()) {
+                                File file = JFileChooserUtil.newInstance().selectFileAndDirectory().showOpenDialog().getApproveSelectedFile();
+                                if (file == null) {
                                     return;
                                 }
 
@@ -219,23 +225,70 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                     }
                     {
                         jPanel3 = new JPanel();
-                        GroupLayout jPanel3Layout = new GroupLayout((JComponent) jPanel3);
-                        jPanel3.setLayout(jPanel3Layout);
                         jPanel2.add(jPanel3, BorderLayout.CENTER);
+                        // jPanel3.add(repFromText, "2, 2, fill, top");
+                        // jPanel3.add(repToText, "2, 4, fill, center");
+                        jPanel3.setLayout(
+                                new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                                        new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                                                FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                                                FormFactory.DEFAULT_ROWSPEC, }));
                         {
-                            repFromText = new JTextField();
+                            lblNewLabel = new JLabel("replace from");
+                            jPanel3.add(lblNewLabel, "2, 2");
                         }
                         {
-                            repToText = new JTextField();
+                            repFromText = new JTextArea();
+                            repFromText.setRows(3);
+                            JTextAreaUtil.applyCommonSetting(repFromText);
+                            jPanel3.add(JCommonUtil.createScrollComponent(repFromText), "4, 2, fill, fill");
                         }
-                        jPanel3Layout.setHorizontalGroup(jPanel3Layout.createSequentialGroup().addContainerGap(25, 25)
-                                .addGroup(jPanel3Layout.createParallelGroup()
-                                        .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repFromText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel3Layout.createSequentialGroup().addComponent(repToText, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(20, Short.MAX_VALUE));
-                        jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup().addContainerGap()
-                                .addComponent(repFromText, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(repToText, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+                        {
+                            JPanel p1 = new JPanel();
+                            startTagText = new JTextField();
+                            startTagPtnText = new JTextField();
+                            startTagText.setColumns(20);
+                            startTagPtnText.setColumns(20);
+                            {
+                                lblStartTag = new JLabel("start tag");
+                                p1.add(lblStartTag);
+                            }
+                            p1.add(startTagText);
+                            {
+                                lblPattern = new JLabel("pattern");
+                                p1.add(lblPattern);
+                            }
+                            p1.add(startTagPtnText);
+                            jPanel3.add(p1, "4, 4, fill, default");
+                        }
+                        {
+                            JPanel p1 = new JPanel();
+                            endTagText = new JTextField();
+                            endTagPtnText = new JTextField();
+                            endTagText.setColumns(20);
+                            endTagPtnText.setColumns(20);
+                            {
+                                lblEndTag = new JLabel("end tag");
+                                p1.add(lblEndTag);
+                            }
+                            p1.add(endTagText);
+                            {
+                                lblPattern_1 = new JLabel("pattern");
+                                p1.add(lblPattern_1);
+                            }
+                            p1.add(endTagPtnText);
+                            jPanel3.add(p1, "4, 6, fill, default");
+                        }
+                        {
+                            lblNewLabel_3 = new JLabel("replace to");
+                            jPanel3.add(lblNewLabel_3, "2, 8");
+                        }
+                        {
+                            repToText = new JTextArea();
+                            repToText.setRows(3);
+                            JTextAreaUtil.applyCommonSetting(repToText);
+                            jPanel3.add(JCommonUtil.createScrollComponent(repToText), "4, 8, fill, fill");
+                        }
                     }
                     {
                         addToTemplate = new JButton();
@@ -395,7 +448,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                     }
                 }
             }
-            this.setSize(512, 350);
+            this.setSize(653, 497);
 
             JCommonUtil.setFontAll(this.getRootPane());
 
@@ -433,7 +486,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
     private JTabbedPane jTabbedPane1;
     private JPanel jPanel1;
-    private JTextField repFromText;
+    private JTextArea repFromText;
     private JButton addDirFiles;
     private JScrollPane jScrollPane1;
     private JScrollPane jScrollPane2;
@@ -446,13 +499,11 @@ public class RegexDirReplacer extends javax.swing.JFrame {
     private JList newRepList;
     private JList srcList;
     private JPanel jPanel4;
-    private JTextField repToText;
+    private JTextArea repToText;
     private JPanel jPanel3;
     private JButton exeucte;
     private JPanel jPanel2;
 
-    StringBuilder errMsg;
-    StringBuilder successMsg;
     static final String MESSAGE = "SUCCESS\n%s\n\nERROR\n%s\n";
 
     static File propFile = new File(PropertiesUtil.getJarCurrentPath(RegexDirReplacer.class), "RegexReplacer.properties");
@@ -463,6 +514,17 @@ public class RegexDirReplacer extends javax.swing.JFrame {
     private JTextField subFileNameText;
     private JCheckBox replaceOldFileChkbox;
     private JTextField charsetText;
+    private JLabel lblNewLabel;
+    private JLabel lblNewLabel_3;
+    private JTextField startTagText;
+    private JTextField endTagText;
+    private JTextField startTagPtnText;
+    private JTextField endTagPtnText;
+    private JLabel lblStartTag;
+    private JLabel lblEndTag;
+    private JLabel lblPattern;
+    private JLabel lblPattern_1;
+
     static {
         try {
             if (!propFile.exists()) {
@@ -489,11 +551,12 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             DefaultListModel rmodel = new DefaultListModel();
             DefaultListModel pmodel = (DefaultListModel) templateList.getModel();
 
-            errMsg = new StringBuilder();
-            successMsg = new StringBuilder();
+            StringBuilder errMsg = new StringBuilder();
+            StringBuilder successMsg = new StringBuilder();
 
             String replaceText = null;
             String bakupReplaceText = null;
+            int waitSecond = 3;
 
             File newFile = null;
             File oldFile = null;
@@ -505,11 +568,18 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
                 for (int jj = 0; jj < pmodel.getSize(); jj++) {
                     Entry<Object, Object> entry = (Entry<Object, Object>) pmodel.getElementAt(jj);
-                    replaceText = replacer((String) entry.getKey(), (String) entry.getValue(), replaceText, oldFile);
+
+                    System.out.println("start file : " + oldFile);
+                    AtomicReference<Throwable> result = new AtomicReference<Throwable>();
+                    replaceText = replacer((String) entry.getKey(), (String) entry.getValue(), replaceText, waitSecond, result);
+                    if (result.get() != null) {
+                        errMsg.append(oldFile.getName() + ":" + result.get() + "\n");
+                    }
+                    System.out.println("end   file : " + oldFile);
                 }
 
                 if (!bakupReplaceText.equals(replaceText)) {
-                    newFile = new File(oldFile.getParent(), oldFile.getName() + ".replace");
+                    newFile = new File(oldFile.getParent(), oldFile.getName() + ".rep_done");
                     FileUtil.saveToFile(newFile, replaceText, getCharset());
                     successMsg.append(newFile.getName() + "\n");
                     oldNewFile = new OldNewFile();
@@ -535,11 +605,12 @@ public class RegexDirReplacer extends javax.swing.JFrame {
             DefaultListModel model = (DefaultListModel) srcList.getModel();
             DefaultListModel rmodel = new DefaultListModel();
 
-            errMsg = new StringBuilder();
-            successMsg = new StringBuilder();
+            StringBuilder errMsg = new StringBuilder();
+            StringBuilder successMsg = new StringBuilder();
 
             String replaceText = null;
             String bakupReplaceText = null;
+            int waitSecond = 3;
 
             File newFile = null;
             File oldFile = null;
@@ -549,7 +620,14 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                 oldFile = (File) model.getElementAt(ii);
                 replaceText = FileUtil.loadFromFile(oldFile, getCharset());
                 bakupReplaceText = replaceText.toString();
-                replaceText = replacer(fromPattern, toFormat, replaceText, oldFile);
+
+                System.out.println("start file : " + oldFile);
+                AtomicReference<Throwable> result = new AtomicReference<Throwable>();
+                replaceText = replacer(fromPattern, toFormat, replaceText, waitSecond, result);
+                if (result.get() != null) {
+                    errMsg.append(oldFile.getName() + ":" + result.get() + "\n");
+                } 
+                System.out.println("end   file : " + oldFile);
 
                 if (!bakupReplaceText.equals(replaceText)) {
 
@@ -572,7 +650,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
 
             newRepList.setModel(rmodel);
             JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog(String.format(MESSAGE, successMsg, errMsg), getTitle());
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
     }
@@ -585,34 +663,82 @@ public class RegexDirReplacer extends javax.swing.JFrame {
      * @param replaceText
      *            要替換的本文
      */
-    String replacer(String fromPattern, String toFormat, String replaceText, File file) {
+    String replacer(String fromPattern, String toFormat, String replaceText, int waitSecond, AtomicReference<Throwable> result) {
         String errorRtn = replaceText.toString();
-        try {
-            Pattern pattern = Pattern.compile(fromPattern);
-            Matcher matcher = pattern.matcher(replaceText);
+        final BlockingQueue<Triple<String, Throwable, String>> queue = new ArrayBlockingQueue<Triple<String, Throwable, String>>(1);
+        new Thread(new Runnable() {
 
-            StringBuilder sb = new StringBuilder();
-            int startPos = 0;
+            private String orignProcess(String replaceText) {
+                StringBuilder sb = new StringBuilder();
+                Pattern pattern = Pattern.compile(fromPattern, Pattern.DOTALL | Pattern.MULTILINE);
+                Matcher matcher = pattern.matcher(replaceText);
 
-            String tempStr = null;
-            for (; matcher.find();) {
-                tempStr = toFormat.toString();
-                sb.append(replaceText.substring(startPos, matcher.start()));
-                for (int ii = 0; ii <= matcher.groupCount(); ii++) {
-                    tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
-                    System.out.println("group[" + ii + "] -- " + matcher.group(ii) + "\t--> " + tempStr);
+                int startPos = 0;
+
+                String tempStr = null;
+                for (; matcher.find();) {
+                    tempStr = toFormat.toString();
+                    sb.append(replaceText.substring(startPos, matcher.start()));
+                    for (int ii = 0; ii <= matcher.groupCount(); ii++) {
+                        tempStr = tempStr.replaceAll("#" + ii + "#", Matcher.quoteReplacement(matcher.group(ii)));
+                        System.out.println("group[" + ii + "] -- " + matcher.group(ii) + "\t--> " + tempStr);
+                    }
+                    sb.append(tempStr);
+                    startPos = matcher.end();
                 }
-                sb.append(tempStr);
-                startPos = matcher.end();
+                sb.append(replaceText.substring(startPos));
+                return sb.toString();
             }
 
-            sb.append(replaceText.substring(startPos));
+            private String tagProcess(String replaceText) {
+                String startTag = StringUtils.trimToEmpty(startTagText.getText());
+                String endTag = StringUtils.trimToEmpty(endTagText.getText());
+                String startPtnStr = StringUtils.trimToEmpty(startTagPtnText.getText());
+                String endPtnStr = StringUtils.trimToEmpty(endTagPtnText.getText());
+                String content = replaceText.toString();
 
-            return sb.toString();
-        } catch (Exception ex) {
-            // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
-            // getTitle());
-            errMsg.append(file.getName() + ":" + ex + "\n");
+                TagMatcher tag = new TagMatcher(startTag, endTag, startPtnStr, endPtnStr, content);
+
+                StringBuffer sb11 = new StringBuffer();
+                while (tag.find()) {
+                    String resultText = orignProcess(tag.getContent());
+                    tag.appendReplacement(sb11, resultText);
+                }
+                tag.appendTail(sb11);
+                return sb11.toString();
+            }
+
+            @Override
+            public void run() {
+                try {
+                    // 特別處理
+                    if (StringUtils.isNotBlank(startTagText.getText()) && StringUtils.isNotBlank(endTagText.getText())) {
+                        String resultText = tagProcess(replaceText.toString());
+                        queue.offer(Triple.of("ok", null, resultText));
+                    } else {
+                        // 一般處理
+                        String resultText = orignProcess(replaceText.toString());
+                        queue.offer(Triple.of("ok", null, resultText));
+                    }
+                } catch (Throwable ex) {
+                    queue.offer(Triple.of("fail", ex, null));
+                    ex.printStackTrace();
+                } finally {
+                }
+            }
+        }).start();
+        try {
+            Triple<String, Throwable, String> result2 = queue.poll(waitSecond * 1000L, TimeUnit.MILLISECONDS);
+            if ("fail".equals(result2.getLeft())) {
+                throw result2.getMiddle();
+            }
+            return result2.getRight();
+        } catch (InterruptedException ex) {
+            // String message = "時間超出範圍 " + waitSecond + "秒!!";
+            result.set(ex);
+            return errorRtn;
+        } catch (Throwable ex) {
+            result.set(ex);
             return errorRtn;
         }
     }

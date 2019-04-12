@@ -1,0 +1,16 @@
+    function summaryTableWidthReset(){
+       $("[id^=recordResultListCtf]").each(function(i, d){
+        var id = $(d).attr("id");
+        if(/\d+$/.test(id)){
+          var tds = $("#" + id + "_summary tr:eq(0) td");
+          console.log("summary length = " + tds.length);
+          
+          var arry = $("tr:eq(0) th", d);
+          console.log("orign length = " + arry.length);
+          
+          for(var ii = 0 ; ii < arry.length; ii ++){
+            tds[ii].style.width = arry[ii].clientWidth + "px";
+          }
+        }
+       });
+    }

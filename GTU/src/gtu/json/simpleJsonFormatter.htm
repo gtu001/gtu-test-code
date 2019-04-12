@@ -1,0 +1,22 @@
+<html>
+<head>
+	<script type="text/javascript">
+		function jsonFormatter(){
+			var text = document.querySelector("#testArea").value;
+			console.log("text = " + text);
+			var json = JSON.parse(text);
+			console.table(json);
+		}
+	</script>
+
+</head>
+
+<body>
+
+	<input type="button" value="JSON formatter" onclick="jsonFormatter();"></input>
+	<br/>
+	<textarea id="testArea" cols="100" rows="20"></textarea>
+
+</body>
+</html>
+
