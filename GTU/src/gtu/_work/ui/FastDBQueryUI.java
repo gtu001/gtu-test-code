@@ -175,6 +175,7 @@ public class FastDBQueryUI extends JFrame {
     private AutoComboBox dbNameIdText_Auto;
     private AutoComboBox sqlMappingFilterText_Auto;
     private AutoComboBox refSearchCategoryCombobox_Auto;
+    
     private JLabel lblDbName;
     private JTextField sqlQueryText;
     private JPanel panel_8;
@@ -441,6 +442,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        
         newPanel1.add(sqlFilterClearBtn);
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("SQL", null, panel_2, null);

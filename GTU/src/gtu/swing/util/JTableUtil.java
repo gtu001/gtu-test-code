@@ -1341,10 +1341,38 @@ public class JTableUtil {
             }
         }
 
+        private Pair<String, List<Pattern>> filterPattern(String filterText) {
+            Pattern ptn = Pattern.compile("\\/(.*?)\\/");
+            Matcher mth = ptn.matcher(filterText);
+            StringBuffer sb = new StringBuffer();
+            List<Pattern> lst = new ArrayList<Pattern>();
+            while (mth.find()) {
+                String temp = mth.group(1);
+                Pattern tmpPtn = null;
+                if (StringUtils.isNotBlank(temp)) {
+                    try {
+                        tmpPtn = Pattern.compile(temp);
+                    } catch (Exception ex) {
+                    }
+                }
+                if (tmpPtn != null) {
+                    lst.add(tmpPtn);
+                    mth.appendReplacement(sb, "");
+                } else {
+                    mth.appendReplacement(sb, mth.group(0));
+                }
+            }
+            mth.appendTail(sb);
+            return Pair.of(sb.toString(), lst);
+        }
+
         private void __filterText(String filterText) {
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
-            String[] params = StringUtils.trimToEmpty(filterText).toUpperCase().split(Pattern.quote(delimit), -1);
+            // 解析 regex ptn
+            Pair<String, List<Pattern>> afterFilterProc = filterPattern(filterText);
+
+            String[] params = StringUtils.trimToEmpty(afterFilterProc.getLeft()).toUpperCase().split(Pattern.quote(delimit), -1);
             Map<String, TableColumn> addColumns = new LinkedHashMap<String, TableColumn>();
 
             for (String param : params) {
@@ -1357,12 +1385,19 @@ public class JTableUtil {
 
                     boolean findOk = false;
 
-                    if (headerColumn.contains(param)) {
+                    if (StringUtils.isNotBlank(param) && headerColumn.contains(param)) {
                         System.out.println("Match------------" + headerColumn + " --> " + param);
                         findOk = true;
                     } else if (param.contains("*")) {
                         if (m.find(headerColumn)) {
                             findOk = true;
+                        }
+                    } else if (!afterFilterProc.getRight().isEmpty()) {
+                        for (Pattern p : afterFilterProc.getRight()) {
+                            if (p.matcher(headerColumn).find()) {
+                                findOk = true;
+                                break;
+                            }
                         }
                     }
 
