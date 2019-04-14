@@ -313,7 +313,8 @@ public class FacebookVideoDownloader extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    urlTextOnBlur(false);
+                    // urlTextOnBlur(false);
+                    JCommonUtil.triggerButtonActionPerformed(autoDownloadBtn);
                 }
             }
         });
