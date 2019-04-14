@@ -1,5 +1,6 @@
 package gtu.swing.util;
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -13,7 +14,12 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataListener;
+import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -104,7 +110,31 @@ public class AutoComboBox extends PlainDocument {
         this.runInIgnoreListener(new Runnable() {
             @Override
             public void run() {
-                model.setSelectedItem(item);
+                // model.setSelectedItem(item);
+
+                BasicComboPopup popup = (BasicComboPopup) comboBox.getAccessibleContext().getAccessibleChild(0);
+                JList list = popup.getList();
+                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+                Point itemPoint = null;
+                A: for (int ii = 0; ii < list.getModel().getSize(); ii++) {
+                    Object itemObj = list.getModel().getElementAt(ii);
+                    if (itemObj == null) {
+                        continue;
+                    }
+                    if (itemObj.equals(item)) {
+                        System.out.println("equal ---- " + item);
+                        list.setSelectedIndex(ii);
+                        itemPoint = list.indexToLocation(ii);
+                        break;
+                    }
+                }
+
+                if (itemPoint != null) {
+                    JScrollPane scrollPane = (JScrollPane) popup.getComponent(0);
+                    JScrollBar scroll = scrollPane.getVerticalScrollBar();
+                    scroll.setValue((int) itemPoint.getY());
+                }
             }
         });
     }

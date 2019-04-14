@@ -87,7 +87,7 @@ import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.log.LoggerAppender;
-import gtu.poi.hssf.ExcelUtil;
+import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesMultiUtil;
@@ -2517,7 +2517,7 @@ public class FastDBQueryUI extends JFrame {
 
     private void excelExportBtnAction() {
         try {
-            ExcelUtil exlUtl = ExcelUtil.getInstance();
+            ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
             AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnExcelBtn);
             if (radio_import_excel == selBtn) {
                 File xlsfile = JCommonUtil._jFileChooser_selectFileOnly();
@@ -2547,7 +2547,7 @@ public class FastDBQueryUI extends JFrame {
                     Row row = sheet.getRow(ii);
                     List<Object> titles = new ArrayList<Object>();
                     for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                        String value = ExcelUtil.getInstance().readCell(row.getCell(jj));
+                        String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                         titles.add(value);
                     }
                     model = JTableUtil.createModel(true, titles.toArray());
@@ -2561,7 +2561,7 @@ public class FastDBQueryUI extends JFrame {
                     }
                     List<Object> rows = new ArrayList<Object>();
                     for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                        String value = ExcelUtil.getInstance().readCell(row.getCell(jj));
+                        String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                         rows.add(value);
                     }
                     model.addRow(rows.toArray());

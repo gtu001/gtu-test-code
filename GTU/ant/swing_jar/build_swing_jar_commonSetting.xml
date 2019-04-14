@@ -75,6 +75,15 @@
 			<!-- excel xls
 			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
 			-->
+			<!-- excel All
+			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
+			<packagename mode="small">org.apache.poi.ss.usermodel.Cell</packagename>
+			<packagename mode="small">org/apache/xmlbeans/XmlObject</packagename>
+			<packagename mode="small">org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheet</packagename>
+			<packagename mode="small">org.dom4j.DocumentException</packagename>
+			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
+			<packagename mode="small">org/apache/commons/collections4/ListValuedMap</packagename>
+			-->
 			<!-- zip
 			<packagename mode="small">org/apache/tools/zip/ZipFile</packagename>
 			-->

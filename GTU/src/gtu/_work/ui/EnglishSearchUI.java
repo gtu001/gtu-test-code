@@ -105,6 +105,7 @@ import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.HistoryComboBox;
 import gtu.swing.util.JCommonUtil;
@@ -147,6 +148,7 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox offlineModeFirstChk;
     private JCheckBox simpleSentanceChk;
     private JCheckBox robotFocusChk;
+    private AutoComboBox searchEnglishIdText_auto;
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
@@ -156,6 +158,11 @@ public class EnglishSearchUI extends JFrame {
         } else {
             System.out.println("[linux]");
             propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_linux");
+        }
+
+        File tmpFile = new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI", "EnglishSearchUI_linux_config.properties");
+        if (tmpFile.exists()) {
+            propertyBean = new PropertiesUtilBean(tmpFile);
         }
         System.out.println("configFile : " + propertyBean.getPropFile());
     }
@@ -519,12 +526,13 @@ public class EnglishSearchUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         searchEnglishIdText = new JComboBox();
-        HistoryComboBox.applyComboBox(searchEnglishIdText, new ArrayList());
+        // HistoryComboBox.applyComboBox(searchEnglishIdText, new ArrayList());
+        searchEnglishIdText_auto = AutoComboBox.applyAutoComboBox(searchEnglishIdText);
         searchEnglishIdText.setFont(new Font("細明體", Font.PLAIN, 16));
         searchEnglishIdTextController.get().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                System.out.println("keyPressed ---- " + e);
+//                System.out.println("keyPressed ---- " + e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     System.out.println("key ENTER");
                     queryButtonAction(true);
@@ -554,6 +562,22 @@ public class EnglishSearchUI extends JFrame {
                                         }
                                         text = URLEncoder.encode(text, "UTF-8");
                                         String url = String.format("https://translate.google.com.tw/?hl=zh-TW#en/zh-TW/%s", text);
+                                        DesktopUtil.browse(url);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            }).addJMenuItem("google圖片搜尋", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    try {
+                                        String text = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
+                                        if (StringUtils.isBlank(text)) {
+                                            return;
+                                        }
+                                        text = URLEncoder.encode(text, "UTF-8");
+                                        String url = String.format(
+                                                "https://www.google.com/search?client=ubuntu&hs=uR4&channel=fs&biw=1533&bih=746&tbm=isch&sa=1&ei=CRayXJbwHIbH5gL1_LGICw&q=%1$s&oq=%1$s&gs_l=img", text);
                                         DesktopUtil.browse(url);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);
@@ -1104,11 +1128,17 @@ public class EnglishSearchUI extends JFrame {
                         System.out.println("read --- " + "exportFileJson.bin");
                         String content = FileUtil.loadFromFile(file, "utf8");
                         JSONArray arry = new JSONArray(content);
+                        List<String> englishLst = new ArrayList<String>();
                         for (int ii = 0; ii < arry.length(); ii++) {
                             JSONObject obj = (JSONObject) arry.get(ii);
                             String englishId = obj.getString("englishId");
                             String englishDesc = obj.getString("englishDesc");
                             prop.setProperty(englishId, englishDesc);
+                            englishLst.add(englishId);
+                        }
+                        if (searchEnglishIdText_auto != null) {
+                            searchEnglishIdText_auto.applyComboxBoxList(englishLst);
+                            System.out.println("searchEnglishIdText_auto size : " + englishLst.size());
                         }
                         System.out.println("read --- " + prop.size());
                     }
@@ -1118,15 +1148,22 @@ public class EnglishSearchUI extends JFrame {
                     FileInputStream fis = new FileInputStream(file);
                     ObjectInputStream input = new ObjectInputStream(fis);
                     List<EnglishwordInfoDAO.EnglishWord> list = new ArrayList<EnglishwordInfoDAO.EnglishWord>();
+                    List<String> englishLst = new ArrayList<String>();
                     try {
                         for (Object readObj = null; (readObj = input.readObject()) != null;) {
                             EnglishwordInfoDAO.EnglishWord word = (EnglishwordInfoDAO.EnglishWord) readObj;
                             String englishId = word.getEnglishId();
                             String englishDesc = word.getEnglishDesc();
                             prop.setProperty(englishId, englishDesc);
+                            englishLst.add(englishId);
                         }
                         input.close();
                     } catch (java.io.EOFException ex) {
+                    } finally {
+                        if (searchEnglishIdText_auto != null) {
+                            searchEnglishIdText_auto.applyComboxBoxList(englishLst);
+                            System.out.println("searchEnglishIdText_auto size : " + englishLst.size());
+                        }
                     }
                     System.out.println("read --- " + prop.size());
                 }

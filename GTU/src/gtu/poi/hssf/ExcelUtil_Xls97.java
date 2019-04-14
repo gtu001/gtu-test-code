@@ -30,13 +30,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
-public class ExcelUtil_Simple {
+public class ExcelUtil_Xls97 {
 
     public static void main(String[] args) {
-        System.out.println(ExcelUtil_Simple.cellEnglishToPos(3047));
+        System.out.println(ExcelUtil_Xls97.cellEnglishToPos(3047));
     }
 
-    private ExcelUtil_Simple() {
+    private ExcelUtil_Xls97() {
     }
 
     public Date getDate(double dateValue) {
@@ -45,14 +45,14 @@ public class ExcelUtil_Simple {
 
     public String getDate(Cell cell, String pattern) {
         try {
-            return DateFormatUtils.format(getDate(Double.parseDouble(ExcelUtil_Simple.getInstance().readCell(cell))), pattern);
+            return DateFormatUtils.format(getDate(Double.parseDouble(ExcelUtil_Xls97.getInstance().readCell(cell))), pattern);
         } catch (Exception ex) {
             System.out.println("cell日期轉型錯誤:" + ex.getMessage());
             return "";
         }
     }
 
-    public static ExcelUtil_Simple getInstance() {
+    public static ExcelUtil_Xls97 getInstance() {
         return INSTANCE;
     }
 
@@ -565,7 +565,7 @@ public class ExcelUtil_Simple {
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
                 cell = row.getCell(jj);
                 if (cell != null) {
-                    value = ExcelUtil_Simple.getInstance().readCell(cell);
+                    value = ExcelUtil_Xls97.getInstance().readCell(cell);
                 } else {
                     value = null;
                 }
@@ -582,7 +582,7 @@ public class ExcelUtil_Simple {
                 continue;
             }
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                String value = ExcelUtil_Simple.getInstance().readCell(row.getCell(jj));
+                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
             }
         }
     }
@@ -673,5 +673,5 @@ public class ExcelUtil_Simple {
         sheet.addMergedRegion(CellRangeAddress.valueOf(rangeStr));
     }
 
-    private static final ExcelUtil_Simple INSTANCE = new ExcelUtil_Simple();
+    private static final ExcelUtil_Xls97 INSTANCE = new ExcelUtil_Xls97();
 }

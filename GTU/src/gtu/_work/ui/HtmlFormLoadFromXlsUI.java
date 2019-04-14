@@ -27,7 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.poi.hssf.ExcelUtil_Simple;
+import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -186,7 +186,7 @@ public class HtmlFormLoadFromXlsUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 File xlsFile = JCommonUtil.filePathCheck(xlsFileText.getText(), "請輸入xls", "xls");
-                ExcelUtil_Simple eutil = ExcelUtil_Simple.getInstance();
+                ExcelUtil_Xls97 eutil = ExcelUtil_Xls97.getInstance();
                 HSSFWorkbook wb = eutil.readExcel(xlsFile);
                 HSSFSheet sheet = wb.getSheetAt(0);
 
