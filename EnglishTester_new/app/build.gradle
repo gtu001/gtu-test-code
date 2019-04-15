@@ -41,6 +41,7 @@ android {
         exclude 'META-INF/spring.schemas'
         exclude 'META-INF/license.txt'
         exclude 'META-INF/notice.txt'
+        exclude 'META-INF/DEPENDENCIES'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -77,7 +78,10 @@ dependencies {
     compile files('libs/jcc-bate-0.7.3.jar')
     compile files('libs/mobi-api4java.jar')
 
+    compile 'org.apache.pdfbox:pdfbox:2.0.4'
+
     compile 'com.android.support:percent:26.0.1'
+
     //compile 'com.google.firebase:firebase-ads:10.2.0'
     compile 'com.google.firebase:firebase-ads:11.4.0'
     compile 'org.springframework:spring-web:4.3.18.RELEASE'

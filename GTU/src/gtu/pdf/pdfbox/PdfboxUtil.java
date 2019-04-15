@@ -1,14 +1,13 @@
 package gtu.pdf.pdfbox;
 
 import java.io.File;
+import java.util.Scanner;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.text.PDFTextStripper;
-
-import gtu.file.FileUtil;
 
 public class PdfboxUtil {
 
@@ -20,12 +19,18 @@ public class PdfboxUtil {
         // String content = PdfboxUtil.loadText(fromFile);
         // FileUtil.saveToFile(toFile, content, "utf8");
 
-        File fromDir = new File("C:/Users/gtu00/OneDrive/Desktop/秀娟0501/new_pdf");
-        for (File f : fromDir.listFiles()) {
-            File toFile = new File(FileUtil.DESKTOP_DIR, f.getName() + ".txt");
-            String content = PdfboxUtil.loadText(f);
-            FileUtil.saveToFile(toFile, content, "utf8");
-        }
+        // File fromDir = new
+        // File("C:/Users/gtu00/OneDrive/Desktop/秀娟0501/new_pdf");
+        // for (File f : fromDir.listFiles()) {
+        // File toFile = new File(FileUtil.DESKTOP_DIR, f.getName() + ".txt");
+        // String content = PdfboxUtil.loadText(f);
+        // FileUtil.saveToFile(toFile, content, "utf8");
+        // }
+
+        File pdfFile = new File("/home/gtu001/桌面/(Unwind Trilogy 1) Neal Shusterman - Unwind  -Simon & Schuster Books For Young Readers (2007).pdf");
+        String text = PdfboxUtil.loadText(pdfFile, Pair.of(1, 5));
+        System.out.println(text);
+
         System.out.println("done...");
     }
 
