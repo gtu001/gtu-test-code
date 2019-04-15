@@ -175,7 +175,7 @@ public class FastDBQueryUI extends JFrame {
     private AutoComboBox dbNameIdText_Auto;
     private AutoComboBox sqlMappingFilterText_Auto;
     private AutoComboBox refSearchCategoryCombobox_Auto;
-    
+
     private JLabel lblDbName;
     private JTextField sqlQueryText;
     private JPanel panel_8;
@@ -281,8 +281,8 @@ public class FastDBQueryUI extends JFrame {
         /*
          * EventQueue.invokeLater(new Runnable() { public void run() { try {
          * FastDBQueryUI frame = new FastDBQueryUI();
-         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception
-         * e) { e.printStackTrace(); } } });
+         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception e) {
+         * e.printStackTrace(); } } });
          */
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             System.out.println("=====" + info.getClassName());
@@ -442,7 +442,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
-        
+
         newPanel1.add(sqlFilterClearBtn);
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("SQL", null, panel_2, null);

@@ -201,7 +201,7 @@ public class DbSqlCreater {
             ResultSetMetaData meta = rs.getMetaData();
             String colLabel = null;
             for (int ii = 1; ii <= meta.getColumnCount(); ii++) {
-                colLabel = meta.getColumnLabel(ii).toUpperCase();
+                colLabel = meta.getColumnLabel(ii);// .toUpperCase();
                 if (tableName == null) {
                     tableName = meta.getTableName(ii);
                 }
@@ -278,7 +278,7 @@ public class DbSqlCreater {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            
+
             // ResultSet rs2 = dbmd.getIndexInfo(catalogName, schemaName,
             // tableName, false, true);
             // // unique - 該參數為 true 時，僅返回唯一值的索引；該參數為 false
@@ -331,6 +331,26 @@ public class DbSqlCreater {
             }
         }
 
+        private boolean __isContains(Set<String> columns, String key) {
+            key = StringUtils.trimToEmpty(key);
+            for (String s : columns) {
+                if (key.equalsIgnoreCase(s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean __isContains(Map<String, String> valMap, String key) {
+            key = StringUtils.trimToEmpty(key);
+            for (String s : valMap.keySet()) {
+                if (key.equalsIgnoreCase(s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /**
          * 傳入要建立的新增資料
          */
@@ -340,8 +360,8 @@ public class DbSqlCreater {
             String value = null;
             sb.append(String.format("INSERT INTO %s  (", getTableAndSchema()));
             for (String key : columns) {
-                key = key.toUpperCase();
-                if (ignoreColumns.contains(key)) {
+                key = key;// .toUpperCase();
+                if (__isContains(ignoreColumns, key)) {
                     continue;
                 }
                 sb.append(key + ",");
@@ -349,8 +369,8 @@ public class DbSqlCreater {
             sb.deleteCharAt(sb.length() - 1);
             sb.append(") VALUES ( ");
             for (String key : columns) {
-                String key_ = key.toUpperCase();
-                if (ignoreColumns.contains(key)) {
+                String key_ = key;// .toUpperCase();
+                if (__isContains(ignoreColumns, key)) {
                     continue;
                 }
                 value = valmap.get(key_);
@@ -370,14 +390,14 @@ public class DbSqlCreater {
             StringBuilder sb = new StringBuilder();
             sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
-                String key_ = key.toUpperCase();
-                if (!valmap.containsKey(key_)) {
+                String key_ = key;// .toUpperCase();
+                if (!__isContains(valmap, key_)) {
                     continue;
                 }
                 if (valmap.get(key_) == null && ignoreNull) {
                     continue;
                 }
-                if (ignoreColumns != null && ignoreColumns.contains(key_)) {
+                if (ignoreColumns != null && __isContains(ignoreColumns, key_)) {
                     continue;
                 }
                 sb.append(key + "=" + getRealValue(key, valmap.get(key_)) + ",");
@@ -389,7 +409,7 @@ public class DbSqlCreater {
             System.out.println("pkValMap == " + pkValMap);
             boolean addOne = false;
             for (String key : pkColumns) {
-                String key_ = key.toUpperCase();
+                String key_ = key;// .toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, pkValMap.get(key_)) + " and");
                 addOne = true;
             }
@@ -408,7 +428,7 @@ public class DbSqlCreater {
             StringBuilder sb = new StringBuilder();
             sb.append("SELECT * FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
-                String key_ = key.toUpperCase();
+                String key_ = key;// .toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");
             }
             if (pkColumns.size() != 0) {
@@ -426,7 +446,7 @@ public class DbSqlCreater {
             StringBuilder sb = new StringBuilder();
             sb.append("DELETE FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
-                String key_ = key.toUpperCase();
+                String key_ = key;// .toUpperCase();
                 sb.append(" " + key + "=" + getRealValue(key, valmap.get(key_)) + " and");
             }
             if (pkColumns.size() != 0) {
@@ -438,9 +458,9 @@ public class DbSqlCreater {
 
         private String getRealValue(String key_, String value) {
             if (value == null) {
-                if (numberCol.contains(key_)) {
+                if (__isContains(numberCol, key_)) {
                     return "0";
-                } else if (noNullsCol.contains(key_)) {
+                } else if (__isContains(noNullsCol, key_)) {
                     return "''";
                 } else {
                     return "null";
@@ -453,13 +473,13 @@ public class DbSqlCreater {
                 if (dbDateDateFormat == null) {
                     dbDateDateFormat = DBDateUtil.DBDateFormat.Oracle;
                 }
-                if (timestampCol.contains(key_)) {
+                if (__isContains(timestampCol, key_)) {
                     return dbDateDateFormat.varchar2Timestamp(String.format("'%s'", value));
-                } else if (dateCol.contains(key_)) {
+                } else if (__isContains(dateCol, key_)) {
                     return dbDateDateFormat.varchar2Date(String.format("'%s'", value));
                 }
 
-                if (numberCol.contains(key_)) {
+                if (__isContains(numberCol, key_)) {
                     double numVal = 0;
                     try {
                         numVal = Double.parseDouble(String.valueOf(value));
@@ -617,7 +637,7 @@ public class DbSqlCreater {
                 case 'u':
                     Map<String, String> pkMap = new HashMap<String, String>();
                     for (String col : info.pkColumns) {
-                        String col_ = col.toUpperCase();
+                        String col_ = col;// .toUpperCase();
                         String val = map.get(col_);
                         pkMap.put(col_, val);
                     }

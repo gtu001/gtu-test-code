@@ -271,7 +271,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         // 第一筆的處理
                         Map<String, String> map = new LinkedHashMap<String, String>();
                         for (String columnName : dialog.rowMap.get().keySet()) {
-                            columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
+                            columnName = StringUtils.trimToEmpty(columnName);
                             ColumnConf df = dialog.rowMap.get().get(columnName);
                             String value = df.value != null ? String.valueOf(df.value) : null;
                             DataType dtype = df.dtype;
@@ -304,7 +304,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 Map<String, String> toMap = new LinkedHashMap<String, String>();
 
                                 for (String columnName : dialog.rowMap.get().keySet()) {
-                                    columnName = StringUtils.trimToEmpty(columnName.toUpperCase());
+                                    columnName = StringUtils.trimToEmpty(columnName);
                                     ColumnConf df = dialog.rowMap.get().get(columnName);
                                     String valueOrign = fromMap.get(columnName) != null ? String.valueOf(fromMap.get(columnName)) : null;
                                     String valueClone = df.value != null ? String.valueOf(df.value) : null;
@@ -564,13 +564,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 int row = e.getFirstRow();
                 int col = e.getColumn();
                 /*
-                 * Perform actions only if the first column is the source of the
-                 * change.
+                 * Perform actions only if the first column is the source of the change.
                  */
                 /*
-                 * Remember that if you change values here, add it directly to
-                 * the data[][] array and not by calling setValueAt(...) or you
-                 * will cause an infinite loop ...
+                 * Remember that if you change values here, add it directly to the data[][]
+                 * array and not by calling setValueAt(...) or you will cause an infinite loop
+                 * ...
                  */
                 // etc... all your data processing...
                 String valueStr = "ERR";
@@ -655,7 +654,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         for (int ii = 0; ii < tableUtil.getModel().getRowCount(); ii++) {
             String columnName = (String) tableUtil.getRealValueAt(ii, 0);
-            columnName = columnName.toUpperCase();
+            columnName = StringUtils.trimToEmpty(columnName);
             if (columnName == null || StringUtils.isBlank(columnName)) {
                 columnName = "";
             }
@@ -746,7 +745,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + getQuoteStringVal(col, dataMap) + ");\n");
+                    sb.append("map.put(\"" + col + "\", " + getQuoteStringVal(col, dataMap) + ");\n");//
                 }
                 return sb.toString();
             }
@@ -762,11 +761,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("String " + param + " = " + "(String)map.get(\"" + col.toUpperCase() + "\");\n");
+                    sb.append("String " + param + " = " + "(String)map.get(\"" + col + "\");\n");//
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + param + ");\n");
+                    sb.append("map.put(\"" + col + "\", " + param + ");\n");//
                 }
                 return sb.toString();
             }
@@ -778,8 +777,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
-                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + paramVal + ");\n");
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
+                    sb.append("map.put(\"" + col + "\", " + paramVal + ");\n");//
                 }
                 return sb.toString();
             }
@@ -791,19 +790,19 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + paramVal + ";\n");
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
-                    sb.append(paramType + " " + param + " = (" + paramType + ")map.get(\"" + col.toUpperCase() + "\");\n");
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
+                    sb.append(paramType + " " + param + " = (" + paramType + ")map.get(\"" + col + "\");\n");//
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    sb.append("map.put(\"" + col.toUpperCase() + "\", " + param + ");\n");
+                    sb.append("map.put(\"" + col + "\", " + param + ");\n");//
                 }
                 return sb.toString();
             }
@@ -831,8 +830,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("String " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
                 }
                 for (String col : columns) {
@@ -849,7 +848,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + paramVal + ");\n");
                 }
                 return sb.toString();
@@ -862,14 +861,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + paramVal + ";\n");
                 }
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramType = getOrignType(col, tableInfo, dataMap);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
                 }
                 for (String col : columns) {
@@ -888,7 +887,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
                     String param = StringUtilForDb.dbFieldToJava(col);
-                    String paramVal = getOrignVal(col, tableInfo, dataMap);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("vo.set" + col + "(" + paramVal + ");\n");
                 }
                 return sb.toString();
@@ -916,6 +915,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         Set<String> getTableColumns(TableInfo tableInfo, FastDBQueryUI_CrudDlgUI self) {
+            // self.rowMap.get();//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             JTableUtil util = JTableUtil.newInstance(self.rowTable);
             Set<String> columns = tableInfo.getColumns();
             if (self.rowTable.getSelectedRows() == null || self.rowTable.getSelectedRows().length == 0) {
@@ -934,7 +934,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         String getQuoteStringVal(String col, Map<String, String> dataMap) {
-            col = col.toUpperCase();
+            // col = col.toUpperCase();
             String value = dataMap.get(col);
             if (value == null || "null".equals(value)) {
                 return "null";
@@ -942,8 +942,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             return String.format("\"%s\"", value);
         }
 
-        String getOrignVal(String col, TableInfo tableInfo, Map<String, String> dataMap) {
-            col = col.toUpperCase();
+        String getOrignVal(String col, TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
+            // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            // col = col.toUpperCase();
             if ("null".equals(dataMap.get(col))) {
                 return "null";
             }
@@ -972,8 +973,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
 
-        String getOrignType(String col, TableInfo tableInfo, Map<String, String> dataMap) {
-            col = col.toUpperCase();
+        String getOrignType(String col, TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
+            // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            // col = col.toUpperCase();
             if (tableInfo.getDateCol().contains(col)) {
                 return "java.sql.Date";
             } else if (tableInfo.getTimestampCol().contains(col)) {
@@ -1136,7 +1138,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 $rowPos = JTableUtil.getRealRowPos($rowPos, rowTable);
                                 rowPos.set($rowPos);
                                 String column = (String) rowTable.getValueAt($rowPos, 0);
-                                column = StringUtils.trimToEmpty(column).toUpperCase();
+                                column = StringUtils.trimToEmpty(column);//
                                 valueLst.set(_parent.getEditColumnConfig().getColumnValues(column));
                             }
                         } catch (Exception ex) {
@@ -1144,10 +1146,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         }
 
                         /*
-                         * List<JMenuItem> menuList =
-                         * JTableUtil.newInstance(rowTable)
-                         * .getDefaultJMenuItems_Mask(//
-                         * JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                         * List<JMenuItem> menuList = JTableUtil.newInstance(rowTable)
+                         * .getDefaultJMenuItems_Mask(// JTableUtil_DefaultJMenuItems_Mask._加列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._移除列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
