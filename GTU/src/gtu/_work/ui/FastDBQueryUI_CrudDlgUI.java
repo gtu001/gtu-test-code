@@ -243,19 +243,28 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     List<Map<String, String>> maybeMultiRowLst;
                     Set<String> ignoreColumns;
 
-                    Process() throws SQLException {
-                        // 套用此筆資料
+                    private void initTableInfo() throws SQLException {
                         tableInfo = new TableInfo();
-                        String tableAndSchema = dialog.tableAndSchemaText.getText();
-                        JCommonUtil.isBlankErrorMsg(tableAndSchema, "輸入表名稱!");
 
                         DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dialog.dbTypeComboBox.getSelectedItem();
                         tableInfo.setDbDateDateFormat(dbDateDateFormat);
 
-                        tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
-                        if (StringUtils.isBlank(tableInfo.getTableAndSchema())) {
-                            tableInfo.setTableName(tableNSchema);
+                        String tableAndSchema = dialog.tableAndSchemaText.getText();
+                        AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
+                        if (btn != dialog.rdbtnOthers) {
+                            JCommonUtil.isBlankErrorMsg(tableAndSchema, "輸入表名稱!");
                         }
+
+                        if (StringUtils.isNotBlank(tableAndSchema)) {
+                            tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
+                            if (StringUtils.isBlank(tableInfo.getTableAndSchema())) {
+                                tableInfo.setTableName(tableNSchema);
+                            }
+                        }
+                    }
+
+                    Process() throws SQLException {
+                        initTableInfo();
 
                         Set<String> pkColumns = new HashSet<String>();
                         Set<String> noNullsCol = new HashSet<String>();
@@ -564,12 +573,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 int row = e.getFirstRow();
                 int col = e.getColumn();
                 /*
-                 * Perform actions only if the first column is the source of the change.
+                 * Perform actions only if the first column is the source of the
+                 * change.
                  */
                 /*
-                 * Remember that if you change values here, add it directly to the data[][]
-                 * array and not by calling setValueAt(...) or you will cause an infinite loop
-                 * ...
+                 * Remember that if you change values here, add it directly to
+                 * the data[][] array and not by calling setValueAt(...) or you
+                 * will cause an infinite loop ...
                  */
                 // etc... all your data processing...
                 String valueStr = "ERR";
@@ -905,8 +915,38 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return sb.toString();
             }
         }, //
-           // ↑↑↑↑↑↑
-           // 暫放------------------------------------------------------------------
+        VO_Creater_Orign("vo(orign)") {//
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
+                StringBuilder sb = new StringBuilder();
+                Set<String> columns = getTableColumns(tableInfo, self);
+                for (String col : columns) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
+                    sb.append("@JsonProperty(\"" + col + "\")\n");
+                    sb.append("private " + paramType + " " + param + ";\n");
+                }
+                return sb.toString();
+            }
+        }, //
+        VO_Creater_String("vo(string)") {//
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
+                StringBuilder sb = new StringBuilder();
+                Set<String> columns = getTableColumns(tableInfo, self);
+                for (String col : columns) {
+                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
+                    sb.append("@JsonProperty(\"" + col + "\")\n");
+                    sb.append("private " + "String" + " " + param + ";\n");
+                }
+                return sb.toString();
+            }
+        }
+        // ↑↑↑↑↑↑
+        // 暫放------------------------------------------------------------------
         ;
         final String label;
 
@@ -915,9 +955,15 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         Set<String> getTableColumns(TableInfo tableInfo, FastDBQueryUI_CrudDlgUI self) {
-            // self.rowMap.get();//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            Set<String> columns = new LinkedHashSet<String>();
+            if (!tableInfo.getColumns().isEmpty() && StringUtils.isNotBlank(tableInfo.getTableAndSchema())) {
+                columns = tableInfo.getColumns();
+            } else {
+                for (String columnName : self.rowMap.get().keySet()) {
+                    columns.add(columnName);
+                }
+            }
             JTableUtil util = JTableUtil.newInstance(self.rowTable);
-            Set<String> columns = tableInfo.getColumns();
             if (self.rowTable.getSelectedRows() == null || self.rowTable.getSelectedRows().length == 0) {
                 System.out.println("[getTableColumns]全部");
                 return columns;
@@ -943,22 +989,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         String getOrignVal(String col, TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
-            // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             // col = col.toUpperCase();
+            ColumnConf conf = self.rowMap.get().get(col);
             if ("null".equals(dataMap.get(col))) {
                 return "null";
             }
-            if (tableInfo.getDateCol().contains(col)) {
+            if (tableInfo.getDateCol().contains(col) || conf.dtype == DataType.date) {
                 if (StringUtils.isBlank(dataMap.get(col))) {
                     return "null";
                 }
                 return "java.sql.Date.valueOf(\"" + dataMap.get(col) + "\")";
-            } else if (tableInfo.getTimestampCol().contains(col)) {
+            } else if (tableInfo.getTimestampCol().contains(col) || conf.dtype == DataType.timestamp) {
                 if (StringUtils.isBlank(dataMap.get(col))) {
                     return "null";
                 }
                 return "java.sql.Timestamp.valueOf(\"" + dataMap.get(col) + "\")";
-            } else if (tableInfo.getNumberCol().contains(col)) {
+            } else if (tableInfo.getNumberCol().contains(col) || conf.dtype == DataType.number) {
                 if (StringUtils.isBlank(dataMap.get(col))) {
                     return "null";
                 }
@@ -974,13 +1020,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         String getOrignType(String col, TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
-            // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             // col = col.toUpperCase();
-            if (tableInfo.getDateCol().contains(col)) {
+            ColumnConf conf = self.rowMap.get().get(col);
+            if (tableInfo.getDateCol().contains(col) || conf.dtype == DataType.date) {
                 return "java.sql.Date";
-            } else if (tableInfo.getTimestampCol().contains(col)) {
+            } else if (tableInfo.getTimestampCol().contains(col) || conf.dtype == DataType.timestamp) {
                 return "java.sql.Timestamp";
-            } else if (tableInfo.getNumberCol().contains(col)) {
+            } else if (tableInfo.getNumberCol().contains(col) || conf.dtype == DataType.number) {
                 return "java.math.BigDecimal";
             } else {
                 return "String";
@@ -1146,8 +1192,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         }
 
                         /*
-                         * List<JMenuItem> menuList = JTableUtil.newInstance(rowTable)
-                         * .getDefaultJMenuItems_Mask(// JTableUtil_DefaultJMenuItems_Mask._加列 | //
+                         * List<JMenuItem> menuList =
+                         * JTableUtil.newInstance(rowTable)
+                         * .getDefaultJMenuItems_Mask(//
+                         * JTableUtil_DefaultJMenuItems_Mask._加列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._加多筆列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._移除列 | //
                          * JTableUtil_DefaultJMenuItems_Mask._移除所有列 | //
@@ -1215,6 +1263,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         this.keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
+
             @Override
             public void run() {
                 JCommonUtil.triggerButtonActionPerformed(okButton);
@@ -1256,6 +1305,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 JCommonUtil.handleException(ex);
             }
         }
+
     }
 
     // 儲存 欄位編輯歷史紀錄

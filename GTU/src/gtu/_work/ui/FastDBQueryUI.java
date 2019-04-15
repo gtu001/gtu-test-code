@@ -281,8 +281,8 @@ public class FastDBQueryUI extends JFrame {
         /*
          * EventQueue.invokeLater(new Runnable() { public void run() { try {
          * FastDBQueryUI frame = new FastDBQueryUI();
-         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception e) {
-         * e.printStackTrace(); } } });
+         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception
+         * e) { e.printStackTrace(); } } });
          */
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             System.out.println("=====" + info.getClassName());
