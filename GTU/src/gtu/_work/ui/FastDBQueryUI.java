@@ -365,7 +365,8 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SqlIdConfigBean bean = (SqlIdConfigBean) e.getSource();
-                String tooltip = "<html>" + JTooltipUtil.escapeHtml(bean.sql) + "</html>";
+                String comment = "<font color=\"red\">" + bean.sqlComment + "</font><br/>";
+                String tooltip = "<html>" + comment + JTooltipUtil.escapeHtml(bean.sql) + "</html>";
                 sqlList.setToolTipText(tooltip);
             }
         });
@@ -1637,6 +1638,7 @@ public class FastDBQueryUI extends JFrame {
     private void clearButtonClick() {
         sqlIdText.setText("");
         sqlTextArea.setText("");
+        sqlIdCommentArea.setText("");
         this.sqlBean = null;
         setSqlListSelection(this.sqlBean);
     }

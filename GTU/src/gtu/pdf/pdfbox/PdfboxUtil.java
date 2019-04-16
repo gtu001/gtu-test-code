@@ -1,7 +1,6 @@
 package gtu.pdf.pdfbox;
 
 import java.io.File;
-import java.util.Scanner;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -27,7 +26,7 @@ public class PdfboxUtil {
         // FileUtil.saveToFile(toFile, content, "utf8");
         // }
 
-        File pdfFile = new File("/home/gtu001/桌面/(Unwind Trilogy 1) Neal Shusterman - Unwind  -Simon & Schuster Books For Young Readers (2007).pdf");
+        File pdfFile = new File("D:/gtu001_dropbox/Dropbox/guava/電子書/(Unwind Trilogy 1) Neal Shusterman - Unwind  -Simon & Schuster Books For Young Readers (2007).pdf");
         String text = PdfboxUtil.loadText(pdfFile, Pair.of(1, 5));
         System.out.println(text);
 
@@ -48,6 +47,11 @@ public class PdfboxUtil {
             spp.setEncryptionKeyLength(keyLength);
             spp.setPermissions(ap);
             PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setParagraphStart("^---para start---^");
+            stripper.setParagraphEnd("^---para end---^");
+            stripper.setArticleStart("^---article start---^");
+            stripper.setArticleEnd("^---article end---^");
+            stripper.setIndentThreshold(4);
             if (range != null) {
                 stripper.setStartPage(range.getLeft());
                 stripper.setEndPage(range.getRight());

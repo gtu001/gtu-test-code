@@ -437,7 +437,7 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
                         File file = epubFileZ.get();
 
                         //設定書籍 及 初始化
-                        epubViewerMainHandler.initBook(file);
+                        epubViewerMainHandler.initBook(file, PdfReaderPdfActivity.this);
 
                         handler.post(new Runnable() {
                             @Override
@@ -447,7 +447,9 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
 
                                 viewPager.setCurrentItem(0);
 
+
                                 gotoViewPagerPosition(0);
+
 
                                 if (translateView != null) {
                                     translateView.setText("");
@@ -1034,7 +1036,7 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
             private void epubProcess() {
                 try {
                     //設定書籍 及 初始化
-                    epubViewerMainHandler.initBook(bookFile);
+                    epubViewerMainHandler.initBook(bookFile, PdfReaderPdfActivity.this);
 
                     handler.post(new Runnable() {
                         @Override

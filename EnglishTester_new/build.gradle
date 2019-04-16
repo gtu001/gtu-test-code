@@ -24,6 +24,9 @@ buildscript {
         maven {
             url 'https://maven.google.com'
         }
+        flatDir {
+            dirs 'libs'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
@@ -57,6 +60,9 @@ allprojects {
             url "http://maven.ibiblio.org/maven2/"
         }
         jcenter()
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 

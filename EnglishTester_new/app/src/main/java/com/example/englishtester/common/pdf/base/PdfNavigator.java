@@ -78,7 +78,7 @@ public class PdfNavigator {
     }
 
     public PdfViewerMainHandler.PageContentHolder gotoPosition(int position) {
-        Log.v(TAG, ">> gotoPosition " + position, 1);
+        Log.v(TAG, ">> gotoPosition " + position);
         List keys = new ArrayList<Integer>(spineRangeHolder.spineHolder.get().keySet());
         Collections.sort(keys);
         for (int ii = 0; ii < keys.size(); ii++) {
@@ -92,7 +92,7 @@ public class PdfNavigator {
                     PdfViewerMainHandler.PageContentHolder pageContentHolder = spineRangeHolder.spineHolder.get().get(ii);
                     int currPos = position - pair.getLeft();
                     pageContentHolder.setCurrentPageIndex(currPos);
-//                    Log.line(TAG, "## position : " + position + " , currPos : " + currPos + " , pair : " + pair + " , spine : " + ii + " -- " + dto.getPageIndex());
+                    Log.v(TAG, "## position : " + position + " , currPos : " + currPos + " , pair : " + pair + " , spine : " + ii + " -- " + dto.getPageIndex());
                     return pageContentHolder;
                 }
             }

@@ -1,5 +1,6 @@
 package com.example.englishtester.common.pdf.base;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.SpannableString;
 import android.widget.TextView;
@@ -49,12 +50,12 @@ public class PdfViewerMainHandler {
         this.dto.setTextView(textView);
     }
 
-    public void initBook(File bookFile) {
+    public void initBook(File bookFile, Context context) {
         try {
             this.dto.setBookFile(bookFile);
             this.dto.getGoDirectLinkStack().clear();
             InputStream bookStream = new FileInputStream(bookFile);
-            this.mPdfBookHandler = new PdfBookHandler(bookFile);
+            this.mPdfBookHandler = new PdfBookHandler(bookFile, context);
             this.navigator = new PdfNavigator(mPdfBookHandler, this.PdfActivityInterface, this.dto);
         } catch (Exception ex) {
             throw new RuntimeException("initBook ERR : " + ex.getMessage(), ex);

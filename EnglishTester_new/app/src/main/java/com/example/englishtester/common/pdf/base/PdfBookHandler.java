@@ -1,35 +1,58 @@
 package com.example.englishtester.common.pdf.base;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
-import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.apache.pdfbox.text.PDFTextStripper;
+
+import android.content.Context;
+
+import com.example.englishtester.common.Log;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.text.PDFTextStripper;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PdfBookHandler {
 
-    List<String> pages = new ArrayList<String>();
-    int pageIndex = -1;
+    private static final String TAG = PdfBookHandler.class.getSimpleName();
+
+    Map<Integer, String> pageMap = new HashMap<>();
+    int pageNo = 0;
+    int finalPageNo = -1;
 
     private File pdfFile;
     private PDDocument document;
     private PDFTextStripper stripper;
 
+    private static final String PAGE_END = "^-----PageEnd-----^";
+    private static final Pattern PAGE_END_PTN = Pattern.compile("\\^\\-{5}PageEnd\\-{5}\\^", Pattern.DOTALL | Pattern.MULTILINE);
 
-    private void initPdfBefore(File pdfFile) {
+    private void initPdfBefore(File pdfFile, Context context) {
         try {
+            PDFBoxResourceLoader.init(context);
+
+            pageMap.clear();
+
             this.pdfFile = pdfFile;
             document = PDDocument.load(pdfFile);
             stripper = new PDFTextStripper();
-            int keyLength = 256;
-            AccessPermission ap = new AccessPermission();
-            ap.setCanPrint(false);
-            StandardProtectionPolicy spp = new StandardProtectionPolicy("12345", "", ap);
-            spp.setEncryptionKeyLength(keyLength);
-            spp.setPermissions(ap);
+            stripper.setLineSeparator("");
+            stripper.setParagraphStart("\n");
+            stripper.setParagraphEnd("\n");
+            stripper.setPageEnd("");//PAGE_END
+
+            finalPageNo = document.getNumberOfPages();
+
+            pageNo = 0;
+            stripper.setStartPage(1);
+            stripper.setEndPage(Integer.MAX_VALUE);
         } catch (Exception e) {
             throw new RuntimeException("initPdfBefore ERR : " + e.getMessage(), e);
         }
@@ -37,57 +60,57 @@ public class PdfBookHandler {
 
     private String getPage(int pageNo) {
         try {
+            if (pageMap.containsKey(pageNo)) {
+                return pageMap.get(pageNo);
+            }
             stripper.setStartPage(pageNo);
             stripper.setEndPage(pageNo);
-            return stripper.getText(document);
-        } catch (Exception e) {
-            throw new RuntimeException("getPage ERR : " + e.getMessage(), e);
+            String pageContent = stripper.getText(document);
+            pageMap.put(pageNo, pageContent);
+            return pageContent;
+        } catch (Exception ex) {
+            throw new RuntimeException("getPage, ERR : " + ex.getMessage(), ex);
         }
     }
 
-    public void close() {
+    public void closePreviousBook() {
         try {
             document.close();
         } catch (Exception ex) {
-            throw new RuntimeException("close ERR : " + ex.getMessage(), ex);
         }
     }
 
-    public PdfBookHandler(File pdfFile) {
-        this.initPdfBefore(pdfFile);
-        for (int ii = 1; ii <= document.getNumberOfPages(); ii++) {
-            String pageContent = this.getPage(ii);
-            pages.add(pageContent);
-        }
-        this.close();
+    public PdfBookHandler(File pdfFile, Context context) {
+        this.closePreviousBook();
+        this.initPdfBefore(pdfFile, context);
     }
 
     public void next() {
-        if (pageIndex >= pages.size() - 1) {
-            pageIndex = pages.size() - 1;
+        if (pageNo >= finalPageNo) {
+            pageNo = finalPageNo;
         } else {
-            pageIndex++;
+            pageNo++;
         }
     }
 
     public void previous() {
-        if (pageIndex <= 0) {
-            pageIndex = 0;
+        if (pageNo <= 1) {
+            pageNo = 1;
         } else {
-            pageIndex--;
+            pageNo--;
         }
     }
 
     public String getPage() {
-        return pages.get(pageIndex);
+        return getPage(pageNo);
     }
 
     public String getFirstPage() {
-        pageIndex = 0;
+        pageNo = 1;
         return getPage();
     }
 
     public boolean hasNext() {
-        return !(pageIndex >= pages.size() - 1);
+        return pageNo < finalPageNo;
     }
 }
