@@ -1,7 +1,7 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style>
 	table { 
 		border:1px solid #000; 
 		font-family: 微軟正黑體; 
@@ -22,16 +22,18 @@
 		padding:5px;
 	} 
 </style>
-	<script type="text/javascript">
+
+<script type="text/javascript">
 	function jsonFormatter(){
 		var text = document.querySelector("#testArea").value;
-
-		var json1 = JSON.parse(text);
+		var lines = text.split('\n');
 		var arry = new Array();
-		if(Array.isArray(json1)){
-			arry = json1;
-		}else{
-			arry.push(json1);
+		for(var i = 0;i < lines.length;i++){
+			var line = lines[i];
+			var json = toJson(line);
+			if(json){
+				arry.push(json);
+			}
 		}
 
 		var tbody = getTbody();		
@@ -168,3 +170,4 @@
 
 </body>
 </html>
+
