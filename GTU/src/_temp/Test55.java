@@ -22,5 +22,33 @@ public class Test55 {
     private class TTT {
         String aaa;
         String bbb;
+        String aaa1;
+        String bbb1;
+        String aaa2;
+        String bbb2;
+        String aaa3;
+        String bbb3;
+        String aaa4;
+        String bbb4;
+        String aaa5;
+        String bbb5;
+        String aaa6;
+        String bbb6;
+        String aaa7;
+        String bbb7;
+        String aaa8;
+        String bbb8;
+        String aaa9;
+        String bbb9;
+        String aaa10;
+        String bbb10;
+        String aaa11;
+        String bbb11;
+        String aaa12;
+        String bbb12;
+        String aaa13;
+        String bbb13;
+        String aaa14;
+        String bbb14;
     }
 }
