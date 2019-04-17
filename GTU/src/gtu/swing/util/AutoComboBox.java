@@ -7,6 +7,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -252,6 +253,13 @@ public class AutoComboBox extends PlainDocument {
         return applyComboxBoxList(lst, "");
     }
 
+    private Comparator<String> ignoreCaseSort = new Comparator<String>() {
+        @Override
+        public int compare(String arg0, String arg1) {
+            return StringUtils.defaultString(arg0).toLowerCase().compareTo(StringUtils.defaultString(arg1).toLowerCase());
+        }
+    };
+
     public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText) {
         LinkedList<String> cloneLst = new LinkedList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
@@ -261,8 +269,8 @@ public class AutoComboBox extends PlainDocument {
             }
         }
         cloneLst.push("");// 塞個空的放第一個
+        Collections.sort(cloneLst, ignoreCaseSort);
 
-        Collections.sort(cloneLst);
         final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
         for (String s : cloneLst) {
             m1.addElement(s);

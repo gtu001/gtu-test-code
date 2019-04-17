@@ -885,7 +885,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             this.initLoading();
 
             // 因為initLoading會清空
-            tagComboBoxUtil.getTextComponent().setText(tag);
+            tagComboBoxUtil.setSelectItemAndText(tag);
 
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {
