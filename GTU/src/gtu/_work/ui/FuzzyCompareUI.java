@@ -35,15 +35,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.spring.SimilarityUtil;
-import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.TableColorDef;
 import gtu.swing.util.JTextAreaUtil;
 
 /**
@@ -361,6 +362,8 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
             }
         }
 
+        CaculateHandler mCaculateHandler = new CaculateHandler();
+
         for (String compare1 : text1List) {
             List<CompareResult> compareList = new ArrayList<CompareResult>();
             String comment = "";
@@ -384,14 +387,117 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                     comment = text2Map.get(compare2Str);
                 }
             }
-            model.addRow(new Object[] { compare1, compare2Str, percent, comment });
+
+            RowContent data = new RowContent();
+            data.compare1 = compare1;
+            data.compare2Str = compare2Str;
+            data.percent = percent;
+            data.comment = comment;
+
+            mCaculateHandler.append(data);
 
             // 設定補正資料
             fix.append(compare1, compare2Str, comment);
         }
 
+        mCaculateHandler.addDataToModel(model);
+
+        TableColorDef duplicateChangeColor = new TableColorDef() {
+            @Override
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Object v = resultTable.getValueAt(row, column);
+                if (v == null || StringUtils.isBlank(String.valueOf(v))) {
+                    return null;
+                }
+                int count = 0;
+                for (int r = 0; r < table.getRowCount(); r++) {
+                    Object v2 = table.getValueAt(r, column);
+                    if (ObjectUtils.equals(v, v2)) {
+                        count++;
+                    }
+                }
+                if (count > 1) {
+                    return Pair.of(Color.YELLOW.brighter(), null);
+                }
+                return null;
+            }
+        };
+
+        JTableUtil.newInstance(resultTable).setColumnColor_byCondition(1, duplicateChangeColor);
+        JTableUtil.newInstance(resultTable).setColumnColor_byCondition(3, duplicateChangeColor);
+
         // 設定補正資料
         fix.setFixTextArea(fixFormatText.getText(), text1);
+    }
+
+    private class CaculateHandler {
+        List<RowContent> dataLst = new ArrayList<RowContent>();
+        Map<RowContent, Integer> countMap = new HashMap<RowContent, Integer>();
+
+        public void append(RowContent data) {
+            dataLst.add(data);
+            int count = 0;
+            if (countMap.containsKey(data)) {
+                count = countMap.get(data);
+            }
+            count++;
+            countMap.put(data, count);
+        }
+
+        public void addDataToModel(DefaultTableModel model) {
+            for (RowContent row : dataLst) {
+                model.addRow(row.toArray());
+            }
+        }
+    }
+
+    private class RowContent {
+        String compare1;
+        String compare2Str;
+        BigDecimal percent;
+        String comment;
+
+        public Object[] toArray() {
+            return new Object[] { compare1, compare2Str, percent, comment, this };
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getEnclosingInstance().hashCode();
+            result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+            result = prime * result + ((compare2Str == null) ? 0 : compare2Str.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            RowContent other = (RowContent) obj;
+            if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+                return false;
+            if (comment == null) {
+                if (other.comment != null)
+                    return false;
+            } else if (!comment.equals(other.comment))
+                return false;
+            if (compare2Str == null) {
+                if (other.compare2Str != null)
+                    return false;
+            } else if (!compare2Str.equals(other.compare2Str))
+                return false;
+            return true;
+        }
+
+        private FuzzyCompareUI getEnclosingInstance() {
+            return FuzzyCompareUI.this;
+        }
     }
 
     private class FixTextAreaHandler {
