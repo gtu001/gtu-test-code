@@ -752,7 +752,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("map.put(\"" + col + "\", " + getQuoteStringVal(col, dataMap) + ");\n");//
                 }
                 return sb.toString();
@@ -764,15 +764,15 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("String " + param + " = " + getQuoteStringVal(col, dataMap) + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("String " + param + " = " + "(String)map.get(\"" + col + "\");\n");//
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("map.put(\"" + col + "\", " + param + ");\n");//
                 }
                 return sb.toString();
@@ -784,7 +784,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("map.put(\"" + col + "\", " + paramVal + ");\n");//
                 }
@@ -797,19 +797,19 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + paramVal + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = (" + paramType + ")map.get(\"" + col + "\");\n");//
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("map.put(\"" + col + "\", " + param + ");\n");//
                 }
                 return sb.toString();
@@ -821,7 +821,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + getQuoteStringVal(col, dataMap) + ");\n");
                 }
                 return sb.toString();
@@ -833,17 +833,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("String " + param + " = " + getQuoteStringVal(col, dataMap) + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("String " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
                 }
                 return sb.toString();
@@ -855,7 +855,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + paramVal + ");\n");
                 }
@@ -868,19 +868,19 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + paramVal + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append(paramType + " " + param + " = " + "vo.get" + StringUtils.capitalize(param) + "()" + ";\n");
                 }
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     sb.append("vo.set" + StringUtils.capitalize(param) + "(" + param + ");\n");
                 }
                 return sb.toString();
@@ -888,7 +888,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }, //
            // ↓↓↓↓↓↓
            // 暫放------------------------------------------------------------------
-        VO_SETTER_Cathay("vo.setter(orign) [國泰]") {
+        VO_SETTER_Cathay("vo.setter(orign) [不調整格式]") {
             @Override
             String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
                 StringBuilder sb = new StringBuilder();
@@ -901,7 +901,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return sb.toString();
             }
         }, //
-        VO_SETTER_STR_Cathay("vo.setter(str) [國泰]") {
+        VO_SETTER_STR_Cathay("vo.setter(str) [不調整格式]") {
             @Override
             String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
                 StringBuilder sb = new StringBuilder();
@@ -913,13 +913,15 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return sb.toString();
             }
         }, //
+        // ↑↑↑↑↑↑
+        // 暫放------------------------------------------------------------------
         VO_Creater_Orign("vo(orign)") {//
             @Override
             String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("@JsonProperty(\"" + col + "\")\n");
@@ -934,7 +936,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 StringBuilder sb = new StringBuilder();
                 Set<String> columns = getTableColumns(tableInfo, self);
                 for (String col : columns) {
-                    String param = StringUtilForDb.dbFieldToJava(col);
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
                     String paramType = getOrignType(col, tableInfo, dataMap, self);
                     String paramVal = getOrignVal(col, tableInfo, dataMap, self);
                     sb.append("@JsonProperty(\"" + col + "\")\n");

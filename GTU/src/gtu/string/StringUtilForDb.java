@@ -39,6 +39,36 @@ public class StringUtilForDb {
         System.out.println("done...");
     }
 
+    private static boolean isNeedDbFieldToJava(String columnName) {
+        columnName = StringUtils.defaultString(columnName);
+        if (columnName.contains("_")) {
+            return true;
+        }
+        char[] cs = columnName.toCharArray();
+        boolean hasUpperCase = false;
+        boolean hasLowerCase = false;
+        for (int ii = 0; ii < cs.length; ii++) {
+            if (!hasUpperCase && Character.isUpperCase(cs[ii])) {
+                hasUpperCase = true;
+            }
+            if (!hasLowerCase && Character.isLowerCase(cs[ii])) {
+                hasLowerCase = true;
+            }
+        }
+        if (hasUpperCase && hasLowerCase) {
+            return false;
+        }
+        return true;
+    }
+
+    public static String dbFieldToJava_smartCheck(String columnName) {
+        if (isNeedDbFieldToJava(columnName)) {
+            return dbFieldToJava(columnName);
+        } else {
+            return StringUtils.uncapitalize(columnName);
+        }
+    }
+
     /**
      * 資料庫欄位轉為變數字串 Ex: CODE_NAME -> codeName
      * 
