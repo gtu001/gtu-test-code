@@ -4,8 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import com.example.englishtester.common.Log;
+
+import androidx.core.app.ActivityCompat;
 
 /**
  * Created by gtu001 on 2017/6/27.

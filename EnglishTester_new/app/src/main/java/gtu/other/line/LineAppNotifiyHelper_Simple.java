@@ -1,8 +1,9 @@
 package gtu.other.line;
 
-import junit.framework.Assert;
+//import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +49,8 @@ public class LineAppNotifiyHelper_Simple {
 
     public String send(final String lineToken, String message) {
         try {
-            Assert.assertNotNull("必須設定message!", message);
-            Assert.assertTrue("必須設定lineToken", StringUtils.isNotBlank(lineToken));
+            Validate.notNull(message, "必須設定message!");
+            Validate.isTrue(StringUtils.isNotBlank(lineToken), "必須設定lineToken");
 
             final String postForm = "&message=" + URLEncoder.encode(message, "UTF8");
             final ArrayBlockingQueue<String> waitQue = new ArrayBlockingQueue<String>(1);

@@ -1,12 +1,13 @@
 package com.example.englishtester.common;
 
 import android.os.Handler;
-import android.support.v4.view.ViewPager;
 
 import com.example.englishtester.common.Log;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
+
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by gtu001 on 2018/8/9.

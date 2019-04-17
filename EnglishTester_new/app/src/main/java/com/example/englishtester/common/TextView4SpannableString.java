@@ -4,18 +4,19 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+
 /**
  * Created by wistronits on 2018/8/9.
  */
 
-public class TextView4SpannableString extends android.support.v7.widget.AppCompatTextView {
+public class TextView4SpannableString extends AppCompatTextView {
 
     private Runnable onRenderCompleteCallback;
     private Runnable onRenderStartCallback;
