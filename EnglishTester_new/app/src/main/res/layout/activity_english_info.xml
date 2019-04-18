@@ -23,7 +23,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
 
-            <android.support.percent.PercentRelativeLayout
+            <androidx.percentlayout.widget.PercentRelativeLayout
                 android:id="@+id/englishIdLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true" />
-            </android.support.percent.PercentRelativeLayout>
+            </androidx.percentlayout.widget.PercentRelativeLayout>
 
             <TextView
                 android:id="@+id/noUseText1"
