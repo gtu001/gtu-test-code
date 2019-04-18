@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class StringUtil_ {
@@ -642,7 +643,7 @@ public class StringUtil_ {
     private static class AppendReplacementEscaper {
         String content;
         String result;
-        private static final char[] ESCAPE_ARRY = new char[]{'t', 'b', 'n', 'r', 'f', '\'', '\"', '\\'};
+        private static final char[] ESCAPE_ARRY = new char[] { 't', 'b', 'n', 'r', 'f', '\'', '\"', '\\' };
 
         AppendReplacementEscaper(String content) {
             this.content = content;
@@ -660,10 +661,9 @@ public class StringUtil_ {
                 result = "\\\\";
             }
             /*
-            if (result.indexOf('\\') != -1) {
-                result = replaceChar(result, '\\');
-            }
-            */
+             * if (result.indexOf('\\') != -1) { result = replaceChar(result,
+             * '\\'); }
+             */
         }
 
         private String replaceChar(String content, char from) {
@@ -733,5 +733,25 @@ public class StringUtil_ {
             }
         }
         return lst;
+    }
+
+    public static Object oracleDecode(Object... strs) {
+        if (strs == null) {
+            throw new RuntimeException("decode args 不可為空!");
+        }
+        Object val = strs[0];
+        int index = 1;
+        while (true) {
+            if (index > strs.length - 1) {
+                if (((strs.length - 1) & 1) == 0) {
+                    return null;
+                }
+                return strs[strs.length - 1];
+            }
+            if (ObjectUtils.equals(val, strs[index])) {
+                return strs[index + 1];
+            }
+            index += 2;
+        }
     }
 }
