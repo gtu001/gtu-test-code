@@ -127,14 +127,32 @@ public class AutoComboBox extends PlainDocument {
         } else {
             editor.setText(String.valueOf(item));
         }
-        String currentSelect1 = comboBox.getSelectedItem() != null ? String.valueOf(comboBox.getSelectedItem()) : "";
-        String currentSelect = editor.getText();
 
-        if (!StringUtils.equals(currentSelect1, currentSelect)) {
-            DefaultComboBoxModel model = (DefaultComboBoxModel) (comboBox.getModel());
-            model.insertElementAt(currentSelect, 0);
-            comboBox.setSelectedIndex(0);
-            System.out.println("\t force set currentSelect = " + currentSelect);
+        DefaultComboBoxModel model = (DefaultComboBoxModel) (comboBox.getModel());
+        String currentText = editor.getText();
+
+        boolean findOk = false;
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            Object val = model.getElementAt(ii);
+            if (val != null && (item == val || StringUtils.equalsIgnoreCase(currentText, String.valueOf(val)))) {
+                this.runInIgnoreListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        comboBox.setSelectedItem(val);
+                    }
+                });
+                findOk = true;
+                break;
+            }
+        }
+
+        if (!findOk) {
+            String currentSelect1 = comboBox.getSelectedItem() != null ? String.valueOf(comboBox.getSelectedItem()) : "";
+            if (!StringUtils.equalsIgnoreCase(currentSelect1, currentText)) {
+                model.insertElementAt(currentText, 0);
+                comboBox.setSelectedIndex(0);
+                System.out.println("\t force set currentSelect = " + currentText);
+            }
         }
 
         System.out.println("\t comboBox.setValue : " + comboBox.getSelectedItem());
