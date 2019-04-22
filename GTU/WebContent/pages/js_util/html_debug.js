@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function(){
 		try{
 			if(ele.tagName == "SELECT"){
 				return ele.options[ele.selectedIndex].value;
-			}	
+			}	zz
 		}catch(e){
 		}
 		return null;
@@ -63,8 +63,12 @@ document.addEventListener("DOMContentLoaded", function(){
 	};
 
 	var hoverShow = function(ele, color, func){
+		var div1 = document.createElement("span");
+		ele.addEventListener("mousemove", function(e){
+			div1.style.left = mousePositionHandler.x + "px";
+            div1.style.top = mousePositionHandler.y + "px";
+		});
 		ele.addEventListener("mouseover", function(e){
-			var div1 = document.createElement("span");
 			//ele.after(div1);
 			document.querySelector("body").appendChild(div1);
 		

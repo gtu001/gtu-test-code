@@ -77,10 +77,12 @@
 		padding:10px;
 		border:1px solid #000;
 		color:#fff;
+		font-size:10px;
 	} 
 	td { 
 		border:1px solid #000;
 		padding:5px;
+		font-size:10px;
 	} 
 </style>
 
@@ -113,7 +115,10 @@
 			break;
 		}
 
-		startGenerateTable(arry);
+		//欄位過濾
+		var columnFilterText = document.querySelector("[name=columnFilterText]").value;
+
+		startGenerateTable(arry, columnFilterText);
 	}
 
 	function toStringJson(line){
@@ -133,8 +138,104 @@
 	}
 
 	//------------------------------------------------------------------------------------
+	function trim(value){
+		if(!value){
+			return '';
+		}
+		return value.trim();
+	}
 
-	function startGenerateTable(arry){
+	function ReplaceMatcher(regex, inputText) {
+		var inputText = inputText;
+		var regex = regex;
+		var tmpStartPos = 0;
+		var found;
+		var sb = '';
+		var start = -1;
+		var end = -1;
+
+		return {
+			group : function(index){
+				if(found){
+					return found[index];
+				}
+				return false;
+			},
+			get : function(){
+				var json = {};
+				if(found){
+					for(var i in found){
+						json[i] = found[i];
+					}
+				}
+				return json;
+			},
+			find : function(){
+				found = regex.exec(inputText);
+				if(found){
+					return true;
+				}
+				return false;
+			},
+			appendReplace : function(replaceText){
+				start = parseInt(found['index'], 10);
+				end = start + found[0].length;
+				sb += inputText.substring(tmpStartPos, start) + replaceText;
+				tmpStartPos = end;
+			},
+			appendTail : function(){
+				sb += inputText.substring(tmpStartPos);
+			},
+			getResult : function(){
+				return sb;
+			},
+		}
+	}
+
+	function isColumnFilterArryOk(text, columnFilterText){
+		if(!columnFilterText || !text){
+			return true;
+		}
+
+		var ptnArry = new Array();
+
+		var reg = new ReplaceMatcher(/\/(.*?)\//gi, columnFilterText);
+		while(reg.find()){
+			reg.appendReplace('');
+			try{
+				var rg = new RegExp(reg.group(1), "gi");
+				ptnArry.push(rg);
+			}catch(e){
+				var msg = ''
+				for(var i in e){
+					msg += i + " - " + e[i] + "\n";
+				}
+				alert(msg);
+			}
+		}
+		reg.appendTail();
+
+		text = trim(text).toLowerCase();
+		var columnFilterArry = trim(reg.getResult()).split("^");
+
+		for(var i in columnFilterArry){
+			if(columnFilterArry[i]){
+				var tmpText = trim(columnFilterArry[i]).toLowerCase();
+				if(tmpText != '' && text.indexOf(tmpText) != -1){
+					return true;
+				}
+			}
+		}
+
+		for(var i in ptnArry){
+			if(ptnArry[i].test(text)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function startGenerateTable(arry, columnFilterText){
 		var tbody = getTbody();		
 
 		var keys;
@@ -146,8 +247,12 @@
 				keys = [];
 				for(var k in obj){
 					keys.push(k);
-					var td = createTh(k);
-					tr.appendChild(td);
+
+					var isMatchOk = isColumnFilterArryOk(k, columnFilterText);
+					if(isMatchOk){
+						var td = createTh(k);
+						tr.appendChild(td);
+					}
 				}
 				if(keys.length == 0){
 					keys = null;
@@ -159,9 +264,14 @@
 			var tr = createTr();
 			tr.appendChild(createChoice(obj, idx));
 			for(var idx2 in keys){
-				var value = obj[keys[idx2]];
-				var td = createTd(value);
-				tr.appendChild(td);
+				var k = keys[idx2]
+				var value = obj[k];
+
+				var isMatchOk = isColumnFilterArryOk(k, columnFilterText);
+				if(isMatchOk){
+					var td = createTd(value);
+					tr.appendChild(td);
+				}
 			}
 			tbody.appendChild(tr);
 		}
@@ -265,10 +375,16 @@
 
 <body onload="javascript:initLoading();">
 
+	內文類型:&nbsp;&nbsp;
 	<input type="radio" name="choiceType" value="json" />JSON
-	<input type="radio" name="choiceType" value="toString" />ToString
+	<input type="radio" name="choiceType" value="toString" checked />ToString
 	<br/>	
 
+	欄位過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText" size="30" />
+	<font color="red">以"^"作為分隔</font>
+	<br/>
+
+	內文:&nbsp;&nbsp;<br/>
 	<textarea id="testArea" cols="100" rows="20"></textarea>
 
 	<br/>
