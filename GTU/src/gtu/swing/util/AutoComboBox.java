@@ -48,21 +48,6 @@ public class AutoComboBox extends PlainDocument {
         ;
     }
 
-    // 輸入不符合項目時要做的處理
-    ActionListener addNewChoiceListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JComboBox box = (JComboBox) e.getSource();
-            String currentSelect = (String) box.getSelectedItem();
-            DefaultComboBoxModel model = (DefaultComboBoxModel) (box.getModel());
-            if (box.getSelectedIndex() == -1) {
-                model.insertElementAt(currentSelect, 0);
-                setSelectItem(currentSelect);
-                System.out.println("force set currentSelect = " + currentSelect);
-            }
-        }
-    };
-
     public JTextComponent getTextComponent() {
         return (JTextComponent) comboBox.getEditor().getEditorComponent();
     }
@@ -71,11 +56,6 @@ public class AutoComboBox extends PlainDocument {
         this.comboBox = comboBox;
         model = comboBox.getModel();
         editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
-        comboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addNewChoiceListener.actionPerformed(e);
-            }
-        });
         editor.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (comboBox.isDisplayable()) {
@@ -107,12 +87,10 @@ public class AutoComboBox extends PlainDocument {
         removeLinisterController.addBackListener(comboBox);
     }
 
-    public void setSelectItem(final Object item) {
+    private void setComboBoxPopupList(final Object item) {
         this.runInIgnoreListener(new Runnable() {
             @Override
             public void run() {
-                // model.setSelectedItem(item);
-
                 BasicComboPopup popup = (BasicComboPopup) comboBox.getAccessibleContext().getAccessibleChild(0);
                 JList list = popup.getList();
                 list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -124,7 +102,7 @@ public class AutoComboBox extends PlainDocument {
                         continue;
                     }
                     if (itemObj.equals(item)) {
-                        System.out.println("equal ---- " + item);
+                        System.out.println("\t comboBox.setIndex : " + ii);
                         list.setSelectedIndex(ii);
                         itemPoint = list.indexToLocation(ii);
                         break;
@@ -141,12 +119,26 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public void setSelectItemAndText(final Object item) {
-        setSelectItem(item);
+        // 設定popup list
+        setComboBoxPopupList(item);
+
         if (item == null) {
             editor.setText("");
         } else {
             editor.setText(String.valueOf(item));
         }
+        String currentSelect1 = comboBox.getSelectedItem() != null ? String.valueOf(comboBox.getSelectedItem()) : "";
+        String currentSelect = editor.getText();
+
+        if (!StringUtils.equals(currentSelect1, currentSelect)) {
+            DefaultComboBoxModel model = (DefaultComboBoxModel) (comboBox.getModel());
+            model.insertElementAt(currentSelect, 0);
+            comboBox.setSelectedIndex(0);
+            System.out.println("\t force set currentSelect = " + currentSelect);
+        }
+
+        System.out.println("\t comboBox.setValue : " + comboBox.getSelectedItem());
+        System.out.println("\t comboBox.setTextValue : " + editor.getText());
     }
 
     private void triggerComboxBoxActionPerformed() {
@@ -169,7 +161,7 @@ public class AutoComboBox extends PlainDocument {
         if (item != null) {
 
             System.out.println("set selectItem = " + item);
-            setSelectItem(item);
+            setComboBoxPopupList(item);
 
         } else {
             // keep old item selected if there is no match
@@ -281,7 +273,8 @@ public class AutoComboBox extends PlainDocument {
         comboBox.setEditable(true);
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
         defaultText = StringUtils.trimToEmpty(defaultText);
-        editor.setText(defaultText);
+        // editor.setText(defaultText);
+        this.setSelectItemAndText(defaultText);
         editor.setDocument(this);
         return this;
     }
