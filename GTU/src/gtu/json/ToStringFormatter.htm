@@ -117,8 +117,9 @@
 
 		//欄位過濾
 		var columnFilterText = document.querySelector("[name=columnFilterText]").value;
+		var valueFilterText = document.querySelector("[name=valueFilterText]").value;
 
-		startGenerateTable(arry, columnFilterText);
+		startGenerateTable(arry, columnFilterText, valueFilterText);
 	}
 
 	function toStringJson(line){
@@ -192,6 +193,15 @@
 		}
 	}
 
+	function isValueFilterArryOk(json, valueFilterText) {
+		for(var k in json){
+			if(isColumnFilterArryOk(json[k], valueFilterText)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	function isColumnFilterArryOk(text, columnFilterText){
 		if(!columnFilterText || !text){
 			return true;
@@ -235,7 +245,7 @@
 		return false;
 	}
 
-	function startGenerateTable(arry, columnFilterText){
+	function startGenerateTable(arry, columnFilterText, valueFilterText){
 		var tbody = getTbody();		
 
 		var keys;
@@ -261,8 +271,14 @@
 				tbody.appendChild(tr);
 			}
 
+			var isValueOk = isValueFilterArryOk(obj, valueFilterText);
+			if(!isValueOk){
+				continue;
+			}
+
 			var tr = createTr();
 			tr.appendChild(createChoice(obj, idx));
+
 			for(var idx2 in keys){
 				var k = keys[idx2]
 				var value = obj[k];
@@ -324,7 +340,7 @@
 		tbody2.appendChild(tr1);
 
 		for(var k in json) {
-			if(isColumnFilterArryOk(k, columnFilterText)){
+			if(isColumnFilterArryOk(k, columnFilterText) || isColumnFilterArryOk(json[k], columnFilterText)){
 				var tr = document.createElement("tr");
 				tr.appendChild(createTd(k));
 				tr.appendChild(createTd(json[k]));
@@ -374,15 +390,21 @@
 	};
 	//-----------------------------------------------------------------------
 
-	function initColumnFilterText2(){
+	function initAllEvent(){
 		document.querySelector("[name=columnFilterText2]").addEventListener("keypress", function(e){
-			showRecord(null, this.value);
+			showRecord(null, this.value, false);
 		});
+		var arry = document.querySelectorAll("#testArea,[name=choiceType],[name=columnFilterText],[name=valueFilterText]");
+		for(var ii = 0 ; ii < arry.length ; ii ++){
+			arry[ii].addEventListener("blur", function(e){
+				mainProcess();
+			});
+		}
 	}
 
 	function initLoading() {
 		dialogHandler.initFunc();
-		initColumnFilterText2();
+		initAllEvent();
 	};
 </script>
 
@@ -398,12 +420,14 @@
 	欄位過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText" size="30" />
 	<font color="red">以"^"作為分隔</font>
 	<br/>
+	值過濾:&nbsp;&nbsp;<input type="text" name="valueFilterText" size="30" />
+	<font color="red">以"^"作為分隔</font>
+	<br/>
 
 	內文:&nbsp;&nbsp;<br/>
 	<textarea id="testArea" cols="100" rows="20"></textarea>
 
 	<br/>
-	<input type="button" value="產生表格" onclick="javascript:mainProcess();"></input>
 	<br/>
 	<br/>
 
@@ -414,7 +438,7 @@
 		<div>
 			<div class="popupCloseButton">X</div>
 			<p>單筆紀錄</p>
-			欄位過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText2" size="30" />
+			欄位或值過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText2" size="30" />
 			<font color="red">以"^"作為分隔</font>
 			<br/>
 			<table id="singleTable">
