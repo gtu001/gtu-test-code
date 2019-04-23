@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -11,7 +12,10 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -23,16 +27,15 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -44,13 +47,17 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
+import gtu.freemarker.FreeMarkerSimpleUtil;
+import gtu.log.Logger2File;
 import gtu.poi.hssf.ExcelUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
-import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -73,14 +80,11 @@ public class ExcelMergeToAnotherUI extends JFrame {
     private JTextField mergeFromSheetIndexText;
     private JTextField mergeToSheetIndexText;
     private JPanel panel_3;
-    private JButton executeBtn;
     private JPanel panel_4;
     private JPanel panel_5;
     private JPanel panel_6;
     private JPanel panel_7;
     private JList mergeColumnLst;
-    private JRadioButton pkRadio;
-    private JRadioButton mergeRadio;
     private JTextField columnFromText;
     private JLabel lblNewLabel_4;
     private JLabel lblToColumn;
@@ -91,6 +95,28 @@ public class ExcelMergeToAnotherUI extends JFrame {
     private JLabel lblNewLabel_6;
     private JTextField includeRowsText;
     private JTextField excludeRowsText;
+    private JButton executeBtn;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JPanel panel_10;
+    private JLabel label;
+    private JTextArea conditionTextArea;
+    private PropertiesUtilBean config = new PropertiesUtilBean(ExcelMergeToAnotherUI.class);
+    private JLabel lblNewLabel_7;
+
+    private static final String TOOLTIP;
+    static {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<#assign f1=\"${from['C']!'XXXX'}\" />\n");
+        sb.append("<#assign f1=\"${f?replace('-', '')}\" />\n");
+        sb.append("<#assign t1=\"${to['B']!'YYYYY'}\" />\n");
+        sb.append("<#if f1 == t1 >\n");
+        sb.append("  true\n");
+        sb.append("<#else>\n");
+        sb.append("  false\n");
+        sb.append("</#if>\n");
+        TOOLTIP = sb.toString();
+    }
 
     /**
      * Launch the application.
@@ -187,48 +213,67 @@ public class ExcelMergeToAnotherUI extends JFrame {
         panel_3 = new JPanel();
         panel.add(panel_3, "4, 28, fill, fill");
 
-        executeBtn = new JButton("執行");
-        executeBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                swingUtil.invokeAction("executeBtn.click", arg0);
-            }
-        });
-        panel_3.add(executeBtn);
-
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("欄位", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
 
         panel_4 = new JPanel();
         panel_1.add(panel_4, BorderLayout.NORTH);
+        panel_4.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { RowSpec.decode("80dlu:grow"), RowSpec.decode("25dlu"), RowSpec.decode("25dlu:grow"), }));
 
-        pkRadio = new JRadioButton("PK");
-        panel_4.add(pkRadio);
+        panel_10 = new JPanel();
+        panel_4.add(panel_10, "4, 1, fill, fill");
 
-        mergeRadio = new JRadioButton("merge");
-        panel_4.add(mergeRadio);
+        label = new JLabel("條件式");
+        panel_10.add(label);
 
-        lblNewLabel_4 = new JLabel("from column");
-        panel_4.add(lblNewLabel_4);
+        conditionTextArea = new JTextArea();
+        conditionTextArea.setToolTipText("<html>" + JTooltipUtil.escapeHtml(TOOLTIP) + "</html>");
+        JTextAreaUtil.applyCommonSetting(conditionTextArea);
+        conditionTextArea.setRows(5);
+        conditionTextArea.setColumns(70);
+        panel_10.add(JCommonUtil.createScrollComponent(conditionTextArea));
+
+        panel_8 = new JPanel();
+        panel_4.add(panel_8, "4, 2");
+
+        lblNewLabel_4 = new JLabel("來源欄");
+        panel_8.add(lblNewLabel_4);
 
         columnFromText = new JTextField();
-        panel_4.add(columnFromText);
+        panel_8.add(columnFromText);
         columnFromText.setColumns(10);
 
-        lblToColumn = new JLabel("<-->  to column");
-        panel_4.add(lblToColumn);
+        lblToColumn = new JLabel("<-->  目的欄");
+        panel_8.add(lblToColumn);
 
         columnToText = new JTextField();
-        panel_4.add(columnToText);
+        panel_8.add(columnToText);
         columnToText.setColumns(10);
 
+        panel_9 = new JPanel();
+        panel_4.add(panel_9, "4, 3, fill, fill");
+
+        lblNewLabel_7 = new JLabel("來源欄位表示法為 from['欄位英文'], 目的表示法為 to['欄位英文']");
+        lblNewLabel_7.setForeground(Color.RED);
+        panel_9.add(lblNewLabel_7);
+
         addColumnDefBtn = new JButton("加入");
+        panel_9.add(addColumnDefBtn);
         addColumnDefBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 swingUtil.invokeAction("addColumnDefBtn.click", e);
             }
         });
-        panel_4.add(addColumnDefBtn);
+
+        executeBtn = new JButton("執行");
+        panel_9.add(executeBtn);
+        executeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                swingUtil.invokeAction("executeBtn.click", arg0);
+            }
+        });
 
         panel_5 = new JPanel();
         panel_1.add(panel_5, BorderLayout.WEST);
@@ -254,7 +299,7 @@ public class ExcelMergeToAnotherUI extends JFrame {
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         {
-            buttonGroup = JButtonGroupUtil.createRadioButtonGroup(pkRadio, mergeRadio);
+            config.reflectInit(this);
 
             // 掛載所有event
             applyAllEvents();
@@ -297,6 +342,7 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 Validate.notBlank(mergeToExcelText.getText(), "未輸入ToExcel");
                 Validate.notBlank(mergeFromSheetIndexText.getText(), "未輸入FromSheetIndex");
                 Validate.notBlank(mergeToSheetIndexText.getText(), "未輸入ToSheetIndex");
+                Validate.notBlank(conditionTextArea.getText(), "未輸入condition");
                 Validate.isTrue(mergeColumnLst.getModel().getSize() != 0, "必須加入條件List");
 
                 File fromExcelFile = new File(mergeFromExcelText.getText());
@@ -317,6 +363,8 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 File destExcelFile = new File(FileUtil.DESKTOP_DIR, newName);
                 ExcelUtil.getInstance().writeExcel(destExcelFile, toBook);
                 JCommonUtil._jOptionPane_showMessageDialog_info(destExcelFile + " 產生完成!");
+                config.reflectSetConfig(ExcelMergeToAnotherUI.this);
+                config.store();
             }
 
             private List<Integer> getProcessRowIndexes(Sheet toSheet) {
@@ -361,76 +409,75 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 return new ArrayList<Integer>(set);
             }
 
+            private Map<String, String> getMap(Row row) {
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                ExcelUtil util = ExcelUtil.getInstance();
+                for (int cell = 0; cell < row.getLastCellNum(); cell++) {
+                    String cellPos = StringUtils.trimToEmpty(util.cellEnglishToPos(cell)).toUpperCase();
+                    String value = util.readCell(util.getCellChk(row, cell));
+                    map.put(cellPos, value);
+                }
+                return map;
+            }
+
             private void mainProcess(Sheet fromSheet, Sheet toSheet, List<Integer> processRowsArray) {
-                List<AddInfo> pkLst = new ArrayList<AddInfo>();
+                String freemarkerConditionText = conditionTextArea.getText();
+
+                Logger2File logger = new Logger2File(ExcelMergeToAnotherUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+
                 List<AddInfo> mergeLst = new ArrayList<AddInfo>();
                 DefaultListModel model = (DefaultListModel) mergeColumnLst.getModel();
                 for (int ii = 0; ii < model.getSize(); ii++) {
                     AddInfo ad = (AddInfo) model.getElementAt(ii);
-                    if (ad.addType.equals("PK")) {
-                        pkLst.add(ad);
-                    } else {
-                        mergeLst.add(ad);
-                    }
+                    mergeLst.add(ad);
                 }
 
-                List<Pair<List<AddInfo>, List<AddInfo>>> lst = new ArrayList<Pair<List<AddInfo>, List<AddInfo>>>();
-                for (int ii = 0; ii <= fromSheet.getLastRowNum(); ii++) {
-                    Row row = fromSheet.getRow(ii);
+                for (int formRowPos = 0; formRowPos <= fromSheet.getLastRowNum(); formRowPos++) {
+                    Row row = fromSheet.getRow(formRowPos);
                     if (row == null) {
                         continue;
                     }
 
-                    List<AddInfo> pkLst1 = new ArrayList<AddInfo>();
-                    List<AddInfo> mergeLst1 = new ArrayList<AddInfo>();
-                    for (AddInfo ad : pkLst) {
-                        AddInfo ad2 = getClone(ad);
-                        ad2.fromValue = StringUtils.trimToEmpty(ExcelUtil.getInstance().readCell(row, ad2.fromColumn));
-                        pkLst1.add(ad2);
-                    }
-                    for (AddInfo ad : mergeLst) {
-                        AddInfo ad2 = getClone(ad);
-                        ad2.fromValue = ExcelUtil.getInstance().readCell(row, ad2.fromColumn);
-                        mergeLst1.add(ad2);
-                    }
-                    lst.add(Pair.of(pkLst1, mergeLst1));
-                }
+                    boolean isPkMatchOk = false;
+                    Map<String, String> fromMap = getMap(row);
 
-                B: for (Pair<List<AddInfo>, List<AddInfo>> pair : lst) {
-                    List<AddInfo> pkLst1 = pair.getLeft();
-                    List<AddInfo> mergeLst1 = pair.getRight();
-
-                    A: for (int ii = 0; ii <= toSheet.getLastRowNum(); ii++) {
-                        Row row = toSheet.getRow(ii);
+                    A: for (int toRowPos = 0; toRowPos <= toSheet.getLastRowNum(); toRowPos++) {
+                        Row row2 = toSheet.getRow(toRowPos);
                         if (row == null) {
                             continue A;
-                        } else if (!processRowsArray.contains(ii)) {
+                        } else if (!processRowsArray.contains(toRowPos)) {
                             continue A;
                         }
 
-                        for (AddInfo ad2 : pkLst1) {
-                            String toValue = StringUtils.trimToEmpty(ExcelUtil.getInstance().readCell(row, ad2.toColumn));
-                            if (!StringUtils.equals(toValue, ad2.fromValue)) {
-                                continue A;
+                        Map<String, String> toMap = getMap(row2);
+
+                        Map<String, Object> root = new HashMap<String, Object>();
+                        root.put("from", fromMap);
+                        root.put("to", toMap);
+                        String resultStr = StringUtils.trimToEmpty(FreeMarkerSimpleUtil.replace(freemarkerConditionText, root)).replaceAll("[\r\n\\s]", "");
+
+                        if ("Y".equalsIgnoreCase(resultStr) || "true".equalsIgnoreCase(resultStr)) {
+                            isPkMatchOk = true;
+
+                            for (AddInfo ad2 : mergeLst) {
+                                if (!fromMap.containsKey(ad2.fromColumn)) {
+                                    throw new RuntimeException("不存在from column : " + ad2.fromColumn + " -> " + fromMap);
+                                }
+                                String fromValue = fromMap.get(ad2.fromColumn);
+                                System.out.println("\t更新 row " + toRowPos + " -> " + fromValue);
+                                String orignValue = ExcelUtil.getInstance().readCell(row, ad2.toColumn);
+                                if (StringUtils.isNotBlank(orignValue)) {
+                                    orignValue = orignValue + " ";
+                                }
+                                ExcelUtil.getInstance().setCellValue(row2, ad2.toColumn, orignValue + fromValue);
+                                isPkMatchOk = true;
                             }
-                        }
-                        for (AddInfo ad2 : mergeLst1) {
-                            System.out.println("\t更新 row " + ii + " -> " + ad2.fromValue);
-                            String orignValue = ExcelUtil.getInstance().readCell(row, ad2.toColumn);
-                            if (StringUtils.isNotBlank(orignValue)) {
-                                orignValue = orignValue + " ";
-                            }
-                            ExcelUtil.getInstance().setCellValue(row, ad2.toColumn, orignValue + ad2.fromValue);
                         }
                     }
-                }
-            }
 
-            private AddInfo getClone(AddInfo ad) {
-                try {
-                    return (AddInfo) ad.clone();
-                } catch (CloneNotSupportedException e) {
-                    throw new RuntimeException("無法clone : " + ReflectionToStringBuilder.toString(ad));
+                    if (!isPkMatchOk) {
+                        logger.debug("來源row index : " + formRowPos + ", 無法找到目的 sheet資料!");
+                    }
                 }
             }
         });
@@ -438,20 +485,10 @@ public class ExcelMergeToAnotherUI extends JFrame {
         swingUtil.addActionHex("addColumnDefBtn.click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                String addType = "";
-                if (JButtonGroupUtil.getSelectedButton(buttonGroup) == pkRadio) {
-                    addType = "PK";
-                } else if (JButtonGroupUtil.getSelectedButton(buttonGroup) == mergeRadio) {
-                    addType = "Merge";
-                } else {
-                    Validate.isTrue(false, "請選擇Radio!");
-                }
-
                 Validate.notBlank(columnFromText.getText(), "輸入來源column");
                 Validate.notBlank(columnToText.getText(), "輸入目的column");
 
                 AddInfo ad = new AddInfo();
-                ad.addType = addType;
                 ad.fromColumn = StringUtils.trimToEmpty(columnFromText.getText()).toUpperCase();
                 ad.toColumn = StringUtils.trimToEmpty(columnToText.getText()).toUpperCase();
 
@@ -469,9 +506,6 @@ public class ExcelMergeToAnotherUI extends JFrame {
     private class AddInfo implements Cloneable, Serializable {
         String fromColumn;
         String toColumn;
-        String addType;
-
-        String fromValue;
 
         @Override
         protected Object clone() throws CloneNotSupportedException {
@@ -480,12 +514,12 @@ public class ExcelMergeToAnotherUI extends JFrame {
 
         public String toString() {
             String prefix = "";
-            if ("PK".equalsIgnoreCase(addType)) {
-                prefix = "比較來源";
-            } else {
-                prefix = "設定內容";
-            }
+            prefix = "設定內容";
             return "<html>[" + prefix + "]&nbsp;&nbsp;<font color='blue'>" + fromColumn + "</font> -> <font color='green'>" + toColumn + "</font></html>";
+        }
+
+        private ExcelMergeToAnotherUI getEnclosingInstance() {
+            return ExcelMergeToAnotherUI.this;
         }
 
         @Override
@@ -493,7 +527,6 @@ public class ExcelMergeToAnotherUI extends JFrame {
             final int prime = 31;
             int result = 1;
             result = prime * result + getEnclosingInstance().hashCode();
-            result = prime * result + ((addType == null) ? 0 : addType.hashCode());
             result = prime * result + ((fromColumn == null) ? 0 : fromColumn.hashCode());
             result = prime * result + ((toColumn == null) ? 0 : toColumn.hashCode());
             return result;
@@ -510,11 +543,6 @@ public class ExcelMergeToAnotherUI extends JFrame {
             AddInfo other = (AddInfo) obj;
             if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
                 return false;
-            if (addType == null) {
-                if (other.addType != null)
-                    return false;
-            } else if (!addType.equals(other.addType))
-                return false;
             if (fromColumn == null) {
                 if (other.fromColumn != null)
                     return false;
@@ -526,10 +554,6 @@ public class ExcelMergeToAnotherUI extends JFrame {
             } else if (!toColumn.equals(other.toColumn))
                 return false;
             return true;
-        }
-
-        private ExcelMergeToAnotherUI getEnclosingInstance() {
-            return ExcelMergeToAnotherUI.this;
         }
     }
 

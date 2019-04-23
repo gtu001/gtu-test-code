@@ -133,7 +133,7 @@ public class AutoComboBox extends PlainDocument {
 
         boolean findOk = false;
         for (int ii = 0; ii < model.getSize(); ii++) {
-            Object val = model.getElementAt(ii);
+            final Object val = model.getElementAt(ii);
             if (val != null && (item == val || StringUtils.equalsIgnoreCase(currentText, String.valueOf(val)))) {
                 this.runInIgnoreListener(new Runnable() {
                     @Override

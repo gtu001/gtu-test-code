@@ -3974,22 +3974,17 @@ public class DebugMointerUI {
                     inst = getInstance(false);
                 }
                 final String basepathKey = "log.basepath";
-                final String isLogAppendKey = "log.append";
-                boolean isLogAppend = true;
-                if (inst.configProp.containsKey(isLogAppendKey)) {
-                    isLogAppend = Boolean.parseBoolean(inst.configProp.getProperty(isLogAppendKey));
-                }
                 if (inst.configProp.containsKey(basepathKey)) {
                     String basePath = inst.configProp.getProperty(basepathKey);
-                    log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                    log = new Logger2File(basePath, DebugMointerUI.class.getSimpleName() + "_Logger");
                 } else {
-                    log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", isLogAppend);
+                    log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
 
                 // 在linux上必須用此做法
-                log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger", true);
+                log = new Logger2File(DebugMointerUI.class.getSimpleName() + "_Logger");
             }
         }
         return log;

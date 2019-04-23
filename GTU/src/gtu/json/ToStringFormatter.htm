@@ -301,7 +301,14 @@
 		return td;
 	}
 
-	function showRecord(idx){
+	var tmpIdx;
+	function showRecord(idx, columnFilterText){
+		if(idx){
+			tmpIdx = idx;
+		}else{
+			idx = tmpIdx;
+		}
+
 		var text = document.querySelector("#area_" + idx).innerText;
 		console.log("record = " + text);
 		var json = JSON.parse(text);
@@ -317,12 +324,13 @@
 		tbody2.appendChild(tr1);
 
 		for(var k in json) {
-			var tr = document.createElement("tr");
-			tr.appendChild(createTd(k));
-			tr.appendChild(createTd(json[k]));
-			tbody2.appendChild(tr);
+			if(isColumnFilterArryOk(k, columnFilterText)){
+				var tr = document.createElement("tr");
+				tr.appendChild(createTd(k));
+				tr.appendChild(createTd(json[k]));
+				tbody2.appendChild(tr);
+			}
 		}
-
 		dialogHandler.open();
 	}
 
@@ -349,7 +357,7 @@
 		var initFunc = function(){
 			document.querySelector(".hover_bkgr_fricc")
 			.addEventListener("click", function(e){
-				document.querySelector(".hover_bkgr_fricc").style.display = "none";
+				//document.querySelector(".hover_bkgr_fricc").style.display = "none";
 			});
 			document.querySelector(".popupCloseButton")
 			.addEventListener("click", function(e){
@@ -366,8 +374,15 @@
 	};
 	//-----------------------------------------------------------------------
 
+	function initColumnFilterText2(){
+		document.querySelector("[name=columnFilterText2]").addEventListener("keypress", function(e){
+			showRecord(null, this.value);
+		});
+	}
+
 	function initLoading() {
 		dialogHandler.initFunc();
+		initColumnFilterText2();
 	};
 </script>
 
@@ -399,6 +414,9 @@
 		<div>
 			<div class="popupCloseButton">X</div>
 			<p>單筆紀錄</p>
+			欄位過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText2" size="30" />
+			<font color="red">以"^"作為分隔</font>
+			<br/>
 			<table id="singleTable">
 				<tbody id="tbody002"></tbody>
 			</table>

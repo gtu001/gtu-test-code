@@ -16,21 +16,21 @@ import org.apache.commons.lang.StringUtils;
 
 public class Logger2File {
     private static final SimpleDateFormat SDF = new SimpleDateFormat("MM/dd HH:mm:ss");
-    private static final Logger2File INSTANCE = new Logger2File("Logger", true);
+    private static final Logger2File INSTANCE = new Logger2File("Logger");
 
     private BufferedWriter out;
-    private boolean logAppend;
     private File logFile;
+    private FileOutputStream outputStream;
 
     public static Logger2File getLogger() {
         return INSTANCE;
     }
 
-    public Logger2File(String filename, boolean logAppend) {
-        this(null, filename, logAppend);
+    public Logger2File(String filename) {
+        this(null, filename);
     }
 
-    public Logger2File(String basepath, String filename, boolean logAppend) {
+    public Logger2File(String basepath, String filename) {
         String path = FileUtil.DESKTOP_PATH;
         if (StringUtils.isNotBlank(basepath)) {
             path = basepath;
@@ -40,13 +40,12 @@ public class Logger2File {
         }
         String fileFullName = path + "/" + filename + ".log";
         logFile = new File(fileFullName);
-        this.logAppend = logAppend;
     }
 
     private void checkPrintStreamAvailable() {
         if (out == null) {
             try {
-                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, logAppend), "utf8"));
+                out = new BufferedWriter(new OutputStreamWriter((outputStream = new FileOutputStream(logFile, true)), "utf8"));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -75,7 +74,6 @@ public class Logger2File {
     }
 
     public void close() {
-        this.debug("logger will close...");
         if (out != null) {
             try {
                 out.flush();
@@ -83,6 +81,13 @@ public class Logger2File {
                 out = null;
             } catch (Exception ex) {
                 ex.printStackTrace();
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (Exception e) {
+                    }
+                }
             }
         }
     }
@@ -128,23 +133,29 @@ public class Logger2File {
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            close();
         }
     }
 
     public synchronized void error(Object message, Throwable ex) {// root
         this.debug("[ERROR]:" + message);
         try {
-            printError(ex, true);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                printError(ex, true);
+                out.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                out.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ex.printStackTrace();
+        } finally {
+            close();
         }
-        try {
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ex.printStackTrace();
     }
 
     private void printError(Throwable ex, boolean isRoot) {
