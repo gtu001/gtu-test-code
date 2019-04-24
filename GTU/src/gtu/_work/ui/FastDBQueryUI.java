@@ -2486,7 +2486,7 @@ public class FastDBQueryUI extends JFrame {
         List<String> columns = queryList.getLeft();
         Object[] row = queryList.getRight().get(queryListIndex);
 
-        Map<String, List<Object>> multiMap = new HashMap<String, List<Object>>();
+        Map<String, List<Object>> multiMap = new LinkedHashMap<String, List<Object>>();
         for (int ii = 0; ii < columns.size(); ii++) {
             String col = columns.get(ii);
             Object val = row[ii];
