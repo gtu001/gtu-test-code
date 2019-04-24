@@ -23,5 +23,12 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jnativehook-2.1.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/webTest2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/db2jcc.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/derbyclient.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/FastDBQueryUI.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/mysql-connector-java-5.1.35.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/ojdbc7.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/postgresql-42.2.3.jar"/>
+	<classpathentry kind="lib" path="/media/gtu001/OLD_D/my_tool/FastDBQueryUI/sqljdbc4-4.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

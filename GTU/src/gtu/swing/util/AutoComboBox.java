@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -35,6 +36,7 @@ public class AutoComboBox extends PlainDocument {
     JComboBox comboBox;
     ComboBoxModel model;
     JTextComponent editor;
+    AtomicInteger tempSelectIndex = new AtomicInteger(-1);
     // flag to indicate if setSelectedItem has been called
     // subsequent calls to remove/insertString should be ignored
 
@@ -73,6 +75,11 @@ public class AutoComboBox extends PlainDocument {
                     // }
                     // });
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    if (comboBox.isPopupVisible() && tempSelectIndex.get() != -1) {
+                        comboBox.setSelectedIndex(tempSelectIndex.get());
+                        tempSelectIndex.set(-1);
+                    }
                 }
             }
         });
@@ -102,9 +109,13 @@ public class AutoComboBox extends PlainDocument {
                         continue;
                     }
                     if (itemObj.equals(item)) {
-                        System.out.println("\t comboBox.setIndex : " + ii);
                         list.setSelectedIndex(ii);
                         itemPoint = list.indexToLocation(ii);
+                        System.out.println("\t comboBox.setIndex : " + ii + " -> " + item);
+                        tempSelectIndex.set(ii);
+                        if (comboBox.getSelectedIndex() == ii) {
+                            tempSelectIndex.set(-1);
+                        }
                         break;
                     }
                 }

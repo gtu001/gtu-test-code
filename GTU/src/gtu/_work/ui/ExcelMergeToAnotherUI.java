@@ -11,8 +11,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +35,9 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -409,13 +411,15 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 return new ArrayList<Integer>(set);
             }
 
-            private Map<String, String> getMap(Row row) {
+            private Map<String, String> getMap(Row row, Set<String> removeSet) {
                 Map<String, String> map = new LinkedHashMap<String, String>();
                 ExcelUtil util = ExcelUtil.getInstance();
                 for (int cell = 0; cell < row.getLastCellNum(); cell++) {
                     String cellPos = StringUtils.trimToEmpty(util.cellEnglishToPos(cell)).toUpperCase();
                     String value = util.readCell(util.getCellChk(row, cell));
-                    map.put(cellPos, value);
+                    if (!removeSet.contains(cellPos)) {
+                        map.put(cellPos, value);
+                    }
                 }
                 return map;
             }
@@ -426,10 +430,12 @@ public class ExcelMergeToAnotherUI extends JFrame {
                 Logger2File logger = new Logger2File(ExcelMergeToAnotherUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
 
                 List<AddInfo> mergeLst = new ArrayList<AddInfo>();
+                Set<String> removeSet = new HashSet<String>();
                 DefaultListModel model = (DefaultListModel) mergeColumnLst.getModel();
                 for (int ii = 0; ii < model.getSize(); ii++) {
                     AddInfo ad = (AddInfo) model.getElementAt(ii);
                     mergeLst.add(ad);
+                    removeSet.add(StringUtils.trimToEmpty(ad.toColumn).toUpperCase());
                 }
 
                 for (int formRowPos = 0; formRowPos <= fromSheet.getLastRowNum(); formRowPos++) {
@@ -439,7 +445,7 @@ public class ExcelMergeToAnotherUI extends JFrame {
                     }
 
                     boolean isPkMatchOk = false;
-                    Map<String, String> fromMap = getMap(row);
+                    Map<String, String> fromMap = getMap(row, Collections.EMPTY_SET);
 
                     A: for (int toRowPos = 0; toRowPos <= toSheet.getLastRowNum(); toRowPos++) {
                         Row row2 = toSheet.getRow(toRowPos);
@@ -449,7 +455,7 @@ public class ExcelMergeToAnotherUI extends JFrame {
                             continue A;
                         }
 
-                        Map<String, String> toMap = getMap(row2);
+                        Map<String, String> toMap = getMap(row2, removeSet);
 
                         Map<String, Object> root = new HashMap<String, Object>();
                         root.put("from", fromMap);
