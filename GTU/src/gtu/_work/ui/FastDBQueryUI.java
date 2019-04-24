@@ -127,7 +127,7 @@ public class FastDBQueryUI extends JFrame {
     static {
         if (!PropertiesUtil.isClassInJar(FastDBQueryUI.class)) {
             if (OsInfoUtil.isWindows()) {
-                JAR_PATH_FILE = new File("D:/my_tool/FastDBQueryUI");
+                JAR_PATH_FILE = new File("D:\\my_tool\\FastDBQueryUI");
             } else {
                 JAR_PATH_FILE = new File("/media/gtu001/OLD_D/my_tool/FastDBQueryUI");
             }
@@ -993,7 +993,11 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    refSearchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
+                    String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+                    String text = refSearchText.getText();
+                    if (refSearchListConfigHandler != null) {
+                        refSearchListConfigHandler.find(category, text);
+                    }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -1013,7 +1017,11 @@ public class FastDBQueryUI extends JFrame {
         refSearchText.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 try {
-                    refSearchListConfigHandler.find(refSearchCategoryCombobox_Auto.getTextComponent().getText(), refSearchText.getText());
+                    String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+                    String text = refSearchText.getText();
+                    if (refSearchListConfigHandler != null) {
+                        refSearchListConfigHandler.find(category, text);
+                    }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
