@@ -1,0 +1,15 @@
+
+	按 Ctrl + Shift + P
+	輸入 Set Syntax
+	選語言
+	
+	
+---
+	
+安裝新語言高亮
+
+	按Ctrl + Shift + P
+	輸入Browse Packages
+	在路徑 Sublime Text 3\Packages\User\[新語言目錄]         
+	
+---

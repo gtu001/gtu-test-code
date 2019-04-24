@@ -400,6 +400,14 @@
 				mainProcess();
 			});
 		}
+		document.querySelector("#testArea").addEventListener("mouseover", function(e){
+			this.setAttribute("cols", 100);
+			this.setAttribute("rows", 20);
+		});
+		document.querySelector("#testArea").addEventListener("mouseout", function(e){
+			this.setAttribute("cols", 10);
+			this.setAttribute("rows", 2);
+		});
 	}
 
 	function initLoading() {
@@ -424,8 +432,8 @@
 	<font color="red">以"^"作為分隔</font>
 	<br/>
 
-	內文:&nbsp;&nbsp;<br/>
-	<textarea id="testArea" cols="100" rows="20"></textarea>
+	內文:&nbsp;&nbsp;
+	<textarea id="testArea" cols="10" rows="2"></textarea>
 
 	<br/>
 	<br/>
