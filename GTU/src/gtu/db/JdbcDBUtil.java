@@ -239,7 +239,7 @@ public class JdbcDBUtil {
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
+                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
                 ps.setObject(i + 1, param[i]);
             }
 
@@ -306,7 +306,7 @@ public class JdbcDBUtil {
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
+                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
                 try {
                     ps.setObject(i + 1, param[i]);
                 } catch (Exception ex) {
@@ -396,7 +396,7 @@ public class JdbcDBUtil {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             if (param != null) {
                 for (int i = 0; i < param.length; i++) {
-                    System.out.println("param[" + i + "]:" + param[i]);
+                    System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
                     ps.setObject(i + 1, param[i]);
                 }
             }
@@ -426,7 +426,7 @@ public class JdbcDBUtil {
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:" + param[i]);
+                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
                 ps.setObject(i + 1, param[i]);
             }
 

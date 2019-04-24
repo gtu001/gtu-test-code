@@ -1801,8 +1801,8 @@ public class FastDBQueryUI extends JFrame {
 
             System.out.println("尚未執行=====================================================");
             System.out.println(param.getQuestionSql());
-            for (int ii = 0; ii < parameterList.size(); ii++) {
-                System.out.println(String.format("\tparam [%d] : \"%s\"", (ii + 1), parameterList.get(ii)));
+            for (int i = 0; i < parameterList.size(); i++) {
+                System.out.println("param[" + i + "]:\"" + parameterList.get(i) + "\"  (" + (parameterList.get(i) != null ? parameterList.get(i).getClass().getName() : "NA") + ")");
             }
             System.out.println("尚未執行=====================================================");
 
