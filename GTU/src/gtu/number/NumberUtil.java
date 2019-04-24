@@ -203,4 +203,35 @@ public class NumberUtil {
             throw new RuntimeException("format09V9 錯誤 , 原始資料 : " + orignData + " , ERR : " + ex.getMessage(), ex);
         }
     }
+
+    public static BigDecimal getBigDecimal(Object val) {
+        if (val == null) {
+            return BigDecimal.ZERO;
+        }
+        if (val instanceof BigDecimal) {
+            return (BigDecimal) val;
+        }
+        try {
+            String tmpVal = String.valueOf(val);
+            tmpVal = StringUtils.trimToEmpty(tmpVal).replaceAll(",", "");
+            return new BigDecimal(tmpVal);
+        } catch (Exception ex) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    public static String formatNumberByCurrencyDigit(String oldNumber, int keepLength) {
+        if (StringUtils.isBlank(oldNumber)) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder("###,###,###,###,###,###,##0");
+        for (int ii = 0; ii < keepLength; ii++) {
+            if (ii == 0) {
+                sb.append(".");
+            }
+            sb.append("0");
+        }
+        DecimalFormat df = new DecimalFormat(sb.toString());
+        return df.format(NumberUtil.getBigDecimal(oldNumber));
+    }
 }

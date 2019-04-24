@@ -39,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:hint="輸入英文句子" />
 
-                <android.support.percent.PercentRelativeLayout
+                <androidx.percentlayout.widget.PercentRelativeLayout
                     android:id="@+id/englishIdLayout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                         android:padding="5dp"
                         android:text="確認"
                         app:layout_widthPercent="50%" />
-                </android.support.percent.PercentRelativeLayout>
+                </androidx.percentlayout.widget.PercentRelativeLayout>
             </LinearLayout>
 
             <LinearLayout

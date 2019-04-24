@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -88,6 +87,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.annotation.RequiresApi;
 
 public class TxtReaderActivity extends Activity implements FloatViewService.Callbacks, ITxtReaderActivity {
 

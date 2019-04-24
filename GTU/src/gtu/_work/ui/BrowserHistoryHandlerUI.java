@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -389,12 +390,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JComboBoxUtil.newInstance(searchComboBox).setWidth(300);
             searchComboBoxUtil = AutoComboBox.applyAutoComboBox(searchComboBox);
             panel_2x.add(searchComboBox);
-            searchComboBoxUtil.getTextComponent().addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent event) {
-                    JChangeInputMethodUtil.toEnglish();
-                }
-            });
 
             JButton allOpenBtn = new JButton("全開");
             allOpenBtn.addActionListener(new ActionListener() {
@@ -885,7 +880,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             this.initLoading();
 
             // 因為initLoading會清空
-            tagComboBoxUtil.getTextComponent().setText(tag);
+            tagComboBoxUtil.setSelectItemAndText(tag);
 
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         } catch (Exception ex) {
@@ -911,289 +906,311 @@ public class BrowserHistoryHandlerUI extends JFrame {
         initLoading(null);
     }
 
+    private AtomicBoolean searchBool = new AtomicBoolean(false);
+
     private void initLoading(final JProgressBarHelper progressBarHelper) {
-        if (bookmarkConfig == null) {
-            System.out.println("bookmarkConfig null !!!");
-            return;
-        }
+        try {
+            if (searchBool.get()) {
+                return;
+            }
+            searchBool.set(true);
 
-        final List<String> tagLst = new ArrayList<String>();
-        final List<UrlConfig> lst = new ArrayList<UrlConfig>();
-
-        final JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
-        DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
-        tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
-        urlTable.setModel(model);
-        columnColorHandler.apply();
-
-        urlTableResize();
-
-        for (String v : new String[] { UrlTableConfigEnum.刪除.name() }) {
-            System.out.println("columnIsButton = " + v);
-            tableUtil.columnIsButton(v);
-        }
-        tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());// 設定為checkbox
-
-        final String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
-        System.out.println("searchText " + searchText);
-
-        for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
-            String url = (String) enu.nextElement();
-            String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
-
-            AtomicReference<UrlConfig> dd = new AtomicReference<UrlConfig>();
-            System.out.println("<<" + title_tag_remark_time);
-            try {
-                dd.set(UrlConfig.parseTo(url, title_tag_remark_time));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                continue;
+            if (bookmarkConfig == null) {
+                System.out.println("bookmarkConfig null !!!");
+                return;
             }
 
-            final UrlConfig d = dd.get();
+            final List<String> tagLst = new ArrayList<String>();
+            final List<UrlConfig> lst = new ArrayList<UrlConfig>();
 
-            new Runnable() {
-                private String s2t(String oringStr) {
-                    try {
-                        return JChineseConvertor.getInstance().s2t(oringStr);
-                    } catch (Exception ex) {
-                        return oringStr;
-                    }
+            final JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
+            DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
+            tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
+            urlTable.setModel(model);
+            columnColorHandler.apply();
+
+            urlTableResize();
+
+            for (String v : new String[] { UrlTableConfigEnum.刪除.name() }) {
+                System.out.println("columnIsButton = " + v);
+                tableUtil.columnIsButton(v);
+            }
+            tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());// 設定為checkbox
+
+            final String searchText = StringUtils.trimToEmpty(searchComboBoxUtil.getTextComponent().getText()).toLowerCase();
+            System.out.println("searchText = " + searchText);
+            if (StringUtils.isBlank(searchText)) {
+                System.out.println("====================");
+                new Exception("").printStackTrace();
+            }
+
+            for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+                String url = (String) enu.nextElement();
+                final String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
+
+                AtomicReference<UrlConfig> dd = new AtomicReference<UrlConfig>();
+                try {
+                    dd.set(UrlConfig.parseTo(url, title_tag_remark_time));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    continue;
                 }
 
-                private String decode(String url) {
-                    try {
-                        return URLDecoder.decode(url, "UTF-8");
-                    } catch (Exception ex) {
-                        return url;
-                    }
-                }
+                final UrlConfig d = dd.get();
 
-                private boolean isUrlNotOk(UrlConfig d) {
-                    try {
-                        int stateCode = SimpleHttpsUtil.newInstance().getStatusCode(d.url, 5000);
-                        if (stateCode == 301) {
-                            String urlNew = d.url.replaceFirst("http:\\/", "https:\\/");
-                            stateCode = SimpleHttpsUtil.newInstance().getStatusCode(urlNew, 5000);
+                new Runnable() {
+                    private String s2t(String oringStr) {
+                        try {
+                            return JChineseConvertor.getInstance().s2t(oringStr);
+                        } catch (Exception ex) {
+                            return oringStr;
                         }
-                        if (stateCode != 200) {
-                            JCommonUtil._jOptionPane_showMessageDialog_error(stateCode + " " + d.title);
+                    }
+
+                    private String decode(String url) {
+                        try {
+                            return URLDecoder.decode(url, "UTF-8");
+                        } catch (Exception ex) {
+                            return url;
+                        }
+                    }
+
+                    private boolean isUrlNotOk(UrlConfig d) {
+                        try {
+                            int stateCode = SimpleHttpsUtil.newInstance().getStatusCode(d.url, 5000);
+                            if (stateCode == 301) {
+                                String urlNew = d.url.replaceFirst("http:\\/", "https:\\/");
+                                stateCode = SimpleHttpsUtil.newInstance().getStatusCode(urlNew, 5000);
+                            }
+                            if (stateCode != 200) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error(stateCode + " " + d.title);
+                                return true;
+                            }
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException("Err Url : " + d.title + ", " + d.url, ex);
                             return true;
                         }
-                    } catch (Exception ex) {
-                        JCommonUtil.handleException("Err Url : " + d.title + ", " + d.url, ex);
-                        return true;
-                    }
-                    return false;
-                }
-
-                private boolean isNonWrokUrl(UrlConfig d) {
-                    if (StringUtil_.isUUID(d.url)) {
                         return false;
-                    } else if (DesktopUtil.isFile(d.url)) {
-                        File file = DesktopUtil.getFile(d.url);
-                        if (file == null || !file.exists()) {
-                            return true;
-                        }
-                    } else {
-                        if (isUrlNotOk(d)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                class InnerMatch {
-                    Pattern ptn;
-
-                    InnerMatch(String singleText) {
-                        singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
-                        ptn = Pattern.compile(singleText, Pattern.CASE_INSENSITIVE);
                     }
 
-                    boolean find(String value) {
-                        Matcher mth = ptn.matcher(value);
-                        return mth.find();
-                    }
-                }
-
-                private boolean isNormalMatch_detail(String singleText) {
-                    String tag = s2t(d.tag);
-                    String remark = s2t(d.remark);
-                    String url = decode(d.url);
-
-                    if (StringUtils.isBlank(singleText)) {
-                        return true;
-                    } else if (d.title.toLowerCase().contains(singleText) || //
-                    tag.toLowerCase().contains(singleText) || //
-                    remark.toLowerCase().contains(singleText) || //
-                    d.timestamp.toLowerCase().contains(singleText) || //
-                    url.toLowerCase().contains(singleText) //
-                    ) {
-                        return true;
-                    } else {
-                        if (singleText.contains("*")) {
-                            InnerMatch m = new InnerMatch(singleText);
-                            if (m.find(d.title) || //
-                            m.find(tag) || //
-                            m.find(remark) || //
-                            m.find(d.timestamp) || //
-                            m.find(url) //
-                            ) {
+                    private boolean isNonWrokUrl(UrlConfig d) {
+                        if (StringUtil_.isUUID(d.url)) {
+                            return false;
+                        } else if (DesktopUtil.isFile(d.url)) {
+                            File file = DesktopUtil.getFile(d.url);
+                            if (file == null || !file.exists()) {
+                                return true;
+                            }
+                        } else {
+                            if (isUrlNotOk(d)) {
                                 return true;
                             }
                         }
-                    }
-                    return false;
-                }
-
-                private boolean isNormalMatch_logic(String compareTarget, String comparator, String compareText) {
-                    String comareThisStr = "";
-                    boolean isTag = false;
-                    if ("tag".equalsIgnoreCase(compareTarget)) {
-                        comareThisStr = d.tag;
-                        isTag = true;
-                    } else if ("remark".equalsIgnoreCase(compareTarget)) {
-                        comareThisStr = d.remark;
+                        return false;
                     }
 
-                    NormalLogicTagMatch tagChk = new NormalLogicTagMatch(d, comparator, compareText);
-                    if (isTag) {
-                        return tagChk.isMatch();
-                    }
+                    class InnerMatch {
+                        Pattern ptn;
 
-                    if ("^=".equalsIgnoreCase(comparator)) {
-                        if (comareThisStr.toLowerCase().startsWith(compareText.toLowerCase())) {
-                            return true;
+                        InnerMatch(String singleText) {
+                            singleText = singleText.replaceAll(Pattern.quote("*"), ".*");
+                            ptn = Pattern.compile(singleText, Pattern.CASE_INSENSITIVE);
                         }
-                    } else if ("$=".equalsIgnoreCase(comparator)) {
-                        if (comareThisStr.toLowerCase().endsWith(compareText.toLowerCase())) {
-                            return true;
-                        }
-                    } else if ("*=".equalsIgnoreCase(comparator)) {
-                        if (comareThisStr.toLowerCase().contains(compareText.toLowerCase())) {
-                            return true;
-                        }
-                    } else if ("=".equalsIgnoreCase(comparator)) {
-                        if (comareThisStr.equalsIgnoreCase(compareText)) {
-                            return true;
+
+                        boolean find(String value) {
+                            Matcher mth = ptn.matcher(value);
+                            return mth.find();
                         }
                     }
-                    return false;
-                }
 
-                private Pattern logicPtn = Pattern.compile("^\\[(tag|remark)(\\=|\\^\\=|\\&\\=|\\*\\=)(.*)\\]", Pattern.CASE_INSENSITIVE);
+                    private boolean isNormalMatch_detail(String singleText) {
+                        String tag = s2t(d.tag);
+                        String remark = s2t(d.remark);
+                        String url = decode(d.url);
 
-                private boolean isNormalMatch(String singleText) {
-                    // 條件查詢
-                    Matcher mth = logicPtn.matcher(singleText);
-                    if (mth.find()) {
-                        String compareTarget = mth.group(1);
-                        String comparator = mth.group(2);
-                        String compareText = mth.group(3);
-                        return this.isNormalMatch_logic(compareTarget, comparator, compareText);
+                        if (StringUtils.isBlank(singleText)) {
+                            return true;
+                        } else if (d.title.toLowerCase().contains(singleText) || //
+                        tag.toLowerCase().contains(singleText) || //
+                        remark.toLowerCase().contains(singleText) || //
+                        d.timestamp.toLowerCase().contains(singleText) || //
+                        url.toLowerCase().contains(singleText) //
+                        ) {
+                            return true;
+                        } else {
+                            if (singleText.contains("*")) {
+                                InnerMatch m = new InnerMatch(singleText);
+                                if (m.find(d.title) || //
+                                m.find(tag) || //
+                                m.find(remark) || //
+                                m.find(d.timestamp) || //
+                                m.find(url) //
+                                ) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
                     }
 
-                    // 一般查詢
-                    String[] searchArry = searchText.split(",", -1);
-                    for (String _singleText : searchArry) {
-                        _singleText = StringUtils.trimToEmpty(_singleText);
-                        if (StringUtils.isNotBlank(_singleText)) {
-                            if (isNormalMatch_detail(_singleText)) {
+                    private boolean isNormalMatch_logic(String compareTarget, String comparator, String compareText) {
+                        String comareThisStr = "";
+                        boolean isTag = false;
+                        if ("tag".equalsIgnoreCase(compareTarget)) {
+                            comareThisStr = d.tag;
+                            isTag = true;
+                        } else if ("remark".equalsIgnoreCase(compareTarget)) {
+                            comareThisStr = d.remark;
+                        }
+
+                        NormalLogicTagMatch tagChk = new NormalLogicTagMatch(d, comparator, compareText);
+                        if (isTag) {
+                            return tagChk.isMatch();
+                        }
+
+                        if ("^=".equalsIgnoreCase(comparator)) {
+                            if (comareThisStr.toLowerCase().startsWith(compareText.toLowerCase())) {
+                                return true;
+                            }
+                        } else if ("$=".equalsIgnoreCase(comparator)) {
+                            if (comareThisStr.toLowerCase().endsWith(compareText.toLowerCase())) {
+                                return true;
+                            }
+                        } else if ("*=".equalsIgnoreCase(comparator)) {
+                            if (comareThisStr.toLowerCase().contains(compareText.toLowerCase())) {
+                                return true;
+                            }
+                        } else if ("=".equalsIgnoreCase(comparator)) {
+                            if (comareThisStr.equalsIgnoreCase(compareText)) {
                                 return true;
                             }
                         }
+                        return false;
                     }
-                    return false;
-                }
 
-                private boolean isNotHiddenObj(UrlConfig d) {
-                    if (showHiddenChk.isSelected()) {
-                        return true;
+                    private Pattern logicPtn = Pattern.compile("^\\[(tag|remark)(\\=|\\^\\=|\\&\\=|\\*\\=)(.*)\\]", Pattern.CASE_INSENSITIVE);
+
+                    private boolean isNormalMatch(String singleText) {
+                        // 條件查詢
+                        Matcher mth = logicPtn.matcher(singleText);
+                        if (mth.find()) {
+                            String compareTarget = mth.group(1);
+                            String comparator = mth.group(2);
+                            String compareText = mth.group(3);
+                            return this.isNormalMatch_logic(compareTarget, comparator, compareText);
+                        }
+
+                        // 一般查詢
+                        String[] searchArry = searchText.split(",", -1);
+                        for (String _singleText : searchArry) {
+                            _singleText = StringUtils.trimToEmpty(_singleText);
+                            if (StringUtils.isNotBlank(_singleText)) {
+                                if (isNormalMatch_detail(_singleText)) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
                     }
-                    return !"Y".equalsIgnoreCase(d.isHidden);
-                }
 
-                @Override
-                public void run() {
-                    if (nonWorkChk.isSelected()) {
-                        if (isNonWrokUrl(d)) {
-                            lst.add(d);
-                        }
-                        if (progressBarHelper != null) {
-                            progressBarHelper.addOne();
-                        }
-                    } else {
-                        if (StringUtils.isBlank(searchText) && //
-                        isNotHiddenObj(d)) {
-                            lst.add(d);
-                        } else if (isNormalMatch(searchText) && //
-                        isNotHiddenObj(d)) {
-                            lst.add(d);
-                        }
-                    }
-                }
-            }.run();
-
-            // 過濾重複的
-            new Runnable() {
-                private boolean isContains(String val) {
-                    for (String str : tagLst) {
-                        if (StringUtils.equalsIgnoreCase(str, val)) {
+                    private boolean isNotHiddenObj(UrlConfig d) {
+                        if (showHiddenChk.isSelected()) {
                             return true;
                         }
+                        return !"Y".equalsIgnoreCase(d.isHidden);
                     }
-                    return false;
-                }
 
-                @Override
-                public void run() {
-                    String[] strs = StringUtils.split(d.tag, ",");
-                    for (String str : strs) {
-                        str = StringUtils.trimToEmpty(str);
-                        if (!isContains(str)) {
-                            tagLst.add(str);
+                    @Override
+                    public void run() {
+                        if (nonWorkChk.isSelected()) {
+                            if (isNonWrokUrl(d)) {
+                                // System.out.println("find = " +
+                                // title_tag_remark_time);
+                                lst.add(d);
+                            }
+                            if (progressBarHelper != null) {
+                                progressBarHelper.addOne();
+                            }
+                        } else {
+                            if (StringUtils.isBlank(searchText) && //
+                            isNotHiddenObj(d)) {
+                                // System.out.println("find = " +
+                                // title_tag_remark_time);
+                                lst.add(d);
+                            } else if (isNormalMatch(searchText) && //
+                            isNotHiddenObj(d)) {
+                                // System.out.println("find = " +
+                                // title_tag_remark_time);
+                                lst.add(d);
+                            }
                         }
                     }
+                }.run();
+
+                // 過濾重複的
+                new Runnable() {
+                    private boolean isContains(String val) {
+                        for (String str : tagLst) {
+                            if (StringUtils.equalsIgnoreCase(str, val)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void run() {
+                        String[] strs = StringUtils.split(d.tag, ",");
+                        for (String str : strs) {
+                            str = StringUtils.trimToEmpty(str);
+                            if (!isContains(str)) {
+                                tagLst.add(str);
+                            }
+                        }
+                    }
+                }.run();
+            }
+
+            // 設定tag 夏拉
+            Collections.sort(tagLst);
+            tagComboBoxUtil.applyComboxBoxList(tagLst);
+            searchComboBoxUtil.applyComboxBoxList(tagLst, searchText);
+
+            // 設定urlTable
+            Collections.sort(lst, new Comparator<UrlConfig>() {
+
+                @Override
+                public int compare(UrlConfig o1, UrlConfig o2) {
+                    return o1.timestamp.compareTo(o2.timestamp);
                 }
-            }.run();
-        }
+            });
 
-        // 設定tag 夏拉
-        Collections.sort(tagLst);
-        tagComboBoxUtil.applyComboxBoxList(tagLst);
-        searchComboBoxUtil.applyComboxBoxList(tagLst, searchText);
+            for (
 
-        // 設定urlTable
-        Collections.sort(lst, new Comparator<UrlConfig>() {
-
-            @Override
-            public int compare(UrlConfig o1, UrlConfig o2) {
-                return o1.timestamp.compareTo(o2.timestamp);
+            final UrlConfig d : lst) {
+                model.addRow(UrlTableConfigEnum.getRow(d, this));
             }
-        });
 
-        for (
+            System.out.println("searchSize : " + model.getRowCount());
 
-        final UrlConfig d : lst) {
-            model.addRow(UrlTableConfigEnum.getRow(d, this));
-        }
+            matchCountLabel.setText((model.getRowCount() == 0) ? "查無!" : "數量:" + model.getRowCount());
 
-        matchCountLabel.setText((model.getRowCount() == 0) ? "查無!" : "數量:" + model.getRowCount());
-
-        // 如果只有一筆直接打開
-        if (model.getRowCount() == 1 && directOpenFileChk.isSelected()) {
-            JTableUtil jtab = JTableUtil.newInstance(urlTable);
-            int realRowPos = JTableUtil.getRealRowPos(0, urlTable);
-            UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(realRowPos, UrlTableConfigEnum.VO.ordinal());
-            if (DesktopUtil.isFile(vo.url)) {
-                CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
-                e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
+            // 如果只有一筆直接打開
+            if (model.getRowCount() == 1 && directOpenFileChk.isSelected()) {
+                JTableUtil jtab = JTableUtil.newInstance(urlTable);
+                int realRowPos = JTableUtil.getRealRowPos(0, urlTable);
+                UrlConfig vo = (UrlConfig) jtab.getModel().getValueAt(realRowPos, UrlTableConfigEnum.VO.ordinal());
+                if (DesktopUtil.isFile(vo.url)) {
+                    CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
+                    e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
+                }
             }
-        }
 
-        // 重設bookmarkConfig 時間
-        this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
+            // 重設bookmarkConfig 時間
+            this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
+        } finally {
+            searchBool.set(false);
+        }
     }
 
     private static class ColumnColorHandler {

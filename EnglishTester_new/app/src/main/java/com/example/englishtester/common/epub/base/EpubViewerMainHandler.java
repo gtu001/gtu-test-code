@@ -20,7 +20,7 @@ import com.example.englishtester.common.html.image.ImageLoaderCandidate4EpubHtml
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.html.parser.HtmlEpubParser;
 
-import junit.framework.Assert;
+//import junit.framework.Assert;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;

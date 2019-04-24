@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.RequiresApi;
 import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
@@ -38,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.RequiresApi;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
 

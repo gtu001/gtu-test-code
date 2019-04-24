@@ -2,13 +2,14 @@ package com.example.englishtester.common;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.viewpager.widget.PagerAdapter;
 
 public abstract class RecyclerPagerAdapter<VH extends RecyclerPagerAdapter.ViewHolder> extends PagerAdapter {
 

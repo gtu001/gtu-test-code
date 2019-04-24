@@ -281,8 +281,8 @@ public class FastDBQueryUI extends JFrame {
         /*
          * EventQueue.invokeLater(new Runnable() { public void run() { try {
          * FastDBQueryUI frame = new FastDBQueryUI();
-         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception e) {
-         * e.printStackTrace(); } } });
+         * gtu.swing.util.JFrameUtil.setVisible(true, frame); } catch (Exception
+         * e) { e.printStackTrace(); } } });
          */
         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
             System.out.println("=====" + info.getClassName());
@@ -365,7 +365,8 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SqlIdConfigBean bean = (SqlIdConfigBean) e.getSource();
-                String tooltip = "<html>" + JTooltipUtil.escapeHtml(bean.sql) + "</html>";
+                String comment = "<font color=\"red\">" + bean.sqlComment + "</font><br/>";
+                String tooltip = "<html>" + comment + JTooltipUtil.escapeHtml(bean.sql) + "</html>";
                 sqlList.setToolTipText(tooltip);
             }
         });
@@ -1637,6 +1638,7 @@ public class FastDBQueryUI extends JFrame {
     private void clearButtonClick() {
         sqlIdText.setText("");
         sqlTextArea.setText("");
+        sqlIdCommentArea.setText("");
         this.sqlBean = null;
         setSqlListSelection(this.sqlBean);
     }

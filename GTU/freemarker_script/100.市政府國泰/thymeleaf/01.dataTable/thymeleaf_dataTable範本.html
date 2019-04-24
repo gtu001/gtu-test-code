@@ -16,15 +16,15 @@
 								<tr>
 									<!-- class 對 資料庫欄位(因資料多列，因此設class非用id且放在Header表示，資料部分在看要怎麼處理) -->
 									<#list dataLst as item>
-									<th>${item.label}</th>
+									<th id="${item.value}_td">${item.label}</th>
 									</#list>
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="entity : ${dataLstNameAndQuote}">
+								<tr th:each="item : ${dataLstNameAndQuote}">
 									<#list dataLst as item>
 										<#if !item.value?is_enumerable>
-											<#assign itemVal = "${r'${'} entity.${item.value} }" />
+											<#assign itemVal = "${r'${'} item.${item.value} }" />
 											<td data-th="${item.label}" th:text="${itemVal}">
 												<#if item.type == 'link'>
 													<a
@@ -50,7 +50,7 @@
 										<#else>
 											<td data-th="${item.label}">
 											<#list item.value as val1>
-												<#assign itemVal = "${r'${'} entity.${val1} }" />
+												<#assign itemVal = "${r'${'} item.${val1} }" />
 												<#if item.type == 'link'>
 													<a
 													th:href="@{/fund/qryApplicationDetail/} + ${itemVal}"

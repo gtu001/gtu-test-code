@@ -3,10 +3,11 @@ package com.example.englishtester.common;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.RequiresApi;
 import com.example.englishtester.common.Log;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Created by wistronits on 2018/8/9.

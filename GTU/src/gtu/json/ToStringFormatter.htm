@@ -1,0 +1,456 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style>
+	/* Popup dialog box BEGIN */
+	.hover_bkgr_fricc{
+		background:rgba(0,0,0,.4);
+		cursor:pointer;
+		display:none;/*none*/
+		height:100%; 
+		position:fixed;
+		text-align:center;
+		top:0;
+		width:100%;
+		z-index:10000;
+	}
+	.hover_bkgr_fricc .helper{
+		display:inline-block;
+		height:100%;
+		vertical-align:middle;
+	}
+	.hover_bkgr_fricc > div {
+		background-color: #fff;
+		box-shadow: 10px 10px 60px #555;
+		display: inline-block;
+		height: auto;
+		max-width: 551px;
+		min-height: 100px;
+		max-height: 80%;
+		vertical-align: middle;
+		width: 60%;
+		position: relative;
+		border-radius: 8px;
+		padding: 15px 5%;
+		overflow:auto;
+	}
+	.hover_bkgr_fricc .popupCloseButton {
+		background-color: #fff;
+		border: 3px solid #999;
+		border-radius: 50px;
+		cursor: pointer;
+		display: inline-block;
+		font-family: arial;
+		font-weight: bold;
+		position: absolute;
+		top: 0px;
+		right: 0px;
+		font-size: 25px;
+		line-height: 30px;
+		width: 30px;
+		height: 30px;
+		text-align: center;
+	}
+	.hover_bkgr_fricc .popupCloseButton:hover {
+		background-color: #ccc;
+	}
+	.trigger_popup_fricc {
+		cursor: pointer;
+		font-size: 20px;
+		margin: 20px;
+		display: inline-block;
+		font-weight: bold;
+	}
+	/* Popup dialog box End */
+	/*-----------------------------------------------------*/
+	table { 
+		border:1px solid #000; 
+		font-family: 微軟正黑體; 
+		font-size:16px; 
+		width:200px;
+		border:1px solid #000;
+		text-align:center;
+		border-collapse:collapse;
+	} 
+	th { 
+		background-color: #009FCC;
+		padding:10px;
+		border:1px solid #000;
+		color:#fff;
+		font-size:10px;
+	} 
+	td { 
+		border:1px solid #000;
+		padding:5px;
+		font-size:10px;
+	} 
+</style>
+
+<script type="text/javascript">
+	function mainProcess() {
+		var text = document.querySelector("#testArea").value;
+
+		var choiceType = document.querySelector("[name=choiceType]:checked").value;
+
+		var arry = new Array();
+
+		switch(choiceType){
+			case "json":
+			var json1 = JSON.parse(text);
+			if(Array.isArray(json1)){
+				arry = json1;
+			}else{
+				arry.push(json1);
+			}
+			break;
+			case "toString":
+			var lines = text.split('\n');
+			for(var i = 0;i < lines.length;i++){
+				var line = lines[i];
+				var json = toStringJson(line);
+				if(json){
+					arry.push(json);
+				}
+			}
+			break;
+		}
+
+		//欄位過濾
+		var columnFilterText = document.querySelector("[name=columnFilterText]").value;
+		var valueFilterText = document.querySelector("[name=valueFilterText]").value;
+
+		startGenerateTable(arry, columnFilterText, valueFilterText);
+	}
+
+	function toStringJson(line){
+		line = line.substring(line.indexOf("[") + 1, line.lastIndexOf("]"));
+		line = line + ",";
+		var json = {};
+		var reg = /(\w+)\s*\=\s*(.*?)[\,]/gi;
+		var found;
+		while (found = reg.exec(line)) {
+			var key = found[1];
+			var value = found[2];
+			console.log("----" + key + " = " + value);
+			json[key] = value;
+		}
+		//console.log(json)
+		return json;
+	}
+
+	//------------------------------------------------------------------------------------
+	function trim(value){
+		if(!value){
+			return '';
+		}
+		return value.trim();
+	}
+
+	function ReplaceMatcher(regex, inputText) {
+		var inputText = inputText;
+		var regex = regex;
+		var tmpStartPos = 0;
+		var found;
+		var sb = '';
+		var start = -1;
+		var end = -1;
+
+		return {
+			group : function(index){
+				if(found){
+					return found[index];
+				}
+				return false;
+			},
+			get : function(){
+				var json = {};
+				if(found){
+					for(var i in found){
+						json[i] = found[i];
+					}
+				}
+				return json;
+			},
+			find : function(){
+				found = regex.exec(inputText);
+				if(found){
+					return true;
+				}
+				return false;
+			},
+			appendReplace : function(replaceText){
+				start = parseInt(found['index'], 10);
+				end = start + found[0].length;
+				sb += inputText.substring(tmpStartPos, start) + replaceText;
+				tmpStartPos = end;
+			},
+			appendTail : function(){
+				sb += inputText.substring(tmpStartPos);
+			},
+			getResult : function(){
+				return sb;
+			},
+		}
+	}
+
+	function isValueFilterArryOk(json, valueFilterText) {
+		for(var k in json){
+			if(isColumnFilterArryOk(json[k], valueFilterText)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function isColumnFilterArryOk(text, columnFilterText){
+		if(!columnFilterText || !text){
+			return true;
+		}
+
+		var ptnArry = new Array();
+
+		var reg = new ReplaceMatcher(/\/(.*?)\//gi, columnFilterText);
+		while(reg.find()){
+			reg.appendReplace('');
+			try{
+				var rg = new RegExp(reg.group(1), "gi");
+				ptnArry.push(rg);
+			}catch(e){
+				var msg = ''
+				for(var i in e){
+					msg += i + " - " + e[i] + "\n";
+				}
+				alert(msg);
+			}
+		}
+		reg.appendTail();
+
+		text = trim(text).toLowerCase();
+		var columnFilterArry = trim(reg.getResult()).split("^");
+
+		for(var i in columnFilterArry){
+			if(columnFilterArry[i]){
+				var tmpText = trim(columnFilterArry[i]).toLowerCase();
+				if(tmpText != '' && text.indexOf(tmpText) != -1){
+					return true;
+				}
+			}
+		}
+
+		for(var i in ptnArry){
+			if(ptnArry[i].test(text)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function startGenerateTable(arry, columnFilterText, valueFilterText){
+		var tbody = getTbody();		
+
+		var keys;
+		for(var idx in arry){
+			var obj = arry[idx];
+			if(!keys){
+				var tr = createTr();
+				tr.appendChild(createTh("選擇"));
+				keys = [];
+				for(var k in obj){
+					keys.push(k);
+
+					var isMatchOk = isColumnFilterArryOk(k, columnFilterText);
+					if(isMatchOk){
+						var td = createTh(k);
+						tr.appendChild(td);
+					}
+				}
+				if(keys.length == 0){
+					keys = null;
+					continue;
+				}
+				tbody.appendChild(tr);
+			}
+
+			var isValueOk = isValueFilterArryOk(obj, valueFilterText);
+			if(!isValueOk){
+				continue;
+			}
+
+			var tr = createTr();
+			tr.appendChild(createChoice(obj, idx));
+
+			for(var idx2 in keys){
+				var k = keys[idx2]
+				var value = obj[k];
+
+				var isMatchOk = isColumnFilterArryOk(k, columnFilterText);
+				if(isMatchOk){
+					var td = createTd(value);
+					tr.appendChild(td);
+				}
+			}
+			tbody.appendChild(tr);
+		}
+	}
+
+	function getTbody(){
+		var tbody1 = document.querySelector("#tbody001");
+		var tbody2 = document.createElement("tbody");
+		tbody2.setAttribute("id", "tbody001");
+		tbody1.parentNode.replaceChild(tbody2, tbody1);
+		return tbody2;
+	}
+
+	function createChoice(json, idx){
+		var td = document.createElement("td");
+		var radio = document.createElement("input");
+		var textArea = document.createElement("textarea");
+		radio.setAttribute("type", "radio");
+		radio.setAttribute("name", "testRadio");
+		radio.setAttribute("onclick", "javascript:showRecord("+idx+");");
+		textArea.setAttribute("style", "display:none;");
+		textArea.setAttribute("id", "area_" + idx);
+		var text = document.createTextNode(JSON.stringify(json));
+		textArea.appendChild(text);
+		td.appendChild(textArea);
+		td.appendChild(radio);
+		return td;
+	}
+
+	var tmpIdx;
+	function showRecord(idx, columnFilterText){
+		if(idx){
+			tmpIdx = idx;
+		}else{
+			idx = tmpIdx;
+		}
+
+		var text = document.querySelector("#area_" + idx).innerText;
+		console.log("record = " + text);
+		var json = JSON.parse(text);
+
+		var tbody1 = document.querySelector("#tbody002");
+		var tbody2 = document.createElement("tbody");
+		tbody2.setAttribute("id", "tbody002");
+		tbody1.parentNode.replaceChild(tbody2, tbody1);
+
+		var tr1 = document.createElement("tr");
+		tr1.appendChild(createTh("欄位"));
+		tr1.appendChild(createTh("值"));
+		tbody2.appendChild(tr1);
+
+		for(var k in json) {
+			if(isColumnFilterArryOk(k, columnFilterText) || isColumnFilterArryOk(json[k], columnFilterText)){
+				var tr = document.createElement("tr");
+				tr.appendChild(createTd(k));
+				tr.appendChild(createTd(json[k]));
+				tbody2.appendChild(tr);
+			}
+		}
+		dialogHandler.open();
+	}
+
+	function createTr(){
+		return document.createElement("tr");
+	}
+
+	function createTh(data){
+		var td = document.createElement("th");
+		var text = document.createTextNode(data);
+		td.appendChild(text);
+		return td;
+	}
+
+	function createTd(data){
+		var td = document.createElement("td");
+		var text = document.createTextNode(data);
+		td.appendChild(text);
+		return td;
+	}
+
+	//-----------------------------------------------------------------------
+	var dialogHandler = new function(){
+		var initFunc = function(){
+			document.querySelector(".hover_bkgr_fricc")
+			.addEventListener("click", function(e){
+				//document.querySelector(".hover_bkgr_fricc").style.display = "none";
+			});
+			document.querySelector(".popupCloseButton")
+			.addEventListener("click", function(e){
+				document.querySelector(".hover_bkgr_fricc").style.display = "none";
+			});
+		};
+
+		return {
+			initFunc : initFunc,
+			open : function(){
+				document.querySelector(".hover_bkgr_fricc").style.display = "block";
+			},
+		}
+	};
+	//-----------------------------------------------------------------------
+
+	function initAllEvent(){
+		document.querySelector("[name=columnFilterText2]").addEventListener("keypress", function(e){
+			showRecord(null, this.value, false);
+		});
+		var arry = document.querySelectorAll("#testArea,[name=choiceType],[name=columnFilterText],[name=valueFilterText]");
+		for(var ii = 0 ; ii < arry.length ; ii ++){
+			arry[ii].addEventListener("blur", function(e){
+				mainProcess();
+			});
+		}
+	}
+
+	function initLoading() {
+		dialogHandler.initFunc();
+		initAllEvent();
+	};
+</script>
+
+</head>
+
+<body onload="javascript:initLoading();">
+
+	內文類型:&nbsp;&nbsp;
+	<input type="radio" name="choiceType" value="json" />JSON
+	<input type="radio" name="choiceType" value="toString" checked />ToString
+	<br/>	
+
+	欄位過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText" size="30" />
+	<font color="red">以"^"作為分隔</font>
+	<br/>
+	值過濾:&nbsp;&nbsp;<input type="text" name="valueFilterText" size="30" />
+	<font color="red">以"^"作為分隔</font>
+	<br/>
+
+	內文:&nbsp;&nbsp;<br/>
+	<textarea id="testArea" cols="100" rows="20"></textarea>
+
+	<br/>
+	<br/>
+	<br/>
+
+
+
+	<div class="hover_bkgr_fricc">
+		<span class="helper"></span>
+		<div>
+			<div class="popupCloseButton">X</div>
+			<p>單筆紀錄</p>
+			欄位或值過濾:&nbsp;&nbsp;<input type="text" name="columnFilterText2" size="30" />
+			<font color="red">以"^"作為分隔</font>
+			<br/>
+			<table id="singleTable">
+				<tbody id="tbody002"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<table id="testTable">
+		<tbody id="tbody001"></tbody>
+	</table>
+
+</body>
+</html>
+

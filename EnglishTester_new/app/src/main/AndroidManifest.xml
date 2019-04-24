@@ -142,6 +142,9 @@
             android:name=".MobiReaderMobiActivity"
             android:label="Mobi閱讀器" />
         <activity
+            android:name=".PdfReaderPdfActivity"
+            android:label="Pdf閱讀器" />
+        <activity
             android:name="DropboxApplicationActivity"
             android:label="Dropbox App申請" />
         <activity

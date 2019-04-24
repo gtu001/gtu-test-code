@@ -1,0 +1,4 @@
+
+.content_table table tr:nth-child(1) > th,td {
+	text-align: center !important;
+}

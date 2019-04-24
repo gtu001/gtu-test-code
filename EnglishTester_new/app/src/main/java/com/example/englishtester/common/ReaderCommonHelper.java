@@ -12,7 +12,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
@@ -42,6 +41,8 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.core.content.ContextCompat;
 
 import static java.lang.Thread.sleep;
 

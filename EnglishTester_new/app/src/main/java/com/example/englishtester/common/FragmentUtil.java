@@ -1,8 +1,9 @@
 package com.example.englishtester.common;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by wistronits on 2018/8/9.

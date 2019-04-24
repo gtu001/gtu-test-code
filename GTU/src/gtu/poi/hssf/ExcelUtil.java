@@ -38,7 +38,7 @@ import gtu.file.FileUtil;
 public class ExcelUtil {
 
     public static void main(String[] args) {
-        System.out.println(ExcelUtil.cellEnglishToPos(3047));
+        System.out.println(ExcelUtil.cellEnglishToPos(0));
     }
 
     private ExcelUtil() {
@@ -80,6 +80,7 @@ public class ExcelUtil {
      * 用英文欄位取得相對row的index
      */
     public static String cellEnglishToPos(int column) {
+        column += 1;
         Transformer c1 = new Transformer() {
             @Override
             public Object transform(Object input) {

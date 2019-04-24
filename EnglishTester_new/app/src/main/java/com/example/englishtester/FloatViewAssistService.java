@@ -11,8 +11,6 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import com.example.englishtester.common.Log;
 import android.widget.Toast;
 
@@ -21,6 +19,9 @@ import com.example.englishtester.common.ServiceUtil;
 
 import java.util.Calendar;
 import java.util.List;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 /**
  * @author gtu001_5F

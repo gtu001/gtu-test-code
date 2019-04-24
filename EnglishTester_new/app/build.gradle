@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.application' //
 
 android {
     signingConfigs {
@@ -10,8 +10,8 @@ android {
             storePassword '1234'
         }
     }
-    compileSdkVersion 26
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.gtu.example.englishtester"
         minSdkVersion 16
@@ -41,6 +41,7 @@ android {
         exclude 'META-INF/spring.schemas'
         exclude 'META-INF/license.txt'
         exclude 'META-INF/notice.txt'
+        exclude 'META-INF/DEPENDENCIES'
     }
     lintOptions {
         checkReleaseBuilds false
@@ -53,50 +54,61 @@ configurations {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    compile fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+
+    implementation "androidx.room:room-runtime:2.0.0-alpha1"
+    annotationProcessor "androidx.room:room-compiler:2.0.0-alpha1"
+
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:multidex:1.0.1'
+
+    implementation 'com.android.support:multidex:1.0.1'
     //method量超標
-    compile 'com.android.support:appcompat-v7:26.0.1'
+    implementation 'com.android.support:appcompat-v7:28.0.1'
+
     //25.3.1  25.2.0
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'org.apache.commons:commons-collections4:4.1'
-    compile 'com.dropbox.core:dropbox-core-sdk:3.0.3'
-    compile 'com.google.guava:guava:16.0.1'
-    compile 'com.thoughtworks.xstream:xstream:1.4.7'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.3'
+    implementation 'com.google.guava:guava:16.0.1'
+    implementation 'com.thoughtworks.xstream:xstream:1.4.7'
     //compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.7.3'
     //compile 'com.google.android.gms:play-services:6.+'
     //compile 'com.google.android.gms:play-services:10.2.6'
-    compile('com.opencsv:opencsv:3.9')
-    compile files('libs/baiduTranslate.jar')
-    compile files('libs/jcc-bate-0.7.3.jar')
-    compile files('libs/mobi-api4java.jar')
+    implementation 'com.opencsv:opencsv:3.9'
+    implementation files('libs/baiduTranslate.jar')
+    implementation files('libs/jcc-bate-0.7.3.jar')
+    implementation files('libs/mobi-api4java.jar')
 
-    compile 'com.android.support:percent:26.0.1'
+//    compile(name: 'pdfbox-android-1.8.10.1', ext: 'aar')
+    implementation files('libs/pdfbox-android-1.8.10.1.aar')
+
+    implementation 'com.android.support:percent:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
     //compile 'com.google.firebase:firebase-ads:10.2.0'
-    compile 'com.google.firebase:firebase-ads:11.4.0'
-    compile 'org.springframework:spring-web:4.3.18.RELEASE'
+    implementation 'com.google.firebase:firebase-ads:11.4.0'
+    implementation 'org.springframework:spring-web:4.3.18.RELEASE'
 
     //https://github.com/koral--/android-gif-drawable
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.14' // for GifDrawable
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.14'// for GifDrawable
 
-    compile('nl.siegmann.epublib:epublib-core:3.1') { // for epub  3.1
+    implementation('nl.siegmann.epublib:epublib-core:3.1') { // for epub  3.1
         exclude group: 'net.sf.kxml', module: 'kxml2'
     }
-    compile('org.apache.commons:commons-io:1.3.2') {
+    implementation('org.apache.commons:commons-io:1.3.2') {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    compile('commons-io:commons-io:2.6')
+    implementation 'commons-io:commons-io:2.6'
     //compile 'commons-logging:commons-logging:1.2'
 
     //https://github.com/nostra13/Android-Universal-Image-Loader
-    compile files('libs/universal-image-loader-1.9.5.jar')
+    implementation files('libs/universal-image-loader-1.9.5.jar')
 }
 
 apply plugin: 'com.google.gms.google-services'
