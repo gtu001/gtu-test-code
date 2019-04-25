@@ -1324,7 +1324,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         public void setFromVal(String fromVal) {
-            this.fromVal = fromVal;
+            this.fromVal = StringUtils.defaultString(fromVal).replaceAll("[\t\r\n\\s]$", "");
         }
 
         public String getToVal() {
