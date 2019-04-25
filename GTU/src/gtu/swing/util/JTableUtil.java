@@ -8,6 +8,8 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -47,10 +49,13 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -103,6 +108,113 @@ public class JTableUtil {
         table.setAutoCreateColumnsFromModel(true);
         table.setColumnSelectionAllowed(true);
         table.getTableHeader().setAutoscrolls(true);
+    }
+
+    // 設定自動高動
+    public static void applyAutoHeight(JTable table) {
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            private static final long serialVersionUID = 1L;
+
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                Component c1 = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                int maxRowHeight = -1;
+                for (int col1 = 0; col1 < table.getColumnCount(); col1++) {
+                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col1);
+                    Font f = c.getFont();
+                    FontMetrics fm = c.getFontMetrics(f);
+                    if (c instanceof JTextArea) {
+                        int lineCount = ((JTextArea) c).getLineCount();
+                        int fheight = fm.getHeight();
+                        int rowHeight = lineCount * fheight;
+                        maxRowHeight = Math.max(maxRowHeight, rowHeight);
+                    } else {
+                        maxRowHeight = Math.max(maxRowHeight, fm.getHeight());
+                    }
+                }
+                table.setRowHeight(row, maxRowHeight);
+                return c1;
+            }
+        });
+    }
+
+    public void columnIsJTextArea(final String columnTitle, final boolean useScrollPane, final Integer fontSize, final Transformer customConfig) {
+        final Transformer applyConfig = new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                JTextArea textarea = (JTextArea) input;
+                textarea.setLineWrap(true);
+                textarea.setWrapStyleWord(true);
+                textarea.setBorder(new TitledBorder(""));
+                textarea.setOpaque(true);
+                textarea.setBorder(new EmptyBorder(-1, 2, -1, 2));
+                if (fontSize != null) {
+                    textarea.setFont(new Font("Serif", Font.PLAIN, fontSize));
+                }
+                if (customConfig != null) {
+                    customConfig.transform(input);
+                }
+                return null;
+            }
+        };
+
+        class TextAreaRenderer extends JTextArea implements TableCellRenderer {
+            TextAreaRenderer() {
+                applyConfig.transform(this);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                setText(value == null ? "" : value.toString());
+
+                Font f = getFont();
+                FontMetrics fm = getFontMetrics(f);
+                // this cast depends on the way your renderer is implemented
+                // !!!!
+                int lineCount = getLineCount();
+                int fheight = fm.getHeight();
+                int rowHeight = lineCount * fheight;
+                table.setRowHeight(row, rowHeight);
+
+                if (isSelected) {
+                    setForeground(table.getSelectionForeground());
+                    setBackground(table.getSelectionBackground());
+                } else {
+                    setForeground(table.getForeground());
+                    setBackground(table.getBackground());
+                }
+                return this;
+            }
+        }
+
+        class TextAreaEditor extends DefaultCellEditor {
+            protected JScrollPane scrollpane;
+            protected JTextArea textarea;
+
+            public TextAreaEditor(boolean useScrollPane) {
+                super(new JCheckBox());
+                textarea = new JTextArea();
+                applyConfig.transform(textarea);
+                if (useScrollPane) {
+                    scrollpane = new JScrollPane();
+                    scrollpane.getViewport().add(textarea);
+                }
+            }
+
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                textarea.setText(value == null ? "" : String.valueOf(value));
+                if (scrollpane != null) {
+                    return scrollpane;
+                }
+                return textarea;
+            }
+
+            public Object getCellEditorValue() {
+                return textarea.getText();
+            }
+        }
+
+        table.getColumn(columnTitle).setCellRenderer(new TextAreaRenderer());
+        table.getColumn(columnTitle).setCellEditor(new TextAreaEditor(useScrollPane));
     }
 
     /**
@@ -1288,6 +1400,7 @@ public class JTableUtil {
                     data.put("value", orignVal);
                     listener.actionPerformed(new ActionEvent(data, -1, "Map"));
                 }
+                table.invalidate();
             }
         });
     }

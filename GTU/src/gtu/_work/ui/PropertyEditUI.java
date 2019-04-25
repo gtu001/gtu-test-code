@@ -2,8 +2,11 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -32,13 +35,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -138,6 +144,12 @@ public class PropertyEditUI extends javax.swing.JFrame {
             BorderLayout thisLayout = new BorderLayout();
             this.setTitle("PropertyEditUI");
             getContentPane().setLayout(thisLayout);
+            this.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+//                    JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+                }
+            });
             {
                 jMenuBar1 = new JMenuBar();
                 setJMenuBar(jMenuBar1);
@@ -384,15 +396,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 if (currentFile == null) {
                                     return;
                                 }
-                                DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
-                                for (Triple<Integer, String, String> p : backupModel) {
-                                    String desc = StringUtils.defaultString(p.getRight());
-                                    if (!StringUtil_.hasChineseWord(desc)) {
-                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
-                                    }
-                                }
-                                propTable.setModel(model);
-                                applyPropTableOnBlurEvent();
+                                resetPropTable("");
                             }
                         });
                     }
@@ -440,18 +444,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 if (currentFile == null) {
                                     return;
                                 }
-
                                 String text = StringUtils.trimToEmpty(queryText.getText()).toLowerCase();
-                                DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
-                                for (Triple<Integer, String, String> p : backupModel) {
-                                    if (StringUtils.isBlank(text)) {
-                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
-                                    } else if (p.getMiddle().toLowerCase().contains(text) || p.getRight().toLowerCase().contains(text)) {
-                                        model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
-                                    }
-                                }
-                                propTable.setModel(model);
-                                applyPropTableOnBlurEvent();
+                                resetPropTable(text);
                             }
                         }));
                     }
@@ -733,6 +727,35 @@ public class PropertyEditUI extends javax.swing.JFrame {
         fileList.setModel(model);
     }
 
+    private JTextArea getTextArea(String content) {
+        JTextArea t = new JTextArea();
+        t.setText(content);
+        t.setLineWrap(true);
+        t.setWrapStyleWord(true);
+        t.setOpaque(true);
+        t.setRows(2);
+        t.setBorder(new EmptyBorder(-1, 2, -1, 2));
+        return t;
+    }
+
+    private void resetPropTable(String text) {
+        propTable.setFont(new Font("Serif", Font.PLAIN, 20));
+        DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+        for (Triple<Integer, String, String> p : backupModel) {
+            if (StringUtils.isBlank(text)) {
+                model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+            } else if (p.getMiddle().toLowerCase().contains(text) || p.getRight().toLowerCase().contains(text)) {
+                model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+            }
+        }
+        propTable.setModel(model);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("key", false, null, null);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("value", false, null, null);
+        JTableUtil.applyAutoHeight(propTable);
+//        JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+        applyPropTableOnBlurEvent();
+    }
+
     static class File_ {
         File file;
 
@@ -755,18 +778,15 @@ public class PropertyEditUI extends javax.swing.JFrame {
                 e.printStackTrace();
             }
 
-            DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
             propertyEditUI.backupModel = new ArrayList<Triple<Integer, String, String>>();
             String value = null;
             int index = 0;
             for (String key : prop.stringPropertyNames()) {
                 index++;
                 value = prop.getProperty(key);
-                model.addRow(new Object[] { index, key, propertyEditUI.getChs2Big5(value) });
                 propertyEditUI.backupModel.add(Triple.of(index, key, propertyEditUI.getChs2Big5(value)));
             }
-            propertyEditUI.propTable.setModel(model);
-            propertyEditUI.applyPropTableOnBlurEvent();
+            propertyEditUI.resetPropTable(null);
         }
     }
 }
