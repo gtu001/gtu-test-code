@@ -154,7 +154,7 @@ public class DbSqlCreater {
             try {
                 ps = con.prepareStatement(sql);
                 for (int i = 0; i < param.length; i++) {
-                    System.out.println("param[" + i + "]:" + param[i] + " = " + (param[i] != null ? param[i].getClass() : "NA"));
+                    System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
                     ps.setObject(i + 1, param[i]);
                 }
                 rs = ps.executeQuery();

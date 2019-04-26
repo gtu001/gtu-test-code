@@ -8,9 +8,10 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -20,10 +21,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
+import java.text.BreakIterator;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -111,140 +119,80 @@ public class JTableUtil {
         table.getTableHeader().setAutoscrolls(true);
     }
 
-    // 設定自動高動
-    public static void applyAutoHeight(JTable table) {
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            private static final long serialVersionUID = 1L;
+    /**
+     * //設定為展開的JTeatArea
+     */
+    public void columnIsJTextArea(final String columnTitle, final Integer fontSize) {
+        class CellArea1 extends DefaultTableCellRenderer {
 
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-                Component c1 = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                int maxRowHeight = -1;
-                for (int col1 = 0; col1 < table.getColumnCount(); col1++) {
-                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col1);
-                    Font f = c.getFont();
-                    FontMetrics fm = c.getFontMetrics(f);
-                    if (c instanceof JTextArea) {
-                        int lineCount = ((JTextArea) c).getLineCount();
-                        int fheight = fm.getHeight();
-                        int rowHeight = lineCount * fheight;
-                        maxRowHeight = Math.max(maxRowHeight, rowHeight);
-                    } else {
-                        maxRowHeight = Math.max(maxRowHeight, fm.getHeight());
+            private String text;
+            protected int rowIndex;
+            protected int columnIndex;
+            protected JTable table;
+            protected Font font;
+
+            private int paragraphStart, paragraphEnd;
+            private LineBreakMeasurer lineMeasurer;
+
+            public void paintComponent(Graphics gr) {
+                super.paintComponent(gr);
+
+                if (text != null && !text.isEmpty()) {
+                    Graphics2D g = (Graphics2D) gr;
+                    if (lineMeasurer == null) {
+                        AttributedString mAttributedString = new AttributedString(text);
+                        if (fontSize != null) {
+                            mAttributedString.addAttribute(TextAttribute.FONT, new Font("Serif", Font.PLAIN, fontSize));
+                        }
+                        AttributedCharacterIterator paragraph = mAttributedString.getIterator();
+                        paragraphStart = paragraph.getBeginIndex();
+                        paragraphEnd = paragraph.getEndIndex();
+                        FontRenderContext frc = g.getFontRenderContext();
+                        lineMeasurer = new LineBreakMeasurer(paragraph, BreakIterator.getWordInstance(), frc);
                     }
+                    float breakWidth = (float) table.getColumnModel().getColumn(columnIndex).getWidth();
+                    float drawPosY = 0;
+                    // Set position to the index of the first character in
+                    // the paragraph.
+                    lineMeasurer.setPosition(paragraphStart);
+                    // Get lines until the entire paragraph has been
+                    // displayed.
+                    while (lineMeasurer.getPosition() < paragraphEnd) {
+                        // Retrieve next layout. A cleverer program would
+                        // also cache
+                        // these layouts until the component is re-sized.
+                        TextLayout layout = lineMeasurer.nextLayout(breakWidth);
+                        // Compute pen x position. If the paragraph is
+                        // right-to-left we
+                        // will align the TextLayouts to the right edge of
+                        // the panel.
+                        // Note: this won't occur for the English text in
+                        // this sample.
+                        // Note: drawPosX is always where the LEFT of the
+                        // text is placed.
+                        float drawPosX = layout.isLeftToRight() ? 0 : breakWidth - layout.getAdvance();
+                        // Move y-coordinate by the ascent of the layout.
+                        drawPosY += layout.getAscent();
+                        // Draw the TextLayout at (drawPosX, drawPosY).
+                        layout.draw(g, drawPosX, drawPosY);
+                        // Move y-coordinate in preparation for next layout.
+                        drawPosY += layout.getDescent() + layout.getLeading();
+                    }
+                    table.setRowHeight(rowIndex, (int) drawPosY);
                 }
-                table.setRowHeight(row, maxRowHeight);
-                return c1;
+            }
+        }
+
+        table.getColumn(columnTitle).setCellRenderer(new TableCellRenderer() {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                CellArea1 jTextArea = new CellArea1();
+                jTextArea.text = value == null ? "" : value.toString();
+                jTextArea.rowIndex = row;
+                jTextArea.columnIndex = column;
+                jTextArea.table = table;
+                return jTextArea;
             }
         });
-    }
-
-    public void columnIsJTextArea(final String columnTitle, final boolean useScrollPane, final Integer fontSize, final Transformer customConfig) {
-        final Transformer applyConfig = new Transformer() {
-            @Override
-            public Object transform(Object input) {
-                JTextArea textarea = (JTextArea) input;
-                textarea.setLineWrap(true);
-                textarea.setWrapStyleWord(true);
-                textarea.setBorder(new TitledBorder(""));
-                textarea.setOpaque(true);
-                textarea.setBorder(new EmptyBorder(-1, 2, -1, 2));
-                textarea.setPreferredSize(new Dimension(0, 200));
-                if (fontSize != null) {
-                    textarea.setFont(new Font("Serif", Font.PLAIN, fontSize));
-                }
-                if (customConfig != null) {
-                    customConfig.transform(input);
-                }
-                return null;
-            }
-        };
-
-        class TextAreaRenderer extends JTextArea implements TableCellRenderer {
-            TextAreaRenderer() {
-                applyConfig.transform(this);
-            }
-
-            private int getTableMaxHeight(JTable table, int row, int column) {
-                int maxRowHeight = -1;
-                for (int col = 0; col < table.getColumnCount(); col++) {
-                    if (column != col) {
-                        continue;
-                    }
-                    Object obj = table.getCellRenderer(row, col);
-                    if (obj instanceof Component) {
-                        Component c = (Component) obj;
-                        Font f = c.getFont();
-                        FontMetrics fm = c.getFontMetrics(f);
-                        if (c instanceof JTextArea) {
-                            int lineCount = ((JTextArea) c).getLineCount();
-                            int fheight = fm.getHeight();
-                            int rowHeight = lineCount * fheight;
-                            maxRowHeight = Math.max(maxRowHeight, rowHeight);
-                        } else {
-                            maxRowHeight = Math.max(maxRowHeight, fm.getHeight());
-                        }
-                    }
-                }
-                return maxRowHeight;
-            }
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                setText(value == null ? "" : value.toString());
-
-                Font f = getFont();
-                FontMetrics fm = getFontMetrics(f);
-                // this cast depends on the way your renderer is implemented
-                // !!!!
-                int lineCount = getLineCount();
-                int fheight = fm.getHeight();
-                int rowHeight = lineCount * fheight;
-
-                // 計算最大值
-                rowHeight = Math.max(rowHeight, this.getTableMaxHeight(table, row, column));
-
-                table.setRowHeight(row, rowHeight);
-
-                if (isSelected) {
-                    setForeground(table.getSelectionForeground());
-                    setBackground(table.getSelectionBackground());
-                } else {
-                    setForeground(table.getForeground());
-                    setBackground(table.getBackground());
-                }
-                return this;
-            }
-        }
-
-        class TextAreaEditor extends DefaultCellEditor {
-            protected JScrollPane scrollpane;
-            protected JTextArea textarea;
-
-            public TextAreaEditor(boolean useScrollPane) {
-                super(new JCheckBox());
-                textarea = new JTextArea();
-                applyConfig.transform(textarea);
-                if (useScrollPane) {
-                    scrollpane = new JScrollPane();
-                    scrollpane.getViewport().add(textarea);
-                }
-            }
-
-            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-                textarea.setText(value == null ? "" : String.valueOf(value));
-                if (scrollpane != null) {
-                    return scrollpane;
-                }
-                return textarea;
-            }
-
-            public Object getCellEditorValue() {
-                return textarea.getText();
-            }
-        }
-
-        table.getColumn(columnTitle).setCellRenderer(new TextAreaRenderer());
-        table.getColumn(columnTitle).setCellEditor(new TextAreaEditor(useScrollPane));
     }
 
     /**

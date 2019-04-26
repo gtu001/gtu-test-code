@@ -739,8 +739,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
             }
         }
         propTable.setModel(model);
-        JTableUtil.newInstance(propTable).columnIsJTextArea("key", false, 20, null);
-        JTableUtil.newInstance(propTable).columnIsJTextArea("value", false, 20, null);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("key", 20);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("value", 20);
         JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
         applyPropTableOnBlurEvent();
     }
