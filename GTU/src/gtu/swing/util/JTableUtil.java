@@ -8,6 +8,7 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Insets;
@@ -147,6 +148,7 @@ public class JTableUtil {
                 textarea.setBorder(new TitledBorder(""));
                 textarea.setOpaque(true);
                 textarea.setBorder(new EmptyBorder(-1, 2, -1, 2));
+                textarea.setPreferredSize(new Dimension(0, 200));
                 if (fontSize != null) {
                     textarea.setFont(new Font("Serif", Font.PLAIN, fontSize));
                 }
@@ -162,6 +164,30 @@ public class JTableUtil {
                 applyConfig.transform(this);
             }
 
+            private int getTableMaxHeight(JTable table, int row, int column) {
+                int maxRowHeight = -1;
+                for (int col = 0; col < table.getColumnCount(); col++) {
+                    if (column != col) {
+                        continue;
+                    }
+                    Object obj = table.getCellRenderer(row, col);
+                    if (obj instanceof Component) {
+                        Component c = (Component) obj;
+                        Font f = c.getFont();
+                        FontMetrics fm = c.getFontMetrics(f);
+                        if (c instanceof JTextArea) {
+                            int lineCount = ((JTextArea) c).getLineCount();
+                            int fheight = fm.getHeight();
+                            int rowHeight = lineCount * fheight;
+                            maxRowHeight = Math.max(maxRowHeight, rowHeight);
+                        } else {
+                            maxRowHeight = Math.max(maxRowHeight, fm.getHeight());
+                        }
+                    }
+                }
+                return maxRowHeight;
+            }
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 setText(value == null ? "" : value.toString());
@@ -173,6 +199,10 @@ public class JTableUtil {
                 int lineCount = getLineCount();
                 int fheight = fm.getHeight();
                 int rowHeight = lineCount * fheight;
+
+                // 計算最大值
+                rowHeight = Math.max(rowHeight, this.getTableMaxHeight(table, row, column));
+
                 table.setRowHeight(row, rowHeight);
 
                 if (isSelected) {

@@ -147,7 +147,8 @@ public class PropertyEditUI extends javax.swing.JFrame {
             this.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
-//                    JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+                    // JTableUtil.setColumnWidths_Percent(propTable, new float[]
+                    // { 5, 30, 65 });
                 }
             });
             {
@@ -727,17 +728,6 @@ public class PropertyEditUI extends javax.swing.JFrame {
         fileList.setModel(model);
     }
 
-    private JTextArea getTextArea(String content) {
-        JTextArea t = new JTextArea();
-        t.setText(content);
-        t.setLineWrap(true);
-        t.setWrapStyleWord(true);
-        t.setOpaque(true);
-        t.setRows(2);
-        t.setBorder(new EmptyBorder(-1, 2, -1, 2));
-        return t;
-    }
-
     private void resetPropTable(String text) {
         propTable.setFont(new Font("Serif", Font.PLAIN, 20));
         DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
@@ -749,10 +739,9 @@ public class PropertyEditUI extends javax.swing.JFrame {
             }
         }
         propTable.setModel(model);
-        JTableUtil.newInstance(propTable).columnIsJTextArea("key", false, null, null);
-        JTableUtil.newInstance(propTable).columnIsJTextArea("value", false, null, null);
-        JTableUtil.applyAutoHeight(propTable);
-//        JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+        JTableUtil.newInstance(propTable).columnIsJTextArea("key", false, 20, null);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("value", false, 20, null);
+        JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
         applyPropTableOnBlurEvent();
     }
 

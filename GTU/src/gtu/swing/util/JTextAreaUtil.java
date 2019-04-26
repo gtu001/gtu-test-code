@@ -155,6 +155,7 @@ public class JTextAreaUtil {
             font = new Font("Courier New", Font.PLAIN, 14);
         } else if (jtext instanceof JTextArea) {
             font = new Font("宋体", Font.PLAIN, 14);
+            // font = new Font("Serif", Font.PLAIN, 14);
         }
         if (font == null) {
             throw new RuntimeException("請測試jtext是否可設定font");
