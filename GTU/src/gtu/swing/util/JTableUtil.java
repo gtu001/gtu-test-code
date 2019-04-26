@@ -123,7 +123,7 @@ public class JTableUtil {
      * //設定為展開的JTeatArea
      */
     public void columnIsJTextArea(final String columnTitle, final Integer fontSize) {
-        class CellArea1 extends DefaultTableCellRenderer {
+        class CellArea1 extends JComponent {
 
             private String text;
             protected int rowIndex;
