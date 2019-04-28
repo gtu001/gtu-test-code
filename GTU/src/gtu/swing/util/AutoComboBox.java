@@ -77,7 +77,13 @@ public class AutoComboBox extends PlainDocument {
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                 } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     if (comboBox.isPopupVisible() && tempSelectIndex.get() != -1) {
-                        comboBox.setSelectedIndex(tempSelectIndex.get());
+                        if (e.getKeyCode() == KeyEvent.VK_DOWN && tempSelectIndex.get() - 1 >= 0) {
+                            comboBox.setSelectedIndex(tempSelectIndex.get() - 1);
+                        } else if (e.getKeyCode() == KeyEvent.VK_UP && (tempSelectIndex.get() + 1) >= (model.getSize() - 1)) {
+                            comboBox.setSelectedIndex(tempSelectIndex.get() + 1);
+                        } else {
+                            comboBox.setSelectedIndex(tempSelectIndex.get());
+                        }
                         tempSelectIndex.set(-1);
                     }
                 }
