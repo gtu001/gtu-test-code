@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -238,10 +240,7 @@ public class JdbcDBUtil {
         System.out.println("sql : " + sql);
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
-            for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
-                ps.setObject(i + 1, param[i]);
-            }
+            doSettingParameters(con, ps, param);
 
             rs = ps.executeQuery();
             java.sql.ResultSetMetaData mdata = rs.getMetaData();
@@ -305,19 +304,7 @@ public class JdbcDBUtil {
         System.out.println("sql : " + sql);
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
-            for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
-                try {
-                    ps.setObject(i + 1, param[i]);
-                } catch (Exception ex) {
-                    System.out.println("\t param[" + i + "] - error ertry : " + ex.getMessage());
-                    if (param[i] != null) {
-                        ps.setString(i + 1, String.valueOf(param[i]));
-                    } else {
-                        ps.setNull(i + 1, java.sql.Types.VARCHAR);
-                    }
-                }
-            }
+            doSettingParameters(con, ps, param);
 
             rs = ps.executeQuery();
             java.sql.ResultSetMetaData mdata = rs.getMetaData();
@@ -395,10 +382,7 @@ public class JdbcDBUtil {
 
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             if (param != null) {
-                for (int i = 0; i < param.length; i++) {
-                    System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
-                    ps.setObject(i + 1, param[i]);
-                }
+                doSettingParameters(con, ps, param);
             }
             rsCount = ps.executeUpdate();
         } catch (Exception e) {
@@ -416,6 +400,27 @@ public class JdbcDBUtil {
         return rsCount;
     }
 
+    private static void doSettingParameters(java.sql.Connection conn, java.sql.PreparedStatement ps, Object param[]) throws SQLException {
+        for (int i = 0; i < param.length; i++) {
+            if (param[i] != null) {
+                if (param[i].getClass().isArray()) {
+                    java.sql.Array array = conn.createArrayOf("VARCHAR", (Object[]) param[i]);
+                    System.out.println("param[" + i + "]:\"" + Arrays.toString((Object[]) param[i]) + "\"  (Array)");
+                    ps.setArray(i + 1, array);
+                } else if (param[i] instanceof String) {
+                    System.out.println("param[" + i + "]:\"" + param[i] + "\"  (String)");
+                    ps.setObject(i + 1, param[i]);
+                } else {
+                    System.out.println("param[" + i + "]:" + param[i] + "  (" + param[i].getClass().getSimpleName() + ")");
+                    ps.setObject(i + 1, param[i]);
+                }
+            } else {
+                System.out.println("param[" + i + "]:" + param[i] + "  (Null)");
+                ps.setObject(i + 1, param[i]);
+            }
+        }
+    }
+
     /**
      * 只供新增使用 並回傳回新增後所產生的 key 值
      */
@@ -425,10 +430,7 @@ public class JdbcDBUtil {
         java.sql.ResultSet rs = null;
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 0; i < param.length; i++) {
-                System.out.println("param[" + i + "]:\"" + param[i] + "\"  (" + (param[i] != null ? param[i].getClass().getName() : "NA") + ")");
-                ps.setObject(i + 1, param[i]);
-            }
+            doSettingParameters(con, ps, param);
 
             rs = ps.getGeneratedKeys();
             while (rs.next()) {

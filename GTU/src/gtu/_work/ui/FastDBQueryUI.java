@@ -1448,6 +1448,21 @@ public class FastDBQueryUI extends JFrame {
                 return "";
             }
         }, //
+        Varchar_Array(new Class<?>[] { String.class }, true) {
+            protected Object applyDataChange(Object value) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+                if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+                    List<Object> lst = new ArrayList<Object>();
+                    String strVal = (String) value;
+                    String[] valArry = StringUtils.split(strVal, ',');
+                    for (String str : valArry) {
+                        lst.add(StringUtils.trimToEmpty(str));
+                    }
+                    return lst.toArray();
+                }
+                return value;
+            }
+        }, //
         UNKNOW(new Class<?>[] { void.class }, false) {
         },//
         ;
@@ -1999,10 +2014,30 @@ public class FastDBQueryUI extends JFrame {
             return lst;
         }
 
+        protected static String getIgnoreCommonentSql(String sql) {
+            StringBuffer sb = new StringBuffer();
+            Pattern ptn1 = Pattern.compile("\\/\\*(?:.|\n)*?\\*\\/", Pattern.MULTILINE | Pattern.DOTALL);
+            Matcher mth = ptn1.matcher(sql);
+            while (mth.find()) {
+                mth.appendReplacement(sb, "");
+            }
+            mth.appendTail(sb);
+
+            Pattern ptn2 = Pattern.compile("\\-{2}.*");
+            sql = sb.toString();
+            sb.setLength(0);
+            Matcher mth2 = ptn2.matcher(sql);
+            while (mth2.find()) {
+                mth2.appendReplacement(sb, "");
+            }
+            mth2.appendTail(sb);
+            return sb.toString();
+        }
+
         public static SqlParam parseToSqlParam(String sql) {
             // 一般處理
             Pattern ptn = Pattern.compile("\\:(\\w+)");
-            Matcher mth = ptn.matcher(sql);
+            Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));// <----------------
 
             List<String> paramList = new ArrayList<String>();
             Set<String> paramSet = new LinkedHashSet<String>();
@@ -2071,7 +2106,7 @@ public class FastDBQueryUI extends JFrame {
             sqlParam.orginialSql = sql;
 
             Pattern ptn = Pattern.compile("(\\[((?:.|\n)*?)\\]|\\:(\\w+))");
-            Matcher mth = ptn.matcher(sql);
+            Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));
 
             while (mth.find()) {
                 String quoteLine = mth.group(1);
