@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -272,6 +273,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_11;
     private JLabel lblNewLabel_12;
     private JLabel queryResultTimeLbl;
+    private JLabel lblNewLabel_13;
 
     /**
      * Launch the application.
@@ -660,6 +662,10 @@ public class FastDBQueryUI extends JFrame {
             innerPanel11.add(sqlParamCommentArea, "4, 2, fill, fill");
 
             innerPanel2.add(innerPanel11, BorderLayout.SOUTH);
+            
+            lblNewLabel_13 = new JLabel("選填項目用中括號\"[]\"表示, 參數用 :paramKey 表示, 注入式SQL用 _#sqlKey#_ 表示");
+            lblNewLabel_13.setForeground(Color.RED);
+            innerPanel11.add(lblNewLabel_13, "4, 3");
         }
 
         panel_1.add(innerPanel2, BorderLayout.CENTER);
@@ -1793,7 +1799,7 @@ public class FastDBQueryUI extends JFrame {
 
             // 檢查參數是否異動
             for (String columnName : param.paramSet) {
-                if (!paramMap.containsKey(columnName)) {
+                if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
                     Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
                 }
             }
@@ -1808,7 +1814,7 @@ public class FastDBQueryUI extends JFrame {
                     parameterList.add(paramMap.get(columnName));
                 }
             } else if (param.getClass() == SqlParam_IfExists.class) {
-                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, forceAddColumns));
+                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
             }
 
             // 設定 sqlInjectionMap
@@ -2010,7 +2016,14 @@ public class FastDBQueryUI extends JFrame {
         public List<String> getOrderParametersLst() {
             List<String> lst = new ArrayList<String>();
             lst.addAll(paramSet);
-            lst.addAll(sqlInjectionMap.keySet());
+
+            Set<String> s1 = new LinkedHashSet<String>();
+            for (String k : sqlInjectionMap.keySet()) {
+                if (!paramSet.contains(k)) {
+                    s1.add(k);
+                }
+            }
+            lst.addAll(s1);
             return lst;
         }
 
@@ -2066,7 +2079,7 @@ public class FastDBQueryUI extends JFrame {
         List<Pair<List<String>, int[]>> paramListFix = new ArrayList<Pair<List<String>, int[]>>();
         private Map<String, String> paramSetSentanceMap = new HashMap<String, String>();
 
-        private boolean isParametersAllOk(List<String> paramLst, Map<String, Object> paramMap, Set<String> forceAddColumns) {
+        private boolean isParametersAllOk(List<String> paramLst, Map<String, Object> paramMap, Map<String, String> sqlInjectionMap, Set<String> forceAddColumns) {
             List<Pair<String, Boolean>> paramBoolLst = new ArrayList<Pair<String, Boolean>>();
             for (String col : paramLst) {
                 if (paramMap.containsKey(col)) {
@@ -2087,6 +2100,8 @@ public class FastDBQueryUI extends JFrame {
                     } else {
                         paramBoolLst.add(Pair.of(col, false));
                     }
+                } else if (sqlInjectionMap.containsKey(col) && StringUtils.isNotBlank(sqlInjectionMap.get(col))) {
+                    paramBoolLst.add(Pair.of(col, true));
                 } else {
                     paramBoolLst.add(Pair.of(col, false));
                 }
@@ -2115,11 +2130,19 @@ public class FastDBQueryUI extends JFrame {
                 if (quoteLine.matches("^\\[(.|\n)*\\]")) {
                     String realQuoteLine = mth.group(2);
                     Pattern ptn2 = Pattern.compile("\\:(\\w+)");
+                    Pattern ptn3 = Pattern.compile("\\_\\#.*?\\#\\_");
                     Matcher mth2 = ptn2.matcher(realQuoteLine);
+                    Matcher mth3 = ptn3.matcher(realQuoteLine);
 
                     List<String> params = new ArrayList<String>();
                     while (mth2.find()) {
                         String para = mth2.group(1);
+                        params.add(para);
+                        sqlParam.paramSetSentanceMap.put(para, quoteLine);
+                    }
+
+                    while (mth3.find()) {
+                        String para = mth3.group(0);
                         params.add(para);
                         sqlParam.paramSetSentanceMap.put(para, quoteLine);
                     }
@@ -2139,7 +2162,8 @@ public class FastDBQueryUI extends JFrame {
             return sqlParam;
         }
 
-        private String toQuestionMarkSql(String markSql, List<Object> rtnParamLst, Map<String, Object> paramMap) {
+        private String toQuestionMarkSql(String markSql, List<Object> rtnParamLst, Map<String, Object> paramMap, Map<String, String> sqlInjectionMap) {
+            // -----------------------------------------------------------------------------
             Pattern ptn = Pattern.compile(":(\\w+)");
             Matcher mth = ptn.matcher(markSql);
             StringBuffer sb = new StringBuffer();
@@ -2155,11 +2179,27 @@ public class FastDBQueryUI extends JFrame {
             }
             mth.appendTail(sb);
 
+            // ------------------------------------------------------------------------------
+            markSql = sb.toString();
+            sb.setLength(0);
+            Pattern ptn2 = Pattern.compile("\\_\\#.*?\\#\\_");
+            Matcher mth2 = ptn2.matcher(markSql);
+
+            while (mth2.find()) {
+                String col = mth2.group(0);
+                if (sqlInjectionMap.containsKey(col)) {
+                    mth2.appendReplacement(sb, (String) sqlInjectionMap.get(col));
+                } else {
+                    mth2.appendReplacement(sb, col);
+                }
+            }
+            mth2.appendTail(sb);
             String rtnStr = sb.toString().replaceAll("[\\[\\]]", " ");
+            // ------------------------------------------------------------------------------
             return rtnStr;
         }
 
-        public List<Object> processParamMap(Map<String, Object> paramMap, Set<String> forceAddColumns) {
+        public List<Object> processParamMap(Map<String, Object> paramMap, Map<String, String> sqlInjectionMap, Set<String> forceAddColumns) {
             String orginialSqlBackup = this.orginialSql.toString();
 
             List<Object> rtnParamLst = new ArrayList<Object>();
@@ -2170,8 +2210,8 @@ public class FastDBQueryUI extends JFrame {
                 String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
                 String replaceToSql = StringUtils.rightPad("", markSql.length());
 
-                if (isParametersAllOk(row.getLeft(), paramMap, forceAddColumns) || markSql.matches("\\:\\w+")) {
-                    replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap);
+                if (isParametersAllOk(row.getLeft(), paramMap, sqlInjectionMap, forceAddColumns) || markSql.matches("\\:\\w+")) {
+                    replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap, sqlInjectionMap);
                 }
 
                 orginialSqlBackup = orginialSqlBackup.substring(0, start_end[0]) + //
