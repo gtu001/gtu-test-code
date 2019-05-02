@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -56,6 +57,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
@@ -343,7 +345,12 @@ public class FastDBQueryUI extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane();
         panel.add(scrollPane, BorderLayout.CENTER);
-        sqlList = new JList();
+        sqlList = new JList() {
+            @Override
+            public JToolTip createToolTip() {
+                return JTooltipUtil.createToolTip(null, null);
+            }
+        };
         sqlList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -662,7 +669,7 @@ public class FastDBQueryUI extends JFrame {
             innerPanel11.add(sqlParamCommentArea, "4, 2, fill, fill");
 
             innerPanel2.add(innerPanel11, BorderLayout.SOUTH);
-            
+
             lblNewLabel_13 = new JLabel("選填項目用中括號\"[]\"表示, 參數用 :paramKey 表示, 注入式SQL用 _#sqlKey#_ 表示");
             lblNewLabel_13.setForeground(Color.RED);
             innerPanel11.add(lblNewLabel_13, "4, 3");
@@ -1775,7 +1782,7 @@ public class FastDBQueryUI extends JFrame {
 
                 if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
                     // sql Injection
-                    sqlInjectMap.put(columnName, value);
+                    sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
                 } else {
                     // 一般處理
                     DataType dataType = (DataType) util.getRealValueAt(ii, 2);
@@ -1854,7 +1861,7 @@ public class FastDBQueryUI extends JFrame {
                 for (int ii = 0; ii < model.getRowCount(); ii++) {
                     String col = (String) util2.getRealValueAt(ii, 0);
                     String val = (String) util2.getRealValueAt(ii, 1);
-                    paramMap2.put(col, val);
+                    paramMap2.put(col, StringUtils.trimToEmpty(val));
                 }
                 try {
                     // 一般儲存參數處理
@@ -2201,26 +2208,33 @@ public class FastDBQueryUI extends JFrame {
 
         public List<Object> processParamMap(Map<String, Object> paramMap, Map<String, String> sqlInjectionMap, Set<String> forceAddColumns) {
             String orginialSqlBackup = this.orginialSql.toString();
+            StringBuffer sb = new StringBuffer();
 
             List<Object> rtnParamLst = new ArrayList<Object>();
+
+            int tempStartPos = 0;
 
             for (Pair<List<String>, int[]> row : paramListFix) {
                 int[] start_end = row.getRight();
 
                 String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
-                String replaceToSql = StringUtils.rightPad("", markSql.length());
+                String replaceToSql_FIX = StringUtils.rightPad("", markSql.length());
 
                 if (isParametersAllOk(row.getLeft(), paramMap, sqlInjectionMap, forceAddColumns) || markSql.matches("\\:\\w+")) {
-                    replaceToSql = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap, sqlInjectionMap);
+                    replaceToSql_FIX = this.toQuestionMarkSql(markSql, rtnParamLst, paramMap, sqlInjectionMap);
                 }
 
-                orginialSqlBackup = orginialSqlBackup.substring(0, start_end[0]) + //
-                        replaceToSql + //
-                        orginialSqlBackup.substring(start_end[1]);
+                sb.append(orginialSqlBackup.substring(tempStartPos, start_end[0]));
+                sb.append(replaceToSql_FIX);
+
+                tempStartPos = start_end[1];
             }
 
-            this.questionSql = orginialSqlBackup;
+            if (tempStartPos != 0) {
+                sb.append(orginialSqlBackup.substring(tempStartPos));
+            }
 
+            this.questionSql = sb.toString();
             return rtnParamLst;
         }
     }

@@ -1,6 +1,14 @@
+import sys
+sys.path.append("D:\workstuff\gtu-test-code\PythonGtu")
+
 from enum import Enum
 from gtu.reflect import checkSelf
 import re
+
+
+class Test001Class :
+    def __init__(self):
+        print("Test001Class Done!!!")
 
 
 def main():
