@@ -397,7 +397,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 if (currentFile == null) {
                                     return;
                                 }
-                                resetPropTable("");
+                                resetPropTable_onlyWorngEnglish();
                             }
                         });
                     }
@@ -726,6 +726,22 @@ public class PropertyEditUI extends javax.swing.JFrame {
             backupFileList.add(f);
         }
         fileList.setModel(model);
+    }
+
+    private void resetPropTable_onlyWorngEnglish() {
+        propTable.setFont(new Font("Serif", Font.PLAIN, 20));
+        DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+        for (Triple<Integer, String, String> p : backupModel) {
+            String desc = p.getRight();
+            if (StringUtils.isBlank(desc) || !StringUtil_.hasChineseWord(desc)) {
+                model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+            }
+        }
+        propTable.setModel(model);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("key", 20);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("value", 20);
+        JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+        applyPropTableOnBlurEvent();
     }
 
     private void resetPropTable(String text) {

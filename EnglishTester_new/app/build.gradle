@@ -6,8 +6,8 @@ android {
             keyAlias 'gtu001'
             //storeFile file('E:/workstuff/workspace/gtu-test-code/EnglishTester_new/app/signature.jks')
             storeFile file('./signature.jks')
-            keyPassword '1234'
-            storePassword '1234'
+            keyPassword '123474736'
+            storePassword '123474736'
         }
     }
     compileSdkVersion 28

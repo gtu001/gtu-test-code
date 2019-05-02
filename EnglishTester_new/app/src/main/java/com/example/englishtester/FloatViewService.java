@@ -1070,6 +1070,11 @@ public class FloatViewService extends Service {
             modeholder.set(newVal);
             imageView1.setImageResource(modeArry[modeholder.get()]);
 
+            //如果切回查英文模式清掉剪貼簿
+            if (this.isSearchMode()) {
+                ClipboardHelper.copyToClipboard(FloatViewService.this.getApplicationContext(), "");
+            }
+
             if (clipboardListenerHandler != null) {
                 if (modeholder.get() == 0) {
                     clipboardListenerHandler.doStart(true);
@@ -1773,7 +1778,7 @@ public class FloatViewService extends Service {
             if (!BuildConfig.DEBUG) {
                 InterstitialAdActivity.startThisActivity(FloatViewService.this);
             } else {
-                GodToast.getInstance(getApplicationContext()).show();
+//                GodToast.getInstance(getApplicationContext()).show();//不秀A圖
                 //InterstitialAdActivity.startThisActivity(FloatViewService.this);
             }
         }
