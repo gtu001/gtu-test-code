@@ -1,0 +1,31 @@
+僅限於根目錄py黨
+	執行方式1
+		於專案跟目錄放置MAIN.py檔作為入口
+		可用絕對路徑直接執行
+		c:\> py D:\workstuff\gtu-test-code\PythonGtu\MAIN.py
+		
+	---
+	執行方式2
+		切到專案目錄
+		D:...PythonGtu\> py MAIN.py
+	
+---
+使用sys.path
+	執行方式
+		於欲直行的module上加入
+			import sys
+			sys.path.append("D:\workstuff\gtu-test-code\PythonGtu") <--專案路徑, **建議load env比較可靠
+		執行時可於任何目錄執行
+			c:\> py D:\workstuff\gtu-test-code\PythonGtu\gtu\_test\test001.py
+		
+	
+		
+---
+標準版 : 執行module
+	前提
+		所屬目錄每層要放__init__.py檔
+	執行方式1
+		切到專案目錄
+		D:...PythonGtu\> py -m gtu._test.test001
+		
+		

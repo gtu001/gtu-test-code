@@ -208,6 +208,7 @@ public class JCommonUtil {
      */
     public static void defaultToolTipDelay() {
         ToolTipManager.sharedInstance().setInitialDelay(0);
+        
     }
 
     /**
