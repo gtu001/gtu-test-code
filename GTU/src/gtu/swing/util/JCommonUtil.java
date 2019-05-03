@@ -182,9 +182,20 @@ public class JCommonUtil {
             taskBarSize = scnMax.bottom;
         } catch (Exception ex) {
         }
+
+        // 單一螢幕
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(scr_size.width - frame.getWidth(), //
-                scr_size.height - frame.getHeight() - taskBarSize);
+        int width = scr_size.width;
+        int height = scr_size.height;
+
+        // 多螢幕模式
+        // GraphicsDevice gd =
+        // GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        // int width = gd.getDisplayMode().getWidth();
+        // int height = gd.getDisplayMode().getHeight();
+
+        frame.setLocation(width - frame.getWidth(), //
+                height - frame.getHeight() - taskBarSize);
     }
 
     /**
@@ -208,7 +219,7 @@ public class JCommonUtil {
      */
     public static void defaultToolTipDelay() {
         ToolTipManager.sharedInstance().setInitialDelay(0);
-        
+
     }
 
     /**

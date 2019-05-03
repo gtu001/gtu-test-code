@@ -1,5 +1,5 @@
 import sys
-sys.path.append("D:\workstuff\gtu-test-code\PythonGtu")
+# sys.path.append("D:\workstuff\gtu-test-code\PythonGtu")
 
 from enum import Enum
 from gtu.reflect import checkSelf

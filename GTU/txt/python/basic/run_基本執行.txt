@@ -19,6 +19,11 @@
 			c:\> py D:\workstuff\gtu-test-code\PythonGtu\gtu\_test\test001.py
 		
 	
+	---
+	理想做法
+		window
+			set PYTHONPATH=D:\workstuff\gtu-test-code\PythonGtu;...
+			D:\> py -m gtu._test.test001
 		
 ---
 標準版 : 執行module

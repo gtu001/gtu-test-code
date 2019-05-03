@@ -1,6 +1,7 @@
 package gtu.swing.util;
 
 import java.awt.Dimension;
+import java.awt.MouseInfo;
 
 import javax.swing.JToolTip;
 
@@ -29,11 +30,17 @@ public class JTooltipUtil {
         JToolTip t = new JToolTip() {
             @Override
             public Dimension getPreferredSize() {
+                int mouseRelativeWidth = scr_size.width - MouseInfo.getPointerInfo().getLocation().x;
+                
                 Dimension d = super.getPreferredSize();
                 int newWidth = d.width;
                 int newHeight = d.height;
+                
                 if (d.width > maxBound.width) {
                     newWidth = maxBound.width;
+                }
+                if(newWidth > mouseRelativeWidth) {
+                    newWidth = mouseRelativeWidth;
                 }
                 if (d.height > maxBound.height) {
                     newHeight = maxBound.height;
