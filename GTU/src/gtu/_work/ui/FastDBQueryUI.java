@@ -2207,7 +2207,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public List<Object> processParamMap(Map<String, Object> paramMap, Map<String, String> sqlInjectionMap, Set<String> forceAddColumns) {
-            String orginialSqlBackup = this.orginialSql.toString();
+            String orginialSqlBackup = getIgnoreCommonentSql(this.orginialSql.toString());
             StringBuffer sb = new StringBuffer();
 
             List<Object> rtnParamLst = new ArrayList<Object>();
