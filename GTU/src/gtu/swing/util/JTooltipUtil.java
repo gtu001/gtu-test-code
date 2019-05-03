@@ -25,7 +25,7 @@ public class JTooltipUtil {
         if (heightPercent == null || heightPercent > 1) {
             heightPercent = 0.4F;
         }
-        java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        final java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         final Dimension maxBound = new Dimension((int) (scr_size.width * widthPercent), (int) (scr_size.height * heightPercent));
         JToolTip t = new JToolTip() {
             @Override
