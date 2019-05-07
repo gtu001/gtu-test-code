@@ -1,0 +1,53 @@
+    
+    public boolean findExistsInTrustAcctPeriod(String trustAcct) {
+        List<String> ignoreLst = new ArrayList<>();
+        com.cathaybk.invf.rest.sqlserver.CTF.entity.TrustAcctPeriod t1 = new com.cathaybk.invf.rest.sqlserver.CTF.entity.TrustAcctPeriod();
+        for (Field f : com.cathaybk.invf.rest.sqlserver.CTF.entity.TrustAcctPeriod.class.getDeclaredFields()) {
+            if (f.getType() != String.class) {
+                try {
+                    Object val = FieldUtils.readDeclaredField(t1, f.getName(), true);
+                    if (val != null) {
+                        ignoreLst.add(f.getName());
+                    }
+                } catch (IllegalAccessException e) {
+                }
+            }
+        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths(ignoreLst.toArray(new String[0]))
+            .withMatcher("trustAcct",
+                new GenericPropertyMatcher().exact());
+        t1.setTrustAcct(trustAcct);
+        List<?> lst1 = trustAcctPeriodCTFRepo.findAll(Example.of(t1, matcher));
+        if (!lst1.isEmpty()) {
+            return true;
+        }
+        com.cathaybk.invf.rest.sqlserver.CTFL.entity.TrustAcctPeriod t2 = new com.cathaybk.invf.rest.sqlserver.CTFL.entity.TrustAcctPeriod();
+        t2.setTrustAcct(trustAcct);
+        List<?> lst2 = trustAcctPeriodCTFLRepo.findAll(Example.of(t2, matcher));
+        if (!lst2.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+spring:
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    hibernate:
+      dialect: org.hibernate.dialect.SQLServer2012Dialect
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+
+

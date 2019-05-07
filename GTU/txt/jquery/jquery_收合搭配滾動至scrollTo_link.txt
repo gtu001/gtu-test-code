@@ -1,0 +1,14 @@
+	function toggleThis(id, element) {
+		$('[id^=dataTable]').toggle(300, function() {
+			if (element) {
+				$([ document.documentElement, document.body ]).animate({
+					scrollTop : $(element).offset().top
+				}, 500);
+			}
+		});
+	}
+
+
+	<div style="float: right; color: #4eae30; padding: 2px 0 3px 15px">
+		<a onclick="toggleThis('dataTable1', this);">全部收合</a>
+	</div>
