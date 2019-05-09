@@ -224,12 +224,16 @@ public class NumberUtil {
         if (StringUtils.isBlank(oldNumber)) {
             return "";
         }
-        StringBuilder sb = new StringBuilder("###,###,###,###,###,###,##0");
-        for (int ii = 0; ii < keepLength; ii++) {
-            if (ii == 0) {
-                sb.append(".");
+        StringBuilder sb = new StringBuilder("###,###,###,###,###,###,###,###,##0");
+        if (keepLength >= 0) {
+            for (int ii = 0; ii < keepLength; ii++) {
+                if (ii == 0) {
+                    sb.append(".");
+                }
+                sb.append("0");
             }
-            sb.append("0");
+        } else if (keepLength == -1) {
+            sb.append(".#####################################");
         }
         DecimalFormat df = new DecimalFormat(sb.toString());
         return df.format(NumberUtil.getBigDecimal(oldNumber));

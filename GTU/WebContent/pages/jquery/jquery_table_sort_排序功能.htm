@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="shortcut icon" href="/img/favicon.ico" />
+<link rel="bookmark" href="/img/favicon.ico" />
+<title>投資平台前台系統</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+<script src="jquery-3.3.1.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
+
+<script type="text/javascript">
+	var ApplicationMain = new function() {
+		return {
+			initApp : function() {
+				initSortTable();
+			}
+		}
+	};
+	$(ApplicationMain.initApp);
+
+	function FundTableSort() {
+		var asc = "↓";
+		var desc = "↑";
+		var map = {};
+		var table;
+		var thr;
+		var dataArry = new Array();
+		var dataTrArry = new Array();
+
+		return {
+			setTable : function(tableQuery) {
+				table = $(tableQuery);
+				thr = $("tr:eq(0)", table);
+			},
+			appendTh : function(queryKey) {
+				map[queryKey] = {
+					html : $(queryKey).html(),
+					order : "",
+					index : $(thr).find("th").index($(queryKey))
+				};
+			},
+			initReset : function() {
+				this.initResetColumn();
+				this.initResetData();
+			},
+			initResetColumn : function() {
+				var self = this;
+				for ( var queryKey in map) {
+					$(queryKey).attr("queryKey", queryKey);
+
+					$(queryKey).click(function() {
+						// 重設其他
+						for ( var queryKey in map) {
+							var valMap = map[queryKey];
+							$(queryKey).html(valMap['html']);
+						}
+
+						// 修改自己
+						var queryKey1 = $(this).attr("queryKey");
+						var valMap = map[queryKey1];
+
+						if (valMap['order'] == '' || valMap['order'] == desc) {
+							valMap['order'] = asc;
+							self.sortTable(queryKey1, 'asc');
+						} else if (valMap['order'] == asc) {
+							valMap['order'] = desc;
+							self.sortTable(queryKey1, 'desc');
+						}
+
+						$(this).html(valMap['html'] + valMap['order']);
+					});
+				}
+			},
+			initResetData : function() {
+				$(".sortTr", table).each(function(i, tr) {
+					var map = {}
+					$(tr).find("td").each(function(ii, td) {
+						map[ii] = $(td).html();
+					});
+					dataArry.push(map);
+					dataTrArry.push($(tr).html());
+				});
+			},
+			sortTable : function(queryKey, sortType) {
+				this.emptySortTr();
+
+				var index = map[queryKey]['index'];
+
+				var sortedTrIndexArry = this.arraySort(this.cloneArry(dataArry),
+						index, sortType);
+
+				for (var ii = 0; ii < sortedTrIndexArry.length; ii++) {
+					var trIndex = sortedTrIndexArry[ii];
+					$(table).append($("<tr class='sortTr'>" + dataTrArry[trIndex] + "</tr>"));
+				}
+			},
+			emptySortTr : function() {
+				$(".sortTr", table).each(function(i, tr) {
+					$(tr).remove();
+				});
+			},
+			cloneArry : function(arry) {
+				var newArry = new Array();
+				for ( var ii in arry) {
+					newArry.push(arry[ii])
+				}
+				return newArry;
+			},
+			arraySort : function(arry, columnIndex, sortType) {
+				var dArry = new Array();
+				for (var ii = 0; ii < arry.length; ii++) {
+					dArry.push(new String(arry[ii][columnIndex]));
+				}
+				dArry.sort();
+				if (sortType == 'desc') {
+					dArry.reverse();
+				}
+				var rtnArry = new Array();
+				for ( var val in dArry) {
+					for (var ii = 0; ii < arry.length; ii++) {
+						if (arry[ii][columnIndex] == dArry[val]) {
+							rtnArry.push(ii);
+							arry.splice(ii, 1);
+							break;
+						}
+					}
+				}
+				return rtnArry;
+			},
+		}
+	};
+
+	function initSortTable() {
+		var fundTableSort = new FundTableSort();
+		fundTableSort.setTable("#fundSortTable");
+		fundTableSort.appendTh("th.ApplicationDate");
+		fundTableSort.appendTh("th.OrderDate");
+		fundTableSort.appendTh("th.OrderTime");
+		fundTableSort.appendTh("th.CustomerID_Res");
+		fundTableSort.appendTh("th.ApplicationID");
+		fundTableSort.appendTh("th.DealType_Res");
+		fundTableSort.appendTh("th.TrustType_Res");
+		fundTableSort.appendTh("th.ShoreType_Res");
+		fundTableSort.appendTh("th.FundID");
+		fundTableSort.appendTh("th.FundCName");
+		fundTableSort.appendTh("th.TrustCapital");
+		fundTableSort.appendTh("th.WithDrawAcct_Res");
+		fundTableSort.appendTh("th.ApplicationStauts_Res");
+		fundTableSort.appendTh("th.BranchID");
+		fundTableSort.appendTh("th.TradeType_Res");
+		fundTableSort.initReset();
+	}
+</script>
+</head>
+<body>
+	<div class="has_client_menu" id="container">
+
+		<!-- ↓↓↓↓↓ ↓↓↓↓↓ -->
+		<div class="content has_sidebar">
+			<div class="content_col1">
+				<div class="content_title">基金</div>
+				<div style="background: #d7dde2; text-align: center;">
+					註記說明：已建檔[<span style="color: yellow"> ● </span>] 申請書未覆核 [<span
+						style="color: red"> ● </span>] 憑證未覆核 [<span style="color: green">
+						● </span>]
+				</div>
+				<hr class="content_title_hr"></hr>
+				<div class="content_box">
+					<div class="content_table content_table table-xh-140">
+						<table class="rwd-table" id="fundSortTable">
+							<thead>
+								<tr>
+									<!-- class 對 資料庫欄位(因資料多列，因此設class非用id且放在Header表示，資料部分在看要怎麼處理) -->
+									<th width="6%" class="ApplicationDate">申請日</th>
+									<th width="6%" class="OrderDate">交易日</th>
+									<th width="6%" class="OrderTime">交易時間</th>
+									<th width="6%" class="CustomerID_Res">客戶</th>
+									<th width="6%" class="ApplicationID">申請書編號</th>
+									<th width="6%" class="DealType_Res">交易別</th>
+									<th width="6%" class="TrustType_Res">信託別</th>
+									<th width="6%" class="ShoreType_Res">境內/外</th>
+									<th width="6%" class="FundID">商品代碼</th>
+									<th width="6%" class="FundCName">商品名稱</th>
+									<th width="6%" class="TrustCapital">信託金額</th>
+									<th width="6%" class="WithDrawAcct_Res">扣款帳戶</th>
+									<th width="6%" class="ApplicationStauts_Res"><span
+										class="ApplicationStauts_Res">申請書狀態</span> </br> <span
+										class="TrustAcct_Res">信託帳號</span></th>
+									<th width="6%" class="BranchID">交易分行</th>
+									<th width="6%" class="TradeType_Res">交易通路</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">09:58:15</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004165&#39;, &#39;2&#39;);">001-2019-004165</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境外</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">00010022</a></td>
+									<td data-th="商品名稱" class="FundCName">國外－JPM亞太入息基金(美元)</td>
+									<td data-th="信託金額" class="TrustCapital">TWD 10,000</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">001-03-5008353</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span style="color: red">未覆核●</span>
+
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157089/2">001-78-157089</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">10:37:07</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004167&#39;, &#39;2&#39;);">001-2019-004167</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境外</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">00010022</a></td>
+									<td data-th="商品名稱" class="FundCName">國外－JPM亞太入息基金(美元)</td>
+									<td data-th="信託金額" class="TrustCapital">USD 300.00</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">062-08-7002778</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span
+											style="color: green">已覆核●</span>
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157091/2">001-78-157091</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">10:40:45</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004169&#39;, &#39;2&#39;);">001-2019-004169</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境外</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">00010022</a></td>
+									<td data-th="商品名稱" class="FundCName">國外－JPM亞太入息基金(美元)</td>
+									<td data-th="信託金額" class="TrustCapital">USD 600.00</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">062-08-7002778</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span style="color: red">未覆核●</span>
+
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157093/2">001-78-157093</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">10:36:09</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004166&#39;, &#39;2&#39;);">001-2019-004166</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境外</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">00010022</a></td>
+									<td data-th="商品名稱" class="FundCName">國外－JPM亞太入息基金(美元)</td>
+									<td data-th="信託金額" class="TrustCapital">USD 300.00</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">062-08-7002778</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span style="color: red">未覆核●</span>
+
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157090/2">001-78-157090</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">11:37:07</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004171&#39;, &#39;1&#39;);">001-2019-004171</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境內</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">10020007</a></td>
+									<td data-th="商品名稱" class="FundCName">國內─摩根大歐洲基金</td>
+									<td data-th="信託金額" class="TrustCapital">TWD 10,000</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">001-50-6000765</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span
+											style="color: green">已覆核●</span>
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157095/1">001-78-157095</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">10:39:06</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004168&#39;, &#39;1&#39;);">001-2019-004168</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境內</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">10020007</a></td>
+									<td data-th="商品名稱" class="FundCName">國內─摩根大歐洲基金</td>
+									<td data-th="信託金額" class="TrustCapital">TWD 20,000</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">001-03-5008353</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span style="color: red">未覆核●</span>
+
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157092/1">001-78-157092</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">09:54:49</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004164&#39;, &#39;1&#39;);">001-2019-004164</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境內</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">10020007</a></td>
+									<td data-th="商品名稱" class="FundCName">國內─摩根大歐洲基金</td>
+									<td data-th="信託金額" class="TrustCapital">TWD 10,000</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">001-03-5008353</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span style="color: red">未覆核●</span>
+
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157088/1">001-78-157088</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+								<tr class="sortTr">
+									<td data-th="申請日" class="ApplicationDate">2019-05-07</td>
+									<td data-th="交易日" class="OrderDate">2019-05-07</td>
+									<td data-th="交易時間" class="OrderTime">11:34:23</td>
+									<td data-th="客戶" class="CustomerID_Res"><span>A101770888</span><br>
+										<span>Allan,aa</span></td>
+									<td data-th="申請書編號" class="ApplicationID"><a
+										href="javascript:applyDetailPageForward(&#39;001-2019-004170&#39;, &#39;1&#39;);">001-2019-004170</a></td>
+									<td data-th="交易別" class="DealType_Res">申購</td>
+									<td data-th="信託別" class="TrustType_Res">一般</td>
+									<td data-th="境內/外" class="ShoreType_Res">境內</td>
+									<td data-th="商品代碼" class="FundID"><a
+										href="javascript:void(0);">10020007</a></td>
+									<td data-th="商品名稱" class="FundCName">國內─摩根大歐洲基金</td>
+									<td data-th="信託金額" class="TrustCapital">TWD 10,000</td>
+									<td data-th="扣款帳戶" class="WithDrawAcct_Res">001-50-6000765</td>
+									<td data-th="申請書狀態/信託帳號"><span
+										class="ApplicationStauts_Res"> <span
+											style="color: green">已覆核●</span>
+
+
+
+
+									</span> </br> <a class="TrustAcct_Res"
+										href="/fund/qryTrustAcct/001-78-157094/1">001-78-157094</a></td>
+									<td data-th="交易分行" class="BranchID">001</td>
+									<td data-th="交易通路" class="TradeType_Res">臨櫃</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- ↑↑↑↑↑ ↑↑↑↑↑ -->
+</body>
+</html>

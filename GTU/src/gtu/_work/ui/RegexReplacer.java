@@ -54,6 +54,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -591,8 +592,11 @@ public class RegexReplacer extends javax.swing.JFrame {
                                     JSONObject json = null;
                                     if (StringUtils.isBlank(tradeOff)) {
                                         json = new JSONObject();
-                                        json.put(SelectionObj.equal.key, new JSONArray());
-                                        json.put(SelectionObj.not_equal.key, new JSONArray());
+                                        for (SelectionObj e1 : SelectionObj.values()) {
+                                            if ("arryKey".equals(e1.type)) {
+                                                json.put(e1.key, new JSONArray());
+                                            }
+                                        }
                                         tradeOff = json.toString();
                                     } else {
                                         json = JSONObject.fromObject(tradeOff);
@@ -817,6 +821,8 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
         replaceLock.set(true);
         try {
+            TradeOffConfig config = this.getTradeOffConfig(tradeOffArea.getText());
+
             if (tempComboLst != null && !tempComboLst.isEmpty()) {
                 String replaceText = replaceArea.getText();
                 for (String comboKey : tempComboLst) {
@@ -826,6 +832,28 @@ public class RegexReplacer extends javax.swing.JFrame {
                     }
                 }
                 resultArea.setText(replaceText);
+            } else if (!config.sourceFiles.isEmpty()) {
+
+                String fromPattern = null;
+                String configkeytext = null;
+                String toFormat = repToText.getText();
+                Validate.notEmpty((configkeytext = configKeyText.getText()), "configKey can't empty");
+                Validate.notEmpty((fromPattern = repFromText.getText()), "replace regex can't empty");
+
+                List<String> successLst = new ArrayList<String>();
+                List<String> failLst = new ArrayList<String>();
+                for (File file : config.sourceFiles) {
+                    String replaceText = FileUtil.loadFromFile(file, "UTF8");
+                    String replaceTextOk = replacerDetail(fromPattern, toFormat, replaceText, multiLineCheckBox.isSelected(), tradeOffArea.getText());
+                    FileUtil.saveToFile(file, replaceTextOk, "UTF8");
+                    if (!StringUtils.equals(replaceText, replaceTextOk)) {
+                        successLst.add(file.getName());
+                    } else {
+                        failLst.add(file.getName());
+                    }
+                }
+                JCommonUtil._jOptionPane_showMessageDialog_info("寫檔完成! : " + "\n成功:" + StringUtils.join(successLst, "\n") + "\n失敗:" + StringUtils.join(failLst, "\n"));
+
             } else {
                 // !!!!NORMAL PROCESS HERE!!!!
                 String replaceText = null;
@@ -960,6 +988,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         String split;
         boolean isOnlyMatch = false;
         JSONObject json;
+        List<File> sourceFiles = new ArrayList<File>();
 
         TradeOffConfig(JSONObject json) {
             this.json = json;
@@ -977,6 +1006,15 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
             if (json.containsKey(SelectionObj.split.key)) {
                 split = json.getString(SelectionObj.split.key);
+            }
+            if (json.containsKey(SelectionObj.sourceFiles.key)) {
+                JSONArray fileString = json.getJSONArray(SelectionObj.sourceFiles.key);
+                for (int ii = 0; ii < fileString.size(); ii++) {
+                    File file = new File(fileString.getString(ii));
+                    if (file.exists()) {
+                        sourceFiles.add(file);
+                    }
+                }
             }
         }
     }
@@ -1368,7 +1406,8 @@ public class RegexReplacer extends javax.swing.JFrame {
         only_match("only_match", "only_match (是否只抓group, true|false)", "boolKey"), //
         prefix("prefix", "prefix (前置文字)", "strKey"), //
         suffix("suffix", "suffix (後置文字)", "strKey"), //
-        split("split", "split (分頁)", "strKey"),//
+        split("split", "split (分頁)", "strKey"), //
+        sourceFiles("sourceFiles", "sourceFiles (固定來源檔)", "arryKey"),//
         ;
         final String key;
         final String label;
