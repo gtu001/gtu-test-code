@@ -1442,7 +1442,7 @@ public class JTableUtil {
                 Pattern tmpPtn = null;
                 if (StringUtils.isNotBlank(temp)) {
                     try {
-                        tmpPtn = Pattern.compile(temp);
+                        tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
                     } catch (Exception ex) {
                     }
                 }
@@ -1472,7 +1472,7 @@ public class JTableUtil {
 
                 for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
                     Object key = headerDef.getLeft().get(ii);
-                    String headerColumn = String.valueOf(key).toUpperCase();
+                    String headerColumn = String.valueOf(key);
 
                     boolean findOk = false;
 
