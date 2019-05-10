@@ -1473,14 +1473,15 @@ public class JTableUtil {
                 for (int ii = 0; ii < headerDef.getLeft().size(); ii++) {
                     Object key = headerDef.getLeft().get(ii);
                     String headerColumn = String.valueOf(key);
+                    String headerColumnUpper = headerColumn.toUpperCase();
 
                     boolean findOk = false;
 
-                    if (StringUtils.isNotBlank(param) && headerColumn.contains(param)) {
+                    if (StringUtils.isNotBlank(param) && headerColumnUpper.contains(param)) {
                         System.out.println("Match------------" + headerColumn + " --> " + param);
                         findOk = true;
                     } else if (param.contains("*")) {
-                        if (m.find(headerColumn)) {
+                        if (m.find(headerColumnUpper)) {
                             findOk = true;
                         }
                     } else if (!afterFilterProc.getRight().isEmpty()) {
@@ -1492,7 +1493,7 @@ public class JTableUtil {
                         }
                     }
 
-                    if (findOk && !addColumns.containsKey(headerColumn)) {
+                    if (findOk && !addColumns.containsKey(headerColumnUpper)) {
                         System.out.println("Add------------" + key);
                         addColumns.put(headerColumn, headerDef.getRight().get(ii));
                     }
