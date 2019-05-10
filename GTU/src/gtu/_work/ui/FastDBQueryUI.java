@@ -2048,7 +2048,12 @@ public class FastDBQueryUI extends JFrame {
             sb.setLength(0);
             Matcher mth2 = ptn2.matcher(sql);
             while (mth2.find()) {
-                mth2.appendReplacement(sb, "");
+                String tmp = mth2.group();
+                if (tmp.indexOf("]") == -1) {//如果有對應參數設定則不拿掉
+                    mth2.appendReplacement(sb, "");
+                } else {
+                    mth2.appendReplacement(sb, tmp);
+                }
             }
             mth2.appendTail(sb);
             return sb.toString();
