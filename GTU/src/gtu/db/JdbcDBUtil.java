@@ -239,22 +239,31 @@ public class JdbcDBUtil {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             doSettingParameters(con, ps, param);
 
+            List<String> colList = new ArrayList<String>();
+            List<Class<?>> typeList = new ArrayList<Class<?>>();
+
             rs = ps.executeQuery();
             java.sql.ResultSetMetaData mdata = rs.getMetaData();
             int cols = mdata.getColumnCount();
-            List<String> colList = new ArrayList<String>();
             for (int i = 1; i <= cols; i++) {
                 colList.add(mdata.getColumnName(i));
+                typeList.add(JdbcTypeMappingToJava.getMappingClass(mdata.getColumnType(i)));
             }
 
             while (rs.next()) {
                 Map<String, Object> map = new LinkedHashMap<String, Object>();
-                for (String col : colList) {
-                    map.put(col, rs.getObject(col));
+                for (int ii = 0; ii < colList.size(); ii++) {
+                    String col = colList.get(ii);
+                    Object value = null;
+                    if (typeList.get(ii - 1) == java.sql.Clob.class) {
+                        value = rs.getString(ii);
+                    } else {
+                        value = rs.getObject(ii);
+                    }
+                    map.put(col, value);
                 }
                 rsList.add(map);
             }
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -315,9 +324,11 @@ public class JdbcDBUtil {
                 List<Object> lst = new ArrayList<Object>();
                 for (int ii = 1; ii <= cols; ii++) {
                     try {
-                        Object value = rs.getObject(ii);
-                        if (value instanceof java.sql.Clob) {
+                        Object value = null;
+                        if (typeList.get(ii - 1) == java.sql.Clob.class) {
                             value = rs.getString(ii);
+                        } else {
+                            value = rs.getObject(ii);
                         }
                         lst.add(value);
                     } catch (Exception ex) {
@@ -325,12 +336,7 @@ public class JdbcDBUtil {
                         System.out.println(errorMsg);
                         ex.printStackTrace();
                         JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true, false);
-                        try {
-                            lst.add(getCharStream(rs.getCharacterStream(ii)));
-                        } catch (Exception ex2) {
-                            lst.add("__#ERROR#__ : " + ex.getMessage());
-                            JCommonUtil.handleException(errorMsg, ex2, true, "_getCharacterStream_", "yyyyMMdd.HHmm", true, false);
-                        }
+                        lst.add("__#ERROR#__ : " + ex.getMessage());
                     }
                 }
                 rsList.add(lst.toArray());
