@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,7 +20,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
@@ -318,7 +315,11 @@ public class JdbcDBUtil {
                 List<Object> lst = new ArrayList<Object>();
                 for (int ii = 1; ii <= cols; ii++) {
                     try {
-                        lst.add(rs.getObject(ii));
+                        Object value = rs.getObject(ii);
+                        if (value instanceof java.sql.Clob) {
+                            value = rs.getString(ii);
+                        }
+                        lst.add(value);
                     } catch (Exception ex) {
                         String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, colList.get(ii - 1)) + ex.getMessage();
                         System.out.println(errorMsg);
