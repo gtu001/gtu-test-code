@@ -1491,6 +1491,8 @@ public class JTableUtil {
                                 break;
                             }
                         }
+                    } else if (StringUtils.isBlank(filterText)) {
+                        findOk = true;
                     }
 
                     if (findOk && !addColumns.containsKey(headerColumnUpper)) {
