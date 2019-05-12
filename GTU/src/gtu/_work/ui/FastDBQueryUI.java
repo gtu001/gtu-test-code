@@ -146,6 +146,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdConfigBeanHandler sqlIdConfigBeanHandler;
     private SqlIdListDSMappingHandler sqlIdListDSMappingHandler;
     private SqlParameterConfigLoadHandler sqlParameterConfigLoadHandler = new SqlParameterConfigLoadHandler();
+    private SqlIdColumnHolder mSqlIdColumnHolder = new SqlIdColumnHolder();
     public LoggerAppender updateLogger = new LoggerAppender(new File(JAR_PATH_FILE, "updateLog_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".txt"));
 
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
@@ -393,12 +394,12 @@ public class FastDBQueryUI extends JFrame {
 
         panel.add(newPanel1, BorderLayout.NORTH);
 
-        lblNewLabel_5 = new JLabel("SQL過濾");
+        lblNewLabel_5 = new JLabel("SQL與欄位過濾");
         newPanel1.add(lblNewLabel_5);
 
         sqlContentFilterText = new JTextField();
         sqlContentFilterText.setColumns(15);
-        sqlContentFilterText.setToolTipText("SQL內所包含文字過濾");
+        sqlContentFilterText.setToolTipText("SQL內所包含文字以及所含欄位過濾");
 
         newPanel1.add(sqlContentFilterText);
 
@@ -1550,14 +1551,18 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(queryText) && StringUtils.isBlank(contentFilterText)) {
                 findOk = true;
             } else {
-                if (StringUtils.isNotBlank(queryText) && StringUtils.isNotBlank(contentFilterText)) {
-                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText)) && content.contains(contentFilterText)) {
+                if (StringUtils.isNotBlank(queryText)) {
+                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText))) {
                         findOk = true;
                     }
-                } else if (StringUtils.isNotBlank(queryText) && (category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText))) {
-                    findOk = true;
-                } else if (StringUtils.isNotBlank(contentFilterText) && content.contains(contentFilterText)) {
-                    findOk = true;
+                }
+
+                if (!findOk && StringUtils.isNotBlank(contentFilterText)) {
+                    if (content.contains(contentFilterText)) {
+                        findOk = true;
+                    } else if (mSqlIdColumnHolder.isColumnExists(sqlId, contentFilterText)) {
+                        findOk = true;
+                    }
                 }
             }
 
@@ -1839,6 +1844,9 @@ public class FastDBQueryUI extends JFrame {
                 int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
                 Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
                         this.getDataSource().getConnection(), true, maxRowsLimit);
+
+                mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
+
                 this.queryList = orignQueryResult;
 
                 // 切換查詢結果
@@ -2049,7 +2057,7 @@ public class FastDBQueryUI extends JFrame {
             Matcher mth2 = ptn2.matcher(sql);
             while (mth2.find()) {
                 String tmp = mth2.group();
-                if (tmp.indexOf("]") == -1) {//如果有對應參數設定則不拿掉
+                if (tmp.indexOf("]") == -1) {// 如果有對應參數設定則不拿掉
                     mth2.appendReplacement(sb, "");
                 } else {
                     mth2.appendReplacement(sb, tmp);
@@ -2939,6 +2947,9 @@ public class FastDBQueryUI extends JFrame {
                 // 移除db config mapping
                 sqlIdListDSMappingHandler.remove(sqlBean.getUniqueKey());
             }
+
+            // 刪除sqlIdColumn設定
+            mSqlIdColumnHolder.remove(mSqlIdColumnHolder.getSqlId());
 
             JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
         }
@@ -3915,6 +3926,58 @@ public class FastDBQueryUI extends JFrame {
             if (delConfirm) {
                 sqlParameterConfigLoad.removeConfig();
             }
+        }
+    }
+
+    private class SqlIdColumnHolder {
+        private PropertiesUtilBean config;
+        private File configFile;
+
+        private String getSqlId() {
+            if (sqlBean != null) {
+                return sqlBean.sqlId;
+            }
+            return StringUtils.trimToEmpty(sqlIdText.getText());
+        }
+
+        private SqlIdColumnHolder() {
+            configFile = new File(JAR_PATH_FILE, SqlIdColumnHolder.class.getSimpleName() + ".properties");
+            config = new PropertiesUtilBean(configFile);
+        }
+
+        private void remove(String sqlId) {
+            if (!config.getConfigProp().containsKey(sqlId)) {
+                return;
+            }
+            config.getConfigProp().remove(sqlId);
+            config.store();
+        }
+
+        private void setColumns(String sqlId, List<String> columns) {
+            if (StringUtils.isBlank(sqlId)) {
+                return;
+            }
+            String value = StringUtils.join(columns, "^");
+            config.getConfigProp().setProperty(sqlId, value);
+            config.store();
+        }
+
+        private boolean isColumnExists(String sqlId, String column) {
+            column = StringUtils.trimToEmpty(column);
+            if (StringUtils.isBlank(column)) {
+                return false;
+            }
+            if (!config.getConfigProp().containsKey(sqlId)) {
+                return false;
+            }
+            String columnStr = config.getConfigProp().getProperty(sqlId);
+            String[] columns = StringUtils.split(columnStr, "^");
+            for (String col : columns) {
+                if (StringUtils.trimToEmpty(col).equalsIgnoreCase(column)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

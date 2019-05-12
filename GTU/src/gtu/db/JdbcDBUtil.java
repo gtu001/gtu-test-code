@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,7 +20,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
@@ -242,22 +239,31 @@ public class JdbcDBUtil {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
             doSettingParameters(con, ps, param);
 
+            List<String> colList = new ArrayList<String>();
+            List<Class<?>> typeList = new ArrayList<Class<?>>();
+
             rs = ps.executeQuery();
             java.sql.ResultSetMetaData mdata = rs.getMetaData();
             int cols = mdata.getColumnCount();
-            List<String> colList = new ArrayList<String>();
             for (int i = 1; i <= cols; i++) {
                 colList.add(mdata.getColumnName(i));
+                typeList.add(JdbcTypeMappingToJava.getMappingClass(mdata.getColumnType(i)));
             }
 
             while (rs.next()) {
                 Map<String, Object> map = new LinkedHashMap<String, Object>();
-                for (String col : colList) {
-                    map.put(col, rs.getObject(col));
+                for (int ii = 0; ii < colList.size(); ii++) {
+                    String col = colList.get(ii);
+                    Object value = null;
+                    if (typeList.get(ii - 1) == java.sql.Clob.class) {
+                        value = rs.getString(ii);
+                    } else {
+                        value = rs.getObject(ii);
+                    }
+                    map.put(col, value);
                 }
                 rsList.add(map);
             }
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -318,18 +324,19 @@ public class JdbcDBUtil {
                 List<Object> lst = new ArrayList<Object>();
                 for (int ii = 1; ii <= cols; ii++) {
                     try {
-                        lst.add(rs.getObject(ii));
+                        Object value = null;
+                        if (typeList.get(ii - 1) == java.sql.Clob.class) {
+                            value = rs.getString(ii);
+                        } else {
+                            value = rs.getObject(ii);
+                        }
+                        lst.add(value);
                     } catch (Exception ex) {
                         String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, colList.get(ii - 1)) + ex.getMessage();
                         System.out.println(errorMsg);
                         ex.printStackTrace();
                         JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true, false);
-                        try {
-                            lst.add(getCharStream(rs.getCharacterStream(ii)));
-                        } catch (Exception ex2) {
-                            lst.add("__#ERROR#__ : " + ex.getMessage());
-                            JCommonUtil.handleException(errorMsg, ex2, true, "_getCharacterStream_", "yyyyMMdd.HHmm", true, false);
-                        }
+                        lst.add("__#ERROR#__ : " + ex.getMessage());
                     }
                 }
                 rsList.add(lst.toArray());
