@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -117,6 +119,8 @@ public class AVChoicerUI extends JFrame {
     private JTextField avExeAliasText;
     private AvExeConfigHandler avExeConfigHandler;
     private JTextField avExeEncodeText;
+    private JTextField dirCheckText;
+    private JList dirCheckList;
 
     /**
      * Launch the application.
@@ -417,6 +421,53 @@ public class AVChoicerUI extends JFrame {
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
 
         panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
+
+        JPanel panel_18 = new JPanel();
+        tabbedPane.addTab("目錄檢視", null, panel_18, null);
+        panel_18.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_19 = new JPanel();
+        panel_18.add(panel_19, BorderLayout.NORTH);
+
+        JLabel lblNewLabel_3 = new JLabel("檢視目錄");
+        panel_19.add(lblNewLabel_3);
+
+        dirCheckText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(dirCheckText, true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dirCheckTextActionPerformed();
+            }
+        });
+        dirCheckText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                dirCheckTextActionPerformed();
+            }
+        });
+
+        panel_19.add(dirCheckText);
+        dirCheckText.setColumns(30);
+
+        JPanel panel_20 = new JPanel();
+        panel_18.add(panel_20, BorderLayout.WEST);
+
+        JPanel panel_21 = new JPanel();
+        panel_18.add(panel_21, BorderLayout.EAST);
+
+        JPanel panel_22 = new JPanel();
+        panel_18.add(panel_22, BorderLayout.SOUTH);
+
+        dirCheckList = new JList();
+        dirCheckList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (JMouseEventUtil.buttonLeftClick(2, arg0)) {
+                    dirCheckListMouseClicked();
+                }
+            }
+        });
+        panel_18.add(JCommonUtil.createScrollComponent(dirCheckList), BorderLayout.CENTER);
     }
 
     private class MoveToHandler {
@@ -908,6 +959,52 @@ public class AVChoicerUI extends JFrame {
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }
+        }
+    }
+
+    private void dirCheckTextActionPerformed() {
+        List<FileZ> lst = new ArrayList<FileZ>();
+        File dirFile = new File(dirCheckText.getText());
+        if (dirFile.isFile()) {
+            lst.add(new FileZ(dirFile));
+        } else {
+            for (File f : dirFile.listFiles()) {
+                lst.add(new FileZ(f));
+            }
+        }
+        DefaultListModel model = JListUtil.createModel();
+        for (FileZ f : lst) {
+            model.addElement(f);
+        }
+        dirCheckList.setModel(model);
+    }
+
+    private void dirCheckListMouseClicked() {
+        FileZ fileZ = (FileZ) JListUtil.getLeadSelectionObject(dirCheckList);
+        System.out.println("file --- " + fileZ.file);
+        if (fileZ.file.isDirectory()) {
+            try {
+                Desktop.getDesktop().open(fileZ.file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            playAvFile(fileZ.file);
+        }
+    }
+
+    private class FileZ {
+        File file;
+        String name;
+
+        FileZ(File file) {
+            this.file = file;
+            this.name = file.getName();
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

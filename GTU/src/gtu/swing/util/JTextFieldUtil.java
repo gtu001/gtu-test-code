@@ -47,7 +47,7 @@ public class JTextFieldUtil {
                         textField.setText(droppedFiles.get(0).getAbsolutePath());
                     }
                     if (multiFileListener != null) {
-                        if (!droppedFiles.isEmpty() && droppedFiles.size() > 1) {
+                        if (!droppedFiles.isEmpty()) {
                             ActionEvent event = new ActionEvent(droppedFiles, -1, "go multi file");
                             multiFileListener.actionPerformed(event);
                         }
