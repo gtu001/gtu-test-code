@@ -841,6 +841,7 @@ public class AVChoicerUI extends JFrame {
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
                     resetCacheFileList();
+                    dirCheckTextActionPerformed();
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
                 }
@@ -983,6 +984,12 @@ public class AVChoicerUI extends JFrame {
         FileZ fileZ = (FileZ) JListUtil.getLeadSelectionObject(dirCheckList);
         System.out.println("file --- " + fileZ.file);
         if (fileZ.file.isDirectory()) {
+            try {
+                Desktop.getDesktop().open(fileZ.file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (fileZ.file.getName().matches(".*\\.(jpg|jpeg|bmp|png|gif)")) {
             try {
                 Desktop.getDesktop().open(fileZ.file);
             } catch (IOException e) {

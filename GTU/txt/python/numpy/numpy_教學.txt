@@ -1,0 +1,9 @@
+
+	x[ row直 , col橫 ]
+	
+	x[ start:stop:step ]
+	
+	
+---
+
+		

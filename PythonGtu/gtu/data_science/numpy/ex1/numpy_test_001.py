@@ -23,3 +23,6 @@ arry = np.asarray([op(X, 1) for op in ops])
 '''
 print(arry)
 
+
+
+
