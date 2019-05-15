@@ -60,6 +60,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
@@ -482,6 +483,20 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextAreaChange();
             }
         }));
+
+        sqlTextArea.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                sqlTextAreaPromptProcess("insertUpdate", e);
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                sqlTextAreaPromptProcess("removeUpdate", e);
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                sqlTextAreaPromptProcess("changedUpdate", e);
+            }
+        });
 
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
@@ -4116,5 +4131,21 @@ public class FastDBQueryUI extends JFrame {
 
     public EditColumnHistoryHandler getEditColumnConfig() {
         return editColumnHistoryHandler;
+    }
+
+    private void sqlTextAreaPromptProcess(String label, DocumentEvent event) {
+        System.out.println("Offset : " + event.getOffset());
+        System.out.println("Length : " + event.getLength());
+
+        String tmpSql = StringUtils.substring(sqlTextArea.getText(), 0, event.getOffset() + event.getLength());
+        Pattern ptn = Pattern.compile("[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = ptn.matcher(tmpSql);
+        int startPos = -1;
+        while (mth.find()) {
+            startPos = mth.end();
+        }
+        String queryDbParam = StringUtils.substring(tmpSql, startPos);
+
+        System.out.println(label + ">> ---- ||" + queryDbParam);
     }
 }
