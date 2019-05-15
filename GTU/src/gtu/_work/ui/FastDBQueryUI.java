@@ -4200,7 +4200,7 @@ public class FastDBQueryUI extends JFrame {
             util.applyEvent(rect);
             util.getJPopupMenu().setFocusable(false);
             for (int ii = 0; ii < columnLst.size(); ii++) {
-                String col = columnLst.get(ii);
+                final String col = columnLst.get(ii);
                 util.addJMenuItem(col, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
