@@ -45,12 +45,12 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -283,7 +283,6 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_13;
     private JTextAreaSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
-    private JCheckBox sqlPromptChk;
 
     /**
      * Launch the application.
@@ -484,6 +483,8 @@ public class FastDBQueryUI extends JFrame {
                     mSqlTextAreaPromptHandler.performSelectTopColumn();
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     mSqlTextAreaPromptHandler.performSelectClose();
+                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                 }
             }
         });
@@ -612,9 +613,6 @@ public class FastDBQueryUI extends JFrame {
 
         JPanel panel_3 = new JPanel();
         panel_2.add(panel_3, BorderLayout.SOUTH);
-
-        sqlPromptChk = new JCheckBox("SQL提示");
-        panel_3.add(sqlPromptChk);
 
         label_1 = new JLabel("max rows :");
         panel_3.add(label_1);
@@ -4156,7 +4154,14 @@ public class FastDBQueryUI extends JFrame {
 
         public void performSelectTopColumn() {
             if (util.getJPopupMenu().isVisible() && !util.getMenuList().isEmpty()) {
-                JCommonUtil.triggerButtonActionPerformed(util.getMenuList().get(0));
+                JMenuItem select = util.getMenuList().get(0);
+                for (int ii = 0; ii < util.getMenuList().size(); ii++) {
+                    if (util.getMenuList().get(ii).isSelected()) {
+                        select = util.getMenuList().get(ii);
+                        break;
+                    }
+                }
+                JCommonUtil.triggerButtonActionPerformed(select);
             }
         }
 
@@ -4227,7 +4232,7 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isNotBlank(columnPrefix)) {
                 String _columnPrefix = columnPrefix.toLowerCase();
                 for (String col : tab.getColumns()) {
-                    if (col.toLowerCase().contains(_columnPrefix)) {
+                    if (col.toLowerCase().startsWith(_columnPrefix)) {
                         columnLst.add(col);
                     }
                 }
@@ -4287,9 +4292,6 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void sqlTextAreaPromptProcess(String label, DocumentEvent event) {
-        if (!sqlPromptChk.isSelected()) {
-            return;
-        }
         if (mSqlTextAreaPromptHandler == null) {
             mSqlTextAreaPromptHandler = new SqlTextAreaPromptHandler();
         }

@@ -971,8 +971,8 @@ public class JCommonUtil {
         jcomponent.setRequestFocusEnabled(true);
         jcomponent.setFocusable(true);
         jcomponent.grabFocus();
+//        jcomponent.requestFocus();
         jcomponent.requestFocusInWindow();
-        jcomponent.requestFocus();
         boolean useRobotFocus = false;
         if (!jcomponent.isFocusOwner() && robotFocus) {
             try {
