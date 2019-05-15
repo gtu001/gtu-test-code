@@ -45,6 +45,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -75,7 +76,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
-import org.springframework.util.CollectionUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -125,7 +125,6 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
-import javax.swing.JCheckBox;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -4167,7 +4166,7 @@ public class FastDBQueryUI extends JFrame {
             }
             if (tab != null) {
                 List<String> columnLst = getColumnLst();
-                if (!CollectionUtils.isEmpty(columnLst)) {
+                if (!columnLst.isEmpty()) {
                     showPopup(columnLst);
                 }
             }
