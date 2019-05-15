@@ -121,4 +121,8 @@ public class JPopupMenuUtil {
     public void dismiss() {
         jPopupMenu1.setVisible(false);
     }
+
+    public JPopupMenu getJPopupMenu() {
+        return jPopupMenu1;
+    }
 }

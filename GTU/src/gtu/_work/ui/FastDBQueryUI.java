@@ -480,6 +480,10 @@ public class FastDBQueryUI extends JFrame {
                 if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
                 e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
+                } else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    mSqlTextAreaPromptHandler.performSelectTopColumn();
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    mSqlTextAreaPromptHandler.performSelectClose();
                 }
             }
         });
@@ -4139,8 +4143,21 @@ public class FastDBQueryUI extends JFrame {
         Map<String, DbSqlCreater.TableInfo> tabMap = new HashMap<String, DbSqlCreater.TableInfo>();
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
+        JPopupMenuUtil util;
 
         private SqlTextAreaPromptHandler() {
+        }
+
+        public void performSelectClose() {
+            if (util.getJPopupMenu().isVisible()) {
+                util.dismiss();
+            }
+        }
+
+        public void performSelectTopColumn() {
+            if (util.getJPopupMenu().isVisible() && !util.getMenuList().isEmpty()) {
+                JCommonUtil.triggerButtonActionPerformed(util.getMenuList().get(0));
+            }
         }
 
         private void init(DocumentEvent event) {
@@ -4174,8 +4191,9 @@ public class FastDBQueryUI extends JFrame {
 
         private void showPopup(List<String> columnLst) {
             Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
-            final JPopupMenuUtil util = JPopupMenuUtil.newInstance(sqlTextArea);
+            util = JPopupMenuUtil.newInstance(sqlTextArea);
             util.applyEvent(rect);
+            util.getJPopupMenu().setFocusable(false);
             for (int ii = 0; ii < columnLst.size(); ii++) {
                 String col = columnLst.get(ii);
                 util.addJMenuItem(col, new ActionListener() {
