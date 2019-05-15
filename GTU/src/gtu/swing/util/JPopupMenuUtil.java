@@ -1,9 +1,7 @@
 package gtu.swing.util;
 
 import java.awt.Component;
-import java.awt.Frame;
-import java.awt.MouseInfo;
-import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -23,6 +21,7 @@ public class JPopupMenuUtil {
     JPopupMenu jPopupMenu1;
     Component component;
     EventObject event;
+    Rectangle rect;
     List<JMenuItem> menuList;
 
     public static final ActionListener DO_THING_ACTIONLISTENER = new ActionListener() {
@@ -50,6 +49,11 @@ public class JPopupMenuUtil {
         return this;
     }
 
+    public JPopupMenuUtil applyEvent(Rectangle rect) {
+        this.rect = rect;
+        return this;
+    }
+
     public JPopupMenuUtil show() {
         if (event instanceof MouseEvent) {
             MouseEvent e1 = (MouseEvent) event;
@@ -57,6 +61,11 @@ public class JPopupMenuUtil {
                 jPopupMenu1.add(menu);
             }
             jPopupMenu1.show(component, e1.getX(), e1.getY());
+        } else if (rect != null) {
+            for (JMenuItem menu : menuList) {
+                jPopupMenu1.add(menu);
+            }
+            jPopupMenu1.show(component, (int) rect.getX(), (int) rect.getY());
         } else {
             for (JMenuItem menu : menuList) {
                 jPopupMenu1.add(menu);
@@ -107,5 +116,9 @@ public class JPopupMenuUtil {
 
     public List<JMenuItem> getMenuList() {
         return menuList;
+    }
+
+    public void dismiss() {
+        jPopupMenu1.setVisible(false);
     }
 }

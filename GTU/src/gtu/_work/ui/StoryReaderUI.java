@@ -1,12 +1,6 @@
 package gtu._work.ui;
 
-import gtu.properties.PropertiesUtil;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JTextAreaUtil;
-
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -34,9 +28,30 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.NativeInputEvent;
+import org.jnativehook.keyboard.NativeKeyAdapter;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.mouse.NativeMouseAdapter;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseWheelAdapter;
+import org.jnativehook.mouse.NativeMouseWheelEvent;
+
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFontChooserHelper;
+import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JTextAreaUtil;
+import javax.swing.JCheckBox;
 
 /**
  * @author gtu001
@@ -45,8 +60,6 @@ import org.apache.commons.lang3.StringUtils;
 public class StoryReaderUI extends JFrame {
 
     private JPanel contentPane;
-
-    private JList fileList = new JList();
     private JTextArea textArea = new JTextArea();
     private JLabel lineNumberLabel = new JLabel("");
 
@@ -57,40 +70,39 @@ public class StoryReaderUI extends JFrame {
     private int currentLineNumber = -1;
     private int maxLineNumber = -1;
     private String currentFileUrl;
+    private JList storyList;
+    private JTextField storyEncodingText;
+    private PropertiesUtilBean configBean = new PropertiesUtilBean(StoryReaderUI.class);
 
     /**
      * 初始化檔案清單
      */
     private void loadAndSyncConfigProp() {
-        Properties prop = new Properties();
         try {
+            Properties prop = new Properties();
             if (!configFile.exists()) {
                 configFile.createNewFile();
             }
             prop.load(new FileInputStream(configFile));
-        } catch (Exception ex) {
-            JCommonUtil.handleException(ex);
-        }
-        if (configProp == null) {
-            configProp = new Properties();
-        }
-        for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
-            String key = (String) enu.nextElement();
-            String value = prop.getProperty(key);
-            if (!configProp.containsKey(key)) {
-                configProp.setProperty(key, value);
-                System.out.println("Add---" + key + " : " + value);
+            if (configProp == null) {
+                configProp = new Properties();
             }
-        }
-        DefaultListModel model = JListUtil.createModel();
-        for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
-            String key = (String) enu.nextElement();
-            String value = configProp.getProperty(key);
-            System.out.println("List---" + key + " : " + value);
-            model.addElement(key);
-        }
-        fileList.setModel(model);
-        try {
+            for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = prop.getProperty(key);
+                if (!configProp.containsKey(key)) {
+                    configProp.setProperty(key, value);
+                    System.out.println("Add---" + key + " : " + value);
+                }
+            }
+            DefaultListModel model = JListUtil.createModel();
+            for (Enumeration enu = configProp.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = configProp.getProperty(key);
+                System.out.println("List---" + key + " : " + value);
+                model.addElement(key);
+            }
+            storyList.setModel(model);
             configProp.store(new FileOutputStream(configFile), "------");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -101,37 +113,42 @@ public class StoryReaderUI extends JFrame {
      * 新增檔案
      */
     private void addNewFileToFileList() {
-        File file = JCommonUtil._jFileChooser_selectFileOnly();
-        if (file == null) {
-            return;
-        }
-        String key = file.getAbsolutePath();
-        System.out.println("key = " + key);
-        if (!configProp.containsKey(key)) {
-            configProp.setProperty(key, "-1");
-        }
+        try {
+            File file = JCommonUtil._jFileChooser_selectFileOnly();
+            if (file == null) {
+                return;
+            }
+            String key = file.getAbsolutePath();
+            System.out.println("key = " + key);
+            if (!configProp.containsKey(key)) {
+                configProp.setProperty(key, "-1");
+            }
 
-        // 初始化檔案清單
-        loadAndSyncConfigProp();
+            // 初始化檔案清單
+            loadAndSyncConfigProp();
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     /**
      * 點檔案清單
      */
     private void fileListClickEvent() {
-        String fileUrl = JListUtil.getLeadSelectionObject(fileList);
-        if (fileUrl == null) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
-            return;
-        }
-        File file = new File(fileUrl);
-        if (!file.exists()) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
-            return;
-        }
         try {
+            String fileUrl = JListUtil.getLeadSelectionObject(storyList);
+            if (fileUrl == null) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                return;
+            }
+            File file = new File(fileUrl);
+            if (!file.exists()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                return;
+            }
+
             lineNumberMap = new LinkedHashMap<Integer, String>();
-            LineNumberReader reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file), "utf8"));
+            LineNumberReader reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file), storyEncodingText.getText()));
             for (String line = null; (line = reader.readLine()) != null;) {
                 lineNumberMap.put(reader.getLineNumber(), line);
                 maxLineNumber = reader.getLineNumber();
@@ -152,31 +169,39 @@ public class StoryReaderUI extends JFrame {
      * 設定儲存點
      */
     private void savepoint() {
-        if (StringUtils.isNotBlank(currentFileUrl)) {
-            if (maxLineNumber != -1 && currentLineNumber != -1) {
-                if (currentLineNumber > 0 && currentLineNumber <= maxLineNumber) {
-                    configProp.setProperty(currentFileUrl, String.valueOf(currentLineNumber));
-                    try {
-                        configProp.store(new FileOutputStream(configFile), "------");
-                    } catch (Exception ex) {
-                        JCommonUtil.handleException(ex);
+        try {
+            if (StringUtils.isNotBlank(currentFileUrl)) {
+                if (maxLineNumber != -1 && currentLineNumber != -1) {
+                    if (currentLineNumber > 0 && currentLineNumber <= maxLineNumber) {
+                        configProp.setProperty(currentFileUrl, String.valueOf(currentLineNumber));
+                        try {
+                            configProp.store(new FileOutputStream(configFile), "------");
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
                     }
                 }
             }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
-    
+
     /**
      * 重設儲存點
      */
-    private void resetSavepoint(){
-        if (StringUtils.isNotBlank(currentFileUrl)) {
-            configProp.setProperty(currentFileUrl, "-1");
-            try {
-                configProp.store(new FileOutputStream(configFile), "------");
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
+    private void resetSavepoint() {
+        try {
+            if (StringUtils.isNotBlank(currentFileUrl)) {
+                configProp.setProperty(currentFileUrl, "-1");
+                try {
+                    configProp.store(new FileOutputStream(configFile), "------");
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
             }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
@@ -184,75 +209,63 @@ public class StoryReaderUI extends JFrame {
      * 重設textarea
      */
     private void resetTextArea(String upperAndDownText) {
-        if (upperAndDownText != null) {
-            switch (upperAndDownText.charAt(0)) {
-            case 'u':
-                currentLineNumber--;
-                break;
-            case 'd':
-                currentLineNumber++;
-                break;
-            }
-        }
-
-        if (currentLineNumber <= 1) {
-            currentLineNumber = 1;
-        }
-
-        if (currentLineNumber >= maxLineNumber) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("本文結束!");
-            return;
-        }
-        
-        String text = null;
-        boolean nextChk = false;
-        do {
-            lineNumberLabel.setText(String.valueOf(currentLineNumber));
-            text = StringUtils.defaultString(lineNumberMap.get(currentLineNumber));
-            textArea.setText(text);
-
-            if (StringUtils.isBlank(text)) {
+        try {
+            if (upperAndDownText != null) {
                 switch (upperAndDownText.charAt(0)) {
                 case 'u':
                     currentLineNumber--;
-                    nextChk = currentLineNumber > 1;
                     break;
                 case 'd':
                     currentLineNumber++;
-                    nextChk = currentLineNumber < maxLineNumber;
                     break;
                 }
-            } else {
-                break;
             }
-        } while (nextChk);
+
+            if (currentLineNumber <= 1) {
+                currentLineNumber = 1;
+            }
+
+            if (currentLineNumber >= maxLineNumber) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("本文結束!");
+                return;
+            }
+
+            String text = null;
+            boolean nextChk = false;
+            do {
+                lineNumberLabel.setText(String.valueOf(currentLineNumber));
+                text = StringUtils.defaultString(lineNumberMap.get(currentLineNumber));
+                textArea.setText(text);
+
+                if (StringUtils.isBlank(text)) {
+                    switch (upperAndDownText.charAt(0)) {
+                    case 'u':
+                        currentLineNumber--;
+                        nextChk = currentLineNumber > 1;
+                        break;
+                    case 'd':
+                        currentLineNumber++;
+                        nextChk = currentLineNumber < maxLineNumber;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            } while (nextChk);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     /**
      * 設定字形大小
      */
-    private void setFontSize() {
-        String val = JCommonUtil._jOptionPane_showInputDialog("字型大小", "12");
-        if (val != null) {
-            int fontSize = Integer.parseInt(val);
-            textArea.setFont(new java.awt.Font("新細明體", 0, fontSize));
+    private void setupFont() {
+        try {
+            JFontChooserHelper.showChooser(textArea);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
-    }
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    StoryReaderUI frame = new StoryReaderUI();
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     /**
@@ -281,7 +294,25 @@ public class StoryReaderUI extends JFrame {
         });
         panel.add(button, BorderLayout.SOUTH);
 
-        panel.add(fileList, BorderLayout.CENTER);
+        JPanel panel_3 = new JPanel();
+        panel.add(panel_3, BorderLayout.NORTH);
+
+        JLabel lblNewLabel = new JLabel("開啟編碼");
+        panel_3.add(lblNewLabel);
+
+        storyEncodingText = new JTextField();
+        storyEncodingText.setText("UTF8");
+        panel_3.add(storyEncodingText);
+        storyEncodingText.setColumns(10);
+
+        JPanel panel_4 = new JPanel();
+        panel.add(panel_4, BorderLayout.WEST);
+
+        JPanel panel_5 = new JPanel();
+        panel.add(panel_5, BorderLayout.EAST);
+
+        storyList = new JList();
+        panel.add(JCommonUtil.createScrollComponent(storyList), BorderLayout.CENTER);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("文件", null, panel_1, null);
@@ -309,23 +340,23 @@ public class StoryReaderUI extends JFrame {
         });
         panel_2.add(button_2);
 
-        JButton btnFont = new JButton("大小");
+        JButton btnFont = new JButton("字");
         btnFont.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
-                setFontSize();
+                setupFont();
             }
         });
         panel_2.add(btnFont);
 
-        JButton btnRec = new JButton("紀錄");
+        JButton btnRec = new JButton("紀");
         btnRec.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
                 savepoint();
             }
         });
         panel_2.add(btnRec);
-        
-        JButton btnReset = new JButton("重設");
+
+        JButton btnReset = new JButton("重");
         btnReset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent paramActionEvent) {
                 resetSavepoint();
@@ -333,13 +364,16 @@ public class StoryReaderUI extends JFrame {
         });
         panel_2.add(btnReset);
 
+        wheelChangePageChk = new JCheckBox("翻");
+        panel_2.add(wheelChangePageChk);
+
         JScrollPane scrollPanl = JCommonUtil.createScrollComponent(textArea, false, true);
         textArea.setEditable(false);
         JTextAreaUtil.setWrapTextArea(textArea);
 
         panel_1.add(scrollPanl, BorderLayout.CENTER);
 
-        fileList.addMouseListener(new MouseAdapter() {
+        storyList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 fileListClickEvent();
@@ -349,27 +383,120 @@ public class StoryReaderUI extends JFrame {
         // 初始化檔案清單
         loadAndSyncConfigProp();
 
-        //離開前儲存
+        // 離開前儲存
         exitThisApp();
+
+        configBean.reflectInit(this);
+
+        JCommonUtil.setLocationToRightBottomCorner(this);
     }
 
     /**
      * 離開前儲存
      */
     private void exitThisApp() {
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                int closeOption = JOptionPane.showConfirmDialog(null, "離開前儲存?");
-                if (closeOption == JOptionPane.YES_OPTION) {
-                    savepoint();
-                    loadAndSyncConfigProp();
+        try {
+            this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            this.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    int closeOption = JOptionPane.showConfirmDialog(null, "離開前儲存?");
+                    if (closeOption == JOptionPane.YES_OPTION) {
+                        savepoint();
+                        loadAndSyncConfigProp();
+                        configBean.reflectSetConfig(StoryReaderUI.this);
+                        configBean.store();
+                    }
+                    gtu.swing.util.JFrameUtil.setVisible(false, StoryReaderUI.this);
+                    StoryReaderUI.this.dispose();
+                    System.exit(0);
                 }
-                 gtu.swing.util.JFrameUtil.setVisible(false,StoryReaderUI.this);
-                StoryReaderUI.this.dispose();
-                System.exit(0);
-            }
-        });
+            });
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Launch the application.
+     */
+    private static StoryReaderUI FRAME;
+    private GlobalKeyListener_StoryReaderUI keyUtil;
+    private JCheckBox wheelChangePageChk;
+
+    public static void main(String[] args) {
+        if (!JFrameUtil.lockInstance(StoryReaderUI.class)) {
+            return;
+        }
+
+        JnativehookKeyboardMouseHelper.getInstance().disableLogger();
+        FRAME = new StoryReaderUI();
+        FRAME.keyUtil = FRAME.new GlobalKeyListener_StoryReaderUI();
+        FRAME.keyUtil.init();
+    }
+
+    private static void startNewUI() {
+        synchronized (StoryReaderUI.class) {
+            if (FRAME == null) {
+                FRAME = new StoryReaderUI();
+            }
+        }
+        if (gtu.swing.util.JFrameUtil.isVisible(FRAME) && FRAME.isFocusOwner()) {
+            gtu.swing.util.JFrameUtil.setVisible(false, FRAME);
+        } else {
+            JCommonUtil.setFrameAtop(FRAME, false);
+            JCommonUtil.setLocationToRightBottomCorner(FRAME);
+        }
+        System.out.println("startNewUI done...");
+    }
+
+    private class GlobalNativeMouseWh__StoryReaderUI extends NativeMouseWheelAdapter {
+        public void nativeMouseWheelMoved(NativeMouseWheelEvent arg0) {
+            if (wheelChangePageChk.isSelected()) {
+                if (arg0.getWheelRotation() < 0) {
+                    resetTextArea("u");
+                } else if (arg0.getWheelRotation() > 0) {
+                    resetTextArea("d");
+                }
+            }
+        }
+    }
+
+    private class GlobalKeyListener_StoryReaderUI extends NativeKeyAdapter {
+        public void close() {
+            try {
+                org.jnativehook.GlobalScreen.unregisterNativeHook();
+            } catch (NativeHookException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        public void nativeKeyReleased(NativeKeyEvent e) {
+            System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
+            // 模式check
+            if ((e.getModifiers() & NativeInputEvent.ALT_MASK) != 0 && //
+                    e.getKeyCode() == NativeKeyEvent.VC_A) {
+                startNewUI();
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_UP || e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                resetTextArea("u");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_DOWN || e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                resetTextArea("d");
+            }
+        }
+
+        public void init() {
+            try {
+                GlobalScreen.registerNativeHook();
+                GlobalScreen.addNativeKeyListener(new GlobalKeyListener_StoryReaderUI());
+                GlobalScreen.addNativeMouseWheelListener(new GlobalNativeMouseWh__StoryReaderUI());
+                JnativehookKeyboardMouseHelper.getInstance().disableLogger();
+                startNewUI();
+            } catch (NativeHookException ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+    }
 }

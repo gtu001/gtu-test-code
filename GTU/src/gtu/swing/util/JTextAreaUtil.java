@@ -3,6 +3,7 @@ package gtu.swing.util;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import java.util.TreeMap;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -289,5 +292,32 @@ public class JTextAreaUtil {
         // of the document by 1 so that text entered at the end of the
         // document uses the attributes.
         doc.setCharacterAttributes(0, doc.getLength() + 1, attrs, false);
+    }
+
+    public static class JTextAreaSelectPositionHandler {
+        Rectangle rect;
+
+        public static JTextAreaSelectPositionHandler newInst(JTextArea textArea) {
+            return new JTextAreaSelectPositionHandler(textArea);
+        }
+
+        private JTextAreaSelectPositionHandler(JTextArea textArea) {
+            textArea.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    JTextComponent textComp = (JTextComponent) e.getSource();
+                    try {
+                        rect = textComp.getUI().modelToView(textComp, e.getDot());
+                        System.out.println("caretUpdate = " + rect.toString());
+                    } catch (BadLocationException ex) {
+                        throw new RuntimeException("Failed to get pixel position of caret", ex);
+                    }
+                }
+            });
+        }
+
+        public Rectangle getRect() {
+            return rect;
+        }
     }
 }

@@ -3,7 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -60,7 +60,6 @@ import javax.swing.JTextField;
 import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
@@ -76,6 +75,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
+import org.springframework.util.CollectionUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -87,6 +87,7 @@ import gtu.collection.ListUtil;
 import gtu.db.ExternalJDBCDriverJarLoader;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
+import gtu.db.sqlMaker.DbSqlCreater;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
@@ -114,6 +115,8 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JTextAreaUtil.JTextAreaSelectPositionHandler;
+import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
@@ -122,6 +125,7 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
+import javax.swing.JCheckBox;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -278,6 +282,9 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_12;
     private JLabel queryResultTimeLbl;
     private JLabel lblNewLabel_13;
+    private JTextAreaSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
+    private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
+    private JCheckBox sqlPromptChk;
 
     /**
      * Launch the application.
@@ -481,22 +488,11 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void process(DocumentEvent event) {
                 sqlTextAreaChange();
+                sqlTextAreaPromptProcess("insertUpdate", event);
             }
         }));
 
-        sqlTextArea.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                sqlTextAreaPromptProcess("insertUpdate", e);
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                sqlTextAreaPromptProcess("removeUpdate", e);
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                sqlTextAreaPromptProcess("changedUpdate", e);
-            }
-        });
+        mSqlTextAreaJTextAreaSelectPositionHandler = JTextAreaSelectPositionHandler.newInst(sqlTextArea);
 
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
@@ -613,6 +609,9 @@ public class FastDBQueryUI extends JFrame {
 
         JPanel panel_3 = new JPanel();
         panel_2.add(panel_3, BorderLayout.SOUTH);
+        
+        sqlPromptChk = new JCheckBox("SQL提示");
+        panel_3.add(sqlPromptChk);
 
         label_1 = new JLabel("max rows :");
         panel_3.add(label_1);
@@ -4133,19 +4132,145 @@ public class FastDBQueryUI extends JFrame {
         return editColumnHistoryHandler;
     }
 
-    private void sqlTextAreaPromptProcess(String label, DocumentEvent event) {
-        System.out.println("Offset : " + event.getOffset());
-        System.out.println("Length : " + event.getLength());
+    private class SqlTextAreaPromptHandler {
+        String queryText = "";
+        String tableAlias = "";
+        String columnPrefix = "";
+        DbSqlCreater.TableInfo tab;
+        Pair<Integer, Integer> columnIndex;
+        int queryTextPos = -1;
 
-        String tmpSql = StringUtils.substring(sqlTextArea.getText(), 0, event.getOffset() + event.getLength());
-        Pattern ptn = Pattern.compile("[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE);
-        Matcher mth = ptn.matcher(tmpSql);
-        int startPos = -1;
-        while (mth.find()) {
-            startPos = mth.end();
+        private SqlTextAreaPromptHandler() {
         }
-        String queryDbParam = StringUtils.substring(tmpSql, startPos);
 
-        System.out.println(label + ">> ---- ||" + queryDbParam);
+        private void init(DocumentEvent event) {
+            String tmpSql = StringUtils.substring(sqlTextArea.getText(), 0, event.getOffset() + event.getLength());
+            Pattern ptn = Pattern.compile("[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptn.matcher(tmpSql);
+            queryTextPos = -1;
+            while (mth.find()) {
+                queryTextPos = mth.end();
+            }
+            queryText = StringUtils.substring(tmpSql, queryTextPos);
+        }
+
+        private void mainProcess() {
+            Pair<Boolean, Boolean> isOk = delimitDBTable();
+            if (!isOk.getLeft()) {
+                return;
+            }
+            if (isOk.getRight()) {
+                String tableName = getTableName();
+                System.out.println("SqlTextAreaPromptHandler.tableName : " + tableName);
+                querySchema(tableName);
+            }
+            if (tab != null) {
+                List<String> columnLst = getColumnLst();
+                if (!CollectionUtils.isEmpty(columnLst)) {
+                    showPopup(columnLst);
+                }
+            }
+        }
+
+        private void showPopup(List<String> columnLst) {
+            Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
+            final JPopupMenuUtil util = JPopupMenuUtil.newInstance(sqlTextArea);
+            util.applyEvent(rect);
+            for (int ii = 0; ii < columnLst.size(); ii++) {
+                String col = columnLst.get(ii);
+                util.addJMenuItem(col, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        replaceColumn(col);
+                        util.dismiss();
+                    }
+                });
+            }
+            util.show();
+        }
+
+        private void replaceColumn(String column) {
+            if (columnIndex == null) {
+                return;
+            }
+            String textOrign = StringUtils.defaultString(sqlTextArea.getText());
+            String text = StringUtils.substring(textOrign, 0, columnIndex.getLeft()) + column;
+            int afterPos = text.length();
+            text = text + StringUtils.substring(textOrign, columnIndex.getRight());
+
+            JTextFieldUtil.setTextIgnoreDocumentListener(sqlTextArea, text);
+
+            sqlTextArea.setSelectionStart(afterPos);
+            sqlTextArea.setSelectionEnd(afterPos);
+        }
+
+        private List<String> getColumnLst() {
+            List<String> columnLst = new ArrayList<String>();
+            if (StringUtils.isNotBlank(columnPrefix)) {
+                String _columnPrefix = columnPrefix.toLowerCase();
+                for (String col : tab.getColumns()) {
+                    if (col.toLowerCase().contains(_columnPrefix)) {
+                        columnLst.add(col);
+                    }
+                }
+            } else {
+                columnLst.addAll(tab.getColumns());
+            }
+            Collections.sort(columnLst);
+            return columnLst;
+        }
+
+        private String getTableName() {
+            String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
+            Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Matcher mth = ptn.matcher(tmpSql);
+            if (mth.find()) {
+                return mth.group(1);
+            }
+            return "";
+        }
+
+        private void querySchema(String tableName) {
+            if (StringUtils.isBlank(tableName)) {
+                return;
+            }
+            tab = new DbSqlCreater.TableInfo();
+            try {
+                tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private Pair<Boolean, Boolean> delimitDBTable() {
+            String tempTableAlias = tableAlias;
+            boolean hasDot = false;
+            if ((hasDot = queryText.contains("."))) {
+                Pattern ptn2 = Pattern.compile("(.*)\\.(.*)");
+                Matcher mth2 = ptn2.matcher(queryText);
+                if (mth2.find()) {
+                    tableAlias = mth2.group(1);
+                    columnPrefix = mth2.group(2);
+                    columnIndex = Pair.of(queryTextPos + mth2.start(2), queryTextPos + mth2.end(2));
+                } else {
+                    tableAlias = queryText.replaceAll("\\.+$", "");
+                    columnIndex = null;
+                }
+            }
+            System.out.println("SqlTextAreaPromptHandler.tableAlias : " + tableAlias);
+            System.out.println("SqlTextAreaPromptHandler.columnPrefix : " + columnPrefix);
+            return Pair.of(hasDot, !StringUtils.equalsIgnoreCase(tempTableAlias, tableAlias));
+        }
+    }
+
+    private void sqlTextAreaPromptProcess(String label, DocumentEvent event) {
+        if (!sqlPromptChk.isSelected()) {
+            return;
+        }
+        if (mSqlTextAreaPromptHandler == null) {
+            mSqlTextAreaPromptHandler = new SqlTextAreaPromptHandler();
+        }
+        mSqlTextAreaPromptHandler.init(event);
+        mSqlTextAreaPromptHandler.mainProcess();
     }
 }

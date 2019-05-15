@@ -11,7 +11,9 @@ import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 public class JTextFieldUtil {
@@ -57,5 +59,44 @@ public class JTextFieldUtil {
                 }
             }
         });
+    }
+    
+    public static void setTextIgnoreDocumentListener(JTextComponent jtext, String text) {
+        new JTextComponentSetContentProcessor(jtext).setText(text);
+    }
+
+    private static class JTextComponentSetContentProcessor {
+        JTextComponent jtext;
+        DocumentListener[] listeners;
+
+        public JTextComponentSetContentProcessor(JTextComponent jtext) {
+            this.jtext = jtext;
+        }
+
+        private void removeEvent() {
+            Document doc = jtext.getDocument();
+            if (doc instanceof AbstractDocument) {
+                listeners = ((AbstractDocument) doc).getDocumentListeners();
+                if (listeners != null) {
+                    for (DocumentListener l : listeners) {
+                        jtext.getDocument().removeDocumentListener(l);
+                    }
+                }
+            }
+        }
+
+        private void addEvent() {
+            if (listeners != null) {
+                for (DocumentListener l : listeners) {
+                    jtext.getDocument().addDocumentListener(l);
+                }
+            }
+        }
+
+        public void setText(String text) {
+            removeEvent();
+            jtext.setText(text);
+            addEvent();
+        }
     }
 }
