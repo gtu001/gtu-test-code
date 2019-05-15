@@ -609,7 +609,7 @@ public class FastDBQueryUI extends JFrame {
 
         JPanel panel_3 = new JPanel();
         panel_2.add(panel_3, BorderLayout.SOUTH);
-        
+
         sqlPromptChk = new JCheckBox("SQL提示");
         panel_3.add(sqlPromptChk);
 
@@ -4137,6 +4137,7 @@ public class FastDBQueryUI extends JFrame {
         String tableAlias = "";
         String columnPrefix = "";
         DbSqlCreater.TableInfo tab;
+        Map<String, DbSqlCreater.TableInfo> tabMap = new HashMap<String, DbSqlCreater.TableInfo>();
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
 
@@ -4234,7 +4235,12 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(tableName)) {
                 return;
             }
+            if (tabMap.containsKey(tableName)) {
+                tab = tabMap.get(tableName);
+                return;
+            }
             tab = new DbSqlCreater.TableInfo();
+            tabMap.put(tableName, tab);
             try {
                 tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
             } catch (SQLException e) {
