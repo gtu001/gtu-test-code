@@ -4138,7 +4138,6 @@ public class FastDBQueryUI extends JFrame {
         String queryText = "";
         String tableAlias = "";
         String columnPrefix = "";
-        DbSqlCreater.TableInfo tab;
         Map<String, DbSqlCreater.TableInfo> tabMap = new HashMap<String, DbSqlCreater.TableInfo>();
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
@@ -4186,17 +4185,18 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private void mainProcess() {
-            Pair<Boolean, Boolean> isOk = delimitDBTable();
-            if (!isOk.getLeft()) {
+            if (queryText.contains(".")) {
+                delimitDBTable();
+            } else {
                 return;
             }
-            if (isOk.getRight()) {
-                String tableName = getTableName();
-                System.out.println("SqlTextAreaPromptHandler.tableName : " + tableName);
-                querySchema(tableName);
+            String tableName = getTableName(tableAlias);
+            if (StringUtils.isBlank(tableName)) {
+                return;
             }
+            DbSqlCreater.TableInfo tab = querySchema(tableName);
             if (tab != null) {
-                List<String> columnLst = getColumnLst();
+                List<String> columnLst = getColumnLst(tab);
                 if (!columnLst.isEmpty()) {
                     showPopup(columnLst);
                 }
@@ -4266,7 +4266,7 @@ public class FastDBQueryUI extends JFrame {
             sqlTextArea.setSelectionEnd(afterPos);
         }
 
-        private List<String> getColumnLst() {
+        private List<String> getColumnLst(DbSqlCreater.TableInfo tab) {
             List<String> columnLst = new ArrayList<String>();
             if (StringUtils.isNotBlank(columnPrefix)) {
                 String _columnPrefix = columnPrefix.toLowerCase();
@@ -4282,7 +4282,7 @@ public class FastDBQueryUI extends JFrame {
             return columnLst;
         }
 
-        private String getTableName() {
+        private String getTableName(String tableAlias) {
             String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
             Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(tmpSql);
@@ -4293,41 +4293,32 @@ public class FastDBQueryUI extends JFrame {
             return finalTableName;
         }
 
-        private void querySchema(String tableName) {
-            if (StringUtils.isBlank(tableName)) {
-                return;
-            }
+        private DbSqlCreater.TableInfo querySchema(String tableName) {
             if (tabMap.containsKey(tableName)) {
-                tab = tabMap.get(tableName);
-                return;
-            }
-            tab = new DbSqlCreater.TableInfo();
-            tabMap.put(tableName, tab);
-            try {
-                tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
-            } catch (SQLException e) {
-                e.printStackTrace();
+                return tabMap.get(tableName);
+            } else {
+                DbSqlCreater.TableInfo tab = new DbSqlCreater.TableInfo();
+                tabMap.put(tableName, tab);
+                try {
+                    tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return tab;
             }
         }
 
-        private Pair<Boolean, Boolean> delimitDBTable() {
-            String tempTableAlias = tableAlias;
-            boolean hasDot = false;
-            if ((hasDot = queryText.contains("."))) {
-                Pattern ptn2 = Pattern.compile("(.*)\\.(.*)");
-                Matcher mth2 = ptn2.matcher(queryText);
-                if (mth2.find()) {
-                    tableAlias = mth2.group(1);
-                    columnPrefix = mth2.group(2);
-                    columnIndex = Pair.of(queryTextPos + mth2.start(2), queryTextPos + mth2.end(2));
-                } else {
-                    tableAlias = queryText.replaceAll("\\.+$", "");
-                    columnIndex = null;
-                }
+        private void delimitDBTable() {
+            Pattern ptn2 = Pattern.compile("(.*)\\.(.*)");
+            Matcher mth2 = ptn2.matcher(queryText);
+            if (mth2.find()) {
+                tableAlias = mth2.group(1);
+                columnPrefix = mth2.group(2);
+                columnIndex = Pair.of(queryTextPos + mth2.start(2), queryTextPos + mth2.end(2));
+            } else {
+                tableAlias = queryText.replaceAll("\\.+$", "");
+                columnIndex = null;
             }
-            System.out.println("SqlTextAreaPromptHandler.tableAlias : " + tableAlias);
-            System.out.println("SqlTextAreaPromptHandler.columnPrefix : " + columnPrefix);
-            return Pair.of(hasDot, !StringUtils.equalsIgnoreCase(tempTableAlias, tableAlias));
         }
     }
 
