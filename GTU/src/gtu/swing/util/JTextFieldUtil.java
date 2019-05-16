@@ -1,5 +1,6 @@
 package gtu.swing.util;
 
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -11,8 +12,11 @@ import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
@@ -60,7 +64,7 @@ public class JTextFieldUtil {
             }
         });
     }
-    
+
     public static void setTextIgnoreDocumentListener(JTextComponent jtext, String text) {
         new JTextComponentSetContentProcessor(jtext).setText(text);
     }
@@ -97,6 +101,33 @@ public class JTextFieldUtil {
             removeEvent();
             jtext.setText(text);
             addEvent();
+        }
+    }
+
+    public static class JTextComponentSelectPositionHandler {
+        Rectangle rect;
+
+        public static JTextComponentSelectPositionHandler newInst(JTextComponent textArea) {
+            return new JTextComponentSelectPositionHandler(textArea);
+        }
+
+        private JTextComponentSelectPositionHandler(JTextComponent textArea) {
+            textArea.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    JTextComponent textComp = (JTextComponent) e.getSource();
+                    try {
+                        rect = textComp.getUI().modelToView(textComp, e.getDot());
+                        System.out.println("caretUpdate = " + rect.toString());
+                    } catch (BadLocationException ex) {
+                        throw new RuntimeException("Failed to get pixel position of caret", ex);
+                    }
+                }
+            });
+        }
+
+        public Rectangle getRect() {
+            return rect;
         }
     }
 }

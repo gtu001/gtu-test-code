@@ -59,6 +59,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolTip;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
@@ -115,8 +116,8 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
-import gtu.swing.util.JTextAreaUtil.JTextAreaSelectPositionHandler;
 import gtu.swing.util.JTextFieldUtil;
+import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.SwingTabTemplateUI;
@@ -281,7 +282,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_12;
     private JLabel queryResultTimeLbl;
     private JLabel lblNewLabel_13;
-    private JTextAreaSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
+    private JTextComponentSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
 
     /**
@@ -483,8 +484,8 @@ public class FastDBQueryUI extends JFrame {
                     mSqlTextAreaPromptHandler.performSelectTopColumn();
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     mSqlTextAreaPromptHandler.performSelectClose();
-                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    mSqlTextAreaPromptHandler.performSelectUpDown(e);
                 }
             }
         });
@@ -496,7 +497,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }));
 
-        mSqlTextAreaJTextAreaSelectPositionHandler = JTextAreaSelectPositionHandler.newInst(sqlTextArea);
+        mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
 
         JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
         // panel_2.add(sqlTextArea, BorderLayout.CENTER);
@@ -4142,6 +4143,7 @@ public class FastDBQueryUI extends JFrame {
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
         JPopupMenuUtil util;
+        int currentMenuIndex = 0;
 
         private SqlTextAreaPromptHandler() {
         }
@@ -4152,15 +4154,18 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
+        public void performSelectUpDown(KeyEvent e) {
+            if (util.getJPopupMenu().isVisible()) {
+                System.out.println(">>>>>>> up down");
+                util.getJPopupMenu().setFocusable(true);
+                util.getJPopupMenu().grabFocus();
+                // e.consume();
+            }
+        }
+
         public void performSelectTopColumn() {
             if (util.getJPopupMenu().isVisible() && !util.getMenuList().isEmpty()) {
-                JMenuItem select = util.getMenuList().get(0);
-                for (int ii = 0; ii < util.getMenuList().size(); ii++) {
-                    if (util.getMenuList().get(ii).isSelected()) {
-                        select = util.getMenuList().get(ii);
-                        break;
-                    }
-                }
+                JMenuItem select = util.getMenuList().get(currentMenuIndex);
                 JCommonUtil.triggerButtonActionPerformed(select);
             }
         }
@@ -4174,6 +4179,7 @@ public class FastDBQueryUI extends JFrame {
                 queryTextPos = mth.end();
             }
             queryText = StringUtils.substring(tmpSql, queryTextPos);
+            currentMenuIndex = 0;
         }
 
         private void mainProcess() {
@@ -4209,6 +4215,35 @@ public class FastDBQueryUI extends JFrame {
                     }
                 });
             }
+            util.getJPopupMenu().addKeyListener(new KeyAdapter() {
+                public void keyPressed(java.awt.event.KeyEvent arg0) {
+                    boolean upDownOk = false;
+                    if (arg0.getKeyCode() == 38) {// up
+                        currentMenuIndex--;
+                        if (currentMenuIndex < 0) {
+                            currentMenuIndex = 0;
+                        }
+                        upDownOk = true;
+                    } else if (arg0.getKeyCode() == 40) {// down
+                        currentMenuIndex++;
+                        if (currentMenuIndex > util.getMenuList().size() - 1) {
+                            currentMenuIndex = util.getMenuList().size() - 1;
+                        }
+                        upDownOk = true;
+                    } else if (arg0.getKeyChar() == KeyEvent.VK_TAB) {
+                        sqlTextArea.grabFocus();
+                    }
+                    if (upDownOk) {
+                        for (int ii = 0; ii < util.getMenuList().size(); ii++) {
+                            util.getMenuList().get(ii).setOpaque(true);
+                            util.getMenuList().get(ii).setBackground(UIManager.getColor("Panel.background"));
+                        }
+                        JMenuItem item = util.getMenuList().get(currentMenuIndex);
+                        System.out.println(">> " + currentMenuIndex + " --> " + item.getText());
+                        item.setBackground(Color.yellow);
+                    }
+                }
+            });
             util.show();
         }
 
@@ -4247,10 +4282,11 @@ public class FastDBQueryUI extends JFrame {
             String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
             Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(tmpSql);
-            if (mth.find()) {
-                return mth.group(1);
+            String finalTableName = "";
+            while (mth.find()) {
+                finalTableName = mth.group(1);
             }
-            return "";
+            return finalTableName;
         }
 
         private void querySchema(String tableName) {

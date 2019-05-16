@@ -293,31 +293,4 @@ public class JTextAreaUtil {
         // document uses the attributes.
         doc.setCharacterAttributes(0, doc.getLength() + 1, attrs, false);
     }
-
-    public static class JTextAreaSelectPositionHandler {
-        Rectangle rect;
-
-        public static JTextAreaSelectPositionHandler newInst(JTextArea textArea) {
-            return new JTextAreaSelectPositionHandler(textArea);
-        }
-
-        private JTextAreaSelectPositionHandler(JTextArea textArea) {
-            textArea.addCaretListener(new CaretListener() {
-                @Override
-                public void caretUpdate(CaretEvent e) {
-                    JTextComponent textComp = (JTextComponent) e.getSource();
-                    try {
-                        rect = textComp.getUI().modelToView(textComp, e.getDot());
-                        System.out.println("caretUpdate = " + rect.toString());
-                    } catch (BadLocationException ex) {
-                        throw new RuntimeException("Failed to get pixel position of caret", ex);
-                    }
-                }
-            });
-        }
-
-        public Rectangle getRect() {
-            return rect;
-        }
-    }
 }
