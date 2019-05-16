@@ -134,8 +134,12 @@ public class JPopupMenuUtil {
         return this;
     }
 
+    public static JPopupMenuUtil newInstance(Component component, boolean isScrollable) {
+        return new JPopupMenuUtil(component, isScrollable);
+    }
+
     public static JPopupMenuUtil newInstance(Component component) {
-        return new JPopupMenuUtil(component);
+        return new JPopupMenuUtil(component, false);
     }
 
     public List<JMenuItem> getMenuList() {

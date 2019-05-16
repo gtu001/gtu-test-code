@@ -4156,9 +4156,12 @@ public class FastDBQueryUI extends JFrame {
 
         public void performSelectUpDown(KeyEvent e) {
             if (util.getJPopupMenu().isVisible()) {
-                System.out.println(">>>>>>> up down");
+                System.out.println("1 - up down" + util.getJPopupMenu().isFocusable() + " , " + util.getJPopupMenu().isFocusOwner());
                 util.getJPopupMenu().setFocusable(true);
                 util.getJPopupMenu().grabFocus();
+                util.getJPopupMenu().requestFocus();
+                util.getJPopupMenu().requestFocusInWindow();
+                System.out.println("2 - up down" + util.getJPopupMenu().isFocusable() + " , " + util.getJPopupMenu().isFocusOwner());
                 // e.consume();
             }
         }
@@ -4202,7 +4205,7 @@ public class FastDBQueryUI extends JFrame {
 
         private void showPopup(List<String> columnLst) {
             Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
-            util = JPopupMenuUtil.newInstance(sqlTextArea);
+            util = JPopupMenuUtil.newInstance(sqlTextArea, true);
             util.applyEvent(rect);
             util.getJPopupMenu().setFocusable(false);
             for (int ii = 0; ii < columnLst.size(); ii++) {
