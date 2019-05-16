@@ -4241,6 +4241,7 @@ public class FastDBQueryUI extends JFrame {
                         JMenuItem item = util.getMenuList().get(currentMenuIndex);
                         System.out.println(">> " + currentMenuIndex + " --> " + item.getText());
                         item.setBackground(Color.yellow);
+                        util.setScrollBarToIndex(currentMenuIndex);
                     }
                 }
             });
