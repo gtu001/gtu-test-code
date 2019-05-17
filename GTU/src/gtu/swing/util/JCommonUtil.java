@@ -3,8 +3,10 @@ package gtu.swing.util;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.DisplayMode;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -968,14 +970,15 @@ public class JCommonUtil {
     }
 
     public static boolean focusComponent(JComponent jcomponent, boolean robotFocus, ActionListener afterRobotFocus) {
-        jcomponent.setRequestFocusEnabled(true);
         jcomponent.setFocusable(true);
+        jcomponent.setRequestFocusEnabled(true);
         jcomponent.grabFocus();
-//        jcomponent.requestFocus();
+        jcomponent.requestFocus();
         jcomponent.requestFocusInWindow();
         boolean useRobotFocus = false;
         if (!jcomponent.isFocusOwner() && robotFocus) {
             try {
+                System.out.println("roboFocus!!");
                 Point p = MouseInfo.getPointerInfo().getLocation();
                 Robot robot = new Robot();
                 // 先release滑鼠
@@ -999,6 +1002,45 @@ public class JCommonUtil {
             }
         }
         return useRobotFocus;
+    }
+
+    public static void focusComponentByFramePolicy(Window frame, Component[] focusList) {
+        frame.setFocusTraversalPolicy(new FocusTraversalPolicy() {
+            int focusNumber = 0;
+
+            @Override
+            public Component getLastComponent(Container aContainer) {
+                return focusList[focusList.length - 1];
+            }
+
+            @Override
+            public Component getFirstComponent(Container aContainer) {
+                return focusList[0];
+            }
+
+            @Override
+            public Component getDefaultComponent(Container aContainer) {
+                return focusList[1];
+            }
+
+            @Override
+            public Component getComponentAfter(Container focusCycleRoot, Component aComponent) {
+                focusNumber = (focusNumber + 1) % focusList.length;
+                if (focusList[focusNumber].isEnabled() == false) {
+                    getComponentAfter(focusCycleRoot, focusList[focusNumber]);
+                }
+                return focusList[focusNumber];
+            }
+
+            @Override
+            public Component getComponentBefore(Container focusCycleRoot, Component aComponent) {
+                focusNumber = (focusList.length + focusNumber - 1) % focusList.length;
+                if (focusList[focusNumber].isEnabled() == false) {
+                    getComponentBefore(focusCycleRoot, focusList[focusNumber]);
+                }
+                return focusList[focusNumber];
+            }
+        });
     }
 
     /**

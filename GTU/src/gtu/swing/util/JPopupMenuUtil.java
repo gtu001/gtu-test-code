@@ -40,26 +40,6 @@ public class JPopupMenuUtil {
         menuList = new ArrayList<JMenuItem>();
     }
 
-    public void setScrollBarToIndex(int currentMenuIndex) {
-        try {
-            int height = 0;
-            for (int ii = 0; ii < currentMenuIndex; ii++) {
-                height += menuList.get(ii).getHeight();
-            }
-            setScrollBarValue(height);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private void setScrollBarValue(int scrollValue) {
-        try {
-            ((JScrollPopupMenu) this.jPopupMenu1).getScrollBar().setValue(scrollValue);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     public JPopupMenuUtil addJMenuItem(JMenuItem... items) {
         if (items == null || items.length == 0) {
             return this;
@@ -152,5 +132,15 @@ public class JPopupMenuUtil {
 
     public JPopupMenu getJPopupMenu() {
         return jPopupMenu1;
+    }
+
+    public void setLocation(Component component, int x, int y) {
+        if (jPopupMenu1.isShowing()) {
+            if (component != null) {
+                jPopupMenu1.show(component, x, y);
+            } else {
+                jPopupMenu1.setLocation(x, y);
+            }
+        }
     }
 }

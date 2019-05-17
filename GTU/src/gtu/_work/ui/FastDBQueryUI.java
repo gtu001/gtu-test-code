@@ -1,13 +1,18 @@
 package gtu._work.ui;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -59,9 +64,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolTip;
+import javax.swing.MenuElement;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
@@ -486,6 +494,8 @@ public class FastDBQueryUI extends JFrame {
                     mSqlTextAreaPromptHandler.performSelectClose();
                 } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     mSqlTextAreaPromptHandler.performSelectUpDown(e);
+                } else {
+                    mSqlTextAreaPromptHandler.performUpdateLocation();
                 }
             }
         });
@@ -4147,26 +4157,40 @@ public class FastDBQueryUI extends JFrame {
         private SqlTextAreaPromptHandler() {
         }
 
+        public void performUpdateLocation() {
+            Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
+            if (rect == null || util == null) {
+                return;
+            }
+            if (StringUtils.isBlank(queryText)) {
+                util.dismiss();
+            }
+            util.setLocation(sqlTextArea, (int) rect.getX(), (int) rect.getY());
+        }
+
         public void performSelectClose() {
-            if (util.getJPopupMenu().isVisible()) {
+            if (util == null) {
+                return;
+            }
+            if (util.getJPopupMenu().isShowing()) {
                 util.dismiss();
             }
         }
 
         public void performSelectUpDown(KeyEvent e) {
-            if (util.getJPopupMenu().isVisible()) {
-                System.out.println("1 - up down" + util.getJPopupMenu().isFocusable() + " , " + util.getJPopupMenu().isFocusOwner());
-                util.getJPopupMenu().setFocusable(true);
-                util.getJPopupMenu().grabFocus();
-                util.getJPopupMenu().requestFocus();
-                util.getJPopupMenu().requestFocusInWindow();
-                System.out.println("2 - up down" + util.getJPopupMenu().isFocusable() + " , " + util.getJPopupMenu().isFocusOwner());
-                // e.consume();
+            if (util == null) {
+                return;
+            }
+            if (util.getJPopupMenu().isShowing() && !util.getJPopupMenu().isFocusOwner()) {
+                JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
             }
         }
 
         public void performSelectTopColumn() {
-            if (util.getJPopupMenu().isVisible() && !util.getMenuList().isEmpty()) {
+            if (util == null) {
+                return;
+            }
+            if (util.getJPopupMenu().isShowing() && !util.getMenuList().isEmpty()) {
                 JMenuItem select = util.getMenuList().get(currentMenuIndex);
                 JCommonUtil.triggerButtonActionPerformed(select);
             }
@@ -4182,6 +4206,7 @@ public class FastDBQueryUI extends JFrame {
             }
             queryText = StringUtils.substring(tmpSql, queryTextPos);
             currentMenuIndex = 0;
+            System.out.println("prompt - [" + queryText + "]");
         }
 
         private void mainProcess() {
@@ -4207,7 +4232,7 @@ public class FastDBQueryUI extends JFrame {
             Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
             util = JPopupMenuUtil.newInstance(sqlTextArea, true);
             util.applyEvent(rect);
-            util.getJPopupMenu().setFocusable(false);
+            // util.getJPopupMenu().setFocusable(false);
             for (int ii = 0; ii < columnLst.size(); ii++) {
                 final String col = columnLst.get(ii);
                 util.addJMenuItem(col, new ActionListener() {
@@ -4218,33 +4243,20 @@ public class FastDBQueryUI extends JFrame {
                     }
                 });
             }
-            util.getJPopupMenu().addKeyListener(new KeyAdapter() {
-                public void keyPressed(java.awt.event.KeyEvent arg0) {
-                    boolean upDownOk = false;
-                    if (arg0.getKeyCode() == 38) {// up
-                        currentMenuIndex--;
-                        if (currentMenuIndex < 0) {
-                            currentMenuIndex = 0;
-                        }
-                        upDownOk = true;
-                    } else if (arg0.getKeyCode() == 40) {// down
-                        currentMenuIndex++;
-                        if (currentMenuIndex > util.getMenuList().size() - 1) {
-                            currentMenuIndex = util.getMenuList().size() - 1;
-                        }
-                        upDownOk = true;
-                    } else if (arg0.getKeyChar() == KeyEvent.VK_TAB) {
+            util.getJPopupMenu().addMenuKeyListener(new MenuKeyListener() {
+                @Override
+                public void menuKeyTyped(MenuKeyEvent arg0) {
+                }
+
+                @Override
+                public void menuKeyReleased(MenuKeyEvent arg0) {
+                }
+
+                @Override
+                public void menuKeyPressed(MenuKeyEvent arg0) {
+                    if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
+                    } else {
                         sqlTextArea.grabFocus();
-                    }
-                    if (upDownOk) {
-                        for (int ii = 0; ii < util.getMenuList().size(); ii++) {
-                            util.getMenuList().get(ii).setOpaque(true);
-                            util.getMenuList().get(ii).setBackground(UIManager.getColor("Panel.background"));
-                        }
-                        JMenuItem item = util.getMenuList().get(currentMenuIndex);
-                        System.out.println(">> " + currentMenuIndex + " --> " + item.getText());
-                        item.setBackground(Color.yellow);
-                        util.setScrollBarToIndex(currentMenuIndex);
                     }
                 }
             });
@@ -4262,6 +4274,8 @@ public class FastDBQueryUI extends JFrame {
 
             JTextFieldUtil.setTextIgnoreDocumentListener(sqlTextArea, text);
 
+            sqlTextArea.updateUI();
+            
             sqlTextArea.setSelectionStart(afterPos);
             sqlTextArea.setSelectionEnd(afterPos);
         }
@@ -4298,9 +4312,9 @@ public class FastDBQueryUI extends JFrame {
                 return tabMap.get(tableName);
             } else {
                 DbSqlCreater.TableInfo tab = new DbSqlCreater.TableInfo();
-                tabMap.put(tableName, tab);
                 try {
                     tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
+                    tabMap.put(tableName, tab);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

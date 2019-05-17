@@ -6,19 +6,36 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.Point;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
+import javax.swing.MenuElement;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
 
 public class JScrollPopupMenu extends JPopupMenu {
+    private static final long serialVersionUID = 4693231165732192396L;
     protected int maximumVisibleRows = 10;
+
+    public static void main(String[] args) {
+        JFrame frame = JFrameUtil.createSimpleFrame(JScrollPopupMenu.class);
+        JScrollPopupMenu menu = new JScrollPopupMenu();
+        for (int ii = 0; ii < 20; ii++) {
+            JMenuItem item = new JMenuItem("xx" + ii);
+            menu.add(item);
+        }
+        frame.pack();
+        frame.show();
+        menu.show(frame, 0, 0);
+    }
 
     public JScrollPopupMenu() {
         this(null);
@@ -40,6 +57,50 @@ public class JScrollPopupMenu extends JPopupMenu {
                 event.consume();
             }
         });
+
+        addMenuKeyListener(new MenuKeyListener() {
+            @Override
+            public void menuKeyTyped(MenuKeyEvent arg0) {
+            }
+
+            @Override
+            public void menuKeyReleased(MenuKeyEvent arg0) {
+            }
+
+            @Override
+            public void menuKeyPressed(MenuKeyEvent arg0) {
+                if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
+                    setFocusable(true);
+                    grabFocus();
+                    MenuElement[] me = arg0.getMenuSelectionManager().getSelectedPath();
+                    if (me.length > 1) {
+                        if (me[1] instanceof JMenuItem) {
+                            System.out.println("currentItem = " + ((JMenuItem) me[1]).getText());
+                        } else {
+                            System.out.println("currentItem = " + (me[1]));
+                        }
+                        getScrollBar().setValue(caculateScrollValue(me[1]));
+                    }
+                } else {
+                    setFocusable(false);
+                }
+            }
+        });
+    }
+
+    private int caculateScrollValue(MenuElement component) {
+        List<JMenuItem> lst = new ArrayList<JMenuItem>();
+        for (int ii = 0; ii < getAccessibleContext().getAccessibleChildrenCount(); ii++) {
+            if (getAccessibleContext().getAccessibleChild(ii) instanceof JMenuItem) {
+                JMenuItem m = (JMenuItem) getAccessibleContext().getAccessibleChild(ii);
+                lst.add(m);
+            }
+        }
+        int height = 0;
+        for (int ii = 0; ii < lst.indexOf(component); ii++) {
+            height += lst.get(ii).getHeight();
+        }
+        return height;
     }
 
     private JScrollBar popupScrollBar;
@@ -54,10 +115,8 @@ public class JScrollPopupMenu extends JPopupMenu {
                     repaint();
                 }
             });
-
             popupScrollBar.setVisible(false);
         }
-
         return popupScrollBar;
     }
 
