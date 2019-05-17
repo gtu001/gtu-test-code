@@ -30,10 +30,34 @@ public class JPopupMenuUtil {
         }
     };
 
-    private JPopupMenuUtil(Component component) {
+    private JPopupMenuUtil(Component component, boolean isScrollable) {
         this.component = component;
-        jPopupMenu1 = new JPopupMenu();
+        if (!isScrollable) {
+            jPopupMenu1 = new JPopupMenu();
+        } else {
+            jPopupMenu1 = new JScrollPopupMenu();
+        }
         menuList = new ArrayList<JMenuItem>();
+    }
+
+    public void setScrollBarToIndex(int currentMenuIndex) {
+        try {
+            int height = 0;
+            for (int ii = 0; ii < currentMenuIndex; ii++) {
+                height += menuList.get(ii).getHeight();
+            }
+            setScrollBarValue(height);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void setScrollBarValue(int scrollValue) {
+        try {
+            ((JScrollPopupMenu) this.jPopupMenu1).getScrollBar().setValue(scrollValue);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public JPopupMenuUtil addJMenuItem(JMenuItem... items) {
@@ -110,8 +134,12 @@ public class JPopupMenuUtil {
         return this;
     }
 
+    public static JPopupMenuUtil newInstance(Component component, boolean isScrollable) {
+        return new JPopupMenuUtil(component, isScrollable);
+    }
+
     public static JPopupMenuUtil newInstance(Component component) {
-        return new JPopupMenuUtil(component);
+        return new JPopupMenuUtil(component, false);
     }
 
     public List<JMenuItem> getMenuList() {
