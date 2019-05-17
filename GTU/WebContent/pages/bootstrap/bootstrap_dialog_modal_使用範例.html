@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="shortcut icon" href="/img/favicon.ico" />
+<link rel="bookmark" href="/img/favicon.ico" />
+<title>投資平台前台系統</title>
+<meta name="keywords" content="">
+<meta name="description" content="">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style type="text/css">
+</style>
+
+<script type="text/javascript">
+	var cancelDialogHanlder = null;
+	$(document).ready(function(){
+		cancelDialogHanlder = new CancelDialogHanlder();
+	});
+
+	function CancelDialogHanlder() {
+		var dialog = $('#cancel_dialog');
+		var form = $("#cancelDialogForm");
+
+/*
+		jQuery.validator.addMethod("radioChk", function(value, element) {
+			var radio1Val = $("[name=cancelDialog_radio1]:checked").val();
+			var text1 = $("[name=cancelDialog_XXXXXX1]").val();
+			var text2 = $("[name=cancelDialog_XXXXXX2]").val();
+			console.log("radio1Val : ", radio1Val, text1, text2);
+			if (radio1Val == '1') {
+				if ($.trim(text1) == '' && $.trim(text2) == '') {
+					return false;
+				}
+			}
+			return true;
+		}, "預設錯誤訊息");
+
+		form.validate({
+			rules : {
+				cancelDialog_radio1 : {
+					required : true,
+					radioChk : true
+				}
+			},
+			messages : {
+				cancelDialog_radio1 : {
+					required : "請選擇其中一項",
+					radioChk : "至少輸入則內容"
+				}
+			},
+			errorPlacement : function(error, element) {
+				//element.attr("name") == "fname" 
+				$("#cancelErrorMsg").empty();
+				error.appendTo($("#cancelErrorMsg"));
+			},
+			submitHandler : function(form) {
+				alert("dddddddddddd");
+			}
+		});
+		*/
+
+		//開啟 modal trigger 事件
+		dialog.on('show.bs.modal',
+				function() {
+					console.log("Opened");
+					$("input[name=cancelDialog_radio1]:checked").attr(
+							"checked", false);
+					$("input[name=cancelDialog_XXXXXX1]").val("");
+					$("input[name=cancelDialog_XXXXXX2]").val("");
+				});
+
+		//關閉 modal trigger 事件
+		dialog.on('hide.bs.modal', function() {
+			console.log("Closed");
+		});
+
+		//移除關閉特效
+		this.removeAnim = function(isRemove) {
+			if (isRemove) {
+				dialog.removeClass("fade");
+			} else if (!dialog.hasClass("fade")) {
+				dialog.addClass("fade");
+			}
+		}
+
+		this.hide = function() {
+			dialog.modal('hide');
+		};
+
+		this.show = function() {
+			dialog.modal('show');
+		};
+
+		this.isShown = function() {
+			return dialog.data('bs.modal').isShown;
+		};
+
+		this.submit = function() {
+			//form.submit();
+		};
+	};
+</script>
+</head>
+
+<body>
+	<button onclick="cancelDialogHanlder.show();">顯示</button>
+
+	<!-- ↓↓↓↓↓↓  Modal  ↓↓↓↓↓↓  -->
+	<!-- Modal 債卷撤銷 start -->
+	<div class="modal fade" id="cancel_dialog" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="title-leftline">商品選擇</h4>
+				</div>
+				<div class="modal-body">
+					<form id="cancelDialogForm">
+						<div class="row padding-left25 padding-right25">
+							<div class="col-sm-12">
+								<h4>此筆撤銷之交易人員選擇</h4>
+							</div>
+							<!-- left -->
+							<div class="col-sm-12">
+								<div class="box_line">
+									<div class="line_title">
+										<input type="radio" name="cancelDialog_radio1" value="0" />
+										本人
+									</div>
+									<div class="line_content" style="padding-left: 50px">
+										包含作業疏失</div>
+								</div>
+								<div class="box_line">
+									<div class="line_title">
+										<input type="radio" name="cancelDialog_radio1" value="1" />
+										被授權人/法代
+									</div>
+									<div class="line_content" style="padding-left: 50px;">
+										<div style="display: inline-block">
+											<input class="form-control" type="text"
+												placeholder="被授權人/法代一ID" name="cancelDialog_XXXXXX1">
+										</div>
+										<div style="display: inline-block">
+											<input class="form-control" type="text"
+												placeholder="被授權人/法代二ID" name="cancelDialog_XXXXXX2">
+										</div>
+										<span class="btn btn_g" style="margin-bottom: 25px;"
+											onclick="cancelDialogHanlder.submit()">檢核</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="text-center"></div>
+				<div class="row text-center">
+					<div id="cancelErrorMsg"></div>
+				</div>
+				<hr>
+				<div class="modal-footer" style="margin: 0 0 0 0;">
+					<a class="btn btn_o" data-dismiss="modal">關閉</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<!-- Modal 債卷撤銷  End -->
+
+</body>
