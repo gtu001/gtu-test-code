@@ -1004,7 +1004,7 @@ public class JCommonUtil {
         return useRobotFocus;
     }
 
-    public static void focusComponentByFramePolicy(Window frame, Component[] focusList) {
+    public static void focusComponentByFramePolicy(final Window frame, final Component[] focusList) {
         frame.setFocusTraversalPolicy(new FocusTraversalPolicy() {
             int focusNumber = 0;
 

@@ -1,0 +1,7 @@
+
+靜態的呼叫方式
+${T(cub.inv.query.ui.dto.web.util.PaddingUtils).getNormalDate_yyyyMMdd('20190520')}
+
+SpringBean的呼叫方式
+${@fundController.branchList}
+

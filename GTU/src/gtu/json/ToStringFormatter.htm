@@ -103,6 +103,19 @@
 				arry.push(json1);
 			}
 			break;
+			case "json_lineByLine":
+			var lines = text.split('\n');
+			for(var i = 0;i < lines.length;i++){
+				var line = lines[i];
+				//line = line.replace(/\\/g, '');
+				try{
+					var json = JSON.parse(line);
+					if(json){
+						arry.push(json);
+					}
+				}catch(e){
+				}
+			}
 			case "toString":
 			var lines = text.split('\n');
 			for(var i = 0;i < lines.length;i++){
@@ -422,6 +435,7 @@
 
 	內文類型:&nbsp;&nbsp;
 	<input type="radio" name="choiceType" value="json" />JSON
+	<input type="radio" name="choiceType" value="json_lineByLine" />JSON_lineByLine
 	<input type="radio" name="choiceType" value="toString" checked />ToString
 	<br/>	
 
