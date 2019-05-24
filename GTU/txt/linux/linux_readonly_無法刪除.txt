@@ -1,0 +1,17 @@
+
+觀察唯獨的硬碟單位
+		1)
+				mount | grep \(ro
+		2)
+				cat /proc/mounts
+
+重新掛載為可讀寫
+		sudo mount -o remount,rw,relatime,data=ordered /dev/sdb5
+
+
+觀察受損或失敗單位
+		dmesg
+
+
+修復受損單位
+		fsck -y /dev/sdb5

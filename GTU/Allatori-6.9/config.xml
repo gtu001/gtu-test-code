@@ -1,0 +1,14 @@
+<config>
+    <input>
+        <jar in="_#in#_" out="_#out#_"/>
+    </input>
+
+    <keep-names>
+        <class access="protected+">
+            <field access="protected+"/>
+            <method access="protected+"/>
+        </class>
+    </keep-names>
+
+    <property name="log-file" value="log.xml"/>
+</config>

@@ -16,6 +16,7 @@
 	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
 	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
 	-->
+	<property name="obfuscator_dir" value="/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/Allatori-6.9" />
 	<!--${main_class}-->
 
 
@@ -33,6 +34,7 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -83,10 +85,10 @@
 			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
-			
+
 			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
-			
+
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
 		</jarfinder>
 
@@ -114,64 +116,70 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
 		<antcall target="copyReference">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
 
 		<antcall target="runClass">
-			<param name="enable" value="false" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
 		<antcall target="createJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="false" />
+			<param name="enable" value="false" /><!--false -->
+		</antcall>
+	
+		<antcall target="obfuscator">
+			<param name="enable" value="false" /><!--true -->
 		</antcall>
 
 		<antcall target="moveJarToDesktop">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="renameJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
 		<antcall target="jarToExe">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="notify">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 	</target>
 
 	<target name="notify">
 		<echo># notify ...</echo>
 		<!--
-				<exec executable="cmd">
-					<arg value="/c start echo create ${main_class}.jar complete!!" />
-				</exec>
-				-->
+		<exec executable="cmd">
+			<arg value="/c start echo create ${main_class}.jar complete!!" />
+		</exec>
+		-->
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
 		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
@@ -259,5 +267,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>
