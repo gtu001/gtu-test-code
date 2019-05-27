@@ -133,8 +133,8 @@ public class DurningMointer {
         private String getFormatResult() {
             String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
             String classInfo = getClassInfo();
-            String startLineNumber = String.valueOf(startStack.getLineNumber());
-            String endLineNumber = String.valueOf(endStack.getLineNumber());
+            String startLineNumber = String.valueOf(getStartStack().getLineNumber());
+            String endLineNumber = String.valueOf(getEndStack().getLineNumber());
             String comment = "";
             if (this.comment != null) {
                 comment = StringUtils.trimToEmpty(String.valueOf(this.comment));
@@ -142,14 +142,15 @@ public class DurningMointer {
                     comment = ", 備註 : " + comment;
                 }
             }
-            return String.format("%s %s 行數[%s -> %s] 耗時 : %s %s", _tag, classInfo, startLineNumber, endLineNumber, duringTime, comment);
+            return String.format("%s %s 行數[%s -> %s] 耗時 : %s %s", _tag, classInfo, startLineNumber, endLineNumber,
+                duringTime, comment);
         }
 
         private String getSummaryTag() {
             String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
             String classInfo = getClassInfo();
-            String startLineNumber = String.valueOf(startStack.getLineNumber());
-            String endLineNumber = String.valueOf(endStack.getLineNumber());
+            String startLineNumber = String.valueOf(getStartStack().getLineNumber());
+            String endLineNumber = String.valueOf(getEndStack().getLineNumber());
             return String.format("%s %s 行數[%s -> %s]", _tag, classInfo, startLineNumber, endLineNumber);
         }
 
@@ -163,15 +164,31 @@ public class DurningMointer {
         }
 
         private String getClassInfo() {
-            if (StringUtils.equals(endStack.getClassName(), startStack.getClassName())) {
-                if (StringUtils.equals(endStack.getMethodName(), startStack.getMethodName())) {
-                    return getSimpleClassName(startStack) + "." + startStack.getMethodName() + "()";
+            if (StringUtils.equals(getEndStack().getClassName(), getStartStack().getClassName())) {
+                if (StringUtils.equals(getEndStack().getMethodName(), getStartStack().getMethodName())) {
+                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "()";
                 } else {
-                    return getSimpleClassName(startStack) + "." + startStack.getMethodName() + "->" + endStack.getMethodName() + "()";
+                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                            + getEndStack().getMethodName() + "()";
                 }
             } else {
-                return getSimpleClassName(startStack) + "." + startStack.getMethodName() + "->" + getSimpleClassName(endStack) + endStack.getMethodName() + "()";
+                return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                        + getSimpleClassName(getEndStack()) + getEndStack().getMethodName() + "()";
             }
+        }
+
+        private StackTraceElement getStartStack() {
+            if (startStack == null) {
+                return new StackTraceElement("NA", "NA", "NA", 0);
+            }
+            return startStack;
+        }
+
+        private StackTraceElement getEndStack() {
+            if (endStack == null) {
+                return new StackTraceElement("NA", "NA", "NA", 0);
+            }
+            return endStack;
         }
 
         private StackTraceElement getCallerStack() {
