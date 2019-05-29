@@ -754,4 +754,26 @@ public class StringUtil_ {
             index += 2;
         }
     }
+
+    public static Object oracleDecodeAsString(Object... strs) {
+        if (strs == null) {
+            throw new RuntimeException("decode args 不可為空!");
+        }
+        Object val = strs[0];
+        int index = 1;
+        while (true) {
+            if (index > strs.length - 1) {
+                if (((strs.length - 1) & 1) == 0) {
+                    return "";
+                }
+                return (strs[strs.length - 1] != null ? String.valueOf(strs[strs.length - 1]) : "");
+            }
+            String strVal = strs[index] != null ? String.valueOf(strs[index]) : "";
+            String strVal2 = val != null ? String.valueOf(val) : "";
+            if (StringUtils.equals(strVal, strVal2)) {
+                return (strs[index + 1] != null ? String.valueOf(strs[index + 1]) : "");
+            }
+            index += 2;
+        }
+    }
 }

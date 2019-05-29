@@ -964,6 +964,26 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return sb.toString();
             }
         }, //
+        Entity_And_Vo_Creater_Orign("entity(orign)與vo") {//
+            @Override
+            String apply(TableInfo tableInfo, Map<String, String> dataMap, FastDBQueryUI_CrudDlgUI self) {
+                StringBuilder sb = new StringBuilder();
+                Set<String> columns = getTableColumns(tableInfo, self);
+                for (String col : columns) {
+                    String param = StringUtilForDb.dbFieldToJava_smartCheck(col);
+                    String paramType = getOrignType(col, tableInfo, dataMap, self);
+                    String paramVal = getOrignVal(col, tableInfo, dataMap, self);
+                    String notNullFix = "";
+                    if (tableInfo.getNoNullsCol().contains(col)) {
+                        notNullFix = ", nullable = false";
+                    }
+                    sb.append("@JsonProperty(\"" + col + "\")\n");
+                    sb.append("@Column(name=\"" + col + "\"" + notNullFix + ")\n");
+                    sb.append("private " + paramType + " " + param + ";\n");
+                }
+                return sb.toString();
+            }
+        }, //
         ;
         final String label;
 

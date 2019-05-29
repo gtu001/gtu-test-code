@@ -25,6 +25,8 @@ public class JScrollPopupMenu extends JPopupMenu {
     private static final long serialVersionUID = 4693231165732192396L;
     protected int maximumVisibleRows = 10;
 
+    private MenuElement currentItem;
+
     public static void main(String[] args) {
         JFrame frame = JFrameUtil.createSimpleFrame(JScrollPopupMenu.class);
         JScrollPopupMenu menu = new JScrollPopupMenu();
@@ -39,6 +41,10 @@ public class JScrollPopupMenu extends JPopupMenu {
 
     public JScrollPopupMenu() {
         this(null);
+    }
+
+    public MenuElement getCurrentItem() {
+        return this.currentItem;
     }
 
     public JScrollPopupMenu(String label) {
@@ -72,18 +78,40 @@ public class JScrollPopupMenu extends JPopupMenu {
                 if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
                     setFocusable(true);
                     grabFocus();
-                    MenuElement[] me = arg0.getMenuSelectionManager().getSelectedPath();
-                    if (me.length > 1) {
-                        if (me[1] instanceof JMenuItem) {
-                            System.out.println("currentItem = " + ((JMenuItem) me[1]).getText());
-                        } else {
-                            System.out.println("currentItem = " + (me[1]));
-                        }
-                        getScrollBar().setValue(caculateScrollValue(me[1]));
+                    MenuElement me = fixSelection(arg0);
+                    if (me != null) {
+                        System.out.println("currentItem = " + ((JMenuItem) me).getText());
+                        currentItem = me;
+                        getScrollBar().setValue(caculateScrollValue(me));
                     }
                 } else {
                     setFocusable(false);
                 }
+            }
+
+            private MenuElement fixSelection(MenuKeyEvent arg0) {
+                MenuElement[] me = arg0.getMenuSelectionManager().getSelectedPath();
+                if (me.length > 1) {
+                    MenuElement[] me2 = JScrollPopupMenu.this.getSubElements();
+                    for (int ii = 0; ii < me2.length; ii++) {
+                        if (me2[ii] == me[1]) {
+                            if (arg0.getKeyCode() == 38) {
+                                int tmpPos = ii - 1;
+                                if (tmpPos < 0) {
+                                    tmpPos = me2.length - 1;
+                                }
+                                return me2[tmpPos];
+                            } else if (arg0.getKeyCode() == 40) {
+                                int tmpPos = ii + 1;
+                                if (tmpPos >= me2.length) {
+                                    tmpPos = 0;
+                                }
+                                return me2[tmpPos];
+                            }
+                        }
+                    }
+                }
+                return null;
             }
         });
     }

@@ -1,18 +1,13 @@
 package gtu._work.ui;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -64,8 +59,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolTip;
-import javax.swing.MenuElement;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -121,6 +114,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JScrollPopupMenu;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
@@ -488,7 +482,7 @@ public class FastDBQueryUI extends JFrame {
                 if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
                 e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
-                } else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     mSqlTextAreaPromptHandler.performSelectTopColumn();
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     mSqlTextAreaPromptHandler.performSelectClose();
@@ -4191,8 +4185,11 @@ public class FastDBQueryUI extends JFrame {
                 return;
             }
             if (util.getJPopupMenu().isShowing() && !util.getMenuList().isEmpty()) {
-                JMenuItem select = util.getMenuList().get(currentMenuIndex);
-                JCommonUtil.triggerButtonActionPerformed(select);
+                JScrollPopupMenu popup = (JScrollPopupMenu) util.getJPopupMenu();
+                Object select = popup.getCurrentItem();
+                if (select != null) {
+                    JCommonUtil.triggerButtonActionPerformed((JMenuItem) select);
+                }
             }
         }
 
@@ -4275,7 +4272,7 @@ public class FastDBQueryUI extends JFrame {
             JTextFieldUtil.setTextIgnoreDocumentListener(sqlTextArea, text);
 
             sqlTextArea.updateUI();
-            
+
             sqlTextArea.setSelectionStart(afterPos);
             sqlTextArea.setSelectionEnd(afterPos);
         }

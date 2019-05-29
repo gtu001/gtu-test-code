@@ -1,7 +1,5 @@
 package gtu.collection;
 
-import gtu.reflect.ReflectUtil;
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +12,8 @@ import java.util.List;
 import org.apache.commons.collections.Factory;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
+
+import gtu.reflect.ReflectUtil;
 
 public class ListUtil {
 
@@ -219,5 +219,12 @@ public class ListUtil {
                 return o1s.compareTo(o2s);
             }
         });
+    }
+
+    public static <T> T getFirstOne(List<T> lst, Class<T> clz) {
+        if (lst != null && !lst.isEmpty()) {
+            return lst.get(0);
+        }
+        return ReflectUtil.newInstance(clz);
     }
 }
