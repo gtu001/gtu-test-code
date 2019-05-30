@@ -1,0 +1,6 @@
+C:\Program Files (x86)\Jaspersoft\iReport-5.6.0\etc\ireport.conf
+
+
+不可用 jdk 1.8 需修改為 jdk 1.7
+
+jdkhome="C:\Program Files\Java\jdk1.7.0_80"
