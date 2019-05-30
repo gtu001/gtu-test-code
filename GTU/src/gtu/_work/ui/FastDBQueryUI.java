@@ -122,6 +122,7 @@ import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
+import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
@@ -286,6 +287,8 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_13;
     private JTextComponentSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
+
+    private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
 
     /**
      * Launch the application.
@@ -478,9 +481,8 @@ public class FastDBQueryUI extends JFrame {
         });
         sqlTextArea.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
-                if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0 && //
-                e.getKeyCode() == KeyEvent.VK_S) {
+            public void keyPressed(KeyEvent e) {
+                if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
                 } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER) {
                     mSqlTextAreaPromptHandler.performSelectTopColumn();
@@ -488,9 +490,25 @@ public class FastDBQueryUI extends JFrame {
                     mSqlTextAreaPromptHandler.performSelectClose();
                 } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
                     mSqlTextAreaPromptHandler.performSelectUpDown(e);
+                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_F) {
+                    mSearchAndReplace.findKey();
+                } else if (KeyEventUtil.isMaskKeyPress(e, "s") && e.getKeyCode() == KeyEvent.VK_F3) {
+                    mSearchAndReplace.findNext(false);
+                } else if (e.getKeyCode() == KeyEvent.VK_F3) {
+                    mSearchAndReplace.findNext(true);
+                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_H) {
+                    mSearchAndReplace.replaceAll();
                 } else {
                     mSqlTextAreaPromptHandler.performUpdateLocation();
                 }
+
+                if (KeyEventUtil.isMaskKeyPress(e, "c") || KeyEventUtil.isMaskKeyPress(e, "s") || KeyEventUtil.isMaskKeyPress(e, "a")) {
+                    e.consume();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
             }
         });
         sqlTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
@@ -4339,5 +4357,89 @@ public class FastDBQueryUI extends JFrame {
         }
         mSqlTextAreaPromptHandler.init(event);
         mSqlTextAreaPromptHandler.mainProcess();
+    }
+
+    private class SearchAndReplace {
+        String findKey;
+        String lastestStatusArea;
+        List<Pair<Integer, Integer>> findLst = new ArrayList<Pair<Integer, Integer>>();
+
+        public void findKey() {
+            findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
+            if (StringUtils.isBlank(findKey)) {
+                return;
+            }
+            lastestStatusArea = StringUtils.defaultString(sqlTextArea.getText());
+
+            Pattern findPtn = Pattern.compile(Pattern.quote(findKey), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Matcher findMth = findPtn.matcher(lastestStatusArea);
+
+            boolean isFirst = true;
+            while (findMth.find()) {
+                findLst.add(Pair.of(findMth.start(), findMth.end()));
+
+                if (isFirst) {
+                    sqlTextArea.setSelectionStart(findMth.start());
+                    sqlTextArea.setSelectionEnd(findMth.end());
+                    isFirst = false;
+                }
+            }
+        }
+
+        public void replaceAll() {
+            if (StringUtils.isBlank(findKey)) {
+                findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
+            }
+            if (StringUtils.isBlank(findKey)) {
+                return;
+            }
+            String replaceKey = JCommonUtil._jOptionPane_showInputDialog("將" + findKey + "取代為:", "");
+            if (replaceKey == null) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("錯誤！");
+                return;
+            }
+            replaceKey = StringUtils.defaultString(replaceKey);
+
+            Pattern findPtn = Pattern.compile(Pattern.quote(findKey), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Matcher findMth = findPtn.matcher(StringUtils.defaultString(sqlTextArea.getText()));
+            StringBuffer sb = new StringBuffer();
+            while (findMth.find()) {
+                findMth.appendReplacement(sb, replaceKey);
+            }
+            findMth.appendTail(sb);
+            sqlTextArea.setText(sb.toString());
+            sqlTextArea.setSelectionStart(StringUtils.defaultString(sqlTextArea.getText()).length());
+            sqlTextArea.updateUI();
+        }
+
+        public void findNext(boolean isForward) {
+            String tmpAreaText = StringUtils.defaultString(sqlTextArea.getText());
+            if (StringUtils.isNotBlank(tmpAreaText) && StringUtils.equals(tmpAreaText, lastestStatusArea) && !findLst.isEmpty()) {
+                int idx = 0;
+
+                for (int ii = 0; ii < findLst.size(); ii++) {
+                    Pair<Integer, Integer> p = findLst.get(ii);
+                    if (p.getLeft() == sqlTextArea.getSelectionStart() && p.getRight() == sqlTextArea.getSelectionEnd()) {
+                        idx = ii;
+                        break;
+                    }
+                }
+                if (isForward) {
+                    idx++;
+                    if (idx >= findLst.size()) {
+                        idx = 0;
+                    }
+                } else {
+                    idx--;
+                    if (idx < 0) {
+                        idx = findLst.size() - 1;
+                    }
+                }
+
+                Pair<Integer, Integer> pos = findLst.get(idx);
+                sqlTextArea.setSelectionStart(pos.getLeft());
+                sqlTextArea.setSelectionEnd(pos.getRight());
+            }
+        }
     }
 }
