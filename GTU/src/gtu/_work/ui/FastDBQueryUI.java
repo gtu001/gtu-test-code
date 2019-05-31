@@ -482,27 +482,27 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                boolean isConsume = false;
                 if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
-                } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    mSqlTextAreaPromptHandler.performSelectTopColumn();
-                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    mSqlTextAreaPromptHandler.performSelectClose();
-                } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    mSqlTextAreaPromptHandler.performSelectUpDown(e);
-                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_F) {
-                    mSearchAndReplace.findKey();
-                } else if (KeyEventUtil.isMaskKeyPress(e, "s") && e.getKeyCode() == KeyEvent.VK_F3) {
-                    mSearchAndReplace.findNext(false);
-                } else if (e.getKeyCode() == KeyEvent.VK_F3) {
-                    mSearchAndReplace.findNext(true);
-                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_H) {
-                    mSearchAndReplace.replaceAll();
-                } else {
-                    mSqlTextAreaPromptHandler.performUpdateLocation();
+                } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && mSqlTextAreaPromptHandler != null) {
+                    isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn();
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && mSqlTextAreaPromptHandler != null) {
+                    isConsume = mSqlTextAreaPromptHandler.performSelectClose();
+                } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN && mSqlTextAreaPromptHandler != null) {
+                    isConsume = mSqlTextAreaPromptHandler.performSelectUpDown(e);
+                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_F && mSearchAndReplace != null) {
+                    isConsume = mSearchAndReplace.findKey();
+                } else if (KeyEventUtil.isMaskKeyPress(e, "s") && e.getKeyCode() == KeyEvent.VK_F3 && mSearchAndReplace != null) {
+                    isConsume = mSearchAndReplace.findNext(false);
+                } else if (e.getKeyCode() == KeyEvent.VK_F3 && mSearchAndReplace != null) {
+                    isConsume = mSearchAndReplace.findNext(true);
+                } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_H && mSearchAndReplace != null) {
+                    isConsume = mSearchAndReplace.replaceAll();
+                } else if (mSqlTextAreaPromptHandler != null) {
+                    isConsume = mSqlTextAreaPromptHandler.performUpdateLocation();
                 }
-
-                if (KeyEventUtil.isMaskKeyPress(e, "c") || KeyEventUtil.isMaskKeyPress(e, "s") || KeyEventUtil.isMaskKeyPress(e, "a")) {
+                if (isConsume) {
                     e.consume();
                 }
             }
@@ -4169,38 +4169,43 @@ public class FastDBQueryUI extends JFrame {
         private SqlTextAreaPromptHandler() {
         }
 
-        public void performUpdateLocation() {
+        public boolean performUpdateLocation() {
             Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
             if (rect == null || util == null) {
-                return;
+                return false;
             }
             if (StringUtils.isBlank(queryText)) {
                 util.dismiss();
             }
             util.setLocation(sqlTextArea, (int) rect.getX(), (int) rect.getY());
+            return false;
         }
 
-        public void performSelectClose() {
+        public boolean performSelectClose() {
             if (util == null) {
-                return;
+                return false;
             }
             if (util.getJPopupMenu().isShowing()) {
                 util.dismiss();
+                return true;
             }
+            return false;
         }
 
-        public void performSelectUpDown(KeyEvent e) {
+        public boolean performSelectUpDown(KeyEvent e) {
             if (util == null) {
-                return;
+                return false;
             }
             if (util.getJPopupMenu().isShowing() && !util.getJPopupMenu().isFocusOwner()) {
                 JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
+                return true;
             }
+            return false;
         }
 
-        public void performSelectTopColumn() {
+        public boolean performSelectTopColumn() {
             if (util == null) {
-                return;
+                return false;
             }
             if (util.getJPopupMenu().isShowing() && !util.getMenuList().isEmpty()) {
                 JScrollPopupMenu popup = (JScrollPopupMenu) util.getJPopupMenu();
@@ -4208,7 +4213,9 @@ public class FastDBQueryUI extends JFrame {
                 if (select != null) {
                     JCommonUtil.triggerButtonActionPerformed((JMenuItem) select);
                 }
+                return true;
             }
+            return false;
         }
 
         private void init(DocumentEvent event) {
@@ -4364,10 +4371,10 @@ public class FastDBQueryUI extends JFrame {
         String lastestStatusArea;
         List<Pair<Integer, Integer>> findLst = new ArrayList<Pair<Integer, Integer>>();
 
-        public void findKey() {
+        public boolean findKey() {
             findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
             if (StringUtils.isBlank(findKey)) {
-                return;
+                return true;
             }
             lastestStatusArea = StringUtils.defaultString(sqlTextArea.getText());
 
@@ -4384,19 +4391,23 @@ public class FastDBQueryUI extends JFrame {
                     isFirst = false;
                 }
             }
+            if (isFirst) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + findKey);
+            }
+            return true;
         }
 
-        public void replaceAll() {
+        public boolean replaceAll() {
             if (StringUtils.isBlank(findKey)) {
                 findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
             }
             if (StringUtils.isBlank(findKey)) {
-                return;
+                return true;
             }
             String replaceKey = JCommonUtil._jOptionPane_showInputDialog("將" + findKey + "取代為:", "");
             if (replaceKey == null) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("錯誤！");
-                return;
+                return true;
             }
             replaceKey = StringUtils.defaultString(replaceKey);
 
@@ -4410,9 +4421,10 @@ public class FastDBQueryUI extends JFrame {
             sqlTextArea.setText(sb.toString());
             sqlTextArea.setSelectionStart(StringUtils.defaultString(sqlTextArea.getText()).length());
             sqlTextArea.updateUI();
+            return true;
         }
 
-        public void findNext(boolean isForward) {
+        public boolean findNext(boolean isForward) {
             String tmpAreaText = StringUtils.defaultString(sqlTextArea.getText());
             if (StringUtils.isNotBlank(tmpAreaText) && StringUtils.equals(tmpAreaText, lastestStatusArea) && !findLst.isEmpty()) {
                 int idx = 0;
@@ -4440,6 +4452,7 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextArea.setSelectionStart(pos.getLeft());
                 sqlTextArea.setSelectionEnd(pos.getRight());
             }
+            return true;
         }
     }
 }
