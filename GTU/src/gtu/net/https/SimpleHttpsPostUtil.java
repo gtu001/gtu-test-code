@@ -1,7 +1,10 @@
 package gtu.net.https;
 
-import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -20,20 +23,20 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-public class SimpleHttpsUtil {
+public class SimpleHttpsPostUtil {
 
-    private SimpleHttpsUtil() {
+    private SimpleHttpsPostUtil() {
     }
 
-    public static SimpleHttpsUtil newInstance() {
-        return new SimpleHttpsUtil();
+    public static SimpleHttpsPostUtil newInstance() {
+        return new SimpleHttpsPostUtil();
     }
 
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         String url = "http://blog.xuite.net/laurated/game/356417230-%E5%8B%87%E8%80%85%E9%AC%A5%E6%83%A1%E9%BE%8D2%28%E6%94%BB%E7%95%A5%29";
-        int code = SimpleHttpsUtil.newInstance().getStatusCode(url, 5000);
+        int code = SimpleHttpsPostUtil.newInstance().getStatusCode(url, 5000);
         System.out.println(code);
         System.out.println("done...");
     }
@@ -64,8 +67,14 @@ public class SimpleHttpsUtil {
         }
     }
 
-    public String queryPage(String urls) {
+    public String queryPage(String urls, String postData) {
         StringBuffer sb = new StringBuffer();
+        OutputStream os = null;
+        InputStream is = null;
+        InputStreamReader isr = null;
+        char[] buff = new char[4096];
+        int size = 0;
+        int r = 0;
         try {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("11.22.33.44", 8080));
             // URLConnection uc = url.openConnection(proxy);
@@ -102,20 +111,30 @@ public class SimpleHttpsUtil {
             // 设置属性
             url.setConnectTimeout(8 * 1000);
             url.setReadTimeout(1 * 60 * 1000);
+            url.setDoOutput(true);
+            url.setDoInput(true);
 
-            // url.setReadTimeout(5000);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.getInputStream(), "utf8"));
-            for (String line = null; (line = reader.readLine()) != null;) {
-                sb.append(line + "\n");
+            os = url.getOutputStream();
+            OutputStreamWriter wr = new OutputStreamWriter(os, "UTF-8");
+            wr.write(postData);
+            wr.flush();
+
+            is = url.getInputStream();
+            isr = new InputStreamReader(is, "UTF-8");
+            while ((r = isr.read(buff)) > 0) {
+                sb.append(buff, 0, r);
+                size += r;
+                if (size >= Integer.MAX_VALUE) {
+                    break;
+                }
             }
-
-            // System.out.println("<<<" + sb.toString());
-            reader.close();
+            return sb.toString();
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new RuntimeException(ex);
+        } finally {
+            safeClose(is, os);
         }
-        return sb.toString();
     }
 
     /**
@@ -158,5 +177,20 @@ public class SimpleHttpsUtil {
         SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
         sslContext.init(null, tm, new java.security.SecureRandom());
         return sslContext;
+    }
+
+    private static void safeClose(InputStream is, OutputStream os) {
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        }
+        if (os != null) {
+            try {
+                os.close();
+            } catch (IOException e) {
+            }
+        }
     }
 }

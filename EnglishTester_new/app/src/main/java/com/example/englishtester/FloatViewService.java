@@ -101,6 +101,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gtu._work.etc.ChineseToJapanese;
 import gtu._work.etc.EnglishTester_Diectory;
 import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 import gtu._work.etc.EnglishTester_Diectory_Factory;
@@ -981,6 +982,30 @@ public class FloatViewService extends Service {
                 } catch (Exception ex) {
                     Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
                     Toast.makeText(self, "無法開啟網頁!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        },//
+        TRANSLATE_TO_JAPAN("轉換為日文", R.drawable.icon_book_stack) {
+            @Override
+            void process(FloatViewService self) {
+                try {
+                    final String chineseWord = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                    String japanWord = DropboxEnglishService.getRunOnUiThread(new Callable<String>() {
+                        @Override
+                        public String call() throws Exception {
+                            try {
+                                return ChineseToJapanese.parseToJapanWord(chineseWord);
+                            } catch (Exception e) {
+                                Log.e(TAG, "TRANSLATE_TO_JAPAN ERR : " + e.getMessage(), e);
+                            } finally {
+                            }
+                            return "";
+                        }
+                    }, -1);
+                    self.noteText.setText(japanWord);
+                } catch (Exception ex) {
+                    Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
+                    Toast.makeText(self, "無法轉換為日文!", Toast.LENGTH_SHORT).show();
                 }
             }
         },//

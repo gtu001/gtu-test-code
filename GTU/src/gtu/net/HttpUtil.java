@@ -68,7 +68,7 @@ public class HttpUtil {
 
             final HttpParams httpParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
-            
+
             HttpClient httpclient = new DefaultHttpClient(httpParams);
             HttpGet httpget = new HttpGet(uri);
             if (userAgent != null && userAgent.length() > 0) {
@@ -163,6 +163,10 @@ public class HttpUtil {
     }
 
     public static String doPostRequest(String urlStr, String postData, String encode, String type) throws IOException {
+        return doPostRequest_UserAgent(urlStr, postData, encode, type, "");
+    }
+
+    public static String doPostRequest_UserAgent(String urlStr, String postData, String encode, String type, String userAgent) throws IOException {
         StringBuffer response = new StringBuffer();
         URL url = null;
         HttpURLConnection conn = null;
@@ -186,6 +190,10 @@ public class HttpUtil {
             conn.setDoOutput(true);
             conn.setDoInput(true);
 
+            if (StringUtils.isNotBlank(userAgent)) {
+                conn.setRequestProperty("User-Agent", userAgent);
+            }
+
             os = conn.getOutputStream();
             OutputStreamWriter wr = new OutputStreamWriter(os, "UTF-8");
             wr.write(postData);
@@ -205,7 +213,6 @@ public class HttpUtil {
         } finally {
             safeClose(is, os);
         }
-
     }
 
     public static String doSoapPostRequest(String urlStr, String postData) throws IOException {
