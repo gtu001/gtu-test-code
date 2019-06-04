@@ -1,0 +1,12 @@
+Apache-cxf 產生soap client方式	
+	
+	下載 apache-cxf-3.3.2
+	切到 C:\Users\E123474\Desktop\apache-cxf-3.3.2\bin
+
+	-p : package
+	-d : 產黨路徑
+	最後放 wsdl.xml 位置 , 似乎不可直接給url
+	
+	wsdl2java -p  com.test -d C:\Users\E123474\Desktop\XXXXXXX  -encoding UTF-8   C:\Users\E123474\Desktop\BANCSService.xml
+	
+---

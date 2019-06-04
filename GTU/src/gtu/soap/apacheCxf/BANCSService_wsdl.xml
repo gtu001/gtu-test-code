@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://webservice.cathaybk.com.tw" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://webservice.cathaybk.com.tw" xmlns:intf="http://webservice.cathaybk.com.tw" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://webservice.cathaybk.com.tw" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="XServiceMethod">
+    <complexType>
+     <sequence>
+      <element name="RequstXML" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="XServiceMethodResponse">
+    <complexType>
+     <sequence>
+      <element name="XServiceMethodReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="ECHO">
+    <complexType>
+     <sequence>
+      <element name="RequestString" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="ECHOResponse">
+    <complexType>
+     <sequence>
+      <element name="ECHOReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="ECHOResponse">
+
+      <wsdl:part element="impl:ECHOResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ECHORequest">
+
+      <wsdl:part element="impl:ECHO" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="XServiceMethodResponse">
+
+      <wsdl:part element="impl:XServiceMethodResponse" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="XServiceMethodRequest">
+
+      <wsdl:part element="impl:XServiceMethod" name="parameters"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="BANCSService">
+
+      <wsdl:operation name="XServiceMethod">
+
+         <wsdl:input message="impl:XServiceMethodRequest" name="XServiceMethodRequest"/>
+
+         <wsdl:output message="impl:XServiceMethodResponse" name="XServiceMethodResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ECHO">
+
+         <wsdl:input message="impl:ECHORequest" name="ECHORequest"/>
+
+         <wsdl:output message="impl:ECHOResponse" name="ECHOResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="BANCSServiceSoapBinding" type="impl:BANCSService">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="XServiceMethod">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="XServiceMethodRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="XServiceMethodResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ECHO">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="ECHORequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="ECHOResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="BANCSServiceService">
+
+      <wsdl:port binding="impl:BANCSServiceSoapBinding" name="BANCSService">
+
+         <wsdlsoap:address location="http://dar6midd01:38080/WEBS/services/BANCSService"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
