@@ -2,10 +2,13 @@ package gtu.soap.apacheCxf;
 
 import java.io.IOException;
 
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
 import javax.xml.transform.TransformerException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.xmlbeans.impl.soap.SOAPException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -38,6 +41,19 @@ public class SoapConfiguration {
             getWebServiceTemplate().setMessageSender(sender);
             return getWebServiceTemplate().marshalSendAndReceive(url, request,
                 new CustomMessageCallback("", "", "CIF6IDCNS/CheckID"));
+        }
+        
+        public Object callWebService12(String url, Object request) {
+            WebServiceTemplate wsTemplate = null;
+            try {
+                MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+                SaajSoapMessageFactory saajSoapMessageFactory = new SaajSoapMessageFactory(newFactory);
+                wsTemplate = getWebServiceTemplate();
+                wsTemplate.setMessageFactory(saajSoapMessageFactory)
+            }catch(SOAPException e) {
+                e.printStackTrace();
+            }
+            return wsTemplate.marshalSendAndReceive(url, request);
         }
     }
 
@@ -76,4 +92,5 @@ public class SoapConfiguration {
         client.setUnmarshaller(marshaller);
         return client;
     }
+    
 }
