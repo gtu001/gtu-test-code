@@ -301,7 +301,16 @@ public class TxtReaderAppenderForHtmlTag {
                 self.ss.setSpan(self.createChangeLineImageSpan(), self.getPairStart(pair), self.getPairEnd(pair), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         },//
-        ;
+        PAGEBREAKER("{{pagebreak}}", "pagebreak\\}\\}") {
+            @Override
+            void apply(Pair<Integer, Integer> pair, Matcher mth, TxtReaderAppenderForHtmlTag self) {
+                __SpecialTagHolder_Pos proc = new __SpecialTagHolder_Pos(pair, mth, 0);
+                log(proc);
+
+                self.hiddenSpan(self.ss, self.getPairStart(pair), self.getPairEnd(pair));
+                self.ss.setSpan(self.createChangeLineImageSpan(), self.getPairStart(pair), self.getPairEnd(pair), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        },;
 
         final Pattern ptn;
         final String startWtih;

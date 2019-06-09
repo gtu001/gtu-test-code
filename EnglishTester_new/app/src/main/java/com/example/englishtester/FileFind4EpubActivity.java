@@ -1,5 +1,6 @@
 package com.example.englishtester;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
@@ -10,8 +11,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -20,7 +23,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -45,6 +50,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,27 +59,37 @@ import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubReader;
 
-public class FileFind4EpubActivity extends ListActivity {
+public class FileFind4EpubActivity extends Activity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {//ListActivity
 
     private static final String TAG = FileFind4EpubActivity.class.getSimpleName();
 
     private List<Map<String, Object>> pathList = null;
+    private List<Map<String, Object>> listItemBackup = null;
+
     private TextView mPath;
+    private ListView listView;
+    private EditText searchTextView;
 
     public static final String BUNDLE_FILE = "file";
 
     private ExtensionChecker extensionChecker;
     private RootDirHolder rootDirHolder;
     private CommonImageHolder commonImageHolder;
+    private boolean isEpubOverCountBool;
+    private AtomicBoolean isLongItemClick = new AtomicBoolean(false);
 
     public static final String FILE_PATTERN_KEY = FileFind4EpubActivity.class.getName() + "_FILE_PATTERN_KEY";
     public static final String FILE_START_DIRS = FileFind4EpubActivity.class.getName() + "_FILE_START_DIRS";
+    private static final int EPUB_OVER_COUNT = 5;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         System.out.println("# onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_directory);
+        setContentView(R.layout.activity_file_directory_n_search);
+
+        listView = this.findViewById(android.R.id.list);
+        searchTextView = this.findViewById(R.id.searchTextView);
 
         String defaultPattern = ".*";
         String[] defultCustomDirs = null;
@@ -112,7 +128,65 @@ public class FileFind4EpubActivity extends ListActivity {
         setListAdapter(fileList);
         */
 
-        setListAdapter(new MyBaseAdapter(this, pathList));
+//        setListAdapter(new MyBaseAdapter(this, pathList));
+        listView.setAdapter(new MyBaseAdapter(this, pathList));
+
+        listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
+
+        searchTextView.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchTextViewSearch();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            private boolean isEpubMatch(Map<String, Object> map, String searchKey) {
+                searchKey = StringUtils.trimToEmpty(searchKey).toLowerCase();
+                for (String key : new String[]{"file_name", "file_name_desc"}) {
+                    if (map.containsKey(key)) {
+                        String text = StringUtils.defaultString((String) map.get(key)).toLowerCase();
+                        if (text.contains(searchKey)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            private void searchTextViewSearch() {
+                String searchText = StringUtils.trimToEmpty(searchTextView.getText().toString()).toLowerCase();
+                List<Map<String, Object>> listItem = pathList;
+                Log.v(TAG, "[searchTextView] key : " + searchText);
+
+                if (listItemBackup == null || listItemBackup.isEmpty()) {
+                    listItemBackup = new ArrayList<>(listItem);
+                }
+
+                if (StringUtils.isNotBlank(searchText)) {
+                    listItem.clear();
+                    for (int ii = 0; ii < listItemBackup.size(); ii++) {
+                        Map<String, Object> map = listItemBackup.get(ii);
+                        if (isEpubMatch(map, searchText)) {
+                            listItem.add(map);
+                        }
+                    }
+                } else {
+                    listItem.clear();
+                    listItem.addAll(listItemBackup);
+                }
+
+                ((MyBaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+            }
+        });
     }
 
     private static class CommonImageHolder {
@@ -154,6 +228,10 @@ public class FileFind4EpubActivity extends ListActivity {
     }
 
     private void addPathMap(String name, String path) {
+        addPathMap(name, path, true);
+    }
+
+    private void addPathMap(String name, String path, boolean isOverCount) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("file_name", name);
         map.put("path", path);
@@ -162,12 +240,16 @@ public class FileFind4EpubActivity extends ListActivity {
             map.put("icon", commonImageHolder.getFolder());
         } else if (extensionChecker.isMatch(file)) {
 //            map.put("icon", R.drawable.icon_file);
-            EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
-            map.put("icon", e.getImage());
-            if (StringUtils.isNotBlank(e.getTitle())) {
-                map.put("file_name", e.getTitle());
+            if (!isOverCount) {
+                EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
+                map.put("icon", e.getImage());
+                if (StringUtils.isNotBlank(e.getTitle())) {
+                    map.put("file_name", e.getTitle());
+                }
+                map.put("file_name_desc", e.getAuthor());
+            } else {
+                map.put("icon", commonImageHolder.getNotfound());
             }
-            map.put("file_name_desc", e.getAuthor());
         } else {
             map.put("icon", null);
         }
@@ -219,10 +301,13 @@ public class FileFind4EpubActivity extends ListActivity {
 
         if (!ignoreSubdirLst) {
             List<File> sortFileList = getCurrentDirLst(currentDir);
+
+            isEpubOverCountBool = isEpubFileOverCount(sortFileList);
+
             for (int ii = 0; ii < sortFileList.size(); ii++) {
                 File file = sortFileList.get(ii);
                 String fileName = file.getName();
-                addPathMap(fileName, file.getPath());
+                addPathMap(fileName, file.getPath(), isEpubOverCountBool);
             }
         }
 
@@ -231,6 +316,8 @@ public class FileFind4EpubActivity extends ListActivity {
         // setListAdapter(fileList);
 
         pathList = sortPathList(pathList);
+
+        listItemBackup = null;//清除當前目錄備份
 
         /*
         SimpleAdapter fileList = new SimpleAdapter(this, pathList,// 資料來源
@@ -243,7 +330,21 @@ public class FileFind4EpubActivity extends ListActivity {
         setListAdapter(fileList);
         */
 
-        setListAdapter(new MyBaseAdapter(this, pathList));
+        //setListAdapter(new MyBaseAdapter(this, pathList));
+        listView.setAdapter(new MyBaseAdapter(this, pathList));
+    }
+
+    private boolean isEpubFileOverCount(List<File> sortFileList) {
+        int count = 0;
+        for (File f : sortFileList) {
+            if (f.exists() && f.isFile() && f.getName().toLowerCase().endsWith(".epub")) {
+                count++;
+            }
+        }
+        if (count > EPUB_OVER_COUNT) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -267,6 +368,17 @@ public class FileFind4EpubActivity extends ListActivity {
     }
 
     @Override
+    public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+        onListItemClick((ListView) l, v, position, id);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> l, View v, int position, long id) {
+        isLongItemClick.set(true);
+        onListItemClick((ListView) l, v, position, id);
+        return true;
+    }
+
     protected void onListItemClick(ListView l, View v, int position, long id) {
         String path = (String) pathList.get(position).get("path");
         File file = new File(path);
@@ -283,7 +395,24 @@ public class FileFind4EpubActivity extends ListActivity {
             } else {
                 // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 取得檔案回傳
                 if (extensionChecker.isMatch(file)) {
-                    returnChoiceFile(file);
+                    if (isLongItemClick.get()) {
+                        //一般開檔
+                        returnChoiceFile(file);
+                        isLongItemClick.set(false);
+                    } else if (isEpubOverCountBool) {
+                        //顯示封面
+                        EpubCoverImageFetcher mEpubCoverImageFetcher = new EpubCoverImageFetcher(path);
+                        Map<String, Object> map = pathList.get(position);
+
+                        EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
+                        map.put("icon", e.getImage());
+                        if (StringUtils.isNotBlank(e.getTitle())) {
+                            map.put("file_name", e.getTitle());
+                        }
+                        map.put("file_name_desc", e.getAuthor());
+
+                        ((MyBaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+                    }
                 }
                 // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 取得檔案回傳
             }
@@ -336,8 +465,16 @@ public class FileFind4EpubActivity extends ListActivity {
             ptn = Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE);
         }
 
+        private boolean isMatch(String path) {
+            path = StringUtils.trimToEmpty(path);
+            if (StringUtils.isBlank(path)) {
+                return false;
+            }
+            return isMatch(new File(path));
+        }
+
         private boolean isMatch(File file) {
-            if (file.isFile()) {
+            if (file.exists() && file.isFile()) {
                 Matcher mth = ptn.matcher(FileUtilGtu.getSubName(file.getName()));
                 return mth.find();
             }
@@ -433,6 +570,11 @@ public class FileFind4EpubActivity extends ListActivity {
 
         private EpubCoverImageFetcher(String filePath) {
             try {
+                filePath = StringUtils.trimToEmpty(filePath);
+                if (!filePath.toLowerCase().endsWith(".epub")) {
+                    return;
+                }
+
                 EpubReader epubReader = new EpubReader();
                 Book book = epubReader.readEpubLazy(filePath, "UTF8");
                 if (book != null) {
@@ -542,7 +684,7 @@ public class FileFind4EpubActivity extends ListActivity {
             String name = (String) map.get("file_name");
             String desc = (String) map.get("file_name_desc");
             Bitmap bitmap = (Bitmap) map.get("icon");
-            boolean isEpubFile = StringUtils.defaultString((String) map.get("path")).endsWith(".epub");
+            boolean isTargetBookFile = extensionChecker.isMatch((String) map.get("path"));
 
             if (StringUtils.isNotBlank(name)) {
                 SpannableString s1 = new SpannableString(StringUtils.defaultString(name));
@@ -560,12 +702,12 @@ public class FileFind4EpubActivity extends ListActivity {
                 viewHolder.itemTitle_desc.setText("");
             }
 
-            if (isEpubFile && bitmap == null) {
+            if (isTargetBookFile && bitmap == null) {
                 bitmap = commonImageHolder.getNotfound();
             }
             viewHolder.imageView01.setImageBitmap(bitmap);
 
-            viewHolder.resetViewStatus(isEpubFile);
+            viewHolder.resetViewStatus(isTargetBookFile);
 
             return convertView;
         }

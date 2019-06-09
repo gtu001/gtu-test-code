@@ -165,6 +165,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step7_codeTag", content, checkStr);
         content = _step8_endNote(content, isPure);
         validateContent("_step8_endNote", content, checkStr);
+        content = _step9_pagebreak(content, isPure);
+        validateContent("_step9_pagebreak", content, checkStr);
 
         content = _stepFinal_customPlus(content, isPure, checkStr);
         validateContent("_stepFinal_customPlus", content, checkStr);
@@ -186,6 +188,7 @@ public abstract class HtmlBaseParser {
     }
 
     protected abstract String _step3_imageProc_custom(String content, boolean isPure, String checkStr);
+
     protected abstract String _stepFinal_customPlus(String content, boolean isPure, String checkStr);
 
     protected void logContent(String content) {
@@ -838,6 +841,25 @@ public abstract class HtmlBaseParser {
             }
         }
         return content;
+    }
+
+    protected String _step9_pagebreak(String content, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile(Pattern.quote("<div class=\"mbppagebreak\"></div>"), Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String pagebreak = mth.group();
+            String tmpVal = "";
+            if (StringUtils.isNotBlank(pagebreak)) {
+                tmpVal = "{{pagebreak}}" + NEW_LINE;
+                if (isPure) {
+                    tmpVal = NEW_LINE;
+                }
+            }
+            mth.appendReplacement(sb, tmpVal);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
     }
 
     protected String getPicDirForDropbox() {
