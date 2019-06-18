@@ -1,0 +1,30 @@
+	Pom.xml
+		<!-- cache -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+---
+
+
+    @EnableCaching <---這個要加
+	@SpringBootApplication
+	public class InvQueryUiApplication {
+
+		public static void main(String[] args) {
+			SpringApplication.run(InvQueryUiApplication.class, args);
+		}
+	}
+
+---
+
+	@Cacheable("getBranchLstKeeper")
+    public List<FundQryBranchWebResponseBranchDto> getBranchLstKeeper() {
+        return getBranchLst();
+    }
+
+    @CachePut("getBranchLstKeeper")
+    public List<FundQryBranchWebResponseBranchDto> getBranchLstUpdate() {
+        return getBranchLst();
+    }
