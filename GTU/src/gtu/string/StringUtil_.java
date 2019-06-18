@@ -720,10 +720,10 @@ public class StringUtil_ {
                         lst.add(line);
                         continue;
                     }
+                } else {
+                    lst.add(line);
                 }
-                lst.add(line);
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

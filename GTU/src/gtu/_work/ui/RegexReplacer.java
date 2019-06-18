@@ -488,6 +488,14 @@ public class RegexReplacer extends javax.swing.JFrame {
                                                             resultArea.setText(StringUtils.join(lst, "\r\n"));
                                                         }
                                                     })//
+                                                    .addJMenuItem("排序[反向]", new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
+                                                            Collections.sort(lst);
+                                                            Collections.reverse(lst);
+                                                            resultArea.setText(StringUtils.join(lst, "\r\n"));
+                                                        }
+                                                    })//
                                                     .show();
                                         } catch (Exception ex) {
                                             JCommonUtil.handleException(ex);

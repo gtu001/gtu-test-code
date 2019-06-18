@@ -25,6 +25,8 @@ import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -430,7 +432,7 @@ public class UrlPlayerDialog_bg {
 
                 Map<String, String> toMap = new HashMap<String, String>();
                 toMap.put(bean.getName(), bean.getUrl());
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
                 Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -440,11 +442,14 @@ public class UrlPlayerDialog_bg {
                 Mp3Bean bean = self.bean;
                 List<Mp3Bean> totalUrlList = self.totalUrlList;
 
-                Map<String, String> toMap = new LinkedHashMap<String, String>();
+                List<String> nameLst = new ArrayList<>();
+                List<String> pathLst = new ArrayList<>();
                 for (Mp3Bean b : totalUrlList) {
-                    toMap.put(b.getName(), b.getUrl());
+                    nameLst.add(b.getName());
+                    pathLst.add(b.getUrl());
                 }
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(nameLst, pathLst, false);
                 Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -454,11 +459,14 @@ public class UrlPlayerDialog_bg {
                 Mp3Bean bean = self.bean;
                 List<Mp3Bean> totalUrlList = self.totalUrlList;
 
-                Map<String, String> toMap = new HashMap<String, String>();
+                List<String> nameLst = new ArrayList<>();
+                List<String> pathLst = new ArrayList<>();
                 for (Mp3Bean b : totalUrlList) {
-                    toMap.put(b.getName(), b.getUrl());
+                    nameLst.add(b.getName());
+                    pathLst.add(b.getUrl());
                 }
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(toMap);
+
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(nameLst, pathLst, true);
                 Toast.makeText(self.context, "重複播放全部(隨機)", Toast.LENGTH_SHORT).show();
             }
         },//

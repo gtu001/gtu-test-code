@@ -26,6 +26,7 @@ import com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceKeepAliveHelper;
 import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
+import com.example.gtu001.qrcodemaker.util.RandomUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -217,20 +218,23 @@ public class UrlPlayerService extends Service {
         }
     }
 
-    public void setReplayMode(Map totalLst) {
+    public void setReplayMode(List<String> nameLst, List<String> pathLst, boolean isRandom) {
         try {
             List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
             if (totalLst != null) {
                 Log.v(TAG, "TotalLst size : " + totalLst.size());
-                for (Object k : totalLst.keySet()) {
-                    String name = (String) k;
-                    String url = (String) totalLst.get(k);
+                for (int ii = 0 ; ii < nameLst.size() ; ii ++) {
+                    String name = (String) nameLst.get(ii);
+                    String url = (String) pathLst.get(ii);
                     Mp3Bean b = new Mp3Bean();
                     b.setName(name);
                     b.setUrl(url);
                     Log.v(TAG, "Add TotalLst : " + ReflectionToStringBuilder.toString(b));
                     lst.add(b);
                 }
+            }
+            if(isRandom){
+                lst = RandomUtil.randomList(lst);
             }
             this.totalLst = lst;
             if (!this.totalLst.isEmpty()) {
@@ -322,8 +326,8 @@ public class UrlPlayerService extends Service {
         }
 
         @Override
-        public void setReplayMode(Map totalLst) throws RemoteException {
-            UrlPlayerService.this.setReplayMode(totalLst);
+        public void setReplayMode(List<String> nameLst, List<String> pathLst, boolean isRandom) throws RemoteException {
+            UrlPlayerService.this.setReplayMode(nameLst, pathLst, isRandom);
         }
 
         @Override
