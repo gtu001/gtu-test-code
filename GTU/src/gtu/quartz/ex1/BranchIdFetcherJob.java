@@ -1,4 +1,4 @@
-package cub.inv.query.ui.job.branchid;
+package gtu.quartz.ex1;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class BranchIdFetcherJob extends QuartzJobBean {
     private InvfQueryService invfQueryService;
     
     @Resource
-    private BranchIdFetcherJob self;
+    private BranchIdFetcherJob self;//自己call自己必須用resource才能 cache
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {

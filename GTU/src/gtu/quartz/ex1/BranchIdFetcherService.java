@@ -1,4 +1,4 @@
-package cub.inv.query.ui.job.branchid;
+package gtu.quartz.ex1;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
