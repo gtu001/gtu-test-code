@@ -71,7 +71,7 @@ public class BranchIdFetcherService {
         CronTrigger crontrigger = TriggerBuilder.newTrigger()
             .withIdentity(jobDetail.getKey().getName(), "getBranchID")
             .withDescription("getBranchID")
-            .withSchedule(CronScheduleBuilder.cronSchedule("0 * * * * ?"))
+            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 8 * * ?"))
             .build();
         return crontrigger;
     }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+
+   <fontFamily name="&#27161;&#26999;&#39636;">
+       <normal><![CDATA[fonts/kaiu.ttf]]></normal>
+       <pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+       <pdfEmbedded><![CDATA[false]]></pdfEmbedded>
+   </fontFamily>
+
+	<fontFamily name="Segoe UI Symbol">
+       <normal><![CDATA[fonts/SEGUISYM.TTF]]></normal>
+       <pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+       <pdfEmbedded><![CDATA[false]]></pdfEmbedded>
+   </fontFamily>
+
+	<fontFamily name="Times New Roman">
+       <normal><![CDATA[fonts/times.ttf]]></normal>
+       <pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+       <pdfEmbedded><![CDATA[false]]></pdfEmbedded>
+   </fontFamily>
+</fontFamilies>
