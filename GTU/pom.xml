@@ -301,12 +301,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jboss.as</groupId>
-			<artifactId>jboss-as-domain-management</artifactId>
-			<version>7.2.0.Final</version>
-		</dependency>
-
-		<dependency>
 			<!-- itext-2.1.7.jar -->
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
@@ -400,15 +394,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3.1</version>
+			<version>2.8.5</version>
 		</dependency>
 
 		<dependency>
@@ -765,6 +753,18 @@
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.11.0</version>
+		</dependency>
+		
+		<!-- Swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.2.2</version>
 		</dependency>
 
 		<!-- spring boot -->
