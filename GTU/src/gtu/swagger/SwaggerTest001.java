@@ -1,5 +1,7 @@
 package gtu.swagger;
 
+import java.util.UUID;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -56,7 +58,7 @@ public class SwaggerTest001 {
         }
     }
 
-//    @SessionAttributes({ "loginDomain", "roiEntity" })
+    // @SessionAttributes({ "loginDomain", "roiEntity" })
     @RequestMapping("/fund")
     @RestController
     public static class FundController {
@@ -68,6 +70,7 @@ public class SwaggerTest001 {
                 Model model) {
             if (webRequestDto != null) {
                 TestBean bean = new TestBean();
+                bean.setTest(UUID.randomUUID().toString());
                 // set ui model
                 return new ResponseEntity<TestBean>(bean, HttpStatus.OK);
             }
@@ -75,7 +78,7 @@ public class SwaggerTest001 {
         }
     }
 
-//    @Profile({ "utvm", "utpaas", "uatvm", "uatpaas" })
+    // @Profile({ "utvm", "utpaas", "uatvm", "uatpaas" })
     @Configuration
     @EnableSwagger2
     public static class SwaggerConfig {
