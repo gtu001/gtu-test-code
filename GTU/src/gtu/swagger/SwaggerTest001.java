@@ -57,6 +57,14 @@ public class SwaggerTest001 {
             this.test = test;
         }
     }
+    
+    /*
+     * 測試url
+     * http://localhost:8080/fund/qryTest?test=XXXX
+     * 
+     * swagger 網址
+     * http://localhost:8080/swagger-ui.html
+     */
 
     // @SessionAttributes({ "loginDomain", "roiEntity" })
     @RequestMapping("/fund")
