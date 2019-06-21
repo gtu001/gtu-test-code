@@ -6,11 +6,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,12 +34,14 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableAutoConfiguration(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class }) // disable
-                                                                                                       // Mongo
 @ComponentScan("gtu.swagger")
 @Component
-@SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class }) // disable
-                                                                                                     // Mongo
+@EnableAutoConfiguration(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, //
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, //
+        HibernateJpaAutoConfiguration.class })
+@SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, //
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, //
+        HibernateJpaAutoConfiguration.class })
 public class SwaggerTest001 {
 
     public static void main(String[] args) {
@@ -57,13 +60,11 @@ public class SwaggerTest001 {
             this.test = test;
         }
     }
-    
+
     /*
-     * 測試url
-     * http://localhost:8080/fund/qryTest?test=XXXX
+     * 測試url http://localhost:8080/fund/qryTest?test=XXXX
      * 
-     * swagger 網址
-     * http://localhost:8080/swagger-ui.html
+     * swagger 網址 http://localhost:8080/swagger-ui.html
      */
 
     // @SessionAttributes({ "loginDomain", "roiEntity" })
