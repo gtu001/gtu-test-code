@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
@@ -28,9 +29,11 @@ import org.apache.commons.lang3.Validate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -48,6 +51,7 @@ public class UrlPlayerDialog_bg {
     private int currentIndex = -1;
     private int replayMode = -1;
     private static AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
+    private PercentProgressBarTimer mPercentProgressBarTimer;
 
     public UrlPlayerDialog_bg(Context context) {
         this.context = context;
@@ -94,6 +98,7 @@ public class UrlPlayerDialog_bg {
         final TextView text_title = (TextView) dialog.findViewById(R.id.text_title);
         final TextView text_close = (TextView) dialog.findViewById(R.id.text_close);
         final TextView text_content = (TextView) dialog.findViewById(R.id.text_content);
+        final TextView text_timer = (TextView) dialog.findViewById(R.id.text_timer);
         final ImageView btn_img_play = (ImageView) dialog.findViewById(R.id.btn_img_play);
         final ImageView btn_img_cancel = (ImageView) dialog.findViewById(R.id.btn_img_cancel);
         final ImageView btn_img_backward = (ImageView) dialog.findViewById(R.id.btn_img_backward);
@@ -287,6 +292,13 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 try {
+                    try {
+                        if (mPercentProgressBarTimer.isPercentProgressTrigger.get()) {
+                            mPercentProgressBarTimer.isPercentProgressTrigger.set(false);
+                            return;
+                        }
+                    } catch (Exception ex) {
+                    }
                     urlPlayerServiceHander.get().getMService().onProgressChange(progress);
                 } catch (RemoteException e) {
                     Log.e(TAG, "progressBar ERR : " + e.getMessage(), e);
@@ -303,7 +315,60 @@ public class UrlPlayerDialog_bg {
             }
         });
 
+        //初始化服務
+        this.initService(progressBar, text_timer);
+
         return dialog;
+    }
+
+    private void initService(SeekBar progressBar, TextView text_timer) {
+        mPercentProgressBarTimer = new PercentProgressBarTimer(progressBar, text_timer);
+    }
+
+    private static class PercentProgressBarTimer {
+        private AtomicBoolean isPercentProgressTrigger = new AtomicBoolean(false);
+        private Timer timer;
+        private SeekBar progressBar;
+        private TextView textTimer;
+        private final Handler handler = new Handler();
+
+        public SeekBar getProgressBar() {
+            return progressBar;
+        }
+
+        public TextView getTextTimer() {
+            return textTimer;
+        }
+
+        private PercentProgressBarTimer(SeekBar progressBar, TextView textTimer) {
+            this.progressBar = progressBar;
+            this.textTimer = textTimer;
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        final int percent = urlPlayerServiceHander.get().getMService().getProgressPercent();
+                        final String timeTxt = urlPlayerServiceHander.get().getMService().getProgressTime();
+                        Log.v(TAG, "[PercentProgressBarTimer] == " + timeTxt + "\t" + percent);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    isPercentProgressTrigger.set(true);
+                                    getProgressBar().setProgress(percent);
+                                    getTextTimer().setText(timeTxt);
+                                } catch (Exception e) {
+                                    Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
+                    }
+                }
+            }, 0, 1000L);
+        }
     }
 
     public static void stopService(Context context) {

@@ -23,6 +23,10 @@ interface IUrlPlayerService {
 
     void onProgressChange(int percent);
 
+    int getProgressPercent();
+
+    String getProgressTime();
+
     void stopSelf();
 
     void start();

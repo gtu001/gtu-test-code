@@ -48,18 +48,27 @@
                 android:text="客製化視窗"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@android:color/white" />
+
         </RelativeLayout>
 
         <TextView
             android:id="@+id/text_content"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="140dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
             android:minHeight="100dp"
             android:padding="30dp"
             android:text="這是您客製化的視窗!"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/text_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="時間在此"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/black" />
 
         <SeekBar

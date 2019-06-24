@@ -2,19 +2,14 @@ package com.example.gtu001.qrcodemaker.services;
 
 import android.app.NotificationManager;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.RequiresApi;
-import android.telephony.TelephonyManager;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.IUrlPlayerService;
@@ -33,7 +28,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -223,7 +217,7 @@ public class UrlPlayerService extends Service {
             List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
             if (totalLst != null) {
                 Log.v(TAG, "TotalLst size : " + totalLst.size());
-                for (int ii = 0 ; ii < nameLst.size() ; ii ++) {
+                for (int ii = 0; ii < nameLst.size(); ii++) {
                     String name = (String) nameLst.get(ii);
                     String url = (String) pathLst.get(ii);
                     Mp3Bean b = new Mp3Bean();
@@ -233,7 +227,7 @@ public class UrlPlayerService extends Service {
                     lst.add(b);
                 }
             }
-            if(isRandom){
+            if (isRandom) {
                 lst = RandomUtil.randomList(lst);
             }
             this.totalLst = lst;
@@ -289,6 +283,24 @@ public class UrlPlayerService extends Service {
         }
     }
 
+    public int getProgressPercent() {
+        try {
+            return mp3Helper.getProgressPercent();
+        } catch (Exception ex) {
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("getProgressPercent ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public String getProgressTime(){
+        try {
+            return mp3Helper.getProgressTime();
+        } catch (Exception ex) {
+            Log.e(TAG, "ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("getProgressTime ERR : " + ex.getMessage(), ex);
+        }
+    }
+
     private IUrlPlayerService.Stub mBinderNew = new IUrlPlayerService.Stub() {
         @Override
         public boolean isPlaying() throws RemoteException {
@@ -333,6 +345,16 @@ public class UrlPlayerService extends Service {
         @Override
         public void onProgressChange(int percent) throws RemoteException {
             UrlPlayerService.this.onProgressChange(percent);
+        }
+
+        @Override
+        public int getProgressPercent() throws RemoteException {
+            return UrlPlayerService.this.getProgressPercent();
+        }
+
+        @Override
+        public String getProgressTime() throws RemoteException {
+            return UrlPlayerService.this.getProgressTime();
         }
 
         public void stopSelf() throws RemoteException {

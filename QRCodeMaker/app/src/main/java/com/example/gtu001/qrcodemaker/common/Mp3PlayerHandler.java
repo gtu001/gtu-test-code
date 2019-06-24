@@ -215,4 +215,23 @@ public class Mp3PlayerHandler {
             mediaplayer.pause();
         }
     }
+
+    public int getProgressPercent() {
+        try {
+            double current = (double) this.mediaplayer.getCurrentPosition();
+            double duriation = (double) this.mediaplayer.getDuration();
+            int percent = (int) (current / duriation * 100);
+            return percent;
+        } catch (Exception ex) {
+            Log.e(TAG, "getProgressPercent ERR " + ex.getMessage(), ex);
+            return 0;
+        }
+    }
+
+    public String getProgressTime() {
+        int second = this.mediaplayer.getCurrentPosition() / 1000;
+        int hour = second / (60 * 60);
+        int minute = second / 60;
+        return hour + ":" + StringUtils.leftPad("" + minute, 2, "0") + ":" + StringUtils.leftPad("" + second, 2, "0");
+    }
 }
