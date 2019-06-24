@@ -62,8 +62,9 @@ public class FilePlayerDialog {
                     if (mp3Helper != null) {
                         mp3Helper.release();
                     }
-                    mp3Helper = Mp3PlayerHandler.create(context);
-                    mp3Helper.of(file.getAbsolutePath());
+
+                    Mp3PlayerHandler mp3Helper = new Mp3PlayerHandler();
+                    mp3Helper.applyOf(file.getAbsolutePath(), context);
                     mp3Helper.play();
                 } catch (Exception ex) {
                     Log.e(TAG, ex.getMessage(), ex);

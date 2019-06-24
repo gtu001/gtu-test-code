@@ -123,8 +123,11 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    if (!urlPlayerServiceHander.get().getMService().isInitDone()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl());
+                    if (urlPlayerServiceHander.get().getMService().isInitDone()) {
+                        String name = UrlPlayerDialog_bg.this.bean.getName();
+                        String url = UrlPlayerDialog_bg.this.bean.getUrl();
+                        Log.v(TAG, "clickStartPlay : " + name + " , " + url);
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(name, url);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -221,6 +224,7 @@ public class UrlPlayerDialog_bg {
                 }
             }
         });
+
         btn_img_next_song.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -356,7 +360,7 @@ public class UrlPlayerDialog_bg {
                 @Override
                 public void run() {
                     try {
-                        if (urlPlayerServiceHander.get() == null || urlPlayerServiceHander.get().initNotDone(context)) {
+                        if (urlPlayerServiceHander.get() == null || !urlPlayerServiceHander.get().getMService().isInitDone()) {
                             return;
                         }
 
@@ -428,6 +432,7 @@ public class UrlPlayerDialog_bg {
         private ServiceConnection mConnection;
 
         private IUrlPlayerService getMService() {
+            Log.v(TAG, "[getMService]" + mService);
             return mService;
         }
 
@@ -538,7 +543,7 @@ public class UrlPlayerDialog_bg {
                 Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
             }
         },//
-        ReplayAll_Random(2) {
+        ReplayAll_Random(3) {
             @Override
             void apply(UrlPlayerDialog_bg self) throws RemoteException {
                 Mp3Bean bean = self.bean;

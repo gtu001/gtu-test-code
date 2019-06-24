@@ -20,7 +20,6 @@ import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceKeepAliveHelper;
-import com.example.gtu001.qrcodemaker.common.SharedPreferencesUtil;
 import com.example.gtu001.qrcodemaker.util.RandomUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,8 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by wistronits on 2018/6/27.
@@ -66,7 +63,6 @@ public class UrlPlayerService extends Service {
     private static final String TAG = UrlPlayerService.class.getSimpleName();
 
     private Handler handler = new Handler();
-    private Mp3Bean currentBean;
     private List<Mp3Bean> totalLst = new ArrayList<>();
 
     private MyMp3BroadcastReceiver mMp3BroadcastReceiver;
@@ -125,37 +121,35 @@ public class UrlPlayerService extends Service {
     //↓↓↓↓↓↓↓↓ business logical ------------------------------------------------------------------------------------------------------------------------------------
     private Mp3PlayerHandler mp3Helper;
 
-    private String startPlay(String name, String url) {
-        currentBean = new Mp3Bean();
-        currentBean.setName(name);
-        currentBean.setUrl(url);
+    private Mp3PlayerHandler getMp3Helper() {
+        if (mp3Helper == null) {
+            mp3Helper = new Mp3PlayerHandler();
+        }
+        return mp3Helper;
+    }
 
+    private String startPlay(String name, String url) {
         Log.v(TAG, "#---startPlay : " + url);
-        if (StringUtils.isBlank(url)) {
-            return "檔案錯誤!";
-        }
-        if (mp3Helper != null) {
-            mp3Helper.release();
-        }
-        mp3Helper = Mp3PlayerHandler.create(this.getApplicationContext());
-        mp3Helper.of(url);
-        mp3Helper.play();
+        List<Mp3Bean> lst = new ArrayList<>();
+        this.totalLst = lst;
+
+        Mp3Bean bean = new Mp3Bean();
+        bean.setName(name);
+        bean.setUrl(url);
+        lst.add(bean);
+        getMp3Helper().setReplayMode(this.getApplicationContext(), name, lst);
         return "";
     }
 
     private String stopPlay() {
         Log.v(TAG, "#---stopPlay");
-        if (mp3Helper == null) {
-            return "尚未撥放!";
-        }
-        mp3Helper.release();
-        mp3Helper = null;
+        getMp3Helper().release();
         return "";
     }
 
     public boolean isPlaying() {
         try {
-            return mp3Helper.isPlaying();
+            return getMp3Helper().isPlaying();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("isPlaying ERR : " + ex.getMessage(), ex);
@@ -164,7 +158,7 @@ public class UrlPlayerService extends Service {
 
     public void pauseAndResume() {
         try {
-            mp3Helper.pauseAndResume();
+            getMp3Helper().pauseAndResume();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
@@ -173,7 +167,7 @@ public class UrlPlayerService extends Service {
 
     public void start() {
         try {
-            mp3Helper.start();
+            getMp3Helper().start();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
@@ -182,7 +176,7 @@ public class UrlPlayerService extends Service {
 
     public void pause() {
         try {
-            mp3Helper.pause();
+            getMp3Helper().pause();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
@@ -191,7 +185,7 @@ public class UrlPlayerService extends Service {
 
     public void backwardOrBackward(int second) {
         try {
-            mp3Helper.backwardOrBackward(second);
+            getMp3Helper().backwardOrBackward(second);
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("backwardOrBackward ERR : " + ex.getMessage(), ex);
@@ -200,7 +194,8 @@ public class UrlPlayerService extends Service {
 
     public boolean isInitDone() {
         try {
-            return mp3Helper != null;
+            getMp3Helper();
+            return true;
         } catch (NullPointerException ex) {
             Log.e(TAG, ex.getMessage(), ex);
             return false;
@@ -225,12 +220,16 @@ public class UrlPlayerService extends Service {
                     lst.add(b);
                 }
             }
+
             if (isRandom) {
                 lst = RandomUtil.randomList(lst);
             }
+
             this.totalLst = lst;
+
             if (!this.totalLst.isEmpty()) {
-                mp3Helper.setReplayMode(this.currentBean.getName(), this.totalLst);
+                String firstName = this.totalLst.get(0).getName();
+                getMp3Helper().setReplayMode(this.getApplicationContext(), firstName, this.totalLst);
             }
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
@@ -241,8 +240,11 @@ public class UrlPlayerService extends Service {
     private Map getCurrentBean() {
         try {
             Map<String, String> map = new HashMap<>();
-            map.put("name", mp3Helper.getCurrentBean().getCurrentName());
-            map.put("path", mp3Helper.getCurrentBean().getCurrentPath());
+            if (getMp3Helper().getCurrentBean() == null) {
+                return map;
+            }
+            map.put("name", getMp3Helper().getCurrentBean().getCurrentName());
+            map.put("path", getMp3Helper().getCurrentBean().getCurrentPath());
             return map;
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
@@ -252,7 +254,7 @@ public class UrlPlayerService extends Service {
 
     public void onProgressChange(int percent) {
         try {
-            mp3Helper.onProgressChange(percent);
+            getMp3Helper().onProgressChange(percent);
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("onProgressChange ERR : " + ex.getMessage(), ex);
@@ -261,7 +263,7 @@ public class UrlPlayerService extends Service {
 
     public int getProgressPercent() {
         try {
-            return mp3Helper.getProgressPercent();
+            return getMp3Helper().getProgressPercent();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("getProgressPercent ERR : " + ex.getMessage(), ex);
@@ -270,7 +272,7 @@ public class UrlPlayerService extends Service {
 
     public String getProgressTime() {
         try {
-            return mp3Helper.getProgressTime();
+            return getMp3Helper().getProgressTime();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("getProgressTime ERR : " + ex.getMessage(), ex);
