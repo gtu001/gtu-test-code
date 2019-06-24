@@ -148,7 +148,7 @@ public class Mp3PlayerHandler {
         }
         Log.v(TAG, "# ReplayList ----------- end");
 
-        mMyReplayListObj = new MyReplayListObj(this, currentName, lst);
+        mMyReplayListObj = new MyReplayListObj(this.context, currentName, lst);
         mediaplayer.setOnCompletionListener(mMyReplayListObj);
     }
 
@@ -156,10 +156,10 @@ public class Mp3PlayerHandler {
         String currentName = "";
         String currentPath = "";
         List<Mp3Bean> lst;
-        Mp3PlayerHandler mp3PlayerHandler;
+        Context context;
 
-        MyReplayListObj(Mp3PlayerHandler mp3PlayerHandler, final String currentName, final List<Mp3Bean> lst) {
-            this.mp3PlayerHandler = mp3PlayerHandler;
+        MyReplayListObj(Context context, final String currentName, final List<Mp3Bean> lst) {
+            this.context = context;
             this.currentName = currentName;
             this.lst = lst;
         }
@@ -173,24 +173,35 @@ public class Mp3PlayerHandler {
                     Log.v(TAG, "# Replaying ... ERROR");
                     return;
                 }
+
+                Mp3PlayerHandler mp3PlayerHandler = Mp3PlayerHandler.create(context);
                 if (lst.size() == 1) {
+                    Log.line(TAG, "[onCompletion] 1");
                     Log.v(TAG, "# Replaying ... ONE");
                     mp3PlayerHandler.of("");//播放同一首
+                    Log.line(TAG, "[onCompletion] 1-1");
                     mp3PlayerHandler.mediaplayer.start();
+                    Log.line(TAG, "[onCompletion] 1-2");
                 } else {
                     Log.v(TAG, "# Replaying ... ALL");
+                    Log.line(TAG, "[onCompletion] All - 1 " + lst);
                     int findIndex = 0;
                     for (int ii = 0; ii < lst.size(); ii++) {
                         Mp3Bean b = lst.get(ii);
                         if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
                             findIndex = ii + 1;
+                            Log.line(TAG, "[onCompletion] All - findIndex " + findIndex);
                             break;
                         }
                     }
+                    Log.line(TAG, "[onCompletion] All - 2 ");
                     mp3PlayerHandler.of(lst.get(findIndex).getUrl());
+                    Log.line(TAG, "[onCompletion] All - 3 ");
                     mp3PlayerHandler.mediaplayer.start();
+                    Log.line(TAG, "[onCompletion] All - 4 ");
 
                     Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());
+                    Log.line(TAG, "[onCompletion] All - 5 " + findIndex + "/" + lst.size());
 
                     //設定當前首
                     this.currentName = lst.get(findIndex).getName();
@@ -198,6 +209,7 @@ public class Mp3PlayerHandler {
                 }
             } catch (Exception ex) {
                 Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
+                Log.line(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
             } finally {
                 Log.v(TAG, "onCompletion end ...");
             }
