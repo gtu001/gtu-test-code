@@ -316,20 +316,22 @@ public class UrlPlayerDialog_bg {
         });
 
         //初始化服務
-        this.initService(progressBar, text_timer);
+        this.initService(progressBar, text_timer, text_content);
 
         return dialog;
     }
 
-    private void initService(SeekBar progressBar, TextView text_timer) {
-        mPercentProgressBarTimer = new PercentProgressBarTimer(progressBar, text_timer);
+    private void initService(SeekBar progressBar, TextView text_timer, TextView text_content) {
+        mPercentProgressBarTimer = new PercentProgressBarTimer(this.context, progressBar, text_timer, text_content);
     }
 
     private static class PercentProgressBarTimer {
         private AtomicBoolean isPercentProgressTrigger = new AtomicBoolean(false);
+        private Context context;
         private Timer timer;
         private SeekBar progressBar;
         private TextView textTimer;
+        private TextView textContent;
         private final Handler handler = new Handler();
 
         public SeekBar getProgressBar() {
@@ -340,31 +342,49 @@ public class UrlPlayerDialog_bg {
             return textTimer;
         }
 
-        private PercentProgressBarTimer(SeekBar progressBar, TextView textTimer) {
+        public TextView getTextContent() {
+            return textContent;
+        }
+
+        private PercentProgressBarTimer(final Context context, SeekBar progressBar, TextView textTimer, TextView textContent) {
             this.progressBar = progressBar;
             this.textTimer = textTimer;
+            this.textContent = textContent;
+            this.context = context;
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
+                        if (urlPlayerServiceHander.get() == null || urlPlayerServiceHander.get().initNotDone(context)) {
+                            return;
+                        }
+
                         final int percent = urlPlayerServiceHander.get().getMService().getProgressPercent();
                         final String timeTxt = urlPlayerServiceHander.get().getMService().getProgressTime();
+                        final Map<String, String> map = urlPlayerServiceHander.get().getMService().getCurrentBean();
                         Log.v(TAG, "[PercentProgressBarTimer] == " + timeTxt + "\t" + percent);
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    isPercentProgressTrigger.set(true);
-                                    getProgressBar().setProgress(percent);
-                                    getTextTimer().setText(timeTxt);
-                                } catch (Exception e) {
-                                    Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
-                                }
+                                isPercentProgressTrigger.set(true);
+                                getProgressBar().setProgress(percent);
                             }
                         });
-                    } catch (Exception e) {
-                        Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                getTextTimer().setText(timeTxt);
+                            }
+                        });
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                getTextContent().setText(map.get("name"));
+                            }
+                        });
+                    } catch (final Exception e) {
+                        Log.line(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
                     }
                 }
             }, 0, 1000L);

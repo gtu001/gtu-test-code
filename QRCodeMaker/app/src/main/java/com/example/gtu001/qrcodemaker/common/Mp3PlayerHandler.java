@@ -152,8 +152,9 @@ public class Mp3PlayerHandler {
         mediaplayer.setOnCompletionListener(mMyReplayListObj);
     }
 
-    private static class MyReplayListObj implements MediaPlayer.OnCompletionListener {
-        String currentName;
+    public static class MyReplayListObj implements MediaPlayer.OnCompletionListener {
+        String currentName = "";
+        String currentPath = "";
         List<Mp3Bean> lst;
         Mp3PlayerHandler mp3PlayerHandler;
 
@@ -193,12 +194,21 @@ public class Mp3PlayerHandler {
 
                     //設定當前首
                     this.currentName = lst.get(findIndex).getName();
+                    this.currentPath = lst.get(findIndex).getUrl();
                 }
             } catch (Exception ex) {
                 Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
             } finally {
                 Log.v(TAG, "onCompletion end ...");
             }
+        }
+
+        public String getCurrentName() {
+            return currentName;
+        }
+
+        public String getCurrentPath() {
+            return currentPath;
         }
     }
 
@@ -229,9 +239,12 @@ public class Mp3PlayerHandler {
     }
 
     public String getProgressTime() {
-        int second = this.mediaplayer.getCurrentPosition() / 1000;
-        int hour = second / (60 * 60);
-        int minute = second / 60;
-        return hour + ":" + StringUtils.leftPad("" + minute, 2, "0") + ":" + StringUtils.leftPad("" + second, 2, "0");
+        String currentTimeStr = DateUtil.wasteTotalTime_HHmmss(this.mediaplayer.getCurrentPosition());
+        String allTimeStr = DateUtil.wasteTotalTime_HHmmss(this.mediaplayer.getDuration());
+        return currentTimeStr + " / " + allTimeStr;
+    }
+
+    public MyReplayListObj getCurrentBean() {
+        return mMyReplayListObj;
     }
 }

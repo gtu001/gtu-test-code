@@ -28,6 +28,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -66,7 +67,6 @@ public class UrlPlayerService extends Service {
 
     private Handler handler = new Handler();
     private Mp3Bean currentBean;
-    private CurrentBeanHandler currentBeanHandler;
     private List<Mp3Bean> totalLst = new ArrayList<>();
 
     private MyMp3BroadcastReceiver mMp3BroadcastReceiver;
@@ -89,9 +89,7 @@ public class UrlPlayerService extends Service {
         this.registerReceiver(mMp3BroadcastReceiver, mMp3BroadcastReceiver.getFilter());
         mMp3BroadcastReceiver.register1(this.getApplicationContext());
 
-
         Log.i(TAG, "oncreat");
-        currentBeanHandler = new CurrentBeanHandler();
     }
 
     @Override
@@ -240,34 +238,12 @@ public class UrlPlayerService extends Service {
         }
     }
 
-    private static class CurrentBeanHandler {
-        public void putBean(Context context, Mp3Bean currentBean) {
-            String refKey = UrlPlayerService.class.getName() + "_currentBean";
-            SharedPreferencesUtil.putData(context, refKey, "currentBean_name", currentBean.getName());
-            SharedPreferencesUtil.putData(context, refKey, "currentBean_url", currentBean.getUrl());
-            SharedPreferencesUtil.putData(context, refKey, "currentBean_lastPosition", currentBean.getLastPosition());
-        }
-
-        public Mp3Bean getBean(Context context) {
-            String refKey = UrlPlayerService.class.getName() + "_currentBean";
-            String name = SharedPreferencesUtil.getData(context, refKey, "currentBean_name");
-            String url = SharedPreferencesUtil.getData(context, refKey, "currentBean_url");
-            String lastPosition = SharedPreferencesUtil.getData(context, refKey, "currentBean_lastPosition");
-            Mp3Bean b = new Mp3Bean();
-            b.setUrl(url);
-            b.setName(name);
-            b.setLastPosition(lastPosition);
-            return b;
-        }
-    }
-
     private Map getCurrentBean() {
         try {
-            if (currentBean == null) {
-                return currentBeanHandler.getBean(this.getApplicationContext()).toMap();
-            } else {
-                return currentBean.toMap();
-            }
+            Map<String, String> map = new HashMap<>();
+            map.put("name", mp3Helper.getCurrentBean().getCurrentName());
+            map.put("path", mp3Helper.getCurrentBean().getCurrentPath());
+            return map;
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
             throw new RuntimeException("getCurrentBean ERR : " + ex.getMessage(), ex);
@@ -292,7 +268,7 @@ public class UrlPlayerService extends Service {
         }
     }
 
-    public String getProgressTime(){
+    public String getProgressTime() {
         try {
             return mp3Helper.getProgressTime();
         } catch (Exception ex) {

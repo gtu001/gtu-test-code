@@ -67,7 +67,8 @@
             android:id="@+id/text_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="時間在此"
+            android:gravity="end"
+            android:text="    "
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/black" />
 
