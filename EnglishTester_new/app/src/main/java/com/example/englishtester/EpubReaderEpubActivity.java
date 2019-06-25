@@ -1176,7 +1176,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 //                int position = activity.viewPager.getCurrentItem();
 //                EpubViewerMainHandler.PageContentHolder holder = activity.epubViewerMainHandler.gotoPosition(position);
 //                String debugContent = holder.getPageContent4Debug();
-//                Log.line(TAG, debugContent);
+//                Log.lineFix(TAG, debugContent);
 //            }
 //        },//
         ;
