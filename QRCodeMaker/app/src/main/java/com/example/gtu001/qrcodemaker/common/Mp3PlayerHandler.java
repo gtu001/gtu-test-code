@@ -180,9 +180,10 @@ public class Mp3PlayerHandler {
 
                 int findIndex = 0;
 
-                if (isFirst) {
+                if (isFirst || lst.size() == 1) {
                     isFirst = false;
-                } else {
+
+                } else if (lst.size() > 1) {
                     Log.v(TAG, "# Replaying ... ALL");
 
                     boolean findOk = false;
