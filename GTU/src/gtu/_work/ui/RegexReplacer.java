@@ -54,7 +54,6 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
-import gtu.file.OsInfoUtil;
 import gtu.freemarker.FreeMarkerSimpleUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -77,6 +76,7 @@ import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.swing.util.SwingTabTemplateUI.FocusTabHandlerGtu001;
 import gtu.swing.util.SwingTabTemplateUI.SwingTabTemplateUI_Callback;
 import gtu.yaml.util.YamlMapUtil;
+import gtu.yaml.util.YamlUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -99,6 +99,8 @@ public class RegexReplacer extends javax.swing.JFrame {
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
     private KeyEventExecuteHandler keyEventExecuteHandler;
     private List<String> tempComboLst;
+
+    private static AtomicReference<SwingTabTemplateUI> MASTER_UI = new AtomicReference<SwingTabTemplateUI>();
 
     /**
      * Auto-generated main method to display this JFrame
@@ -160,6 +162,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
         });
+
+        MASTER_UI.set(tabUI);
 
         tabUI.setSize(700, 550);
         tabUI.startUI();
@@ -385,6 +389,8 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                                 // 放入執行紀錄 並 載入預設
                                 configHandler.loadExample(configKeyText.getText());
+
+                                setTitleByTemplateName(config.configKeyText);
 
                                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                                     exeucteActionPerformed(null);
@@ -750,7 +756,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             });
 
-            this.setTitle("You Set My World On Fire");
+            setTitleByTemplateName("");
 
             JCommonUtil.frameCloseDo(this, new WindowAdapter() {
                 public void windowClosing(WindowEvent paramWindowEvent) {
@@ -767,6 +773,21 @@ public class RegexReplacer extends javax.swing.JFrame {
 
         Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setTitleByTemplateName(String title) {
+        if (StringUtils.isNotBlank(title)) {
+            title = "  [" + title + "]";
+        } else {
+            title = "";
+        }
+        String newTitle = "You Set My World On Fire" + title;
+        System.out.println(newTitle);
+        this.setTitle(newTitle);
+        try {
+            MASTER_UI.get().getJframe().setTitle(newTitle);
+        } catch (Exception ex) {
         }
     }
 

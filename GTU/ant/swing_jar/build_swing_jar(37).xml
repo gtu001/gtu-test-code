@@ -80,6 +80,8 @@
 			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+			
+			<packagename mode="pom">org/apache/logging/log4j/spi/AbstractLoggerAdapter</packagename>
 				
 			<packagename mode="pom">freemarker.template</packagename>
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
