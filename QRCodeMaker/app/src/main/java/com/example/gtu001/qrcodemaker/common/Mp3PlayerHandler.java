@@ -10,10 +10,11 @@ import com.example.gtu001.qrcodemaker.Mp3Bean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by gtu001 on 2017/10/28.
@@ -25,22 +26,21 @@ public class Mp3PlayerHandler {
     private static final String TAG = Mp3PlayerHandler.class.getSimpleName();
 
     private MediaPlayer mediaplayer = new MediaPlayer();
-    MyReplayListObj mMyReplayListObj;
+    private static MyReplayListObj mMyReplayListObj;
+    private AtomicBoolean isMediaInitDone = new AtomicBoolean(true);
 
-    public Mp3PlayerHandler(){
+    public Mp3PlayerHandler() {
     }
 
     public void applyOf(String url, Context context) {
         try {
-            Log.line(TAG, "-----1-urlA: " + url);
+            isMediaInitDone.set(false);
             if (mediaplayer.isPlaying()) {
-                Log.line(TAG, "-----1-stop");
                 mediaplayer.stop();
                 mediaplayer.reset();
             }
 
             if (StringUtils.isNotBlank(url)) {
-                Log.line(TAG, "-----1-urlB: " + url);
                 mediaplayer = new MediaPlayer();
                 Uri uri = Uri.parse(url);
 
@@ -53,25 +53,20 @@ public class Mp3PlayerHandler {
                 Log.v(TAG, "context = " + context);
                 Log.v(TAG, "headerMap = " + headerMap);
 
-                Log.line(TAG, "-----2 " + mediaplayer);
                 mediaplayer.setDataSource(context, uri, headerMap);
                 mediaplayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
                 if ("file".equalsIgnoreCase(uri.getScheme())) {
-                    Log.line(TAG, "-----3 " + mediaplayer);
                     mediaplayer.prepare();
                 } else {
-                    Log.line(TAG, "-----3A " + mediaplayer);
                     mediaplayer.prepareAsync();
                 }
             } else {
                 Log.v(TAG, "重播ing...");
-                Log.line(TAG, "-----4 " + mediaplayer);
                 mediaplayer.seekTo(0);
             }
 
             if (mMyReplayListObj == null) {
-                Log.line(TAG, "-----5 A");
                 mediaplayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -81,7 +76,6 @@ public class Mp3PlayerHandler {
                     }
                 });
             } else {
-                Log.line(TAG, "-----5 B");
                 mediaplayer.setOnCompletionListener(mMyReplayListObj);
             }
 
@@ -94,7 +88,10 @@ public class Mp3PlayerHandler {
             });
 
         } catch (Exception ex) {
+            Log.e(TAG, "mp3讀取錯誤 ex : " + ex.getMessage(), ex);
             throw new RuntimeException("mp3讀取錯誤 ex : " + ex.getMessage(), ex);
+        } finally {
+            isMediaInitDone.set(true);
         }
     }
 
@@ -151,7 +148,7 @@ public class Mp3PlayerHandler {
         }
         Log.v(TAG, "# ReplayList ----------- end");
 
-        mMyReplayListObj = new MyReplayListObj(context, currentName, lst);
+        mMyReplayListObj = new MyReplayListObj(context, this, currentName, lst, true);
         mMyReplayListObj.onCompletion(this.mediaplayer);
     }
 
@@ -160,11 +157,15 @@ public class Mp3PlayerHandler {
         String currentPath = "";
         List<Mp3Bean> lst;
         Context context;
+        Mp3PlayerHandler mp3PlayerHandler;
+        boolean isFirst = false;
 
-        MyReplayListObj(Context context, final String currentName, final List<Mp3Bean> lst) {
+        MyReplayListObj(Context context, Mp3PlayerHandler mMp3PlayerHandler, final String currentName, final List<Mp3Bean> lst, boolean isFirst) {
             this.context = context;
             this.currentName = currentName;
             this.lst = lst;
+            this.mp3PlayerHandler = mMp3PlayerHandler;
+            this.isFirst = isFirst;
         }
 
         @Override
@@ -177,34 +178,43 @@ public class Mp3PlayerHandler {
                     return;
                 }
 
-                Mp3PlayerHandler mp3PlayerHandler = new Mp3PlayerHandler();
-                if (lst.size() == 1) {
-                    Log.v(TAG, "# Replaying ... ONE");
-                    mp3PlayerHandler.applyOf("", context);//播放同一首
-                    mp3PlayerHandler.mediaplayer.start();
+                int findIndex = 0;
+
+                if (isFirst) {
+                    isFirst = false;
                 } else {
                     Log.v(TAG, "# Replaying ... ALL");
-                    int findIndex = 0;
+
+                    boolean findOk = false;
                     for (int ii = 0; ii < lst.size(); ii++) {
                         Mp3Bean b = lst.get(ii);
                         if (StringUtils.equals(currentName, b.getName()) && (ii + 1 < lst.size())) {
                             findIndex = ii + 1;
-                            Log.line(TAG, "[onCompletion] All - findIndex " + findIndex);
+                            findOk = true;
                             break;
                         }
                     }
-                    mp3PlayerHandler.applyOf(lst.get(findIndex).getUrl(), context);
-                    mp3PlayerHandler.mediaplayer.start();
 
-                    Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());
-
-                    //設定當前首
-                    this.currentName = lst.get(findIndex).getName();
-                    this.currentPath = lst.get(findIndex).getUrl();
+                    if (!findOk) {
+                        List<String> notFoundLst = new ArrayList<>();
+                        for (int ii = 0; ii < lst.size(); ii++) {
+                            Mp3Bean b = lst.get(ii);
+                            notFoundLst.add(b.getName());
+                        }
+                    }
                 }
+
+                mp3PlayerHandler.applyOf(lst.get(findIndex).getUrl(), context);
+                mp3PlayerHandler.mediaplayer.start();
+
+                Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());
+
+                //設定當前首
+                this.currentName = lst.get(findIndex).getName();
+                this.currentPath = lst.get(findIndex).getUrl();
+
             } catch (Exception ex) {
                 Log.e(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
-                Log.line(TAG, "onCompletion ERR : " + ex.getMessage(), ex);
             } finally {
                 Log.v(TAG, "onCompletion end ...");
             }
@@ -235,6 +245,9 @@ public class Mp3PlayerHandler {
 
     public int getProgressPercent() {
         try {
+            if (!isMediaInitDone.get()) {
+                return 0;
+            }
             double current = (double) this.mediaplayer.getCurrentPosition();
             double duriation = (double) this.mediaplayer.getDuration();
             int percent = (int) (current / duriation * 100);
@@ -246,6 +259,9 @@ public class Mp3PlayerHandler {
     }
 
     public String getProgressTime() {
+        if (!isMediaInitDone.get()) {
+            return "";
+        }
         String currentTimeStr = DateUtil.wasteTotalTime_HHmmss(this.mediaplayer.getCurrentPosition());
         String allTimeStr = DateUtil.wasteTotalTime_HHmmss(this.mediaplayer.getDuration());
         return currentTimeStr + " / " + allTimeStr;

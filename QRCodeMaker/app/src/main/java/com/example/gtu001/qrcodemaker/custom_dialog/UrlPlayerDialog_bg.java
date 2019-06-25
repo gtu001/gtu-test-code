@@ -388,7 +388,7 @@ public class UrlPlayerDialog_bg {
                             }
                         });
                     } catch (final Exception e) {
-                        Log.line(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
+                        Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
                     }
                 }
             }, 0, 1000L);
