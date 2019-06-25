@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,16 +25,21 @@ import org.yaml.snakeyaml.representer.Representer;
 public class YamlUtil {
 
     public static void main(String[] args) {
-//        File fromFile = new File("D:/workstuff/gtu-test-code/GTU/src/gtu/_work/ui/RegexReplacer_NEW.yml");
-//        Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
-//        List<RegexReplacer_Config> lst = YamlMapUtil.getInstance().loadFromFile(fromFile, RegexReplacer_Config.class, classMap);
-//        for (RegexReplacer_Config t : lst) {
-//            String tmpToVal = getPlainString(t.getToVal());
-//            System.out.println(tmpToVal);
-//            t.setToVal(tmpToVal);
-//            System.out.println("=======================================");
-//        }
-//        YamlMapUtil.getInstance().saveToFile(new File(FileUtil.DESKTOP_DIR, "test111.yml"), lst, false);
+        // File fromFile = new
+        // File("D:/workstuff/gtu-test-code/GTU/src/gtu/_work/ui/RegexReplacer_NEW.yml");
+        // Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
+        // List<RegexReplacer_Config> lst =
+        // YamlMapUtil.getInstance().loadFromFile(fromFile,
+        // RegexReplacer_Config.class, classMap);
+        // for (RegexReplacer_Config t : lst) {
+        // String tmpToVal = getPlainString(t.getToVal());
+        // System.out.println(tmpToVal);
+        // t.setToVal(tmpToVal);
+        // System.out.println("=======================================");
+        // }
+        // File destFile = new File(FileUtil.DESKTOP_DIR, "test111.yml");
+        // System.out.println(destFile);
+        // YamlMapUtil.getInstance().saveToFile(destFile, lst, false);
         System.out.println("done...");
     }
 
@@ -122,7 +129,7 @@ public class YamlUtil {
      * @return
      */
     public static String getPlainString(String orignStr) {
-        StringBuilder sb = new StringBuilder();
+        List<String> sbLst = new ArrayList<String>();
         BufferedReader reader = null;
         try {
             Matcher mth = null;
@@ -141,9 +148,9 @@ public class YamlUtil {
                 }
                 mth.appendTail(sb2);
 
-                sb.append(sb2.toString() + "\n");
+                sbLst.add(sb2.toString());
             }
-            return sb.toString();
+            return StringUtils.join(sbLst, "\n");
         } catch (Exception ex) {
             throw new RuntimeException("getPlainString ERR : " + ex.getMessage(), ex);
         } finally {
@@ -153,4 +160,25 @@ public class YamlUtil {
             }
         }
     }
+
+//    /**
+//     * 判斷是否換行字尾結束
+//     * 
+//     * @param strData
+//     * @return
+//     */
+//    public static boolean isChangeLineEnd(String strData) {
+//        strData = StringUtils.defaultString(strData);
+//        char[] arry = strData.toCharArray();
+//        for (int ii = arry.length - 1; ii > 0; ii++) {
+//            if (arry[ii] == ' ' || arry[ii] == '\t') {
+//                continue;
+//            } else if (arry[ii] == '\n') {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 }
