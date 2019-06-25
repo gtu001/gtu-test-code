@@ -100,6 +100,8 @@ public class RegexReplacer extends javax.swing.JFrame {
     private KeyEventExecuteHandler keyEventExecuteHandler;
     private List<String> tempComboLst;
 
+    private static AtomicReference<SwingTabTemplateUI> MASTER_UI = new AtomicReference<SwingTabTemplateUI>();
+
     /**
      * Auto-generated main method to display this JFrame
      */
@@ -160,6 +162,8 @@ public class RegexReplacer extends javax.swing.JFrame {
                 }
             }
         });
+
+        MASTER_UI.set(tabUI);
 
         tabUI.setSize(700, 550);
         tabUI.startUI();
@@ -778,7 +782,13 @@ public class RegexReplacer extends javax.swing.JFrame {
         } else {
             title = "";
         }
-        this.setTitle("You Set My World On Fire" + title);
+        String newTitle = "You Set My World On Fire" + title;
+        System.out.println(newTitle);
+        this.setTitle(newTitle);
+        try {
+            MASTER_UI.get().getJframe().setTitle(newTitle);
+        } catch (Exception ex) {
+        }
     }
 
     private JTabbedPane jTabbedPane1;
