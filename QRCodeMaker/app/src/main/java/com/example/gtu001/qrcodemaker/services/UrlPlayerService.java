@@ -170,7 +170,7 @@ public class UrlPlayerService extends Service {
             getMp3Helper().start();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
-            throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("start ERR : " + ex.getMessage(), ex);
         }
     }
 
@@ -179,7 +179,7 @@ public class UrlPlayerService extends Service {
             getMp3Helper().pause();
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
-            throw new RuntimeException("pauseAndResume ERR : " + ex.getMessage(), ex);
+            throw new RuntimeException("pause ERR : " + ex.getMessage(), ex);
         }
     }
 

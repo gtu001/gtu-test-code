@@ -1,0 +1,18 @@
+package cub.inv.query.ui;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@EnableCaching
+@SpringBootApplication
+public class InvQueryUiApplication {
+
+    public static void main(String[] args) {
+        // SpringApplication.run(InvQueryUiApplication.class, args);
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(InvQueryUiApplication.class);
+        builder.headless(false);
+        ConfigurableApplicationContext context = builder.run(args);
+    }
+}

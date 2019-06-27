@@ -71,7 +71,7 @@
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 
-			<packagename mode="small">javassist.Modifier</packagename>
+			<packagename mode="pom">javassist.Modifier</packagename>
 			<packagename mode="exact" name="commons-io-2.6.jar">org.apache.commons.io.FileUtils</packagename>
 			<packagename mode="exact" name="guava-20.0.jar">com.google.common.base.Optional</packagename>
 			<packagename mode="pom">freemarker.template</packagename>
@@ -110,7 +110,7 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="buildClassSet">
@@ -145,7 +145,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -196,6 +196,7 @@
 				<include name="**/success.png" />
 				<include name="**/warning.png" />
 				<include name="**/TrayNotification.fxml" />
+				<include name="**/freemarker/version.properties" />
 			</zipfileset>
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />

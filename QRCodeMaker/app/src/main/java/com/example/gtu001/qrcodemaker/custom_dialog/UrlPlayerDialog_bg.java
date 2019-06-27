@@ -123,20 +123,20 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    if (urlPlayerServiceHander.get().getMService().isInitDone()) {
-                        String name = UrlPlayerDialog_bg.this.bean.getName();
-                        String url = UrlPlayerDialog_bg.this.bean.getUrl();
-                        Log.v(TAG, "clickStartPlay : " + name + " , " + url);
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(name, url);
-                        if (StringUtils.isNotBlank(result)) {
-                            Validate.isTrue(false, result);
-                        }
-                        Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
-                    } else {
+//                    if (urlPlayerServiceHander.get().getMService().isInitDone()) {
+//                        String name = UrlPlayerDialog_bg.this.bean.getName();
+//                        String url = UrlPlayerDialog_bg.this.bean.getUrl();
+//                        Log.v(TAG, "clickStartPlay : " + name + " , " + url);
+//                        String result = urlPlayerServiceHander.get().getMService().startPlay(name, url);
+//                        if (StringUtils.isNotBlank(result)) {
+//                            Validate.isTrue(false, result);
+//                        }
+//                        Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
+//                    } else {
                         urlPlayerServiceHander.get().getMService().pauseAndResume();
                         String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
                         Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
-                    }
+//                    }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -320,13 +320,13 @@ public class UrlPlayerDialog_bg {
         });
 
         //初始化服務
-        this.initService(progressBar, text_timer, text_content);
+        this.initService(progressBar, text_timer, text_title, text_content);
 
         return dialog;
     }
 
-    private void initService(SeekBar progressBar, TextView text_timer, TextView text_content) {
-        mPercentProgressBarTimer = new PercentProgressBarTimer(this.context, progressBar, text_timer, text_content);
+    private void initService(SeekBar progressBar, TextView text_timer, TextView text_title, TextView text_content) {
+        mPercentProgressBarTimer = new PercentProgressBarTimer(this.context, progressBar, text_timer, text_title, text_content);
     }
 
     private static class PercentProgressBarTimer {
@@ -336,6 +336,7 @@ public class UrlPlayerDialog_bg {
         private SeekBar progressBar;
         private TextView textTimer;
         private TextView textContent;
+        private TextView textTitle;
         private final Handler handler = new Handler();
 
         public SeekBar getProgressBar() {
@@ -350,10 +351,15 @@ public class UrlPlayerDialog_bg {
             return textContent;
         }
 
-        private PercentProgressBarTimer(final Context context, SeekBar progressBar, TextView textTimer, TextView textContent) {
+        public TextView getTextTitle() {
+            return textTitle;
+        }
+
+        private PercentProgressBarTimer(final Context context, SeekBar progressBar, TextView textTimer, TextView textTitle, TextView textContent) {
             this.progressBar = progressBar;
             this.textTimer = textTimer;
             this.textContent = textContent;
+            this.textTitle = textTitle;
             this.context = context;
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -373,18 +379,9 @@ public class UrlPlayerDialog_bg {
                             public void run() {
                                 isPercentProgressTrigger.set(true);
                                 getProgressBar().setProgress(percent);
-                            }
-                        });
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
                                 getTextTimer().setText(timeTxt);
-                            }
-                        });
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                getTextContent().setText(map.get("name"));
+                                getTextTitle().setText(map.get("name"));
+                                getTextContent().setText(map.get("path"));
                             }
                         });
                     } catch (final Exception e) {

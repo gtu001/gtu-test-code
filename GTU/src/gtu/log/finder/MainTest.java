@@ -11,7 +11,7 @@ public class MainTest {
         MainTest test = new MainTest();
         MyTest t = test.new MyTest();
         
-        
+        DebugMointerUI.startWithReflectAndDispose(test, t);
     }
     
     private class MyTest {
