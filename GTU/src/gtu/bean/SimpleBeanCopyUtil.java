@@ -96,6 +96,7 @@ public class SimpleBeanCopyUtil {
             SameProperty s = new SameProperty();
             s.name = pd.getName();
             s.propertyType = pd.getPropertyType();
+            set.add(s);
         }
         return set;
     }

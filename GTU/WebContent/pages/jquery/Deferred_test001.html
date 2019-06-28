@@ -18,6 +18,19 @@ focused {
 			test001();
 		});
 		
+		//一個list的promise
+		jQuery.whenAll = function (deferreds) {
+	        var lastResolved = 0;
+	        var wrappedDeferreds = [];
+	        for (var i = 0; i < deferreds.length; i++) {
+	            wrappedDeferreds.push(jQuery.Deferred());
+	            deferreds[i].always(function() {
+	                wrappedDeferreds[lastResolved++].resolve(arguments);
+	            });
+	        }
+	        return jQuery.when.apply(jQuery, wrappedDeferreds).promise();
+	    };
+		
 		function test001(){
 			var chk1 = $.Deferred();
 			var chk2 = $.Deferred();
@@ -33,10 +46,23 @@ focused {
 				return val + " Done!";
 			});
 			
+			/*
+			第一種寫法
 			$.when(chkA, chkB, chkC).done(function(r1, r2, r3){
 				alert("done = " + r1 + " , " + r2 + " , " + r3);
 			}).fail(function(r1, r2, r3){
 				alert("fail = " + r1 + " , " + r2 + " , " + r3);
+			});
+			*/
+			
+			//第二種寫法
+			var promises = [];
+			promises.push(chkA);
+			promises.push(chkB);
+			promises.push(chkC);
+
+			jQuery.whenAll(promises).done(function() {
+				alert("allDone");
 			});
 
 			setTimeout(function(){
@@ -48,7 +74,8 @@ focused {
 			}, 4000);
 
 			setTimeout(function(){
-				chk3.reject("chk3");
+				//chk3.reject("chk3");
+				chk3.resolve("chk3");
 			}, 3000);
 		}
 		
