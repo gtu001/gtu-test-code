@@ -1,15 +1,19 @@
 
-存到 /etc/envirment (全局)
-   /etc/profile
+	存到 /etc/envirment (全局)
+	   /etc/profile
 
+	修改by User
+	~/.profile
 
-修改by User
-~/.profile
+	修改~/.bashrc <--ubuntu全局好像這玩意有效
 
+---
 
-修改~/.bashrc <--ubuntu全局好像這玩意有效
+	馬上生效
+	$ source <腳本路徑>
+		Ex: source ~/.bashrc
 
-
+---
 
 	JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 	export JAVA_HOME
