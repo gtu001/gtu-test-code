@@ -1,0 +1,34 @@
+ PSA: Monstrum runs perfectly on the Vive using Revive
+Game looks and runs awesome on the Vive with Revive.
+
+1. Make sure to install Oculus Home and Revive on your PC.
+
+2. Goto your Revive installation folder. Mine is at C:\Games\Revive
+
+3. Inside the Revive installation folder, open another folder called Revive. For me the path is C:\Games\Revive\Revive
+
+4. Copy everything (including folders) inside C:\Games\Revive\Revive (into your Monstrum directory. For me that's C:\Games\Steam\SteamApps\common\Monstrum
+
+5
+
+Create a shortcut with the following in the target field including quotes.
+
+"C:\Games\Steam\SteamApps\common\Monstrum\ReviveInjector_x64.exe" "C:\Games\Steam\SteamApps\common\Monstrum\Monstrum.exe -oculus"
+
+The path should be whatever your Monstrum path is. This is also where you copied the Revive injector.
+
+6. Make sure your Xbox One controller is on. start Steam VR, and launch the shortcut you made above.
+
+7. Enjoy! 
+
+
+
+1.安裝Oculus Home和Revive
+2.去Revive安裝目錄 C:\Games\Revive
+3.Revive安裝目錄裡面還有個Revive目錄 , C:\Games\Revive\Revive 像這樣
+4.複製C:\Games\Revive\Revive裡面所有的東西到遊戲安裝目錄C:\Games\Steam\SteamApps\common\Monstrum 底下
+5.建立bat檔
+	"C:\Games\Steam\SteamApps\common\Monstrum\ReviveInjector_x64.exe" "C:\Games\Steam\SteamApps\common\Monstrum\Monstrum.exe -oculus"
+這個路徑應該是你的遊戲安裝目錄, 也是Revive injector要複製的位置
+6.確定你Xbox One控制器有在. 開啟 Steam VR, 執行bat檔
+7.享受!
