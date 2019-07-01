@@ -1,0 +1,24 @@
+安裝
+	
+	export GOROOT=/media/gtu001/OLD_D/apps/linux_apps/go1.12.6
+	export PATH=$PATH:$GOROOT/bin
+	export GOPATH=/media/gtu001/OLD_D/apps/linux_apps/go_gtu001_lib
+	export PATH=$PATH:$GOPATH/bin
+	
+	1)官方sdk解壓路徑
+	3)你自己的lib
+	
+---
+(Golipse) Eclipse plugin
+
+	Install URL : http://goclipse.github.io/releases/ 
+
+	設定sdk路徑
+		preferences -> go -> Go installation 設定sdk目錄
+
+	設定專案
+		點專案右鍵 -> property -> Go Compiler -> Go installation
+	
+---
+
+	
