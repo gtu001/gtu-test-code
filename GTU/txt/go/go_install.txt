@@ -8,6 +8,7 @@
 	1)官方sdk解壓路徑
 	3)你自己的lib
 	
+	
 ---
 (Golipse) Eclipse plugin
 
@@ -19,6 +20,8 @@
 	設定專案
 		點專案右鍵 -> property -> Go Compiler -> Go installation
 	
+	
 ---
 
+	
 	

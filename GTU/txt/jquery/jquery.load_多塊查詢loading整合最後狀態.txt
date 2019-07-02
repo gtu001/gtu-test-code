@@ -1,0 +1,194 @@
+畫面按查詢時會呼叫 loadProdBlockAsyn
+按照查詢條件可能會loading三種產品 Fund, ETF, Bond
+當三個都load完畢,會顯示最終結果, 若三個都沒資料要顯示 "查無資料"
+
+
+
+<th:block th:fragment="initLoadProdBlock">
+    <script th:inline="javascript">         
+        
+        jQuery.whenAll = function (deferreds) {
+            var lastResolved = 0;
+            var wrappedDeferreds = [];
+            for (var i = 0; i < deferreds.length; i++) {
+                wrappedDeferreds.push(jQuery.Deferred());
+                deferreds[i].always(function() {
+                    wrappedDeferreds[lastResolved++].resolve(arguments);
+                });
+            }
+            return jQuery.when.apply(jQuery, wrappedDeferreds).promise();
+        };
+        
+        function LoadProdBlockAsynCompleteHandler() {
+            var deferredMap = {};
+            var promises = [];
+            var returnCodeMap = {};
+            var INIT_STATUS = '';//初始狀態
+
+            var func = {
+                //三個顯示區塊
+                fundFunc : function(response, status, xhr){
+                    func.resolveFuncProcess("fund", response);
+                },
+                etfFunc : function(response, status, xhr){
+                    func.resolveFuncProcess("etf", response);
+                },
+                bondFunc : function(response, status, xhr){
+                    func.resolveFuncProcess("bond", response);
+                },
+                
+                //確認畫面回覆馬從html
+                checkResturnCode : function(response) {
+                    //<!-- GridResult=returnCode:[[${returnCode}]],returnDesc:[[${returnDesc}]] -->
+                    var reg = /GridResult\=returnCode\:(\w+)\,.*/gmi;
+                    var found;
+                    while (found = reg.exec(response)) {
+                        console.log(" catch : " + found[0]);
+                        return found[1];
+                    }
+                    return false;
+                },
+                
+                //是否顯示最終區塊[查無資料]
+                checkShowNoDataDiv : function(isVisible) {
+                    if(isVisible){
+                        $("#noDataDiv").show();
+                    }else{
+                        $("#noDataDiv").hide();
+                    }
+                },
+                
+                resolveFuncProcess : function(type, response) {
+                    console.log("["+type+"] status : " + status);
+                    deferredMap[type].resolve(""+type+" : " + status)
+                    returnCodeMap[type] = func.checkResturnCode(response);
+                },
+                
+                beforeProcess : function(key) {
+                    var chk1 = $.Deferred();
+                    var promise = chk1.then(function(val){
+                        console.log(key + "-----------------" + val);
+                        return key + " " + val + " Done!";
+                    });
+                    promises.push(promise);
+                    deferredMap[key] = chk1;
+                    returnCodeMap[key] = INIT_STATUS;
+                },
+                
+                checkShowNoData : function() {
+                    console.log(">>> returnCodeMap : " + JSON.stringify(returnCodeMap));
+                    if(Object.keys(returnCodeMap).length == 0){
+                        func.checkShowNoDataDiv(false);//沒loading不顯示
+                        return;
+                    }
+                    var isNoData = true;
+                    for(var key in returnCodeMap) {
+                        if(returnCodeMap[key] == '0000'){//查詢有資料
+                            isNoData = false;
+                            break;
+                        } else if(returnCodeMap[key] == INIT_STATUS) {
+                            setTimeout(100, func.checkShowNoData);
+                            return;
+                        }
+                    }
+                    if(isNoData){
+                        console.log(">>> show-----noDataDiv !!");
+                        func.checkShowNoDataDiv(true);//沒資料顯示最終區塊[查無資料]
+                    }
+                },
+            };
+            
+            func.checkShowNoDataDiv(false);//回覆init狀態
+            
+            return {
+                getFundFunc : function() {
+                    func.beforeProcess('fund');
+                    return func.fundFunc;
+                },
+                getEtfFunc : function() {
+                    func.beforeProcess('etf');
+                    return func.etfFunc;
+                },
+                getBondFunc : function() {
+                    func.beforeProcess('bond');
+                    return func.bondFunc;
+                },
+                doStart : function() {
+                    console.log("[doStart] size -------------- " + promises.length );
+                    jQuery.whenAll(promises).done(function(){
+                        console.log("[doStart] All Done !");
+                        func.checkShowNoData();
+                    }).fail(function(){
+                        console.log("[doStart] Fail !");
+                        func.checkShowNoData();
+                    })
+                }
+            };
+        }
+        
+        function loadProdBlockAsyn(queryType, pageNo, appendix){
+            var postData = {'lastestQueryJSON': /*[[${lastestQueryJSON}]]*/, 'pageNo': pageNo};
+            var productTypeReq = /*[[${productTypeReq}]]*/;
+            var queryObj = {};
+            
+            if(appendix) {
+                postData = $.extend(postData, appendix);
+            }
+            if(postData['productTypeReq']){
+                productTypeReq = postData['productTypeReq'];
+            }
+            
+            if(queryType == "applicationMain"){
+                queryObj.fundUrl = "/fund/qryApplicationMainGrid";
+                queryObj.etfUrl = "/etf/qryApplicationMainGrid";
+                queryObj.bondUrl = "/bond/qryApplicationMainGrid";
+            } else if(queryType == "tradeJournal"){
+                queryObj.fundUrl = "/fund/qryTradeJournalGrid";
+                queryObj.etfUrl = "/etf/qryTradeJournalGrid";
+                queryObj.bondUrl = "/bond/qryTradeJournalGrid";
+            } else if(queryType == "preTrustAcct"){
+                queryObj.fundUrl = "/fund/qryPreTrustAcctGrid";
+                queryObj.etfUrl = "/etf/qryPreTrustAcctGrid";
+                queryObj.bondUrl = "/bond/qryPreTrustAcctGrid";
+            } else if(queryType == "roi"){
+                queryObj.fundUrl = "/fund/qryRoiGrid";
+                queryObj.etfUrl = "/etf/qryRoiGrid";
+                queryObj.bondUrl = "/bond/qryRoiGrid";
+            }
+
+            var allDone = new LoadProdBlockAsynCompleteHandler();
+            
+            if (productTypeReq == '0') {
+                console.log("loadProdBlockAsyn all");
+                $('#fundDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');
+                $('#etfDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');
+                $('#bondDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');              
+                $('#fundDiv').load(queryObj.fundUrl,  postData, allDone.getFundFunc());
+                $('#etfDiv').load(queryObj.etfUrl,  postData, allDone.getEtfFunc());
+                $('#bondDiv').load(queryObj.bondUrl,  postData, allDone.getBondFunc());
+            }else if (productTypeReq == '1' || productTypeReq == '4') {
+                console.log("loadProdBlockAsyn fund");
+                if ($('#fundDiv')) {
+                    $('#fundDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');
+                    $('#fundDiv').load(queryObj.fundUrl,  postData, allDone.getFundFunc());
+                }
+            } else if (productTypeReq == '2') {
+                console.log("loadProdBlockAsyn etf");
+                if ($('#etfDiv')) {
+                    $('#etfDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');
+                    $('#etfDiv').load(queryObj.etfUrl,  postData, allDone.getEtfFunc());    
+                }
+            } else if (productTypeReq == '3') {
+                console.log("loadProdBlockAsyn bond");
+                if ($('#bondDiv')) {
+                    $('#bondDiv').html('<div style="width:100%; height: 200px;"><img src="/images/justLoading.gif"></img></div>');
+                    $('#bondDiv').load(queryObj.bondUrl,  postData, allDone.getBondFunc());
+                }
+            }
+            
+            allDone.doStart();
+        }
+        
+                
+    </script>
+</th:block>
