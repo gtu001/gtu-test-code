@@ -5,16 +5,19 @@ import (
 	"strings"
     "regexp"
     "reflect"
+    //"strconv"
 )
 
 func main() {
-    fmt.Println(TrimAllSpace("  dd  dd  "))
-    fmt.Println(Trim("  dd  dd  "))
-    fmt.Println(GetChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
-    fmt.Println(HasChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
-    fmt.Println(HasChinese("  dfasdfl  lksjdf  sldfjsdlf   "))
-    
-    tester()
+    fmt.Println("TrimAllSpace-->" , TrimAllSpace("  dd  dd  "))
+    fmt.Println("Trim-->" , Trim("  dd  dd  "))
+    fmt.Println("GetChinese-->" , GetChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
+    fmt.Println("HasChinese-->" , HasChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
+    fmt.Println("HasChinese-->" , HasChinese("  dfasdfl  lksjdf  sldfjsdlf   "))
+    fmt.Println("Left Padding-->" , Padding("aaa", 10, 'x', true))
+    fmt.Println("Right Padding-->" , Padding("aaa", 10, 'x', false))
+    fmt.Println("IsNumber-->" , IsNumber(-12354.566))
+   // tester()
 }
 
 func Trim(strVal string) string {
@@ -57,3 +60,29 @@ func HasChinese(strVal string) bool {
 	return len(GetChinese(strVal)) > 0
 }
 
+func Padding(strVal string, length int, c rune, isLeft bool) string {
+	appendLen := length - len(strVal)
+	if appendLen <= 0 {
+		return strVal
+	}
+	for i := 0; i < appendLen; i ++ {
+		if isLeft {
+			strVal = string(c) + strVal
+		}else {
+			strVal += string(c)
+		}
+	}
+	return strVal
+}
+
+func IsNumber(dataVal interface{}) bool {
+	if dataVal == nil {
+		return false
+	}
+	strVal := fmt.Sprintf("%v", dataVal)
+	if len(strVal) == 0 {
+		return false
+	}
+	ptn,_ := regexp.Compile("\\-?(\\d+\\.\\d+|\\d+)")
+	return ptn.Match([]byte(strVal))
+}

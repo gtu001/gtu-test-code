@@ -233,7 +233,7 @@ public class StringUtil_ {
     public static boolean chkNumber(String data) {
         if (data == null || data.equals(""))
             return false;
-        return Pattern.matches("(\\d+\\.\\d+|\\d+)", data);
+        return Pattern.matches("\\-?(\\d+\\.\\d+|\\d+)", data);
     }
 
     /**
