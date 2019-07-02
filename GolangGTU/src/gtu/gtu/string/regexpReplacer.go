@@ -1,18 +1,28 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	//"strings"
     "regexp"
     //"reflect"
 )
 
+func tester() {
+	r := &DoReplace{}
+    r.Replace = func(str string) string {
+    	fmt.Println(str)
+    	return "@"
+    }
+    fmt.Println("結果 : ", MatchReplace("  dfasdfl  lksjdf  sldfjsdlf   ", "d+", r))
+    fmt.Println("done...")
+}
 
 type DoReplace struct {
+	count int
 	Replace func(string) string
 }
 
-func MatchReplace(strVal string, ptnStr string, r DoReplace) string {
+func MatchReplace(strVal string, ptnStr string, r *DoReplace) string {
 	ptn,_ := regexp.Compile(ptnStr)
 	intArry := ptn.FindAllIndex ([]byte(strVal), -1)
 	if len(intArry) == 0 {

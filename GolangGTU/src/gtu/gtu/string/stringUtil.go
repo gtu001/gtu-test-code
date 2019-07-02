@@ -14,12 +14,7 @@ func main() {
     fmt.Println(HasChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
     fmt.Println(HasChinese("  dfasdfl  lksjdf  sldfjsdlf   "))
     
-    r := struct { DoReplace }{}
-    r.Replace = func(str string) string {
-    	return "@"
-    }
-    
-    MatchReplace("  dfasdfl  lksjdf  sldfjsdlf   ", "d+", r)
+    tester()
 }
 
 func Trim(strVal string) string {
