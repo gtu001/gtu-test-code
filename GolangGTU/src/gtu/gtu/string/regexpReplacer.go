@@ -18,7 +18,6 @@ func tester() {
 }
 
 type DoReplace struct {
-	count int
 	Replace func(string) string
 }
 
