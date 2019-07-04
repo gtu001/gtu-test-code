@@ -32,7 +32,7 @@
 		var thr;
 		var dataArry = new Array();
 		var dataTrArry = new Array();
-
+	
 		return {
 			setTable : function(tableQuery) {
 				table = $(tableQuery);
@@ -53,18 +53,25 @@
 				var self = this;
 				for ( var queryKey in map) {
 					$(queryKey).attr("queryKey", queryKey);
-
+					
 					$(queryKey).click(function() {
 						// 重設其他
 						for ( var queryKey in map) {
 							var valMap = map[queryKey];
 							$(queryKey).html(valMap['html']);
+							
+							//-----------------------------------------------------------
+							//客製箭頭class 
+							$(queryKey).removeClass("glyphicon");
+							$(queryKey).removeClass("glyphicon-triangle-top");//向上
+							$(queryKey).removeClass("glyphicon-triangle-bottom");//向下
+							//-----------------------------------------------------------
 						}
-
+	
 						// 修改自己
 						var queryKey1 = $(this).attr("queryKey");
 						var valMap = map[queryKey1];
-
+	
 						if (valMap['order'] == '' || valMap['order'] == desc) {
 							valMap['order'] = asc;
 							self.sortTable(queryKey1, 'asc');
@@ -72,8 +79,23 @@
 							valMap['order'] = desc;
 							self.sortTable(queryKey1, 'desc');
 						}
-
-						$(this).html(valMap['html'] + valMap['order']);
+	
+						$(this).html(valMap['html'] + valMap['order']);//原版
+						
+						//-----------------------------------------------------------
+						//客製箭頭class 
+						$(this).removeClass("glyphicon");
+						$(this).removeClass("glyphicon-triangle-top");//向上
+						$(this).removeClass("glyphicon-triangle-bottom");//向下
+						
+						if(valMap['order'] == asc){
+							$(this).addClass("glyphicon");
+							$(this).addClass("glyphicon-triangle-bottom");//向上
+						}else if(valMap['order'] == desc){
+							$(this).addClass("glyphicon");
+							$(this).addClass("glyphicon-triangle-top");//向上
+						}
+						//-----------------------------------------------------------
 					});
 				}
 			},
@@ -89,15 +111,18 @@
 			},
 			sortTable : function(queryKey, sortType) {
 				this.emptySortTr();
-
+	
 				var index = map[queryKey]['index'];
-
+	
 				var sortedTrIndexArry = this.arraySort(this.cloneArry(dataArry),
 						index, sortType);
-
+	
 				for (var ii = 0; ii < sortedTrIndexArry.length; ii++) {
 					var trIndex = sortedTrIndexArry[ii];
-					$(table).append($("<tr class='sortTr'>" + dataTrArry[trIndex] + "</tr>"));
+					$(table)
+							.append(
+									$("<tr class='sortTr'>" + dataTrArry[trIndex]
+											+ "</tr>"));
 				}
 			},
 			emptySortTr : function() {
@@ -124,9 +149,10 @@
 				var rtnArry = new Array();
 				for ( var val in dArry) {
 					for (var ii = 0; ii < arry.length; ii++) {
-						if (arry[ii][columnIndex] == dArry[val]) {
+						if (arry[ii] != null && arry[ii][columnIndex] == dArry[val]) {
 							rtnArry.push(ii);
-							arry.splice(ii, 1);
+							//arry.splice(ii, 1);
+							arry[ii] = null;
 							break;
 						}
 					}
