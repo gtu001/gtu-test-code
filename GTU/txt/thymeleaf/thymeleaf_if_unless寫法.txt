@@ -1,0 +1,4 @@
+<th:block th:with=" isShow = ${ roiEntity.mDistributeHandler_Robo.allCount > 0 } ">
+	<a th:if="${isShow}" href="javascript:distributeQuery('3')">共[[${roiEntity.mDistributeHandler_Robo.allCount}]]筆</a>
+	<span th:unless="${isShow}" th:text="'共0筆'"></span>
+</th:block>

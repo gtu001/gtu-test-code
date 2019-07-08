@@ -1,0 +1,71 @@
+﻿用session 控制cookie存取
+
+//-----------JAVA
+
+package cub.inv.query.ui.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+
+@Configuration
+@EnableWebSecurity
+public class SessionConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+
+	http.authorizeRequests().antMatchers("/**").permitAll().anyRequest().authenticated().and().csrf().disable();
+    }
+}
+
+//disable security
+@SpringBootApplication
+(exclude = {
+        SecurityAutoConfiguration.class
+        //ManagementWebSecurityAutoConfiguration.class 
+        })
+        
+
+//-----------POM 
+
+		<!-- session control -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+
+
+//-----------Javascript 
+
+var sessionID = /*[[${#session ne null ? #session.id : ''}]]*/;
+
+var cookieSetter = {
+	isNoData : function() {
+		if(typeof $.cookie("qrySessionId") === 'undefined'){
+			return true;
+		}else if($.cookie("qrySessionId") == '') {
+			return true;
+		}else if($.cookie("qrySessionId") != sessionID){
+			return true;
+		}
+		return false;
+	},
+	clear : function(key) {
+		$.removeCookie(key); 
+	},
+	set : function(key, value) {
+		$.cookie(key, value, { expires : 1 });
+	},
+	get : function(key) {
+		return $.cookie(key);
+	},
+};

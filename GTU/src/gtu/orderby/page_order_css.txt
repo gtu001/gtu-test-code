@@ -1,0 +1,56 @@
+	
+	/*	
+	* titleTr	將一個需要排序的th傳入
+	* formJSONStr 	將原本form轉成JSON傳入
+	*/
+	function OrderbyColumnsHereHandler(titleTr, formJSONStr) {
+		var formJSON = JSON.parse(formJSONStr);
+		var lastestForm = {};
+		var func = {
+			creatTableHere : function(title, orderDiv) {
+				var tableHtml = "<table border='0' style='border-bottom:0px;'><tr>";
+				tableHtml += "<td style='color:#858585;font-size:10px;font-weight:normal;padding:0px;'>" + title + "</td>";
+				tableHtml += "<td style='color:#858585;font-size:10px;font-weight:normal;padding:0px;'>" + orderDiv + "</td>";
+				tableHtml += "</tr></table>";
+				return tableHtml;
+//				return title + orderDiv;
+			},
+			processTitleTr : function(trObj) {
+				var ths = $(trObj).find("th");
+				for(var i = 0 ; i < ths.length ; i ++) {
+					var html = '';
+					if(formJSON && formJSON['orderColumn'] && formJSON['orderType'] && i == formJSON['orderColumn']){
+						console.log("orderBy idx : " + i + ", type : " + formJSON['orderType']);
+						lastestForm['orderColumn'] = formJSON['orderColumn'];
+						lastestForm['orderType'] = formJSON['orderType'];
+						html = this.creatTableHere($(ths[i]).text(), this.addIcon(formJSON['orderType'], i));
+					}else {
+						html = this.creatTableHere($(ths[i]).text(), this.addIcon("all", i));
+					}
+					$(ths[i]).html(html);
+				}
+			},
+			addIcon : function(type, idx) {
+				var sortIconhtml = '';
+				sortIconhtml += '<div class="sortDiv" style="float: right; padding-top: 8px">';
+				switch(type) {
+				case 'asc':
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
+					break;
+				case 'desc':
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
+					break;
+				default :
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
+					break;
+				}
+				sortIconhtml += '</div>';
+				return sortIconhtml;
+			}
+		};
+		func.processTitleTr(titleTr);
+		return lastestForm;
+	};
