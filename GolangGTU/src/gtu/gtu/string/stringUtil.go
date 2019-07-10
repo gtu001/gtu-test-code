@@ -9,22 +9,22 @@ import (
 )
 
 func main() {
-    fmt.Println("TrimAllSpace-->" , TrimAllSpace("  dd  dd  "))
-    fmt.Println("Trim-->" , Trim("  dd  dd  "))
-    fmt.Println("GetChinese-->" , GetChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
-    fmt.Println("HasChinese-->" , HasChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
-    fmt.Println("HasChinese-->" , HasChinese("  dfasdfl  lksjdf  sldfjsdlf   "))
-    fmt.Println("Left Padding-->" , Padding("aaa", 10, 'x', true))
-    fmt.Println("Right Padding-->" , Padding("aaa", 10, 'x', false))
-    fmt.Println("IsNumber-->" , IsNumber(-12354.566))
+    fmt.Println("TrimAllSpace-->" , trimAllSpace("  dd  dd  "))
+    fmt.Println("Trim-->" , trim("  dd  dd  "))
+    fmt.Println("GetChinese-->" , getChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
+    fmt.Println("HasChinese-->" , hasChinese("  dfasdfl 測試 lksjdf 中文 sldfjsdlf   "))
+    fmt.Println("HasChinese-->" , hasChinese("  dfasdfl  lksjdf  sldfjsdlf   "))
+    fmt.Println("Left Padding-->" , padding("aaa", 10, 'x', true))
+    fmt.Println("Right Padding-->" , padding("aaa", 10, 'x', false))
+    fmt.Println("IsNumber-->" , isNumber(-12354.566))
    // tester()
 }
 
-func Trim(strVal string) string {
+func trim(strVal string) string {
 	return strings.Trim(strVal, " ")
 }
 
-func TrimAllSpace(strVal string) string {
+func trimAllSpace(strVal string) string {
 	var resultStr string = ""
     for _, r := range strVal {
         c := string(r)
@@ -35,15 +35,15 @@ func TrimAllSpace(strVal string) string {
 	return resultStr
 }
 
-func TypeOf(value interface{}) string {
+func typeOf(value interface{}) string {
 	return fmt.Sprintf("%v", reflect.TypeOf(value))
 }
 
-func ValueOf(value interface{}) string {
+func valueOf(value interface{}) string {
 	return fmt.Sprintf("value:[%v], type:[%T]", value, value)
 }
 
-func GetChinese(strVal string) string {
+func getChinese(strVal string) string {
 	ptn,_ := regexp.Compile("[\u4e00-\u9fa5]")
 	intArry := ptn.FindAllIndex ([]byte(strVal), -1)
 	if len(intArry) == 0 {
@@ -56,11 +56,11 @@ func GetChinese(strVal string) string {
 	return rtnString
 }
 
-func HasChinese(strVal string) bool {
-	return len(GetChinese(strVal)) > 0
+func hasChinese(strVal string) bool {
+	return len(getChinese(strVal)) > 0
 }
 
-func Padding(strVal string, length int, c rune, isLeft bool) string {
+func padding(strVal string, length int, c rune, isLeft bool) string {
 	appendLen := length - len(strVal)
 	if appendLen <= 0 {
 		return strVal
@@ -75,7 +75,7 @@ func Padding(strVal string, length int, c rune, isLeft bool) string {
 	return strVal
 }
 
-func IsNumber(dataVal interface{}) bool {
+func isNumber(dataVal interface{}) bool {
 	if dataVal == nil {
 		return false
 	}

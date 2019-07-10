@@ -9,19 +9,19 @@ import (
 
 func tester() {
 	r := &DoReplace{}
-    r.Replace = func(str string) string {
+    r.replace = func(str string) string {
     	fmt.Println(str)
     	return "@"
     }
-    fmt.Println("結果 : ", MatchReplace("  dfasdfl  lksjdf  sldfjsdlf   ", "d+", r))
+    fmt.Println("結果 : ", matchReplace("  dfasdfl  lksjdf  sldfjsdlf   ", "d+", r))
     fmt.Println("done...")
 }
 
 type DoReplace struct {
-	Replace func(string) string
+	replace func(string) string
 }
 
-func MatchReplace(strVal string, ptnStr string, r *DoReplace) string {
+func matchReplace(strVal string, ptnStr string, r *DoReplace) string {
 	ptn,_ := regexp.Compile(ptnStr)
 	intArry := ptn.FindAllIndex ([]byte(strVal), -1)
 	if len(intArry) == 0 {
@@ -31,7 +31,7 @@ func MatchReplace(strVal string, ptnStr string, r *DoReplace) string {
 	startPos := 0
 	for _,subArry := range intArry {
 		rtnString += strVal[startPos : subArry[0]]
-		rtnString += r.Replace(strVal[subArry[0] : subArry[1]])
+		rtnString += r.replace(strVal[subArry[0] : subArry[1]])
 		startPos = subArry[1]
 	}
 	rtnString += strVal[startPos:]

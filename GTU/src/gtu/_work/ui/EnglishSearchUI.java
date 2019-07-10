@@ -98,6 +98,7 @@ import gtu._work.etc.EnglishTester_Diectory2;
 import gtu._work.etc.EnglishTester_Diectory2.WordInfo2;
 import gtu.binary.StringUtil4FullChar;
 import gtu.clipboard.ClipboardListener;
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
@@ -532,7 +533,7 @@ public class EnglishSearchUI extends JFrame {
         searchEnglishIdTextController.get().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-//                System.out.println("keyPressed ---- " + e);
+                // System.out.println("keyPressed ---- " + e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     System.out.println("key ENTER");
                     queryButtonAction(true);
@@ -552,7 +553,15 @@ public class EnglishSearchUI extends JFrame {
             public void mouseClicked(MouseEvent arg0) {
                 if (JMouseEventUtil.buttonRightClick(1, arg0)) {
                     JPopupMenuUtil.newInstance(searchEnglishIdTextController.get())//
-                            .addJMenuItem("google翻譯", new ActionListener() {
+                            .addJMenuItem("貼上", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    String text = ClipboardUtil.getInstance().getContents();
+                                    if (StringUtils.isNotBlank(text)) {
+                                        searchEnglishIdTextController.get().setText(text);
+                                    }
+                                }
+                            }).addJMenuItem("google翻譯", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent arg0) {
                                     try {
