@@ -5,6 +5,7 @@ import (
 	"time"
 	//	"reflect"
 	"strings"
+	"regexp"
 	//	"strconv"
 	//	"gtu/string/stringUtil"
 )
@@ -46,6 +47,8 @@ func formatDate(format string, date time.Time, isChineseYear bool) string {
 	format = strings.Replace(format, "HH", hour, -1)
 	format = strings.Replace(format, "mm", minute, -1)
 	format = strings.Replace(format, "ss", second, -1)
-	format = strings.Replace(format, "SSS", millsec, -1)
+	re,_ := regexp.Compile("S+")
+	tmpFormat := re.ReplaceAll([]byte(format), []byte(millsec))
+	format = string(tmpFormat)
 	return format
 }
