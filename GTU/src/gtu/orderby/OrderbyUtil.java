@@ -1,5 +1,7 @@
 package gtu.orderby;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +17,9 @@ import java.util.stream.Stream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +84,26 @@ public class OrderbyUtil {
         public int ordinal();
     }
 
-    public static <T> Comparator orderbyProcess(int orderColumnIndex, String orderType, List<T> lst, IOrderByEnum[] values) {
+    private static String getMatchType(Object o1, String fieldName) {
+        if (o1 != null) {
+            for (Field f : o1.getClass().getDeclaredFields()) {
+                if (StringUtils.equals(fieldName, f.getName())) {
+                    return "Field";
+                }
+            }
+            for (Method m : o1.getClass().getDeclaredMethods()) {
+                if (StringUtils.equals("get" + StringUtils.capitalize(fieldName), m.getName())) {
+                    return "get" + StringUtils.capitalize(fieldName);
+                } else if (StringUtils.equals("is" + StringUtils.capitalize(fieldName), m.getName())) {
+                    return "is" + StringUtils.capitalize(fieldName);
+                }
+            }
+        }
+        return "";
+    }
+
+    public static <T> Comparator orderbyProcess(int orderColumnIndex, String orderType,
+            List<T> lst, IOrderByEnum[] values) {
         if (orderColumnIndex < 0 || StringUtils.isBlank(orderType)) {
             return null;
         }
@@ -108,20 +131,39 @@ public class OrderbyUtil {
 
         Comparator comparator = new Comparator<T>() {
             @Override
-            public int compare(T o1, T o2) {
+            public int compare(T o1,
+                    T o2) {
 
                 List<String> columns = new ArrayList<>(setting.get().getColumnLst());
                 columnsBak.set(columns);
 
-                if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) && isListCoverEachOther(columns, setting.get().getNumberColumns())) {
+                if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) &&
+                        isListCoverEachOther(columns, setting.get().getNumberColumns())) {
                     columns.retainAll(setting.get().getNumberColumns());
 
                     for (String fieldName : columns) {
                         try {
-                            BigDecimal b1 = NumberUtil.getBigDecimal(FieldUtils.readDeclaredField(o1, fieldName, true));
-                            BigDecimal b2 = NumberUtil.getBigDecimal(FieldUtils.readDeclaredField(o2, fieldName, true));
+                            String o1Type = getMatchType(o1, fieldName);
+                            String o2Type = getMatchType(o2, fieldName);
+                            if (StringUtils.isBlank(o1Type) || StringUtils.isBlank(o2Type)) {
+                                continue;
+                            }
 
-                            int compareResult = b1.compareTo(b2) * orderVal.get();
+                            BigDecimal b1 = null;
+                            BigDecimal b2 = null;
+
+                            if ("Field".equals(o1Type)) {
+                                b1 = NumberUtil.getBigDecimal(FieldUtils.readDeclaredField(o1, fieldName, true));
+                            } else if (StringUtils.isNotBlank(o1Type)) {
+                                b1 = NumberUtil.getBigDecimal(MethodUtils.invokeMethod(o1, o1Type, new Object[0]));
+                            }
+                            if ("Field".equals(o2Type)) {
+                                b2 = NumberUtil.getBigDecimal(FieldUtils.readDeclaredField(o2, fieldName, true));
+                            } else if (StringUtils.isNotBlank(o2Type)) {
+                                b2 = NumberUtil.getBigDecimal(MethodUtils.invokeMethod(o2, o2Type, new Object[0]));
+                            }
+
+                            int compareResult = ObjectUtils.compare(b1, b2) * orderVal.get();
                             if (compareResult != 0) {
                                 return compareResult;
                             }
@@ -136,8 +178,25 @@ public class OrderbyUtil {
                 String v22 = "";
                 for (String fieldName : columns) {
                     try {
-                        Object v1 = FieldUtils.readDeclaredField(o1, fieldName, true);
-                        Object v2 = FieldUtils.readDeclaredField(o2, fieldName, true);
+                        String o1Type = getMatchType(o1, fieldName);
+                        String o2Type = getMatchType(o2, fieldName);
+                        if (StringUtils.isBlank(o1Type) || StringUtils.isBlank(o2Type)) {
+                            continue;
+                        }
+
+                        Object v1 = null;
+                        Object v2 = null;
+
+                        if ("Field".equals(o1Type)) {
+                            v1 = FieldUtils.readDeclaredField(o1, fieldName, true);
+                        } else if (StringUtils.isNotBlank(o1Type)) {
+                            v1 = MethodUtils.invokeMethod(o1, o1Type, new Object[0]);
+                        }
+                        if ("Field".equals(o2Type)) {
+                            v2 = FieldUtils.readDeclaredField(o2, fieldName, true);
+                        } else if (StringUtils.isNotBlank(o2Type)) {
+                            v2 = MethodUtils.invokeMethod(o2, o2Type, new Object[0]);
+                        }
 
                         v11 += (v1 == null ? "" : String.valueOf(v1));
                         v22 += (v2 == null ? "" : String.valueOf(v2));
@@ -160,7 +219,7 @@ public class OrderbyUtil {
                 for (String column : columnsBak.get()) {
                     try {
                         valLst.add(FieldUtils.readDeclaredField(v, column, true));
-                    } catch (IllegalAccessException e1) {
+                    } catch (Exception e1) {
                     }
                 }
                 logger.info("sort result : " + columnsBak.get() + " -> " + valLst);
@@ -178,7 +237,8 @@ public class OrderbyUtil {
         return false;
     }
 
-    public static Comparator orderbyProcess4Map(int orderColumnIndex, String orderType, List<Map<String, Object>> lst, IOrderByEnum[] values) {
+    public static Comparator orderbyProcess4Map(int orderColumnIndex, String orderType,
+            List<Map<String, Object>> lst, IOrderByEnum[] values) {
         if (orderColumnIndex < 0 || StringUtils.isBlank(orderType)) {
             return null;
         }
@@ -206,12 +266,14 @@ public class OrderbyUtil {
 
         Comparator comparator = new Comparator<Map<String, Object>>() {
             @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+            public int compare(Map<String, Object> o1,
+                    Map<String, Object> o2) {
 
                 List<String> columns = new ArrayList<>(setting.get().getColumnLst());
                 columnsBak.set(columns);
 
-                if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) && isListCoverEachOther(columns, setting.get().getNumberColumns())) {
+                if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) &&
+                        isListCoverEachOther(columns, setting.get().getNumberColumns())) {
                     columns.retainAll(setting.get().getNumberColumns());
 
                     for (String fieldName : columns) {

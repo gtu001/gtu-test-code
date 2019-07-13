@@ -3,54 +3,81 @@
 	* titleTr	將一個需要排序的th傳入
 	* formJSONStr 	將原本form轉成JSON傳入
 	*/
-	function OrderbyColumnsHereHandler(titleTr, formJSONStr) {
-		var formJSON = JSON.parse(formJSONStr);
+	function OrderbyColumnsHereHandler(titleTr, prodType, formJSONStr) {
+		var formJSON = null;
+		if(typeof formJSONStr === 'string'){
+			formJSON = JSON.parse(formJSONStr);
+		}else{
+			formJSON = formJSONStr;
+		}
+		
 		var lastestForm = {};
+		if(formJSON && formJSON['orderColumn'] && formJSON['orderType']){
+			lastestForm['orderColumn'] = formJSON['orderColumn'];
+			lastestForm['orderType'] = formJSON['orderType'];
+		}
+		
+		var getHtml = function(el){
+			var x = $(el).wrap('<p/>').parent().html();
+			$(el).unwrap();
+			return x;
+		};
+		
+		console.log("current sort : " + JSON.stringify(lastestForm));
+		
 		var func = {
 			creatTableHere : function(title, orderDiv) {
-				var tableHtml = "<table border='0' style='border-bottom:0px;'><tr>";
-				tableHtml += "<td style='color:#858585;font-size:10px;font-weight:normal;padding:0px;'>" + title + "</td>";
-				tableHtml += "<td style='color:#858585;font-size:10px;font-weight:normal;padding:0px;'>" + orderDiv + "</td>";
+				var tableHtml = "<table border='0' style='border-bottom:0px;'><tr align='center'>";
+				tableHtml += "<td style='color:#858585;font-size:13px;font-weight:normal;padding:0px !important; border-bottom-style:none' width='90%' >" + title + "</td>";
+				tableHtml += "<td style='color:#858585;font-size:13px;font-weight:normal;padding:0px !important; border-bottom-style:none'>" + orderDiv + "</td>";
 				tableHtml += "</tr></table>";
 				return tableHtml;
 //				return title + orderDiv;
 			},
 			processTitleTr : function(trObj) {
-				var ths = $(trObj).find("th");
+				var ths = $(trObj).find("th,td");
+				
+				var index = 0;
 				for(var i = 0 ; i < ths.length ; i ++) {
+					if($(ths[i]).hasClass("orderbyColumnsIgnore")){
+						console.log("IgnoreOrderBy : " + getHtml(ths[i]));
+						continue;
+					}
+					
 					var html = '';
-					if(formJSON && formJSON['orderColumn'] && formJSON['orderType'] && i == formJSON['orderColumn']){
-						console.log("orderBy idx : " + i + ", type : " + formJSON['orderType']);
-						lastestForm['orderColumn'] = formJSON['orderColumn'];
-						lastestForm['orderType'] = formJSON['orderType'];
-						html = this.creatTableHere($(ths[i]).text(), this.addIcon(formJSON['orderType'], i));
+					if(Object.keys(lastestForm).length != 0 && lastestForm['orderColumn'] == index){
+						html = this.creatTableHere($(ths[i]).html(), this.addIcon(lastestForm['orderType'], index));
 					}else {
-						html = this.creatTableHere($(ths[i]).text(), this.addIcon("all", i));
+						html = this.creatTableHere($(ths[i]).html(), this.addIcon("all", index));
 					}
 					$(ths[i]).html(html);
+					
+					index ++;
 				}
 			},
 			addIcon : function(type, idx) {
 				var sortIconhtml = '';
-				sortIconhtml += '<div class="sortDiv" style="float: right; padding-top: 8px">';
+				sortIconhtml += '<div class="sortDiv" style="float: right;">';
 				switch(type) {
 				case 'asc':
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'desc\', \''+prodType+'\');" />';//方向要相反
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\', \''+prodType+'\');" />';
 					break;
 				case 'desc':
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\', \''+prodType+'\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row;color:green;" onclick="javascript:orderbyColumn('+idx+', \'asc\', \''+prodType+'\');" />';//方向要相反
 					break;
 				default :
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\');" />';
-					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-top" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'asc\', \''+prodType+'\');" />';
+					sortIconhtml += '<div class="glyphicon glyphicon-triangle-bottom" style="cursor:pointer;display:table-row" onclick="javascript:orderbyColumn('+idx+', \'desc\', \''+prodType+'\');" />';
 					break;
 				}
 				sortIconhtml += '</div>';
 				return sortIconhtml;
 			}
 		};
+		
 		func.processTitleTr(titleTr);
+		
 		return lastestForm;
 	};
