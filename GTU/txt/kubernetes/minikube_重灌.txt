@@ -1,0 +1,48 @@
+在此取得 minikube-installer.exe
+	https://github.com/kubernetes/minikube/releases
+
+
+---
+預設安裝目錄於
+	C:\Program Files (x86)\Kubernetes\Minikube
+
+
+---
+重灌
+	刪除重建流程
+	 PS:要用管理者權限開啟 cmd
+	    minikube start --vm-driver=hyperv
+	    minikube stop
+	    minikube delete
+	    minikube start
+	
+	需刪除 (若上述失敗做)
+		linux
+		    rm -rf ~/.minikube
+		    rmdir /S/Q C:\Users\wistronits\.minikube
+	    
+	    win系統
+	    	刪除 C:\Users\wistronits\.minikube 底下
+    
+
+---
+啟動錯誤
+	1)VBoxManage.exe: error: Details: code CO_E_SERVER_EXEC_FAILURE (0x80080005)
+	解法:
+		右鍵VBoxManage.exe 設定相容性Win7, 且勾起以系統管理員開啟
+			
+	2)E0717 14:24:29.925000   27444 start.go:174] Error starting host:  Error getting state for host: machine does not exist
+	解法:
+		minikube delete
+		
+		
+	3)E0717 15:30:16.910500   10844 start.go:168] Error starting host: Error creating host: Error executing step: Creating VM.
+	: open /Users/wistronits/.minikube/cache/iso/minikube-v0.28.0.iso: The system cannot find the path specified..
+	解法:
+		自訂minikube目錄
+		set MINIKUBE_HOME=C:/Users/wistronits/.minikube
+		
+		
+---
+印log
+	minikube logs | findstr /C:image > d:/xxxxx.txt

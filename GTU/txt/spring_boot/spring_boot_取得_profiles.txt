@@ -1,0 +1,16 @@
+@Component
+public class DBPasswordGetter {
+    private static final Logger logger = LogManager.getLogger(DBPasswordGetter.class);
+
+    @Autowired
+    public Environment env;
+
+    public List<String> getProfiles() {
+        List<String> lst = new ArrayList<>();
+        String[] profiles = env.getActiveProfiles();
+        for (String profile : profiles) {
+            lst.add(profile);
+        }
+        return lst;
+    }
+}

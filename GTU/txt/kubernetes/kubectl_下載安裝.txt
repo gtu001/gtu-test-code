@@ -1,0 +1,15 @@
+操作網址
+	https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+
+linux 安裝
+	curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+	-->要指定版本換掉 $(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) 這段
+		例如 : curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl
+	
+window 安裝
+	https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe
+	
+
+測試是否可run
+	$ kubectl version

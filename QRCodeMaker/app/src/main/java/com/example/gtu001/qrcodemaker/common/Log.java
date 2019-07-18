@@ -12,6 +12,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -98,6 +100,38 @@ public class Log {
             @Override
             public void run() {
                 LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + " : " + message);
+            }
+        });
+    }
+
+    public static void lineFix(String tag, String message) {
+        final ClassInfo info = new ClassInfo(Log.class, tag);
+        android.util.Log.v(info.getTag(), message);
+
+        message = StringUtils.defaultString(message);
+        List<String> lst = fixLength(message, 900);
+
+        for (final String msg : lst) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + " : " + msg);
+                }
+            });
+        }
+    }
+
+    public static void lineFix(String tag, final String message, final Throwable e) {
+        final ClassInfo info = new ClassInfo(Log.class, tag);
+        android.util.Log.e(info.getTag(), message, e);
+
+        List<String> lst = fixLength(StringUtils.defaultString(message), 900);
+
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                LineAppNotifiyHelper_Simple.getInstance().send(info.getTag() + message);
+                LineAppNotifiyHelper_Simple.getInstance().send(ExceptionUtils.getMessage(e));
             }
         });
     }
@@ -197,5 +231,42 @@ public class Log {
             methodName = StringUtils.isNotEmpty(methodName) ? methodName : "<na>";
             return simpleName + "." + methodName + ":" + lineNumber;
         }
+    }
+
+    private static final int ENCODE_LENGTH = 3;//UTF8=3,BIG5=2
+
+    public static List<String> fixLength(String value, int length) {
+        char[] array = value.toCharArray();
+        List<String> list = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, count = 0, lastTime = 0; i < array.length; i++) {
+            if (String.valueOf(array[i]).matches("[^\\x00-\\xff]")) {
+                count += ENCODE_LENGTH;
+                lastTime = ENCODE_LENGTH;
+            } else {
+                count++;
+                lastTime = 1;
+            }
+            if (count > length) {
+                list.add(sb.toString());
+                sb = new StringBuilder();
+                // sb.append(count + "" + array[i]);
+                sb.append(array[i]);
+                count = lastTime;
+            } else if (count == length) {
+                // sb.append(count + "" + array[i]);
+                sb.append(array[i]);
+                list.add(sb.toString());
+                sb = new StringBuilder();
+                count = 0;
+            } else {
+                // sb.append(count + "" + array[i]);
+                sb.append(array[i]);
+            }
+        }
+        if (sb.length() > 0) {
+            list.add(sb.toString());
+        }
+        return list;
     }
 }
