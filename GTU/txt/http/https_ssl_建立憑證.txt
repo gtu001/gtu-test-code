@@ -1,0 +1,56 @@
+﻿檢是憑證內容
+
+	keytool  -list -v -keystore  baeldung.p12
+
+建立憑證
+
+	keytool -genkeypair -alias baeldung -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore baeldung.p12 -validity 3650    
+
+		-ext san=dns:localhost,ip:127.0.0.1,dns:inv-svc-fund-res.ivtlxivp01,dns:inv-svc-platform.ivtlxivp01,dns:inv-svc-platform-ivtlxivp01,dns:dar6midd01,dns:www.cathaybk.com.tw,dns:invf-query-ivtlxivp01,dns:inv-svc-etf-query,dns:inv-svc-platform,dns:PAR6MWTR,dns:inv-svc-fund-query.ivtlxivp01,dns:TAR6MWTR,dns:inv-svc-fund-query.ivtlxivp01.svc.cluster.local,dns:inv-svc-fund-query-ivtlxivp01,dns:inv-svc-platform-ivtlxivp01.paas.cathdevelop.intra.uwccb
+		後面是加入DNS 多組用逗號隔開, 有兩種ip或dns
+
+
+
+JAVA 設定
+
+	@Value("${server.ssl.key-store-password}")
+    private String keyStorePassword;
+
+
+	@Bean
+    public RestTemplate restTemplate_SSL() throws Exception {
+        final URL trustStore = this.getClass().getClassLoader().getResource("keystore/baeldung.p12");
+        final char[] storePassword = keyStorePassword.toCharArray();
+
+        SSLContext sslContext = new SSLContextBuilder()
+            .loadTrustMaterial(trustStore, storePassword)
+            .build();
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+        HttpClient httpClient = HttpClients.custom()
+            .setSSLSocketFactory(socketFactory)
+            .build();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        return new RestTemplate(factory);
+    }
+
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+            .antMatchers("/**")
+            .permitAll();
+    }
+
+
+
+
+
+設定 application.properties
+
+	
+	# The format used for the keystore. It could be set to JKS in case it is a JKS file
+	server.ssl.key-store-type=PKCS12
+	# The path to the keystore containing the certificate
+	server.ssl.key-store=classpath:keystore/baeldung.p12
+	# The password used to generate the certificate
+	server.ssl.key-store-password=123456
+	# The alias mapped to the certificate
+	server.ssl.key-alias=baeldung

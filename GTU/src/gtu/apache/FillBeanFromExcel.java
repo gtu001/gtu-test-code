@@ -3,11 +3,14 @@ package gtu.apache;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,9 +24,33 @@ import gtu.poi.hssf.ExcelUtil_Xls97;
 public class FillBeanFromExcel {
 
     private class XXXXX {
-        String aaaa;
+        int aaaa;
         String bbbb;
         String cccc;
+
+        public int getAaaa() {
+            return aaaa;
+        }
+
+        public void setAaaa(int aaaa) {
+            this.aaaa = aaaa;
+        }
+
+        public String getBbbb() {
+            return bbbb;
+        }
+
+        public void setBbbb(String bbbb) {
+            this.bbbb = bbbb;
+        }
+
+        public String getCccc() {
+            return cccc;
+        }
+
+        public void setCccc(String cccc) {
+            this.cccc = cccc;
+        }
     }
 
     public static void main(String[] args) {
@@ -58,40 +85,72 @@ public class FillBeanFromExcel {
             Object beanObj = newInstanceDefault(beanClz, parentInst, false);
 
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                String fieldName = defineMap.get(jj);
-                Field field = FieldUtils.getDeclaredField(beanClz, fieldName, true);
-                if (field == null) {
-                    continue;
-                }
-
                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
 
-                try {
-                    if (field.getType() == String.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, value, true);
-                    } else if (field.getType() == BigDecimal.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, new BigDecimal(value), true);
-                    } else if (field.getType() == Integer.class || field.getType() == int.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Integer.parseInt(value), true);
-                    } else if (field.getType() == Long.class || field.getType() == long.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Long.parseLong(value), true);
-                    } else if (field.getType() == Double.class || field.getType() == double.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Double.parseDouble(value), true);
-                    } else if (field.getType() == Float.class || field.getType() == float.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Float.parseFloat(value), true);
-                    } else if (field.getType() == Byte.class || field.getType() == byte.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Byte.parseByte(value), true);
-                    } else if (field.getType() == Short.class || field.getType() == short.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Short.parseShort(value), true);
-                    } else if (field.getType() == Boolean.class || field.getType() == boolean.class) {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, Boolean.parseBoolean(value), true);
+                String fieldName = defineMap.get(jj);
+
+                Field field = FieldUtils.getDeclaredField(beanClz, fieldName, true);
+                Method method = getSetterMethod(beanClz, fieldName);
+
+                boolean findOk = false;
+
+                if (method != null && !findOk) {
+                    Class<?> paramType = method.getParameterTypes()[0];
+                    Object realValue = getValue(paramType, value);
+                    try {
+                        method.invoke(beanObj, new Object[] { realValue });
+                        findOk = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                }
+
+                if (field != null && !findOk) {
+                    Object realValue = getValue(field.getType(), value);
+                    try {
+                        FieldUtils.writeDeclaredField(beanObj, fieldName, realValue, true);
+                        findOk = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             lst.add(beanObj);
+        }
+    }
+
+    private static Method getSetterMethod(Class<?> clz, String fieldName) {
+        String methodName = "set" + StringUtils.capitalise(fieldName);
+        for (Method mth : clz.getMethods()) {
+            if (mth.getName().equals(methodName) && mth.getParameterTypes() != null && mth.getParameterTypes().length == 1) {
+                return mth;
+            }
+        }
+        return null;
+    }
+
+    private static Object getValue(Class<?> fieldType, String value) {
+        if (fieldType == String.class) {
+            return value;
+        } else if (fieldType == BigDecimal.class) {
+            return new BigDecimal(value);
+        } else if (fieldType == Integer.class || fieldType == int.class) {
+            return Integer.parseInt(value);
+        } else if (fieldType == Long.class || fieldType == long.class) {
+            return Long.parseLong(value);
+        } else if (fieldType == Double.class || fieldType == double.class) {
+            return Double.parseDouble(value);
+        } else if (fieldType == Float.class || fieldType == float.class) {
+            return Float.parseFloat(value);
+        } else if (fieldType == Byte.class || fieldType == byte.class) {
+            return Byte.parseByte(value);
+        } else if (fieldType == Short.class || fieldType == short.class) {
+            return Short.parseShort(value);
+        } else if (fieldType == Boolean.class || fieldType == boolean.class) {
+            return Boolean.parseBoolean(value);
+        } else {
+            throw new RuntimeException("無法處理的型別 : " + value + " -> " + fieldType);
         }
     }
 
