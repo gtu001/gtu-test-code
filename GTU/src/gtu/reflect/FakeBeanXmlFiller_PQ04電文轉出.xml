@@ -1,0 +1,209 @@
+﻿<CUBXML xmlns="http://www.cathaybk.com.tw/webservice/ETFBDPQ04/">
+  <MWHEADER>
+    <MSGID>ETFBDPQ04</MSGID>
+    <SOURCECHANNEL>IVT-LX-ITP-01</SOURCECHANNEL>
+    <RETURNCODE>0000</RETURNCODE>
+    <RETURNDESC>   </RETURNDESC>
+    <RETURNCODECHANNEL>ETFS</RETURNCODECHANNEL>
+    <TXNSEQ/>
+    <O360SEQ>O0082019072208423519</O360SEQ>
+  </MWHEADER>
+  <TRANRS>
+    <ProcessDate>01080722</ProcessDate>
+    <ProcessTime>094241</ProcessTime>
+    <DataStatus>9</DataStatus>
+    <DataIndex>                                        </DataIndex>
+    <DataCnt>0009</DataCnt>
+    <Records>
+      <Record>
+        <BuyDate>01010730</BuyDate>
+        <TrustId>05078055690   </TrustId>
+        <BondsId>00230034    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>ZAR</TrustCcy>
+        <TrustAmt>0000393000000</TrustAmt>
+        <TrustUnit>0000005000000</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000000000</GetAmt>
+        <PriceDate>01071011</PriceDate>
+        <PriceAmt>0000000093470000000</PriceAmt>
+        <TrustAmtNT>00000089407</TrustAmtNT>
+        <RefAmtNT>00000106322</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000000</GetAmtNT>
+        <BondsName> �����X�@�Ȧ�n�D���s���Ũ�]�G�^�@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01010924</BuyDate>
+        <TrustId>05078056116   </TrustId>
+        <BondsId>00230042    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>ZAR</TrustCcy>
+        <TrustAmt>0000206250000</TrustAmt>
+        <TrustUnit>0000005000000</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000000000</GetAmt>
+        <PriceDate>01080511</PriceDate>
+        <PriceAmt>0000000046400000000</PriceAmt>
+        <TrustAmtNT>00000046921</TrustAmtNT>
+        <RefAmtNT>00000052780</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000000</GetAmtNT>
+        <BondsName> ��������Ȧ�n�D���s���Ũ�]�T�^�@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01011107</BuyDate>
+        <TrustId>05078056518   </TrustId>
+        <BondsId>00990037    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>USD</TrustCcy>
+        <TrustAmt>0000050000000</TrustAmt>
+        <TrustUnit>0000000989710</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000320100</GetAmt>
+        <PriceDate>01071012</PriceDate>
+        <PriceAmt>0000000021580000000</PriceAmt>
+        <TrustAmtNT>00000152800</TrustAmtNT>
+        <RefAmtNT>00000065270</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000978</GetAmtNT>
+        <BondsName> �բҢ�߬����ҥ�Ҫ��q���ƫ�����@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01011116</BuyDate>
+        <TrustId>05078056597   </TrustId>
+        <BondsId>00330379    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>ZAR</TrustCcy>
+        <TrustAmt>0000494050000</TrustAmt>
+        <TrustUnit>0000005000000</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000021001500</GetAmt>
+        <PriceDate>01080511</PriceDate>
+        <PriceAmt>0000000094450000000</PriceAmt>
+        <TrustAmtNT>00000112396</TrustAmtNT>
+        <RefAmtNT>00000107437</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000004777</GetAmtNT>
+        <BondsName> �w�N�ӻȦ�n�D�����q�Ũ�]�@�^�@�@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01011116</BuyDate>
+        <TrustId>05078056598   </TrustId>
+        <BondsId>00330368    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>ZAR</TrustCcy>
+        <TrustAmt>0000511122000</TrustAmt>
+        <TrustUnit>0000005000000</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000026667000</GetAmt>
+        <PriceDate>01071011</PriceDate>
+        <PriceAmt>0000000095550000000</PriceAmt>
+        <TrustAmtNT>00000116280</TrustAmtNT>
+        <RefAmtNT>00000108688</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000006066</GetAmtNT>
+        <BondsName> Ĭ�����Ӯa�Ȧ�n�D�����q�Ũ�]�@�^�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01011204</BuyDate>
+        <TrustId>05078056707   </TrustId>
+        <BondsId>00990037    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>USD</TrustCcy>
+        <TrustAmt>0000100000000</TrustAmt>
+        <TrustUnit>0000002162160</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000699200</GetAmt>
+        <PriceDate>01071012</PriceDate>
+        <PriceAmt>0000000021580000000</PriceAmt>
+        <TrustAmtNT>00000305600</TrustAmtNT>
+        <RefAmtNT>00000142591</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000002136</GetAmtNT>
+        <BondsName> �բҢ�߬����ҥ�Ҫ��q���ƫ�����@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01020128</BuyDate>
+        <TrustId>05078057311   </TrustId>
+        <BondsId>00990037    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>USD</TrustCcy>
+        <TrustAmt>0000100000000</TrustAmt>
+        <TrustUnit>0000002400390</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000000000</GetAmt>
+        <PriceDate>01071012</PriceDate>
+        <PriceAmt>0000000021580000000</PriceAmt>
+        <TrustAmtNT>00000305600</TrustAmtNT>
+        <RefAmtNT>00000158302</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000000</GetAmtNT>
+        <BondsName> �բҢ�߬����ҥ�Ҫ��q���ƫ�����@�@�@�@�@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01020311</BuyDate>
+        <TrustId>05078057773   </TrustId>
+        <BondsId>00990039    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>HKD</TrustCcy>
+        <TrustAmt>0000300000000</TrustAmt>
+        <TrustUnit>0000027272730</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000000000</GetAmt>
+        <PriceDate>01071012</PriceDate>
+        <PriceAmt>0000000012600000000</PriceAmt>
+        <TrustAmtNT>00000116100</TrustAmtNT>
+        <RefAmtNT>00000132987</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000000</GetAmtNT>
+        <BondsName> ���������C�֢١ߴI�ɢϢ���������ƫ�����@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+      <Record>
+        <BuyDate>01020613</BuyDate>
+        <TrustId>05078058822   </TrustId>
+        <BondsId>00990039    </BondsId>
+        <TrustType>Y</TrustType>
+        <TrustCcy>HKD</TrustCcy>
+        <TrustAmt>0000300000000</TrustAmt>
+        <TrustUnit>0000030674850</TrustUnit>
+        <AllocateAmt>0000000000000</AllocateAmt>
+        <RedeemUnit>0000000000000</RedeemUnit>
+        <GetAmt>0000000000000</GetAmt>
+        <PriceDate>01071012</PriceDate>
+        <PriceAmt>0000000012600000000</PriceAmt>
+        <TrustAmtNT>00000116100</TrustAmtNT>
+        <RefAmtNT>00000149577</RefAmtNT>
+        <AllocateAmtNT>00000000000</AllocateAmtNT>
+        <GetAmtNT>00000000000</GetAmtNT>
+        <BondsName> ���������C�֢١ߴI�ɢϢ���������ƫ�����@�@�@     </BondsName>
+        <SetFlag>Y</SetFlag>
+        <CourtFlag> </CourtFlag>
+      </Record>
+    </Records>
+  </TRANRS>
+</CUBXML>

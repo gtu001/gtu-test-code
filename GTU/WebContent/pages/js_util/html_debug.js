@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", function(){
 					(document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
 			var y = (window.Event) ? e.pageY : event.clientY + 
 					(document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+			
+			if((window.innerWidth - x) < 100) {
+				x = x - 120;
+			}
+			if((window.innerHeight - y) < 40) {
+				y = y - 45;
+			}
+			
 			rtnJson['x'] = x;
 			rtnJson['y'] = y;
 		};

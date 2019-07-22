@@ -4,84 +4,186 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.beans.BeanUtils;
 
 public class FakeBeanFiller {
 
-    private static void createFakeList(Object bean, String fieldName, int size) {
-        try {
-            List lst = new ArrayList();
-            Field field = bean.getClass().getDeclaredField(fieldName);
-            Class clz = getFieldGenericType_4Collection(field);
-            for (int ii = 0; ii < size; ii++) {
-                Object inst = BeanUtils.instantiate(clz);
-                fillBean(inst, size);
-                lst.add(inst);
-            }
-            FieldUtils.writeDeclaredField(bean, fieldName, lst, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private static long START_DATE_LONG = getBeginDateLong();
 
-    public static void fillBean(Object bean, int size) {
-        Date d = new Date();
-        java.sql.Date d2 = new java.sql.Date(d.getTime());
-        Timestamp d3 = new Timestamp(d.getTime());
-        BigDecimal b = BigDecimal.ZERO;
+    public static String getRandomString(String... strings) {
+        int index = new Random().nextInt(strings.length);
+        return strings[index];
+    }
+    
+    public static void fillBean_Random(Object bean) {
         for (Field f : bean.getClass().getDeclaredFields()) {
+            String forString = String.valueOf(new java.util.Random().nextInt(10000));
+            String forInt = String.valueOf(new java.util.Random().nextInt(10000));
             if (f.getType() == String.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), "XXXXX", true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), forString, true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == int.class || f.getType() == Integer.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 1, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Integer.parseInt(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == byte.class || f.getType() == Byte.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 2, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Byte.parseByte(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == short.class || f.getType() == Short.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 3, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Short.valueOf(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == boolean.class || f.getType() == Boolean.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), false, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), true, true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == long.class || f.getType() == Long.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 100L, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Long.parseLong(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == float.class || f.getType() == Float.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 1.1f, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Float.parseFloat(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == double.class || f.getType() == Double.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 2.2f, true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Double.parseDouble(forInt), true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == char.class || f.getType() == Character.class) {
                 try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), 'A', true);
+                    FieldUtils.writeDeclaredField(bean, f.getName(), StringUtils.substring(forString, 0, 1).charAt(0),
+                        true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == BigDecimal.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), new BigDecimal(forInt),
+                        true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == Date.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), new Date(getRandomDateLong()), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == java.sql.Date.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), new java.sql.Date(getRandomDateLong()), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == Timestamp.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), new Timestamp(getRandomDateLong()), true);
+                } catch (Exception e) {
+                }
+            } else if (Collection.class.isAssignableFrom(f.getType())) {
+                // createFakeList(bean, f.getName(), size);
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
+            } else if (Map.class.isAssignableFrom(f.getType())) {
+                // throw new UnsupportedOperationException("不支援Map操作!");
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
+            } else {
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
+            }
+        }
+    }
+
+    private static long getRandomDateLong() {
+        return getRandomNumberInRange(START_DATE_LONG, System.currentTimeMillis());
+    }
+
+    private static long getRandomNumberInRange(long min, long max) {
+        return new BigDecimal(Math.random()).multiply(new BigDecimal((max - min) + 1)).add(new BigDecimal(min))
+            .longValue();
+    }
+
+    private static long getBeginDateLong() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 1990);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
+    public static void fillBean(Object bean, String forString, int _forInt, boolean forBoolean) {
+        Date d = new Date();
+        java.sql.Date d2 = new java.sql.Date(d.getTime());
+        Timestamp d3 = new Timestamp(d.getTime());
+        String forInt = String.valueOf(_forInt);
+        for (Field f : bean.getClass().getDeclaredFields()) {
+            if (f.getType() == String.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), forString, true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == int.class || f.getType() == Integer.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Integer.parseInt(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == byte.class || f.getType() == Byte.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Byte.parseByte(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == short.class || f.getType() == Short.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Short.valueOf(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == boolean.class || f.getType() == Boolean.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), forBoolean, true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == long.class || f.getType() == Long.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Long.parseLong(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == float.class || f.getType() == Float.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Float.parseFloat(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == double.class || f.getType() == Double.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), Double.parseDouble(forInt), true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == char.class || f.getType() == Character.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), StringUtils.substring(forString, 0, 1).charAt(0),
+                        true);
+                } catch (Exception e) {
+                }
+            } else if (f.getType() == BigDecimal.class) {
+                try {
+                    FieldUtils.writeDeclaredField(bean, f.getName(), new BigDecimal(forInt),
+                        true);
                 } catch (Exception e) {
                 }
             } else if (f.getType() == Date.class) {
@@ -99,15 +201,12 @@ public class FakeBeanFiller {
                     FieldUtils.writeDeclaredField(bean, f.getName(), d3, true);
                 } catch (Exception e) {
                 }
-            } else if (f.getType() == BigDecimal.class) {
-                try {
-                    FieldUtils.writeDeclaredField(bean, f.getName(), b, true);
-                } catch (Exception e) {
-                }
             } else if (Collection.class.isAssignableFrom(f.getType())) {
-                createFakeList(bean, f.getName(), size);
+                // createFakeList(bean, f.getName(), size);
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
             } else if (Map.class.isAssignableFrom(f.getType())) {
-                throw new UnsupportedOperationException("不支援Map操作!");
+                // throw new UnsupportedOperationException("不支援Map操作!");
+                System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
             } else {
                 System.err.println("欄位錯誤 : " + f.getName() + "\t" + f.getType());
             }

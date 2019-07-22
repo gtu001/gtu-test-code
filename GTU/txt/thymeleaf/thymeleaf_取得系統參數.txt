@@ -1,0 +1,1 @@
+var strDomain = /*[[${@environment.getProperty('app.login.domain')}]]*/ ;

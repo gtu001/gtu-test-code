@@ -1,10 +1,10 @@
-package gtu.apache;
+package gtu.reflect;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,16 +12,18 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-
-import com.ibm.icu.math.BigDecimal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gtu.poi.hssf.ExcelUtil_Xls97;
 
-public class FillBeanFromExcel {
+public class FakeBeanExcelFiller {
+
+    private static Logger logger = LoggerFactory.getLogger(FakeBeanExcelFiller.class);
 
     private class XXXXX {
         int aaaa;
@@ -55,12 +57,16 @@ public class FillBeanFromExcel {
 
     public static void main(String[] args) {
         List<XXXXX> lst = new ArrayList<XXXXX>();
-        FillBeanFromExcel t = new FillBeanFromExcel();
+        FakeBeanExcelFiller t = new FakeBeanExcelFiller();
         File file = new File("/home/gtu001/桌面/無題 1.xls");
-        FillBeanFromExcel.fillLst(file, XXXXX.class, t, lst);
+        FakeBeanExcelFiller.fillLst(file, XXXXX.class, t, lst);
         for (XXXXX b : lst) {
             System.out.println(ReflectionToStringBuilder.toString(b));
         }
+    }
+
+    public static <T> void fillLst(File xlsFile, Class<T> beanClz, List lst) {
+        fillLst(xlsFile, beanClz, null, lst);
     }
 
     public static <T> void fillLst(File xlsFile, Class<T> beanClz, Object parentInst, List lst) {
@@ -86,44 +92,52 @@ public class FillBeanFromExcel {
 
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-
                 String fieldName = defineMap.get(jj);
-
-                Field field = FieldUtils.getDeclaredField(beanClz, fieldName, true);
-                Method method = getSetterMethod(beanClz, fieldName);
-
-                boolean findOk = false;
-
-                if (method != null && !findOk) {
-                    Class<?> paramType = method.getParameterTypes()[0];
-                    Object realValue = getValue(paramType, value);
-                    try {
-                        method.invoke(beanObj, new Object[] { realValue });
-                        findOk = true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (field != null && !findOk) {
-                    Object realValue = getValue(field.getType(), value);
-                    try {
-                        FieldUtils.writeDeclaredField(beanObj, fieldName, realValue, true);
-                        findOk = true;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                fillBeanFieldByStringValue(beanClz, fieldName, beanObj, value);
             }
 
             lst.add(beanObj);
         }
     }
 
+    // ----------------------------------------------------------------------------------------------------------
+    // 底下是公用
+    // ----------------------------------------------------------------------------------------------------------
+
+    private static void fillBeanFieldByStringValue(Class<?> beanClz, String fieldName, Object beanObj,
+            String strValue) {
+        Field field = FieldUtils.getDeclaredField(beanClz, fieldName, true);
+        Method method = getSetterMethod(beanClz, fieldName);
+
+        boolean findOk = false;
+
+        if (method != null && !findOk) {
+            Class<?> paramType = method.getParameterTypes()[0];
+            Object realValue = getValue(paramType, strValue);
+            try {
+                method.invoke(beanObj, new Object[] { realValue });
+                findOk = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (field != null && !findOk) {
+            Object realValue = getValue(field.getType(), strValue);
+            try {
+                FieldUtils.writeDeclaredField(beanObj, fieldName, realValue, true);
+                findOk = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private static Method getSetterMethod(Class<?> clz, String fieldName) {
         String methodName = "set" + StringUtils.capitalise(fieldName);
         for (Method mth : clz.getMethods()) {
-            if (mth.getName().equals(methodName) && mth.getParameterTypes() != null && mth.getParameterTypes().length == 1) {
+            if (mth.getName().equals(methodName) && mth.getParameterTypes() != null
+                    && mth.getParameterTypes().length == 1) {
                 return mth;
             }
         }
