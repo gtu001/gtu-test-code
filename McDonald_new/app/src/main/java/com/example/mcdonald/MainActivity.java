@@ -103,6 +103,11 @@ public class MainActivity extends ActionBarActivity { //
         f_gpei(R.id.item_f_gpei, new int[]{R.drawable.f_gpie_001, R.drawable.f_gpie_002, R.drawable.f_gpie_003, R.drawable.f_gpie_004, R.drawable.f_gpie_005}), //
         f_potato(R.id.item_f_potato, new int[]{R.drawable.f_potato_001, R.drawable.f_potato_002, R.drawable.f_potato_003, R.drawable.f_potato_004, R.drawable.f_potato_005}), //
         f_blackTea(R.id.item_f_blackTea, new int[]{R.drawable.f_blacktea_001, R.drawable.f_blacktea_002, R.drawable.f_blacktea_003, R.drawable.f_blacktea_004, R.drawable.f_blacktea_005}), //
+        f_fiber_coke(R.id.item_f_fiberCoke, new int[]{R.drawable.f_fiber_coke_01, R.drawable.f_fiber_coke_02, R.drawable.f_fiber_coke_03, R.drawable.f_fiber_coke_04, R.drawable.f_fiber_coke_05}), //
+        f_latte(R.id.item_f_latte, new int[]{R.drawable.f_latte_01, R.drawable.f_latte_02, R.drawable.f_latte_03, R.drawable.f_latte_04, R.drawable.f_latte_05}), //
+        f_nugget_new(R.id.item_f_nugget_new, new int[]{R.drawable.f_nugget_new_01, R.drawable.f_nugget_new_02, R.drawable.f_nugget_new_03, R.drawable.f_nugget_new_04, R.drawable.f_nugget_new_05}), //
+        f_shrimp_burger(R.id.item_f_shrimpBurger, new int[]{R.drawable.f_shrimp_burger_01, R.drawable.f_shrimp_burger_02, R.drawable.f_shrimp_burger_03, R.drawable.f_shrimp_burger_04, R.drawable.f_shrimp_burger_05}), //
+        f_spicywing(R.id.item_f_spicyWing,  new int[]{R.drawable.f_spicywing_01, R.drawable.f_spicywing_02, R.drawable.f_spicywing_03, R.drawable.f_spicywing_04, R.drawable.f_spicywing_05}), //
         ;
 
         final int menuId;

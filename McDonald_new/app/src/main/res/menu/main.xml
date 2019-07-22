@@ -208,5 +208,25 @@
         android:id="@+id/item_f_blackTea"
         android:orderInCategory="100"
         android:title="紅茶(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_fiberCoke"
+        android:orderInCategory="100"
+        android:title="纖維可樂(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_latte"
+        android:orderInCategory="100"
+        android:title="那堤(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_nugget_new"
+        android:orderInCategory="100"
+        android:title="四快麥克雞(買一送一)(new)" />
+    <item
+        android:id="@+id/item_f_shrimpBurger"
+        android:orderInCategory="100"
+        android:title="黃金蝦堡(買餐送)(new)" />
+    <item
+        android:id="@+id/item_f_spicyWing"
+        android:orderInCategory="100"
+        android:title="酥嫩雞翅(買一送一)(new)" />
 
 </menu>
