@@ -1,4 +1,4 @@
-package gtu.springdata.jpa;
+package gtu.springdata.jpa.tool001;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;

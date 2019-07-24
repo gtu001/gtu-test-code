@@ -42,10 +42,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, //
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, //
         HibernateJpaAutoConfiguration.class })
-public class SwaggerTest001 {
+public class SwaggerTest001Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(SwaggerTest001.class, args);
+        SpringApplication.run(SwaggerTest001Application.class, args);
     }
 
     public static class TestBean {

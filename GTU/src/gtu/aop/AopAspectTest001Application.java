@@ -48,10 +48,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, //
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, //
         HibernateJpaAutoConfiguration.class }) 
-public class AopAspectTest001 {
+public class AopAspectTest001Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(AopAspectTest001.class, args);
+        SpringApplication.run(AopAspectTest001Application.class, args);
     }
 
     public static class TestBean {
@@ -100,7 +100,7 @@ public class AopAspectTest001 {
     @Component
     public static class AopConfig {
 
-        private static Logger logger = LoggerFactory.getLogger(AopAspectTest001.class);
+        private static Logger logger = LoggerFactory.getLogger(AopAspectTest001Application.class);
 
         @Pointcut("execution(public * gtu.aop..*.*Grid(..)) && !excludeQryControllerGrid()")
         public void qryControllerGrid() {

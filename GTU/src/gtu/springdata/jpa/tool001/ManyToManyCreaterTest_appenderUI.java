@@ -1,4 +1,4 @@
-package gtu.springdata.jpa;
+package gtu.springdata.jpa.tool001;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -29,7 +29,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.file.FileUtil;
-import gtu.springdata.jpa.OneToManyCreaterTest__appenderUI.__JpaRelation_PerformExecute;
+import gtu.springdata.jpa.tool001.OneToManyCreaterTest__appenderUI.__JpaRelation_PerformExecute;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JLabelUtil;

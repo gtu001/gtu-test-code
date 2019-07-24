@@ -1,4 +1,4 @@
-package gtu.springdata;
+package gtu.springdata.jpa.tool002;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package gtu.springdata;
+package gtu.springdata.jpa.tool002;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.console.SystemInUtil;
-import gtu.springdata.EntitySimpleCreater.___JavaPropertyConfig;
+import gtu.springdata.jpa.tool002.EntitySimpleCreater.___JavaPropertyConfig;
 import gtu.string.StringUtilForDb;
 
 public class EntitySimpleCreater_MAIN {

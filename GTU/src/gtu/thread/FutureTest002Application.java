@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication(exclude = { MongoAutoConfiguration.class, MongoDataAutoConfiguration.class, //
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, //
         HibernateJpaAutoConfiguration.class })
-public class FutureTest002 {
+public class FutureTest002Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(FutureTest002.class, args);
+        SpringApplication.run(FutureTest002Application.class, args);
     }
     
     @PostConstruct
