@@ -1,17 +1,16 @@
 package gtu.springdata.jpa.ex1;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -85,8 +88,8 @@ public class SimpleJpaTest001Application {
         Map<String, Object> prop = new HashMap<String, Object>();
         // prop.put("hibernate.dialect",
         // env.getProperty("sqlserver.hibernate.dialect"));
-        // prop.put("hibernate.show_sql",
-        // env.getProperty("spring.jpa.show-sql"));
+        prop.put("hibernate.show_sql", "true");
+        prop.put("spring.jpa.show-sql", "true");
         return builder.dataSource(getDataSource())//
                 .packages("gtu.springdata.jpa.ex1")//
                 .persistenceUnit("secondaryPersistenceUnit")//
@@ -117,22 +120,46 @@ public class SimpleJpaTest001Application {
     @Service
     public static class RunTest {
 
+        // @Autowired
+        // EmployeeRepository mEmployeeRepository;
+
         @Autowired
-        EmployeeRepository mEmployeeRepository;
+        Employee1Repository mEmployee1Repository;
 
         @PostConstruct
         public void postConstruct() {
-            List<Employee> lst = mEmployeeRepository.qryCondition001("t1", "33");
-            for (int ii = 0; ii < lst.size(); ii++) {
-                logger.info(ii + " Employee = " + ReflectionToStringBuilder.toString(lst.get(ii)));
+            // List<Employee> lst = mEmployeeRepository.qryCondition001("t1",
+            // "33");
+            // for (int ii = 0; ii < lst.size(); ii++) {
+            // logger.info(ii + " Employee = " +
+            // ReflectionToStringBuilder.toString(lst.get(ii)));
+            // }
+            //
+            // String maxEmployeeId = mEmployeeRepository.getMaxEmployeeId();
+            // logger.info("maxEmployeeId : " + maxEmployeeId);
+            //
+            // Optional<Employee> employee =
+            // mEmployeeRepository.findByEmployeeId(new BigDecimal(3));
+            // logger.info("FindById : " +
+            // ReflectionToStringBuilder.toString(employee.get()));
+
+            Pageable pageable = PageRequest.of(4, 3, Sort.Direction.ASC, "pk_1");
+            Page<Employee1> page = mEmployee1Repository.findPageFromEmployee(pageable);
+            
+            //查询结果总行数
+            System.out.println("TotalElements = " + page.getTotalElements());
+            //按照当前分页大小，总页数
+            System.out.println("TotalPages = " + page.getTotalPages());
+            
+            page.nextPageable();
+            System.out.println("Size = " + page.getSize());
+            System.out.println("NumberOfElements = " + page.getNumberOfElements());
+            System.out.println("Number = " + page.getNumber());
+            
+            logger.info(ReflectionToStringBuilder.toString(page, ToStringStyle.MULTI_LINE_STYLE));
+            for (int ii = 0; ii < page.getContent().size(); ii++) {
+                logger.info(ii + " Employee = " + ReflectionToStringBuilder.toString(page.getContent().get(ii)));
             }
-
-            String maxEmployeeId = mEmployeeRepository.getMaxEmployeeId();
-            logger.info("maxEmployeeId : " + maxEmployeeId);
-
-            Optional<Employee> employee = mEmployeeRepository.findByEmployeeId(new BigDecimal(3));
-            logger.info("FindById : " + ReflectionToStringBuilder.toString(employee.get()));
-
         }
     }
 
