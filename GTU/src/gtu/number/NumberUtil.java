@@ -204,6 +204,18 @@ public class NumberUtil {
         }
     }
 
+    //取得被除數(為零就給1)
+    public static BigDecimal getBigDecimalForDivided(Object val) {
+        BigDecimal val2 = getBigDecimal(val);
+        if (val2 == null) {
+            return BigDecimal.ONE;
+        } else if (BigDecimal.ZERO.compareTo(val2) == 0) {
+            return BigDecimal.ONE;
+        }
+        return val2;
+    }
+
+    //任何數值轉
     public static BigDecimal getBigDecimal(Object val) {
         if (val == null) {
             return BigDecimal.ZERO;

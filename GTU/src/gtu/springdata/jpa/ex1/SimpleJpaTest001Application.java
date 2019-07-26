@@ -120,11 +120,11 @@ public class SimpleJpaTest001Application {
     @Service
     public static class RunTest {
 
-        // @Autowired
-        // EmployeeRepository mEmployeeRepository;
-
         @Autowired
-        Employee1Repository mEmployee1Repository;
+        EmployeeRepository mEmployeeRepository;
+
+        // @Autowired
+        // Employee1Repository mEmployee1Repository;
 
         @PostConstruct
         public void postConstruct() {
@@ -143,19 +143,42 @@ public class SimpleJpaTest001Application {
             // logger.info("FindById : " +
             // ReflectionToStringBuilder.toString(employee.get()));
 
-            Pageable pageable = PageRequest.of(4, 3, Sort.Direction.ASC, "pk_1");
-            Page<Employee1> page = mEmployee1Repository.findPageFromEmployee(pageable);
-            
-            //查询结果总行数
+            // Pageable pageable = PageRequest.of(4, 3, Sort.Direction.ASC,
+            // "pk_1");
+            // Page<Employee1> page =
+            // mEmployee1Repository.findPageFromEmployee(pageable);
+            //
+            // //查询结果总行数
+            // System.out.println("TotalElements = " + page.getTotalElements());
+            // //按照当前分页大小，总页数
+            // System.out.println("TotalPages = " + page.getTotalPages());
+            //
+            // page.nextPageable();
+            // System.out.println("Size = " + page.getSize());
+            // System.out.println("NumberOfElements = " +
+            // page.getNumberOfElements());
+            // System.out.println("Number = " + page.getNumber());
+            //
+            // logger.info(ReflectionToStringBuilder.toString(page,
+            // ToStringStyle.MULTI_LINE_STYLE));
+            // for (int ii = 0; ii < page.getContent().size(); ii++) {
+            // logger.info(ii + " Employee = " +
+            // ReflectionToStringBuilder.toString(page.getContent().get(ii)));
+            // }
+
+            Pageable pageable = PageRequest.of(1, 3, Sort.Direction.ASC, "EMPLOYEE_ID");
+            Page<Employee> page = mEmployeeRepository.findPageFromEmployee(pageable);
+
+            // 查询结果总行数
             System.out.println("TotalElements = " + page.getTotalElements());
-            //按照当前分页大小，总页数
+            // 按照当前分页大小，总页数
             System.out.println("TotalPages = " + page.getTotalPages());
-            
+
             page.nextPageable();
             System.out.println("Size = " + page.getSize());
             System.out.println("NumberOfElements = " + page.getNumberOfElements());
             System.out.println("Number = " + page.getNumber());
-            
+
             logger.info(ReflectionToStringBuilder.toString(page, ToStringStyle.MULTI_LINE_STYLE));
             for (int ii = 0; ii < page.getContent().size(); ii++) {
                 logger.info(ii + " Employee = " + ReflectionToStringBuilder.toString(page.getContent().get(ii)));

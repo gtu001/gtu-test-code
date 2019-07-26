@@ -1,7 +1,12 @@
 在目錄底下建立 git目錄
 
 	$ cd project
+	$ echo "# fake_json_server" >> README.md
 	$ git init
+	$ git add README.md
+	$ git commit -m "first commit"
+	$ git remote add origin https://github.com/gtu001/fake_json_server.git
+	$ git push -u origin master
 
 --------------------------------------------------------------------------
 建立遠端別名

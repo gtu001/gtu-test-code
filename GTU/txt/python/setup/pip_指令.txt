@@ -1,0 +1,11 @@
+
+檢視可安裝版本清單
+
+	pip install <package>==
+	Ex : pip install pyinstaller==
+
+	
+---
+反安裝
+
+	pip uninstall <package>

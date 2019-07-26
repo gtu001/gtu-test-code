@@ -1,0 +1,11 @@
+win 安裝
+	下載 opencv-4.1.0-vc14_vc15.exe 解壓
+	設定環境變數
+  	$ setx -m OPENCV_DIR D:\apps\opencv\build\x64\vc15
+  	
+---
+python
+
+	$ pip install opencv-python
+	
+	

@@ -1,0 +1,48 @@
+<script type="text/javascript">
+	// Feature detect + local reference
+	var storage = (function() {
+		var uid = new Date;
+		var storage;
+		var result;
+		try {
+			(storage = window.localStorage).setItem(uid, uid);
+			result = storage.getItem(uid) == uid;
+			storage.removeItem(uid);
+			return result && storage;
+		} catch (exception) {}
+	}());
+
+	function localStorageHasItem(key) {
+		return !(window.localStorage.getItem(key) === null);
+	}
+
+	function test() {
+		if(storage) {
+			console.log("window.localStorage " + window.localStorage);
+
+			console.log("hasKey = " + localStorageHasItem("key"));
+
+			var value = window.localStorage.getItem("key");
+			console.log("value = " + value);
+
+			window.localStorage.setItem("key", "test001");
+
+			value = window.localStorage.getItem("key");
+			console.log("value = " + value);
+
+			window.localStorage.removeItem("key");
+			value = window.localStorage.getItem("key");
+			console.log("value = " + value);
+
+			window.localStorage.clear();
+		} else {
+			console.log("not support localStorage!!");
+		}
+	}
+
+</script>
+<html>
+	<body>
+		<input type="button" value="test" onclick="test()" />
+	</body>
+</html>

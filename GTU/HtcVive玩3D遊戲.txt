@@ -1,0 +1,15 @@
+1.下載 ReShade :　https://reshade.me/
+
+2.下載 Depth3D : https://github.com/BlueSkyDefender/Depth3D
+
+3. 1)執行ReShade_Setup_4.3.0.exe 選擇遊戲執行檔 
+   2)選擇Direct3D 10+
+   3)反選全部, 在選擇最下面Vignette.fx
+
+4. 1)解壓縮 Depth3D-master.zip
+   2)複製檔案到 "Depth3D-master\Shaders\SuperDepth3D.fx" 到 "遊戲目錄\reshade-shaders\Shaders"
+
+5. 1)開啟遊戲 按 Home鑑
+   2)選擇 Home 頁籤 , 選擇 SuperDepth3D 啟用
+
+6. 開啟Virtual Desktop 選擇 SBS 模式 再開啟遊戲

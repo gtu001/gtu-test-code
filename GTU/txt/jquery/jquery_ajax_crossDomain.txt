@@ -1,0 +1,24 @@
+			$.post({
+				url: url,
+				data: {"id": openId},
+				dataType: "json",
+				async: false,
+				crossDomain: true, 
+				xhrFields: {
+					withCredentials: true
+				},
+				success: function( data ) {
+					console.log("getJwtToken Success..." + data);
+					
+					token = {
+						token: data.data.token,
+						expiredTime: data.timestamp
+					}
+				},
+				error:function (xhr, ajaxOptions, thrownError){
+					token = "error";
+					console.log("Get JWT Token error " + xhr);
+					console.log("Get JWT Token error " + ajaxOptions);
+					console.log("Get JWT Token error " + thrownError);
+				}
+			});
