@@ -9,3 +9,10 @@
 反安裝
 
 	pip uninstall <package>
+	
+---
+檢視目前版本
+	linux :
+		pip freeze | grep <package>
+	win : 
+		pip freeze | findstr <package>

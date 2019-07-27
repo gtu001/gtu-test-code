@@ -1,6 +1,7 @@
 package gtu.reflect;
 
 import java.io.File;
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -53,8 +58,24 @@ public class FakeBeanXmlFiller {
         FakeBeanXmlFiller.fillLst(xmlFile, beanClz, parentInst, map, rtnLst);
     }
 
-    public static void fillLst(File xmlFile, Class<?> beanClz, Object parentInst, Map<String, String> formXmlToFieldMap,
-            List rtnLst) {
+    /**
+     * XMLStringToObj for soap
+     * 
+     * @param xmlString
+     * @param clazz
+     * @param wsCode
+     * @return
+     * @throws JAXBException
+     */
+    public static <T> T transferSoapXMLStringToObj(String xmlString, Class<T> clazz) throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        StringReader reader = new StringReader(xmlString);
+        T obj = (T) unmarshaller.unmarshal(reader);
+        return obj;
+    }
+
+    public static void fillLst(File xmlFile, Class<?> beanClz, Object parentInst, Map<String, String> formXmlToFieldMap, List rtnLst) {
         try {
             SAXReader reader = new SAXReader();
 
@@ -111,8 +132,7 @@ public class FakeBeanXmlFiller {
     // 底下是公用
     // ----------------------------------------------------------------------------------------------------------
 
-    private static void fillBeanFieldByStringValue(Class<?> beanClz, String fieldName, Object beanObj,
-            String strValue) {
+    private static void fillBeanFieldByStringValue(Class<?> beanClz, String fieldName, Object beanObj, String strValue) {
         Field field = FieldUtils.getDeclaredField(beanClz, fieldName, true);
         Method method = getSetterMethod(beanClz, fieldName);
 
@@ -143,8 +163,7 @@ public class FakeBeanXmlFiller {
     private static Method getSetterMethod(Class<?> clz, String fieldName) {
         String methodName = "set" + StringUtils.capitalise(fieldName);
         for (Method mth : clz.getMethods()) {
-            if (mth.getName().equals(methodName) && mth.getParameterTypes() != null
-                    && mth.getParameterTypes().length == 1) {
+            if (mth.getName().equals(methodName) && mth.getParameterTypes() != null && mth.getParameterTypes().length == 1) {
                 return mth;
             }
         }

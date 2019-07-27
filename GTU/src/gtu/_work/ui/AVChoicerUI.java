@@ -98,9 +98,9 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);
-    // private PropertiesUtilBean config = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+    // private PropertiesUtilBean config = new
+    // PropertiesUtilBean(AVChoicerUI.class);//xxxxxxxxxxxxxxxxxxxxxxx
+    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
@@ -468,6 +468,16 @@ public class AVChoicerUI extends JFrame {
             }
         });
         panel_18.add(JCommonUtil.createScrollComponent(dirCheckList), BorderLayout.CENTER);
+
+        JCommonUtil.applyDropFiles(this, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> lst = (List<File>) e.getSource();
+                if (lst != null && !lst.isEmpty()) {
+                    playAvFile(lst.get(0));
+                }
+            }
+        });
     }
 
     private class MoveToHandler {
@@ -969,8 +979,10 @@ public class AVChoicerUI extends JFrame {
         if (dirFile.isFile()) {
             lst.add(new FileZ(dirFile));
         } else {
-            for (File f : dirFile.listFiles()) {
-                lst.add(new FileZ(f));
+            if (dirFile.listFiles() != null) {
+                for (File f : dirFile.listFiles()) {
+                    lst.add(new FileZ(f));
+                }
             }
         }
         DefaultListModel model = JListUtil.createModel();
@@ -1000,7 +1012,10 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private class FileZ {
+    private static class FileZ {
+        private static Pattern movPtn = Pattern.compile("(mp4|avi|flv|rm|rmvb|3gp|mp3)", Pattern.CASE_INSENSITIVE);
+        private static Pattern jpgPtn = Pattern.compile("(jpg|jpeg|gif|tif|png|bmp)", Pattern.CASE_INSENSITIVE);
+
         File file;
         String name;
 
@@ -1011,7 +1026,16 @@ public class AVChoicerUI extends JFrame {
 
         @Override
         public String toString() {
-            return name;
+            String bgColor = "write";
+            String fontColor = "black";
+            Matcher mth1 = movPtn.matcher(name);
+            Matcher mth2 = jpgPtn.matcher(name);
+            if (mth1.find()) {
+                bgColor = "#cce8cf";
+            } else if (mth2.find()) {
+                bgColor = "yellow";
+            }
+            return String.format("<html><span style='color : %s ; background-color : %s;'>%s</span></html>", fontColor, bgColor, name);
         }
     }
 }
