@@ -12,10 +12,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -98,9 +100,10 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    // private PropertiesUtilBean config = new
-    // PropertiesUtilBean(AVChoicerUI.class);//xxxxxxxxxxxxxxxxxxxxxxx
-    private PropertiesUtilBean config = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
+    // private PropertiesUtilBean config = new PropertiesUtilBean(new
+    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
+//    private PropertiesUtilBean config = new PropertiesUtilBean(new File("D:/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
@@ -896,16 +899,17 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void playAvFile(File avFile) {
-        try {
-            // File exe = getMediaPlayerExe();
+        try {// -Dfile.encoding=UTF-8
+             // File exe = getMediaPlayerExe();
             File exe = new File(avExeText.getText());
             String commandFormat = avExeFormatText.getText();
             String encoding = avExeEncodeText.getText();
 
             currentFileHandler.setFile(avFile);
+            System.out.println("檔案存在 : " + avFile.exists() + " -> " + avFile);
 
             RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-            String command = String.format(commandFormat, exe, avFile);
+            String command = String.format(commandFormat, exe, avFile.getCanonicalPath());
             System.out.println("CMD ==> " + command);
             System.out.println("encoding ==> " + encoding);
             t.command(command);
