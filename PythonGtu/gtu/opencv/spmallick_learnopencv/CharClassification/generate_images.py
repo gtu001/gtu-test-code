@@ -53,6 +53,8 @@ for i in range(65, 65+26):
 # List of digits
 for j in range(48,48+10):
   char_list.append(chr(j))
+  
+print("char_list ", char_list)
 
 # List of light font colors
 color_light = ['white','lime','gray','yellow','silver','aqua']
