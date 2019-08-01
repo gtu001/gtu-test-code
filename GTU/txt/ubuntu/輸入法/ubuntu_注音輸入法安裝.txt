@@ -15,8 +15,8 @@
 
 	sudo ibus-setup
 	
-安裝新酷音
-	sudo apt-get install fcitx fcitx-chewing
+安裝新酷音 
+	sudo apt-get install fcitx fcitx-chewing  <---最簡單
 	或是
 	sudo apt install ibus-chewing
 	鍵盤輸入法系統選 fcitx

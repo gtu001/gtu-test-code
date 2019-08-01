@@ -1,22 +1,26 @@
 ﻿
 1. 切割磁區 先裝win10
 
-2. 取消快速啟動
-	控制台->硬體和音效->電源選項
-	  ->選擇按下電源按鈕時的行為->
-    		1.點變更目前無法使用的設定
-    		2.再點 開啟快速啟動 (取消)
 
-3. 進入 bios 確定 UEFI 模式啟動
+/* 2-4 看起來不用
+	2. 取消快速啟動
+		控制台->硬體和音效->電源選項
+		  ->選擇按下電源按鈕時的行為->
+	    		1.點變更目前無法使用的設定
+	    		2.再點 開啟快速啟動 (取消)
 
-4. 進入win10, 用管理者模式開啟 cmd ,  執行以下指令
-	 bcdedit /set "{bootmgr}" path \EFI\ubuntu\grubx64.efi
+	3. 進入 bios 確定 UEFI 模式啟動
 
-
-3. 用 ubuntu 開機選 try ubuntu without install
-
-4. 建立 ubuntu 磁區 選 ext2 , 勾 format , 填 root 路徑 "/"
+	4. 進入win10, 用管理者模式開啟 cmd ,  執行以下指令
+		 bcdedit /set "{bootmgr}" path \EFI\ubuntu\grubx64.efi
+*/
 
 5. 用大白菜開機 將啟動磁區設定為 ubuntu
 
-6. 完成
+6. 用 ubuntu 開機選 try ubuntu without install
+
+7. 是否要全部清空選擇取消
+
+8. 建立 ubuntu 磁區 選 ext2 , 勾 format , 填 root 路徑 "/"
+
+9. 完成
