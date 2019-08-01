@@ -216,9 +216,10 @@ public final class TrayNotification {
             dismiss();
         } else {
             stage.show();
-            
-            if(stage.isFocused()) {
-                stage.setFocused(false);
+
+            if (stage.isFocused()) {
+                // stage.setFocused(false);
+                stage.toFront();
             }
 
             onShown();

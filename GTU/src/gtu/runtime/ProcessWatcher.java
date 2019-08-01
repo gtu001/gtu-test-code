@@ -192,4 +192,30 @@ public class ProcessWatcher {
     public byte[] getErrorStreamBytes() {
         return errorStreamBytes.get();
     }
+
+    public static String getOutputStreamString(Process process, String type, String encoding) {
+        try {
+            InputStream is = null;
+            if ("input".equals(type)) {
+                is = process.getInputStream();
+            } else if ("error".equals(type)) {
+                is = process.getErrorStream();
+            }
+            BufferedInputStream bis = new BufferedInputStream(is);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] content = new byte[1024];
+            int pos = -1;
+
+            while ((pos = bis.read(content)) != -1) {
+                baos.write(content, 0, pos);
+            }
+            bis.close();
+            baos.flush();
+            baos.close();
+            return new String(baos.toByteArray(), encoding);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "getOutputStreamString ERROR";
+    }
 }

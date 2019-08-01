@@ -2161,13 +2161,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         private UrlConfig __getNewConfig_for_Merge(UrlConfig d1, UrlConfig d2) throws ParseException {
-            if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
-                if (UrlConfig.getConfigValue(d1).length() > UrlConfig.getConfigValue(d2).length()) {
-                    return d1;
-                } else {
-                    return d2;
-                }
-            }
+//            if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
+//                if (UrlConfig.getConfigValue(d1).length() > UrlConfig.getConfigValue(d2).length()) {
+//                    return d1;
+//                } else {
+//                    return d2;
+//                }
+//            }
 
             if (StringUtils.isNotBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
                 return d1;
