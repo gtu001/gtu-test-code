@@ -1,0 +1,43 @@
+
+
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.2.2.jre8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+
+@Configuration
+public class DataSourceConfig {
+
+    private static final Logger logger = LogManager.getLogger(DataSourceConfig.class);
+
+    @Autowired
+    private Environment env;
+
+    @Autowired
+    private DBPasswordGetter mDBPasswordGetter;
+
+    @Bean(name = "sqlserverCTFDataSource")
+    @Qualifier("sqlserverCTFDataSource")
+    @Primary
+    @ConfigurationProperties(prefix = "spring.datasource.sqlserver-CTF")
+    public DataSource sqlserverCTFDataSource() {
+        logger.debug("### sqlserverCTFDataSource");
+        // DataSourceBuilder builder = DataSourceBuilder.create();
+        // return builder.build();
+
+        SQLServerDataSource dataSource = new SQLServerDataSource();
+        dataSource.setURL(env.getProperty("spring.datasource.sqlserver-CTF.url"));
+        // spring.datasource.sqlserver-CTF.driver-class-name
+        dataSource.setSendStringParametersAsUnicode(false);
+        return dataSource;
+    }
+}
