@@ -1,0 +1,14 @@
+先安裝
+	pip install pylint
+
+安裝python plugin
+	Python
+	Python Extended
+
+在專案根目錄建立 ".env" 檔案
+	裡面放值(設定絕對路徑)
+		PYTHONPATH=D:/workstuff/gtu-test-code/PythonGtu
+
+重開vscode
+
+按 F5 執行 debug mode 操作方式同瀏覽器
