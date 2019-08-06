@@ -2,7 +2,7 @@
 import os
 from os.path import expanduser
 from pathlib import Path
-from gtu.thread import threadUtil
+from gtu.thread_test import threadUtil
 from gtu.reflect import checkSelf
 import re
 from gtu.string import stringUtil
