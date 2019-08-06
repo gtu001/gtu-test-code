@@ -54,6 +54,9 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
         self.driver.get(response.url)
 #         selenium.webdriver.firefox.webelement.FirefoxWebElement
 
+        print("-------------------login")
+        # self.doLoginForm()
+
         print("-------------------A")
         self.getClickBtn()
         
@@ -98,10 +101,10 @@ class Porn91CrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpider
             raise Exception("未輸入正確驗證馬")
         
         userName.send_keys("gtu001")
-        password.send_keys("123474736e")
+        password.send_keys("123474736eE!")
         captcha.send_keys(capthaText)
         
-        form.submit();
+        form.submit()
         print("doLoginForm done...")
         
             
