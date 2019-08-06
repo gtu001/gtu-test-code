@@ -30,7 +30,6 @@ with tf.Session() as sess:
         sess.run(gd_step, feed_dict={x: batch_xs, y_true: batch_ys})
         # Test
         
-    ans = sess.run(accuracy, feed_dict={x: data.test.images,
-    y_true: data.test.labels})
+    ans = sess.run(accuracy, feed_dict={x: data.test.images, y_true: data.test.labels})
     
 print("Accuracy: {:.4}%".format(ans*100))
