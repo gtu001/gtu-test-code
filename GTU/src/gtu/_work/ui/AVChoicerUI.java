@@ -74,6 +74,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JTabbedPaneUtil;
 
 public class AVChoicerUI extends JFrame {
 
@@ -103,7 +104,8 @@ public class AVChoicerUI extends JFrame {
     private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
     // private PropertiesUtilBean config = new PropertiesUtilBean(new
     // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
-//    private PropertiesUtilBean config = new PropertiesUtilBean(new File("D:/my_tool/AVChoicerUI_config.properties"));
+    // private PropertiesUtilBean config = new PropertiesUtilBean(new
+    // File("D:/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
@@ -477,10 +479,19 @@ public class AVChoicerUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 List<File> lst = (List<File>) e.getSource();
                 if (lst != null && !lst.isEmpty()) {
-                    playAvFile(lst.get(0));
+                    File file = lst.get(0);
+                    if (file.isFile()) {
+                        playAvFile(file);
+                    } else {
+                        dirCheckText.setText(file.getAbsolutePath());
+                        dirCheckTextActionPerformed();
+                        JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("目錄檢視");
+                    }
                 }
             }
         });
+
+        System.out.println("file.encoding : " + System.getProperty("file.encoding"));
     }
 
     private class MoveToHandler {
