@@ -259,8 +259,17 @@ merge到主線
 	1)先commit你的線 假設叫  --> QRCodeTest001
 	2)切到主線 pull到最新  假設主線叫做 master
 	3)切到主線 master輸入
-		git merge QRCodeTest001 master
+		git merge QRCodeTest001 
 	5)完成後會停在master本地端, 會自動產生一版commit 記得再push到master遠端
+	
+---
+merge更新主線內容
+
+	1)先commit你的線 假設叫  --> QRCodeTest001
+	2)切到主線 pull到最新  假設主線叫做 master
+	3)切回你的branch --> QRCodeTest001
+	4)加入主線新的內容
+		git merge master
 
 --------------------------------------------------------------------------------------------------------------------
 git 看檔案歷史紀錄
