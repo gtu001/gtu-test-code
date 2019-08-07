@@ -472,6 +472,25 @@ public class AVChoicerUI extends JFrame {
                 }
             }
         });
+
+        dirCheckList.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                JListUtil.newInstance(dirCheckList).defaultJListKeyPressed(e, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        FileZ f = (FileZ) e.getSource();
+                        boolean deleteOk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除:" + f.file, "刪除??");
+                        if (deleteOk) {
+                            f.file.delete();
+                            e.setSource(true);
+                        } else {
+                            e.setSource(false);
+                        }
+                    }
+                });
+            }
+        });
+
         panel_18.add(JCommonUtil.createScrollComponent(dirCheckList), BorderLayout.CENTER);
 
         JCommonUtil.applyDropFiles(this, new ActionListener() {
