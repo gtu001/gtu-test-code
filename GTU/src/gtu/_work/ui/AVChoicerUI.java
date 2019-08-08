@@ -218,16 +218,16 @@ public class AVChoicerUI extends JFrame {
                 File avFolder = new File(indicateFolderText.getText());
                 if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
                     currentAvFile.set(avFolder);
-                    sameFolderChk.setSelected(true);
+                    resetSameFolderChk(true);
                 } else {
                     indicateFolderText.setText("");
-                    sameFolderChk.setSelected(false);
+                    resetSameFolderChk6(false);
                 }
             }
         });
-
         panel_9.add(indicateFolderText);
         indicateFolderText.setColumns(10);
+        
         sameFolderChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 choiceAVBtn.setText(!sameFolderChk.isSelected() ? "隨機撥放" : "播放同目錄");
@@ -825,15 +825,17 @@ public class AVChoicerUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("清單已跑完一輪");
             choiceFile = cacheFileList.get(new Random().nextInt(cacheFileList.size()));
             clickAvSet.clear();
-
-            // reset
-            sameFolderChk.setSelected(false);
-            JCommonUtil.triggerButtonActionPerformed(sameFolderChk);
+            resetSameFolderChk(false);
         }
 
         currentAvFile.set(choiceFile);
         clickAvSet.add(choiceFile);
         return choiceFile;
+    }
+
+    private void resetSameFolderChk(boolean isSelected) {
+        sameFolderChk.setSelected(isSelected);
+        JCommonUtil.triggerButtonActionPerformed(sameFolderChk);
     }
 
     private class CurrentFileHandler {
