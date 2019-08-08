@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,14 +13,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,6 +108,7 @@ public class AVChoicerUI extends JFrame {
     // File("D:/my_tool/AVChoicerUI_config.properties"));
 
     private Set<File> clickAvSet = new HashSet<File>();
+    private AtomicReference<File> currentAvFile = new AtomicReference<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
     private List<File> cacheFileList = new ArrayList<File>();
     private JLabel deleteAVFileLabel;
@@ -126,6 +127,8 @@ public class AVChoicerUI extends JFrame {
     private JTextField avExeEncodeText;
     private JTextField dirCheckText;
     private JList dirCheckList;
+    private JCheckBox sameFolderChk;
+    private JTextField indicateFolderText;
 
     /**
      * Launch the application.
@@ -203,10 +206,39 @@ public class AVChoicerUI extends JFrame {
         JPanel panel_9 = new JPanel();
         panel.add(panel_9, BorderLayout.SOUTH);
 
+        sameFolderChk = new JCheckBox("播放同目錄");
+        panel_9.add(sameFolderChk);
+
+        indicateFolderText = new JTextField();
+        indicateFolderText.setToolTipText("指定播放某目錄");
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(indicateFolderText, true);
+        indicateFolderText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                File avFolder = new File(indicateFolderText.getText());
+                if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
+                    currentAvFile.set(avFolder);
+                    sameFolderChk.setSelected(true);
+                } else {
+                    indicateFolderText.setText("");
+                    sameFolderChk.setSelected(false);
+                }
+            }
+        });
+
+        panel_9.add(indicateFolderText);
+        indicateFolderText.setColumns(10);
+        sameFolderChk.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                choiceAVBtn.setText(!sameFolderChk.isSelected() ? "隨機撥放" : "播放同目錄");
+            }
+        });
+
         JPanel panel_10 = new JPanel();
         panel.add(panel_10, BorderLayout.EAST);
 
         choiceAVBtn = new JButton("隨機撥放");
+        choiceAVBtn.setFont(new Font("新細明體", Font.PLAIN, 50));
         choiceAVBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 choiceAVBtnAction();
@@ -772,14 +804,19 @@ public class AVChoicerUI extends JFrame {
                     });
         }
 
-        if (cacheFileList == null) {
-            cacheFileList = new ArrayList<>();
-        }
-
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
 
         File choiceFile = null;
-        List<File> cloneLst = new ArrayList<>(cacheFileList);
+        List<File> cloneLst = Collections.EMPTY_LIST;
+        if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
+            List<File> folderFileLst = new ArrayList<File>();
+            File avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
+            FileUtil.searchFileMatchs(avDir, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, folderFileLst);
+            cloneLst = new ArrayList<>(folderFileLst);
+        } else if (!cacheFileList.isEmpty()) {
+            cloneLst = new ArrayList<>(cacheFileList);
+        }
+
         cloneLst.removeAll(clickAvSet);
 
         if (!cloneLst.isEmpty()) {
@@ -788,8 +825,13 @@ public class AVChoicerUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("清單已跑完一輪");
             choiceFile = cacheFileList.get(new Random().nextInt(cacheFileList.size()));
             clickAvSet.clear();
+
+            // reset
+            sameFolderChk.setSelected(false);
+            JCommonUtil.triggerButtonActionPerformed(sameFolderChk);
         }
 
+        currentAvFile.set(choiceFile);
         clickAvSet.add(choiceFile);
         return choiceFile;
     }
