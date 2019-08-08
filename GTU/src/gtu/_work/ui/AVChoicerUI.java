@@ -221,7 +221,7 @@ public class AVChoicerUI extends JFrame {
                     resetSameFolderChk(true);
                 } else {
                     indicateFolderText.setText("");
-                    resetSameFolderChk6(false);
+                    resetSameFolderChk(false);
                 }
             }
         });
