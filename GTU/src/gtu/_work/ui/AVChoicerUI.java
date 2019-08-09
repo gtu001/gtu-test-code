@@ -227,7 +227,7 @@ public class AVChoicerUI extends JFrame {
         });
         panel_9.add(indicateFolderText);
         indicateFolderText.setColumns(10);
-        
+
         sameFolderChk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 choiceAVBtn.setText(!sameFolderChk.isSelected() ? "隨機撥放" : "播放同目錄");
@@ -808,11 +808,19 @@ public class AVChoicerUI extends JFrame {
 
         File choiceFile = null;
         List<File> cloneLst = Collections.EMPTY_LIST;
+
         if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
             List<File> folderFileLst = new ArrayList<File>();
             File avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
             FileUtil.searchFileMatchs(avDir, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, folderFileLst);
             cloneLst = new ArrayList<>(folderFileLst);
+
+        } else if (sameFolderChk.isSelected() && new File(indicateFolderText.getText()).isDirectory()) {
+            List<File> folderFileLst = new ArrayList<File>();
+            File avDir = new File(indicateFolderText.getText());
+            FileUtil.searchFileMatchs(avDir, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, folderFileLst);
+            cloneLst = new ArrayList<>(folderFileLst);
+
         } else if (!cacheFileList.isEmpty()) {
             cloneLst = new ArrayList<>(cacheFileList);
         }
