@@ -818,16 +818,11 @@ public class AVChoicerUI extends JFrame {
         List<File> cloneLst = Collections.EMPTY_LIST;
 
         if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
-            List<File> folderFileLst = new ArrayList<File>();
             File avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
-            FileUtil.searchFileMatchs(avDir, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
-            cloneLst = new ArrayList<>(folderFileLst);
+            cloneLst = this.getSubFolderAvLst(avDir);
 
         } else if (sameFolderChk.isSelected() && new File(indicateFolderText.getText()).isDirectory()) {
-            List<File> folderFileLst = new ArrayList<File>();
-            File avDir = new File(indicateFolderText.getText());
-            FileUtil.searchFileMatchs(avDir, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
-            cloneLst = new ArrayList<>(folderFileLst);
+            cloneLst = this.getSubFolderAvLst(new File(indicateFolderText.getText()));
 
         } else if (!cacheFileList.isEmpty()) {
             cloneLst = new ArrayList<>(cacheFileList);
@@ -847,6 +842,12 @@ public class AVChoicerUI extends JFrame {
         currentAvFile.set(choiceFile);
         clickAvSet.add(choiceFile);
         return choiceFile;
+    }
+
+    private List<File> getSubFolderAvLst(File folder) {
+        List<File> folderFileLst = new ArrayList<File>();
+        FileUtil.searchFileMatchs(folder, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
+        return folderFileLst;
     }
 
     private void resetSameFolderChk(boolean isSelected) {
