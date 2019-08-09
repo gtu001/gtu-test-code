@@ -57,6 +57,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.constant.FileExtenstion;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.jdk8.ex1.StreamUtil;
@@ -79,8 +80,6 @@ import gtu.swing.util.JTabbedPaneUtil;
 public class AVChoicerUI extends JFrame {
 
     private static final long serialVersionUID = 1L;
-
-    public static final String FILE_EXTENSTION_VIDEO_PATTERN = "(mp4|avi|flv|rm|rmvb|3gp|mp3)";
 
     private static boolean isWindows = false;
 
@@ -211,18 +210,16 @@ public class AVChoicerUI extends JFrame {
 
         indicateFolderText = new JTextField();
         indicateFolderText.setToolTipText("指定播放某目錄");
-        JCommonUtil.jTextFieldSetFilePathMouseEvent(indicateFolderText, true);
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(indicateFolderText, true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                triggerIndicateFolderTextFoucsLost();
+            }
+        });
         indicateFolderText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                File avFolder = new File(indicateFolderText.getText());
-                if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
-                    currentAvFile.set(avFolder);
-                    resetSameFolderChk(true);
-                } else {
-                    indicateFolderText.setText("");
-                    resetSameFolderChk(false);
-                }
+                triggerIndicateFolderTextFoucsLost();
             }
         });
         panel_9.add(indicateFolderText);
@@ -545,6 +542,17 @@ public class AVChoicerUI extends JFrame {
         System.out.println("file.encoding : " + System.getProperty("file.encoding"));
     }
 
+    private void triggerIndicateFolderTextFoucsLost() {
+        File avFolder = new File(indicateFolderText.getText());
+        if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
+            currentAvFile.set(avFolder);
+            resetSameFolderChk(true);
+        } else {
+            indicateFolderText.setText("");
+            resetSameFolderChk(false);
+        }
+    }
+
     private class MoveToHandler {
         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(MoveToHandler.class, AVChoicerUI.class.getSimpleName() + "_" + MoveToHandler.class.getSimpleName());
         // private PropertiesUtilBean moveConfig = new PropertiesUtilBean(new
@@ -800,7 +808,7 @@ public class AVChoicerUI extends JFrame {
             IntStream.range(0, model.size())//
                     .mapToObj(i -> (File) model.getElementAt(i))//
                     .forEach(file -> {
-                        FileUtil.searchFileMatchs(file, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, cacheFileList);
+                        FileUtil.searchFileMatchs(file, ".*\\." + FileExtenstion.VIDEO_PATTERN, cacheFileList);
                     });
         }
 
@@ -812,13 +820,13 @@ public class AVChoicerUI extends JFrame {
         if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
             List<File> folderFileLst = new ArrayList<File>();
             File avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
-            FileUtil.searchFileMatchs(avDir, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, folderFileLst);
+            FileUtil.searchFileMatchs(avDir, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
             cloneLst = new ArrayList<>(folderFileLst);
 
         } else if (sameFolderChk.isSelected() && new File(indicateFolderText.getText()).isDirectory()) {
             List<File> folderFileLst = new ArrayList<File>();
             File avDir = new File(indicateFolderText.getText());
-            FileUtil.searchFileMatchs(avDir, ".*\\." + FILE_EXTENSTION_VIDEO_PATTERN, folderFileLst);
+            FileUtil.searchFileMatchs(avDir, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
             cloneLst = new ArrayList<>(folderFileLst);
 
         } else if (!cacheFileList.isEmpty()) {
@@ -1099,8 +1107,8 @@ public class AVChoicerUI extends JFrame {
     }
 
     private static class FileZ {
-        private static Pattern movPtn = Pattern.compile("(mp4|avi|flv|rm|rmvb|3gp|mp3)", Pattern.CASE_INSENSITIVE);
-        private static Pattern jpgPtn = Pattern.compile("(jpg|jpeg|gif|tif|png|bmp)", Pattern.CASE_INSENSITIVE);
+        private static Pattern movPtn = Pattern.compile(FileExtenstion.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
+        private static Pattern jpgPtn = Pattern.compile(FileExtenstion.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
 
         File file;
         String name;
