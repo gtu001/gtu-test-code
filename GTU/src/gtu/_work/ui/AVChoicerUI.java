@@ -818,7 +818,16 @@ public class AVChoicerUI extends JFrame {
         List<File> cloneLst = Collections.EMPTY_LIST;
 
         if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
-            File avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
+            File avDir = null;
+            if (currentAvFile.get().exists()) {
+                avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
+            } else {
+                if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+                    avDir = currentAvFile.get().getParentFile();
+                } else {
+                    avDir = currentAvFile.get();
+                }
+            }
             cloneLst = this.getSubFolderAvLst(avDir);
 
         } else if (sameFolderChk.isSelected() && new File(indicateFolderText.getText()).isDirectory()) {
