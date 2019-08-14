@@ -155,6 +155,46 @@ public class JListUtil {
         return defaultJListKeyPressed(event, true);
     }
 
+    public <T> JListUtil defaultJListKeyPressed(EventObject event, ActionListener deleteEvent) {
+        T[] objects = (T[]) jList1.getSelectedValues();
+        if (objects == null || objects.length == 0) {
+            return this;
+        }
+        KeyEvent evt = (KeyEvent) event;
+        DefaultListModel model = (DefaultListModel) jList1.getModel();
+        int lastIndex = model.getSize() - 1;
+        T swap = null;
+        for (T current : objects) {
+            int index = model.indexOf(current);
+            switch (evt.getKeyCode()) {
+            case 38:// up
+                if (index != 0) {
+                    swap = (T) model.getElementAt(index - 1);
+                    model.setElementAt(swap, index);
+                    model.setElementAt(current, index - 1);
+                }
+                break;
+            case 40:// down
+                if (index != lastIndex) {
+                    swap = (T) model.getElementAt(index + 1);
+                    model.setElementAt(swap, index);
+                    model.setElementAt(current, index + 1);
+                }
+                break;
+            case 127:// del
+                if (deleteEvent != null) {
+                    ActionEvent actEvent = new ActionEvent(current, index, "delete");
+                    deleteEvent.actionPerformed(actEvent);
+                    if (Boolean.valueOf(String.valueOf(actEvent.getSource()))) {
+                        model.removeElementAt(index);
+                    }
+                }
+                break;
+            }
+        }
+        return this;
+    }
+
     /**
      * 清單 - 上移(按上) 下移(按下) 移除(按del)
      * 
