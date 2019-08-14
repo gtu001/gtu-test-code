@@ -760,7 +760,7 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                 StringBuffer sb11 = new StringBuffer();
                 while (tag.find()) {
                     String resultText = orignProcess(tag.group().groupWithTag());
-                    tag.appendReplacement(sb11, resultText);
+                    tag.appendReplacement(sb11, toFormat.toString());
                 }
                 tag.appendTail(sb11);
                 return sb11.toString();
