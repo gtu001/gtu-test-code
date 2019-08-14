@@ -18,7 +18,7 @@ public class TagMatcher2 {
     private static final String TAG = TagMatcher2.class.getSimpleName();
 
     public static void main(String[] args) {
-        File file = new File("/home/gtu001/桌面/FundQryApplicationDetailWebRequestDto.java");
+        File file = new File("C:\\Users\\wistronits\\Desktop\\EtfQryApplicationMainWebResponseDto.java");
         String content = FileUtil.loadFromFile(file, "UTF8");
 
         String startTag = "@Override";
@@ -354,16 +354,20 @@ public class TagMatcher2 {
         if (startPtn == null) {
             return content.indexOf(startTag, startPad.startPad);
         } else {
-            int pos = startPtn.indexOf(content, startPad.startPad);
+            int fixStartPos = 0;
+            if (StringUtils.isNotBlank(this.startTag)) {
+                fixStartPos = content.indexOf(startTag, startPad.startPad);
+            }
+            int pos = startPtn.indexOf(content, startPad.startPad + fixStartPos);
             if (pos == -1) {
                 return -1;
             } else {
-                int startPos = pos + startPad.startPad;
+                int startPos = pos + startPad.startPad + fixStartPos;
                 int endPos = startPos + startPtn.group().length();
                 String tmpContent = StringUtils.substring(content, startPos, endPos);
                 int fixOffset = tmpContent.indexOf(startTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
-                int rtnPos = pos + fixOffset;
+                int rtnPos = pos + fixOffset + fixStartPos;
                 Log.v(TAG, "[startTagPtn] [pos " + rtnPos + "/auto_offset:" + fixOffset + "] : " + tmpContent);// ok
 
                 if (info != null) {
