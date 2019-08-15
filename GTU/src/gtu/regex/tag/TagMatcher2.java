@@ -18,13 +18,13 @@ public class TagMatcher2 {
     private static final String TAG = TagMatcher2.class.getSimpleName();
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\wistronits\\Desktop\\EtfQryApplicationMainWebResponseDto.java");
+        File file = new File("C:\\Users\\wistronits\\Desktop\\EtfExRateQueryComponent.java");
         String content = FileUtil.loadFromFile(file, "UTF8");
 
         String startTag = "@Override";
         String endTag = "}";
-        String startPtn = "\\@Override(?:.|\\n)*?public\\s*String\\s*toString\\(\\)";
-        String endPtn = "return\\s*sb\\.toString\\(\\)\\;(?:.|\\n)*?\\}";
+        String startPtn = "\\@Override[\\s\\t\\n]*?public\\s+String\\s+toString\\(\\)";
+        String endPtn = "return\\s*sb\\.toString\\(\\)\\;[\\s\\t\\n]*?\\}";
 
         TagMatcher2 t = new TagMatcher2(startTag, endTag, startPtn, endPtn, 0, 0, content);
         StringBuffer sb = new StringBuffer();
@@ -155,7 +155,6 @@ public class TagMatcher2 {
                 Log.v(TAG, "[startPad] reset!!");
             } else {
                 startPad = startPad + startTagLength;
-
                 if (info != null) {
                     startPad = info.getEndWithTag();
                 }
@@ -283,11 +282,10 @@ public class TagMatcher2 {
     }
 
     private int findMatchEnd(int startPos) {
-
         int endPos = -1;
         int token = 1;
 
-        String tmpContent = content.substring(startPos);
+        String tmpContent = StringUtils.substring(content, startPos);
 
         while ((endPos = getEndPos(tmpContent, token)) != -1) {
             // Log.v(TAG, " -- endPos : " + endPos);
@@ -354,20 +352,16 @@ public class TagMatcher2 {
         if (startPtn == null) {
             return content.indexOf(startTag, startPad.startPad);
         } else {
-            int fixStartPos = 0;
-            if (StringUtils.isNotBlank(this.startTag)) {
-                fixStartPos = content.indexOf(startTag, startPad.startPad);
-            }
-            int pos = startPtn.indexOf(content, startPad.startPad + fixStartPos);
+            int pos = startPtn.indexOf(content, startPad.startPad);
             if (pos == -1) {
                 return -1;
             } else {
-                int startPos = pos + startPad.startPad + fixStartPos;
+                int startPos = pos + startPad.startPad;
                 int endPos = startPos + startPtn.group().length();
                 String tmpContent = StringUtils.substring(content, startPos, endPos);
                 int fixOffset = tmpContent.indexOf(startTag);
                 fixOffset = fixOffset == -1 ? 0 : fixOffset;
-                int rtnPos = pos + fixOffset + fixStartPos;
+                int rtnPos = pos + fixOffset;
                 Log.v(TAG, "[startTagPtn] [pos " + rtnPos + "/auto_offset:" + fixOffset + "] : " + tmpContent);// ok
 
                 if (info != null) {
@@ -447,18 +441,20 @@ public class TagMatcher2 {
             if (content.length() <= startPad) {
                 return -1;
             }
-            content = content.substring(startPad);
+
             // 起碼要找到 startTag or endTag
-            if (!content.contains(this.orignTag)) {
+            String currentContent = StringUtils.substring(content, startPad);
+            if (!currentContent.contains(this.orignTag)) {
                 return -1;
             }
-            Matcher mth = ptn.matcher(content);
+            Matcher mth = ptn.matcher(currentContent);
+            int finalPos = -1;
             while (mth.find()) {
                 group = mth.group();
                 this.doGroupMap(mth);
                 return mth.start();
             }
-            return -1;
+            return finalPos;
         }
 
         public boolean contain(String content) {
