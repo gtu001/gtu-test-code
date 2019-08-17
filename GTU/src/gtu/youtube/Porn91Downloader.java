@@ -54,6 +54,7 @@ import gtu.log.LogbackUtil;
 import gtu.log.line.SystemZ;
 import gtu.swing.util.JCommonUtil;
 import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
+import ch.qos.logback.classic.Level.INFO;
 
 public class Porn91Downloader {
 

@@ -300,7 +300,7 @@ public class FacebookVideoDownloader extends JFrame {
         panel.add(urlDetectBtn);
         panel.add(clearUrlConfigBtn);
 
-        JButton autoDownloadBtn = new JButton("自動");
+        final JButton autoDownloadBtn = new JButton("自動");
         autoDownloadBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // autoDownload(false);

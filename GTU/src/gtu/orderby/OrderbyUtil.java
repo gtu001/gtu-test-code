@@ -108,14 +108,14 @@ public class OrderbyUtil {
             return null;
         }
 
-        AtomicInteger orderVal = new AtomicInteger();
+        final AtomicInteger orderVal = new AtomicInteger();
         if ("asc".equalsIgnoreCase(orderType)) {
             orderVal.set(1);
         } else if ("desc".equalsIgnoreCase(orderType)) {
             orderVal.set(-1);
         }
 
-        AtomicReference<IOrderByEnum> setting = new AtomicReference();
+        final AtomicReference<IOrderByEnum> setting = new AtomicReference();
         for (IOrderByEnum e : values) {
             if (e.ordinal() == orderColumnIndex) {
                 setting.set(e);
@@ -127,14 +127,14 @@ public class OrderbyUtil {
             return null;
         }
 
-        AtomicReference<List<String>> columnsBak = new AtomicReference<>();
+        final AtomicReference<List<String>> columnsBak = new AtomicReference<List<String>>();
 
         Comparator comparator = new Comparator<T>() {
             @Override
             public int compare(T o1,
                     T o2) {
 
-                List<String> columns = new ArrayList<>(setting.get().getColumnLst());
+                List<String> columns = new ArrayList<String>(setting.get().getColumnLst());
                 columnsBak.set(columns);
 
                 if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) &&
@@ -215,7 +215,7 @@ public class OrderbyUtil {
             Collections.sort(lst, comparator);
 
             for (Object v : lst) {
-                List<Object> valLst = new ArrayList<>();
+                List<Object> valLst = new ArrayList<Object>();
                 for (String column : columnsBak.get()) {
                     try {
                         valLst.add(FieldUtils.readDeclaredField(v, column, true));
@@ -243,14 +243,14 @@ public class OrderbyUtil {
             return null;
         }
 
-        AtomicInteger orderVal = new AtomicInteger();
+        final AtomicInteger orderVal = new AtomicInteger();
         if ("asc".equalsIgnoreCase(orderType)) {
             orderVal.set(1);
         } else if ("desc".equalsIgnoreCase(orderType)) {
             orderVal.set(-1);
         }
 
-        AtomicReference<IOrderByEnum> setting = new AtomicReference();
+        final AtomicReference<IOrderByEnum> setting = new AtomicReference();
         for (IOrderByEnum e : values) {
             if (e.ordinal() == orderColumnIndex) {
                 setting.set(e);
@@ -262,14 +262,14 @@ public class OrderbyUtil {
             return null;
         }
 
-        AtomicReference<List<String>> columnsBak = new AtomicReference<>();
+        final AtomicReference<List<String>> columnsBak = new AtomicReference<List<String>>();
 
         Comparator comparator = new Comparator<Map<String, Object>>() {
             @Override
             public int compare(Map<String, Object> o1,
                     Map<String, Object> o2) {
 
-                List<String> columns = new ArrayList<>(setting.get().getColumnLst());
+                List<String> columns = new ArrayList<String>(setting.get().getColumnLst());
                 columnsBak.set(columns);
 
                 if (CollectionUtils.isNotEmpty(setting.get().getNumberColumns()) &&
@@ -316,7 +316,7 @@ public class OrderbyUtil {
             Collections.sort(lst, comparator);
 
             for (Map<String, Object> v : lst) {
-                List<Object> valLst = new ArrayList<>();
+                List<Object> valLst = new ArrayList<Object>();
                 for (String column : columnsBak.get()) {
                     valLst.add(v.get(column));
                 }
