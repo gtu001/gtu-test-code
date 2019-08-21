@@ -11,7 +11,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": "D:/workstuff/gtu-test-code/PythonGtu/"
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

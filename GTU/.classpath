@@ -27,10 +27,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/my_tool/FastDBQueryUI/db2jcc.jar"/>
-	<classpathentry kind="lib" path="D:/my_tool/FastDBQueryUI/mysql-connector-java-5.1.35.jar"/>
-	<classpathentry kind="lib" path="D:/my_tool/FastDBQueryUI/ojdbc7.jar"/>
-	<classpathentry kind="lib" path="D:/my_tool/FastDBQueryUI/postgresql-42.2.3.jar"/>
-	<classpathentry kind="lib" path="D:/my_tool/FastDBQueryUI/sqljdbc4-4.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

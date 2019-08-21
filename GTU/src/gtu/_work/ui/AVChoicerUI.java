@@ -100,7 +100,7 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
+    private PropertiesUtilBean config=new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
     // private PropertiesUtilBean config = new PropertiesUtilBean(new
     // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
     // private PropertiesUtilBean config = new PropertiesUtilBean(new
@@ -534,6 +534,10 @@ public class AVChoicerUI extends JFrame {
                         dirCheckText.setText(file.getAbsolutePath());
                         dirCheckTextActionPerformed();
                         JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("目錄檢視");
+
+                        // 設定當前目錄
+                        indicateFolderText.setText(file.getAbsolutePath());
+                        triggerIndicateFolderTextFoucsLost();
                     }
                 }
             }

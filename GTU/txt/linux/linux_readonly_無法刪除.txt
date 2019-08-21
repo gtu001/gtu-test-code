@@ -7,6 +7,7 @@
 
 重新掛載為可讀寫
 		sudo mount -o remount,rw,relatime,data=ordered /dev/sdb5
+		sudo mount -o remount,rw  /dev/sdb5
 
 
 觀察受損或失敗單位
@@ -15,3 +16,58 @@
 
 修復受損單位
 		fsck -y /dev/sdb5
+
+---
+
+	sudo umount /media/gtu001/OLD_D
+
+	sudo mount -t  ntfs-3g  -o rw  /dev/sdb5  /media/gtu001/OLD_D 
+
+
+	---
+		錯誤訊息
+			The disk contains an unclean file system (0, 0).
+			Metadata kept in Windows cache, refused to mount.
+			Falling back to read-only mount because the NTFS partition is in an
+			unsafe state. Please resume and shutdown Windows fully (no hibernation
+			or fast restarting.)
+		$ sudo ntfsfix /dev/sdb5
+
+
+---
+
+	查詢UUID
+		ls -lh /dev/disk/by-uuid
+		
+		可以看到以下資訊
+			lrwxrwxrwx 1 root root 10  8月 21 20:51 C4B2EDC3B2EDBA56 -> ../../sdb5
+
+	編輯掛載資訊
+		sudo vi /etc/fstab
+
+	加入
+		UUID=C4B2EDC3B2EDBA56 /media/gtu001/OLD_D ntfs-3g defaults 0 0
+
+
+---
+
+	查詢 mount 狀態
+
+		$ fuser -m  /media/gtu001/OLD_D 
+			or
+		  fuser -m  /dev/sdb5
+		
+			顯示: /media/gtu001/OLD_D:  2237m
+
+			就代表是 process 2237(pid) 有使用到此目錄, 後面 c 代表的意思可參考下述:
+				c: current directory.
+				e: executable being run.
+				f: open file. f is omitted in default display mode.
+				F: open file for writing. F is omitted in default display mode.
+				r: root directory.
+				m: mmap'ed file or shared library.
+
+		$ fuser -m -v -i -k  /media/gtu001/OLD_D 
+
+
+	

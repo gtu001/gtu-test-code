@@ -28,3 +28,6 @@ $ sudo apt-get install oracle-java8-set-default
 
 lsb_release -a 
 
+
+---
+	sudo apt-get install openjdk-8-jdk
