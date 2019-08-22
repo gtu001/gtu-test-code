@@ -650,10 +650,10 @@
 			<!-- <systemPath>c:\Program Files\Java\jdk1.8.0_73\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<!-- <systemPath>/usr/lib/jvm/java-8-oracle/jre/lib/ext/jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jre1.8.0_211\lib\ext\jfxrt.jar</systemPath> -->
-			<systemPath>/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/WebContent/WEB-INF/lib/jfxrt.jar</systemPath>
+			<!-- <systemPath>/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/WebContent/WEB-INF/lib/jfxrt.jar</systemPath> -->
+			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -816,6 +816,14 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.3.0.Final</version>
+		</dependency>
+
+		<!-- logback-classic -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- spring boot -->
