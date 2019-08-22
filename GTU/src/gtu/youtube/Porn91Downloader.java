@@ -54,7 +54,6 @@ import gtu.log.LogbackUtil;
 import gtu.log.line.SystemZ;
 import gtu.swing.util.JCommonUtil;
 import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
-import ch.qos.logback.classic.Level.INFO;
 
 public class Porn91Downloader {
 
@@ -445,13 +444,22 @@ public class Porn91Downloader {
             SystemZ.out.println("續傳(continue download) : " + isAppend + " , " + (isAppend ? "是" : "否"));
             SystemZ.out.println("outputfile " + outputfile);
 
-            FileOutputStream outstream = new FileOutputStream($fixFilePath, isAppend);// BufferedOutputStream
-
-            DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale, skipLength);
-            if (progressPerformd != null) {
-                downloadHandler.setProgressPerformd(progressPerformd);
+            FileOutputStream outstream = null;
+            try {
+                outstream = new FileOutputStream($fixFilePath, isAppend);// BufferedOutputStream
+                DownloadProgressHandler downloadHandler = new DownloadProgressHandler(length, instream2, outstream, percentScale, skipLength);
+                if (progressPerformd != null) {
+                    downloadHandler.setProgressPerformd(progressPerformd);
+                }
+                downloadHandler.start();
+            } catch (Exception ex) {
+                throw ex;
+            } finally {
+                try {
+                    outstream.close();
+                } catch (Exception ex) {
+                }
             }
-            downloadHandler.start();
 
             SystemZ.out.println("Done...");
         } else {

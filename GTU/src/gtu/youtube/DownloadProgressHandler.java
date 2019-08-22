@@ -179,30 +179,21 @@ public class DownloadProgressHandler {
     }
 
     public DownloadProgressHandler(long totalLength, InputStream instream, OutputStream outstream, Integer percentScale, long skipLength) throws Exception {
-        try {
-            this.totalLength = totalLength;
-            this.totalLengthDescription = FileUtil.getSizeDescription(totalLength);
+        this.totalLength = totalLength;
+        this.totalLengthDescription = FileUtil.getSizeDescription(totalLength);
 
-            this.instream = instream;
-            this.outstream = outstream;
+        this.instream = instream;
+        this.outstream = outstream;
 
-            this.processLst = new ArrayList<DownloadProgress>();
+        this.processLst = new ArrayList<DownloadProgress>();
 
-            this.skipLength = skipLength;// 續傳
+        this.skipLength = skipLength;// 續傳
 
-            // 計算percent敏銳度
-            if (percentScale == null) {
-                this.percentScale = caculatePercentScale(this.totalLength);
-            } else {
-                this.percentScale = percentScale;
-            }
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            try {
-                outstream.close();
-            } catch (Exception ex) {
-            }
+        // 計算percent敏銳度
+        if (percentScale == null) {
+            this.percentScale = caculatePercentScale(this.totalLength);
+        } else {
+            this.percentScale = percentScale;
         }
     }
 
@@ -258,9 +249,15 @@ public class DownloadProgressHandler {
                 (outstream).write(buffer, 0, count);
             }
 
-            outstream.flush();
+            try {
+                outstream.flush();
+            } catch (Exception ex) {
+            }
         } finally {
-            outstream.close();
+            try {
+                outstream.close();
+            } catch (Exception ex) {
+            }
 
             long endtime = System.currentTimeMillis();
             long during = System.currentTimeMillis() - startTime;
