@@ -10,6 +10,9 @@ alternatives --install /usr/bin/java java /home/ibapp/openjdk1.8/jdk1.8.0_172/bi
 #選擇使用 java 版本
 
 alternatives --config java
+or
+sudo update-alternatives --config java
+
 
 #移除
 
