@@ -1,6 +1,9 @@
 package gtu.efficiency;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,7 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -95,8 +97,10 @@ public class DuringMointer {
 
     public static class During {
         private static final Logger logger = LogManager.getLogger(During.class);
+        private static final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss.SSS");
 
         long startTime;
+        long endTime;
         long duringTime;
         StackTraceElement startStack;
         StackTraceElement endStack;
@@ -107,6 +111,16 @@ public class DuringMointer {
 
         public During() {
             this("");
+        }
+
+        public static void log(DuringKey keyObj, String comment) {
+            During d = new During();
+            d.count(keyObj, comment);
+        }
+        
+        public static void log(String comment) {
+            During d = new During();
+            d.count(comment);
         }
 
         public During(String tag) {
@@ -131,7 +145,8 @@ public class DuringMointer {
             getREPORT_MAP(keyObj).add(this);
             this.setComment(comment);
             if (StringUtils.isBlank(resultMessage)) {
-                duringTime = System.currentTimeMillis() - startTime;
+                endTime = System.currentTimeMillis();
+                duringTime = endTime - startTime;
                 endStack = getCallerStack();
                 resultMessage = getFormatResult();
             }
@@ -200,7 +215,7 @@ public class DuringMointer {
                     Long sumDuring = getSumDuring(durLst);
                     Long avgDuring = sumDuring / durLst.size();
                     Long meanDuring = getMeanDuring(durLst);
-                    String msg = String.format(" 總計[%s] : %s / 次數 : %s / 平均 : %s / 中位數 : %s", tag, sumDuring,
+                    String msg = String.format(" 迴圈總計[%s] : %s / 次數 : %s / 平均 : %s / 中位數 : %s", tag, sumDuring,
                         durLst.size(),
                         avgDuring, meanDuring);
                     logLst.add(msg);
@@ -253,8 +268,13 @@ public class DuringMointer {
                     comment = ", 備註 : " + comment;
                 }
             }
-            return String.format("%s %s 行數[%s -> %s] 耗時 : %s %s", _tag, classInfo, startLineNumber, endLineNumber,
-                duringTime, comment);
+            return String.format("%s %s 行數[%s -> %s] 耗時 : %s [起迄 : %s - %s] %s", _tag, classInfo, startLineNumber,
+                endLineNumber,
+                duringTime, getTime(startTime), getTime(endTime), comment);
+        }
+
+        private String getTime(long dateTime) {
+            return SDF_TIME.format(new Date(dateTime));
         }
 
         private String getSummaryTag() {

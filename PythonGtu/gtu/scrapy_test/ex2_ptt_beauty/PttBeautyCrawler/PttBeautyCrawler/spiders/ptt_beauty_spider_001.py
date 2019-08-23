@@ -5,7 +5,9 @@ import scrapy
 from scrapy.crawler import Crawler
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
-# from scrapy.selector.lxmlsel import HtmlXPathSelector
+#from scrapy.selector.lxmlsel import HtmlXPathSelector
+from scrapy.selector import Selector
+
 from scrapy.settings import Settings
 from scrapy.spiders import CrawlSpider, Rule
 from twisted.internet import reactor
@@ -13,8 +15,10 @@ from twisted.internet import reactor
 from gtu.io import fileUtil
 from gtu.net import simple_request_handler_001
 from gtu.reflect import checkSelf
-from gtu.scrapy import scrapy_runner
+from gtu.scrapy_test import scrapy_runner
 from gtu.datetime import dateUtil
+
+from requests import Request, Session
 
 
 # https://medium.com/python-pandemonium/develop-your-first-web-crawler-in-python-scrapy-6b2ee4baf954
@@ -25,7 +29,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
     start_urls = ['https://www.ptt.cc/bbs/Beauty']
     
     BASE_URL = 'https://www.ptt.cc'
-    FETCH_SINCE_DATE = dateUtil.getDatetimeByJavaFormat("2018/11/01", "yyyy/MM/dd", True)
+    FETCH_SINCE_DATE = dateUtil.getDatetimeByJavaFormat("2019/06/01", "yyyy/MM/dd", True)
     FETCH_PREFIX_YEAR = "2019/"
     
     rules = (
@@ -37,18 +41,48 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
              follow=False),
         )
     
+
     def __init__(self):
         self.test = False
   
+
     def parse(self, response):  # process_item
         print("### MAIN page : ", response.url)
-        hxs = HtmlXPathSelector(response)
+        hxs = Selector(response)
+
+        self.postYesToVerify() 
         
         for item in self.otherPageDetect(response) :
             yield item
         
         for item in self.parseLinkAndTitle(response) :
             yield item
+
+
+    def postYesToVerify(self) :
+        '''
+        s = Session()
+        req = Request('POST', 'https://www.ptt.cc/ask/over18?from=/bbs/Beauty/index.html',
+            data={'yes' : 'yes'},
+            headers=None
+        )
+        prepped = req.prepare()
+        # do something with prepped.body
+        # do something with prepped.headers
+        resp = s.send(prepped,
+            stream=None,
+            verify=False,
+            proxies=None,
+            cert=None,
+            timeout=None
+        )
+        print(resp.status_code)
+        '''
+        my_data = {'yes' : 'yes'}
+        request = scrapy.Request( 'https://www.ptt.cc/ask/over18?from=/bbs/Beauty/index.html', method='POST', 
+                                body = json.dumps(my_data), 
+                                headers={'Content-Type':'application/text'} )
+
             
     def parseLinkAndTitle(self, response):
         print("### parseLinkAndTitle")

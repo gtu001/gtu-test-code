@@ -1,5 +1,7 @@
 package gtu.spring.mvc.ex1;
 
+import java.util.UUID;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,9 +10,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -22,12 +24,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -69,13 +65,21 @@ public class SpringMvcTest001Application {
                 @ModelAttribute(value = "fundQryBranchWebRequestDto") //
                 TestBean webRequestDto, //
                 Model model) {
-            // if (webRequestDto != null) {
-            // TestBean bean = new TestBean();
-            // bean.setTest(UUID.randomUUID().toString());
-            // // set ui model
-            // return new ResponseEntity<TestBean>(bean, HttpStatus.OK);
-            // }
-            // return new ResponseEntity(HttpStatus.NOT_FOUND);
+            if (webRequestDto != null) {
+                TestBean bean = new TestBean();
+                bean.setTest(UUID.randomUUID().toString());
+                // set ui model
+                return new ResponseEntity<TestBean>(bean, HttpStatus.OK);
+            }
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        @RequestMapping(value = "/testError", method = { RequestMethod.GET, RequestMethod.POST })
+        @ResponseBody
+        public ResponseEntity<TestBean> testError(//
+                @ModelAttribute(value = "fundQryBranchWebRequestDto") //
+                TestBean webRequestDto, //
+                Model model) {
             throw new CallWebServiceException("測試錯誤!");
         }
     }

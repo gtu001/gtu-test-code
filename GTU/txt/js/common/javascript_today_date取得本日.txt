@@ -1,8 +1,42 @@
-	function getToday(){
+
+	function getCurrentTime(){
 		var d = new Date();
-	    var rtnStr = ('0' + d.getFullYear()).slice(-4) + //
-	    ('0' + d.getMonth()).slice(-2) + //
-	    ('0' + d.getDate()).slice(-2) + //
+	    var rtnStr = ('0' + d.getFullYear()).slice(-4) + "/" + //
+	    ('0' + (d.getMonth() + 1)).slice(-2) + "/" + //
+	    ('0' + d.getDate()).slice(-2) + " " + //
+	    ('0' + d.getHours()).slice(-2) + ":" + //
+	    ('0' + d.getMinutes()).slice(-2) + ":" + //
+	    ('0' + d.getSeconds()).slice(-2) + "." + //
+	    (d.getMilliseconds()) + //
+	    "";
+	    return rtnStr;
+	};
+	
+	function getDateFormatStr(d) {
+		var rtnStr = ('0' + d.getFullYear()).slice(-4) + "/" + //
+	    ('0' + (d.getMonth() + 1)).slice(-2) + "/" + //
+	    ('0' + d.getDate()).slice(-2) + " " + //
+	    ('0' + d.getHours()).slice(-2) + ":" + //
+	    ('0' + d.getMinutes()).slice(-2) + ":" + //
+	    ('0' + d.getSeconds()).slice(-2) + "." + //
+	    (d.getMilliseconds()) + //
 	    "";
 	    return rtnStr;
 	}
+	
+	function During() {
+		var startTime = new Date();
+		var endTime = null;
+		return {
+			count : function(label) {
+				endTime = new Date();
+				if(label) {
+					label = " [ " + label + " ] ";
+				}else{
+					label = "";
+				}
+				return label + " 起迄 : " + getDateFormatStr(startTime) + " ~ " + getDateFormatStr(endTime) +
+					", 耗時: " + (endTime.getTime() - startTime.getTime());
+			}
+		};
+	};	

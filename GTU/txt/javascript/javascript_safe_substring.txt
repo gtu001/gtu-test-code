@@ -1,0 +1,15 @@
+		function substring(str, start, end) {
+			if(!str) {
+				str = '';
+			}
+	        if (start < 0) {
+	            start = str.length + start; 
+	        }
+	        if (start < 0) {
+	            start = 0;
+	        }
+	        if (start > str.length) {
+	            return '';
+	        }
+	        return str.substring(start, end);
+		}
