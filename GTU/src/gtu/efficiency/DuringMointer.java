@@ -138,18 +138,15 @@ public class DuringMointer {
             return resultMessage;
         }
 
-        private static void appendTagDurning(During d, Map<String, Pair<Long, Integer>> duringMap) {
+        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap) {
             String tag = d.getSummaryTag();
             if (StringUtils.isNotBlank(tag)) {
-                Long sumTime = 0L;
-                Integer countTime = 0;
+                List<Long> appLst = new ArrayList<Long>();
                 if (duringMap.containsKey(tag)) {
-                    sumTime = duringMap.get(tag).getLeft();
-                    countTime = duringMap.get(tag).getRight();
+                    appLst = duringMap.get(tag);
                 }
-                sumTime += d.duringTime;
-                countTime++;
-                duringMap.put(tag, Pair.of(sumTime, countTime));
+                appLst.add(d.duringTime);
+                duringMap.put(tag, appLst);
             }
         }
 
@@ -184,7 +181,7 @@ public class DuringMointer {
             }
 
             List<String> logLst = new ArrayList<String>();
-            Map<String, Pair<Long, Integer>> duringMap = new TreeMap<String, Pair<Long, Integer>>();
+            Map<String, List<Long>> duringMap = new TreeMap<String, List<Long>>();
             for (During d : getREPORT_MAP(keyObj)) {
                 if (ignoreLoop && d.isLoop) {
                     // ignore
@@ -198,19 +195,46 @@ public class DuringMointer {
 
             // 加總迴圈
             for (String tag : duringMap.keySet()) {
-                Pair<Long, Integer> sumData = duringMap.get(tag);
-                if (sumData.getRight() > 1) {
-                    Long sumDuring = sumData.getLeft();
-                    String msg = String.format(" 總計[%s] : %s", tag, sumDuring);
+                List<Long> durLst = duringMap.get(tag);
+                if (durLst.size() > 1) {
+                    Long sumDuring = getSumDuring(durLst);
+                    Long avgDuring = sumDuring / durLst.size();
+                    Long meanDuring = getMeanDuring(durLst);
+                    String msg = String.format(" 總計[%s] : %s / 次數 : %s / 平均 : %s / 中位數 : %s", tag, sumDuring,
+                        durLst.size(),
+                        avgDuring, meanDuring);
                     logLst.add(msg);
                 }
             }
 
             logLst.add("report size : " + getREPORT_MAP(keyObj).size());
             for (String log : logLst) {
-                logger.info(log);
+                logger.debug(log);
             }
             return StringUtils.join(logLst, "\n");
+        }
+
+        private static Long getSumDuring(List<Long> lst) {
+            Long total = 0L;
+            for (Long l : lst) {
+                total += l;
+            }
+            return total;
+        }
+
+        private static Long getMeanDuring(List<Long> lst) {
+            if (lst.isEmpty()) {
+                return -1L;
+            } else {
+                Collections.sort(lst);
+                if (lst.size() % 2 == 0) {
+                    int pos = lst.size() / 2 - 1;
+                    return (lst.get(pos) + lst.get(pos + 1)) / 2;
+                } else {
+                    int pos = lst.size() / 2 - 1;
+                    return lst.get(pos);
+                }
+            }
         }
 
         public void setComment(Object comment) {
@@ -229,7 +253,8 @@ public class DuringMointer {
                     comment = ", 備註 : " + comment;
                 }
             }
-            return String.format("%s %s 行數[%s -> %s] 耗時 : %s %s", _tag, classInfo, startLineNumber, endLineNumber, duringTime, comment);
+            return String.format("%s %s 行數[%s -> %s] 耗時 : %s %s", _tag, classInfo, startLineNumber, endLineNumber,
+                duringTime, comment);
         }
 
         private String getSummaryTag() {
@@ -254,10 +279,12 @@ public class DuringMointer {
                 if (StringUtils.equals(getEndStack().getMethodName(), getStartStack().getMethodName())) {
                     return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "()";
                 } else {
-                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->" + getEndStack().getMethodName() + "()";
+                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                            + getEndStack().getMethodName() + "()";
                 }
             } else {
-                return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->" + getSimpleClassName(getEndStack()) + getEndStack().getMethodName() + "()";
+                return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                        + getSimpleClassName(getEndStack()) + getEndStack().getMethodName() + "()";
             }
         }
 
@@ -305,6 +332,10 @@ public class DuringMointer {
 
         public static void clear(DuringKey keyObj) {
             DuringMointer.clear(keyObj);
+        }
+
+        public static void clear() {
+            DuringMointer.clear(DEFAULT_KEY_OBJECT);
         }
     }
 }

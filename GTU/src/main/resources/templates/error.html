@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" th:href="''" /><!-- @{/images/icon/favicon.ico} -->
+    <link rel="bookmark" th:href="''" /><!-- @{/images/icon/favicon.ico} -->
+    <title>投資平台系統</title>
+
+    <link th:href="''" rel="stylesheet"/> <!-- @{/css/main.css} -->
+    
+</head>
+
+<body>
+	<section class="text-center"> 
+		<div class="bg-white font-color-primary height-400">
+			<img th:src="''" width="200" style="margin-top: 120px"/><!-- @{/images/denied.png} -->
+			<h3 th:text="${errorDetail}"></h3>
+		</div>
+		<div class="error-content">
+			<p class="margin-top30" th:text="${msg}"></p>
+		</div> 
+    </section>
+</body>
+
+</html>

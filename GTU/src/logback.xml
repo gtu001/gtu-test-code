@@ -4,7 +4,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>DEBUG</level> 
 			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
-		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<!-- layout class="ch.qos.logback.classic.PatternLayout" / -->
 		<encoder>
 			<!-- <pattern># %class{0}.%method\(\) %date{HH:mm:ss:SSS}|%-5level|%thread 
 				\(%class.java:%L\)%n%caller{0} %msg%n%n%throwable{full}</pattern> -->
@@ -15,7 +15,7 @@
 	<appender name="STDOUT_GTU" class="com.iisigroup.ris.Slf4jConsoleAppender">
 		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>DEBUG</level> 
 			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
-		<layout class="ch.qos.logback.classic.PatternLayout" />
+		<!-- layout class="ch.qos.logback.classic.PatternLayout" / -->
 		<encoder>
 			<!-- <pattern># %class{0}.%method\(\) %date{HH:mm:ss:SSS}|%-5level|%thread 
 				\(%class.java:%L\)%n%caller{0} %msg%n%n%throwable{full}</pattern> -->
@@ -25,7 +25,7 @@
 
 	<appender name="ROLLING"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>C:\Users\gtu001\Desktop\ws-rolling.log</File>
+		<File>logs/ws-rolling.log</File>
 		<!-- 
 		<File>/RIS3/webui/log/ws-rolling.log</File>
 		 -->

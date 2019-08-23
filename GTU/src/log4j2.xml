@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration status="WARN" monitorInterval="30">
+<configuration status="DEBUG" monitorInterval="30">
 	<Properties>
 		<Property name="LOG_PATTERN">
 			%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%C{1}.%M()(%L)] - %m%n
 		</Property>
 	</Properties>
+	
 	<!--先定義所有的appender -->
 	<appenders>
 		<!--輸出控制台的配置 -->
 		<Console name="Console" target="SYSTEM_OUT">
 			<ThresholdFilter level="info" onMatch="ACCEPT"
 				onMismatch="DENY" />
-			<PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}" />
+			<PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%C{1}.%M()(%L)] - %m%n" />
 		</Console>
 
 		<!--文件打印出所有的信息，每次大小超過size，則這size大小的日志會自動備份 -->
 		<RollingFile name="RollingFile" fileName="logs/aplogs/INVF-Rest2_SystemOut.txt"
 			filePattern="logs/INVF-rest2/INVF-Rest2_SystemOut-%d{yyyy-MM-dd}-%i.log">
-			<PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}" />
+			<PatternLayout charset="UTF-8"  pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%C{1}.%M()(%L)] - %m%n"  />
 			<SizeBasedTriggeringPolicy size="10MB" />
 			<!-- DefaultRolloverStrategy屬性如不設置，則默認為最多同一文件夾下7個文件 -->
 			<DefaultRolloverStrategy max="10" />
 		</RollingFile>
 	</appenders>
+	
 	<!--然後定義logger，只有定義了logger並引入的appender，appender才會生效 -->
-
 	<loggers>
 		<logger level="DEBUG" name="org.hibernate.SQL">
 			<appender-ref ref="Console" />
@@ -34,7 +35,7 @@
 		</logger>
 
 		<!--建立一個默認的root的logger -->
-		<Root level="info">
+		<Root level="debug">
 			<appender-ref ref="RollingFile" />
 			<appender-ref ref="Console" />
 		</Root>

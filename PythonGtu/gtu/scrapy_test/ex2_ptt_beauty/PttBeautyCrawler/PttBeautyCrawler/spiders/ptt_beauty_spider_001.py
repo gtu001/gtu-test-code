@@ -5,7 +5,7 @@ import scrapy
 from scrapy.crawler import Crawler
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
-from scrapy.selector.lxmlsel import HtmlXPathSelector
+# from scrapy.selector.lxmlsel import HtmlXPathSelector
 from scrapy.settings import Settings
 from scrapy.spiders import CrawlSpider, Rule
 from twisted.internet import reactor

@@ -1,0 +1,71 @@
+<!-- 全部進行Debug level紀錄，並且每30秒監控設定檔是否有異動 -->
+<configuration debug="true" scan="false" scanPeriod="30 seconds">
+	<!-- 記錄檔存放路徑 -->
+	<property name="LOG_PATH" value="C:\\Application\\IVTLXIVP01\\Log\\${HOSTNAME}" />
+	<property name="LOG_FILE_BASE_NAME" value="aum-service" />
+	<!-- 歷史記錄檔存放路徑 -->
+	<property name="LOG_ARCHIVE" value="${LOG_PATH}/archive" />
+	<!-- 檔名規則 -->
+	<timestamp key="timestamp-by-second" datePattern="yyyyMMdd'T'HHmmss" />
+
+	<appender name="Console-Appender" class="ch.qos.logback.core.ConsoleAppender">
+		<layout>
+			<!-- 紀錄存放格式 -->
+			<pattern>%date %level [%thread] %logger{36} [%file : %line] %msg%n
+			</pattern>
+		</layout>
+	</appender>
+
+	<!-- 記錄檔異動規則 -->
+	<appender name="RollingFile-Appender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/${LOG_FILE_BASE_NAME}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_ARCHIVE}/%d{yyyy-MM-dd}/${LOG_FILE_BASE_NAME}.%i.log
+			</fileNamePattern>
+			<!-- <maxHistory>30</maxHistory> -->
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 100MB -->
+				<maxFileSize>1MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%date %level [%thread] %logger{36} [%file : %line] %msg%n
+			</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+	</appender>
+	<!-- 非同步方式進行紀錄 -->
+	<appender name="Async-Appender" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+		<springProfile name="!ut">
+			<queueSize>512</queueSize>
+		</springProfile>
+		<!-- 套用至RollingFile-Appender -->
+		<appender-ref ref="RollingFile-Appender" />
+	</appender>
+	<!-- 紀錄套用package、level等 -->
+
+	<logger name="cub" level="trace" additivity="false">
+		<appender-ref ref="Console-Appender" />
+		<appender-ref ref="Async-Appender" />
+	</logger>
+
+	<logger name="org.springframework.web" level="info" additivity="false">
+		<appender-ref ref="Console-Appender" />
+		<appender-ref ref="Async-Appender" />
+	</logger>
+
+	<logger name="org.hibernate" level="info" additivity="false">
+		<appender-ref ref="Console-Appender" />
+		<appender-ref ref="Async-Appender" />
+	</logger>
+
+	<root level="info">
+		<appender-ref ref="Console-Appender" />
+		<appender-ref ref="Async-Appender" />
+	</root>
+
+</configuration>
