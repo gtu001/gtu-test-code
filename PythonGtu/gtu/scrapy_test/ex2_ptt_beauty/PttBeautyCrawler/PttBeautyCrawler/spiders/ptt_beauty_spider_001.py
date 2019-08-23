@@ -50,16 +50,25 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
         print("### MAIN page : ", response.url)
         hxs = Selector(response)
 
-        self.postYesToVerify() 
-        
         for item in self.otherPageDetect(response) :
             yield item
         
         for item in self.parseLinkAndTitle(response) :
             yield item
 
+            
+    def start_requests(self):
+        url = 'https://www.ptt.cc/ask/over18?from=/bbs/Beauty/index.html'
+        my_data = {'yes' : 'yes'}
+        yield scrapy.FormRequest(url , 
+                                method='POST', 
+                                formdata = my_data, 
+                                headers=None,
+                                callback = self.parse )
+
 
     def postYesToVerify(self) :
+        print("### postYesToVerify")
         '''
         s = Session()
         req = Request('POST', 'https://www.ptt.cc/ask/over18?from=/bbs/Beauty/index.html',
@@ -78,10 +87,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
         )
         print(resp.status_code)
         '''
-        my_data = {'yes' : 'yes'}
-        request = scrapy.Request( 'https://www.ptt.cc/ask/over18?from=/bbs/Beauty/index.html', method='POST', 
-                                body = json.dumps(my_data), 
-                                headers={'Content-Type':'application/text'} )
+
 
             
     def parseLinkAndTitle(self, response):
@@ -110,6 +116,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
             
             yield scrapy.Request(scraped_info['href'], callback=self.parse_detail_page, meta=scraped_info)
             
+
     def otherPageDetect(self, response):
         print("### otherPageDetect")
         btns = response.css(".btn.wide::attr(href)").extract();
@@ -119,6 +126,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
                 }
             yield scrapy.Request(scraped_info['pageUrl'], callback=self.parse, meta=scraped_info)
             
+
     def parse_detail_page(self, response):
         print("parse_detail_page-------------------")
         '''
@@ -135,6 +143,7 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
 #             print("scraped_info", scraped_info)
             yield scraped_info
             yield self.download(scraped_info);
+
 
     def download(self, scraped_info):
         dateObj = dateUtil.getDatetimeByJavaFormat(PttBeautyCrawlerSpider.FETCH_PREFIX_YEAR + scraped_info['date'], "yyyy/MM/dd", True)
@@ -155,16 +164,19 @@ class PttBeautyCrawlerSpider(scrapy.Spider):  #   scrapy.Spider    /    CrawlSpi
         
         simple_request_handler_001.doDownload(url, filepath)
         
+
     def isDatePremit(self, scraped_info):
         dateObj = dateUtil.getDatetimeByJavaFormat(PttBeautyCrawlerSpider.FETCH_PREFIX_YEAR + scraped_info['date'], "yyyy/MM/dd", True)
         if PttBeautyCrawlerSpider.FETCH_SINCE_DATE > dateObj :
             return False
         return True
     
+
     def isPicFormatOk(self, scraped_info):
         if "帥哥" in scraped_info['title'] or "[公告]" in scraped_info['title'] :
             return False
         return True
+
 
 
 if __name__ == '__main__' :
