@@ -24,21 +24,25 @@ public class DuringMointer {
         During a1 = new During("迴圈一億次1");
         for (int ii = 0; ii < 100000000; ii++) {
         }
-        a1.count(keyObj);
+        a1.count(keyObj, "test1");
 
         During a2 = new During("迴圈一億次2");
         for (int ii = 0; ii < 100000000; ii++) {
         }
-        a2.count(keyObj);
+        a2.count(keyObj, "test2");
 
         for (int ii = 0; ii < 100; ii++) {
             During loopInner = new During("迴圈內部");
-            loopInner.count(keyObj);
+            loopInner.count(keyObj, "test_loop");
         }
         During.printAll(keyObj, true, 0);
         During.clear(keyObj);
+
         System.out.println("done...");
     }
+
+    private static final Logger logger = LogManager.getLogger(During.class);
+    private static final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss.SSS");
 
     public static class DuringKey {
         private Object object;
@@ -96,9 +100,6 @@ public class DuringMointer {
     }
 
     public static class During {
-        private static final Logger logger = LogManager.getLogger(During.class);
-        private static final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss.SSS");
-
         long startTime;
         long endTime;
         long duringTime;
@@ -153,7 +154,7 @@ public class DuringMointer {
             return resultMessage;
         }
 
-        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap) {
+        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap, Map<String, Object> duringCommentMap) {
             String tag = d.getSummaryTag();
             if (StringUtils.isNotBlank(tag)) {
                 List<Long> appLst = new ArrayList<Long>();
@@ -162,6 +163,10 @@ public class DuringMointer {
                 }
                 appLst.add(d.duringTime);
                 duringMap.put(tag, appLst);
+
+                if (!duringCommentMap.containsKey(tag)) {
+                    duringCommentMap.put(tag, d.comment);
+                }
             }
         }
 
@@ -197,6 +202,7 @@ public class DuringMointer {
 
             List<String> logLst = new ArrayList<String>();
             Map<String, List<Long>> duringMap = new TreeMap<String, List<Long>>();
+            Map<String, Object> duringCommentMap = new TreeMap<String, Object>();
             for (During d : getREPORT_MAP(keyObj)) {
                 if (ignoreLoop && d.isLoop) {
                     // ignore
@@ -205,49 +211,33 @@ public class DuringMointer {
                 } else {
                     logLst.add(d.count(keyObj));
                 }
-                appendTagDurning(d, duringMap);
+                appendTagDurning(d, duringMap, duringCommentMap);
             }
 
             // 加總迴圈
             for (String tag : duringMap.keySet()) {
                 List<Long> durLst = duringMap.get(tag);
                 if (durLst.size() > 1) {
-                    Long sumDuring = getSumDuring(durLst);
-                    Long avgDuring = sumDuring / durLst.size();
-                    Long meanDuring = getMeanDuring(durLst);
-                    String msg = String.format(" 迴圈總計[%s] : %s / 次數 : %s / 平均 : %s / 中位數 : %s", tag, sumDuring, durLst.size(), avgDuring, meanDuring);
+                    String msg = String.format(" 迴圈總計[%s] / [耗時] 總計 ： %s / 次數 : %s / 平均 : %s / 最大值 : %s  / 最小值 : %s  / 中位數 : %s  %s", //
+                            tag, //
+                            MyUtil.getSum(durLst), //
+                            durLst.size(), //
+                            MyUtil.getAvg(durLst), //
+                            MyUtil.getMax(durLst), //
+                            MyUtil.getMin(durLst), //
+                            MyUtil.getMean(durLst), //
+                            getLoopDuringComment(tag, duringCommentMap)//
+                            );//
                     logLst.add(msg);
                 }
             }
 
             logLst.add("report size : " + getREPORT_MAP(keyObj).size());
             for (String log : logLst) {
-                logger.debug(log);
+                // logger.debug(log);//XXXXXXXXXXXXXXXXX
+                System.out.println(log);
             }
             return StringUtils.join(logLst, "\n");
-        }
-
-        private static Long getSumDuring(List<Long> lst) {
-            Long total = 0L;
-            for (Long l : lst) {
-                total += l;
-            }
-            return total;
-        }
-
-        private static Long getMeanDuring(List<Long> lst) {
-            if (lst.isEmpty()) {
-                return -1L;
-            } else {
-                Collections.sort(lst);
-                if (lst.size() % 2 == 0) {
-                    int pos = lst.size() / 2 - 1;
-                    return (lst.get(pos) + lst.get(pos + 1)) / 2;
-                } else {
-                    int pos = lst.size() / 2 - 1;
-                    return lst.get(pos);
-                }
-            }
         }
 
         public void setComment(Object comment) {
@@ -340,6 +330,17 @@ public class DuringMointer {
             return rtn;
         }
 
+        private static String getLoopDuringComment(String tag, Map<String, Object> duringCommentMap) {
+            String comment = "";
+            if (duringCommentMap.containsKey(tag)) {
+                Object val = duringCommentMap.get(tag);
+                if (val != null) {
+                    comment = ", 備註 : " + String.valueOf(val);
+                }
+            }
+            return comment;
+        }
+
         public static DuringKey createKey(Object value) {
             return new DuringKey(value);
         }
@@ -350,6 +351,54 @@ public class DuringMointer {
 
         public static void clear() {
             DuringMointer.clear(DEFAULT_KEY_OBJECT);
+        }
+    }
+
+    private static class MyUtil {
+        private static Long getMin(List<Long> lst) {
+            Long minVal = Long.MAX_VALUE;
+            for (Long l : lst) {
+                minVal = Long.min(minVal, l);
+            }
+            return minVal;
+        }
+
+        private static Long getMax(List<Long> lst) {
+            Long maxVal = Long.MIN_VALUE;
+            for (Long l : lst) {
+                maxVal = Long.max(maxVal, l);
+            }
+            return maxVal;
+        }
+
+        private static Long getSum(List<Long> lst) {
+            Long total = 0L;
+            for (Long l : lst) {
+                total += l;
+            }
+            return total;
+        }
+
+        private static Long getAvg(List<Long> lst) {
+            if (lst.size() != 0) {
+                return getSum(lst) / lst.size();
+            }
+            return 0L;
+        }
+
+        private static Long getMean(List<Long> lst) {
+            if (lst.isEmpty()) {
+                return -1L;
+            } else {
+                Collections.sort(lst);
+                if (lst.size() % 2 == 0) {
+                    int pos = lst.size() / 2 - 1;
+                    return (lst.get(pos) + lst.get(pos + 1)) / 2;
+                } else {
+                    int pos = lst.size() / 2 - 1;
+                    return lst.get(pos);
+                }
+            }
         }
     }
 }

@@ -204,8 +204,13 @@ public class JCommonUtil {
      * 設定視窗icon
      */
     public static void setJFrameIcon(Window frame, String resourcePath) {
-        Image img = ImageUtil.getInstance().getImageAutoChoice(resourcePath);
-        frame.setIconImage(img);
+        try {
+            Image img = ImageUtil.getInstance().getImageAutoChoice(resourcePath);
+            frame.setIconImage(img);
+        } catch (NullPointerException e) {
+            System.out.println("ERR resourcePath : " + resourcePath);
+            throw e;
+        }
     }
 
     /**

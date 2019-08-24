@@ -63,8 +63,10 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.file.FileUtil;
 import gtu.file.FileUtil.FileZ;
+import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.ProcessWatcher;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
@@ -116,7 +118,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             public void run() {
                 DirectoryCompareUI inst = new DirectoryCompareUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
         System.out.println("done...");
@@ -139,7 +141,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                     jPanel1 = new JPanel();
                     BorderLayout jPanel1Layout = new BorderLayout();
                     jPanel1.setLayout(jPanel1Layout);
-                    jTabbedPane1.addTab("jPanel1", null, jPanel1, null);
+                    jTabbedPane1.addTab("比對檔案", null, jPanel1, null);
                     {
                         jPanel2 = new JPanel();
                         BoxLayout jPanel2Layout = new BoxLayout(jPanel2, javax.swing.BoxLayout.X_AXIS);
@@ -228,7 +230,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             extensionNameComboBox.setModel(extensionNameComboBoxModel);
                             {
                                 panel = new JPanel();
-                                jTabbedPane1.addTab("New tab", null, panel, null);
+                                jTabbedPane1.addTab("設定", null, panel, null);
                                 panel.setLayout(new FormLayout(
                                         new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                                         new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -284,8 +286,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             }
             pack();
             this.setSize(864, 563);
-            
-            JCommonUtil.setJFrameIcon(getOwner(), "images/ico/file_merge.ico");
+
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/file_merge.ico");
 
             initConfigBean();
         } catch (Exception e) {
@@ -593,7 +595,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                 DiffMergeCommand diffCommand = (DiffMergeCommand) diffToolComboBox.getSelectedItem();
                 String command = diffCommand.getCommand(this, fileA, fileB);
                 System.out.println(command);
-                ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();
+                //ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();//XXXXXXXXXXXXXX
+                RuntimeBatPromptModeUtil.newInstance().command(command).apply();
             }
             if (evt.getClickCount() == 1 && evt.getButton() == MouseEvent.BUTTON3) {
                 final File mainFile = obj.mainFile.getFile();
@@ -1570,7 +1573,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             @Override
             String getCommand(DirectoryCompareUI this_, File fileA, File fileB) {
                 try {
-                    String customCompareCommandURL = "cmd /c call " + this_.customCompareText.getText();
+                    String customCompareCommandURL = this_.customCompareText.getText();
                     String command = String.format(customCompareCommandURL, fileA, fileB);
                     return command;
                 } catch (Exception ex) {
@@ -1582,7 +1585,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         TortoiseSVN("小烏龜SVN") {
             @Override
             String getCommand(DirectoryCompareUI this_, File fileA, File fileB) {
-                String tortoiseMergeFormat = "cmd /c call TortoiseMerge /base:\"%s\" /theirs:\"%s\"";
+                String tortoiseMergeFormat = getPrefixCommand() + " TortoiseMerge /base:\"%s\" /theirs:\"%s\"";
                 String command = String.format(tortoiseMergeFormat, fileA, fileB);
                 return command;
             }
@@ -1590,7 +1593,15 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         TortoiseGIT("小烏龜GIT") {
             @Override
             String getCommand(DirectoryCompareUI this_, File fileA, File fileB) {
-                String tortoiseMergeFormat = "cmd /c call TortoiseGitMerge /base:\"%s\" /theirs:\"%s\"";
+                String tortoiseMergeFormat = getPrefixCommand() + " TortoiseGitMerge /base:\"%s\" /theirs:\"%s\"";
+                String command = String.format(tortoiseMergeFormat, fileA, fileB);
+                return command;
+            }
+        }, //
+        Meld("Meld for ubuntu") {
+            @Override
+            String getCommand(DirectoryCompareUI this_, File fileA, File fileB) {
+                String tortoiseMergeFormat = " meld \"%s\" \"%s\"";
                 String command = String.format(tortoiseMergeFormat, fileA, fileB);
                 return command;
             }
@@ -1610,6 +1621,13 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         }
 
         abstract String getCommand(DirectoryCompareUI this_, File fileA, File fileB);
+
+        private static String getPrefixCommand() {
+            if (OsInfoUtil.isWindows()) {
+                return "cmd /c call ";
+            }
+            return "sh ";
+        }
 
         public String toString() {
             return label;
