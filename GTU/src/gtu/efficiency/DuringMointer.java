@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -109,6 +110,7 @@ public class DuringMointer {
         String tag;
         boolean isLoop = false;// 重複使用
         Object comment;
+        String classInfo;
 
         public During() {
             this("");
@@ -154,7 +156,8 @@ public class DuringMointer {
             return resultMessage;
         }
 
-        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap, Map<String, Object> duringCommentMap) {
+        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap,
+                Map<String, Object> duringCommentMap) {
             String tag = d.getSummaryTag();
             if (StringUtils.isNotBlank(tag)) {
                 List<Long> appLst = new ArrayList<Long>();
@@ -187,20 +190,27 @@ public class DuringMointer {
          *            <= 0 忽略超時
          */
         public static String printAll(DuringKey keyObj, boolean ignoreLoop, long overDurningTime) {
+            List<String> logLst = new ArrayList<String>();
+
             // 檢查重複
             List<During> lst1 = new ArrayList<During>(getREPORT_MAP(keyObj));
+            Map<String, List<Integer>> chkSummaryMap = new HashMap<String, List<Integer>>();
             for (int ii = 0; ii < lst1.size(); ii++) {
-                for (int jj = ii + 1; jj < lst1.size(); jj++) {
-                    During d1 = lst1.get(ii);
-                    During d2 = lst1.get(jj);
-                    if (StringUtils.equals(d1.getSummaryTag(), d2.getSummaryTag())) {
-                        d1.isLoop = true;
-                        d2.isLoop = true;
-                    }
+                During d1 = lst1.get(ii);
+                String summaryTag = d1.getSummaryTag();
+                List<Integer> keyLst = new ArrayList<Integer>();
+                if (chkSummaryMap.containsKey(summaryTag)) {
+                    keyLst = chkSummaryMap.get(summaryTag);
+                }
+                keyLst.add(ii);
+                chkSummaryMap.put(summaryTag, keyLst);
+            }
+            for (List<Integer> indexLst : chkSummaryMap.values()) {
+                for (int idx : indexLst) {
+                    lst1.get(idx).isLoop = true;
                 }
             }
 
-            List<String> logLst = new ArrayList<String>();
             Map<String, List<Long>> duringMap = new TreeMap<String, List<Long>>();
             Map<String, Object> duringCommentMap = new TreeMap<String, Object>();
             for (During d : getREPORT_MAP(keyObj)) {
@@ -218,16 +228,17 @@ public class DuringMointer {
             for (String tag : duringMap.keySet()) {
                 List<Long> durLst = duringMap.get(tag);
                 if (durLst.size() > 1) {
-                    String msg = String.format(" 迴圈總計[%s] / [耗時] 總計 ： %s / 次數 : %s / 平均 : %s / 最大值 : %s  / 最小值 : %s  / 中位數 : %s  %s", //
-                            tag, //
-                            MyUtil.getSum(durLst), //
-                            durLst.size(), //
-                            MyUtil.getAvg(durLst), //
-                            MyUtil.getMax(durLst), //
-                            MyUtil.getMin(durLst), //
-                            MyUtil.getMean(durLst), //
-                            getLoopDuringComment(tag, duringCommentMap)//
-                            );//
+                    String msg = String.format(
+                        " 迴圈總計[%s] / [耗時] 總計 ： %s / 次數 : %s / 平均 : %s / 最大值 : %s  / 最小值 : %s  / 中位數 : %s  %s", //
+                        tag, //
+                        MyUtil.getSum(durLst), //
+                        durLst.size(), //
+                        MyUtil.getAvg(durLst), //
+                        MyUtil.getMax(durLst), //
+                        MyUtil.getMin(durLst), //
+                        MyUtil.getMean(durLst), //
+                        getLoopDuringComment(tag, duringCommentMap)//
+                    );//
                     logLst.add(msg);
                 }
             }
@@ -244,9 +255,16 @@ public class DuringMointer {
             this.comment = comment;
         }
 
+        private String getSelfClassInfo() {
+            if (StringUtils.isBlank(this.classInfo)) {
+                this.classInfo = getClassInfo();
+            }
+            return this.classInfo;
+        }
+
         private String getFormatResult() {
             String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
-            String classInfo = getClassInfo();
+            String classInfo = getSelfClassInfo();
             String startLineNumber = String.valueOf(getStartStack().getLineNumber());
             String endLineNumber = String.valueOf(getEndStack().getLineNumber());
             String comment = "";
@@ -256,7 +274,8 @@ public class DuringMointer {
                     comment = ", 備註 : " + comment;
                 }
             }
-            return String.format("%s %s 行數[%s -> %s] 耗時 : %s [起迄 : %s - %s] %s", _tag, classInfo, startLineNumber, endLineNumber, duringTime, getTime(startTime), getTime(endTime), comment);
+            return String.format("%s %s 行數[%s -> %s] 耗時 : %s [起迄 : %s - %s] %s", _tag, classInfo, startLineNumber,
+                endLineNumber, duringTime, getTime(startTime), getTime(endTime), comment);
         }
 
         private String getTime(long dateTime) {
@@ -265,7 +284,7 @@ public class DuringMointer {
 
         private String getSummaryTag() {
             String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
-            String classInfo = getClassInfo();
+            String classInfo = getSelfClassInfo();
             String startLineNumber = String.valueOf(getStartStack().getLineNumber());
             String endLineNumber = String.valueOf(getEndStack().getLineNumber());
             return String.format("%s %s 行數[%s -> %s]", _tag, classInfo, startLineNumber, endLineNumber);
@@ -285,10 +304,12 @@ public class DuringMointer {
                 if (StringUtils.equals(getEndStack().getMethodName(), getStartStack().getMethodName())) {
                     return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "()";
                 } else {
-                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->" + getEndStack().getMethodName() + "()";
+                    return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                            + getEndStack().getMethodName() + "()";
                 }
             } else {
-                return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->" + getSimpleClassName(getEndStack()) + getEndStack().getMethodName() + "()";
+                return getSimpleClassName(getStartStack()) + "." + getStartStack().getMethodName() + "->"
+                        + getSimpleClassName(getEndStack()) + getEndStack().getMethodName() + "()";
             }
         }
 
