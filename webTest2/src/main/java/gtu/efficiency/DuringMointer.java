@@ -1,5 +1,12 @@
 package gtu.efficiency;
 
+import java.awt.Desktop;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +23,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import gtu.file.FileUtil;
+
 public class DuringMointer {
 
     public static void main(String[] args) {
         DuringKey keyObj = During.createKey(new Object());
 
+        During.clear(keyObj);
         DuringMointer d = new DuringMointer();
         During a1 = new During("迴圈一億次1");
         for (int ii = 0; ii < 100000000; ii++) {
@@ -36,14 +46,15 @@ public class DuringMointer {
             During loopInner = new During("迴圈內部");
             loopInner.count(keyObj, "test_loop");
         }
-        During.printAll(keyObj, true, 0);
-        During.clear(keyObj);
 
+        During.printAll(keyObj, true, 0);
+        During.printHtml("SAVE_FILE.html", keyObj, true, 0);
         System.out.println("done...");
     }
 
     private static final Logger logger = LogManager.getLogger(During.class);
     private static final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss.SSS");
+    private static final SimpleDateFormat YYYYMMDD_SDF_TIME = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
     public static class DuringKey {
         private Object object;
@@ -106,11 +117,10 @@ public class DuringMointer {
         long duringTime;
         StackTraceElement startStack;
         StackTraceElement endStack;
-        String resultMessage;
         String tag;
         boolean isLoop = false;// 重複使用
         Object comment;
-        String classInfo;
+        InnerInfo infoObj;
 
         public During() {
             this("");
@@ -147,17 +157,25 @@ public class DuringMointer {
         public String count(DuringKey keyObj, Object comment) {
             getREPORT_MAP(keyObj).add(this);
             this.setComment(comment);
-            if (StringUtils.isBlank(resultMessage)) {
-                endTime = System.currentTimeMillis();
-                duringTime = endTime - startTime;
-                endStack = getCallerStack();
-                resultMessage = getFormatResult();
-            }
-            return resultMessage;
+            this.infoObj = new InnerInfo();
+            return infoObj.formatResult;
         }
 
-        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap, Map<String, Object> duringCommentMap) {
-            String tag = d.getSummaryTag();
+        private String[] toHtmlTds(DuringKey keyObj) {
+            return new String[] { //
+                    infoObj.tag, //
+                    infoObj.classInfo, //
+                    infoObj.startLineNumber, //
+                    infoObj.endLineNumber, //
+                    YYYYMMDD_SDF_TIME.format(startTime), //
+                    YYYYMMDD_SDF_TIME.format(endTime), //
+                    "" + this.duringTime, //
+                    "" + infoObj.comment //
+            };
+        }
+
+        private static void appendTagDurning(During d, Map<String, List<Long>> duringMap, Map<String, Object> duringCommentMap, Map<String, During> duringSingleMap) {
+            String tag = d.infoObj.summaryTag;
             if (StringUtils.isNotBlank(tag)) {
                 List<Long> appLst = new ArrayList<Long>();
                 if (duringMap.containsKey(tag)) {
@@ -168,6 +186,10 @@ public class DuringMointer {
 
                 if (!duringCommentMap.containsKey(tag)) {
                     duringCommentMap.put(tag, d.comment);
+                }
+
+                if (!duringSingleMap.containsKey(appLst)) {
+                    duringSingleMap.put(tag, d);
                 }
             }
         }
@@ -196,7 +218,7 @@ public class DuringMointer {
             Map<String, List<Integer>> chkSummaryMap = new HashMap<String, List<Integer>>();
             for (int ii = 0; ii < lst1.size(); ii++) {
                 During d1 = lst1.get(ii);
-                String summaryTag = d1.getSummaryTag();
+                String summaryTag = d1.infoObj.summaryTag;
                 List<Integer> keyLst = new ArrayList<Integer>();
                 if (chkSummaryMap.containsKey(summaryTag)) {
                     keyLst = chkSummaryMap.get(summaryTag);
@@ -213,6 +235,7 @@ public class DuringMointer {
 
             Map<String, List<Long>> duringMap = new TreeMap<String, List<Long>>();
             Map<String, Object> duringCommentMap = new TreeMap<String, Object>();
+            Map<String, During> duringSingleMap = new HashMap<String, During>();
             for (During d : getREPORT_MAP(keyObj)) {
                 if (ignoreLoop && d.isLoop) {
                     // ignore
@@ -221,7 +244,7 @@ public class DuringMointer {
                 } else {
                     logLst.add(d.count(keyObj));
                 }
-                appendTagDurning(d, duringMap, duringCommentMap);
+                appendTagDurning(d, duringMap, duringCommentMap, duringSingleMap);
             }
 
             // 加總迴圈
@@ -236,7 +259,7 @@ public class DuringMointer {
                             MyUtil.getMax(durLst), //
                             MyUtil.getMin(durLst), //
                             MyUtil.getMean(durLst), //
-                            getLoopDuringComment(tag, duringCommentMap)//
+                            getLoopDuringComment(tag, duringCommentMap, true)//
                     );//
                     logLst.add(msg);
                 }
@@ -250,42 +273,117 @@ public class DuringMointer {
             return StringUtils.join(logLst, "\n");
         }
 
+        /**
+         * @param ignoreLoop
+         *            在迴圈內的during是否distinct
+         * @param overDurningTime
+         *            <= 0 忽略超時
+         */
+        public static File printHtml(String fileName, DuringKey keyObj, boolean ignoreLoop, long overDurningTime) {
+            HtmlSimpleTableCreater html = new HtmlSimpleTableCreater();
+            html.addTh("標籤", "類別資訊", "開始行數", "結束行數", "開始時間", "結束時間", "耗時", "備註");
+
+            // 檢查重複
+            List<During> lst1 = new ArrayList<During>(getREPORT_MAP(keyObj));
+            Map<String, List<Integer>> chkSummaryMap = new HashMap<String, List<Integer>>();
+            for (int ii = 0; ii < lst1.size(); ii++) {
+                During d1 = lst1.get(ii);
+                String summaryTag = d1.infoObj.summaryTag;
+                List<Integer> keyLst = new ArrayList<Integer>();
+                if (chkSummaryMap.containsKey(summaryTag)) {
+                    keyLst = chkSummaryMap.get(summaryTag);
+                }
+                keyLst.add(ii);
+                chkSummaryMap.put(summaryTag, keyLst);
+            }
+            for (List<Integer> indexLst : chkSummaryMap.values()) {
+                boolean isLoop = indexLst.size() > 1;
+                for (int idx : indexLst) {
+                    lst1.get(idx).isLoop = isLoop;
+                }
+            }
+
+            Map<String, List<Long>> duringMap = new TreeMap<String, List<Long>>();
+            Map<String, Object> duringCommentMap = new TreeMap<String, Object>();
+            Map<String, During> duringSingleMap = new HashMap<String, During>();
+            for (During d : getREPORT_MAP(keyObj)) {
+                if (ignoreLoop && d.isLoop) {
+                    // ignore
+                } else if (overDurningTime > 0 && d.duringTime < overDurningTime) {
+                    // ignore
+                } else {
+                    html.addTd(d.toHtmlTds(keyObj));
+                    html.newTr();
+                }
+                appendTagDurning(d, duringMap, duringCommentMap, duringSingleMap);
+            }
+
+            // 加總迴圈
+            for (String tag : duringMap.keySet()) {
+                List<Long> durLst = duringMap.get(tag);
+                if (durLst.size() > 1) {
+                    String msg = String.format("[耗時] 總計 ： %s / 次數 : %s / 平均 : %s / 最大值 : %s / 最小值 : %s / 中位數 : %s", //
+                            MyUtil.getSum(durLst), //
+                            durLst.size(), //
+                            MyUtil.getAvg(durLst), //
+                            MyUtil.getMax(durLst), //
+                            MyUtil.getMin(durLst), //
+                            MyUtil.getMean(durLst) //
+                    );//
+                    During tmpDuring = duringSingleMap.get(tag);
+                    html.addTd(tag);
+                    html.addTd(tmpDuring.infoObj.classInfo);
+                    html.addTd(tmpDuring.infoObj.startLineNumber);
+                    html.addTd(tmpDuring.infoObj.endLineNumber);
+                    html.addTd(msg, 3);
+                    html.addTd(getLoopDuringComment(tag, duringCommentMap, false));
+                    html.newTr();
+                }
+            }
+
+            html.addTd("report size : " + getREPORT_MAP(keyObj).size(), 100);
+            html.newTr();
+
+            File saveHtmlFile = html.createFile(fileName);
+            return saveHtmlFile;
+        }
+
         public void setComment(Object comment) {
             this.comment = comment;
         }
 
-        private String getSelfClassInfo() {
-            if (StringUtils.isBlank(this.classInfo)) {
-                this.classInfo = getClassInfo();
-            }
-            return this.classInfo;
-        }
+        private class InnerInfo {
+            String tag;
+            String classInfo;
+            String startLineNumber;
+            String endLineNumber;
+            String comment;
+            String formatResult;
+            String summaryTag;
 
-        private String getFormatResult() {
-            String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
-            String classInfo = getSelfClassInfo();
-            String startLineNumber = String.valueOf(getStartStack().getLineNumber());
-            String endLineNumber = String.valueOf(getEndStack().getLineNumber());
-            String comment = "";
-            if (this.comment != null) {
-                comment = StringUtils.trimToEmpty(String.valueOf(this.comment));
-                if (StringUtils.isNotBlank(comment)) {
-                    comment = ", 備註 : " + comment;
+            InnerInfo() {
+                this.tag = StringUtils.isNotBlank(During.this.tag) ? "[" + During.this.tag + "]" : "";
+                this.classInfo = getClassInfo();
+                this.startLineNumber = String.valueOf(getStartStack().getLineNumber());
+                this.endLineNumber = String.valueOf(getEndStack().getLineNumber());
+                this.comment = During.this.comment != null ? String.valueOf(During.this.comment) : "";
+
+                During.this.endTime = System.currentTimeMillis();
+                During.this.duringTime = endTime - startTime;
+                During.this.endStack = getCallerStack();
+
+                String comment = "";
+                if (StringUtils.isNotBlank(this.comment)) {
+                    comment = ", 備註 : " + this.comment;
                 }
+                formatResult = String.format("%s %s 行數[%s -> %s] 耗時 : %s [起迄 : %s - %s] %s", this.tag, classInfo, startLineNumber, endLineNumber, duringTime, getTime(startTime), getTime(endTime),
+                        comment);
+                summaryTag = String.format("%s %s 行數[%s -> %s]", this.tag, classInfo, startLineNumber, endLineNumber);
             }
-            return String.format("%s %s 行數[%s -> %s] 耗時 : %s [起迄 : %s - %s] %s", _tag, classInfo, startLineNumber, endLineNumber, duringTime, getTime(startTime), getTime(endTime), comment);
         }
 
         private String getTime(long dateTime) {
             return SDF_TIME.format(new Date(dateTime));
-        }
-
-        private String getSummaryTag() {
-            String _tag = StringUtils.isNotBlank(tag) ? "[" + tag + "]" : "";
-            String classInfo = getSelfClassInfo();
-            String startLineNumber = String.valueOf(getStartStack().getLineNumber());
-            String endLineNumber = String.valueOf(getEndStack().getLineNumber());
-            return String.format("%s %s 行數[%s -> %s]", _tag, classInfo, startLineNumber, endLineNumber);
         }
 
         private String getSimpleClassName(StackTraceElement stack) {
@@ -347,12 +445,16 @@ public class DuringMointer {
             return rtn;
         }
 
-        private static String getLoopDuringComment(String tag, Map<String, Object> duringCommentMap) {
+        private static String getLoopDuringComment(String tag, Map<String, Object> duringCommentMap, boolean isAddPrefix) {
             String comment = "";
             if (duringCommentMap.containsKey(tag)) {
                 Object val = duringCommentMap.get(tag);
                 if (val != null) {
-                    comment = ", 備註 : " + String.valueOf(val);
+                    String prefix = "";
+                    if (isAddPrefix) {
+                        prefix = ", 備註 : ";
+                    }
+                    comment = prefix + String.valueOf(val);
                 }
             }
             return comment;
@@ -414,6 +516,155 @@ public class DuringMointer {
                 } else {
                     int pos = lst.size() / 2 - 1;
                     return lst.get(pos);
+                }
+            }
+        }
+    }
+
+    public static class HtmlSimpleTableCreater {
+
+        private static final String HTML;
+        static {
+            StringBuilder sb = new StringBuilder();
+            sb.append(" <html>  \n");
+            sb.append(" <head>  \n");
+            sb.append("     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />  \n");
+            sb.append("     <style> \n");
+            sb.append("     table '{'   \n");
+            sb.append("         border:1px solid #000;   \n");
+            sb.append("         font-family: 微軟正黑體;   \n");
+            sb.append("         font-size:16px;   \n");
+            sb.append("         width:80%;  \n");
+            sb.append("         border:1px solid #000;  \n");
+            sb.append("         text-align:center;  \n");
+            sb.append("         border-collapse:collapse;  \n");
+            sb.append("     }   \n");
+            sb.append("     th '{'   \n");
+            sb.append("         background-color: #009FCC;  \n");
+            sb.append("         padding:10px;  \n");
+            sb.append("         border:1px solid #000;  \n");
+            sb.append("         color:#fff;  \n");
+            sb.append("         font-size:10px;  \n");
+            sb.append("     }   \n");
+            sb.append("     td '{'   \n");
+            sb.append("         border:1px solid #000;  \n");
+            sb.append("         padding:5px;  \n");
+            sb.append("         font-size:14px;  \n");
+            sb.append("     }  \n");
+            sb.append(" </style>  \n");
+            sb.append("   \n");
+            sb.append(" <script type=\"text/javascript\">  \n");
+            sb.append(" </script>  \n");
+            sb.append("   ");
+            sb.append(" </head>  \n");
+            sb.append(" <body>  \n");
+            sb.append("   \n");
+            sb.append("  {0} ");
+            sb.append("   ");
+            sb.append(" </body>  \n");
+            sb.append(" </html>  \n");
+            HTML = sb.toString();
+        }
+
+        private List<String> ths = new ArrayList<String>();
+
+        private List<String> tds = new ArrayList<String>();
+        private List<Integer> tdCols = new ArrayList<Integer>();
+        private List<Object[]> tdsLst = new ArrayList<Object[]>();
+
+        public HtmlSimpleTableCreater addTh(String... ths) {
+            for (String str : ths) {
+                this.ths.add(str);
+            }
+            return this;
+        }
+
+        public HtmlSimpleTableCreater addTd(String... tds) {
+            for (String str : tds) {
+                this.tds.add(str);
+                this.tdCols.add(1);
+            }
+            return this;
+        }
+
+        public HtmlSimpleTableCreater addTd(String td) {
+            return addTd(td, 1);
+        }
+
+        public HtmlSimpleTableCreater addTd(String td, int colspan) {
+            if (colspan < 1) {
+                colspan = 1;
+            }
+            this.tds.add(td);
+            this.tdCols.add(colspan);
+            return this;
+        }
+
+        public HtmlSimpleTableCreater newTr() {
+            tdsLst.add(new Object[] { tds, tdCols });
+            tds = new ArrayList<String>();
+            tdCols = new ArrayList<Integer>();
+            return this;
+        }
+
+        public String createHtml() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<table>\n");
+            sb.append("<tr>");
+            for (String str : ths) {
+                sb.append("<th>");
+                sb.append(StringUtils.trimToEmpty(str));
+                sb.append("</th>");
+            }
+            sb.append("</tr>");
+            sb.append("\n");
+            for (Object[] tdConf : tdsLst) {
+                List<String> tds = (List<String>) tdConf[0];
+                List<Integer> tdCols = (List<Integer>) tdConf[1];
+                sb.append("<tr>");
+                for (int ii = 0; ii < tds.size(); ii++) {
+                    String str = tds.get(ii);
+                    sb.append("<td colspan='" + tdCols.get(ii) + "'>");
+                    sb.append(StringUtils.trimToEmpty(str));
+                    sb.append("</td>");
+                }
+                sb.append("</tr>");
+                sb.append("\n");
+            }
+            sb.append("</table>\n");
+            return MessageFormat.format(HTML, new Object[] { sb });
+        }
+
+        public File createFile(String name) {
+            String html = createHtml();
+            File file = getFile(name);
+            saveToFile(file, html, "UTF8");
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return file;
+        }
+
+        public static File getFile(String name) {
+            File file = new File(FileUtil.DESKTOP_DIR, name);
+            System.out.println(">>>>>> " + file);
+            return file;
+        }
+
+        public static void saveToFile(File file, String content, String encode) {
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encode));
+                writer.write(content);
+                writer.close();
+            } catch (Exception ex) {
+                throw new RuntimeException("saveToFile ERR : " + ex.getMessage(), ex);
+            } finally {
+                try {
+                    writer.close();
+                } catch (Exception ex1) {
                 }
             }
         }
