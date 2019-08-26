@@ -46,7 +46,7 @@ public class UrlPlayerDialog_bg {
 
     private Context context;
     private String message;
-    private Mp3Bean bean;
+    private Mp3Bean bean;UrlPlayerServiceHander
     private List<Mp3Bean> totalUrlList;
     private int currentIndex = -1;
     private int replayMode = -1;

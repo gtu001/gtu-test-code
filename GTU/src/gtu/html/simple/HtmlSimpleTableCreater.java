@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu.file.FileUtil;
+
 public class HtmlSimpleTableCreater {
 
     private static final String HTML;
@@ -25,7 +27,7 @@ public class HtmlSimpleTableCreater {
         sb.append("         border:1px solid #000;   \n");
         sb.append("         font-family: 微軟正黑體;   \n");
         sb.append("         font-size:16px;   \n");
-        sb.append("         width:200px;  \n");
+        sb.append("         width:80%;  \n");
         sb.append("         border:1px solid #000;  \n");
         sb.append("         text-align:center;  \n");
         sb.append("         border-collapse:collapse;  \n");
@@ -60,7 +62,8 @@ public class HtmlSimpleTableCreater {
     private List<String> ths = new ArrayList<String>();
 
     private List<String> tds = new ArrayList<String>();
-    private List<List<String>> tdsLst = new ArrayList<List<String>>();
+    private List<Integer> tdCols = new ArrayList<Integer>();
+    private List<Object[]> tdsLst = new ArrayList<Object[]>();
 
     public HtmlSimpleTableCreater addTh(String... ths) {
         for (String str : ths) {
@@ -72,13 +75,28 @@ public class HtmlSimpleTableCreater {
     public HtmlSimpleTableCreater addTd(String... tds) {
         for (String str : tds) {
             this.tds.add(str);
+            this.tdCols.add(1);
         }
         return this;
     }
 
+    public HtmlSimpleTableCreater addTd(String td) {
+        return addTd(td, 1);
+    }
+
+    public HtmlSimpleTableCreater addTd(String td, int colspan) {
+        if (colspan < 1) {
+            colspan = 1;
+        }
+        this.tds.add(td);
+        this.tdCols.add(colspan);
+        return this;
+    }
+
     public HtmlSimpleTableCreater newTr() {
-        tdsLst.add(tds);
+        tdsLst.add(new Object[] { tds, tdCols });
         tds = new ArrayList<String>();
+        tdCols = new ArrayList<Integer>();
         return this;
     }
 
@@ -93,10 +111,13 @@ public class HtmlSimpleTableCreater {
         }
         sb.append("</tr>");
         sb.append("\n");
-        for (List<String> tds : tdsLst) {
+        for (Object[] tdConf : tdsLst) {
+            List<String> tds = (List<String>) tdConf[0];
+            List<Integer> tdCols = (List<Integer>) tdConf[1];
             sb.append("<tr>");
-            for (String str : tds) {
-                sb.append("<td>");
+            for (int ii = 0; ii < tds.size(); ii++) {
+                String str = tds.get(ii);
+                sb.append("<td colspan='" + tdCols.get(ii) + "'>");
                 sb.append(StringUtils.trimToEmpty(str));
                 sb.append("</td>");
             }
@@ -107,7 +128,7 @@ public class HtmlSimpleTableCreater {
         return MessageFormat.format(HTML, new Object[] { sb });
     }
 
-    public void createFile(String name) {
+    public File createFile(String name) {
         String html = createHtml();
         File file = getFile(name);
         saveToFile(file, html, "UTF8");
@@ -116,10 +137,11 @@ public class HtmlSimpleTableCreater {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
     }
 
     public static File getFile(String name) {
-        File file = new File("C:\\Users\\E123474\\Desktop\\", name);
+        File file = new File(FileUtil.DESKTOP_DIR, name);
         System.out.println(">>>>>> " + file);
         return file;
     }
