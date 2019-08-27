@@ -158,7 +158,9 @@ public class DuringMointer {
         public String count(DuringKey keyObj, Object comment) {
             getREPORT_MAP(keyObj).add(this);
             this.setComment(comment);
-            this.infoObj = new InnerInfo();
+            if (this.infoObj == null) {
+                this.infoObj = new InnerInfo();
+            }
             return infoObj.formatResult;
         }
 
