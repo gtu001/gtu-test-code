@@ -365,15 +365,15 @@ public class DuringMointer {
             String summaryTag;
 
             InnerInfo() {
+                During.this.endTime = System.currentTimeMillis();
+                During.this.duringTime = endTime - startTime;
+                During.this.endStack = getCallerStack();
+                
                 this.tag = StringUtils.isNotBlank(During.this.tag) ? "[" + During.this.tag + "]" : "";
                 this.classInfo = getClassInfo();
                 this.startLineNumber = String.valueOf(getStartStack().getLineNumber());
                 this.endLineNumber = String.valueOf(getEndStack().getLineNumber());
                 this.comment = During.this.comment != null ? String.valueOf(During.this.comment) : "";
-
-                During.this.endTime = System.currentTimeMillis();
-                During.this.duringTime = endTime - startTime;
-                During.this.endStack = getCallerStack();
 
                 String comment = "";
                 if (StringUtils.isNotBlank(this.comment)) {
