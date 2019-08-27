@@ -55,6 +55,7 @@ public class DuringMointer {
     private static final Logger logger = LogManager.getLogger(During.class);
     private static final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss.SSS");
     private static final SimpleDateFormat YYYYMMDD_SDF_TIME = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+    private static final Class<?>[] STACK_CLZS = new Class[] { DuringMointer.During.class, DuringMointer.During.InnerInfo.class };
 
     public static class DuringKey {
         private Object object;
@@ -421,6 +422,15 @@ public class DuringMointer {
             return endStack;
         }
 
+        private boolean isContainClassName(String className) {
+            for (Class<?> clz : STACK_CLZS) {
+                if (clz.getName().equals(className)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private StackTraceElement getCallerStack() {
             Class clz = this.getClass();
             boolean findOk = false;
@@ -428,9 +438,9 @@ public class DuringMointer {
             StackTraceElement rtn = null;
             for (int ii = 0; ii < st.length; ii++) {
                 StackTraceElement s = st[ii];
-                if (StringUtils.equals(clz.getName(), s.getClassName())) {
+                if (isContainClassName(s.getClassName())) {
                     findOk = true;
-                } else if (findOk == true && !StringUtils.equals(clz.getName(), s.getClassName())) {
+                } else if (findOk == true && !isContainClassName(s.getClassName())) {
                     // System.out.println("--->" + ii + " - " + s.getClassName()
                     // + " : " +
                     // s.getMethodName() + " : " + s.getLineNumber());
@@ -638,10 +648,10 @@ public class DuringMointer {
         public File createFile(String name) {
             String html = createHtml();
             File file = getFile(name);
-            saveToFile(file, html, "UTF8");
             try {
+                saveToFile(file, html, "UTF8");
                 Desktop.getDesktop().open(file);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return file;
