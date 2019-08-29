@@ -255,6 +255,23 @@ public class DbConstant {
             throw new RuntimeException(e);
         }
     }
+    
+    /*
+    public DataSource getPoolDataSource() throws Exception {
+        PoolDataSource pds = (PoolDataSourceImpl) PoolDataSourceFactory.getPoolDataSource();
+        pds.setUser("xxxxxxxxxxxxx");
+        pds.setPassword("xxxxxxxxxxxxx");
+        pds.setURL(
+                "jdbc:oracle:thin:@(DESCRIPTION_LIST=(LOAD_BALANCE=off)(FAILOVER=on)(DESCRIPTION=(ENABLE=BROKEN)(CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST=pdctcomracl3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=OINVINSTSRV)))(DESCRIPTION=(ENABLE=BROKEN)( ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST= pdctcomracr3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME= OINVINSTSRV))))");
+        pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
+        pds.setFastConnectionFailoverEnabled(true);
+        pds.setMinPoolSize(5);
+        pds.setMaxPoolSize(10);
+        pds.setValidateConnectionOnBorrow(true);
+        pds.setSQLForValidateConnection("select user from dual");
+        return pds;
+    }
+    */
 
     public static final String DRIVER_HSQL = "org.hsqldb.jdbcDriver";
     public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";

@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<script type="text/javascript" src="http://gabelerner.github.io/canvg/canvg.js"></script>
+
+		<script type="text/javascript">
+			var svg = document.getElementsByTagName('svg')[0];
+			var svg_xml = (new XMLSerializer()).serializeToString(svg);
+			svg.remove();
+
+			// write serialized svg to canvas
+			canvg('canvas', svg_xml, {useCORS: true});
+
+			// create canvas data on demand
+			function downloadCanvas() {
+			    this.href = canvas.toDataURL('image/png');
+			};
+			document.getElementById('imgId').addEventListener('click', downloadCanvas, false);
+		</script>
+	</head>
+	<body>
+		
+		<div>
+		    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1" width="800" height="420" id="svg">
+		        <image height="420" width="800" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://upload.wikimedia.org/wikipedia/commons/7/76/Tabby_cat-hello.jpg" transform="matrix(1 0 0 1 0 0)" class="draggable" type="staticimg" id="1465449556528" ></image> 
+		    </svg>
+		    <a id="imgId" download="Canvas.png" href="#">Save</a>
+		</div>
+		<canvas id="canvas" width="730px" height="300px"></canvas> 
+	</body>
+</html>
