@@ -38,8 +38,8 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.file.FileUtil;
 import gtu.image.ScreenshotUtil;
 import gtu.image.ScreenshotUtil.PicType;
-import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 
 public class ScreenshotUI extends JFrame {
@@ -65,7 +65,7 @@ public class ScreenshotUI extends JFrame {
             public void run() {
                 try {
                     ScreenshotUI frame = new ScreenshotUI();
-                     gtu.swing.util.JFrameUtil.setVisible(false,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                     TestKeyListener keyListener = frame.new TestKeyListener();
                 } catch (Exception e) {
                     e.printStackTrace();

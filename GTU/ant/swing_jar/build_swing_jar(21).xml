@@ -60,6 +60,7 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
@@ -140,6 +141,16 @@
 		<antcall target="notify">
 			<param name="enable" value="true" />
 		</antcall>
+	</target>
+	
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
+				<exec executable="cmd">
+					<arg value="/c start echo create ${main_class}.jar complete!!" />
+				</exec>
+				-->
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
 	<target name="compiler">
