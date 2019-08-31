@@ -878,6 +878,9 @@ public class AVChoicerUI extends JFrame {
             resetSameFolderChk(false);
         }
 
+        // 設定以看數
+        movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), cloneLst.size()));
+
         currentAvFile.set(choiceFile);
         clickAvSet.add(choiceFile);
         return choiceFile;
