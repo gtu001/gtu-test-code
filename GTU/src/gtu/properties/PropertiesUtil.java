@@ -128,7 +128,7 @@ public class PropertiesUtil {
         } catch (Exception e) {
             throw new RuntimeException("getComment ERR : " + e.getMessage(), e);
         } finally {
-            if(reader != null){
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (Exception e) {
@@ -154,7 +154,7 @@ public class PropertiesUtil {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
-            if(inputStream != null){
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (Exception e) {
@@ -186,7 +186,7 @@ public class PropertiesUtil {
             }
             return prop;
         } finally {
-            if(inputStream != null){
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (Exception e) {
@@ -222,10 +222,22 @@ public class PropertiesUtil {
     }
 
     public static void storeProperties(Properties prop, File configFile, String comment) {
+        FileOutputStream fis = null;
         try {
-            prop.store(new FileOutputStream(configFile), comment);
+            fis = new FileOutputStream(configFile);
+            prop.store(fis, comment);
         } catch (Exception ex) {
             throw new RuntimeException("[storeProperties] 存檔失敗 ,檔案 : " + configFile + " , ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                fis.flush();
+            } catch (Exception e) {
+            }
+            try {
+                fis.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

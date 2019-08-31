@@ -1,0 +1,11 @@
+
+	＄sudo gedit /etc/profile
+	＄sudo gedit ~/.bashrc
+	
+	export JAVA_HOME=/media/gtu001/OLD_D/apps/java4ubuntu/jdk1.8.0_221
+	export PATH=${PATH}:${JAVA_HOME}/bin
+	
+	啟用
+		$ source /etc/profile
+		or
+		$ . ~/.bash_profile

@@ -17,16 +17,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,6 +65,7 @@ import gtu.constant.FileExtenstion;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.jdk8.ex1.StreamUtil;
+import gtu.number.NumberUtil;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -100,7 +105,7 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config=new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
+    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
     // private PropertiesUtilBean config = new PropertiesUtilBean(new
     // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
     // private PropertiesUtilBean config = new PropertiesUtilBean(new
@@ -108,6 +113,7 @@ public class AVChoicerUI extends JFrame {
 
     private Set<File> clickAvSet = new HashSet<File>();
     private AtomicReference<File> currentAvFile = new AtomicReference<File>();
+    private AtomicReference<File> currentAvFileDir = new AtomicReference<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
     private List<File> cacheFileList = new ArrayList<File>();
     private JLabel deleteAVFileLabel;
@@ -128,6 +134,8 @@ public class AVChoicerUI extends JFrame {
     private JList dirCheckList;
     private JCheckBox sameFolderChk;
     private JTextField indicateFolderText;
+    private HistoryConfigHandler historyConfigHandler = new HistoryConfigHandler();
+    private JTextField historyBetweenConfigText;
 
     /**
      * Launch the application.
@@ -345,6 +353,13 @@ public class AVChoicerUI extends JFrame {
         panel_2.add(avExeEncodeText, "4, 8, fill, default");
         avExeEncodeText.setColumns(10);
 
+        JLabel lblNewLabel_4 = new JLabel("歷史重播間隔");
+        panel_2.add(lblNewLabel_4, "2, 10, right, default");
+
+        historyBetweenConfigText = new JTextField();
+        panel_2.add(historyBetweenConfigText, "4, 10, fill, default");
+        historyBetweenConfigText.setColumns(10);
+
         JPanel panel_17 = new JPanel();
         panel_2.add(panel_17, "4, 20, fill, fill");
 
@@ -529,7 +544,12 @@ public class AVChoicerUI extends JFrame {
                 if (lst != null && !lst.isEmpty()) {
                     File file = lst.get(0);
                     if (file.isFile()) {
-                        playAvFile(file);
+                        playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
+                            @Override
+                            public File call() throws Exception {
+                                return file;
+                            }
+                        }));
                     } else {
                         dirCheckText.setText(file.getAbsolutePath());
                         dirCheckTextActionPerformed();
@@ -550,9 +570,11 @@ public class AVChoicerUI extends JFrame {
         File avFolder = new File(indicateFolderText.getText());
         if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
             currentAvFile.set(avFolder);
+            currentAvFileDir.set(avFolder);
             resetSameFolderChk(true);
         } else {
             indicateFolderText.setText("");
+            currentAvFileDir.set(null);
             resetSameFolderChk(false);
         }
     }
@@ -826,10 +848,14 @@ public class AVChoicerUI extends JFrame {
             if (currentAvFile.get().exists()) {
                 avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
             } else {
-                if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
-                    avDir = currentAvFile.get().getParentFile();
+                if (currentAvFileDir.get() != null && currentAvFileDir.get().exists()) {
+                    avDir = currentAvFileDir.get();
                 } else {
-                    avDir = currentAvFile.get();
+                    if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+                        avDir = currentAvFile.get().getParentFile();
+                    } else {
+                        avDir = currentAvFile.get();
+                    }
                 }
             }
             cloneLst = this.getSubFolderAvLst(avDir);
@@ -979,7 +1005,12 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void replay() {
-            playAvFile(tempFile.get());
+            playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
+                @Override
+                public File call() throws Exception {
+                    return tempFile.get();
+                }
+            }));
         }
     }
 
@@ -999,7 +1030,69 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void choiceAVBtnAction() {
-        playAvFile(getRandomAvFile());
+        playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                return getRandomAvFile();
+            }
+        }));
+    }
+
+    private class HistoryConfigHandler {
+        private SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        private PropertiesUtilBean historyConfig = new PropertiesUtilBean(AVChoicerUI.class, "AVChoicerUI_History");
+
+        private boolean isAlreadyPlayInRecent(File avFile) {
+            double days = 3D;
+            try {
+                days = Double.parseDouble(historyBetweenConfigText.getText());
+            } catch (Exception ex) {
+                historyBetweenConfigText.setText("3");
+                JCommonUtil.handleException(ex);
+            }
+
+            if (!historyConfig.getConfigProp().containsKey(avFile.getName())) {
+                return false;
+            } else {
+                String timestamp = historyConfig.getConfigProp().getProperty(avFile.getName());
+                try {
+                    Date d = SDF.parse(timestamp);
+                    if ((System.currentTimeMillis() - d.getTime()) > (days * 24 * 60 * 60 * 1000)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } catch (ParseException e) {
+                    return false;
+                }
+            }
+        }
+
+        private void setPlayFile(File avFile) {
+            historyConfig.getConfigProp().setProperty(avFile.getName(), SDF.format(new Date()));
+            historyConfig.store();
+        }
+
+        private File getPlayFile(Callable fetchFileCall) {
+            try {
+                int repeatCount = 0;
+                while (true) {
+                    File file = (File) fetchFileCall.call();
+                    boolean falseIsOk = historyConfigHandler.isAlreadyPlayInRecent(file);
+                    if (!falseIsOk) {
+                        setPlayFile(file);
+                        return file;
+                    }
+                    repeatCount++;
+                    if (repeatCount >= 5) {
+                        setPlayFile(file);
+                        return file;
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("HistoryConfigHandler ERR : " + e.getMessage(), e);
+            }
+        }
     }
 
     private void playAvFile(File avFile) {
@@ -1040,6 +1133,7 @@ public class AVChoicerUI extends JFrame {
         private final String AV_EXE_KEY = "avExe";
         private final String AV_EXE_FORMAT_KEY = "avExeFormat";
         private final String AV_EXE_ENCODE_KEY = "avExeEncode";
+        private final String AV_HISTORY_BETWEEN_DAY_CONFIG_KEY = "avHistoryBetweenDayConfig";
 
         public void AvExeConfigHandler() {
         }
@@ -1052,6 +1146,7 @@ public class AVChoicerUI extends JFrame {
                 avExeText.setText(config.get(AV_EXE_KEY));
                 avExeFormatText.setText(config.get(AV_EXE_FORMAT_KEY));
                 avExeEncodeText.setText(config.get(AV_EXE_ENCODE_KEY));
+                historyBetweenConfigText.setText(config.get(AV_HISTORY_BETWEEN_DAY_CONFIG_KEY));
 
                 avExeConfig.next();
             } catch (Exception ex) {
@@ -1066,6 +1161,12 @@ public class AVChoicerUI extends JFrame {
                 Validate.notBlank(avExeAliasText.getText(), "alias不可為空!");
                 Validate.notBlank(avExeText.getText(), "exe不可為空!");
                 Validate.notBlank(avExeFormatText.getText(), "format不可為空!");
+                Validate.notBlank(historyBetweenConfigText.getText(), "歷史重播間隔不可為空");
+
+                if (!NumberUtil.isNumber(historyBetweenConfigText.getText(), false)) {
+                    Validate.isTrue(false, "歷史重播間隔必須為數值");
+                }
+
                 // Validate.notBlank(avExeEncodeText.getText(),
                 // "encoding不可為空!");
 
@@ -1073,6 +1174,7 @@ public class AVChoicerUI extends JFrame {
                 config.put(AV_EXE_KEY, StringUtils.trimToEmpty(avExeText.getText()));
                 config.put(AV_EXE_FORMAT_KEY, StringUtils.trimToEmpty(avExeFormatText.getText()));
                 config.put(AV_EXE_ENCODE_KEY, StringUtils.trimToEmpty(avExeEncodeText.getText()));
+                config.put(AV_HISTORY_BETWEEN_DAY_CONFIG_KEY, StringUtils.trimToEmpty(historyBetweenConfigText.getText()));
 
                 avExeConfig.saveConfig(config);
             } catch (Exception ex) {
@@ -1116,7 +1218,12 @@ public class AVChoicerUI extends JFrame {
                 e.printStackTrace();
             }
         } else {
-            playAvFile(fileZ.file);
+            playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
+                @Override
+                public File call() throws Exception {
+                    return fileZ.file;
+                }
+            }));
         }
     }
 

@@ -137,7 +137,7 @@ public class NumberUtil {
         return new BigDecimal(value).signum();
     }
 
-    public boolean isNumber(String val, boolean thousandComma) {
+    public static boolean isNumber(String val, boolean thousandComma) {
         String pattern = "\\-?[\\d]+\\.?\\d*";
         if (thousandComma) {
             pattern = "\\-?[\\d,]+\\.?\\d*";

@@ -345,7 +345,11 @@ public class HideInSystemTrayHelper {
         try {
             trayIcon.displayMessage(caption, text, messageType);
         } catch (Exception ex) {
-            displayMessage4Linux(caption, text, messageType);
+            try {
+                displayMessage4Linux(caption, text, messageType);
+            } catch (Exception ex2) {
+                ex2.printStackTrace();
+            }
         }
         // trayIconHandler.removeIfExists();
     }
