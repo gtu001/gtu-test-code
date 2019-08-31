@@ -136,6 +136,7 @@ public class AVChoicerUI extends JFrame {
     private JTextField indicateFolderText;
     private HistoryConfigHandler historyConfigHandler = new HistoryConfigHandler();
     private JTextField historyBetweenConfigText;
+    private JCheckBox ignoreHistoryConfigChk;
 
     /**
      * Launch the application.
@@ -212,6 +213,9 @@ public class AVChoicerUI extends JFrame {
 
         JPanel panel_9 = new JPanel();
         panel.add(panel_9, BorderLayout.SOUTH);
+        
+        ignoreHistoryConfigChk = new JCheckBox("忽略重播間隔");
+        panel_9.add(ignoreHistoryConfigChk);
 
         sameFolderChk = new JCheckBox("播放同目錄");
         panel_9.add(sameFolderChk);
@@ -353,7 +357,7 @@ public class AVChoicerUI extends JFrame {
         panel_2.add(avExeEncodeText, "4, 8, fill, default");
         avExeEncodeText.setColumns(10);
 
-        JLabel lblNewLabel_4 = new JLabel("歷史重播間隔");
+        JLabel lblNewLabel_4 = new JLabel("重播間隔(日)");
         panel_2.add(lblNewLabel_4, "2, 10, right, default");
 
         historyBetweenConfigText = new JTextField();
@@ -1046,6 +1050,10 @@ public class AVChoicerUI extends JFrame {
         private PropertiesUtilBean historyConfig = new PropertiesUtilBean(AVChoicerUI.class, "AVChoicerUI_History");
 
         private boolean isAlreadyPlayInRecent(File avFile) {
+            if(ignoreHistoryConfigChk.isSelected()) {
+                return false;
+            }
+            
             double days = 3D;
             try {
                 days = Double.parseDouble(historyBetweenConfigText.getText());
