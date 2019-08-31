@@ -60,6 +60,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
@@ -122,6 +123,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JTextAreaUtil.JTextPaneTextStyle;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
@@ -129,6 +131,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
+
+    private static final String HYPER_LINK_PATTERN = "https?\\:\\/\\/[\\w+\\.\\/\\~\\-\\&\\?\\+\\.\\=]+";
 
     private PropertiesUtilBean configSelf = null;
     {
@@ -150,7 +154,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private PropertiesUtilBean bookmarkConfig;
     private JComboBox tagComboBox;
-    private JTextArea remarkArea;
+    private JTextPane remarkArea;
     private JTable urlTable;
     private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0";
     private JComboBox searchComboBox;
@@ -268,9 +272,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JScrollPane scrollPane = new JScrollPane();
             panel.add(scrollPane, "4, 8, fill, fill");
 
-            remarkArea = new JTextArea();
+            remarkArea = new JTextPane();
             JTextAreaUtil.applyCommonSetting(remarkArea);
             scrollPane.setViewportView(remarkArea);
+
+            remarkArea.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    onRemarkAreaMouseClick(e);
+                }
+            });
 
             JLabel lblCommandType = new JLabel("command type");
             panel.add(lblCommandType, "2, 10, right, default");
@@ -1548,7 +1559,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println(ReflectionToStringBuilder.toString(d));
             urlText.setText(d.url);
             titleText.setText(d.title);
-            remarkArea.setText(d.remark);
+            setRemarkAreaText(d.remark);
             modifyTimeLabel.setText(d.timestamp);
             tagComboBoxUtil.setSelectItemAndText(d.tag);
             commandTypeSetting.setValue(d.commandType);
@@ -1557,6 +1568,34 @@ public class BrowserHistoryHandlerUI extends JFrame {
         } catch (Exception ex) {
             if (throwEx) {
                 throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private void setRemarkAreaText(String remark) {
+        remarkArea.setText(remark);
+        if (StringUtils.isNotBlank(remark)) {
+            Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
+            Matcher mth = ptn.matcher(remark);
+            while (mth.find()) {
+                JTextPaneTextStyle.of(remarkArea).startEnd(mth.start(), mth.end()).foregroundColor(Color.blue).italic(true).underline(true).apply();
+            }
+        }
+    }
+
+    private void onRemarkAreaMouseClick(MouseEvent e) {
+        if (JMouseEventUtil.buttonLeftClick(2, e)) {
+            int pos = remarkArea.getCaretPosition();
+            String remark = remarkArea.getText();
+            if (StringUtils.isNotBlank(remark)) {
+                Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
+                Matcher mth = ptn.matcher(remark);
+                while (mth.find()) {
+                    if (mth.start() <= pos && mth.end() >= pos) {
+                        System.out.println("<<<<<<<<<" + mth.group());
+                        DesktopUtil.browse(mth.group());
+                    }
+                }
             }
         }
     }
@@ -2161,13 +2200,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         private UrlConfig __getNewConfig_for_Merge(UrlConfig d1, UrlConfig d2) throws ParseException {
-//            if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
-//                if (UrlConfig.getConfigValue(d1).length() > UrlConfig.getConfigValue(d2).length()) {
-//                    return d1;
-//                } else {
-//                    return d2;
-//                }
-//            }
+            // if (StringUtils.isBlank(d1.timestampLastest) &&
+            // StringUtils.isBlank(d2.timestampLastest)) {
+            // if (UrlConfig.getConfigValue(d1).length() >
+            // UrlConfig.getConfigValue(d2).length()) {
+            // return d1;
+            // } else {
+            // return d2;
+            // }
+            // }
 
             if (StringUtils.isNotBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
                 return d1;
