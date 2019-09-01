@@ -132,8 +132,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
 
-    private static final String HYPER_LINK_PATTERN = "https?\\:\\/\\/[\\w+\\.\\/\\~\\-\\&\\?\\+\\.\\=]+";
-
     private PropertiesUtilBean configSelf = null;
     {
         if (PropertiesUtil.isClassInJar(BrowserHistoryHandlerUI.class)) {
@@ -180,6 +178,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JToggleButton toggleChangeColorBtn;
+    private HyperlinkJTextPaneHandler mHyperlinkJTextPaneHandler;
 
     /**
      * Launch the application.
@@ -276,10 +275,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JTextAreaUtil.applyCommonSetting(remarkArea);
             scrollPane.setViewportView(remarkArea);
 
+            mHyperlinkJTextPaneHandler = new HyperlinkJTextPaneHandler(remarkArea);
             remarkArea.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    onRemarkAreaMouseClick(e);
+                    mHyperlinkJTextPaneHandler.onAddMouseListener(e);
                 }
             });
 
@@ -1559,7 +1559,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println(ReflectionToStringBuilder.toString(d));
             urlText.setText(d.url);
             titleText.setText(d.title);
-            setRemarkAreaText(d.remark);
+            mHyperlinkJTextPaneHandler.setText(d.remark);
             modifyTimeLabel.setText(d.timestamp);
             tagComboBoxUtil.setSelectItemAndText(d.tag);
             commandTypeSetting.setValue(d.commandType);
@@ -1572,28 +1572,36 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
-    private void setRemarkAreaText(String remark) {
-        remarkArea.setText(remark);
-        if (StringUtils.isNotBlank(remark)) {
-            Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
-            Matcher mth = ptn.matcher(remark);
-            while (mth.find()) {
-                JTextPaneTextStyle.of(remarkArea).startEnd(mth.start(), mth.end()).foregroundColor(Color.blue).italic(true).underline(true).apply();
-            }
-        }
-    }
+    private class HyperlinkJTextPaneHandler {
+        private final String HYPER_LINK_PATTERN = "https?\\:\\/\\/[\\w+\\.\\/\\~\\-\\&\\?\\+\\.\\=]+";
+        private Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
+        JTextPane remarkArea;
 
-    private void onRemarkAreaMouseClick(MouseEvent e) {
-        if (JMouseEventUtil.buttonLeftClick(2, e)) {
-            int pos = remarkArea.getCaretPosition();
-            String remark = remarkArea.getText();
+        private HyperlinkJTextPaneHandler(JTextPane remarkArea) {
+            this.remarkArea = remarkArea;
+        }
+
+        private void setText(String remark) {
+            remarkArea.setText(remark);
             if (StringUtils.isNotBlank(remark)) {
-                Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
                 Matcher mth = ptn.matcher(remark);
                 while (mth.find()) {
-                    if (mth.start() <= pos && mth.end() >= pos) {
-                        System.out.println("<<<<<<<<<" + mth.group());
-                        DesktopUtil.browse(mth.group());
+                    JTextPaneTextStyle.of(remarkArea).startEnd(mth.start(), mth.end()).foregroundColor(Color.blue).italic(true).underline(true).apply();
+                }
+            }
+        }
+
+        private void onAddMouseListener(MouseEvent e) {
+            if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                int pos = remarkArea.getCaretPosition();
+                String remark = remarkArea.getText();
+                if (StringUtils.isNotBlank(remark)) {
+                    Matcher mth = ptn.matcher(remark);
+                    while (mth.find()) {
+                        if (mth.start() <= pos && mth.end() >= pos) {
+                            System.out.println("<<<<<<<<<" + mth.group());
+                            DesktopUtil.browse(mth.group());
+                        }
                     }
                 }
             }
