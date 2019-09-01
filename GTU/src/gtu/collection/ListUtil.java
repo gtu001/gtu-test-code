@@ -39,40 +39,32 @@ public class ListUtil {
         return list;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Comparable<? super T>, A> List<A> getSortList(Iterator<T> iterator, Class<A> clz) {
-        return (List<A>) getSortList(iterator);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Comparable<? super T>, A> List<A> getSortList(Enumeration<T> enumeration, Class<A> clz) {
-        return (List<A>) getSortList(enumeration);
-    }
-
-    public static <T extends Comparable<? super T>> List<T> getSortList(Iterator<T> iterator) {
-        List<T> list = getList(iterator);
-        Collections.sort(list);
-        return list;
-    }
-
-    public static <T extends Comparable<? super T>> List<T> getSortList(Enumeration<T> enumeration) {
-        List<T> list = getList(enumeration);
-        Collections.sort(list);
-        return list;
-    }
-
+    /**
+     * 將Array轉List
+     * 
+     * @param array
+     * @param clz
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public static <T, A> List<A> getList(Iterator<T> iterator, Class<A> clz) {
         return (List<A>) getList(iterator);
     }
 
+    /**
+     * 將Array轉List
+     * 
+     * @param array
+     * @param clz
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public static <T, A> List<A> getList(Enumeration<T> enumeration, Class<A> clz) {
         return (List<A>) getList(enumeration);
     }
 
     /**
-     * 呼叫list的Type的filed的getter為新的List的Type
+     * 取得bean某個field組成List
      * 
      * @param list
      * @param listType
@@ -86,6 +78,14 @@ public class ListUtil {
         return (List<T>) getListField(list, field);
     }
 
+    /**
+     * 取得bean某個field組成List
+     * 
+     * @param list
+     * @param field
+     * @return
+     * @throws Exception
+     */
     public static List<?> getListField(List<?> list, String field) throws Exception {
         List<Object> rtn = new ArrayList<Object>();
         for (Object obj : list) {
@@ -95,7 +95,7 @@ public class ListUtil {
     }
 
     /**
-     * TODO base method
+     * 將Array轉List
      * 
      * @param iterator
      * @return
@@ -118,6 +118,13 @@ public class ListUtil {
         return Collections.list(enumeration);
     }
 
+    /**
+     * 將Array轉List
+     * 
+     * @param array
+     * @param clz
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(Object[] array, Class<T> clz) {
         List<T> list = new ArrayList<T>();
@@ -133,6 +140,13 @@ public class ListUtil {
         return list;
     }
 
+    /**
+     * 將Array轉List
+     * 
+     * @param array
+     * @param clz
+     * @return
+     */
     public static <T, A> List<T> getList(Collection<A> array, Class<T> clz) {
         return getList(array.toArray(), clz);
     }
@@ -162,14 +176,30 @@ public class ListUtil {
         showListInfo(list, System.out);
     }
 
+    /**
+     * 印出此list
+     * 
+     * @param list
+     */
     public static <T> void showListInfo(Enumeration<T> enu) {
         showListInfo(getList(enu));
     }
 
+    /**
+     * 印出此list
+     * 
+     * @param list
+     */
     public static <T> void showListInfo(Iterator<T> enu) {
         showListInfo(getList(enu));
     }
 
+    /**
+     * 移除元素且忽略大小寫
+     * 
+     * @param value
+     * @param list
+     */
     public static void removeIgnorecase(String value, List<String> list) {
         for (int ii = 0; ii < list.size(); ii++) {
             String val = list.get(ii);
@@ -180,6 +210,13 @@ public class ListUtil {
         }
     }
 
+    /**
+     * 是否包含字串且忽略大小寫
+     * 
+     * @param value
+     * @param list
+     * @return
+     */
     public static boolean constainIgnorecase(String value, List<String> list) {
         for (int ii = 0; ii < list.size(); ii++) {
             String val = list.get(ii);
@@ -190,6 +227,12 @@ public class ListUtil {
         return false;
     }
 
+    /**
+     * 是否所有元素相同
+     * 
+     * @param valueLst
+     * @return
+     */
     public static boolean isAllEquals(List<Object> valueLst) {
         if (valueLst.size() <= 1) {
             return true;
@@ -209,6 +252,11 @@ public class ListUtil {
         }
     }
 
+    /**
+     * 轉成字串排序且忽略大小寫
+     * 
+     * @param lst
+     */
     @SuppressWarnings("unchecked")
     public static <T> void sortIgnoreCase(List<T> lst) {
         Collections.sort(lst, new Comparator<T>() {
@@ -221,6 +269,13 @@ public class ListUtil {
         });
     }
 
+    /**
+     * 只取第一筆
+     * 
+     * @param lst
+     * @param clz
+     * @return
+     */
     public static <T> T getFirstOne(List<T> lst, Class<T> clz) {
         if (lst != null && !lst.isEmpty()) {
             return lst.get(0);
@@ -228,6 +283,15 @@ public class ListUtil {
         return ReflectUtil.newInstance(clz);
     }
 
+    /**
+     * 取得百分比區間的資料
+     * 
+     * @param orignLst
+     * @param startPercent
+     * @param endPercent
+     * @param comp
+     * @return
+     */
     public static <T> List<T> getRangePercentLst(List<T> orignLst, double startPercent, double endPercent, Comparator<T> comp) {
         int startPos = (int) ((double) orignLst.size() * startPercent);
         int endPos = (int) ((double) orignLst.size() * endPercent);
@@ -239,5 +303,62 @@ public class ListUtil {
             Collections.sort(resultLst, comp);
         }
         return resultLst;
+    }
+
+    public static class PageListUtil {
+        /**
+         * 取得第幾頁
+         * 
+         * @param pageNo
+         * @param pageSize
+         * @param lst
+         * @return
+         */
+        public static <T> List<T> getPageList(int pageNo, int pageSize, List<T> lst) {
+            if (lst == null || lst.isEmpty()) {
+                return Collections.emptyList();
+            }
+            int fromIndexInclude = 0;
+            int toIndexExclude = 0;
+            if (pageNo >= 1) {
+                fromIndexInclude = (pageNo - 1) * pageSize;
+                toIndexExclude = pageNo * pageSize;
+            }
+            if (fromIndexInclude > lst.size()) {
+                return new ArrayList<>();
+            }
+            if (toIndexExclude > lst.size()) {
+                toIndexExclude = lst.size();
+            }
+            return new ArrayList<>(lst.subList(fromIndexInclude, toIndexExclude));
+        }
+
+        /**
+         * 是否為最後一頁
+         * 
+         * @param pageNo
+         * @param pageSize
+         * @param lst
+         * @return
+         */
+        public static boolean isFinalPage(int pageNo, int pageSize, List<?> lst) {
+            if (lst == null || lst.isEmpty()) {
+                return false;
+            }
+            int fromIndexInclude = 0;
+            int toIndexExclude = 0;
+            if (pageNo >= 1) {
+                fromIndexInclude = (pageNo - 1) * pageSize;
+                toIndexExclude = pageNo * pageSize;
+            }
+            if (fromIndexInclude > lst.size()) {
+                fromIndexInclude = lst.size() - 1;
+                return false;
+            }
+            if (toIndexExclude > lst.size()) {
+                toIndexExclude = lst.size();
+            }
+            return (toIndexExclude == lst.size());
+        }
     }
 }
