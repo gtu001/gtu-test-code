@@ -85,6 +85,7 @@
 			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
 			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+			<packagename mode="pom">org/apache/logging/log4j/spi/AbstractLoggerAdapter</packagename>
 
 			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
@@ -120,11 +121,11 @@
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="false" /><!--false -->
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="copyReference">
-			<param name="enable" value="false" /><!--false -->
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="compiler">
@@ -165,7 +166,7 @@
 		</antcall>
 
 		<antcall target="notify">
-			<param name="enable" value="false" /><!--false -->
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 	</target>
 

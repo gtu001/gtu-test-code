@@ -11,7 +11,7 @@
 	<property name="main_class_full" value="gtu._work.ui.DropboxTestUI" />
 	<property name="main_class" value="DropboxTestUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="tk_aiengine.ico" />
+	<property name="icon_name" value="dropbox.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--${main_class}-->
 
@@ -76,7 +76,7 @@
 			<packagename mode="small">org/slf4j/impl/StaticMarkerBinder</packagename>
 
 			<packagename mode="small">com.dropbox.core.v2.DbxClientV2</packagename>
-			<packagename mode="small">com.fasterxml.jackson.core.JsonParseException</packagename>
+			<packagename mode="pom">com.fasterxml.jackson.core.JsonToken</packagename>
 
 		</jarfinder>
 

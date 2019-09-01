@@ -32,12 +32,14 @@ import org.apache.log4j.Logger;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 
+import gtu.base.CloseUtil;
 import gtu.file.FileUtil;
 import gtu.log.Log;
 import gtu.log.PrintStreamAdapter;
 import gtu.net.urlConn.work.DropboxUtilV2;
 import gtu.net.urlConn.work.DropboxUtilV2.DropboxUtilV2_DropboxFile;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.string.SystemEncodeChange;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTreeUtil;
@@ -54,7 +56,7 @@ public class DropboxTestUI extends JFrame {
         if (StringUtils.isBlank(TOKEN)) {
             JCommonUtil._jOptionPane_showMessageDialog_error("無法取得token屬性");
             try {
-                Runtime.getRuntime().exec(String.format("cmd /c start notepad \"%s\"", config.getPropFile()));
+                DesktopUtil.browse(config.getPropFile().toURL().toString());
                 Desktop.getDesktop().browse(new URI("https://www.dropbox.com/developers/apps"));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -241,6 +243,8 @@ public class DropboxTestUI extends JFrame {
 
         initReloadBtnAction();
 
+        JCommonUtil.setJFrameIcon(this, "resource/images/ico/dropbox.ico");
+
         JCommonUtil.setJFrameCenter(this);
     }
 
@@ -278,15 +282,29 @@ public class DropboxTestUI extends JFrame {
         }
 
         protected void upload(File inputFile, String basePath) throws DbxException, IOException {
-            String uploadPath = basePath + "/" + inputFile.getName();
-            FileInputStream inputStream = new FileInputStream(inputFile);
-            System.out.println("upload >>" + uploadPath);
-            DropboxUtilV2.upload(uploadPath, inputStream, getClient());
+            FileInputStream inputStream = null;
+            try {
+                String uploadPath = basePath + "/" + inputFile.getName();
+                inputStream = new FileInputStream(inputFile);
+                System.out.println("upload >>" + uploadPath);
+                DropboxUtilV2.upload(uploadPath, inputStream, getClient());
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                CloseUtil.close(inputStream);
+            }
         }
 
         protected void download(String name, String path) throws DbxException, IOException {
-            FileOutputStream outputStream = new FileOutputStream(new File(FileUtil.DESKTOP_DIR, name));
-            DropboxUtilV2.download(path, outputStream, getClient());
+            FileOutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(new File(FileUtil.DESKTOP_DIR, name));
+                DropboxUtilV2.download(path, outputStream, getClient());
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                CloseUtil.close(outputStream);
+            }
         }
 
         protected void delete(String path) {

@@ -82,7 +82,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
      */
     public FastDBQueryUI_RowCompareDlg() {
         setTitle("匯入資料與目前資料庫資料比對");
-        setBounds(100, 100, 685, 463);
+        setBounds(100, 100, 790, 477);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -105,7 +105,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                         queryConditionArea = new JTextArea();
                         JTextAreaUtil.applyCommonSetting(queryConditionArea);
                         queryConditionArea.setRows(2);
-                        queryConditionArea.setColumns(50);
+                        queryConditionArea.setColumns(35);
                         panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
                     }
                     {
@@ -389,6 +389,11 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 pkColumns.add(column);
             }
         }
+        
+        //設定DB DateType
+        DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
+        tableInfo.setDbDateDateFormat(dbDateDateFormat);
+        
         tableInfo.setPkColumns(pkColumns);
         String whereSQL = tableInfo.createSelectSql(whereMap);
         queryConditionArea.setText(whereSQL);
