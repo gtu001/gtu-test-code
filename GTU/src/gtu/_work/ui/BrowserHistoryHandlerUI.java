@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -99,6 +100,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.distribition.NormalDistributionFilter;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.image.ImageUtil;
@@ -395,6 +397,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_2x.add(directOpenFileChk);
 
             JLabel label = new JLabel("快速搜尋");
+            label.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    fastSearchMouseClicked(e);
+                }
+            });
             panel_2x.add(label);
 
             searchComboBox = new JComboBox();
@@ -2292,6 +2300,138 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void fastSearchMouseClicked(MouseEvent e) {
+        if (!JMouseEventUtil.buttonRightClick(1, e)) {
+            return;
+        }
+        JPopupMenuUtil.newInstance((JComponent) e.getSource())//
+                .addJMenuItem("熱門選項", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SearchResultProcess mSearchResultProcess = new SearchResultProcess() {
+
+                            @Override
+                            List<UrlConfig> filter(List<UrlConfig> lst) {
+                                return new NormalDistributionFilter<UrlConfig>(lst) {
+                                    public boolean isNeedPredict(UrlConfig bean) {
+                                        return StringUtils.isNotBlank(bean.clickTimes);
+                                    }
+
+                                    public BigDecimal getValue(UrlConfig bean) {
+                                        return new BigDecimal(bean.clickTimes);
+                                    }
+
+                                    public Comparator<UrlConfig> getCompare() {
+                                        return new Comparator<UrlConfig>() {
+                                            private Integer getVal(String val) {
+                                                try {
+                                                    return Integer.parseInt(val);
+                                                } catch (Exception ex) {
+                                                    return Integer.MAX_VALUE;
+                                                }
+                                            }
+
+                                            @Override
+                                            public int compare(UrlConfig o1, UrlConfig o2) {
+                                                return getVal(o1.clickTimes).compareTo(getVal(o2.clickTimes)) * -1;
+                                            }
+                                        };
+                                    }
+                                }.getRangeLst(0.90, 1);
+                            }
+                        };
+                        mSearchResultProcess.process();
+                    }
+                })//
+                .addJMenuItem("冷門選項", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SearchResultProcess mSearchResultProcess = new SearchResultProcess() {
+
+                            @Override
+                            List<UrlConfig> filter(List<UrlConfig> lst) {
+                                return new NormalDistributionFilter<UrlConfig>(lst) {
+                                    public boolean isNeedPredict(UrlConfig bean) {
+                                        return StringUtils.isNotBlank(bean.clickTimes);
+                                    }
+
+                                    public BigDecimal getValue(UrlConfig bean) {
+                                        return new BigDecimal(bean.clickTimes);
+                                    }
+
+                                    public Comparator<UrlConfig> getCompare() {
+                                        return new Comparator<UrlConfig>() {
+                                            private Integer getVal(String val) {
+                                                try {
+                                                    return Integer.parseInt(val);
+                                                } catch (Exception ex) {
+                                                    return Integer.MAX_VALUE;
+                                                }
+                                            }
+
+                                            @Override
+                                            public int compare(UrlConfig o1, UrlConfig o2) {
+                                                return getVal(o1.clickTimes).compareTo(getVal(o2.clickTimes));
+                                            }
+                                        };
+                                    }
+                                }.getRangeLst(0, 0.5);
+                            }
+                        };
+                        mSearchResultProcess.process();
+                    }
+                }).applyEvent(e).show();
+    }
+
+    private abstract class SearchResultProcess {
+        abstract List<UrlConfig> filter(List<UrlConfig> lst);
+
+        private void process() {
+            // ------------------------------------------
+            final JTableUtil tableUtil = JTableUtil.newInstance(urlTable);
+            DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
+            tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
+            urlTable.setModel(model);
+            columnColorHandler.apply();
+
+            urlTableResize();
+
+            for (String v : new String[] { UrlTableConfigEnum.刪除.name() }) {
+                System.out.println("columnIsButton = " + v);
+                tableUtil.columnIsButton(v);
+            }
+            tableUtil.columnIsComponent(UrlTableConfigEnum.開啟.ordinal(), new JCheckBox());// 設定為checkbox
+
+            // ------------------------------------------
+            List<UrlConfig> lst = new ArrayList<UrlConfig>();
+            for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+                String url = (String) enu.nextElement();
+                final String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
+                UrlConfig dd = null;
+                try {
+                    dd = UrlConfig.parseTo(url, title_tag_remark_time);
+                    lst.add(dd);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    continue;
+                }
+            }
+
+            lst = filter(lst);
+
+            for (final UrlConfig d : lst) {
+                model.addRow(UrlTableConfigEnum.getRow(d, BrowserHistoryHandlerUI.this));
+            }
+
+            System.out.println("searchSize : " + model.getRowCount());
+
+            matchCountLabel.setText((model.getRowCount() == 0) ? "查無!" : "數量:" + model.getRowCount());
+
+            // 重設bookmarkConfig 時間
+            BrowserHistoryHandlerUI.this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
         }
     }
 }
