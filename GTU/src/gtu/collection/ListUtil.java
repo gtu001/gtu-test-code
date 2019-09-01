@@ -325,12 +325,12 @@ public class ListUtil {
                 toIndexExclude = pageNo * pageSize;
             }
             if (fromIndexInclude > lst.size()) {
-                return new ArrayList<>();
+                return new ArrayList<T>();
             }
             if (toIndexExclude > lst.size()) {
                 toIndexExclude = lst.size();
             }
-            return new ArrayList<>(lst.subList(fromIndexInclude, toIndexExclude));
+            return new ArrayList<T>(lst.subList(fromIndexInclude, toIndexExclude));
         }
 
         /**
