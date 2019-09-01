@@ -227,4 +227,17 @@ public class ListUtil {
         }
         return ReflectUtil.newInstance(clz);
     }
+
+    public static <T> List<T> getRangePercentLst(List<T> orignLst, double startPercent, double endPercent, Comparator<T> comp) {
+        int startPos = (int) ((double) orignLst.size() * startPercent);
+        int endPos = (int) ((double) orignLst.size() * endPercent);
+        if (endPos >= orignLst.size() - 1) {
+            endPos = orignLst.size() - 1;
+        }
+        List<T> resultLst = orignLst.subList(startPos, endPos + 1);
+        if (comp != null) {
+            Collections.sort(resultLst, comp);
+        }
+        return resultLst;
+    }
 }

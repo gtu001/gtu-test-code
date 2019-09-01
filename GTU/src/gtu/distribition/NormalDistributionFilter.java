@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gtu.collection.ListUtil;
+
 public abstract class NormalDistributionFilter<T> {
     private List<T> orignLst;
     private List<BigDecimal> keyLst;
@@ -51,17 +53,7 @@ public abstract class NormalDistributionFilter<T> {
     }
 
     public List<T> getRangeLst(double startPercent, double endPercent) {
-        int startPos = (int) ((double) allLst.size() * startPercent);
-        int endPos = (int) ((double) allLst.size() * endPercent);
-        if (endPos >= allLst.size() - 1) {
-            endPos = allLst.size() - 1;
-        }
-        List<T> resultLst = allLst.subList(startPos, endPos + 1);
-        Comparator<T> comp = getCompare();
-        if (comp != null) {
-            Collections.sort(resultLst, comp);
-        }
-        return resultLst;
+        return ListUtil.getRangePercentLst(allLst, startPercent, endPercent, getCompare());
     }
 
     public BigDecimal getRangeValue(double startPercent, double endPercent) {
