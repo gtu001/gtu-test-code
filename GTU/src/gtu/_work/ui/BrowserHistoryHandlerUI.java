@@ -946,6 +946,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
             DefaultTableModel model = JTableUtil.createModel(new int[] { UrlTableConfigEnum.開啟.ordinal() }, UrlTableConfigEnum.getTitleConfig());
             tableUtil.hiddenColumn(UrlTableConfigEnum.VO.name());
             urlTable.setModel(model);
+
+            tableUtil.setColumnSortComparator(UrlTableConfigEnum.clickTimes.ordinal(), new Comparator<String>() {
+                private Integer getVal(String val) {
+                    try {
+                        return Integer.parseInt(val);
+                    } catch (Exception ex) {
+                        return Integer.MIN_VALUE;
+                    }
+                }
+
+                @Override
+                public int compare(String o1, String o2) {
+                    return getVal(o1).compareTo(getVal(o2));
+                }
+            });
+
             columnColorHandler.apply();
 
             urlTableResize();
@@ -2330,7 +2346,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                                 try {
                                                     return Integer.parseInt(val);
                                                 } catch (Exception ex) {
-                                                    return Integer.MAX_VALUE;
+                                                    return Integer.MIN_VALUE;
                                                 }
                                             }
 
@@ -2368,7 +2384,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                                                 try {
                                                     return Integer.parseInt(val);
                                                 } catch (Exception ex) {
-                                                    return Integer.MAX_VALUE;
+                                                    return Integer.MIN_VALUE;
                                                 }
                                             }
 

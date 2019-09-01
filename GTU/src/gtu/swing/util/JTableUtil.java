@@ -9,7 +9,6 @@ package gtu.swing.util;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -36,6 +35,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,13 +58,12 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -74,6 +73,8 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
@@ -398,6 +399,30 @@ public class JTableUtil {
         return model;
     }
 
+    public void setColumnSortComparator(int columnIndex, Comparator<?> mComparator) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+        if (table.getRowSorter() == null || table.getRowSorter().getClass() != TableRowSorter.class) {
+            table.setRowSorter(sorter);
+        } else {
+            sorter = (TableRowSorter<TableModel>) table.getRowSorter();
+        }
+        table.setRowSorter(sorter);
+        sorter.setSortable(columnIndex, true);
+
+        System.out.println("setColumnSortComparator Count = " + table.getModel().getColumnCount() + " , " + columnIndex);
+        sorter.setComparator(columnIndex, mComparator);
+
+        sorter.addRowSorterListener(new RowSorterListener() {
+            @Override
+            public void sorterChanged(RowSorterEvent evt) {
+                int indexOfNoColumn = 0;
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    //System.out.println("sorterChanged - " + i + " -> " + table.getValueAt(i, columnIndex));
+                }
+            }
+        });
+    }
+
     public static DefaultTableModel createModel(final boolean readonly, Object... header) {
         DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header) {
             private static final long serialVersionUID = 1L;
@@ -446,7 +471,6 @@ public class JTableUtil {
             @Override
             public Class<?> getColumnClass(int c) {
                 try {
-
                     List<Class<?>> lst = new ArrayList<Class<?>>();
                     for (int ii = 0; ii < this.getRowCount(); ii++) {
                         Object value = getValueAt(ii, c);
