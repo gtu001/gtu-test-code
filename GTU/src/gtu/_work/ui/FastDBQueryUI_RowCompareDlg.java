@@ -2,9 +2,8 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,7 +32,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -63,6 +61,13 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
+        FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
+        try {
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) {
@@ -104,8 +109,8 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                     {
                         queryConditionArea = new JTextArea();
                         JTextAreaUtil.applyCommonSetting(queryConditionArea);
-                        queryConditionArea.setRows(2);
-                        queryConditionArea.setColumns(35);
+                        queryConditionArea.setRows(3);
+                        queryConditionArea.setColumns(40);
                         panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
                     }
                     {
@@ -389,11 +394,11 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 pkColumns.add(column);
             }
         }
-        
-        //設定DB DateType
+
+        // 設定DB DateType
         DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
         tableInfo.setDbDateDateFormat(dbDateDateFormat);
-        
+
         tableInfo.setPkColumns(pkColumns);
         String whereSQL = tableInfo.createSelectSql(whereMap);
         queryConditionArea.setText(whereSQL);
@@ -485,7 +490,8 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             }
 
             tableInfo.setPkColumns(pkColumns);
-            tableInfo.setDbDateDateFormat((DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem());//設定DB type
+            tableInfo.setDbDateDateFormat((DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem());// 設定DB
+                                                                                                      // type
             String updateSQL = tableInfo.createUpdateSql(valueMap, pkMap, false, null);
             updateSQL = JCommonUtil._jOptionPane_showInputDialog("執行SQL", updateSQL);
 
