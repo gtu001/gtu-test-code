@@ -102,34 +102,44 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
                 {
                     JPanel panel_1 = new JPanel();
                     panel.add(panel_1, BorderLayout.NORTH);
+
+                    panel_1.setLayout(new BorderLayout(0, 0));
+
+                    JPanel panel_11 = new JPanel();
+                    panel_1.add(panel_11, BorderLayout.CENTER);
+                    panel_11.setLayout(new BorderLayout(0, 0));
                     {
                         JLabel lblNewLabel = new JLabel("查詢條件");
-                        panel_1.add(lblNewLabel);
+                        panel_11.add(lblNewLabel, BorderLayout.WEST);
                     }
                     {
                         queryConditionArea = new JTextArea();
                         JTextAreaUtil.applyCommonSetting(queryConditionArea);
                         queryConditionArea.setRows(3);
                         queryConditionArea.setColumns(40);
-                        panel_1.add(JCommonUtil.createScrollComponent(queryConditionArea));
+                        panel_11.add(JCommonUtil.createScrollComponent(queryConditionArea), BorderLayout.CENTER);
                     }
                     {
-                        JButton syncQueryConditionBtn = new JButton("產生SQL");
-                        syncQueryConditionBtn.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                syncQueryConditionBtnAction(true);
-                            }
-                        });
-                        panel_1.add(syncQueryConditionBtn);
-                    }
-                    {
-                        JButton queryBtn = new JButton("以SQL查詢");
-                        queryBtn.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                queryBtnAction();
-                            }
-                        });
-                        panel_1.add(queryBtn);
+                        JPanel panel_12 = new JPanel();
+                        panel_11.add(panel_12, BorderLayout.EAST);
+                        {
+                            JButton syncQueryConditionBtn = new JButton("產生SQL");
+                            syncQueryConditionBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    syncQueryConditionBtnAction(true);
+                                }
+                            });
+                            panel_12.add(syncQueryConditionBtn);
+                        }
+                        {
+                            JButton queryBtn = new JButton("以SQL查詢");
+                            queryBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    queryBtnAction();
+                                }
+                            });
+                            panel_12.add(queryBtn);
+                        }
                     }
                 }
                 {
@@ -357,6 +367,9 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
 
         tableInfo.execute(String.format(" select * from %s where 1!=1 ", schemaTable), _parent.getDataSource().getConnection());
         System.out.println(tableInfo.getColumns());
+        if (StringUtils.isBlank(tableInfo.getTableAndSchema())) {
+            tableInfo.setTableName(schemaTable);
+        }
 
         Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
         rowMap.set(rowMapForBackup);

@@ -1,6 +1,12 @@
 ﻿spring boot 執行指令(debug mode)
 
 	mvn spring-boot:run --debug
+	
+	
+---
+spring boot 包jar
+
+	mvn package
 
 ------------------------------------------------------------------------
 淨化jar檔(run 不起來可以跑這個)
