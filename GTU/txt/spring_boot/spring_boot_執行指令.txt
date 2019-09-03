@@ -7,6 +7,10 @@
 spring boot 包jar
 
 	mvn package
+	
+	然後
+	
+	project/target/> java -jar demo-0.0.1.jar
 
 ------------------------------------------------------------------------
 淨化jar檔(run 不起來可以跑這個)
