@@ -989,10 +989,22 @@ public class AVChoicerUI extends JFrame {
                     trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
-                    resetCacheFileList();
+                    // resetCacheFileList();
+                    removeFromCacheLst(file);
                     dirCheckTextActionPerformed();
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
+                }
+            }
+        }
+
+        private void removeFromCacheLst(File removeFile) {
+            if (cacheFileList != null) {
+                for (int ii = 0; ii < cacheFileList.size(); ii++) {
+                    if (cacheFileList.get(ii) == removeFile) {
+                        cacheFileList.remove(ii);
+                        break;
+                    }
                 }
             }
         }
