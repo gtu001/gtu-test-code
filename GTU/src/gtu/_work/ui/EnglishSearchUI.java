@@ -1386,19 +1386,25 @@ public class EnglishSearchUI extends JFrame {
         searchEnglishIdText.requestFocus();
     }
 
+    private String getFixWord(String word) {
+        word = StringUtils.trimToEmpty(word);
+        word = word.replaceAll("[^a-zA-Z]+$", "");
+        return word;
+    }
+
     private int writeNewData2(String word) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getAppendTextFile()), "utf8"));
         Set<String> set = new LinkedHashSet<String>();
         for (String line = null; (line = reader.readLine()) != null;) {
             line = StringUtils.trimToEmpty(line);
             if (StringUtils.isNotBlank(line)) {
-                set.add(line);
+                set.add(getFixWord(line));
             }
         }
         reader.close();
         // 空白太多當成句子不處理
         if (StringUtils.countMatches(StringUtils.trimToEmpty(word), " ") < 4) {
-            set.add(word);
+            set.add(getFixWord(word));
         }
         StringBuffer sb = new StringBuffer();
         for (String v : set) {
