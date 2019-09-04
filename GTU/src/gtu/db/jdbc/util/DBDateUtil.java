@@ -123,12 +123,12 @@ public class DBDateUtil {
 
             @Override
             public String varchar2Timestamp(String columnName) {
-                return String.format(" convert(datetime, %s, 25) ", columnName);
+                return String.format(" convert(datetime2, %s, 25) ", columnName);
             }
 
             @Override
             public String varchar2Date(String columnName) {
-                return String.format(" convert(datetime, %s, 23) ", columnName);
+                return String.format(" convert(datetime2, %s, 23) ", columnName);
             }
 
             @Override

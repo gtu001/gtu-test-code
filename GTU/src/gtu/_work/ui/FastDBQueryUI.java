@@ -2117,6 +2117,9 @@ public class FastDBQueryUI extends JFrame {
 
             while (mth.find()) {
                 String key = mth.group(1);
+                if (isNotParam(key)) {
+                    continue;
+                }
                 paramList.add(key);
                 paramSet.add(key);
                 mth.appendReplacement(sb2, "?");
@@ -2130,6 +2133,10 @@ public class FastDBQueryUI extends JFrame {
             sqlParam.paramList = paramList;
             sqlParam.parseToSqlInjectionMap(sql);
             return sqlParam;
+        }
+
+        protected static boolean isNotParam(String sql) {
+            return StringUtils.defaultString(sql).matches("\\:?\\d+.*");
         }
     }
 
@@ -2195,6 +2202,9 @@ public class FastDBQueryUI extends JFrame {
                     List<String> params = new ArrayList<String>();
                     while (mth2.find()) {
                         String para = mth2.group(1);
+                        if (isNotParam(para)) {
+                            continue;
+                        }
                         params.add(para);
                         sqlParam.paramSetSentanceMap.put(para, quoteLine);
                     }
@@ -2229,6 +2239,10 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String col = mth.group(1);
                 Object value = paramMap.get(col);
+
+                if (isNotParam(col)) {
+                    continue;
+                }
 
                 rtnParamLst.add(value);
                 String replaceVal = StringUtils.rightPad("?", mth.group().length());
