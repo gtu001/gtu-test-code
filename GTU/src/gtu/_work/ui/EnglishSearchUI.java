@@ -121,6 +121,9 @@ import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishSearchUI extends JFrame {
 
+    private static final String HermannEbbinghaus_Memory_Category_ENGLISH = "Eng";
+    private static final String HermannEbbinghaus_Memory_Category_OTHER = "Other";
+
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JComboBox searchEnglishIdText;
@@ -161,7 +164,7 @@ public class EnglishSearchUI extends JFrame {
             propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_linux");
         }
 
-        File tmpFile = new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI", "EnglishSearchUI_linux_config.properties");
+        File tmpFile = new File("D:\\my_tool\\EnglishSearchUI\\EnglishSearchUI_win10_config.properties");
         if (tmpFile.exists()) {
             propertyBean = new PropertiesUtilBean(tmpFile);
         }
@@ -301,6 +304,119 @@ public class EnglishSearchUI extends JFrame {
             System.out.println("offlineProp size = " + getOfflineProp().size());
 
             final MemData d = (MemData) event.getSource();
+
+            if (StringUtils.isBlank(d.getCategory()) || HermannEbbinghaus_Memory_Category_ENGLISH.equals(d.getCategory())) {
+                createEnglishWordDialog(event);
+            } else if (HermannEbbinghaus_Memory_Category_OTHER.equals(d.getCategory())) {
+                createOtherQuestionDialog(event);
+            }
+        }
+
+        private void createOtherQuestionDialog(ActionEvent event) {
+            final MemData d = (MemData) event.getSource();
+            long period = event.getWhen();
+            String reviewType = event.getActionCommand();
+
+            final MouseMarkQueryHandler mouseMarkQueryHandler = new MouseMarkQueryHandler();
+            final EnglishSearchUI_MemoryBank_DialogOtherUI choiceDialog = new EnglishSearchUI_MemoryBank_DialogOtherUI();
+            dialogObervable.add(choiceDialog);
+
+            choiceDialog.initial();
+            choiceDialog.createDialog("複習階段 :" + reviewType + " [組列 : " + memory.getQueue().size() + "]", //
+                    d.getKey(), //
+                    d.getRemark(), //
+                    new ActionListener() { // delete key
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            boolean confirmDel = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定刪除 : " + d.getKey(), "從設定檔中刪除");
+                            if (confirmDel) {
+                                memory.deleteKey(d.getKey());
+                                choiceDialog.closeDialog();
+                            }
+                        }
+                    }, new ActionListener() {// choice
+                                             // one
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            choiceDialog.closeDialog();
+                        }
+                    }, new ActionListener() {// modify
+                                             // desc
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String newMeaning = JCommonUtil._jOptionPane_showInputDialog("請輸入新解釋  : " + d.getKey(), d.getRemark());
+                            if (newMeaning != null && !StringUtils.equals(newMeaning, d.getRemark())) {
+                                d.setRemark(newMeaning);
+                                JCommonUtil._jOptionPane_showMessageDialog_info("原為 : " + d.getRemark() + "\n修正為 : " + newMeaning, "修正成功 " + d.getKey());
+                                choiceDialog.closeDialog();
+                            }
+                        }
+                    }, new ActionListener() {// skip
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            long waitingTime = RandomUtil.rangeInteger(10, 30) * 60 * 1000;
+                            d.setWaitingTriggerTime(waitingTime);
+                            choiceDialog.closeDialog();
+                        }
+                    }, new ActionListener() {// skip
+                                             // all
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "5"));
+                                memory.suspend(Range.between(min, min + 40));
+                            } catch (Exception ex) {
+                                memory.suspend();
+                            }
+                            choiceDialog.closeDialog();
+                        }
+                    }, new ActionListener() { // onCreate
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mouseMarkQueryHandler.before();
+                        }
+                    }, new ActionListener() { // onClose
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mouseMarkQueryHandler.after();
+                            dialogObervable.remove(choiceDialog);
+                        }
+                    }, new ActionListener() { // append
+                                              // new
+                                              // word
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                String key = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入單字:"));
+                                if (StringUtils.isBlank(key)) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("未輸入單字!");
+                                    return;
+                                }
+                                String desc = getChs2Big5(getEnglishMeaning(key));
+                                memory.append(key, HermannEbbinghaus_Memory_Category_ENGLISH, desc);
+                                memory.store();
+                                JCommonUtil._jOptionPane_showMessageDialog_info("加入成功!!\n" + key + "\n" + desc);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    }, new ActionListener() { // suspend
+                                              // key
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            boolean confirmDel = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定終止 : " + d.getKey(), "從設定檔中停止");
+                            if (confirmDel) {
+                                memory.suspendKey(d.getKey());
+                                d.setWaitingTriggerTime(9999 * 60 * 1000);
+                                choiceDialog.closeDialog();
+                            }
+                        }
+                    });
+            choiceDialog.showDialog();
+        }
+
+        private void createEnglishWordDialog(ActionEvent event) {
+            final MemData d = (MemData) event.getSource();
             long period = event.getWhen();
             String reviewType = event.getActionCommand();
 
@@ -421,7 +537,7 @@ public class EnglishSearchUI extends JFrame {
                                         return;
                                     }
                                     String desc = getChs2Big5(getEnglishMeaning(key));
-                                    memory.append(key, desc);
+                                    memory.append(key, HermannEbbinghaus_Memory_Category_ENGLISH, desc);
                                     memory.store();
                                     JCommonUtil._jOptionPane_showMessageDialog_info("加入成功!!\n" + key + "\n" + desc);
                                 } catch (Exception ex) {
@@ -478,6 +594,17 @@ public class EnglishSearchUI extends JFrame {
     private JPanel panel_10;
     private JToggleButton tglbtnNewToggleButton;
     private JButton googleTranslateChangeFontBtn;
+    private JPanel panel_11;
+    private JPanel panel_12;
+    private JPanel panel_13;
+    private JPanel panel_14;
+    private JPanel panel_15;
+    private JLabel lblNewLabel_1;
+    private JTextField emeoryQuestionText;
+    private JTextArea emeoryQuestionDescArea;
+    private JButton emeoryClearBtn;
+    private JButton emeoryRemoveBtn;
+    private JButton emeoryAddBtn;
 
     /**
      * Create the frame.
@@ -992,6 +1119,71 @@ public class EnglishSearchUI extends JFrame {
 
         panel_5.add(JCommonUtil.createScrollComponent(googleTranslateArea, false, true), BorderLayout.CENTER);
 
+        panel_11 = new JPanel();
+        tabbedPane.addTab("記憶工具", null, panel_11, null);
+        panel_11.setLayout(new BorderLayout(0, 0));
+
+        panel_12 = new JPanel();
+        panel_11.add(panel_12, BorderLayout.NORTH);
+
+        lblNewLabel_1 = new JLabel("標題");
+        panel_12.add(lblNewLabel_1);
+
+        emeoryQuestionText = new JTextField();
+        panel_12.add(emeoryQuestionText);
+        emeoryQuestionText.setColumns(35);
+
+        panel_13 = new JPanel();
+        panel_11.add(panel_13, BorderLayout.WEST);
+
+        panel_14 = new JPanel();
+        panel_11.add(panel_14, BorderLayout.EAST);
+
+        panel_15 = new JPanel();
+        panel_11.add(panel_15, BorderLayout.SOUTH);
+
+        emeoryAddBtn = new JButton("加入記憶");
+        emeoryAddBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    Validate.notBlank(emeoryQuestionText.getText(), "題目不可為空");
+                    Validate.notBlank(emeoryQuestionDescArea.getText(), "答案不可為空");
+                    memory.append(StringUtils.defaultString(emeoryQuestionText.getText()), HermannEbbinghaus_Memory_Category_OTHER, StringUtils.defaultString(emeoryQuestionDescArea.getText()));
+                    memory.store();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_15.add(emeoryAddBtn);
+
+        emeoryClearBtn = new JButton("清空");
+        emeoryClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                emeoryQuestionText.setText("");
+                emeoryQuestionDescArea.setText("");
+            }
+        });
+        panel_15.add(emeoryClearBtn);
+
+        emeoryRemoveBtn = new JButton("移除記憶");
+        emeoryRemoveBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    Validate.notBlank(emeoryQuestionText.getText(), "題目不可為空");
+                    memory.deleteKey(StringUtils.defaultString(emeoryQuestionText.getText()));
+                    memory.store();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_15.add(emeoryRemoveBtn);
+
+        emeoryQuestionDescArea = new JTextArea();
+        JTextAreaUtil.applyCommonSetting(emeoryQuestionDescArea);
+        panel_11.add(JCommonUtil.createScrollComponent(emeoryQuestionDescArea), BorderLayout.CENTER);
+
         // ----------------------------------------------------------------------------------------------------------
 
         // 置中
@@ -1285,7 +1477,7 @@ public class EnglishSearchUI extends JFrame {
     private void appendMemoryBank(String word, String desc) {
         desc = getChs2Big5(desc);
         if (StringUtils.isNotBlank(desc) && memory != null && memory.isInitDone()) {
-            memory.append(word, desc);
+            memory.append(word, HermannEbbinghaus_Memory_Category_ENGLISH, desc);
         }
     }
 
@@ -1674,7 +1866,7 @@ public class EnglishSearchUI extends JFrame {
             for (Enumeration<?> enu = prop.keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String meaning = this.getEnglishMeaning(key);
-                memory.append(key, meaning);
+                memory.append(key, HermannEbbinghaus_Memory_Category_ENGLISH, meaning);
             }
 
             JCommonUtil._jOptionPane_showMessageDialog_info("重設完成!");

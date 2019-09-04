@@ -228,7 +228,7 @@ public class HermannEbbinghaus_Memory {
      * @param key
      */
     public void append(String key) {
-        this.append(key, "");
+        this.append(key, "", "");
     }
 
     /**
@@ -237,7 +237,7 @@ public class HermannEbbinghaus_Memory {
      * @param key
      * @param remark
      */
-    public void append(String key, String remark) {
+    public void append(String key, String category, String remark) {
         System.out.println("## 加入  " + key);
 
         Date newDate = new Date();
@@ -247,6 +247,7 @@ public class HermannEbbinghaus_Memory {
         d.fixedTime = newDate;
         d.setRemark(remark);
         d.resetReviewTime();
+        d.category = category;
 
         this.append(d);
     }
@@ -345,7 +346,7 @@ public class HermannEbbinghaus_Memory {
                         queueHandler.updateQueue();
 
                         if (d instanceof NotifyAllClz) {
-                            HermannEbbinghaus_Memory.this.notifyAll();
+                            HermannEbbinghaus_Memory.this.notify();// notifyAll
                             return;
                         }
 
@@ -474,6 +475,7 @@ public class HermannEbbinghaus_Memory {
         Date fixedTime;
         String reviewTime;
         String remark;
+        String category;
         long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
 
         public MemData() {
@@ -487,6 +489,7 @@ public class HermannEbbinghaus_Memory {
                 this.registerTime = __getDateFromString(getArry(1, arry));
                 this.fixedTime = __getDateFromString(getArry(2, arry));
                 this.remark = getArry(3, arry);
+                this.category = getArry(4, arry);
             } catch (Exception e) {
                 throw new RuntimeException("MemData ERR : " + e.getMessage(), e);
             }
@@ -588,6 +591,10 @@ public class HermannEbbinghaus_Memory {
         public void setFixedTime(Date fixedTime) {
             this.fixedTime = fixedTime;
         }
+
+        public String getCategory() {
+            return category;
+        }
     }
 
     public void setMemDo(ActionListener memDo) {
@@ -679,6 +686,7 @@ public class HermannEbbinghaus_Memory {
             this.reviewTime = ReviewTime.getInitialReviewTime().name();
             this.registerTime = new Date();
             this.fixedTime = new Date();
+            this.category = "";
             this.setWaitingTriggerTime(0);
         }
     }
