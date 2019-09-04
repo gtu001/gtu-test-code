@@ -35,6 +35,8 @@ lsb_release -a
 	
 	
 ---
+官方tar檔安裝法
+
 	去oracle官往抓tar擋下來
 
 	sudo cp -rvf jdk1.8.0_221/ -t /usr/lib/jvm

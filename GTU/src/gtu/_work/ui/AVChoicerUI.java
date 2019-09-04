@@ -21,7 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -113,7 +112,6 @@ public class AVChoicerUI extends JFrame {
 
     private Set<File> clickAvSet = new HashSet<File>();
     private AtomicReference<File> currentAvFile = new AtomicReference<File>();
-    private AtomicReference<File> currentAvFileDir = new AtomicReference<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
     private List<File> cacheFileList = new ArrayList<File>();
     private JLabel deleteAVFileLabel;
@@ -213,7 +211,7 @@ public class AVChoicerUI extends JFrame {
 
         JPanel panel_9 = new JPanel();
         panel.add(panel_9, BorderLayout.SOUTH);
-        
+
         ignoreHistoryConfigChk = new JCheckBox("忽略重播間隔");
         panel_9.add(ignoreHistoryConfigChk);
 
@@ -546,22 +544,27 @@ public class AVChoicerUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 List<File> lst = (List<File>) e.getSource();
                 if (lst != null && !lst.isEmpty()) {
-                    File file = lst.get(0);
-                    if (file.isFile()) {
-                        playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
-                            @Override
-                            public File call() throws Exception {
-                                return file;
-                            }
-                        }));
-                    } else {
-                        dirCheckText.setText(file.getAbsolutePath());
-                        dirCheckTextActionPerformed();
-                        JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("目錄檢視");
+                    if (lst.size() == 1) {
+                        File file = lst.get(0);
+                        if (file.isFile()) {
+                            playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
+                                @Override
+                                public File call() throws Exception {
+                                    return file;
+                                }
+                            }));
+                        } else {
+                            dirCheckText.setText(file.getAbsolutePath());
+                            dirCheckTextActionPerformed();
+                            JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("目錄檢視");
 
-                        // 設定當前目錄
-                        indicateFolderText.setText(file.getAbsolutePath());
-                        triggerIndicateFolderTextFoucsLost();
+                            // 設定當前目錄
+                            indicateFolderText.setText(file.getAbsolutePath());
+                            triggerIndicateFolderTextFoucsLost();
+                        }
+                    } else {
+                        cacheFileList = new ArrayList<File>();
+                        cacheFileList.addAll(lst);
                     }
                 }
             }
@@ -574,11 +577,10 @@ public class AVChoicerUI extends JFrame {
         File avFolder = new File(indicateFolderText.getText());
         if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
             currentAvFile.set(avFolder);
-            currentAvFileDir.set(avFolder);
+            this.cacheFileList = this.getSubFolderAvLst(avFolder);
             resetSameFolderChk(true);
         } else {
             indicateFolderText.setText("");
-            currentAvFileDir.set(null);
             resetSameFolderChk(false);
         }
     }
@@ -845,32 +847,29 @@ public class AVChoicerUI extends JFrame {
         System.out.println("cacheFileList.size() = " + cacheFileList.size());
 
         File choiceFile = null;
-        List<File> cloneLst = Collections.EMPTY_LIST;
+        List<File> cloneLst = new ArrayList<File>();
 
-        if (currentAvFile.get() != null && sameFolderChk.isSelected()) {
-            File avDir = null;
-            if (currentAvFile.get().exists()) {
-                avDir = currentAvFile.get().isFile() ? currentAvFile.get().getParentFile() : currentAvFile.get();
-            } else {
-                if (currentAvFileDir.get() != null && currentAvFileDir.get().exists()) {
-                    avDir = currentAvFileDir.get();
+        File avDir = null;
+        if (sameFolderChk.isSelected()) {
+            if (currentAvFile.get() != null && currentAvFile.get().exists()) {
+                if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+                    avDir = currentAvFile.get().getParentFile();
                 } else {
-                    if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
-                        avDir = currentAvFile.get().getParentFile();
-                    } else {
-                        avDir = currentAvFile.get();
-                    }
+                    avDir = currentAvFile.get();
                 }
+            } else if (StringUtils.isNotBlank(indicateFolderText.getText())) {
+                avDir = currentAvFile.get().isFile() ? //
+                        currentAvFile.get().getParentFile() : currentAvFile.get();
             }
-            cloneLst = this.getSubFolderAvLst(avDir);
-
-        } else if (sameFolderChk.isSelected() && new File(indicateFolderText.getText()).isDirectory()) {
-            cloneLst = this.getSubFolderAvLst(new File(indicateFolderText.getText()));
-
-        } else if (!cacheFileList.isEmpty()) {
-            cloneLst = new ArrayList<>(cacheFileList);
         }
 
+        if (avDir != null) {
+            cloneLst = getSubFolderAvLst(avDir);
+        } else {
+            cloneLst.addAll(cacheFileList);
+        }
+
+        int cacheCloneLstSize = cloneLst.size();
         cloneLst.removeAll(clickAvSet);
 
         if (!cloneLst.isEmpty()) {
@@ -883,7 +882,7 @@ public class AVChoicerUI extends JFrame {
         }
 
         // 設定以看數
-        movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), cloneLst.size()));
+        movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), cacheCloneLstSize));
 
         currentAvFile.set(choiceFile);
         clickAvSet.add(choiceFile);
@@ -990,10 +989,22 @@ public class AVChoicerUI extends JFrame {
                     trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
                     deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
                     setCountLabel();
-                    resetCacheFileList();
+                    // resetCacheFileList();
+                    removeFromCacheLst(file);
                     dirCheckTextActionPerformed();
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
+                }
+            }
+        }
+
+        private void removeFromCacheLst(File removeFile) {
+            if (cacheFileList != null) {
+                for (int ii = 0; ii < cacheFileList.size(); ii++) {
+                    if (cacheFileList.get(ii) == removeFile) {
+                        cacheFileList.remove(ii);
+                        break;
+                    }
                 }
             }
         }
@@ -1050,10 +1061,10 @@ public class AVChoicerUI extends JFrame {
         private PropertiesUtilBean historyConfig = new PropertiesUtilBean(AVChoicerUI.class, "AVChoicerUI_History");
 
         private boolean isAlreadyPlayInRecent(File avFile) {
-            if(ignoreHistoryConfigChk.isSelected()) {
+            if (ignoreHistoryConfigChk.isSelected()) {
                 return false;
             }
-            
+
             double days = 3D;
             try {
                 days = Double.parseDouble(historyBetweenConfigText.getText());
@@ -1101,6 +1112,7 @@ public class AVChoicerUI extends JFrame {
                     }
                 }
             } catch (Exception e) {
+                JCommonUtil.handleException(e);
                 throw new RuntimeException("HistoryConfigHandler ERR : " + e.getMessage(), e);
             }
         }
