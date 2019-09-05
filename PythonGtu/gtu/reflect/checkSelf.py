@@ -26,8 +26,8 @@ def checkMembersToHtml(testObj, fileName) :
     html += "<ul>"
     for i, mem in enumerate(dlist, 0):        
         print("<<", i, ">>", mem[0], "\t", mem[1])
-        html += "<li><a href='#{0}'>{0}</a></li>\n".format(mem[0])
-        htmlDoc += "<a id='{0}'><h3><font color='red'>{0}</font></h3></a><br/>{1}<br/><br/><br/>\n\n".format(getDiv(mem[0]), getDiv(getDoc(mem[1])))
+        html += "<li><a href='#{0}'>{1}</a></li>\n".format(mem[0], getDiv(mem[0]))
+        htmlDoc += "<a id='{0}'><h3><font color='red'>{1}</font></h3></a><br/>{2}<br/><br/><br/>\n\n".format(mem[0], getDiv(mem[0]), getDiv(getDoc(mem[1])))
     html += "</ul>\n"
     html += "<br/><br/>\n"
     html += htmlDoc
