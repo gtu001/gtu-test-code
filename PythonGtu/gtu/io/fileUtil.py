@@ -54,7 +54,7 @@ def getDesktopDir():
 		else :
 			return home + os.sep + "Desktop" + os.sep
 	else :
-		return "/home/gtu001/桌面"
+		return "/home/gtu001/桌面" + os.sep
 	
 	
 def getAbsPath(path):
