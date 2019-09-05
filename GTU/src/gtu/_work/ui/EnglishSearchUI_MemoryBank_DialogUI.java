@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -9,6 +10,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Array;
@@ -80,6 +83,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
     private JButton appendBtn;
     private JComboBox alignTypeComboBox;
     private JButton suspendTerminatedBtn;
+    private SkipBtnShowAnswer mSkipBtnShowAnswer = new SkipBtnShowAnswer();
 
     /**
      * Launch the application.
@@ -91,7 +95,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         String[] arry = new String[] { testStr, testStr, testStr, testStr, testStr };
         EnglishSearchUI_MemoryBank_DialogUI dialog = new EnglishSearchUI_MemoryBank_DialogUI();
         dialog.initial();
-        dialog.createDialog("title", "abcdefg", arry, null, null, null, null, null, null, null, null, null);
+        dialog.createDialog("title", "abcdefg", arry, 2, null, null, null, null, null, null, null, null, null);
         dialog.showDialog();
     }
 
@@ -110,7 +114,10 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         }
     }
 
-    public void createDialog(String title, String englishWord, String[] meaningLst, //
+    public void createDialog(String title, //
+            String englishWord, //
+            String[] meaningLst, //
+            int correctAnswerIndex, //
             ActionListener deleteConfigAction, ActionListener choiceRadioAction, //
             ActionListener customDescAction, ActionListener skipBtnAction, //
             ActionListener skipAllBtnAction, ActionListener onCreateAction, //
@@ -120,6 +127,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             setTitle(title);
             this.meaningLst.set(meaningLst);
             englishWordLabel.setText(englishWord);
+            mSkipBtnShowAnswer.setCorrectAnswerIndex(correctAnswerIndex);
             q1Radio.setText(__getArryByIndex(meaningLst, 0));
             q2Radio.setText(__getArryByIndex(meaningLst, 1));
             q3Radio.setText(__getArryByIndex(meaningLst, 2));
@@ -348,6 +356,17 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
                         }
                     }
                 });
+                skipBtn.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseExited(MouseEvent arg0) {
+                        mSkipBtnShowAnswer.mouseExited();
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent arg0) {
+                        mSkipBtnShowAnswer.mouseEntered();
+                    }
+                });
                 {
                     suspendTerminatedBtn = new JButton("停止");
                     suspendTerminatedBtn.addActionListener(new ActionListener() {
@@ -413,6 +432,28 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
         JCommonUtil.setFoucsToChildren(this, this);
         this.setModal(false);
         btnGroup = JButtonGroupUtil.createRadioButtonGroup(q1Radio, q2Radio, q3Radio, q4Radio, q5Radio);
+    }
+
+    private class SkipBtnShowAnswer {
+        int correctAnswerIndex = -1;
+
+        public void setCorrectAnswerIndex(int correctAnswerIndex) {
+            this.correctAnswerIndex = correctAnswerIndex;
+        }
+
+        public void mouseEntered() {
+            JRadioButton[] ary = new JRadioButton[] { q1Radio, q2Radio, q3Radio, q4Radio, q5Radio };
+            if (correctAnswerIndex != -1) {
+                ary[correctAnswerIndex].setBackground(Color.yellow);
+            }
+        }
+
+        public void mouseExited() {
+            JRadioButton[] ary = new JRadioButton[] { q1Radio, q2Radio, q3Radio, q4Radio, q5Radio };
+            if (correctAnswerIndex != -1) {
+                ary[correctAnswerIndex].setBackground(JCommonUtil.DEFULAT_BTN_COLOR);
+            }
+        }
     }
 
     public void setNewMeaning(String oldMeaning, String newMeaning) {

@@ -495,16 +495,21 @@ public class HermannEbbinghaus_Memory {
             }
         }
 
+        private String toValue() {
+            return StringUtils.trimToEmpty(this.reviewTime) + "^" + //
+                    DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + //
+                    DateFormatUtils.format(this.fixedTime, DATE_FORMAT) + "^" + //
+                    StringUtils.defaultString(this.remark) + "^" + //
+                    StringUtils.trimToEmpty(this.category) + "" //
+            ;
+        }
+
         private Date __getDateFromString(String dateStr) {
             try {
                 return SDF.parse(dateStr);
             } catch (Exception ex) {
                 return new Date();
             }
-        }
-
-        String toValue() {
-            return this.reviewTime + "^" + DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + DateFormatUtils.format(this.fixedTime, DATE_FORMAT) + "^" + this.remark;
         }
 
         private String getArry(int index, String[] arry) {

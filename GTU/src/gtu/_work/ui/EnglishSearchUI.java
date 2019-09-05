@@ -355,7 +355,7 @@ public class EnglishSearchUI extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             long waitingTime = RandomUtil.rangeInteger(10, 30) * 60 * 1000;
-                            d.setWaitingTriggerTime(waitingTime);
+                            d.setWaitingTriggerTime(-1);// TODO 改成進入下個階段排成
                             choiceDialog.closeDialog();
                         }
                     }, new ActionListener() {// skip
@@ -434,6 +434,9 @@ public class EnglishSearchUI extends JFrame {
             List<String> meaningLst = new ArrayList<String>(questionMap.keySet());
             meaningLst = RandomUtil.randomList(meaningLst);
 
+            // 正確答案第幾項
+            int correctAnswerIndex = meaningLst.indexOf(meaning.get());
+
             StringBuilder sb = new StringBuilder();
             sb.append("複習 : " + d.getKey() + "\n");
             sb.append("加入時間 : " + DateFormatUtils.format(d.getRegisterTime(), d.getDateFormat()) + "\n");
@@ -460,6 +463,7 @@ public class EnglishSearchUI extends JFrame {
                 choiceDialog.createDialog("複習階段 :" + reviewType + " [組列 : " + memory.getQueue().size() + "]", //
                         d.getKey(), //
                         meaningLst.toArray(new String[0]), //
+                        correctAnswerIndex, //
                         new ActionListener() { // delete key
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -497,7 +501,7 @@ public class EnglishSearchUI extends JFrame {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 long waitingTime = RandomUtil.rangeInteger(10, 30) * 60 * 1000;
-                                d.setWaitingTriggerTime(waitingTime);
+                                d.setWaitingTriggerTime(-1);// TODO 改成進入下個階段排成
                                 checkChoiceEqual.set(false);
                                 choiceDialog.closeDialog();
                             }
