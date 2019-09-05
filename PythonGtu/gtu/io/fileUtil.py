@@ -141,10 +141,15 @@ def loadFileBytes(filePath):
 	return file.read() 
 
 
-def getCurrentDir():
+
+def getCurrentDir(filename=None):
+	''' filename 呼叫端要傳 __file__ '''
 	''' print(os.getcwd()) '''
-	(threadId, filename, lineno, name, line) = threadUtil.getCurrentRunning(ignorePy=[__file__])
+	if filename is None :
+		(threadId, filename, lineno, name, line) = threadUtil.getCurrentRunning(ignorePy=[__file__])
 	return (os.path.dirname(os.path.abspath(filename))) + os.sep
+
+
 
 
 def getDir(file):

@@ -11,23 +11,61 @@ from gtu.reflect import checkSelf
 
 def checkMembersToHtml(testObj, fileName) :
     '''檢查物件成員'''
-    def getDiv(html) :
-        return "<div style='font-family: Consolas'>" + html + "</div>"
+    def getDiv(html, tag='div', id=None, header='') :
+        if id is not None :
+            id = "id=\"" + id + "\""
+        else :
+            id = ""
+        return "<" + tag + " " + id + " style='font-family: Consolas'>" + header + html + "</" + tag + ">"
     def getDoc(obj) :
         strVal = inspect.getdoc(obj)
         if strVal :
             return strVal.replace('\n', '<br/>\n').replace(' ', '&nbsp;')
         else:
             return "NA"
+    htmlHeader = '''
+    <head>
+        <script text="text/javascript">
+            function search() {
+                var value = document.querySelector(".search").value.toLowerCase();
+                var aArry = document.querySelectorAll("li");
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    aArry[ii].style.display = 'block';
+                }
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    var id = aArry[ii].getAttribute("id").replace(/^li\_/, '').toLowerCase();
+                    if(id.indexOf(value) == -1) {
+                        aArry[ii].style.display = 'none';
+                    }
+                }
+                var aArry = document.querySelectorAll("div");
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    aArry[ii].style.display = 'block';
+                }
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    if(aArry[ii].getAttribute('id') && aArry[ii].getAttribute('id').toLowerCase().indexOf(value) == -1) {
+                        aArry[ii].style.display = 'none';
+                    }
+                }
+            }
+        </script>
+    </head>
+    '''
     print("testObj ==> ", getClassFullName(testObj))
     dlist = inspect.getmembers(testObj)
     htmlDoc = ''
-    html = "<html><body>"
+    html = "<html>"
+    html += htmlHeader
+    html += "<body>"
+    html += "<input type='text' class='search' onblur='javascript:search();' /><br/><br/>"
     html += "<ul>"
+    header = "<a id='{0}'><h3><font color='red'>{1}</font></h3></a>"
     for i, mem in enumerate(dlist, 0):        
         print("<<", i, ">>", mem[0], "\t", mem[1])
-        html += "<li><a href='#{0}'>{1}</a></li>\n".format(mem[0], getDiv(mem[0]))
-        htmlDoc += "<a id='{0}'><h3><font color='red'>{1}</font></h3></a><br/>{2}<br/><br/><br/>\n\n".format(mem[0], getDiv(mem[0]), getDiv(getDoc(mem[1])))
+        html += "<li id='li_{0}'><a href='#{0}'>{1}</a></li>\n".format(mem[0], getDiv(mem[0], tag='span'))
+        headerContent = header.format(mem[0], getDiv(mem[0]))
+        divContent = "<br/>{0}<br/><br/><br/>\n\n".format(getDoc(mem[1]))
+        htmlDoc += getDiv(divContent, id=mem[0], header=headerContent)
     html += "</ul>\n"
     html += "<br/><br/>\n"
     html += htmlDoc
