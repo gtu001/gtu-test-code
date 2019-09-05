@@ -11,23 +11,23 @@ from gtu.reflect import checkSelf
 
 def checkMembersToHtml(testObj, fileName) :
     '''檢查物件成員'''
-
+    def getDiv(html) :
+        return "<div style='font-family: Consolas'>" + html + "</div>"
     def getDoc(obj) :
         strVal = inspect.getdoc(obj)
         if strVal :
             return strVal.replace('\n', '<br/>\n').replace(' ', '&nbsp;')
         else:
             return "NA"
-
     print("testObj ==> ", getClassFullName(testObj))
     dlist = inspect.getmembers(testObj)
     htmlDoc = ''
-    html = '<html><body>'
+    html = "<html><body>"
     html += "<ul>"
     for i, mem in enumerate(dlist, 0):        
         print("<<", i, ">>", mem[0], "\t", mem[1])
         html += "<li><a href='#{0}'>{0}</a></li>\n".format(mem[0])
-        htmlDoc += "<a id='{0}'><h3><font color='red'>{0}</font></h3></a><br/>{1}<br/><br/><br/>\n\n".format(mem[0], getDoc(mem[1]))
+        htmlDoc += "<a id='{0}'><h3><font color='red'>{0}</font></h3></a><br/>{1}<br/><br/><br/>\n\n".format(getDiv(mem[0]), getDiv(getDoc(mem[1])))
     html += "</ul>\n"
     html += "<br/><br/>\n"
     html += htmlDoc
