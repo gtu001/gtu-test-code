@@ -41,7 +41,8 @@ def _test_applyChineseFont_usePath(ttfPath):
 def stock(dictVal, title=None, xlabel=None, ylabel=None, seabornStyle=False):
     applyChineseFont()
     if seabornStyle:
-        seaborn.set()  # set plot style
+        #seaborn.set()  # set plot style
+        pass
         
     if 'x' in dictVal :
         plt.plot(dictVal['x'], dictVal['y'])
@@ -50,26 +51,28 @@ def stock(dictVal, title=None, xlabel=None, ylabel=None, seabornStyle=False):
     
     plt.title(title)
     plt.xlabel(xlabel)
-    plt.ylabel(ylabel);
+    plt.ylabel(ylabel)
     plt.show()
 
 
 def hist(npArry, title=None, xlabel=None, ylabel="occur times", seabornStyle=False):
     applyChineseFont()
     if seabornStyle:
-        seaborn.set()  # set plot style
+        #seaborn.set()  # set plot style
+        pass
         
     plt.hist(npArry)
     plt.title(title)
     plt.xlabel(xlabel)
-    plt.ylabel(ylabel);
+    plt.ylabel(ylabel)
     plt.show()
     
 
 def image(npArry, seabornStyle=False):
     applyChineseFont()
     if seabornStyle:
-        seaborn.set()  # set plot style
+        #seaborn.set()  # set plot style
+        pass
         
     plt.imshow(npArry, origin='lower', cmap='viridis')
     plt.colorbar()
@@ -79,8 +82,9 @@ def image(npArry, seabornStyle=False):
 def scatter(x, y, seabornStyle=False):
     applyChineseFont()
     if seabornStyle:
-        seaborn.set()  # set plot style
-    plt.scatter(x, y);
+        #seaborn.set()  # set plot style
+        pass
+    plt.scatter(x, y)
     plt.show()
 
 

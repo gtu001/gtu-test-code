@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from gtu.reflect import checkSelf
+from gtu.data_science.matplotlib import matplotlibUtil
 
 
 def test1():
@@ -24,8 +25,24 @@ def test1():
         print("output_result", output_result)
 
 
+def test2() :
+    x = tf.Variable(tf.random_normal([100], mean=10, stddev=7, dtype=tf.float32, name="x"))
+    init_op = tf.initialize_all_variables()
+    with tf.Session() as sess :
+        sess.run(init_op)
+        x1 = sess.run(x)
+        for i,v in enumerate(x1) :
+            print(i, v)
+
+        matplotlibUtil.hist(x1)
+
+
 
 if __name__ == '__main__' :
-    #test1()
-    checkSelf.checkMembersToHtml(tf, "tensorlow_api")
+    # test2()
+    # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
+
+    import matplotlib
+    checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
+    
     print("done...")
