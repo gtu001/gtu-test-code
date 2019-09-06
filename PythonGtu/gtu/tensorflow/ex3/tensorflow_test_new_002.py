@@ -71,6 +71,8 @@ def test5() :
 
 def test6():
     input = tf.Variable(tf.random_normal([100, 784], 10, 3), name="input")
+    tf.placeholder(tf.float32, [1000, 784], name="i_1")
+
     W_1 = tf.Variable(tf.random_uniform([784, 100], -1, 1), name="W_1")
     b_1 = tf.Variable(tf.zeros([100]), name="biases_1")
     output_1 = tf.matmul(input, W_1) + b_1

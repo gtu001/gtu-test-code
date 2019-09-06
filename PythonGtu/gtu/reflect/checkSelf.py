@@ -17,10 +17,22 @@ def checkMembersToHtml(testObj, fileName) :
         else :
             id = ""
         return "<" + tag + " " + id + " style='font-family: Consolas'>" + header + html + "</" + tag + ">"
+    def replaceNbsp(strVal) :
+        def getNbspStr(strVal2) : 
+            return strVal2.replace(' ', '&nbsp;')
+        matchList = re.finditer('\<\w+\s.*?\>', strVal)
+        curPos = 0
+        rtnStr = ""
+        for mth in matchList:
+            rtnStr += getNbspStr(strVal[curPos : mth.start()])
+            rtnStr += mth.group()
+            curPos = mth.end()
+        rtnStr += getNbspStr(strVal[curPos :])
+        return rtnStr
     def getDoc(obj) :
         strVal = inspect.getdoc(obj)
         if strVal :
-            return strVal.replace('\n', '<br/>\n').replace(' ', '&nbsp;')
+            return replaceNbsp(strVal).replace('\n', '<br/>\n')
         else:
             return "NA"
     htmlHeader = '''
