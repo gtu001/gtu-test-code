@@ -25,24 +25,22 @@ def test1():
         print("output_result", output_result)
 
 
+ '''  標準差測試'''
 def test2() :
-    x = tf.Variable(tf.random_normal([100], mean=10, stddev=7, dtype=tf.float32, name="x"))
+    x = tf.Variable(tf.random_normal([1000, 3], mean=10, stddev=0.6, dtype=tf.float32, name="x"))
     init_op = tf.initialize_all_variables()
     with tf.Session() as sess :
         sess.run(init_op)
         x1 = sess.run(x)
-        for i,v in enumerate(x1) :
-            print(i, v)
-
         matplotlibUtil.hist(x1)
 
 
 
 if __name__ == '__main__' :
-    # test2()
+        test2()
     # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
 
-    import matplotlib
-    checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
+    #import matplotlib
+    #checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
     
-    print("done...")
+        print("done...")

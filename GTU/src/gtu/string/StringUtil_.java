@@ -22,18 +22,7 @@ import org.apache.commons.lang.StringUtils;
 public class StringUtil_ {
 
     public static void main(String[] args) {
-        StringBuffer sb = new StringBuffer();
-        Pattern ptn = Pattern.compile("\\<span(?:.|\\n)*?font\\-size\\:([\\d\\.]+)pt\\;(?:.|\\n)*?\\>((?:.|\\n)*?)\\<\\/span\\>");
-        Matcher mth = ptn.matcher("<span\n" + "    lang=EN-US style='mso-bidi-font-size:12.0pt;font-family:細明體;mso-bidi-font-family:\n" + "    細明體;mso-font-kerning:0pt'>\\3333e\n333\\</span>");
-        while (mth.find()) {
-            String text1 = mth.group(1);
-            String text2 = mth.group(2);
-            System.out.println("1>>> " + text1);
-            System.out.println("2>>> " + text2);
-            mth.appendReplacement(sb, appendReplacementEscape(text2));
-        }
-        mth.appendTail(sb);
-        System.out.println(">>>> " + sb);
+        System.out.println(StringUtil_.oracleDecodeAsString("X", "A", "=A", "B", "=B", "C"));
         System.out.println("done...");
     }
 
@@ -735,6 +724,30 @@ public class StringUtil_ {
         return lst;
     }
 
+    public static String oracleDecodeAsString(Object... strs) {
+        if (strs == null) {
+            throw new RuntimeException("decode args 不可為空!");
+        }
+        Object val = strs[0];
+        int index = 1;
+        while (true) {
+            if (index > strs.length - 1) {
+                if (((strs.length - 1) & 1) == 0) {
+                    return null;
+                }
+                return strs[strs.length - 1] != null ? String.valueOf(strs[strs.length - 1]) : "";
+            } else if (index == strs.length - 1) {
+                return strs[index] != null ? String.valueOf(strs[index]) : "";
+            }
+            String strVal = strs[index] != null ? String.valueOf(strs[index]) : "";
+            String strVal2 = val != null ? String.valueOf(val) : "";
+            if (StringUtils.equals(strVal, strVal2)) {
+                return strs[index + 1] != null ? String.valueOf(strs[index + 1]) : "";
+            }
+            index += 2;
+        }
+    }
+
     public static Object oracleDecode(Object... strs) {
         if (strs == null) {
             throw new RuntimeException("decode args 不可為空!");
@@ -747,31 +760,11 @@ public class StringUtil_ {
                     return null;
                 }
                 return strs[strs.length - 1];
+            } else if (index == strs.length - 1) {
+                return strs[index];
             }
             if (ObjectUtils.equals(val, strs[index])) {
                 return strs[index + 1];
-            }
-            index += 2;
-        }
-    }
-
-    public static Object oracleDecodeAsString(Object... strs) {
-        if (strs == null) {
-            throw new RuntimeException("decode args 不可為空!");
-        }
-        Object val = strs[0];
-        int index = 1;
-        while (true) {
-            if (index > strs.length - 1) {
-                if (((strs.length - 1) & 1) == 0) {
-                    return "";
-                }
-                return (strs[strs.length - 1] != null ? String.valueOf(strs[strs.length - 1]) : "");
-            }
-            String strVal = strs[index] != null ? String.valueOf(strs[index]) : "";
-            String strVal2 = val != null ? String.valueOf(val) : "";
-            if (StringUtils.equals(strVal, strVal2)) {
-                return (strs[index + 1] != null ? String.valueOf(strs[index + 1]) : "");
             }
             index += 2;
         }

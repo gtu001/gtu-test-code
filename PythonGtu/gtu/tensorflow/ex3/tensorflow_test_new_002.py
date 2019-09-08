@@ -111,6 +111,7 @@ def test7():
 
 
 if __name__ == '__main__' :
-    test7()
-    # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
+   # test7()
+   # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
+    checkSelf.checkMembersToHtml(str, "string")
     print("done...")
