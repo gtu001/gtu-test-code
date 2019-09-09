@@ -23,9 +23,12 @@ def my_network(input) :
 
 
 def test1() :
-    i_1 = tf.placeholder(tf.float32, [None, None], name="i_1")
-    i_1_p = tf.random_normal(shape=[1000,784], mean=10, stddev=1)
-    final_output = my_network(i_1_p)
+    i_1 = tf.placeholder(tf.float32, [100, 784], name="i_1")
+    i_1_p = np.random.normal(loc=10, scale=1, size=(100, 784))
+    #i_1_p = tf.cast(i_1_p, tf.float32, name="i_1")
+    i_1_p = i_1_p.astype(np.float32, order='K', casting='unsafe', subok=True, copy=True)
+
+    final_output = my_network(i_1)
     init_op = tf.initialize_all_variables()
     with tf.Session() as sess : 
         sess.run(init_op)
@@ -36,13 +39,34 @@ def test1() :
     print("done...test1")
 
 
+def test2() :
+    x = tf.Variable(tf.random_normal(shape=[10, 784], mean=10, stddev=1, dtype=tf.float32), name="x")
+    init = tf.constant_initializer(value=0)
+    W = tf.get_variable("W", [784, 10], initializer=init)
+    b = tf.get_variable("b", [10], initializer=init)
+    output = tf.nn.softmax(tf.matmul(x, W) + b)
+    init_op = tf.initialize_all_variables()
+    with tf.Session() as sess :
+        sess.run(init_op)
+        output_result = sess.run(output)
+        print("output_result", output_result)
+
+
+def test3() :
+    learning_rate = 10
+    global_step = 10
+    cost = 10
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    train_op = optimizer.minimize(cost, global_step=global_step)
+
+
 
 if __name__ == '__main__' :
-    # test1()
-    # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
-
+    test2()
+    #checkSelf.checkMembersToHtml(tf, "tensorlow_api")
     #import matplotlib
     #checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
     #checkSelf.checkMembersToHtml(tf.Session(), "tf.Session")
-    checkSelf.checkMembersToHtml(np, "numpy")
+    #checkSelf.checkMembersToHtml(np.random, "np.random")
+    checkSelf.checkMembersToHtml(tf.train, "tf.train")
     print("done...")
