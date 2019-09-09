@@ -26,6 +26,10 @@
             android:id="@+id/big_file_list"
             android:icon="@drawable/ic_menu_camera"
             android:title="大檔排行" />
+        <item
+            android:id="@+id/html_loader"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="html讀取" />
 
         <!-- no use -->
         <item

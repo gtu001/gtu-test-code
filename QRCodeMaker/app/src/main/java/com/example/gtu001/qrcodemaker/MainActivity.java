@@ -106,6 +106,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.big_file_list) {
             gotoActivity(BigFileActivity.class, null);
 
+        } else if (id == R.id.html_loader) {
+            gotoActivity(HtmlLoaderActivity.class, null);
+
         } else if (id == R.id.nav_send) {
 
         }

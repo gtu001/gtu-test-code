@@ -25,8 +25,9 @@ def test1():
         print("output_result", output_result)
 
 
- '''  標準差測試'''
+
 def test2() :
+    '''  標準差測試'''
     x = tf.Variable(tf.random_normal([1000, 3], mean=10, stddev=0.6, dtype=tf.float32, name="x"))
     init_op = tf.initialize_all_variables()
     with tf.Session() as sess :

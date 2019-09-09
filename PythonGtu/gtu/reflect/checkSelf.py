@@ -60,6 +60,17 @@ def checkMembersToHtml(testObj, fileName) :
                     }
                 }
             }
+            document.addEventListener("DOMContentLoaded", function(){
+                var aa = document.querySelectorAll("a");
+                for(var ii = 0 ; ii < aa.length ; ii ++){
+                    if(aa[ii].getAttribute("href")) {
+                        aa[ii].addEventListener("click", function() {
+                            var href = this.getAttribute("href").replace(/^\#/, "");
+                            document.querySelector("#" + href).scrollIntoView(true);
+                        });
+                    }
+                }
+            });
         </script>
     </head>
     '''

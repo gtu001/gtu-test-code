@@ -23,22 +23,26 @@ def my_network(input) :
 
 
 def test1() :
-    i_1 = tf.placeholder(tf.float32, [1000, 784], name="i_1")
-    final_output = my_network(i_1)
+    i_1 = tf.placeholder(tf.float32, [None, None], name="i_1")
+    i_1_p = tf.random_normal(shape=[1000,784], mean=10, stddev=1)
+    final_output = my_network(i_1_p)
     init_op = tf.initialize_all_variables()
     with tf.Session() as sess : 
         sess.run(init_op)
-        i_1_p = tf.Variable(tf.random_normal(shape=[1000,784], mean=10, stddev=1))
+        
         print("tf.Session()", tf.Session())
         final_output_result = sess.run(final_output, feed_dict={i_1 : i_1_p})
         print(final_output_result)
     print("done...test1")
 
+
+
 if __name__ == '__main__' :
-       # test1()
+    # test1()
     # checkSelf.checkMembersToHtml(tf, "tensorlow_api")
 
     #import matplotlib
     #checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
-    checkSelf.checkMembersToHtml(tf.Session(), "tf.Session")
+    #checkSelf.checkMembersToHtml(tf.Session(), "tf.Session")
+    checkSelf.checkMembersToHtml(np, "numpy")
     print("done...")

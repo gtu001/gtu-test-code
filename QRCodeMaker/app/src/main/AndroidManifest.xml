@@ -102,6 +102,9 @@
         <activity
             android:name=".FileFindMultiActivity"
             android:label="檔案選擇(多選)" />
+        <activity
+            android:name=".HtmlLoaderActivity"
+            android:label="HTML讀取" />
 
     </application>
 
