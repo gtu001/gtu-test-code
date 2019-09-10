@@ -59,6 +59,8 @@ def test3() :
     optimizer = tf.train.GradientDescentOptimizer(learning_rate)
     train_op = optimizer.minimize(cost, global_step=global_step)
 
+    correct_prediction = tf.equal(tf.argmax(output, 1), tf.argmax(y, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 
 if __name__ == '__main__' :
@@ -68,5 +70,5 @@ if __name__ == '__main__' :
     #checkSelf.checkMembersToHtml(matplotlib.pyplot, "matplotlib.pyplot")
     #checkSelf.checkMembersToHtml(tf.Session(), "tf.Session")
     #checkSelf.checkMembersToHtml(np.random, "np.random")
-    checkSelf.checkMembersToHtml(tf.train, "tf.train")
+    checkSelf.checkMembersToHtml(tf.train.GradientDescentOptimizer, "tf.train.GradientDescentOptimizer")
     print("done...")

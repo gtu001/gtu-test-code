@@ -487,13 +487,13 @@ public class AVChoicerUI extends JFrame {
         JCommonUtil.jTextFieldSetFilePathMouseEvent(dirCheckText, true, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dirCheckTextActionPerformed();
+                dirCheckTextActionPerformed(null);
             }
         });
         dirCheckText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                dirCheckTextActionPerformed();
+                dirCheckTextActionPerformed(null);
             }
         });
 
@@ -555,7 +555,7 @@ public class AVChoicerUI extends JFrame {
                             }));
                         } else {
                             dirCheckText.setText(file.getAbsolutePath());
-                            dirCheckTextActionPerformed();
+                            dirCheckTextActionPerformed(null);
                             JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("目錄檢視");
 
                             // 設定當前目錄
@@ -564,7 +564,7 @@ public class AVChoicerUI extends JFrame {
                         }
                     } else {
                         cacheFileList = new ArrayList<File>();
-                        cacheFileList.addAll(lst);
+                        cacheFileList.addAll(dirCheckTextActionPerformed(lst));
                     }
                 }
             }
@@ -991,7 +991,7 @@ public class AVChoicerUI extends JFrame {
                     setCountLabel();
                     // resetCacheFileList();
                     removeFromCacheLst(file);
-                    dirCheckTextActionPerformed();
+                    dirCheckTextActionPerformed(null);
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
                 }
@@ -1206,16 +1206,18 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private void dirCheckTextActionPerformed() {
+    private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
         List<FileZ> lst = new ArrayList<FileZ>();
-        File dirFile = new File(dirCheckText.getText());
-        if (dirFile.isFile()) {
-            lst.add(new FileZ(dirFile));
-        } else {
-            if (dirFile.listFiles() != null) {
-                for (File f : dirFile.listFiles()) {
-                    lst.add(new FileZ(f));
-                }
+        if (fileLst == null) {
+            File dirFile = new File(dirCheckText.getText());
+            fileLst = new ArrayList<File>();
+            gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + FileExtenstion.VIDEO_PATTERN, fileLst);
+        }
+        List<File> forReturnLst = new ArrayList<File>();
+        for (File f : fileLst) {
+            if (f.getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+                lst.add(new FileZ(f));
+                forReturnLst.add(f);
             }
         }
         DefaultListModel model = JListUtil.createModel();
@@ -1223,6 +1225,9 @@ public class AVChoicerUI extends JFrame {
             model.addElement(f);
         }
         dirCheckList.setModel(model);
+        // 設定以看數
+        movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), forReturnLst.size()));
+        return forReturnLst;
     }
 
     private void dirCheckListMouseClicked() {
@@ -1234,7 +1239,7 @@ public class AVChoicerUI extends JFrame {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (fileZ.file.getName().matches(".*\\.(jpg|jpeg|bmp|png|gif)")) {
+        } else if (fileZ.file.getName().matches(".*\\." + FileExtenstion.PICTURE_PATTERN)) {
             try {
                 Desktop.getDesktop().open(fileZ.file);
             } catch (IOException e) {
