@@ -10,11 +10,13 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +26,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -52,6 +60,22 @@ public class SpringMvcTest001Application {
 
         public void setTest(String test) {
             this.test = test;
+        }
+    }
+
+    // @SessionAttributes({ "loginDomain", "roiEntity" })
+    @RequestMapping("/fund2")
+    @Controller
+    public static class Fund2Controller {
+        @RequestMapping(value = "/qryTest", method = { RequestMethod.GET, RequestMethod.POST })
+        public ModelAndView qryTest(//
+                @ModelAttribute(value = "fundQryBranchWebRequestDto") //
+                TestBean webRequestDto, //
+                Model model) {
+            System.out.println("# qryTest");
+            ModelAndView model2 = new ModelAndView();
+            model2.setViewName("test");
+            return model2;
         }
     }
 
@@ -93,23 +117,27 @@ public class SpringMvcTest001Application {
     }
 
     // @EnableWebMvc
-    // @Configuration
-    // public class WebConfig implements WebMvcConfigurer {
-    //
-    // @Override
-    // public void addViewControllers(ViewControllerRegistry registry) {
-    // registry.addViewController("/").setViewName("index");
-    // }
-    //
-    // @Bean
-    // public ViewResolver viewResolver() {
-    // InternalResourceViewResolver bean = new InternalResourceViewResolver();
-    // bean.setViewClass(JstlView.class);
-    // bean.setPrefix("/WEB-INF/view/");
-    // bean.setSuffix(".jsp");
-    // return bean;
-    // }
-    // }
+    @Configuration
+    public class WebConfig implements WebMvcConfigurer {
+
+        @Override
+        public void addViewControllers(ViewControllerRegistry registry) {
+            System.out.println("# addViewControllers ");
+            registry.addViewController("/").setViewName("index");
+        }
+
+        // @Bean
+        // public ViewResolver viewResolver() {
+        // System.out.println("# viewResolver init");
+        // InternalResourceViewResolver bean = new
+        // InternalResourceViewResolver();
+        // bean.setViewClass(JstlView.class);
+        // bean.setPrefix("/WEB-INF/view/");
+        // bean.setPrefix("/resource/templates/");
+        // bean.setSuffix(".html");
+        // return bean;
+        // }
+    }
 
     @ControllerAdvice
     public class ControllerHandler {
