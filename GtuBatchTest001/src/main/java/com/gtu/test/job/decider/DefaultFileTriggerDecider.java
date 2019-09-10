@@ -19,8 +19,13 @@ public class DefaultFileTriggerDecider implements JobExecutionDecider {
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
         ExecutionContext executionContext = jobExecution.getExecutionContext();
         String flagFileName = jobExecution.getJobParameters().getString("targetFlagFile");
-        String jobBeanName = executionContext.getString("jobBeanName");
-        logger.info("In DefaultFileTriggerDecider.decide! {}", jobBeanName);
+
+        String jobBeanName = "";
+        if (executionContext.containsKey("jobBeanName")) {
+            jobBeanName = executionContext.getString("jobBeanName");
+        }
+
+        logger.info("In DefaultFileTriggerDecider.decide! {} , {}", jobExecution.getJobId(), jobExecution.getJobConfigurationName());
 
         if (true) {
             return FlowExecutionStatus.COMPLETED;
