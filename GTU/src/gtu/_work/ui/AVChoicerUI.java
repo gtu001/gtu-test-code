@@ -60,7 +60,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu.constant.FileExtenstion;
+import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.jdk8.ex1.StreamUtil;
@@ -840,7 +840,7 @@ public class AVChoicerUI extends JFrame {
             IntStream.range(0, model.size())//
                     .mapToObj(i -> (File) model.getElementAt(i))//
                     .forEach(file -> {
-                        FileUtil.searchFileMatchs(file, ".*\\." + FileExtenstion.VIDEO_PATTERN, cacheFileList);
+                        FileUtil.searchFileMatchs(file, ".*\\." + PatternCollection.VIDEO_PATTERN, cacheFileList);
                     });
         }
 
@@ -852,7 +852,7 @@ public class AVChoicerUI extends JFrame {
         File avDir = null;
         if (sameFolderChk.isSelected()) {
             if (currentAvFile.get() != null && currentAvFile.get().exists()) {
-                if (currentAvFile.get().getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+                if (currentAvFile.get().getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN)) {
                     avDir = currentAvFile.get().getParentFile();
                 } else {
                     avDir = currentAvFile.get();
@@ -891,7 +891,7 @@ public class AVChoicerUI extends JFrame {
 
     private List<File> getSubFolderAvLst(File folder) {
         List<File> folderFileLst = new ArrayList<File>();
-        FileUtil.searchFileMatchs(folder, ".*\\." + FileExtenstion.VIDEO_PATTERN, folderFileLst);
+        FileUtil.searchFileMatchs(folder, ".*\\." + PatternCollection.VIDEO_PATTERN, folderFileLst);
         return folderFileLst;
     }
 
@@ -1211,11 +1211,11 @@ public class AVChoicerUI extends JFrame {
         if (fileLst == null) {
             File dirFile = new File(dirCheckText.getText());
             fileLst = new ArrayList<File>();
-            gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + FileExtenstion.VIDEO_PATTERN, fileLst);
+            gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.VIDEO_PATTERN, fileLst);
         }
         List<File> forReturnLst = new ArrayList<File>();
         for (File f : fileLst) {
-            if (f.getName().matches(".*\\." + FileExtenstion.VIDEO_PATTERN)) {
+            if (f.getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN)) {
                 lst.add(new FileZ(f));
                 forReturnLst.add(f);
             }
@@ -1239,7 +1239,7 @@ public class AVChoicerUI extends JFrame {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (fileZ.file.getName().matches(".*\\." + FileExtenstion.PICTURE_PATTERN)) {
+        } else if (fileZ.file.getName().matches(".*\\." + PatternCollection.PICTURE_PATTERN)) {
             try {
                 Desktop.getDesktop().open(fileZ.file);
             } catch (IOException e) {
@@ -1256,8 +1256,8 @@ public class AVChoicerUI extends JFrame {
     }
 
     private static class FileZ {
-        private static Pattern movPtn = Pattern.compile(FileExtenstion.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
-        private static Pattern jpgPtn = Pattern.compile(FileExtenstion.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
+        private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
+        private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
 
         File file;
         String name;

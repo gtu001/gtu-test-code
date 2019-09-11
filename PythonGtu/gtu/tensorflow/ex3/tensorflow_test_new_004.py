@@ -52,15 +52,6 @@ def test2() :
         print("output_result", output_result)
 
 
-def test3() :
-    learning_rate = 10
-    global_step = 10
-    cost = 10
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-    train_op = optimizer.minimize(cost, global_step=global_step)
-
-    correct_prediction = tf.equal(tf.argmax(output, 1), tf.argmax(y, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 
 if __name__ == '__main__' :

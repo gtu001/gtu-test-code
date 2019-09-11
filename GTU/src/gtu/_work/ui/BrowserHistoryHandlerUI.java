@@ -100,6 +100,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.constant.PatternCollection;
 import gtu.distribition.NormalDistributionFilter;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
@@ -1597,8 +1598,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private class HyperlinkJTextPaneHandler {
-        private final String HYPER_LINK_PATTERN = "https?\\:\\/\\/[\\w+\\.\\/\\~\\-\\&\\?\\+\\.\\=]+";
-        private Pattern ptn = Pattern.compile(HYPER_LINK_PATTERN);
+        private Pattern ptn = Pattern.compile(PatternCollection.HYPER_LINK_PATTERN);
         JTextPane remarkArea;
 
         private HyperlinkJTextPaneHandler(JTextPane remarkArea) {

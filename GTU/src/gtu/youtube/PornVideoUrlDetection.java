@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import gtu.constant.FileExtenstion;
+import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.log.JdkLoggerUtil;
 
@@ -53,7 +53,7 @@ public class PornVideoUrlDetection {
     }
 
     public PornVideoUrlDetection(String htmlContent) {
-        ptn = new PatternConfig(FileExtenstion.VIDEO_PATTERN);
+        ptn = new PatternConfig(PatternCollection.VIDEO_PATTERN);
         this.htmlContent = htmlContent;
     }
 
@@ -146,7 +146,7 @@ public class PornVideoUrlDetection {
 
     private String getPossiblFileSubName(List<String> possableLst) {
         for (int ii = possableLst.size() - 1; ii > 0; ii--) {
-            if (StringUtils.isNotBlank(possableLst.get(ii)) && possableLst.get(ii).matches(FileExtenstion.VIDEO_AND_PICTURE_PATTERN)) {
+            if (StringUtils.isNotBlank(possableLst.get(ii)) && possableLst.get(ii).matches(PatternCollection.VIDEO_AND_PICTURE_PATTERN)) {
                 return possableLst.get(ii);
             }
         }
@@ -189,7 +189,7 @@ public class PornVideoUrlDetection {
         String url = "https://www.youjizz.com/videos/vixen-tasha-reign-has-intense-sex-with-a-college-friend-47628091.html";
         String content = p.getVideoInfo(URI.create(url), "", "", "");
 
-        PornVideoUrlDetection p2 = new PornVideoUrlDetection(FileExtenstion.VIDEO_PATTERN, content);
+        PornVideoUrlDetection p2 = new PornVideoUrlDetection(PatternCollection.VIDEO_PATTERN, content);
         p2.processMain(url);
         System.out.println("done...");
     }
@@ -260,6 +260,6 @@ public class PornVideoUrlDetection {
     }
 
     public static boolean isVideo(String fileName) {
-        return fileName.matches("^.*\\." + FileExtenstion.VIDEO_PATTERN + "$");
+        return fileName.matches("^.*\\." + PatternCollection.VIDEO_PATTERN + "$");
     }
 }

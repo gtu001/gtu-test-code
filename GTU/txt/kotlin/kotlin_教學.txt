@@ -1,0 +1,2 @@
+kotlin plugin
+	https://dl.bintray.com/jetbrains/kotlin/eclipse-plugin/last
