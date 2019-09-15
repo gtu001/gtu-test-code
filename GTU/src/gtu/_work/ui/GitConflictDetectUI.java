@@ -295,11 +295,11 @@ public class GitConflictDetectUI extends JFrame {
         swingUtil.addActionHex("gitConflictList.Click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                GitFile gitFile = (GitFile) JListUtil.getLeadSelectionObject(gitConflictList);
+                final GitFile gitFile = (GitFile) JListUtil.getLeadSelectionObject(gitConflictList);
                 mResolveConflictFileProcess = null;
                 System.out.println(gitFile.file);
 
-                File projectDir = new File(gitFolderPathText.getText());
+                final File projectDir = new File(gitFolderPathText.getText());
                 String exePath = gitExePathText.getText();
 
                 if (JMouseEventUtil.buttonLeftClick(2, (MouseEvent) evt)) {
@@ -376,7 +376,6 @@ public class GitConflictDetectUI extends JFrame {
         });
 
         swingUtil.addActionHex("nextConfigBtn.Click", new Action() {
-
             @Override
             public void action(EventObject evt) throws Exception {
                 config.next();
