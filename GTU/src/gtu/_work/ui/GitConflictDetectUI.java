@@ -369,6 +369,18 @@ public class GitConflictDetectUI extends JFrame {
                                     new GitCheckProc(projectDir);
                                 }
                             })//
+                            .addJMenuItem("commit", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.commit(projectDir, "ok");
+                                }
+                            })//
+                            .addJMenuItem("push", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.push(projectDir, "gtu001@gmail.com", "e123474736");
+                                }
+                            })//
                             .applyEvent(evt)//
                             .show();
                 }
@@ -738,6 +750,8 @@ public class GitConflictDetectUI extends JFrame {
             String startTag = "Changes to be committed:";
             String endTag = "Changes not staged for commit:";
             String finalTag = "Untracked files:";
+            List<String> ignoreLst = new ArrayList<String>();
+            ignoreLst.add("no changes added to commit (use \"git add\" and/or \"git commit -a\")");
 
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
@@ -751,7 +765,7 @@ public class GitConflictDetectUI extends JFrame {
             List<String> lst = StringUtil_.readContentToList(statusContent, true, true, false);
             int linePos = -1;
             String type = "";
-            for (int ii = 0; ii < lst.size(); ii++) {
+            A: for (int ii = 0; ii < lst.size(); ii++) {
                 String line = lst.get(ii);
                 if (line.contains(startTag)) {
                     linePos = ii + 1;
@@ -764,6 +778,12 @@ public class GitConflictDetectUI extends JFrame {
                     type = "untracked";
                 }
 
+                for (String ignoreStr : ignoreLst) {
+                    if (line.contains(ignoreStr)) {
+                        continue A;
+                    }
+                }
+
                 if (ii > linePos && "stage".equals(type)) {
                     stageLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
                 } else if (ii > linePos && "unstage".equals(type)) {
@@ -773,6 +793,33 @@ public class GitConflictDetectUI extends JFrame {
                 }
             }
             return Triple.of(stageLst, unstageLst, untractedLst);
+        }
+
+        private static void commit(File projectDir, String message) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git commit -m \"" + StringUtils.trimToEmpty(message) + "\"");
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            System.out.println(p.getInputStreamToString());
+        }
+
+        private static void push(File projectDir, String username, String password) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git push");
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            System.out.println("IN:" + p.getInputStreamToString());
+            System.out.println("ER:" + p.getErrorStreamToString());
+            p.setOutputString(username);
+            p.getStreamSync();
+            System.out.println("IN:" + p.getInputStreamToString());
+            System.out.println("ER:" + p.getErrorStreamToString());
+            p.setOutputString(password);
+            p.getStreamSync();
+            System.out.println("IN:" + p.getInputStreamToString());
+            System.out.println("ER:" + p.getErrorStreamToString());
         }
     }
 }
