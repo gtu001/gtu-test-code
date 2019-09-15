@@ -1274,6 +1274,18 @@ public class FileUtil {
         return FilenameUtils.normalize(filePathName, isUnixSeparator);
     }
 
+    public static File getFileRoot(File file) {
+        if (!OS_IS_WINDOWS) {
+            return null;
+        }
+        for (File f : File.listRoots()) {
+            if (file.getAbsolutePath().contains(f.getAbsolutePath())) {
+                return f;
+            }
+        }
+        throw new RuntimeException("找不到根目錄：" + file);
+    }
+
     public static class FileZ {
         File entity;
 
