@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
@@ -365,11 +367,16 @@ public class HermannEbbinghaus_Memory {
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
+                    System.out.println("1----->" + ReflectionToStringBuilder.toString(act.getSource(), ToStringStyle.MULTI_LINE_STYLE));
+                    System.out.println("2----->" + ReflectionToStringBuilder.toString(d, ToStringStyle.MULTI_LINE_STYLE));
+
                     // 計算下次執行起算點
                     d.fixedTime = getCaculateFixedTime(d.reviewTime, d);
 
-                    // 計算下期
-                    d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
+                    if (!d.isRetry()) {
+                        // 計算下期
+                        d.reviewTime = ReviewTime.getNext(d.reviewTime).name();
+                    }
 
                     // 儲存
                     if (containsKey(d.key)) {
@@ -477,6 +484,7 @@ public class HermannEbbinghaus_Memory {
         String remark;
         String category;
         long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
+        boolean isRetry = false;
 
         public MemData() {
         }
@@ -599,6 +607,14 @@ public class HermannEbbinghaus_Memory {
 
         public String getCategory() {
             return category;
+        }
+
+        public boolean isRetry() {
+            return isRetry;
+        }
+
+        public void setRetry(boolean isRetry) {
+            this.isRetry = isRetry;
         }
     }
 

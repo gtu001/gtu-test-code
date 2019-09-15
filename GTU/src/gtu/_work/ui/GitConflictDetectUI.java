@@ -31,6 +31,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Triple;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -49,6 +51,8 @@ import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -79,11 +83,17 @@ public class GitConflictDetectUI extends JFrame {
     private JButton nextConfigBtn;
     private JButton delConfigBtn;
     private JButton resolveConflictBtn;
+    private JLabel lblNewLabel_2;
+    private JTextField gitCmdEncodingText;
+    private JTextField gitBranchNameText;
 
     private File configFile = new File(PropertiesUtil.getJarCurrentPath(GitConflictDetectUI.class), GitConflictDetectUI.class.getSimpleName() + "_config.properties");
     private PropertiesGroupUtils config = new PropertiesGroupUtils(configFile);
     private static final String DIFF_PATH_KEY = "diff_path_key";
+    private static final String ENCODING_KEY = "encoding_key";
+    private static final String PROJECT_KEY = "project_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
+    private JLabel lblNewLabel_3;
 
     /**
      * Launch the application.
@@ -125,7 +135,8 @@ public class GitConflictDetectUI extends JFrame {
         tabbedPane.addTab("檢查衝突", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         lblNewLabel = new JLabel("專案目錄");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -187,6 +198,20 @@ public class GitConflictDetectUI extends JFrame {
             }
         });
         panel_8.add(delConfigBtn);
+
+        lblNewLabel_2 = new JLabel("編碼");
+        panel.add(lblNewLabel_2, "2, 10, right, default");
+
+        gitCmdEncodingText = new JTextField();
+        panel.add(gitCmdEncodingText, "4, 10, fill, default");
+        gitCmdEncodingText.setColumns(10);
+
+        lblNewLabel_3 = new JLabel("branch");
+        panel.add(lblNewLabel_3, "2, 12, right, default");
+
+        gitBranchNameText = new JTextField();
+        panel.add(gitBranchNameText, "4, 12, fill, default");
+        gitBranchNameText.setColumns(10);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("衝突清單", null, panel_1, null);
@@ -273,28 +298,92 @@ public class GitConflictDetectUI extends JFrame {
                 GitFile gitFile = (GitFile) JListUtil.getLeadSelectionObject(gitConflictList);
                 mResolveConflictFileProcess = null;
                 System.out.println(gitFile.file);
-                if (gitFile.mGitLeftRight.isCheck && gitFile.mGitLeftRight.isConflictFile && StringUtils.isNotBlank(gitExePathText.getText())) {
-                    String exePath = gitExePathText.getText();
-                    File leftFile = File.createTempFile("REPO_", ".txt");
-                    FileUtil.saveToFile(leftFile, gitFile.mGitLeftRight.left.toString(), "UTF8");
-                    File rightFile = File.createTempFile("LOCAL_", ".txt");
-                    FileUtil.saveToFile(rightFile, gitFile.mGitLeftRight.right.toString(), "UTF8");
-                    String command = String.format(exePath, leftFile, rightFile);
-                    RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
-                    run.command(command);
-                    run.apply();
 
-                    mResolveConflictFileProcess = new ResolveConflictFileProcess(rightFile, mResolveConflictFileProcess.gitFile);
+                File projectDir = new File(gitFolderPathText.getText());
+                String exePath = gitExePathText.getText();
+
+                if (JMouseEventUtil.buttonLeftClick(2, (MouseEvent) evt)) {
+                    Validate.notBlank(gitExePathText.getText(), "未輸入diff執行檔pattern");
+                    Validate.isTrue(gitFile.mGitLeftRight.isCheck, "檔案未檢核");
+
+                    if (gitFile.mGitLeftRight.isConflictFile) {
+                        File leftFile = File.createTempFile("REPO_", ".txt");
+                        FileUtil.saveToFile(leftFile, gitFile.mGitLeftRight.left.toString(), "UTF8");
+                        File rightFile = File.createTempFile("LOCAL_", ".txt");
+                        FileUtil.saveToFile(rightFile, gitFile.mGitLeftRight.right.toString(), "UTF8");
+                        String command = String.format(exePath, leftFile, rightFile);
+                        RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                        run.command(command);
+                        run.apply();
+
+                        mResolveConflictFileProcess = new ResolveConflictFileProcess(rightFile, mResolveConflictFileProcess.gitFile);
+                    } else {
+                        File leftFile = File.createTempFile("LOCALREPO_", ".txt");
+
+                        String localBranchName = StringUtils.trimToEmpty(gitBranchNameText.getText());
+                        FileUtil.saveToFile(leftFile, GitUtil.getLocalRepoContent(projectDir, localBranchName, gitFile.orignName, getEncoding()), "UTF8");
+                        String command = String.format(exePath, leftFile, gitFile.file);
+                        RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                        run.command(command);
+                        run.apply();
+                    }
+                } else if (JMouseEventUtil.buttonRightClick(1, (MouseEvent) evt)) {
+                    JPopupMenuUtil.newInstance(gitConflictList)//
+                            .addJMenuItem("stage", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.stage(projectDir, gitFile.orignName);
+                                    new GitCheckProc(projectDir);
+                                }
+                            })//
+                            .addJMenuItem("unstage", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.unstage(projectDir, gitFile.orignName);
+                                    new GitCheckProc(projectDir);
+                                }
+                            })//
+                            .addJMenuItem("discard change", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + gitFile.file, "回覆到未改變");
+                                    if (confirm) {
+                                        GitUtil.discardChange(projectDir, gitFile.orignName);
+                                        new GitCheckProc(projectDir);
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("delete file", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除：" + gitFile.file, "刪除");
+                                    if (confirm) {
+                                        gitFile.file.delete();
+                                        new GitCheckProc(projectDir);
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("reload", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new GitCheckProc(projectDir);
+                                }
+                            })//
+                            .applyEvent(evt)//
+                            .show();
                 }
             }
         });
 
         swingUtil.addActionHex("nextConfigBtn.Click", new Action() {
+
             @Override
             public void action(EventObject evt) throws Exception {
                 config.next();
                 Map<String, String> map = config.loadConfig();
                 gitExePathText.setText(StringUtils.trimToEmpty(map.get(DIFF_PATH_KEY)));
+                gitCmdEncodingText.setText(StringUtils.trimToEmpty(map.get(ENCODING_KEY)));
+                gitFolderPathText.setText(StringUtils.trimToEmpty(map.get(PROJECT_KEY)));
             }
         });
         swingUtil.addActionHex("saveConfigBtn.Click", new Action() {
@@ -303,6 +392,8 @@ public class GitConflictDetectUI extends JFrame {
                 if (StringUtils.isNotBlank(gitExePathText.getText())) {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put(DIFF_PATH_KEY, gitExePathText.getText());
+                    map.put(ENCODING_KEY, gitCmdEncodingText.getText());
+                    map.put(PROJECT_KEY, gitFolderPathText.getText());
                     config.saveConfig(map);
                     JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
                 }
@@ -331,26 +422,11 @@ public class GitConflictDetectUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 File gitFolder = new File(gitFolderPathText.getText());
-                RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
-                inst.command("cd " + gitFolder);
-                File rootFile = FileUtil.getFileRoot(gitFolder);
-                if (rootFile != null) {
-                    inst.command("" + gitFolder);
-                }
-                inst.command("git status");
-                ProcessWatcher p = ProcessWatcher.newInstance(inst.apply());
-                p.getStreamSync();
-                String resultStr = p.getInputStreamToString();
-                System.out.println("=================================================");
-                System.out.println(resultStr);
-                System.out.println("=================================================");
-                GitCheckProc t = new GitCheckProc(gitFolder, resultStr);
+                new GitCheckProc(gitFolder);
 
-                JListUtil jUtil = JListUtil.newInstance(gitConflictList);
-                DefaultListModel model = JListUtil.createModel();
-                gitConflictList.setModel(model);
-                for (GitFile f : t.statusFileLst) {
-                    model.addElement(f);
+                // 取得branch
+                if (StringUtils.isBlank(gitBranchNameText.getText())) {
+                    gitBranchNameText.setText(GitUtil.getCurrentBranch(gitFolder, getEncoding()));
                 }
                 JCommonUtil._jOptionPane_showMessageDialog_info("完成！");
             }
@@ -457,6 +533,11 @@ public class GitConflictDetectUI extends JFrame {
         File file;
         GitLeftRight mGitLeftRight = new GitLeftRight();
 
+        String stageDesc = "";
+        String stageColor = "";
+        String statusDesc = "";
+        String statusColor = "";
+
         GitFile(String orignName, File file) {
             this.orignName = orignName;
             this.file = file;
@@ -467,7 +548,12 @@ public class GitConflictDetectUI extends JFrame {
                 mGitLeftRight.load(file);
             }
             StringBuilder sb = new StringBuilder();
-            String string = String.format("<font color='%s'>%s</font>\n", (mGitLeftRight.isConflictFile ? "red" : ""), orignName);
+            String string = String.format("<font color='%s'>%s</font> " + //
+                    "<font color='%s'>%s</font> " + //
+                    "<font color='%s'>%s</font> ", //
+                    stageColor, stageDesc, //
+                    statusColor, statusDesc, //
+                    (mGitLeftRight.isConflictFile ? "red" : ""), orignName);//
             sb.append("<html>\n");
             sb.append(string);
             sb.append("</html>\n");
@@ -476,50 +562,59 @@ public class GitConflictDetectUI extends JFrame {
     }
 
     private class GitCheckProc {
-        File baseDir;
-        Pattern filePtn = Pattern.compile("\\w+\\s*\\:\\s*(.*)");
-        String startTag = "Changes not staged for commit:";
-        String endTag = "Untracked files:";
+        File projectDir;
         List<GitFile> statusFileLst = new ArrayList<GitFile>();
 
-        private File getFile(String line) {
-            Matcher mth = filePtn.matcher(line);
-            if (mth.find()) {
-                return new File(baseDir, StringUtils.trimToEmpty(mth.group(1)));
+        private void applyStatus(GitFile g, String status) {
+            g.statusDesc = status;
+            if ("modified".equalsIgnoreCase(status)) {
+                g.statusColor = "green";
+            } else if ("new file".equalsIgnoreCase(status)) {
+                g.statusColor = "yellow";
+            } else if ("deleted".equalsIgnoreCase(status)) {
+                g.statusColor = "red";
             }
-            return null;
         }
 
-        GitCheckProc(File baseDir, String resultStr) {
-            this.baseDir = baseDir;
-            LineNumberReader reader = null;
-            try {
-                reader = new LineNumberReader(new StringReader(resultStr));
-                int pos = -1;
-                for (String line = null; (line = reader.readLine()) != null;) {
-                    line = StringUtils.defaultString(line);
-                    if (line.contains(startTag)) {
-                        pos = reader.getLineNumber();
-                        continue;
-                    }
-                    if (pos != -1 && line.contains(endTag)) {
-                        pos = -1;
-                        continue;
-                    }
-                    if (pos != -1) {
-                        File file = getFile(line);
-                        if (file != null) {
-                            System.out.println("git file --> " + file);
-                            statusFileLst.add(new GitFile(line, file));
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
-            } finally {
-                gtu.base.CloseUtil.close(reader);
+        GitCheckProc(File projectDir) {
+            this.projectDir = projectDir;
+            Triple<List<String[]>, List<String[]>, List<String[]>> statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
+            for (String[] line : statusInfo.getLeft()) {
+                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                g.stageColor = "blue";
+                g.stageDesc = "commit";
+                this.applyStatus(g, line[0]);
+                statusFileLst.add(g);
+            }
+            for (String[] line : statusInfo.getMiddle()) {
+                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                g.stageColor = "green";
+                g.stageDesc = "uncommit";
+                this.applyStatus(g, line[0]);
+                statusFileLst.add(g);
+            }
+            for (String[] line : statusInfo.getRight()) {
+                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                g.stageColor = "yellow";
+                g.stageDesc = "untracted";
+                this.applyStatus(g, line[0]);
+                statusFileLst.add(g);
+            }
+
+            DefaultListModel model = JListUtil.createModel();
+            gitConflictList.setModel(model);
+            for (GitFile f : statusFileLst) {
+                model.addElement(f);
             }
         }
+    }
+
+    private String getEncoding() {
+        if (StringUtils.isNotBlank(gitCmdEncodingText.getText())) {
+            return StringUtils.trimToEmpty(gitCmdEncodingText.getText());
+        }
+        gitCmdEncodingText.setText("BIG5");
+        return "BIG5";
     }
 
     private class ResolveConflictFileProcess {
@@ -538,5 +633,147 @@ public class GitConflictDetectUI extends JFrame {
 
     public SwingActionUtil getSwingUtil() {
         return swingUtil;
+    }
+
+    private static class GitUtil {
+
+        private static void addProjectCommand(File projectDir, RuntimeBatPromptModeUtil inst) {
+            inst.command("cd " + projectDir);
+            File rootFile = FileUtil.getFileRoot(projectDir);
+            if (rootFile != null) {
+                inst.command("" + projectDir);
+            }
+        }
+
+        private static String getCurrentBranch(File projectDir, String encoding) {
+            RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, inst);
+            inst.command("git branch");
+            ProcessWatcher p = ProcessWatcher.newInstance(inst.apply());
+            p.encode(encoding);
+            p.getStreamSync();
+            String resultStr = p.getInputStreamToString();
+            System.out.println("branch start------------------------------");
+            System.out.println(resultStr);
+            System.out.println("branch end  ------------------------------");
+            List<String> lst = StringUtil_.readContentToList(resultStr, true, true, true);
+            for (String b : lst) {
+                b = StringUtils.trimToEmpty(b);
+                if (b.startsWith("*")) {
+                    return StringUtils.trimToEmpty(b.substring(1));
+                }
+            }
+            return "";
+        }
+
+        private static String getGitOrignStatus(String gitOrignPathName) {
+            Pattern ptn = Pattern.compile("(modified|new\\sfile|deleted)\\:\\s*(.*)");
+            Matcher mth = ptn.matcher(gitOrignPathName);
+            if (mth.find()) {
+                return StringUtils.trimToEmpty(mth.group(1));// 檔名(為git目錄後開始)
+            }
+            return "";
+        }
+
+        private static String getGitOrignPathName(String gitOrignPathName) {
+            Pattern ptn = Pattern.compile("(?:modified|new\\sfile|deleted)\\:\\s*(.*)");
+            Matcher mth = ptn.matcher(gitOrignPathName);
+            if (mth.find()) {
+                return StringUtils.trimToEmpty(mth.group(1));// 檔名(為git目錄後開始)
+            }
+            return StringUtils.trimToEmpty(gitOrignPathName);
+        }
+
+        private static String getLocalRepoContent(File projectDir, String localBranchName, String gitOrignPathName, String encoding) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command(String.format("git show %s:%s", localBranchName, fileGitPath));
+
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.encode(encoding);
+            p.getStreamSync();
+            String fileContent = p.getInputStreamToString();
+            return fileContent;
+        }
+
+        private static void stage(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git add " + fileGitPath);
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+        }
+
+        private static void unstage(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git reset " + fileGitPath);
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+        }
+
+        private static void discardChange(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git checkout HEAD " + fileGitPath);
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+        }
+
+        /**
+         * Left : stage// middle : unstage// right : untraced
+         * 
+         * @param projectDir
+         * @param encoding
+         * @return
+         */
+        private static Triple<List<String[]>, List<String[]>, List<String[]>> getStatusInfo(File projectDir, String encoding) {
+            List<String[]> stageLst = new ArrayList<String[]>();
+            List<String[]> unstageLst = new ArrayList<String[]>();
+            List<String[]> untractedLst = new ArrayList<String[]>();
+
+            String startTag = "Changes to be committed:";
+            String endTag = "Changes not staged for commit:";
+            String finalTag = "Untracked files:";
+
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git status");
+
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.encode(encoding);
+            p.getStreamSync();
+            String statusContent = p.getInputStreamToString();
+
+            List<String> lst = StringUtil_.readContentToList(statusContent, true, true, false);
+            int linePos = -1;
+            String type = "";
+            for (int ii = 0; ii < lst.size(); ii++) {
+                String line = lst.get(ii);
+                if (line.contains(startTag)) {
+                    linePos = ii + 1;
+                    type = "stage";
+                } else if (line.contains(endTag)) {
+                    linePos = ii + 2;
+                    type = "unstage";
+                } else if (line.contains(finalTag)) {
+                    linePos = ii + 1;
+                    type = "untracked";
+                }
+
+                if (ii > linePos && "stage".equals(type)) {
+                    stageLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
+                } else if (ii > linePos && "unstage".equals(type)) {
+                    unstageLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
+                } else if (ii > linePos && "untracked".equals(type)) {
+                    untractedLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
+                }
+            }
+            return Triple.of(stageLst, unstageLst, untractedLst);
+        }
     }
 }

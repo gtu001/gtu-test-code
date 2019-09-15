@@ -34,17 +34,21 @@ public class ProcessWatcher {
         this.process = process;
     }
 
-    public ProcessWatcher getStreamSync() throws IOException, TimeoutException {
+    public ProcessWatcher getStreamSync() {
         System.out.println("watcher --- 1");
         getStreamSync(0);
         System.out.println("watcher --- 2");
         return this;
     }
 
-    public ProcessWatcher getStreamSync(long timeout) throws IOException, TimeoutException {
+    public ProcessWatcher getStreamSync(long timeout) {
         this.timeout = timeout;
-        inputStreamBytes.set(getInputStream("input", timeout));
-        errorStreamBytes.set(getInputStream("error", timeout));
+        try {
+            inputStreamBytes.set(getInputStream("input", timeout));
+            errorStreamBytes.set(getInputStream("error", timeout));
+        } catch (Exception e) {
+            throw new RuntimeException("getStreamSync ERR " + e.getMessage(), e);
+        }
         return this;
     }
 

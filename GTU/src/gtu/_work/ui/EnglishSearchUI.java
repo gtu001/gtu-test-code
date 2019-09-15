@@ -69,6 +69,8 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -166,6 +168,9 @@ public class EnglishSearchUI extends JFrame {
 
         File tmpFile = new File("D:\\my_tool\\EnglishSearchUI\\EnglishSearchUI_win10_config.properties");
         if (tmpFile.exists()) {
+            propertyBean = new PropertiesUtilBean(tmpFile);
+        }else {
+            tmpFile = new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties");
             propertyBean = new PropertiesUtilBean(tmpFile);
         }
         System.out.println("configFile : " + propertyBean.getPropFile());
@@ -368,6 +373,7 @@ public class EnglishSearchUI extends JFrame {
                             } catch (Exception ex) {
                                 memory.suspend();
                             }
+                            d.setRetry(true);
                             choiceDialog.closeDialog();
                         }
                     }, new ActionListener() { // onCreate
@@ -515,6 +521,7 @@ public class EnglishSearchUI extends JFrame {
                                 } catch (Exception ex) {
                                     memory.suspend();
                                 }
+                                d.setRetry(true);
                                 checkChoiceEqual.set(false);
                                 choiceDialog.closeDialog();
                             }
