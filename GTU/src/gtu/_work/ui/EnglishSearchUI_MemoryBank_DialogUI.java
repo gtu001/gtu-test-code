@@ -28,6 +28,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -42,12 +43,15 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JLabelUtil;
+import gtu.swing.util.JTextPaneTextStyle;
 import gtu.swing.util.JTextWidthFitter;
 
 public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
-    private JLabel englishWordLabel;
+    private JTextArea englishWordLabel;
+
     private JRadioButton q1Radio;
     private JRadioButton q2Radio;
     private JRadioButton q3Radio;
@@ -197,7 +201,7 @@ public class EnglishSearchUI_MemoryBank_DialogUI extends JDialog {
             contentPanel.add(lblNewLabel, "2, 2");
         }
         {
-            englishWordLabel = new JLabel("");
+            englishWordLabel = JLabelUtil.createReadonlyJLabel(false);
             englishWordLabel.setFont(new Font("Consolas", Font.PLAIN, 19));
             contentPanel.add(englishWordLabel, "4, 2");
         }

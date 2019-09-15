@@ -1,7 +1,14 @@
 package gtu.swing.util;
 
+import java.awt.Color;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 
 public class JLabelUtil {
 
@@ -49,6 +56,23 @@ public class JLabelUtil {
         return String.format(format, star, text);
     }
 
+    /**
+     * 建立唯獨但可圈選的JLabel
+     */
+    public static JTextArea createReadonlyJLabel(boolean isJTextField) {
+        JTextArea f = new JTextArea();
+        f.setEditable(false); // as before
+        f.setBackground(null); // this is the same as a JLabel
+        f.setBorder(null); // remove the border
+
+        if (isJTextField) {
+            f.setBackground(Color.WHITE);
+            f.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+            f.setForeground(Color.GRAY);
+        }
+        return f;
+    }
+
     public static void main(String[] args) {
         String lblText = JLabelUtil.getText("XXXXXX", //
                 STAR_MARK_FULLCHAR | STAR_MARK_SIMPLE);
@@ -58,7 +82,7 @@ public class JLabelUtil {
         lbl.setText(lblText);
         frame.add(lbl);
         frame.pack();
-         gtu.swing.util.JFrameUtil.setVisible(true,frame);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
 
         System.out.println("done...");
     }

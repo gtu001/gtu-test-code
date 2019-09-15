@@ -126,7 +126,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
-import gtu.swing.util.JTextAreaUtil.JTextPaneTextStyle;
+import gtu.swing.util.JTextPaneTextStyle;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
