@@ -100,6 +100,7 @@ public class GitConflictDetectUI extends JFrame {
     private static final String GIT_USERNAME_KEY = "git_username_key";
     private static final String GIT_PASSWORD_KEY = "git_password_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
+    private List<GitFile> statusFileLstBak = new ArrayList<GitFile>();
 
     /**
      * Launch the application.
@@ -633,6 +634,18 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
+        private void copyFromOld(GitFile f) {
+            if (statusFileLstBak == null && statusFileLstBak.isEmpty()) {
+                return;
+            }
+            for (GitFile g : statusFileLstBak) {
+                if (StringUtils.equals(g.orignName, f.orignName)) {
+                    f.mGitLeftRight = g.mGitLeftRight;
+                    break;
+                }
+            }
+        }
+
         GitCheckProc(File projectDir) {
             this.projectDir = projectDir;
             Triple<List<String[]>, List<String[]>, List<String[]>> statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
@@ -641,6 +654,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "blue";
                 g.stageDesc = "commit";
                 this.applyStatus(g, line[0]);
+                copyFromOld(g);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.getMiddle()) {
@@ -648,6 +662,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "green";
                 g.stageDesc = "uncommit";
                 this.applyStatus(g, line[0]);
+                copyFromOld(g);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.getRight()) {
@@ -655,8 +670,11 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
+                copyFromOld(g);
                 statusFileLst.add(g);
             }
+
+            statusFileLstBak = new ArrayList<GitFile>(statusFileLst);
 
             DefaultListModel model = JListUtil.createModel();
             gitConflictList.setModel(model);
@@ -876,7 +894,9 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+                // resultString =
+                // RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3
+                // * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
