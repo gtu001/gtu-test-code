@@ -46,6 +46,10 @@ public class PropertiesGroupUtils {
 
     public PropertiesGroupUtils(File configFile) {
         this.configFile = configFile;
+        init();
+    }
+
+    public void init() {
         FileInputStream fis = null;
         try {
             if (!configFile.exists()) {
@@ -154,7 +158,7 @@ public class PropertiesGroupUtils {
         PropertiesUtil.storeProperties(configProp, configFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss"));
     }
 
-    private void validateColumnNameSame(Map<String, String> currentConfig) {
+    private void validateColumnNameSame(Map<String, String> currentConfig, boolean forceSave) {
         List<String> currentColumnArry = new ArrayList<String>(loadParametersColumnNames());
         if (currentColumnArry.isEmpty()) {
             return;// 若為空避掉驗證
@@ -163,7 +167,13 @@ public class PropertiesGroupUtils {
         Collections.sort(currentColumnArry);
         Collections.sort(newColumnArry);
         if (currentColumnArry.size() != newColumnArry.size() || !currentColumnArry.equals(newColumnArry)) {
-            throw new RuntimeException("參數不同 \n 目前 : " + currentColumnArry + "\n新參數 : " + newColumnArry);
+            if (!forceSave) {
+                throw new RuntimeException("參數不同 \n 目前 : " + currentColumnArry + "\n新參數 : " + newColumnArry);
+            } else {
+                if (configFile.delete()) {
+                    init();
+                }
+            }
         }
     }
 
@@ -171,8 +181,15 @@ public class PropertiesGroupUtils {
      * 儲存設定
      */
     public void saveConfig(Map<String, String> currentConfig) {
+        saveConfig(currentConfig, false);
+    }
+
+    /**
+     * 儲存設定
+     */
+    public void saveConfig(Map<String, String> currentConfig, boolean forceSave) {
         // 比對新舊是否相同
-        validateColumnNameSame(currentConfig);
+        validateColumnNameSame(currentConfig, forceSave);
 
         // 判斷要儲存的index
         int saveIndex = findParameterConfigIndex(currentConfig);

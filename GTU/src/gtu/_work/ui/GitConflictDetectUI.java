@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -85,14 +86,20 @@ public class GitConflictDetectUI extends JFrame {
     private JLabel lblNewLabel_2;
     private JTextField gitCmdEncodingText;
     private JTextField gitBranchNameText;
+    private JLabel lblNewLabel_3;
+    private JLabel lblNewLabel_4;
+    private JLabel lblNewLabel_5;
+    private JTextField gitUsernameText;
+    private JPasswordField gitPasswordText;
 
     private File configFile = new File(PropertiesUtil.getJarCurrentPath(GitConflictDetectUI.class), GitConflictDetectUI.class.getSimpleName() + "_config.properties");
     private PropertiesGroupUtils config = new PropertiesGroupUtils(configFile);
     private static final String DIFF_PATH_KEY = "diff_path_key";
     private static final String ENCODING_KEY = "encoding_key";
     private static final String PROJECT_KEY = "project_key";
+    private static final String GIT_USERNAME_KEY = "git_username_key";
+    private static final String GIT_PASSWORD_KEY = "git_password_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
-    private JLabel lblNewLabel_3;
 
     /**
      * Launch the application.
@@ -120,7 +127,7 @@ public class GitConflictDetectUI extends JFrame {
         swingUtil = SwingActionUtil.newInstance(this);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 300);
+        setBounds(100, 100, 701, 559);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -135,7 +142,8 @@ public class GitConflictDetectUI extends JFrame {
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         lblNewLabel = new JLabel("專案目錄");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -211,6 +219,20 @@ public class GitConflictDetectUI extends JFrame {
         gitBranchNameText = new JTextField();
         panel.add(gitBranchNameText, "4, 12, fill, default");
         gitBranchNameText.setColumns(10);
+
+        lblNewLabel_4 = new JLabel("Git帳號");
+        panel.add(lblNewLabel_4, "2, 16, right, default");
+
+        gitUsernameText = new JTextField();
+        panel.add(gitUsernameText, "4, 16, fill, default");
+        gitUsernameText.setColumns(10);
+
+        lblNewLabel_5 = new JLabel("Git密碼");
+        panel.add(lblNewLabel_5, "2, 18, right, default");
+
+        gitPasswordText = new JPasswordField();
+        panel.add(gitPasswordText, "4, 18, fill, default");
+        gitPasswordText.setColumns(10);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("衝突清單", null, panel_1, null);
@@ -371,13 +393,29 @@ public class GitConflictDetectUI extends JFrame {
                             .addJMenuItem("commit", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    GitUtil.commit(projectDir, "ok");
+                                    try {
+                                        String message = JCommonUtil._jOptionPane_showInputDialog("請輸入Message", "");
+                                        Validate.notBlank(message, "message不可為空!");
+                                        String resultString = GitUtil.commit(projectDir, message);
+                                        JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
                                 }
                             })//
                             .addJMenuItem("push", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    GitUtil.push(projectDir, "gtu001@gmail.com", "e123474736");
+                                    try {
+                                        Validate.notBlank(gitUsernameText.getText(), "Git帳號未輸入");
+                                        Validate.notBlank(gitPasswordText.getText(), "Git密碼未輸入");
+                                        String resultString = GitUtil.push(projectDir, //
+                                                StringUtils.trimToEmpty(gitUsernameText.getText()), //
+                                                StringUtils.trimToEmpty(gitPasswordText.getText()));
+                                        JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
                                 }
                             })//
                             .applyEvent(evt)//
@@ -394,6 +432,8 @@ public class GitConflictDetectUI extends JFrame {
                 gitExePathText.setText(StringUtils.trimToEmpty(map.get(DIFF_PATH_KEY)));
                 gitCmdEncodingText.setText(StringUtils.trimToEmpty(map.get(ENCODING_KEY)));
                 gitFolderPathText.setText(StringUtils.trimToEmpty(map.get(PROJECT_KEY)));
+                gitUsernameText.setText(StringUtils.trimToEmpty(map.get(GIT_USERNAME_KEY)));
+                gitPasswordText.setText(StringUtils.trimToEmpty(map.get(GIT_PASSWORD_KEY)));
             }
         });
         swingUtil.addActionHex("saveConfigBtn.Click", new Action() {
@@ -404,7 +444,9 @@ public class GitConflictDetectUI extends JFrame {
                     map.put(DIFF_PATH_KEY, gitExePathText.getText());
                     map.put(ENCODING_KEY, gitCmdEncodingText.getText());
                     map.put(PROJECT_KEY, gitFolderPathText.getText());
-                    config.saveConfig(map);
+                    map.put(GIT_USERNAME_KEY, gitUsernameText.getText());
+                    map.put(GIT_PASSWORD_KEY, gitPasswordText.getText());
+                    config.saveConfig(map, true);
                     JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
                 }
             }
@@ -809,17 +851,22 @@ public class GitConflictDetectUI extends JFrame {
             return Triple.of(stageLst, unstageLst, untractedLst);
         }
 
-        private static void commit(File projectDir, String message) {
+        private static String commit(File projectDir, String message) {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
             run.command("git commit -m \"" + StringUtils.trimToEmpty(message) + "\"");
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
-            System.out.println(p.getInputStreamToString());
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
         }
 
         // 目前不work
-        private static void push(File projectDir, String username, String password) {
+        private static String push(File projectDir, String username, String password) {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
             run.command("git push");
@@ -827,8 +874,12 @@ public class GitConflictDetectUI extends JFrame {
             run.command(password);
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
-            System.out.println("IN:" + p.getInputStreamToString());
-            System.out.println("ER:" + p.getErrorStreamToString());
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
         }
     }
 }
