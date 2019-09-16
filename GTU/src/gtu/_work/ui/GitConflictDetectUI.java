@@ -818,20 +818,14 @@ public class GitConflictDetectUI extends JFrame {
             System.out.println(p.getInputStreamToString());
         }
 
-        //目前不work
+        // 目前不work
         private static void push(File projectDir, String username, String password) {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
             run.command("git push");
+            run.command(username);
+            run.command(password);
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
-            p.getStreamSync();
-            System.out.println("IN:" + p.getInputStreamToString());
-            System.out.println("ER:" + p.getErrorStreamToString());
-            p.setOutputString(username);
-            p.getStreamSync();
-            System.out.println("IN:" + p.getInputStreamToString());
-            System.out.println("ER:" + p.getErrorStreamToString());
-            p.setOutputString(password);
             p.getStreamSync();
             System.out.println("IN:" + p.getInputStreamToString());
             System.out.println("ER:" + p.getErrorStreamToString());
