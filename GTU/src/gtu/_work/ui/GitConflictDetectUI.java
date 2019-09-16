@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -66,7 +67,7 @@ public class GitConflictDetectUI extends JFrame {
     private SwingActionUtil swingUtil;
     private JTabbedPane tabbedPane;
     private JPanel panel_2;
-    private JLabel lblNewLabel;
+    private JLabel gitProjectLabel;
     private JTextField gitFolderPathText;
     private JPanel panel_3;
     private JButton gitStatusBtn;
@@ -150,8 +151,14 @@ public class GitConflictDetectUI extends JFrame {
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
-        lblNewLabel = new JLabel("專案目錄");
-        panel.add(lblNewLabel, "2, 2, right, default");
+        gitProjectLabel = new JLabel("專案目錄");
+        gitProjectLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("gitProjectLabel.Click", e);
+            }
+        });
+        panel.add(gitProjectLabel, "2, 2, right, default");
 
         gitFolderPathText = new JTextField();
         JCommonUtil.jTextFieldSetFilePathMouseEvent(gitFolderPathText, true);

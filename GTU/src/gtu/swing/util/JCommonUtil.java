@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.DisplayMode;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,6 +75,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
+import gtu.runtime.DesktopUtil;
 
 /**
  * @author gtu001
@@ -772,6 +775,23 @@ public class JCommonUtil {
                         }
                     } else {
                         JCommonUtil._jOptionPane_showMessageDialog_error("檔案選擇錯誤");
+                    }
+                } else if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                    final File file = new File(jTextField1.getText());
+                    if (file.exists()) {
+                        JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
+                        popUtil.addJMenuItem("開啟" + (file.isFile() ? "檔案" : "目錄"), new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                try {
+                                    DesktopUtil.browse(file.toURL().toString());
+                                } catch (Exception e1) {
+                                    JCommonUtil.handleException(e1);
+                                }
+                            }
+                        });
+                        popUtil.applyEvent(evt);//
+                        popUtil.show();
                     }
                 }
             }
