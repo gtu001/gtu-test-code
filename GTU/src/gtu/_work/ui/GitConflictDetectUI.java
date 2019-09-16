@@ -818,6 +818,7 @@ public class GitConflictDetectUI extends JFrame {
             System.out.println(p.getInputStreamToString());
         }
 
+        //目前不work
         private static void push(File projectDir, String username, String password) {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
