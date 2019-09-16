@@ -355,14 +355,14 @@ public class GitConflictDetectUI extends JFrame {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     GitUtil.stage(projectDir, gitFile.orignName);
-                                    new GitCheckProc(projectDir);
+                                    new GitCheckProc(projectDir, gitFile.orignName);
                                 }
                             })//
                             .addJMenuItem("unstage", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     GitUtil.unstage(projectDir, gitFile.orignName);
-                                    new GitCheckProc(projectDir);
+                                    new GitCheckProc(projectDir, gitFile.orignName);
                                 }
                             })//
                             .addJMenuItem("discard change", new ActionListener() {
@@ -371,7 +371,7 @@ public class GitConflictDetectUI extends JFrame {
                                     boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + gitFile.file, "回覆到未改變");
                                     if (confirm) {
                                         GitUtil.discardChange(projectDir, gitFile.orignName);
-                                        new GitCheckProc(projectDir);
+                                        new GitCheckProc(projectDir, gitFile.orignName);
                                     }
                                 }
                             })//
@@ -381,14 +381,14 @@ public class GitConflictDetectUI extends JFrame {
                                     boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除：" + gitFile.file, "刪除");
                                     if (confirm) {
                                         gitFile.file.delete();
-                                        new GitCheckProc(projectDir);
+                                        new GitCheckProc(projectDir, gitFile.orignName);
                                     }
                                 }
                             })//
                             .addJMenuItem("reload", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    new GitCheckProc(projectDir);
+                                    new GitCheckProc(projectDir, "");
                                 }
                             })//
                             .addJMenuItem("commit", new ActionListener() {
@@ -475,7 +475,7 @@ public class GitConflictDetectUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 File gitFolder = new File(gitFolderPathText.getText());
-                new GitCheckProc(gitFolder);
+                new GitCheckProc(gitFolder, "");
 
                 // 取得branch
                 if (StringUtils.isBlank(gitBranchNameText.getText())) {
@@ -634,9 +634,15 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
-        private void copyFromOld(GitFile f) {
+        private void copyFromOld(GitFile f, String reloadGitFilePath) {
             if (statusFileLstBak == null && statusFileLstBak.isEmpty()) {
                 return;
+            }
+            if (StringUtils.isNotBlank(reloadGitFilePath)) {
+                String ignoreOriginName = GitUtil.getGitOrignPathName(reloadGitFilePath);
+                if (StringUtils.equals(f.orignName, ignoreOriginName)) {
+                    return;
+                }
             }
             for (GitFile g : statusFileLstBak) {
                 if (StringUtils.equals(g.orignName, f.orignName)) {
@@ -646,7 +652,7 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
-        GitCheckProc(File projectDir) {
+        GitCheckProc(File projectDir, String reloadGitFilePath) {
             this.projectDir = projectDir;
             Triple<List<String[]>, List<String[]>, List<String[]>> statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
             for (String[] line : statusInfo.getLeft()) {
@@ -654,7 +660,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "blue";
                 g.stageDesc = "commit";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g);
+                copyFromOld(g, reloadGitFilePath);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.getMiddle()) {
@@ -662,7 +668,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "green";
                 g.stageDesc = "uncommit";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g);
+                copyFromOld(g, reloadGitFilePath);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.getRight()) {
@@ -670,7 +676,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g);
+                copyFromOld(g, reloadGitFilePath);
                 statusFileLst.add(g);
             }
 
