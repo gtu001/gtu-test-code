@@ -8,8 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.LineNumberReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -41,6 +39,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
 import gtu.runtime.ProcessWatcher;
@@ -316,7 +315,7 @@ public class GitConflictDetectUI extends JFrame {
                         run.command(command);
                         run.apply();
 
-                        mResolveConflictFileProcess = new ResolveConflictFileProcess(rightFile, mResolveConflictFileProcess.gitFile);
+                        mResolveConflictFileProcess = new ResolveConflictFileProcess(rightFile, gitFile);
                     } else {
                         File leftFile = File.createTempFile("LOCALREPO_", ".txt");
 
@@ -472,6 +471,7 @@ public class GitConflictDetectUI extends JFrame {
         Pattern rightPtn = Pattern.compile("^[\\s\\t]*\\>{7}");
 
         boolean isCheck = false;
+        boolean isUntracked = false;
         boolean isConflictFile = false;
         StringBuffer left = new StringBuffer();
         StringBuffer right = new StringBuffer();
@@ -486,7 +486,7 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
-        private void load(String content) {
+        private void __load(String content) {
             isCheck = true;
             List<String> lst = StringUtil_.readContentToList(content, false, false, false);
             GitPtnEnum status = GitPtnEnum.NONE;
@@ -535,7 +535,11 @@ public class GitConflictDetectUI extends JFrame {
                 System.out.println("BLANK : " + file);
                 return;
             }
-            load(content);
+            if (isUntracked) {
+                right.append(content);
+            } else {
+                __load(content);
+            }
         }
     }
 
@@ -617,6 +621,8 @@ public class GitConflictDetectUI extends JFrame {
             for (GitFile f : statusFileLst) {
                 model.addElement(f);
             }
+            // model.addElement(new GitFile("TEST----", new
+            // File("C:\\Users\\wistronits\\Desktop\\新文字文件.txt")));//TODO
         }
     }
 
@@ -650,9 +656,10 @@ public class GitConflictDetectUI extends JFrame {
 
         private static void addProjectCommand(File projectDir, RuntimeBatPromptModeUtil inst) {
             inst.command("cd " + projectDir);
-            File rootFile = FileUtil.getFileRoot(projectDir);
+            inst.runInBatFile(false);
+            String rootFile = FileUtil.getFileRoot(projectDir);
             if (rootFile != null) {
-                inst.command("" + projectDir);
+                inst.command("" + rootFile);
             }
         }
 
@@ -699,12 +706,16 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command(String.format("git show %s:%s", localBranchName, fileGitPath));
+            String startTagCommand = String.format("git show %s:%s", localBranchName, fileGitPath);
+            run.command(startTagCommand);
 
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.encode(encoding);
             p.getStreamSync();
             String fileContent = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                fileContent = RuntimeBatPromptModeUtil.getFixBatInputString(fileContent, 3 * 2, 0);
+            }
             return fileContent;
         }
 
@@ -761,6 +772,9 @@ public class GitConflictDetectUI extends JFrame {
             p.encode(encoding);
             p.getStreamSync();
             String statusContent = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                statusContent = RuntimeBatPromptModeUtil.getFixBatInputString(statusContent, 3 * 2, 0);
+            }
 
             List<String> lst = StringUtil_.readContentToList(statusContent, true, true, false);
             int linePos = -1;

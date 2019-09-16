@@ -95,11 +95,9 @@ public class ProcessWatcher {
                     byte[] arry = baos.toByteArray();
                     if ("input".equals(type)) {
                         inputStreamBytes.set(arry);
-                        ;
                         System.out.println("# input stream done!!!");
                     } else if ("error".equals(type)) {
                         errorStreamBytes.set(arry);
-                        ;
                         System.out.println("# error stream done!!!");
                     }
                 } catch (Exception ex) {

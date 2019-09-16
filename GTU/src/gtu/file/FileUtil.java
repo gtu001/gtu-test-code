@@ -89,6 +89,11 @@ public class FileUtil {
             isOsWindowsSystem = true;
             System.out.println("FileUtil : Windows XP");
         }
+        if (System.getProperty("os.name").equals("Windows 7")) {
+            destopPath = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
+            isOsWindowsSystem = true;
+            System.out.println("FileUtil : Windows 7");
+        }
         if (System.getProperty("os.name").equals("Windows 10")) {
             String tmpDesktop = System.getProperty("user.home") + File.separator + "OneDrive" + File.separator + "Desktop" + File.separator;
             File tmpDesktopFile = new File(tmpDesktop);
@@ -1274,13 +1279,13 @@ public class FileUtil {
         return FilenameUtils.normalize(filePathName, isUnixSeparator);
     }
 
-    public static File getFileRoot(File file) {
+    public static String getFileRoot(File file) {
         if (!OS_IS_WINDOWS) {
             return null;
         }
         for (File f : File.listRoots()) {
             if (file.getAbsolutePath().contains(f.getAbsolutePath())) {
-                return f;
+                return f.getAbsolutePath().replaceAll("\\" + File.separator + "+$", "");
             }
         }
         throw new RuntimeException("找不到根目錄：" + file);

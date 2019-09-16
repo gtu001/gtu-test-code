@@ -8,10 +8,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.file.FileUtil;
+import gtu.string.StringUtil_;
 
 public class RuntimeBatPromptModeUtil {
 
@@ -19,6 +21,9 @@ public class RuntimeBatPromptModeUtil {
     private static String prefix = "  ";
     private static String chgLine = "\r\n";
     private static final String BAT_FORAT;
+
+    public static final String BAT_START_TAG = "REM ####START####";
+    public static final String BAT_END_TAG = "REM ####END  ####";
 
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
@@ -37,7 +42,9 @@ public class RuntimeBatPromptModeUtil {
         sb.append(prefix + "for /F \"tokens=2 delims=:.\" %%x in (''chcp'') do set \"cp=%%x\" \n");
         sb.append(prefix + "chcp {0}  >nul \n");
         sb.append(prefix + " \n");
+        sb.append(prefix + BAT_START_TAG + " \n");
         sb.append(prefix + "{1} \n");
+        sb.append(prefix + BAT_END_TAG + " \n");
         sb.append(prefix + " \n");
         sb.append(prefix + "chcp %cp% >nul    \n");
         sb.append(prefix + "exit    \n");
@@ -45,9 +52,24 @@ public class RuntimeBatPromptModeUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
-        String result = MessageFormat.format(BAT_FORAT, new Object[] { "555555", "command here" });
-        System.out.println(result);
+        File projectDir = new File("D:\\workstuff\\gtu-test-code\\GTU");
+        RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+        inst.command("cd " + projectDir);
+        String rootFile = FileUtil.getFileRoot(projectDir);
+        if (rootFile != null) {
+            inst.command("" + rootFile);
+        }
+        inst.command("git branch");
+        inst.runInBatFile(false);
+        ProcessWatcher p = ProcessWatcher.newInstance(inst.apply());
+        p.encode("BIG5");
+        p.getStreamSync();
+        System.out.println("branch start------------------------------");
+        System.out.println(p.getInputStreamToString());
+        System.out.println("branch end  ------------------------------");
+        System.out.println("branch start------------------------------");
+        System.out.println(getFixBatInputString(p.getInputStreamToString(), 6, 0));
+        System.out.println("branch end  ------------------------------");
         System.out.println("done...");
     }
 
@@ -176,4 +198,21 @@ public class RuntimeBatPromptModeUtil {
         return tmpCmd != null ? tmpCmd.toString() : "";
     }
 
+    public static String getFixBatInputString(String inputString, Integer startOffset, Integer endOffset) {
+        startOffset = startOffset == null ? 0 : startOffset;
+        endOffset = endOffset == null ? 0 : endOffset;
+        List<String> dataLst = StringUtil_.readContentToList(inputString, false, false, false);
+        int startPos = 0;
+        int endPos = dataLst.size() - 1;
+        for (int ii = 0; ii < dataLst.size(); ii++) {
+            String line = StringUtils.defaultString(dataLst.get(ii));
+            if (line.contains(BAT_START_TAG)) {
+                startPos = ii + 1 + startOffset;
+            }
+            if (line.contains(BAT_END_TAG)) {
+                endPos = ii - 1 + endOffset;
+            }
+        }
+        return StringUtils.join(dataLst.subList(startPos, endPos), "\r\n");
+    }
 }
