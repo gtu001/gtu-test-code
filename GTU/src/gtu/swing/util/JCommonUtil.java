@@ -423,6 +423,8 @@ public class JCommonUtil {
             public void run() {
                 String strMessage = message == null ? "" : String.valueOf(message);
                 strMessage = strMessage.replaceAll("\n", "<br/>");
+                strMessage = strMessage.replaceAll(" ", "&nbsp;");
+                strMessage = strMessage.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
                 strMessage = "<html>" + strMessage + "</html>";
                 JOptionPane.showMessageDialog(null, strMessage);
             }

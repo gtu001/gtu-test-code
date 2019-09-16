@@ -69,7 +69,7 @@ public class GitConflictDetectUI extends JFrame {
     private JLabel lblNewLabel;
     private JTextField gitFolderPathText;
     private JPanel panel_3;
-    private JButton gitCheckBtn;
+    private JButton gitStatusBtn;
     private JButton gitResetBtn;
     private JPanel panel_4;
     private JPanel panel_5;
@@ -101,6 +101,10 @@ public class GitConflictDetectUI extends JFrame {
     private static final String GIT_PASSWORD_KEY = "git_password_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
     private List<GitFile> statusFileLstBak = new ArrayList<GitFile>();
+    private JButton gitPullBtn;
+    private JButton gitStashAndPullBtn;
+    private JButton gitCommitBtn;
+    private JButton gitPushBtn;
 
     /**
      * Launch the application.
@@ -157,13 +161,13 @@ public class GitConflictDetectUI extends JFrame {
         panel_3 = new JPanel();
         panel.add(panel_3, "4, 4, fill, fill");
 
-        gitCheckBtn = new JButton("status 清單");
-        gitCheckBtn.addActionListener(new ActionListener() {
+        gitStatusBtn = new JButton("status 清單");
+        gitStatusBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                swingUtil.invokeAction("gitCheckBtn.Click", e);
+                swingUtil.invokeAction("gitStatusBtn.Click", e);
             }
         });
-        panel_3.add(gitCheckBtn);
+        panel_3.add(gitStatusBtn);
 
         gitResetBtn = new JButton("清除");
         gitResetBtn.addActionListener(new ActionListener() {
@@ -171,6 +175,22 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitResetBtn.Click", e);
             }
         });
+
+        gitPullBtn = new JButton("pull");
+        gitPullBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitPullBtn.Click", e);
+            }
+        });
+        panel_3.add(gitPullBtn);
+
+        gitStashAndPullBtn = new JButton("stash＆pull");
+        gitStashAndPullBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitStashAndPullBtn.Click", e);
+            }
+        });
+        panel_3.add(gitStashAndPullBtn);
         panel_3.add(gitResetBtn);
 
         lblNewLabel_1 = new JLabel("執行指令");
@@ -255,6 +275,21 @@ public class GitConflictDetectUI extends JFrame {
             }
         });
         panel_6.add(resolveConflictBtn);
+        gitCommitBtn = new JButton("commit");
+        gitCommitBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitCommitBtn.Click", e);
+            }
+        });
+        panel_6.add(gitCommitBtn);
+
+        gitPushBtn = new JButton("push");
+        gitPushBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitPushBtn.Click", e);
+            }
+        });
+        panel_6.add(gitPushBtn);
 
         panel_7 = new JPanel();
         panel_1.add(panel_7, BorderLayout.EAST);
@@ -391,34 +426,6 @@ public class GitConflictDetectUI extends JFrame {
                                     new GitCheckProc(projectDir, "");
                                 }
                             })//
-                            .addJMenuItem("commit", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    try {
-                                        String message = JCommonUtil._jOptionPane_showInputDialog("請輸入Message", "");
-                                        Validate.notBlank(message, "message不可為空!");
-                                        String resultString = GitUtil.commit(projectDir, message);
-                                        JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex);
-                                    }
-                                }
-                            })//
-                            .addJMenuItem("push", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    try {
-                                        Validate.notBlank(gitUsernameText.getText(), "Git帳號未輸入");
-                                        Validate.notBlank(gitPasswordText.getText(), "Git密碼未輸入");
-                                        String resultString = GitUtil.push(projectDir, //
-                                                StringUtils.trimToEmpty(gitUsernameText.getText()), //
-                                                StringUtils.trimToEmpty(gitPasswordText.getText()));
-                                        JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex);
-                                    }
-                                }
-                            })//
                             .applyEvent(evt)//
                             .show();
                 }
@@ -471,17 +478,57 @@ public class GitConflictDetectUI extends JFrame {
                 }
             }
         });
-        swingUtil.addActionHex("gitCheckBtn.Click", new Action() {
+        swingUtil.addActionHex("gitStatusBtn.Click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 File gitFolder = new File(gitFolderPathText.getText());
                 new GitCheckProc(gitFolder, "");
 
                 // 取得branch
-                if (StringUtils.isBlank(gitBranchNameText.getText())) {
-                    gitBranchNameText.setText(GitUtil.getCurrentBranch(gitFolder, getEncoding()));
-                }
+                gitBranchNameText.setText(GitUtil.getCurrentBranch(gitFolder, getEncoding()));
                 JCommonUtil._jOptionPane_showMessageDialog_info("完成！");
+            }
+        });
+        swingUtil.addActionHex("gitPullBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                File projectDir = new File(gitFolderPathText.getText());
+                String resultString = GitUtil.pull(projectDir);
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+            }
+        });
+        swingUtil.addActionHex("gitStashAndPullBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                File projectDir = new File(gitFolderPathText.getText());
+                String resultString = GitUtil.stashAndPull(projectDir);
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+            }
+        });
+        swingUtil.addActionHex("gitCommitBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                String message = JCommonUtil._jOptionPane_showInputDialog("請輸入Message", "");
+                Validate.notBlank(message, "message不可為空!");
+                File projectDir = new File(gitFolderPathText.getText());
+                String resultString = GitUtil.commit(projectDir, message);
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+            }
+        });
+        swingUtil.addActionHex("gitPushBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                Validate.notBlank(gitUsernameText.getText(), "Git帳號未輸入");
+                Validate.notBlank(gitPasswordText.getText(), "Git密碼未輸入");
+                File projectDir = new File(gitFolderPathText.getText());
+                String resultString = GitUtil.push(projectDir, //
+                        StringUtils.trimToEmpty(gitUsernameText.getText()), //
+                        StringUtils.trimToEmpty(gitPasswordText.getText()));
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
             }
         });
     }
@@ -893,13 +940,42 @@ public class GitConflictDetectUI extends JFrame {
             return resultString;
         }
 
-        // 目前不work
         private static String push(File projectDir, String username, String password) {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
             run.command("git push");
             run.command(username);
             run.command(password);
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
+        }
+
+        private static String pull(File projectDir) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git pull");
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
+        }
+
+        private static String stashAndPull(File projectDir) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git stash");
+            run.command("git pull");
+            run.command("git stash pop");
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
