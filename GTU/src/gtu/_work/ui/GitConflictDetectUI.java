@@ -139,7 +139,7 @@ public class GitConflictDetectUI extends JFrame {
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        tabbedPane.addTab("檢查衝突", null, panel, null);
+        tabbedPane.addTab("Git", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -157,7 +157,7 @@ public class GitConflictDetectUI extends JFrame {
         panel_3 = new JPanel();
         panel.add(panel_3, "4, 4, fill, fill");
 
-        gitCheckBtn = new JButton("衝突檢測");
+        gitCheckBtn = new JButton("status 清單");
         gitCheckBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 swingUtil.invokeAction("gitCheckBtn.Click", e);
@@ -236,7 +236,7 @@ public class GitConflictDetectUI extends JFrame {
         gitPasswordText.setColumns(10);
 
         JPanel panel_1 = new JPanel();
-        tabbedPane.addTab("衝突清單", null, panel_1, null);
+        tabbedPane.addTab("清單", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
 
         panel_4 = new JPanel();
@@ -601,10 +601,11 @@ public class GitConflictDetectUI extends JFrame {
             this.file = file;
         }
 
+        public void load() {
+            mGitLeftRight.load(file);
+        }
+
         public String toString() {
-            if (!mGitLeftRight.isCheck) {
-                mGitLeftRight.load(file);
-            }
             StringBuilder sb = new StringBuilder();
             String string = String.format("<font color='%s'>%s</font> " + //
                     "<font color='%s'>%s</font> " + //
@@ -669,6 +670,9 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageDesc = "uncommit";
                 this.applyStatus(g, line[0]);
                 copyFromOld(g, reloadGitFilePath);
+                if (!g.mGitLeftRight.isCheck) {
+                    g.load();
+                }
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.getRight()) {
@@ -900,9 +904,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                // resultString =
-                // RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3
-                // * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
