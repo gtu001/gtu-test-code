@@ -1,7 +1,6 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -9,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -41,7 +39,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
@@ -192,14 +189,14 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitPullBtn.Click", e);
             }
         });
-        
-                gitLogBtn = new JButton("log");
-                gitLogBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        swingUtil.invokeAction("gitLogBtn.Click", e);
-                    }
-                });
-                panel_3.add(gitLogBtn);
+
+        gitLogBtn = new JButton("log");
+        gitLogBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitLogBtn.Click", e);
+            }
+        });
+        panel_3.add(gitLogBtn);
         panel_3.add(gitPullBtn);
 
         gitStashAndPullBtn = new JButton("stash＆pull");
@@ -558,8 +555,9 @@ public class GitConflictDetectUI extends JFrame {
             public void action(EventObject evt) throws Exception {
                 Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
                 File projectDir = new File(gitFolderPathText.getText());
-                String log = GitUtil.log_stat(projectDir, 3);
-                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(log);
+                String[] result = GitUtil.log_stat_repo(projectDir, 3, getEncoding());
+                String resultString = String.format("<font color='blue'>Remote Branch : %s</font>\r\n%s", result);
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
             }
         });
     }
@@ -1017,11 +1015,29 @@ public class GitConflictDetectUI extends JFrame {
             return resultString;
         }
 
-        private static String log_stat(File projectDir, int topCount) {
+        private static String getCurrentRemote(File projectDir) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git remote");
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            Pattern ptn = Pattern.compile("\\w+");
+            Matcher mth = ptn.matcher(resultString);
+            if (mth.find()) {
+                return mth.group();
+            }
+            return "";
+        }
+
+        private static String log_stat_local(File projectDir, int topCount) {
             topCount = topCount <= 0 ? 1 : topCount;
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command(String.format("git log -%d --stat", topCount));
+            run.command(String.format("git log  -%d --stat", topCount));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
@@ -1030,6 +1046,32 @@ public class GitConflictDetectUI extends JFrame {
             }
             System.out.println(resultString);
             return resultString;
+        }
+
+        private static String[] log_stat_repo(File projectDir, int topCount, String encoding) {
+            topCount = topCount <= 0 ? 1 : topCount;
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+
+            // 顯示遠端log
+            String remoteBranch = "";
+            String remote = getCurrentRemote(projectDir);
+            String branch = getCurrentBranch(projectDir, encoding);
+            if (StringUtils.isNotBlank(remote)) {
+                remote = remote + "/";
+            }
+            remoteBranch = remote + branch;
+
+            run.command(String.format("git log %s -%d --stat", remoteBranch, topCount));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println("branch : " + remoteBranch);
+            System.out.println(resultString);
+            return new String[] { remoteBranch, resultString };
         }
 
         private static File log_stat2File(File projectDir, int topCount) {

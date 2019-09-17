@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.awt.DisplayMode;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
@@ -35,7 +34,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +41,8 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -422,13 +422,28 @@ public class JCommonUtil {
 
     public static void _jOptionPane_showMessageDialog_InvokeLater_Html(final Object message) {
         SwingUtilities.invokeLater(new Runnable() {
+            private String replaceHtml(String strMessage) {
+                strMessage = StringUtils.defaultString(strMessage).replaceAll("\n", "<br/>");
+                strMessage = strMessage.replaceAll(" ", "&nbsp;");
+                strMessage = strMessage.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+                return strMessage;
+            }
+
             @Override
             public void run() {
                 String strMessage = message == null ? "" : String.valueOf(message);
-                strMessage = strMessage.replaceAll("\n", "<br/>");
-                strMessage = strMessage.replaceAll(" ", "&nbsp;");
-                strMessage = strMessage.replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-                strMessage = "<html>" + strMessage + "</html>";
+                Pattern ptn = Pattern.compile("\\<\\w+\\s.*?\\>");
+                Matcher mth = ptn.matcher(strMessage);
+                StringBuffer sb = new StringBuffer();
+                int startPos = 0;
+                while (mth.find()) {
+                    String tmpStr = replaceHtml(strMessage.substring(startPos, mth.start()));
+                    sb.append(tmpStr);
+                    sb.append(mth.group());
+                    startPos = mth.end();
+                }
+                sb.append(replaceHtml(strMessage.substring(startPos)));
+                strMessage = "<html>" + sb + "</html>";
                 JOptionPane.showMessageDialog(null, strMessage);
             }
         });
