@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
+import gtu.runtime.DesktopUtil;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
@@ -99,6 +101,7 @@ public class GitConflictDetectUI extends JFrame {
     private static final String PROJECT_KEY = "project_key";
     private static final String GIT_USERNAME_KEY = "git_username_key";
     private static final String GIT_PASSWORD_KEY = "git_password_key";
+    private static final String EDITOR_KEY = "editor_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
     private List<GitFile> statusFileLstBak = new ArrayList<GitFile>();
     private JButton gitPullBtn;
@@ -106,6 +109,8 @@ public class GitConflictDetectUI extends JFrame {
     private JButton gitCommitBtn;
     private JButton gitPushBtn;
     private JButton gitLogBtn;
+    private JLabel lblNewLabel;
+    private JTextField editorExeText;
 
     /**
      * Launch the application.
@@ -149,7 +154,8 @@ public class GitConflictDetectUI extends JFrame {
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         gitProjectLabel = new JLabel("專案目錄");
         gitProjectLabel.addMouseListener(new MouseAdapter() {
@@ -208,7 +214,7 @@ public class GitConflictDetectUI extends JFrame {
         panel_3.add(gitStashAndPullBtn);
         panel_3.add(gitResetBtn);
 
-        lblNewLabel_1 = new JLabel("執行指令");
+        lblNewLabel_1 = new JLabel("diff 執行指令");
         panel.add(lblNewLabel_1, "2, 6, right, default");
 
         gitExePathText = new JTextField();
@@ -269,6 +275,14 @@ public class GitConflictDetectUI extends JFrame {
         gitPasswordText = new JPasswordField();
         panel.add(gitPasswordText, "4, 18, fill, default");
         gitPasswordText.setColumns(10);
+
+        lblNewLabel = new JLabel("editor編輯器執行檔");
+        panel.add(lblNewLabel, "2, 22, right, default");
+
+        editorExeText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(editorExeText, false);
+        panel.add(editorExeText, "4, 22, fill, default");
+        editorExeText.setColumns(10);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("清單", null, panel_1, null);
@@ -439,10 +453,33 @@ public class GitConflictDetectUI extends JFrame {
                                     }
                                 }
                             })//
-                            .addJMenuItem("reload", new ActionListener() {
+                            .addJMenuItem("open file", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    new GitCheckProc(projectDir, "");
+                                    if (gitFile.file.isFile()) {
+                                        if (StringUtils.isBlank(editorExeText.getText())) {
+                                            try {
+                                                DesktopUtil.browse(gitFile.file.toURL().toString());
+                                            } catch (MalformedURLException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                        } else {
+                                            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                                            run.runInBatFile(false);
+                                            run.command(String.format("\"%s\" \"%s\"", editorExeText.getText(), gitFile.file));
+                                            run.apply();
+                                        }
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("open dir", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    File targetDir = gitFile.file;
+                                    if (gitFile.file.isFile()) {
+                                        gitFile.file.getParentFile();
+                                    }
+                                    DesktopUtil.openDir(targetDir);
                                 }
                             })//
                             .applyEvent(evt)//
@@ -461,6 +498,7 @@ public class GitConflictDetectUI extends JFrame {
                 gitFolderPathText.setText(StringUtils.trimToEmpty(map.get(PROJECT_KEY)));
                 gitUsernameText.setText(StringUtils.trimToEmpty(map.get(GIT_USERNAME_KEY)));
                 gitPasswordText.setText(StringUtils.trimToEmpty(map.get(GIT_PASSWORD_KEY)));
+                editorExeText.setText(StringUtils.trimToEmpty(map.get(EDITOR_KEY)));
             }
         });
         swingUtil.addActionHex("saveConfigBtn.Click", new Action() {
@@ -473,6 +511,7 @@ public class GitConflictDetectUI extends JFrame {
                     map.put(PROJECT_KEY, gitFolderPathText.getText());
                     map.put(GIT_USERNAME_KEY, gitUsernameText.getText());
                     map.put(GIT_PASSWORD_KEY, gitPasswordText.getText());
+                    map.put(EDITOR_KEY, editorExeText.getText());
                     config.saveConfig(map, true);
                     JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
                 }
