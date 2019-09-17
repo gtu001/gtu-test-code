@@ -305,6 +305,23 @@ public class ListUtil {
         return resultLst;
     }
 
+    /**
+     * 安全subList
+     */
+    public static <T> List<T> subList(List<T> lst, int startInclude, int endExclude) {
+        if (startInclude < 0) {
+            startInclude = 0;
+        } else if (startInclude > lst.size()) {
+            startInclude = lst.size() - 1;
+        }
+        if (endExclude < 0) {
+            endExclude = 0;
+        } else if (endExclude > lst.size()) {
+            endExclude = lst.size();
+        }
+        return lst.subList(startInclude, endExclude);
+    }
+
     public static class PageListUtil {
         /**
          * 取得第幾頁

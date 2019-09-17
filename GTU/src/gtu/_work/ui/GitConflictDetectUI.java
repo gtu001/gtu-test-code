@@ -1,7 +1,6 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -9,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -32,7 +32,6 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.Triple;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -43,7 +42,7 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
-import gtu.properties.PropertiesUtil;
+import gtu.runtime.DesktopUtil;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.string.StringUtil_;
@@ -93,19 +92,27 @@ public class GitConflictDetectUI extends JFrame {
     private JTextField gitUsernameText;
     private JPasswordField gitPasswordText;
 
-    private File configFile = new File(PropertiesUtil.getJarCurrentPath(GitConflictDetectUI.class), GitConflictDetectUI.class.getSimpleName() + "_config.properties");
+    // private File configFile = new
+    // File(PropertiesUtil.getJarCurrentPath(GitConflictDetectUI.class),
+    // GitConflictDetectUI.class.getSimpleName() + "_config.properties");
+    private File configFile = new File("/media/gtu001/OLD_D/my_tool/GitConflictDetectUI_config.properties");
+
     private PropertiesGroupUtils config = new PropertiesGroupUtils(configFile);
     private static final String DIFF_PATH_KEY = "diff_path_key";
     private static final String ENCODING_KEY = "encoding_key";
     private static final String PROJECT_KEY = "project_key";
     private static final String GIT_USERNAME_KEY = "git_username_key";
     private static final String GIT_PASSWORD_KEY = "git_password_key";
+    private static final String EDITOR_KEY = "editor_key";
     private ResolveConflictFileProcess mResolveConflictFileProcess;
     private List<GitFile> statusFileLstBak = new ArrayList<GitFile>();
     private JButton gitPullBtn;
     private JButton gitStashAndPullBtn;
     private JButton gitCommitBtn;
     private JButton gitPushBtn;
+    private JButton gitLogBtn;
+    private JLabel lblNewLabel;
+    private JTextField editorExeText;
 
     /**
      * Launch the application.
@@ -149,7 +156,8 @@ public class GitConflictDetectUI extends JFrame {
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
                         FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         gitProjectLabel = new JLabel("專案目錄");
         panel.add(gitProjectLabel, "2, 2, right, default");
@@ -183,6 +191,14 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitPullBtn.Click", e);
             }
         });
+
+        gitLogBtn = new JButton("log");
+        gitLogBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitLogBtn.Click", e);
+            }
+        });
+        panel_3.add(gitLogBtn);
         panel_3.add(gitPullBtn);
 
         gitStashAndPullBtn = new JButton("stash＆pull");
@@ -194,7 +210,7 @@ public class GitConflictDetectUI extends JFrame {
         panel_3.add(gitStashAndPullBtn);
         panel_3.add(gitResetBtn);
 
-        lblNewLabel_1 = new JLabel("執行指令");
+        lblNewLabel_1 = new JLabel("diff 執行指令");
         panel.add(lblNewLabel_1, "2, 6, right, default");
 
         gitExePathText = new JTextField();
@@ -256,6 +272,14 @@ public class GitConflictDetectUI extends JFrame {
         panel.add(gitPasswordText, "4, 18, fill, default");
         gitPasswordText.setColumns(10);
 
+        lblNewLabel = new JLabel("editor編輯器執行檔");
+        panel.add(lblNewLabel, "2, 22, right, default");
+
+        editorExeText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(editorExeText, false);
+        panel.add(editorExeText, "4, 22, fill, default");
+        editorExeText.setColumns(10);
+
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("清單", null, panel_1, null);
         panel_1.setLayout(new BorderLayout(0, 0));
@@ -313,7 +337,7 @@ public class GitConflictDetectUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/git.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
@@ -321,6 +345,7 @@ public class GitConflictDetectUI extends JFrame {
             panel_2.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
+            this.setTitle("You Set My World On Fire");
         }
     }
 
@@ -362,8 +387,8 @@ public class GitConflictDetectUI extends JFrame {
 
                 if (JMouseEventUtil.buttonLeftClick(2, (MouseEvent) evt)) {
                     Validate.notBlank(gitExePathText.getText(), "未輸入diff執行檔pattern");
-                    
-                    if(!gitFile.mGitLeftRight.isCheck) {
+
+                    if (!gitFile.mGitLeftRight.isCheck) {
                         gitFile.load();
                     }
 
@@ -424,10 +449,33 @@ public class GitConflictDetectUI extends JFrame {
                                     }
                                 }
                             })//
-                            .addJMenuItem("reload", new ActionListener() {
+                            .addJMenuItem("open file", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    new GitCheckProc(projectDir, "");
+                                    if (gitFile.file.isFile()) {
+                                        if (StringUtils.isBlank(editorExeText.getText())) {
+                                            try {
+                                                DesktopUtil.browse(gitFile.file.toURL().toString());
+                                            } catch (MalformedURLException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                        } else {
+                                            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                                            run.runInBatFile(false);
+                                            run.command(String.format("\"%s\" \"%s\"", editorExeText.getText(), gitFile.file));
+                                            run.apply();
+                                        }
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("open dir", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    File targetDir = gitFile.file;
+                                    if (gitFile.file.isFile()) {
+                                        gitFile.file.getParentFile();
+                                    }
+                                    DesktopUtil.openDir(targetDir);
                                 }
                             })//
                             .applyEvent(evt)//
@@ -446,6 +494,7 @@ public class GitConflictDetectUI extends JFrame {
                 gitFolderPathText.setText(StringUtils.trimToEmpty(map.get(PROJECT_KEY)));
                 gitUsernameText.setText(StringUtils.trimToEmpty(map.get(GIT_USERNAME_KEY)));
                 gitPasswordText.setText(StringUtils.trimToEmpty(map.get(GIT_PASSWORD_KEY)));
+                editorExeText.setText(StringUtils.trimToEmpty(map.get(EDITOR_KEY)));
             }
         });
         swingUtil.addActionHex("saveConfigBtn.Click", new Action() {
@@ -458,6 +507,7 @@ public class GitConflictDetectUI extends JFrame {
                     map.put(PROJECT_KEY, gitFolderPathText.getText());
                     map.put(GIT_USERNAME_KEY, gitUsernameText.getText());
                     map.put(GIT_PASSWORD_KEY, gitPasswordText.getText());
+                    map.put(EDITOR_KEY, editorExeText.getText());
                     config.saveConfig(map, true);
                     JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功！");
                 }
@@ -532,6 +582,16 @@ public class GitConflictDetectUI extends JFrame {
                 String resultString = GitUtil.push(projectDir, //
                         StringUtils.trimToEmpty(gitUsernameText.getText()), //
                         StringUtils.trimToEmpty(gitPasswordText.getText()));
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+            }
+        });
+        swingUtil.addActionHex("gitLogBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                File projectDir = new File(gitFolderPathText.getText());
+                String[] result = GitUtil.log_stat_repo(projectDir, 3, getEncoding());
+                String resultString = String.format("<font color='blue'>Remote Branch : %s</font>\r\n%s", result);
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
             }
         });
@@ -663,7 +723,7 @@ public class GitConflictDetectUI extends JFrame {
                     "<font color='%s'>%s</font> ", //
                     stageColor, stageDesc, //
                     statusColor, statusDesc, //
-                    (mGitLeftRight.isConflictFile ? "red" : ""), orignName);//
+                    (mGitLeftRight.isConflictFile ? "red" : ""), (mGitLeftRight.isConflictFile ? "＊" : "") + orignName);//
             sb.append("<html>\n");
             sb.append(string);
             sb.append("</html>\n");
@@ -706,8 +766,8 @@ public class GitConflictDetectUI extends JFrame {
 
         GitCheckProc(File projectDir, String reloadGitFilePath) {
             this.projectDir = projectDir;
-            Triple<List<String[]>, List<String[]>, List<String[]>> statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
-            for (String[] line : statusInfo.getLeft()) {
+            GitUtil.StatusInfo statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
+            for (String[] line : statusInfo.stageLst) {
                 GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
                 g.stageColor = "blue";
                 g.stageDesc = "commit";
@@ -715,10 +775,10 @@ public class GitConflictDetectUI extends JFrame {
                 copyFromOld(g, reloadGitFilePath);
                 statusFileLst.add(g);
             }
-            for (String[] line : statusInfo.getMiddle()) {
+            for (String[] line : statusInfo.conflictLst) {
                 GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
-                g.stageColor = "green";
-                g.stageDesc = "uncommit";
+                g.stageColor = "yellow";
+                g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
                 copyFromOld(g, reloadGitFilePath);
                 if (!g.mGitLeftRight.isCheck) {
@@ -726,7 +786,15 @@ public class GitConflictDetectUI extends JFrame {
                 }
                 statusFileLst.add(g);
             }
-            for (String[] line : statusInfo.getRight()) {
+            for (String[] line : statusInfo.unstageLst) {
+                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                g.stageColor = "green";
+                g.stageDesc = "uncommit";
+                this.applyStatus(g, line[0]);
+                copyFromOld(g, reloadGitFilePath);
+                statusFileLst.add(g);
+            }
+            for (String[] line : statusInfo.untractedLst) {
                 GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
@@ -774,6 +842,13 @@ public class GitConflictDetectUI extends JFrame {
     }
 
     private static class GitUtil {
+
+        private static class StatusInfo {
+            List<String[]> stageLst = new ArrayList<String[]>();
+            List<String[]> unstageLst = new ArrayList<String[]>();
+            List<String[]> untractedLst = new ArrayList<String[]>();
+            List<String[]> conflictLst = new ArrayList<String[]>();
+        }
 
         private static void addProjectCommand(File projectDir, RuntimeBatPromptModeUtil inst) {
             inst.command("cd " + projectDir);
@@ -874,12 +949,14 @@ public class GitConflictDetectUI extends JFrame {
          * @param encoding
          * @return
          */
-        private static Triple<List<String[]>, List<String[]>, List<String[]>> getStatusInfo(File projectDir, String encoding) {
+        private static StatusInfo getStatusInfo(File projectDir, String encoding) {
             List<String[]> stageLst = new ArrayList<String[]>();
             List<String[]> unstageLst = new ArrayList<String[]>();
             List<String[]> untractedLst = new ArrayList<String[]>();
+            List<String[]> conflictLst = new ArrayList<String[]>();
 
             String startTag = "Changes to be committed:";
+            String conflictTag = "Unmerged paths:";
             String endTag = "Changes not staged for commit:";
             String finalTag = "Untracked files:";
             List<String> ignoreLst = new ArrayList<String>();
@@ -911,6 +988,9 @@ public class GitConflictDetectUI extends JFrame {
                 } else if (line.contains(finalTag)) {
                     linePos = ii + 1;
                     type = "untracked";
+                } else if (line.contains(conflictTag)) {
+                    linePos = ii + 1;
+                    type = "conflict";
                 }
 
                 for (String ignoreStr : ignoreLst) {
@@ -925,9 +1005,17 @@ public class GitConflictDetectUI extends JFrame {
                     unstageLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
                 } else if (ii > linePos && "untracked".equals(type)) {
                     untractedLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
+                } else if (ii > linePos && "conflict".equals(type)) {
+                    conflictLst.add(new String[] { getGitOrignStatus(line), getGitOrignPathName(line) });
                 }
             }
-            return Triple.of(stageLst, unstageLst, untractedLst);
+
+            StatusInfo rtnObj = new StatusInfo();
+            rtnObj.stageLst = stageLst;
+            rtnObj.unstageLst = unstageLst;
+            rtnObj.untractedLst = untractedLst;
+            rtnObj.conflictLst = conflictLst;
+            return rtnObj;
         }
 
         private static String commit(File projectDir, String message) {
@@ -988,6 +1076,80 @@ public class GitConflictDetectUI extends JFrame {
             }
             System.out.println(resultString);
             return resultString;
+        }
+
+        private static String getCurrentRemote(File projectDir) {
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("git remote");
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            Pattern ptn = Pattern.compile("\\w+");
+            Matcher mth = ptn.matcher(resultString);
+            if (mth.find()) {
+                return mth.group();
+            }
+            return "";
+        }
+
+        private static String log_stat_local(File projectDir, int topCount) {
+            topCount = topCount <= 0 ? 1 : topCount;
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command(String.format("git log  -%d --stat", topCount));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
+        }
+
+        private static String[] log_stat_repo(File projectDir, int topCount, String encoding) {
+            topCount = topCount <= 0 ? 1 : topCount;
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+
+            // 顯示遠端log
+            String remoteBranch = "";
+            String remote = getCurrentRemote(projectDir);
+            String branch = getCurrentBranch(projectDir, encoding);
+            if (StringUtils.isNotBlank(remote)) {
+                remote = remote + "/";
+            }
+            remoteBranch = remote + branch;
+
+            run.command(String.format("git log %s -%d --stat", remoteBranch, topCount));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println("branch : " + remoteBranch);
+            System.out.println(resultString);
+            return new String[] { remoteBranch, resultString };
+        }
+
+        private static File log_stat2File(File projectDir, int topCount) {
+            try {
+                topCount = topCount <= 0 ? 1 : topCount;
+                RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                addProjectCommand(projectDir, run);
+                File tmpLogFile = File.createTempFile("GitLog_", ".txt");
+                run.command(String.format("git log -%d --stat > \"%s\"", topCount, tmpLogFile));
+                ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+                p.getStreamSync();
+                return tmpLogFile;
+            } catch (Exception e) {
+                throw new RuntimeException("log_simple ERR : " + e.getMessage(), e);
+            }
         }
     }
 }

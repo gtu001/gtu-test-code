@@ -99,6 +99,11 @@ public class RuntimeBatPromptModeUtil {
         return this;
     }
 
+    /**
+     * @param runInBatFile
+     *            true 新開視窗 , false 用原cmd開啟
+     * @return
+     */
     public RuntimeBatPromptModeUtil runInBatFile(boolean runInBatFile) {
         this.runInBatFile = runInBatFile;
         return this;

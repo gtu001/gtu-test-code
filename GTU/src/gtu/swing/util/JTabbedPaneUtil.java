@@ -14,10 +14,16 @@ public class JTabbedPaneUtil {
         return new JTabbedPaneUtil(tabbedPane);
     }
 
-    public int getTitleIndex(String title) {
+    public boolean isSelectedTitle(String title, boolean ignoreCase) {
+        return getTitleIndex(title, ignoreCase) == tabbedPane.getSelectedIndex();
+    }
+
+    public int getTitleIndex(String title, boolean ignoreCase) {
         title = title != null ? title.trim() : "";
         for (int ii = 0; ii < tabbedPane.getTabCount(); ii++) {
-            if (title.equals(tabbedPane.getTitleAt(ii))) {
+            if (ignoreCase && title.equalsIgnoreCase(tabbedPane.getTitleAt(ii))) {
+                return ii;
+            } else if (!ignoreCase && title.equals(tabbedPane.getTitleAt(ii))) {
                 return ii;
             }
         }
