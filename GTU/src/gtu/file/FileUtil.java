@@ -368,10 +368,11 @@ public class FileUtil {
     /**
      * 讀檔成逐行成ArrayList
      */
-    public static List<String> readFileToList(String fileName, String codeing) {
+    public static List<String> readFileToList(File fileName, String codeing) {
         List<String> list = new ArrayList<String>();
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), codeing));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), codeing));
             String data = null;
             do {
                 data = reader.readLine();
@@ -383,6 +384,11 @@ public class FileUtil {
             } while (true);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+            }
         }
         return list;
     }

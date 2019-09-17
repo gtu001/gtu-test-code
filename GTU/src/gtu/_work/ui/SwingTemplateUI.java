@@ -91,6 +91,7 @@ public class SwingTemplateUI extends JFrame {
             panel_2.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
+            this.setTitle("You Set My World On Fire");
         }
     }
 

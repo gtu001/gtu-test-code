@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
@@ -106,6 +108,7 @@ public class GitConflictDetectUI extends JFrame {
     private JButton gitStashAndPullBtn;
     private JButton gitCommitBtn;
     private JButton gitPushBtn;
+    private JButton gitLogBtn;
 
     /**
      * Launch the application.
@@ -189,6 +192,14 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitPullBtn.Click", e);
             }
         });
+        
+                gitLogBtn = new JButton("log");
+                gitLogBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        swingUtil.invokeAction("gitLogBtn.Click", e);
+                    }
+                });
+                panel_3.add(gitLogBtn);
         panel_3.add(gitPullBtn);
 
         gitStashAndPullBtn = new JButton("stash＆pull");
@@ -319,7 +330,7 @@ public class GitConflictDetectUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/git.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
@@ -327,6 +338,7 @@ public class GitConflictDetectUI extends JFrame {
             panel_2.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
+            this.setTitle("You Set My World On Fire");
         }
     }
 
@@ -539,6 +551,15 @@ public class GitConflictDetectUI extends JFrame {
                         StringUtils.trimToEmpty(gitUsernameText.getText()), //
                         StringUtils.trimToEmpty(gitPasswordText.getText()));
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+            }
+        });
+        swingUtil.addActionHex("gitLogBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "請輸入專案目錄");
+                File projectDir = new File(gitFolderPathText.getText());
+                String log = GitUtil.log_stat(projectDir, 3);
+                JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(log);
             }
         });
     }
@@ -994,6 +1015,36 @@ public class GitConflictDetectUI extends JFrame {
             }
             System.out.println(resultString);
             return resultString;
+        }
+
+        private static String log_stat(File projectDir, int topCount) {
+            topCount = topCount <= 0 ? 1 : topCount;
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command(String.format("git log -%d --stat", topCount));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, 3 * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
+        }
+
+        private static File log_stat2File(File projectDir, int topCount) {
+            try {
+                topCount = topCount <= 0 ? 1 : topCount;
+                RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                addProjectCommand(projectDir, run);
+                File tmpLogFile = File.createTempFile("GitLog_", ".txt");
+                run.command(String.format("git log -%d --stat > \"%s\"", topCount, tmpLogFile));
+                ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+                p.getStreamSync();
+                return tmpLogFile;
+            } catch (Exception e) {
+                throw new RuntimeException("log_simple ERR : " + e.getMessage(), e);
+            }
         }
     }
 }
