@@ -2246,6 +2246,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return d1;
             } else if (StringUtils.isNotBlank(d2.timestampLastest) && StringUtils.isBlank(d1.timestampLastest)) {
                 return d2;
+            } else if (StringUtils.isBlank(d1.timestampLastest) && StringUtils.isBlank(d2.timestampLastest)) {
+                return d1;
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

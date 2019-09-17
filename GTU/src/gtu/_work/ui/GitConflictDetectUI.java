@@ -368,7 +368,10 @@ public class GitConflictDetectUI extends JFrame {
 
                 if (JMouseEventUtil.buttonLeftClick(2, (MouseEvent) evt)) {
                     Validate.notBlank(gitExePathText.getText(), "未輸入diff執行檔pattern");
-                    Validate.isTrue(gitFile.mGitLeftRight.isCheck, "檔案未檢核");
+
+                    if (!gitFile.mGitLeftRight.isCheck) {
+                        gitFile.load();
+                    }
 
                     if (gitFile.mGitLeftRight.isConflictFile) {
                         File leftFile = File.createTempFile("REPO_", ".txt");
