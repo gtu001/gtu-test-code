@@ -5,6 +5,14 @@ from gtu.data_science.matplotlib import matplotlibUtil
 from tensorflow.examples.tutorials import mnist
 
 
+def layer(input, weight_shape, bias_shape):
+    weight_stddev = (2.0/weight_shape[0]) ** 0.5
+    w_init = tf.random_normal_initializer(stddev=weight_stddev)
+    bias_init = tf.constant_initializer(value=0)
+    W = tf.get_variable("W", weight_shape, initializer=w_init)
+    b = tf.get_variable("b", bias_shape, initializer=bias_init)
+    return tf.nn.relu(tf.matmul(input, W) + b)
+
 
 def inference(x) :
     init = tf.constant_initializer(value=0)

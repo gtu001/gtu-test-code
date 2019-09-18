@@ -27,6 +27,7 @@ import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.binary.Base64JdkUtil;
 import gtu.date.DateUtil;
@@ -96,7 +97,7 @@ public class HermannEbbinghaus_Memory {
 
     private AtomicBoolean startPause = new AtomicBoolean(false);
     private List<MemData> memLst = new ArrayList<MemData>();
-    private Map<String, Timer> timerMap = new HashMap<String, Timer>();
+    private Map<String, Pair<Timer, MemData>> timerMap = new HashMap<String, Pair<Timer, MemData>>();
     private ActionListener memDo = DEFAULT_ACTION;
     private ActionListener onOffDo = DEFAULT_ACTION;
     private ActionListener updateQueueDo = DEFAULT_ACTION;
@@ -175,9 +176,9 @@ public class HermannEbbinghaus_Memory {
      */
     public void stop(boolean triggerOnOffDo) {
         startPause.set(false);
-        for (Timer t : timerMap.values()) {
+        for (Pair<Timer, MemData> t : timerMap.values()) {
             try {
-                t.cancel();
+                t.getLeft().cancel();
             } catch (Exception ex) {
             }
         }
@@ -189,12 +190,13 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
-    private Timer newClock(String key) {
+    private Timer newClock(MemData d) {
         Timer t = new Timer();
+        String key = d.getKey();
         if (timerMap.containsKey(key)) {
-            timerMap.get(key).cancel();
+            timerMap.get(key).getLeft().cancel();
         }
-        timerMap.put(key, t);
+        timerMap.put(key, Pair.of(t, d));
         return t;
     }
 
@@ -211,7 +213,7 @@ public class HermannEbbinghaus_Memory {
         }
 
         memLst = new ArrayList<MemData>();
-        timerMap = new HashMap<String, Timer>();
+        timerMap = new HashMap<String, Pair<Timer, MemData>>();
         startPause = new AtomicBoolean(false);
 
         for (Object k : config.getConfigProp().keySet()) {
@@ -330,7 +332,7 @@ public class HermannEbbinghaus_Memory {
 
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
 
-        Timer timer = newClock(d.getKey());
+        Timer timer = newClock(d);
         timer.schedule(new MemoryTimerTask(d.getKey()) {
             @Override
             public void run() {
@@ -405,7 +407,9 @@ public class HermannEbbinghaus_Memory {
      */
     public List<String> getWaitingList() {
         TreeMap<Long, List<MemData>> map = new TreeMap<Long, List<MemData>>();
-        for (MemData d : getAllMemData(true)) {
+        // for (MemData d : getAllMemData(true)) {
+        for (Pair<Timer, MemData> d2 : timerMap.values()) {
+            MemData d = d2.getRight();
             ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
             if (reviewTime == ReviewTime.NONE) {
                 continue;
