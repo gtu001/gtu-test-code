@@ -66,7 +66,7 @@
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
-			<packagename mode="pom">org.apache.commons.beanutils.ConvertUtils</packagename>
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
 			<packagename mode="small">com.google.common.collect.Multimap</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
