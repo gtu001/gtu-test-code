@@ -1,0 +1,22 @@
+安裝
+
+	sudo apt-get install ffmpeg
+
+轉檔
+
+	ffmpeg -i filename.mp4 filename.mp3
+	ffmpeg -i filename.mp4 -b:a 192K -vn filename.mp3
+	
+	PS : Find out the more options of this command with man page. (man ffmpeg)
+		A stream specifier can match several stream, the option is then  applied to all of them. E.g. the stream specifier in “-b:a 128k” matches all audio streams.
+
+
+轉整個目錄的mp4
+
+	#!/bin/bash
+	MP4FILE=$(ls ~/Music/ |grep .mp4)
+	for filename in $MP4FILE
+	do 
+	 name=`echo "$filename" | sed -e "s/.mp4$//g"`
+	 ffmpeg -i ~/Music/$filename -b:a 192K -vn ~/Music/$name.mp3
+	done
