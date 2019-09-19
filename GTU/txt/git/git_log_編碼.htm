@@ -1,0 +1,3174 @@
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+  <link rel="dns-prefetch" href="https://github.githubassets.com">
+  <link rel="dns-prefetch" href="https://avatars0.githubusercontent.com">
+  <link rel="dns-prefetch" href="https://avatars1.githubusercontent.com">
+  <link rel="dns-prefetch" href="https://avatars2.githubusercontent.com">
+  <link rel="dns-prefetch" href="https://avatars3.githubusercontent.com">
+  <link rel="dns-prefetch" href="https://github-cloud.s3.amazonaws.com">
+  <link rel="dns-prefetch" href="https://user-images.githubusercontent.com/">
+
+
+
+  <link crossorigin="anonymous" media="all" integrity="sha512-XkdvnY4XAps/ohU58xyeZCv2463I3ZTnOhwzle5VPdwFw9Eh/ZfNvhlTgf4H9K7RPiRXW3oGu7CuNk9QiENAFQ==" rel="stylesheet" href="https://github.githubassets.com/assets/frameworks-b003e0a30d85cc60f5920a4b6ff04123.css" />
+  
+    <link crossorigin="anonymous" media="all" integrity="sha512-x5em3k3cLtKDuSW05XSADtIDd37AgOlh57A7jj+7JJRw7ayMd7kPGhtX1HjTHhTpGAI6UsKhudSzInZCbqgpUw==" rel="stylesheet" href="https://github.githubassets.com/assets/github-e2a243a35456e8165ff97336d8161f5e.css" />
+    
+    
+    
+    
+
+  <meta name="viewport" content="width=device-width">
+  
+  <title>git乱码解决方案汇总</title>
+    <meta name="description" content="git乱码解决方案汇总. GitHub Gist: instantly share code, notes, and snippets.">
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch-gist.xml" title="Gist">
+  <link rel="fluid-icon" href="https://gist.github.com/fluidicon.png" title="GitHub">
+  <meta property="fb:app_id" content="1401488693436528">
+
+    <meta name="twitter:image:src" content="https://github.githubassets.com/images/modules/gists/gist-og-image.png" /><meta name="twitter:site" content="@github" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="git乱码解决方案汇总" /><meta name="twitter:description" content="git乱码解决方案汇总. GitHub Gist: instantly share code, notes, and snippets." />
+    <meta property="og:image" content="https://github.githubassets.com/images/modules/gists/gist-og-image.png" /><meta property="og:site_name" content="Gist" /><meta property="og:type" content="article" /><meta property="og:title" content="git乱码解决方案汇总" /><meta property="og:url" content="https://gist.github.com/vkyii/1079783" /><meta property="og:description" content="git乱码解决方案汇总. GitHub Gist: instantly share code, notes, and snippets." /><meta property="article:author" content="262588213843476" /><meta property="article:publisher" content="262588213843476" />
+
+  <link rel="assets" href="https://github.githubassets.com/">
+  <link rel="web-socket" href="wss://live.github.com/_sockets/VjI6NDQ0MzM4MjM2OjE0YjdhYzI2NjJmNzViNTlhYTYzZTg4N2E4ZjVkNDgyNjdlZmI2ZWNkNTlkMjczNTdjNDA2MmIwZDAyOGY4NDM=--99593514a49aa1d1520d6bdf48c2a55e7cecef20">
+  <meta name="pjax-timeout" content="1000">
+  <link rel="sudo-modal" href="/sessions/sudo_modal">
+  <meta name="request-id" content="C5DB:7B94:416581:78BD22:5D834135" data-pjax-transient>
+
+
+  
+
+  <meta name="selected-link" value="gist_code" data-pjax-transient>
+
+      <meta name="google-site-verification" content="KT5gs8h0wvaagLKAVWq8bbeNwnZZK1r1XQysX3xurLU">
+    <meta name="google-site-verification" content="ZzhVyEFwb7w3e0-uOTltm8Jsck2F5StVihD0exw2fsA">
+    <meta name="google-site-verification" content="GXs5KoUUkNCoaAZn7wPN-t01Pywp9M3sEjnt_3_ZWPc">
+
+  <meta name="octolytics-host" content="collector.githubapp.com" /><meta name="octolytics-app-id" content="gist" /><meta name="octolytics-event-url" content="https://collector.githubapp.com/github-external/browser_event" /><meta name="octolytics-dimension-request_id" content="C5DB:7B94:416581:78BD22:5D834135" /><meta name="octolytics-dimension-region_edge" content="iad" /><meta name="octolytics-dimension-region_render" content="iad" /><meta name="octolytics-dimension-ga_id" content="" class="js-octo-ga-id" /><meta name="octolytics-dimension-visitor_id" content="5846171092426619139" /><meta name="octolytics-actor-id" content="1357447" /><meta name="octolytics-actor-login" content="gtu001" /><meta name="octolytics-actor-hash" content="dcf44b8074f88e45d881b364d3be8d944fdab7ae1a63d96e565bfcfd2c2a6a1e" />
+<meta name="analytics-location" content="/&lt;user-name&gt;/&lt;gist-id&gt;/3e77453c05f6bcbce133fd0ba128686683f75bf8" data-pjax-transient="true" />
+
+
+
+    <meta name="google-analytics" content="UA-3769691-4">
+
+  <meta class="js-ga-set" name="userId" content="9c4f859045a26ee426aa361021247748">
+
+<meta class="js-ga-set" name="dimension1" content="Logged In">
+
+
+
+    <meta name="octolytics-dimension-public" content="true" /><meta name="octolytics-dimension-gist_id" content="1079783" /><meta name="octolytics-dimension-gist_name" content="1079783" /><meta name="octolytics-dimension-anonymous" content="false" /><meta name="octolytics-dimension-owner_id" content="373150" /><meta name="octolytics-dimension-owner_login" content="vkyii" /><meta name="octolytics-dimension-forked" content="false" />
+
+  <meta
+    class="js-ga-set"
+    name="dimension5"
+    content="public"
+  >
+  <meta
+    class="js-ga-set"
+    name="dimension6"
+    content="owned"
+  >
+  <meta
+    class="js-ga-set"
+    name="dimension7"
+    content="text unknown"
+  >
+
+
+      <meta name="hostname" content="gist.github.com">
+    <meta name="user-login" content="gtu001">
+
+      <meta name="expected-hostname" content="gist.github.com">
+    <meta name="js-proxy-site-detection-payload" content="ZTVlMmY3NjUzOGQ3NTQyMGI1MmEwODRlNGExNGZlZGU5NzM2ZmE4ODhjMjlhMjQ0ZjhkZDMwOWFmY2Y1Y2NkNXx7InJlbW90ZV9hZGRyZXNzIjoiMTIyLjE0Ni44OC43MiIsInJlcXVlc3RfaWQiOiJDNURCOjdCOTQ6NDE2NTgxOjc4QkQyMjo1RDgzNDEzNSIsInRpbWVzdGFtcCI6MTU2ODg4Mjk5OCwiaG9zdCI6ImdpdGh1Yi5jb20ifQ==">
+
+    <meta name="enabled-features" content="ACTIONS_V2_ON_MARKETPLACE,MARKETPLACE_FEATURED_BLOG_POSTS,MARKETPLACE_INVOICED_BILLING,MARKETPLACE_SOCIAL_PROOF_CUSTOMERS,MARKETPLACE_TRENDING_SOCIAL_PROOF,MARKETPLACE_RECOMMENDATIONS,MARKETPLACE_PENDING_INSTALLATIONS,NOTIFY_ON_BLOCK,RELATED_ISSUES,GHE_CLOUD_TRIAL">
+
+  <meta name="html-safe-nonce" content="7cfd5d0606ced89f5510d7e158070bf044e3e221">
+
+  <meta http-equiv="x-pjax-version" content="aa73d24b039d2d811b6c4501e3d9d8f7">
+  
+
+      <link href="/vkyii.atom" rel="alternate" title="atom" type="application/atom+xml">
+
+  <link crossorigin="anonymous" media="all" integrity="sha512-eugfgjBp0ZgIOWm2vVumT2BtsOo+aZto75qwqV3mlYwSC8XIXu6PRH6hh5ms6HN2RbBii0M8cnK9UuJLO3Cyew==" rel="stylesheet" href="https://github.githubassets.com/assets/gist-04c9f30b6b426947b013a993ce8747c8.css" />
+
+
+
+
+  <meta name="browser-stats-url" content="https://api.github.com/_private/browser/stats">
+
+  <meta name="browser-errors-url" content="https://api.github.com/_private/browser/errors">
+
+  <link rel="mask-icon" href="https://github.githubassets.com/pinned-octocat.svg" color="#000000">
+  <link rel="icon" type="image/x-icon" class="js-site-favicon" href="https://github.githubassets.com/favicon.ico">
+
+<meta name="theme-color" content="#1e2327">
+
+
+
+  <meta name="webauthn-auth-enabled" content="true">
+
+  <meta name="webauthn-registration-enabled" content="true">
+
+
+  </head>
+
+  <body class="logged-in env-production min-width-lg">
+    
+
+  <div class="position-relative js-header-wrapper ">
+    <a href="#start-of-content" tabindex="1" class="p-3 bg-blue text-white show-on-focus js-skip-to-content">Skip to content</a>
+    <div id="js-pjax-loader-bar" class="pjax-loader-bar"><div class="progress"></div></div>
+
+    
+    
+    
+
+
+        <div class="Header" role="banner" >
+  <div class="Header-item">
+    <a class="Header-link" data-hotkey="g d" aria-label="Gist Homepage" href="/">
+  <svg class="octicon octicon-mark-github v-align-middle d-none" height="24" viewBox="0 0 16 16" version="1.1" width="24" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+  <svg height="24" class="octicon octicon-logo-github v-align-middle" viewBox="0 0 45 16" version="1.1" width="67" aria-hidden="true"><path fill-rule="evenodd" d="M18.53 12.03h-.02c.009 0 .015.01.024.011h.006l-.01-.01zm.004.011c-.093.001-.327.05-.574.05-.78 0-1.05-.36-1.05-.83V8.13h1.59c.09 0 .16-.08.16-.19v-1.7c0-.09-.08-.17-.16-.17h-1.59V3.96c0-.08-.05-.13-.14-.13h-2.16c-.09 0-.14.05-.14.13v2.17s-1.09.27-1.16.28c-.08.02-.13.09-.13.17v1.36c0 .11.08.19.17.19h1.11v3.28c0 2.44 1.7 2.69 2.86 2.69.53 0 1.17-.17 1.27-.22.06-.02.09-.09.09-.16v-1.5a.177.177 0 0 0-.146-.18zM42.23 9.84c0-1.81-.73-2.05-1.5-1.97-.6.04-1.08.34-1.08.34v3.52s.49.34 1.22.36c1.03.03 1.36-.34 1.36-2.25zm2.43-.16c0 3.43-1.11 4.41-3.05 4.41-1.64 0-2.52-.83-2.52-.83s-.04.46-.09.52c-.03.06-.08.08-.14.08h-1.48c-.1 0-.19-.08-.19-.17l.02-11.11c0-.09.08-.17.17-.17h2.13c.09 0 .17.08.17.17v3.77s.82-.53 2.02-.53l-.01-.02c1.2 0 2.97.45 2.97 3.88zm-8.72-3.61h-2.1c-.11 0-.17.08-.17.19v5.44s-.55.39-1.3.39-.97-.34-.97-1.09V6.25c0-.09-.08-.17-.17-.17h-2.14c-.09 0-.17.08-.17.17v5.11c0 2.2 1.23 2.75 2.92 2.75 1.39 0 2.52-.77 2.52-.77s.05.39.08.45c.02.05.09.09.16.09h1.34c.11 0 .17-.08.17-.17l.02-7.47c0-.09-.08-.17-.19-.17zm-23.7-.01h-2.13c-.09 0-.17.09-.17.2v7.34c0 .2.13.27.3.27h1.92c.2 0 .25-.09.25-.27V6.23c0-.09-.08-.17-.17-.17zm-1.05-3.38c-.77 0-1.38.61-1.38 1.38 0 .77.61 1.38 1.38 1.38.75 0 1.36-.61 1.36-1.38 0-.77-.61-1.38-1.36-1.38zm16.49-.25h-2.11c-.09 0-.17.08-.17.17v4.09h-3.31V2.6c0-.09-.08-.17-.17-.17h-2.13c-.09 0-.17.08-.17.17v11.11c0 .09.09.17.17.17h2.13c.09 0 .17-.08.17-.17V8.96h3.31l-.02 4.75c0 .09.08.17.17.17h2.13c.09 0 .17-.08.17-.17V2.6c0-.09-.08-.17-.17-.17zM8.81 7.35v5.74c0 .04-.01.11-.06.13 0 0-1.25.89-3.31.89-2.49 0-5.44-.78-5.44-5.92S2.58 1.99 5.1 2c2.18 0 3.06.49 3.2.58.04.05.06.09.06.14L7.94 4.5c0 .09-.09.2-.2.17-.36-.11-.9-.33-2.17-.33-1.47 0-3.05.42-3.05 3.73s1.5 3.7 2.58 3.7c.92 0 1.25-.11 1.25-.11v-2.3H4.88c-.11 0-.19-.08-.19-.17V7.35c0-.09.08-.17.19-.17h3.74c.11 0 .19.08.19.17z"/></svg>
+  <svg height="24" class="octicon octicon-logo-gist v-align-middle" viewBox="0 0 25 16" version="1.1" width="37" aria-hidden="true"><path fill-rule="evenodd" d="M4.7 8.73h2.45v4.02c-.55.27-1.64.34-2.53.34-2.56 0-3.47-2.2-3.47-5.05 0-2.85.91-5.06 3.48-5.06 1.28 0 2.06.23 3.28.73V2.66C7.27 2.33 6.25 2 4.63 2 1.13 2 0 4.69 0 8.03c0 3.34 1.11 6.03 4.63 6.03 1.64 0 2.81-.27 3.59-.64V7.73H4.7v1zm6.39 3.72V6.06h-1.05v6.28c0 1.25.58 1.72 1.72 1.72v-.89c-.48 0-.67-.16-.67-.7v-.02zm.25-8.72c0-.44-.33-.78-.78-.78s-.77.34-.77.78.33.78.77.78.78-.34.78-.78zm4.34 5.69c-1.5-.13-1.78-.48-1.78-1.17 0-.77.33-1.34 1.88-1.34 1.05 0 1.66.16 2.27.36v-.94c-.69-.3-1.52-.39-2.25-.39-2.2 0-2.92 1.2-2.92 2.31 0 1.08.47 1.88 2.73 2.08 1.55.13 1.77.63 1.77 1.34 0 .73-.44 1.42-2.06 1.42-1.11 0-1.86-.19-2.33-.36v.94c.5.2 1.58.39 2.33.39 2.38 0 3.14-1.2 3.14-2.41 0-1.28-.53-2.03-2.75-2.23h-.03zm8.58-2.47v-.86h-2.42v-2.5l-1.08.31v2.11l-1.56.44v.48h1.56v5c0 1.53 1.19 2.13 2.5 2.13.19 0 .52-.02.69-.05v-.89c-.19.03-.41.03-.61.03-.97 0-1.5-.39-1.5-1.34V6.94h2.42v.02-.01z"/></svg>
+</a>
+  </div>
+
+
+  <div class="Header-item Header-item--full js-site-search">
+      <div class="header-search mr-3">
+
+<!-- '"` --><!-- </textarea></xmp> --></option></form><form class="position-relative js-quicksearch-form" role="search" aria-label="Site" action="/search" accept-charset="UTF-8" method="get"><input name="utf8" type="hidden" value="&#x2713;" />
+  <div class="header-search-wrapper form-control input-sm js-chromeless-input-container">
+    <input type="text"
+      class="form-control input-sm js-site-search-focus header-search-input js-navigation-enable js-quicksearch-field"
+      data-hotkey="s,/"
+      name="q"
+      aria-label="Search"
+      placeholder="Search…"
+      autocorrect="off"
+      autocomplete="off"
+      autocapitalize="off">
+  </div>
+
+    <div class="gist-quicksearch-results js-quicksearch-results js-navigation-container" data-quicksearch-url="/search/quick"></div>
+</form></div>
+
+
+    <nav aria-label="Global" class="d-flex">
+  <a class="Header-link mr-3" data-ga-click="Header, go to all gists, text:all gists" href="/discover">All gists</a>
+
+  <a class="Header-link mr-3" data-ga-click="Header, go to GitHub, text:Back to GitHub" href="https://github.com">Back to GitHub</a>
+
+
+
+</nav>
+
+  </div>
+
+
+
+
+
+    
+    <div class="Header-item ">
+      <a aria-label="You have unread notifications" class="Header-link notification-indicator position-relative tooltipped tooltipped-s js-socket-channel js-notification-indicator" data-hotkey="g n" data-ga-click="Header, go to notifications, icon:unread" data-channel="notification-changed:1357447" href="https://github.com/notifications">
+        <span class="mail-status unread"></span>
+        <svg class="octicon octicon-bell" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 12v1H0v-1l.73-.58c.77-.77.81-2.55 1.19-4.42C2.69 3.23 6 2 6 2c0-.55.45-1 1-1s1 .45 1 1c0 0 3.39 1.23 4.16 5 .38 1.88.42 3.66 1.19 4.42l.66.58H14zm-7 4c1.11 0 2-.89 2-2H5c0 1.11.89 2 2 2z"/></svg>
+</a>    </div>
+
+
+    <div class="Header-item ">
+      <a class="Header-link" data-ga-click="Header, go to new gist, text:new gist" aria-label="Create new gist" href="/">
+        <svg class="octicon octicon-plus" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 9H7v5H5V9H0V7h5V2h2v5h5v2z"/></svg>
+</a>    </div>
+
+    <div class="Header-item position-relative mr-0" id="user-links">
+
+      <details class="details-overlay details-reset">
+        <summary class="Header-link name"
+          aria-label="View profile and more"
+          data-ga-click="Header, show menu, icon:avatar">
+          <img class="avatar" src="https://avatars1.githubusercontent.com/u/1357447?s=40&amp;v=4" width="20" height="20" alt="@gtu001" />
+          <span class="dropdown-caret"></span>
+        </summary>
+        <details-menu class="dropdown-menu dropdown-menu-sw" style="width: 180px">
+          <div class="css-truncate"><a role="menuitem" class="text-gray-dark  no-underline px-3 pt-2 pb-2 mb-n2 mt-n1 d-block" href="/gtu001" data-ga-click="Header, go to profile, text:Signed in as">Signed in as <strong class="css-truncate-target">gtu001</strong></a></div>
+          <div role="none" class="dropdown-divider"></div>
+          <a role="menuitem" class="dropdown-item" href="/gtu001" data-ga-click="Header, go to your gists, text:your gists">Your gists</a>
+          <a role="menuitem" class="dropdown-item" href="/gtu001/starred" data-ga-click="Header, go to starred gists, text:starred gists">Starred gists</a>
+          <a role="menuitem" class="dropdown-item" href="https://help.github.com" data-ga-click="Header, go to help, text:help">Help</a>
+          <div role="none" class="dropdown-divider"></div>
+          <a role="menuitem" class="dropdown-item" href="https://github.com/gtu001" data-ga-click="Header, go to profile, text:your profile">Your GitHub profile</a>
+          <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="logout-form" action="https://gist.github.com/auth/github/logout" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="QU3D79jlnBnpJ1dKAuTkNNYW97BpD4/TsR52XrOp5k3H04NcBjH9iWharupCrCeDt4Ez3IiK5vFhF0EJt5E+XQ==" />
+            <button type="submit" class="dropdown-item dropdown-signout" data-ga-click="Header, sign out, icon:logout" role="menuitem">
+              Sign out
+            </button>
+</form>        </details-menu>
+      </details>
+    </div>
+</div>
+
+
+
+      
+
+  </div>
+
+  <div id="start-of-content" class="show-on-focus"></div>
+
+
+    <div id="js-flash-container">
+
+</div>
+
+
+
+  <div class="application-main " data-commit-hovercards-enabled>
+        <div itemscope itemtype="http://schema.org/Code">
+    <main id="gist-pjax-container" class="gist-content-wrapper" data-pjax-container>
+      
+
+
+
+
+<div class="gisthead pagehead repohead instapaper_ignore readability-menu experiment-repo-nav pt-3 mb-4">
+  <div class="container-lg px-3">
+    
+  
+
+
+<div class="mb-3 d-flex">
+  <h1 class="public css-truncate float-none flex-auto width-fit pl-0">
+    <a class="avatar mr-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=373150" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vkyii"><img src="https://avatars0.githubusercontent.com/u/373150?s=52&amp;v=4" width="26" height="26" alt="@vkyii" /></a>
+    <span class="author"><a data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=373150" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vkyii">vkyii</a></span><!--
+        --><span class="path-divider">/</span><!--
+        --><strong itemprop="name" class="css-truncate-target" style="max-width: 410px"><a href="/vkyii/1079783">git乱码解决方案汇总.txt</a></strong>
+
+    <div class="d-block text-small text-gray">
+      Created <time-ago datetime="2011-07-13T05:41:00Z">Jul 13, 2011</time-ago>
+        &bull;
+        <a class="text-gray" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783&amp;report=vkyii+%28user%29">Report abuse</a>
+    </div>
+  </h1>
+
+  <ul class="pagehead-actions float-none">
+
+
+      <li>
+          <div class="thread-subscription-status js-socket-channel js-updatable-content"
+  data-replace-remote-form-target
+  data-channel="list-subscription:user:373150:1357447 thread-subscription:1079783:1357447"
+  data-url="/vkyii/1079783/subscription"
+>
+  <svg height="32" class="octicon octicon-radio-tower" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true"><path fill-rule="evenodd" d="M4.79 6.11c.25-.25.25-.67 0-.92-.32-.33-.48-.76-.48-1.19 0-.43.16-.86.48-1.19.25-.26.25-.67 0-.92a.613.613 0 0 0-.45-.19c-.16 0-.33.06-.45.19-.57.58-.85 1.35-.85 2.11 0 .76.29 1.53.85 2.11.25.25.66.25.9 0zM2.33.52a.651.651 0 0 0-.92 0C.48 1.48.01 2.74.01 3.99c0 1.26.47 2.52 1.4 3.48.25.26.66.26.91 0s.25-.68 0-.94c-.68-.7-1.02-1.62-1.02-2.54 0-.92.34-1.84 1.02-2.54a.66.66 0 0 0 .01-.93zm5.69 5.1A1.62 1.62 0 1 0 6.4 4c-.01.89.72 1.62 1.62 1.62zM14.59.53a.628.628 0 0 0-.91 0c-.25.26-.25.68 0 .94.68.7 1.02 1.62 1.02 2.54 0 .92-.34 1.83-1.02 2.54-.25.26-.25.68 0 .94a.651.651 0 0 0 .92 0c.93-.96 1.4-2.22 1.4-3.48A5.048 5.048 0 0 0 14.59.53zM8.02 6.92c-.41 0-.83-.1-1.2-.3l-3.15 8.37h1.49l.86-1h4l.84 1h1.49L9.21 6.62c-.38.2-.78.3-1.19.3zm-.01.48L9.02 11h-2l.99-3.6zm-1.99 5.59l1-1h2l1 1h-4zm5.19-11.1c-.25.25-.25.67 0 .92.32.33.48.76.48 1.19 0 .43-.16.86-.48 1.19-.25.26-.25.67 0 .92a.63.63 0 0 0 .9 0c.57-.58.85-1.35.85-2.11 0-.76-.28-1.53-.85-2.11a.634.634 0 0 0-.9 0z"/></svg>
+  <!-- '"` --><!-- </textarea></xmp> --></option></form><form data-replace-remote-form="true" class="thread-subscribe-form" action="/vkyii/1079783/subscribe" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="+saSoujOTeMrguct2bPMydmSyTMrYnfByBieKN3gCkqg8NPfhuLbzoxfdX6ro2VfDeDCqtc8uxKXwYW8mxz+sQ==" />    <input type="hidden" name="repository_id" value="373150">
+    <input type="hidden" name="thread_id" value="1079783">
+    <input type="hidden" name="thread_class" value="Gist">
+    <input type="hidden" name="id" value="subscribe">
+    <button type="submit" class="btn btn-block btn-sm" data-disable-with >
+      <svg class="octicon octicon-unmute" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 8.02c0 1.09-.45 2.09-1.17 2.83l-.67-.67c.55-.56.89-1.31.89-2.16 0-.85-.34-1.61-.89-2.16l.67-.67A3.99 3.99 0 0 1 12 8.02zM7.72 2.28L4 6H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h2l3.72 3.72c.47.47 1.28.14 1.28-.53V2.81c0-.67-.81-1-1.28-.53zm5.94.08l-.67.67a6.996 6.996 0 0 1 2.06 4.98c0 1.94-.78 3.7-2.06 4.98l.67.67A7.973 7.973 0 0 0 16 8c0-2.22-.89-4.22-2.34-5.66v.02zm-1.41 1.41l-.69.67a5.05 5.05 0 0 1 1.48 3.58c0 1.39-.56 2.66-1.48 3.56l.69.67A5.971 5.971 0 0 0 14 8.02c0-1.65-.67-3.16-1.75-4.25z"/></svg> Subscribe
+    </button>
+</form></div>
+
+      </li>
+
+    <li>
+          <div class="js-toggler-container js-social-container starring-container ">
+    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="starred js-social-form" action="/vkyii/1079783/unstar" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="pD2mR02fxt+MTsnyidmzKfj0cC8M03hju9GGGpUI8sn8eJgXtamcwC7VoUMNCuQgTK1W/IVFzw8KN4ug25VW2A==" />
+      <input type="hidden" name="context" value="gist"></input>
+      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this gist" title="Unstar vkyii/1079783" data-ga-click="Repository, click unstar button, action:gists/gists#show; text:Unstar">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
+        Unstar
+</button>        <a class="social-count js-social-count" href="/vkyii/1079783/stargazers"
+           aria-label="113 users starred this repository">
+           113
+        </a>
+</form>
+    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="unstarred js-social-form" action="/vkyii/1079783/star" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="Q40iiYgqA+OAkRqIIE48U4Il/fOXBDyPmJ0QakTe1hqRbXBrIfNQS/pKMWQU5Aoe1rUbk2Bebc6yjNwO/HVFVw==" />
+      <input type="hidden" name="context" value="gist"></input>
+      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this gist" title="Star vkyii/1079783" data-ga-click="Repository, click star button, action:gists/gists#show; text:Star">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
+        Star
+</button>        <a class="social-count js-social-count" href="/vkyii/1079783/stargazers"
+           aria-label="113 users starred this repository">
+          113
+        </a>
+</form>  </div>
+
+
+    </li>
+
+      <li>
+          <!-- '"` --><!-- </textarea></xmp> --></option></form><form action="/vkyii/1079783/fork" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="vI21JIpU7dhuA4/ggSuyoZ3LOG+XsStMV+YMbCO6L4Js0GOnPaIXlabD+QeposT6dsOc04DRvdX4JSMc4hsUnQ==" />
+    <button class="btn btn-sm btn-with-count" type="submit">
+      <svg class="octicon octicon-repo-forked" viewBox="0 0 10 16" version="1.1" width="10" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 1a1.993 1.993 0 0 0-1 3.72V6L5 8 3 6V4.72A1.993 1.993 0 0 0 2 1a1.993 1.993 0 0 0-1 3.72V6.5l3 3v1.78A1.993 1.993 0 0 0 5 15a1.993 1.993 0 0 0 1-3.72V9.5l3-3V4.72A1.993 1.993 0 0 0 8 1zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3 10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm3-10c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"/></svg>
+      Fork
+    </button>
+      <a class="social-count js-social-count"
+        href="/vkyii/1079783/forks"
+        aria-label="64 users forked this gist">
+        64
+      </a>
+</form>
+      </li>
+  </ul>
+
+</div>
+
+<div class="d-flex">
+  <div class="flex-auto">
+    <nav class="reponav js-repo-nav js-sidenav-container-pjax"
+     aria-label="Gist"
+     data-pjax="#gist-pjax-container">
+
+  <a class="js-selected-navigation-item selected reponav-item" data-pjax="true" data-hotkey="g c" aria-current="page" data-selected-links="gist_code /vkyii/1079783" href="/vkyii/1079783">
+    <svg class="octicon octicon-code" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg>
+    Code
+</a>
+    <a class="js-selected-navigation-item reponav-item" data-pjax="true" data-hotkey="g r" data-selected-links="gist_revisions /vkyii/1079783/revisions" href="/vkyii/1079783/revisions">
+      <svg class="octicon octicon-git-commit" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"/></svg>
+      Revisions
+      <span class="Counter">4</span>
+</a>
+    <a class="js-selected-navigation-item reponav-item" data-pjax="true" data-hotkey="g s" data-selected-links="gist_stars /vkyii/1079783/stargazers" href="/vkyii/1079783/stargazers">
+      <svg class="octicon octicon-star" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
+      Stars
+      <span class="Counter">113</span>
+</a>
+    <a class="js-selected-navigation-item reponav-item" data-pjax="true" data-hotkey="g f" data-selected-links="gist_forks /vkyii/1079783/forks" href="/vkyii/1079783/forks">
+      <svg class="octicon octicon-git-branch" viewBox="0 0 10 16" version="1.1" width="10" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M10 5c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v.3c-.02.52-.23.98-.63 1.38-.4.4-.86.61-1.38.63-.83.02-1.48.16-2 .45V4.72a1.993 1.993 0 0 0-1-3.72C.88 1 0 1.89 0 3a2 2 0 0 0 1 1.72v6.56c-.59.35-1 .99-1 1.72 0 1.11.89 2 2 2 1.11 0 2-.89 2-2 0-.53-.2-1-.53-1.36.09-.06.48-.41.59-.47.25-.11.56-.17.94-.17 1.05-.05 1.95-.45 2.75-1.25S8.95 7.77 9 6.73h-.02C9.59 6.37 10 5.73 10 5zM2 1.8c.66 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2C1.35 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2zm0 12.41c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm6-8c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"/></svg>
+      Forks
+      <span class="Counter">64</span>
+</a></nav>
+
+  </div>
+
+  <div class="file-navigation-options" data-multiple>
+
+    <div class="file-navigation-option v-align-middle">
+
+  <div class="input-group">
+    <div class="input-group-button">
+      <details class="details-reset details-overlay select-menu">
+        <summary class="btn btn-sm select-menu-button" data-ga-click="Repository, clone Embed, location:repo overview">
+          <span data-menu-button>Embed</span>
+        </summary>
+        <details-menu
+          class="select-menu-modal position-absolute"
+          data-menu-input="gist-share-url"
+          style="z-index: 99;" aria-label="Clone options">
+          <div class="select-menu-header">
+            <span class="select-menu-title">What would you like to do?</span>
+          </div>
+          <div class="select-menu-list">
+              <button name="button" type="button" class="select-menu-item width-full" aria-checked="true" role="menuitemradio" value="&lt;script src=&quot;https://gist.github.com/vkyii/1079783.js&quot;&gt;&lt;/script&gt;" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;EMBED&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="ad79d692cba74eed1b1234097017e86a68e34955325469feb762588517c01647">
+                <svg class="octicon octicon-check select-menu-item-icon" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/></svg>
+                <div class="select-menu-item-text">
+                  <span class="select-menu-item-heading" data-menu-button-text>
+                    
+                    Embed
+                  </span>
+                    <span class="description">
+                      Embed this gist in your website.
+                    </span>
+                </div>
+</button>              <button name="button" type="button" class="select-menu-item width-full" aria-checked="false" role="menuitemradio" value="https://gist.github.com/vkyii/1079783" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;SHARE&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="ac5ca873588d927d38db58e4abfac8e8718da972a101edb48a43bdc661e22e67">
+                <svg class="octicon octicon-check select-menu-item-icon" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/></svg>
+                <div class="select-menu-item-text">
+                  <span class="select-menu-item-heading" data-menu-button-text>
+                    
+                    Share
+                  </span>
+                    <span class="description">
+                      Copy sharable link for this gist.
+                    </span>
+                </div>
+</button>              <button name="button" type="button" class="select-menu-item width-full" aria-checked="false" role="menuitemradio" value="https://gist.github.com/1079783.git" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;USE_HTTPS&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="6fa3ff327c70eaad3ae5b28281a86c0212555a92d975a6f7f98c1f5e0a76363b">
+                <svg class="octicon octicon-check select-menu-item-icon" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/></svg>
+                <div class="select-menu-item-text">
+                  <span class="select-menu-item-heading" data-menu-button-text>
+                    Clone via
+                    HTTPS
+                  </span>
+                    <span class="description">
+                      Clone with Git or checkout with SVN using the repository’s web address.
+                    </span>
+                </div>
+</button>              <button name="button" type="button" class="select-menu-item width-full" aria-checked="false" role="menuitemradio" value="git@gist.github.com:1079783.git" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;USE_SSH&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="240994f440fd6a894a6dcb87d793b6dfe20e0a522a3851b47d2c00fee82e2f86">
+                <svg class="octicon octicon-check select-menu-item-icon" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5L12 5z"/></svg>
+                <div class="select-menu-item-text">
+                  <span class="select-menu-item-heading" data-menu-button-text>
+                    Clone via
+                    SSH
+                  </span>
+                    <span class="description">
+                      Clone with an SSH key and passphrase from your GitHub settings.
+                    </span>
+                </div>
+</button>          </div>
+          <div class="select-menu-list">
+            <a role="menuitem" class="select-menu-item select-menu-action" href="https://help.github.com/articles/which-remote-url-should-i-use" target="_blank">
+              <svg class="octicon octicon-question select-menu-item-icon" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6 10h2v2H6v-2zm4-3.5C10 8.64 8 9 8 9H6c0-.55.45-1 1-1h.5c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5h-1c-.28 0-.5.22-.5.5V7H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7z"/></svg>
+              <div class="select-menu-item-text">
+                Learn more about clone URLs
+              </div>
+            </a>
+          </div>
+        </details-menu>
+      </details>
+    </div>
+
+    <input
+      id="gist-share-url"
+      type="text"
+      data-autoselect
+      class="form-control input-monospace input-sm"
+      value="&lt;script src=&quot;https://gist.github.com/vkyii/1079783.js&quot;&gt;&lt;/script&gt;"
+      aria-label="Clone this repository at &lt;script src=&quot;https://gist.github.com/vkyii/1079783.js&quot;&gt;&lt;/script&gt;"
+      readonly>
+
+    <div class="input-group-button">
+      <clipboard-copy for="gist-share-url" aria-label="Copy to clipboard" class="btn btn-sm zeroclipboard-button" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;COPY_URL&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="0307db64706332ccef3408806512ae2cea2eb663976a51cdc6532589510ad4c3"><svg class="octicon octicon-clippy" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"/></svg></clipboard-copy>
+    </div>
+  </div>
+</div>
+
+
+    <div class="file-navigation-option">
+    <a class="btn btn-sm tooltipped tooltipped-s tooltipped-multiline" aria-label="Save vkyii/1079783 to your computer and use it in GitHub Desktop." data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;OPEN_IN_DESKTOP&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="641b298bd2a9813cdda807f6ec41bd2477a5c563a4c70f5f0c9b39610c462724" href="github-windows://openRepo/https://gist.github.com/1079783"><svg class="octicon octicon-desktop-download" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 6h3V0h2v6h3l-4 4-4-4zm11-4h-4v1h4v8H1V3h4V2H1c-.55 0-1 .45-1 1v9c0 .55.45 1 1 1h5.34c-.25.61-.86 1.39-2.34 2h8c-1.48-.61-2.09-1.39-2.34-2H15c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1z"/></svg></a>
+</div>
+
+
+    <div class="file-navigation-option">
+      <a class="btn btn-sm" rel="nofollow" data-hydro-click="{&quot;event_type&quot;:&quot;clone_or_download.click&quot;,&quot;payload&quot;:{&quot;feature_clicked&quot;:&quot;DOWNLOAD_ZIP&quot;,&quot;git_repository_type&quot;:&quot;GIST&quot;,&quot;gist_id&quot;:1079783,&quot;client_id&quot;:&quot;1361167778.1547630851&quot;,&quot;originating_request_id&quot;:&quot;C5DB:7B94:416581:78BD22:5D834135&quot;,&quot;originating_url&quot;:&quot;https://gist.github.com/vkyii/1079783/3e77453c05f6bcbce133fd0ba128686683f75bf8&quot;,&quot;referrer&quot;:&quot;https://www.google.com/&quot;,&quot;user_id&quot;:1357447}}" data-hydro-click-hmac="cbe4d66be68b09b9b708085793e8a0f1d62f810ed1ac9c75b9fca9dcad0f8016" data-ga-click="Gist, download zip, location:gist overview" href="/vkyii/1079783/archive/3e77453c05f6bcbce133fd0ba128686683f75bf8.zip">Download ZIP</a>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+<div class="container-lg px-3 new-discussion-timeline experiment-repo-nav">
+  <div class="repository-content gist-content">
+    
+  <div>
+      <div itemprop="about">
+    git乱码解决方案汇总
+  </div>
+
+
+        <div class="js-gist-file-update-container js-task-list-container file-box">
+  <div id="file-gistfile1-txt" class="file">
+      <div class="file-header">
+        <div class="file-actions">
+
+          <a class="btn btn-sm " href="/vkyii/1079783/raw/3e77453c05f6bcbce133fd0ba128686683f75bf8/gistfile1.txt">Raw</a>
+        </div>
+        <div class="file-info">
+          <span class="icon">
+            <svg class="octicon octicon-gist" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.5 5L10 7.5 7.5 10l-.75-.75L8.5 7.5 6.75 5.75 7.5 5zm-3 0L2 7.5 4.5 10l.75-.75L3.5 7.5l1.75-1.75L4.5 5zM0 13V2c0-.55.45-1 1-1h10c.55 0 1 .45 1 1v11c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1zm1 0h10V2H1v11z"/></svg>
+          </span>
+          <a class="css-truncate" href="#file-gistfile1-txt">
+            <strong class="user-select-contain gist-blob-name css-truncate-target">
+              gistfile1.txt
+            </strong>
+          </a>
+        </div>
+      </div>
+    
+
+  <div itemprop="text" class="Box-body p-0 blob-wrapper data type-text ">
+      
+<table class="highlight tab-size js-file-line-container" data-tab-size="8">
+      <tr>
+        <td id="file-gistfile1-txt-L1" class="blob-num js-line-number" data-line-number="1"></td>
+        <td id="file-gistfile1-txt-LC1" class="blob-code blob-code-inner js-file-line">原帖地址: http://topic.csdn.net/u/20110113/19/b0d5d506-4307-428b-a61d-7974aa66a2da.html</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L2" class="blob-num js-line-number" data-line-number="2"></td>
+        <td id="file-gistfile1-txt-LC2" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L3" class="blob-num js-line-number" data-line-number="3"></td>
+        <td id="file-gistfile1-txt-LC3" class="blob-code blob-code-inner js-file-line">首先要说明的是：这里介绍的方法都是大部分是本人“悟”出来的，所以网上难有流传！</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L4" class="blob-num js-line-number" data-line-number="4"></td>
+        <td id="file-gistfile1-txt-LC4" class="blob-code blob-code-inner js-file-line">好方法不能自己私藏，否则就白忙乎这几天了，分享给有需要的朋友们。如果有转载，敬请注明来自*CSDN老邓*作品。</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L5" class="blob-num js-line-number" data-line-number="5"></td>
+        <td id="file-gistfile1-txt-LC5" class="blob-code blob-code-inner js-file-line">呵呵，给自己打广告，实在是无耻之极，权当无聊之时打字之用。</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L6" class="blob-num js-line-number" data-line-number="6"></td>
+        <td id="file-gistfile1-txt-LC6" class="blob-code blob-code-inner js-file-line">欢迎流传，为最优秀的分布式版本管理系统Git做宣传！！</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L7" class="blob-num js-line-number" data-line-number="7"></td>
+        <td id="file-gistfile1-txt-LC7" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L8" class="blob-num js-line-number" data-line-number="8"></td>
+        <td id="file-gistfile1-txt-LC8" class="blob-code blob-code-inner js-file-line">步骤：</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L9" class="blob-num js-line-number" data-line-number="9"></td>
+        <td id="file-gistfile1-txt-LC9" class="blob-code blob-code-inner js-file-line">1. 下载：http://loaden.googlecode.com/files/gitconfig.7z</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L10" class="blob-num js-line-number" data-line-number="10"></td>
+        <td id="file-gistfile1-txt-LC10" class="blob-code blob-code-inner js-file-line">2. 解压到：&lt;MsysGit安装目录&gt;/cmd/，例如：D:\Program Files\Git\cmd</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L11" class="blob-num js-line-number" data-line-number="11"></td>
+        <td id="file-gistfile1-txt-LC11" class="blob-code blob-code-inner js-file-line">3. 进入Bash，执行gitconfig</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L12" class="blob-num js-line-number" data-line-number="12"></td>
+        <td id="file-gistfile1-txt-LC12" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L13" class="blob-num js-line-number" data-line-number="13"></td>
+        <td id="file-gistfile1-txt-LC13" class="blob-code blob-code-inner js-file-line">搞定什么了？</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L14" class="blob-num js-line-number" data-line-number="14"></td>
+        <td id="file-gistfile1-txt-LC14" class="blob-code blob-code-inner js-file-line">看看gitconfig的内容先：</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L15" class="blob-num js-line-number" data-line-number="15"></td>
+        <td id="file-gistfile1-txt-LC15" class="blob-code blob-code-inner js-file-line">Perl code</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L16" class="blob-num js-line-number" data-line-number="16"></td>
+        <td id="file-gistfile1-txt-LC16" class="blob-code blob-code-inner js-file-line">#!/bin/sh</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L17" class="blob-num js-line-number" data-line-number="17"></td>
+        <td id="file-gistfile1-txt-LC17" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L18" class="blob-num js-line-number" data-line-number="18"></td>
+        <td id="file-gistfile1-txt-LC18" class="blob-code blob-code-inner js-file-line"># 全局提交用户名与邮箱</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L19" class="blob-num js-line-number" data-line-number="19"></td>
+        <td id="file-gistfile1-txt-LC19" class="blob-code blob-code-inner js-file-line">git config --global user.name &quot;Yuchen Deng&quot;</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L20" class="blob-num js-line-number" data-line-number="20"></td>
+        <td id="file-gistfile1-txt-LC20" class="blob-code blob-code-inner js-file-line">git config --global user.email 邮箱名@gmail.com</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L21" class="blob-num js-line-number" data-line-number="21"></td>
+        <td id="file-gistfile1-txt-LC21" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L22" class="blob-num js-line-number" data-line-number="22"></td>
+        <td id="file-gistfile1-txt-LC22" class="blob-code blob-code-inner js-file-line"># 中文编码支持</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L23" class="blob-num js-line-number" data-line-number="23"></td>
+        <td id="file-gistfile1-txt-LC23" class="blob-code blob-code-inner js-file-line">echo &quot;export LESSCHARSET=utf-8&quot; &gt; $HOME/.profile</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L24" class="blob-num js-line-number" data-line-number="24"></td>
+        <td id="file-gistfile1-txt-LC24" class="blob-code blob-code-inner js-file-line">git config --global gui.encoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L25" class="blob-num js-line-number" data-line-number="25"></td>
+        <td id="file-gistfile1-txt-LC25" class="blob-code blob-code-inner js-file-line">git config --global i18n.commitencoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L26" class="blob-num js-line-number" data-line-number="26"></td>
+        <td id="file-gistfile1-txt-LC26" class="blob-code blob-code-inner js-file-line">git config --global i18n.logoutputencoding gbk</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L27" class="blob-num js-line-number" data-line-number="27"></td>
+        <td id="file-gistfile1-txt-LC27" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L28" class="blob-num js-line-number" data-line-number="28"></td>
+        <td id="file-gistfile1-txt-LC28" class="blob-code blob-code-inner js-file-line"># 全局编辑器，提交时将COMMIT_EDITMSG编码转换成UTF-8可避免乱码</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L29" class="blob-num js-line-number" data-line-number="29"></td>
+        <td id="file-gistfile1-txt-LC29" class="blob-code blob-code-inner js-file-line">git config --global core.editor notepad2</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L30" class="blob-num js-line-number" data-line-number="30"></td>
+        <td id="file-gistfile1-txt-LC30" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L31" class="blob-num js-line-number" data-line-number="31"></td>
+        <td id="file-gistfile1-txt-LC31" class="blob-code blob-code-inner js-file-line"># 差异工具配置</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L32" class="blob-num js-line-number" data-line-number="32"></td>
+        <td id="file-gistfile1-txt-LC32" class="blob-code blob-code-inner js-file-line">git config --global diff.external git-diff-wrapper.sh</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L33" class="blob-num js-line-number" data-line-number="33"></td>
+        <td id="file-gistfile1-txt-LC33" class="blob-code blob-code-inner js-file-line">git config --global diff.tool tortoise</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L34" class="blob-num js-line-number" data-line-number="34"></td>
+        <td id="file-gistfile1-txt-LC34" class="blob-code blob-code-inner js-file-line">git config --global difftool.tortoise.cmd &#39;TortoiseMerge -base:&quot;$LOCAL&quot; -theirs:&quot;$REMOTE&quot;&#39;</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L35" class="blob-num js-line-number" data-line-number="35"></td>
+        <td id="file-gistfile1-txt-LC35" class="blob-code blob-code-inner js-file-line">git config --global difftool.prompt false</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L36" class="blob-num js-line-number" data-line-number="36"></td>
+        <td id="file-gistfile1-txt-LC36" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L37" class="blob-num js-line-number" data-line-number="37"></td>
+        <td id="file-gistfile1-txt-LC37" class="blob-code blob-code-inner js-file-line"># 合并工具配置</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L38" class="blob-num js-line-number" data-line-number="38"></td>
+        <td id="file-gistfile1-txt-LC38" class="blob-code blob-code-inner js-file-line">git config --global merge.tool tortoise</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L39" class="blob-num js-line-number" data-line-number="39"></td>
+        <td id="file-gistfile1-txt-LC39" class="blob-code blob-code-inner js-file-line">git config --global mergetool.tortoise.cmd &#39;TortoiseMerge -base:&quot;$BASE&quot; -theirs:&quot;$REMOTE&quot; -mine:&quot;$LOCAL&quot; -merged:&quot;$MERGED&quot;&#39;</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L40" class="blob-num js-line-number" data-line-number="40"></td>
+        <td id="file-gistfile1-txt-LC40" class="blob-code blob-code-inner js-file-line">git config --global mergetool.prompt false</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L41" class="blob-num js-line-number" data-line-number="41"></td>
+        <td id="file-gistfile1-txt-LC41" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L42" class="blob-num js-line-number" data-line-number="42"></td>
+        <td id="file-gistfile1-txt-LC42" class="blob-code blob-code-inner js-file-line"># 别名设置</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L43" class="blob-num js-line-number" data-line-number="43"></td>
+        <td id="file-gistfile1-txt-LC43" class="blob-code blob-code-inner js-file-line">git config --global alias.dt difftool</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L44" class="blob-num js-line-number" data-line-number="44"></td>
+        <td id="file-gistfile1-txt-LC44" class="blob-code blob-code-inner js-file-line">git config --global alias.mt mergetool</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L45" class="blob-num js-line-number" data-line-number="45"></td>
+        <td id="file-gistfile1-txt-LC45" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L46" class="blob-num js-line-number" data-line-number="46"></td>
+        <td id="file-gistfile1-txt-LC46" class="blob-code blob-code-inner js-file-line"># 取消 $ git gui 的中文界面，改用英文界面更易懂</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L47" class="blob-num js-line-number" data-line-number="47"></td>
+        <td id="file-gistfile1-txt-LC47" class="blob-code blob-code-inner js-file-line">if [ -f &quot;/share/git-gui/lib/msgs/zh_cn.msg&quot; ]; then</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L48" class="blob-num js-line-number" data-line-number="48"></td>
+        <td id="file-gistfile1-txt-LC48" class="blob-code blob-code-inner js-file-line">rm /share/git-gui/lib/msgs/zh_cn.msg</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L49" class="blob-num js-line-number" data-line-number="49"></td>
+        <td id="file-gistfile1-txt-LC49" class="blob-code blob-code-inner js-file-line">fi</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L50" class="blob-num js-line-number" data-line-number="50"></td>
+        <td id="file-gistfile1-txt-LC50" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L51" class="blob-num js-line-number" data-line-number="51"></td>
+        <td id="file-gistfile1-txt-LC51" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L52" class="blob-num js-line-number" data-line-number="52"></td>
+        <td id="file-gistfile1-txt-LC52" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L53" class="blob-num js-line-number" data-line-number="53"></td>
+        <td id="file-gistfile1-txt-LC53" class="blob-code blob-code-inner js-file-line">这个脚本解决了：</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L54" class="blob-num js-line-number" data-line-number="54"></td>
+        <td id="file-gistfile1-txt-LC54" class="blob-code blob-code-inner js-file-line">1. 中文乱码</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L55" class="blob-num js-line-number" data-line-number="55"></td>
+        <td id="file-gistfile1-txt-LC55" class="blob-code blob-code-inner js-file-line">2. 图形化Diff/Merge</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L56" class="blob-num js-line-number" data-line-number="56"></td>
+        <td id="file-gistfile1-txt-LC56" class="blob-code blob-code-inner js-file-line">3. 还原英文界面，更好懂</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L57" class="blob-num js-line-number" data-line-number="57"></td>
+        <td id="file-gistfile1-txt-LC57" class="blob-code blob-code-inner js-file-line">其中最有价值的，就是Git的Diff/Merge外部工具TortoiseMerge配置。</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L58" class="blob-num js-line-number" data-line-number="58"></td>
+        <td id="file-gistfile1-txt-LC58" class="blob-code blob-code-inner js-file-line">安装MsysGit后，一个命令即可完成配置。</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L59" class="blob-num js-line-number" data-line-number="59"></td>
+        <td id="file-gistfile1-txt-LC59" class="blob-code blob-code-inner js-file-line">适用于MsysGit安装版与绿色版。</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L60" class="blob-num js-line-number" data-line-number="60"></td>
+        <td id="file-gistfile1-txt-LC60" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L61" class="blob-num js-line-number" data-line-number="61"></td>
+        <td id="file-gistfile1-txt-LC61" class="blob-code blob-code-inner js-file-line">网上关于为Git配置TortoiseMerge来进行diff和merge的介绍几乎没有（反正我没有搜索到），但我认为TortoiseMerge是最好用的，单文件（一个可执行程序，绿色版，下载地址：http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/TortoiseDiff-1.6.7.zip/download)，实在是绝配！</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L62" class="blob-num js-line-number" data-line-number="62"></td>
+        <td id="file-gistfile1-txt-LC62" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L63" class="blob-num js-line-number" data-line-number="63"></td>
+        <td id="file-gistfile1-txt-LC63" class="blob-code blob-code-inner js-file-line">为什么不使用TortoiseGit？他们不是集成了TortoiseMerge吗？</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L64" class="blob-num js-line-number" data-line-number="64"></td>
+        <td id="file-gistfile1-txt-LC64" class="blob-code blob-code-inner js-file-line">理由：TortoiseGit只有Windows才有，我更喜欢git gui，结合gitk，跨平台实在相同的操作方式，更爽！</td>
+      </tr>
+      <tr>
+        <td id="file-gistfile1-txt-L65" class="blob-num js-line-number" data-line-number="65"></td>
+        <td id="file-gistfile1-txt-LC65" class="blob-code blob-code-inner js-file-line">如果您离不开TortoiseGit，这篇文章就直接无视吧。</td>
+      </tr>
+</table>
+
+
+  </div>
+
+  </div>
+</div>
+
+        <div class="js-gist-file-update-container js-task-list-container file-box">
+  <div id="file-git" class="file">
+      <div class="file-header">
+        <div class="file-actions">
+
+          <a class="btn btn-sm " href="/vkyii/1079783/raw/3e77453c05f6bcbce133fd0ba128686683f75bf8/git%25E4%25B9%25B1%25E7%25A0%2581%25E8%25A7%25A3%25E5%2586%25B3%25E6%2596%25B9%25E6%25A1%2588%25E6%25B1%2587%25E6%2580%25BB">Raw</a>
+        </div>
+        <div class="file-info">
+          <span class="icon">
+            <svg class="octicon octicon-gist" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.5 5L10 7.5 7.5 10l-.75-.75L8.5 7.5 6.75 5.75 7.5 5zm-3 0L2 7.5 4.5 10l.75-.75L3.5 7.5l1.75-1.75L4.5 5zM0 13V2c0-.55.45-1 1-1h10c.55 0 1 .45 1 1v11c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1zm1 0h10V2H1v11z"/></svg>
+          </span>
+          <a class="css-truncate" href="#file-git">
+            <strong class="user-select-contain gist-blob-name css-truncate-target">
+              git乱码解决方案汇总
+            </strong>
+          </a>
+        </div>
+      </div>
+    
+
+  <div itemprop="text" class="Box-body p-0 blob-wrapper data type-text ">
+      
+<table class="highlight tab-size js-file-line-container" data-tab-size="8">
+      <tr>
+        <td id="file-git-L1" class="blob-num js-line-number" data-line-number="1"></td>
+        <td id="file-git-LC1" class="blob-code blob-code-inner js-file-line">git乱码解决方案汇总 http://zengrong.net/post/1249.htm</td>
+      </tr>
+      <tr>
+        <td id="file-git-L2" class="blob-num js-line-number" data-line-number="2"></td>
+        <td id="file-git-LC2" class="blob-code blob-code-inner js-file-line">本站原创文章，转载请注明： 转载自zrong&#39;s Blog，原文 git乱码解决方案汇总，欢迎使用文章源码进行转载。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L3" class="blob-num js-line-number" data-line-number="3"></td>
+        <td id="file-git-LC3" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L4" class="blob-num js-line-number" data-line-number="4"></td>
+        <td id="file-git-LC4" class="blob-code blob-code-inner js-file-line">本站转载文章会标明[转]，转载请注明原始作者文章地址。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L5" class="blob-num js-line-number" data-line-number="5"></td>
+        <td id="file-git-LC5" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L6" class="blob-num js-line-number" data-line-number="6"></td>
+        <td id="file-git-LC6" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L7" class="blob-num js-line-number" data-line-number="7"></td>
+        <td id="file-git-LC7" class="blob-code blob-code-inner js-file-line">我一直是在cygwin下使用git，辅以TortoiseGit。使用上没什么问题，但今天在处理一个有中文文件名的项目时却出现文件名乱码的问题。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L8" class="blob-num js-line-number" data-line-number="8"></td>
+        <td id="file-git-LC8" class="blob-code blob-code-inner js-file-line">情况是这样的：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L9" class="blob-num js-line-number" data-line-number="9"></td>
+        <td id="file-git-LC9" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L10" class="blob-num js-line-number" data-line-number="10"></td>
+        <td id="file-git-LC10" class="blob-code blob-code-inner js-file-line">在一个使用cygwin的bash提交的git项目中，已经完成了所有的提交，但使用TortoiseGit查看的时候，却发现仍有文件没有提交，甚至是有文件还处于未暂存的状态。于是使用TortoiseGit提交；</td>
+      </tr>
+      <tr>
+        <td id="file-git-L11" class="blob-num js-line-number" data-line-number="11"></td>
+        <td id="file-git-LC11" class="blob-code blob-code-inner js-file-line">再次用cygwin下的git status查看，这次又发现了未提交的情况。再次用git commit命令行提交；</td>
+      </tr>
+      <tr>
+        <td id="file-git-L12" class="blob-num js-line-number" data-line-number="12"></td>
+        <td id="file-git-LC12" class="blob-code blob-code-inner js-file-line">回到TortoiseGit下查看，问题又出现了！此时准备返回两次提交前的版本，却因为文件名乱码的问题，无法返回了！</td>
+      </tr>
+      <tr>
+        <td id="file-git-L13" class="blob-num js-line-number" data-line-number="13"></td>
+        <td id="file-git-LC13" class="blob-code blob-code-inner js-file-line">搜索一番，发现git文件名、log乱码，是普遍问题，这其中有编码的原因，也有跨平台的原因。因为git是从linux移植过来，默认采用UTF-8编码。而Windows默认使用UTF-16编码来保存文件名，应该就是这些不同的处理方式造成了乱码。下面是解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L14" class="blob-num js-line-number" data-line-number="14"></td>
+        <td id="file-git-LC14" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L15" class="blob-num js-line-number" data-line-number="15"></td>
+        <td id="file-git-LC15" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L16" class="blob-num js-line-number" data-line-number="16"></td>
+        <td id="file-git-LC16" class="blob-code blob-code-inner js-file-line">乱码情景1</td>
+      </tr>
+      <tr>
+        <td id="file-git-L17" class="blob-num js-line-number" data-line-number="17"></td>
+        <td id="file-git-LC17" class="blob-code blob-code-inner js-file-line">在cygwin中，使用git add添加要提交的文件的时候，如果文件名是中文，会显示形如274\232\350\256\256\346\200\273\347\273\223.png的乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L18" class="blob-num js-line-number" data-line-number="18"></td>
+        <td id="file-git-LC18" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L19" class="blob-num js-line-number" data-line-number="19"></td>
+        <td id="file-git-LC19" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L20" class="blob-num js-line-number" data-line-number="20"></td>
+        <td id="file-git-LC20" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L21" class="blob-num js-line-number" data-line-number="21"></td>
+        <td id="file-git-LC21" class="blob-code blob-code-inner js-file-line">在bash提示符下输入：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L22" class="blob-num js-line-number" data-line-number="22"></td>
+        <td id="file-git-LC22" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L23" class="blob-num js-line-number" data-line-number="23"></td>
+        <td id="file-git-LC23" class="blob-code blob-code-inner js-file-line">git config –global core.quotepath false</td>
+      </tr>
+      <tr>
+        <td id="file-git-L24" class="blob-num js-line-number" data-line-number="24"></td>
+        <td id="file-git-LC24" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L25" class="blob-num js-line-number" data-line-number="25"></td>
+        <td id="file-git-LC25" class="blob-code blob-code-inner js-file-line">ore.quotepath设为false的话，就不会对0×80以上的字符进行quote。中文显示正常。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L26" class="blob-num js-line-number" data-line-number="26"></td>
+        <td id="file-git-LC26" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L27" class="blob-num js-line-number" data-line-number="27"></td>
+        <td id="file-git-LC27" class="blob-code blob-code-inner js-file-line">乱码情景2</td>
+      </tr>
+      <tr>
+        <td id="file-git-L28" class="blob-num js-line-number" data-line-number="28"></td>
+        <td id="file-git-LC28" class="blob-code blob-code-inner js-file-line">在MsysGit中，使用git log显示提交的中文log乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L29" class="blob-num js-line-number" data-line-number="29"></td>
+        <td id="file-git-LC29" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L30" class="blob-num js-line-number" data-line-number="30"></td>
+        <td id="file-git-LC30" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L31" class="blob-num js-line-number" data-line-number="31"></td>
+        <td id="file-git-LC31" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L32" class="blob-num js-line-number" data-line-number="32"></td>
+        <td id="file-git-LC32" class="blob-code blob-code-inner js-file-line">设置git gui的界面编码</td>
+      </tr>
+      <tr>
+        <td id="file-git-L33" class="blob-num js-line-number" data-line-number="33"></td>
+        <td id="file-git-LC33" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L34" class="blob-num js-line-number" data-line-number="34"></td>
+        <td id="file-git-LC34" class="blob-code blob-code-inner js-file-line">git config –global gui.encoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-L35" class="blob-num js-line-number" data-line-number="35"></td>
+        <td id="file-git-LC35" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L36" class="blob-num js-line-number" data-line-number="36"></td>
+        <td id="file-git-LC36" class="blob-code blob-code-inner js-file-line">设置 commit log 提交时使用 utf-8 编码，可避免服务器上乱码，同时与linix上的提交保持一致！</td>
+      </tr>
+      <tr>
+        <td id="file-git-L37" class="blob-num js-line-number" data-line-number="37"></td>
+        <td id="file-git-LC37" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L38" class="blob-num js-line-number" data-line-number="38"></td>
+        <td id="file-git-LC38" class="blob-code blob-code-inner js-file-line">git config –global i18n.commitencoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-L39" class="blob-num js-line-number" data-line-number="39"></td>
+        <td id="file-git-LC39" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L40" class="blob-num js-line-number" data-line-number="40"></td>
+        <td id="file-git-LC40" class="blob-code blob-code-inner js-file-line">使得在 $ git log 时将 utf-8 编码转换成 gbk 编码，解决Msys bash中git log 乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L41" class="blob-num js-line-number" data-line-number="41"></td>
+        <td id="file-git-LC41" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L42" class="blob-num js-line-number" data-line-number="42"></td>
+        <td id="file-git-LC42" class="blob-code blob-code-inner js-file-line">git config –global i18n.logoutputencoding gbk</td>
+      </tr>
+      <tr>
+        <td id="file-git-L43" class="blob-num js-line-number" data-line-number="43"></td>
+        <td id="file-git-LC43" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L44" class="blob-num js-line-number" data-line-number="44"></td>
+        <td id="file-git-LC44" class="blob-code blob-code-inner js-file-line">使得 git log 可以正常显示中文（配合i18n.logoutputencoding = gbk)，在 /etc/profile 中添加：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L45" class="blob-num js-line-number" data-line-number="45"></td>
+        <td id="file-git-LC45" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L46" class="blob-num js-line-number" data-line-number="46"></td>
+        <td id="file-git-LC46" class="blob-code blob-code-inner js-file-line">export LESSCHARSET=utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-L47" class="blob-num js-line-number" data-line-number="47"></td>
+        <td id="file-git-LC47" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L48" class="blob-num js-line-number" data-line-number="48"></td>
+        <td id="file-git-LC48" class="blob-code blob-code-inner js-file-line">乱码情景3</td>
+      </tr>
+      <tr>
+        <td id="file-git-L49" class="blob-num js-line-number" data-line-number="49"></td>
+        <td id="file-git-LC49" class="blob-code blob-code-inner js-file-line">在MsysGit自带的bash中，使用ls命令查看中文文件名乱码。cygwin没有这个问题。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L50" class="blob-num js-line-number" data-line-number="50"></td>
+        <td id="file-git-LC50" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L51" class="blob-num js-line-number" data-line-number="51"></td>
+        <td id="file-git-LC51" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L52" class="blob-num js-line-number" data-line-number="52"></td>
+        <td id="file-git-LC52" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L53" class="blob-num js-line-number" data-line-number="53"></td>
+        <td id="file-git-LC53" class="blob-code blob-code-inner js-file-line">使用ls –show-control-chars命令来强制使用控制台字符编码显示文件名，即可查看中文文件名。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L54" class="blob-num js-line-number" data-line-number="54"></td>
+        <td id="file-git-LC54" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L55" class="blob-num js-line-number" data-line-number="55"></td>
+        <td id="file-git-LC55" class="blob-code blob-code-inner js-file-line">为了方便使用，可以编辑/etc/git-completion.bash ，新增一行 alias ls=”ls –show-control-chars”</td>
+      </tr>
+      <tr>
+        <td id="file-git-L56" class="blob-num js-line-number" data-line-number="56"></td>
+        <td id="file-git-LC56" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L57" class="blob-num js-line-number" data-line-number="57"></td>
+        <td id="file-git-LC57" class="blob-code blob-code-inner js-file-line">最终，还是没能解决最开始我提到的文件名提交乱码的问题。不过倒是有了一个新发现：使用git gui命令，在MsysGit下，看到的中文文件名为正常；而在cygwin下，看到的中文文件名为乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L58" class="blob-num js-line-number" data-line-number="58"></td>
+        <td id="file-git-LC58" class="blob-code blob-code-inner js-file-line">同样的，如果一直使用TortoiseGit（实际调用MsysGit）提交，那么中文文件名没问题；一直使用cygwin提交，中文文件名也没问题。但一定不能交叉使用。这应该是两个平台默认处理中文文件名的方式不同造成的。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L59" class="blob-num js-line-number" data-line-number="59"></td>
+        <td id="file-git-LC59" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L60" class="blob-num js-line-number" data-line-number="60"></td>
+        <td id="file-git-LC60" class="blob-code blob-code-inner js-file-line">分别设置LANG、LC_CTYPE、LC_ALL参数为同样的编码，问题依旧。</td>
+      </tr>
+      <tr>
+        <td id="file-git-L61" class="blob-num js-line-number" data-line-number="61"></td>
+        <td id="file-git-LC61" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L62" class="blob-num js-line-number" data-line-number="62"></td>
+        <td id="file-git-LC62" class="blob-code blob-code-inner js-file-line">cygwin官方网站提到了非拉丁语文件名的问题，也许研究后能解决该吧：Chapter 2. Setting Up Cygwin</td>
+      </tr>
+      <tr>
+        <td id="file-git-L63" class="blob-num js-line-number" data-line-number="63"></td>
+        <td id="file-git-LC63" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L64" class="blob-num js-line-number" data-line-number="64"></td>
+        <td id="file-git-LC64" class="blob-code blob-code-inner js-file-line">这里还有一篇讲解Linux系统编码文章：locale的设定及其LANG、LC_ALL、LANGUAGE环境变量的区别</td>
+      </tr>
+      <tr>
+        <td id="file-git-L65" class="blob-num js-line-number" data-line-number="65"></td>
+        <td id="file-git-LC65" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L66" class="blob-num js-line-number" data-line-number="66"></td>
+        <td id="file-git-LC66" class="blob-code blob-code-inner js-file-line">貌似终极的解决办法是通过修改git和TortoiseGit源码实现的，有网友这么做了：让Windows下Git和TortoiseGit支持中文文件名/UTF-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-L67" class="blob-num js-line-number" data-line-number="67"></td>
+        <td id="file-git-LC67" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L68" class="blob-num js-line-number" data-line-number="68"></td>
+        <td id="file-git-LC68" class="blob-code blob-code-inner js-file-line">本文参考链接：</td>
+      </tr>
+      <tr>
+        <td id="file-git-L69" class="blob-num js-line-number" data-line-number="69"></td>
+        <td id="file-git-LC69" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-L70" class="blob-num js-line-number" data-line-number="70"></td>
+        <td id="file-git-LC70" class="blob-code blob-code-inner js-file-line">搞定Git中文乱码、用TortoiseMerge实现Diff/Merge</td>
+      </tr>
+      <tr>
+        <td id="file-git-L71" class="blob-num js-line-number" data-line-number="71"></td>
+        <td id="file-git-LC71" class="blob-code blob-code-inner js-file-line">MsysGit乱码与跨平台版本管理</td>
+      </tr>
+      <tr>
+        <td id="file-git-L72" class="blob-num js-line-number" data-line-number="72"></td>
+        <td id="file-git-LC72" class="blob-code blob-code-inner js-file-line">git中文文件名、目录名乱码应该怎么解决？</td>
+      </tr>
+</table>
+
+
+  </div>
+
+  </div>
+</div>
+
+        <div class="js-gist-file-update-container js-task-list-container file-box">
+  <div id="file-git-txt" class="file">
+      <div class="file-header">
+        <div class="file-actions">
+
+          <a class="btn btn-sm " href="/vkyii/1079783/raw/3e77453c05f6bcbce133fd0ba128686683f75bf8/git%25E4%25B9%25B1%25E7%25A0%2581%25E8%25A7%25A3%25E5%2586%25B3%25E6%2596%25B9%25E6%25A1%2588%25E6%25B1%2587%25E6%2580%25BB.txt">Raw</a>
+        </div>
+        <div class="file-info">
+          <span class="icon">
+            <svg class="octicon octicon-gist" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.5 5L10 7.5 7.5 10l-.75-.75L8.5 7.5 6.75 5.75 7.5 5zm-3 0L2 7.5 4.5 10l.75-.75L3.5 7.5l1.75-1.75L4.5 5zM0 13V2c0-.55.45-1 1-1h10c.55 0 1 .45 1 1v11c0 .55-.45 1-1 1H1c-.55 0-1-.45-1-1zm1 0h10V2H1v11z"/></svg>
+          </span>
+          <a class="css-truncate" href="#file-git-txt">
+            <strong class="user-select-contain gist-blob-name css-truncate-target">
+              git乱码解决方案汇总.txt
+            </strong>
+          </a>
+        </div>
+      </div>
+    
+
+  <div itemprop="text" class="Box-body p-0 blob-wrapper data type-text ">
+      
+<table class="highlight tab-size js-file-line-container" data-tab-size="8">
+      <tr>
+        <td id="file-git-txt-L1" class="blob-num js-line-number" data-line-number="1"></td>
+        <td id="file-git-txt-LC1" class="blob-code blob-code-inner js-file-line">git乱码解决方案汇总 http://zengrong.net/post/1249.htm</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L2" class="blob-num js-line-number" data-line-number="2"></td>
+        <td id="file-git-txt-LC2" class="blob-code blob-code-inner js-file-line">本站原创文章，转载请注明： 转载自zrong&#39;s Blog，原文 git乱码解决方案汇总，欢迎使用文章源码进行转载。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L3" class="blob-num js-line-number" data-line-number="3"></td>
+        <td id="file-git-txt-LC3" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L4" class="blob-num js-line-number" data-line-number="4"></td>
+        <td id="file-git-txt-LC4" class="blob-code blob-code-inner js-file-line">本站转载文章会标明[转]，转载请注明原始作者文章地址。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L5" class="blob-num js-line-number" data-line-number="5"></td>
+        <td id="file-git-txt-LC5" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L6" class="blob-num js-line-number" data-line-number="6"></td>
+        <td id="file-git-txt-LC6" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L7" class="blob-num js-line-number" data-line-number="7"></td>
+        <td id="file-git-txt-LC7" class="blob-code blob-code-inner js-file-line">我一直是在cygwin下使用git，辅以TortoiseGit。使用上没什么问题，但今天在处理一个有中文文件名的项目时却出现文件名乱码的问题。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L8" class="blob-num js-line-number" data-line-number="8"></td>
+        <td id="file-git-txt-LC8" class="blob-code blob-code-inner js-file-line">情况是这样的：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L9" class="blob-num js-line-number" data-line-number="9"></td>
+        <td id="file-git-txt-LC9" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L10" class="blob-num js-line-number" data-line-number="10"></td>
+        <td id="file-git-txt-LC10" class="blob-code blob-code-inner js-file-line">在一个使用cygwin的bash提交的git项目中，已经完成了所有的提交，但使用TortoiseGit查看的时候，却发现仍有文件没有提交，甚至是有文件还处于未暂存的状态。于是使用TortoiseGit提交；</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L11" class="blob-num js-line-number" data-line-number="11"></td>
+        <td id="file-git-txt-LC11" class="blob-code blob-code-inner js-file-line">再次用cygwin下的git status查看，这次又发现了未提交的情况。再次用git commit命令行提交；</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L12" class="blob-num js-line-number" data-line-number="12"></td>
+        <td id="file-git-txt-LC12" class="blob-code blob-code-inner js-file-line">回到TortoiseGit下查看，问题又出现了！此时准备返回两次提交前的版本，却因为文件名乱码的问题，无法返回了！</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L13" class="blob-num js-line-number" data-line-number="13"></td>
+        <td id="file-git-txt-LC13" class="blob-code blob-code-inner js-file-line">搜索一番，发现git文件名、log乱码，是普遍问题，这其中有编码的原因，也有跨平台的原因。因为git是从linux移植过来，默认采用UTF-8编码。而Windows默认使用UTF-16编码来保存文件名，应该就是这些不同的处理方式造成了乱码。下面是解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L14" class="blob-num js-line-number" data-line-number="14"></td>
+        <td id="file-git-txt-LC14" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L15" class="blob-num js-line-number" data-line-number="15"></td>
+        <td id="file-git-txt-LC15" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L16" class="blob-num js-line-number" data-line-number="16"></td>
+        <td id="file-git-txt-LC16" class="blob-code blob-code-inner js-file-line">乱码情景1</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L17" class="blob-num js-line-number" data-line-number="17"></td>
+        <td id="file-git-txt-LC17" class="blob-code blob-code-inner js-file-line">在cygwin中，使用git add添加要提交的文件的时候，如果文件名是中文，会显示形如274\232\350\256\256\346\200\273\347\273\223.png的乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L18" class="blob-num js-line-number" data-line-number="18"></td>
+        <td id="file-git-txt-LC18" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L19" class="blob-num js-line-number" data-line-number="19"></td>
+        <td id="file-git-txt-LC19" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L20" class="blob-num js-line-number" data-line-number="20"></td>
+        <td id="file-git-txt-LC20" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L21" class="blob-num js-line-number" data-line-number="21"></td>
+        <td id="file-git-txt-LC21" class="blob-code blob-code-inner js-file-line">在bash提示符下输入：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L22" class="blob-num js-line-number" data-line-number="22"></td>
+        <td id="file-git-txt-LC22" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L23" class="blob-num js-line-number" data-line-number="23"></td>
+        <td id="file-git-txt-LC23" class="blob-code blob-code-inner js-file-line">git config –global core.quotepath false</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L24" class="blob-num js-line-number" data-line-number="24"></td>
+        <td id="file-git-txt-LC24" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L25" class="blob-num js-line-number" data-line-number="25"></td>
+        <td id="file-git-txt-LC25" class="blob-code blob-code-inner js-file-line">ore.quotepath设为false的话，就不会对0×80以上的字符进行quote。中文显示正常。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L26" class="blob-num js-line-number" data-line-number="26"></td>
+        <td id="file-git-txt-LC26" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L27" class="blob-num js-line-number" data-line-number="27"></td>
+        <td id="file-git-txt-LC27" class="blob-code blob-code-inner js-file-line">乱码情景2</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L28" class="blob-num js-line-number" data-line-number="28"></td>
+        <td id="file-git-txt-LC28" class="blob-code blob-code-inner js-file-line">在MsysGit中，使用git log显示提交的中文log乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L29" class="blob-num js-line-number" data-line-number="29"></td>
+        <td id="file-git-txt-LC29" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L30" class="blob-num js-line-number" data-line-number="30"></td>
+        <td id="file-git-txt-LC30" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L31" class="blob-num js-line-number" data-line-number="31"></td>
+        <td id="file-git-txt-LC31" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L32" class="blob-num js-line-number" data-line-number="32"></td>
+        <td id="file-git-txt-LC32" class="blob-code blob-code-inner js-file-line">设置git gui的界面编码</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L33" class="blob-num js-line-number" data-line-number="33"></td>
+        <td id="file-git-txt-LC33" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L34" class="blob-num js-line-number" data-line-number="34"></td>
+        <td id="file-git-txt-LC34" class="blob-code blob-code-inner js-file-line">git config –global gui.encoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L35" class="blob-num js-line-number" data-line-number="35"></td>
+        <td id="file-git-txt-LC35" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L36" class="blob-num js-line-number" data-line-number="36"></td>
+        <td id="file-git-txt-LC36" class="blob-code blob-code-inner js-file-line">设置 commit log 提交时使用 utf-8 编码，可避免服务器上乱码，同时与linix上的提交保持一致！</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L37" class="blob-num js-line-number" data-line-number="37"></td>
+        <td id="file-git-txt-LC37" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L38" class="blob-num js-line-number" data-line-number="38"></td>
+        <td id="file-git-txt-LC38" class="blob-code blob-code-inner js-file-line">git config –global i18n.commitencoding utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L39" class="blob-num js-line-number" data-line-number="39"></td>
+        <td id="file-git-txt-LC39" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L40" class="blob-num js-line-number" data-line-number="40"></td>
+        <td id="file-git-txt-LC40" class="blob-code blob-code-inner js-file-line">使得在 $ git log 时将 utf-8 编码转换成 gbk 编码，解决Msys bash中git log 乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L41" class="blob-num js-line-number" data-line-number="41"></td>
+        <td id="file-git-txt-LC41" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L42" class="blob-num js-line-number" data-line-number="42"></td>
+        <td id="file-git-txt-LC42" class="blob-code blob-code-inner js-file-line">git config –global i18n.logoutputencoding gbk</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L43" class="blob-num js-line-number" data-line-number="43"></td>
+        <td id="file-git-txt-LC43" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L44" class="blob-num js-line-number" data-line-number="44"></td>
+        <td id="file-git-txt-LC44" class="blob-code blob-code-inner js-file-line">使得 git log 可以正常显示中文（配合i18n.logoutputencoding = gbk)，在 /etc/profile 中添加：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L45" class="blob-num js-line-number" data-line-number="45"></td>
+        <td id="file-git-txt-LC45" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L46" class="blob-num js-line-number" data-line-number="46"></td>
+        <td id="file-git-txt-LC46" class="blob-code blob-code-inner js-file-line">export LESSCHARSET=utf-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L47" class="blob-num js-line-number" data-line-number="47"></td>
+        <td id="file-git-txt-LC47" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L48" class="blob-num js-line-number" data-line-number="48"></td>
+        <td id="file-git-txt-LC48" class="blob-code blob-code-inner js-file-line">乱码情景3</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L49" class="blob-num js-line-number" data-line-number="49"></td>
+        <td id="file-git-txt-LC49" class="blob-code blob-code-inner js-file-line">在MsysGit自带的bash中，使用ls命令查看中文文件名乱码。cygwin没有这个问题。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L50" class="blob-num js-line-number" data-line-number="50"></td>
+        <td id="file-git-txt-LC50" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L51" class="blob-num js-line-number" data-line-number="51"></td>
+        <td id="file-git-txt-LC51" class="blob-code blob-code-inner js-file-line">解决方案：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L52" class="blob-num js-line-number" data-line-number="52"></td>
+        <td id="file-git-txt-LC52" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L53" class="blob-num js-line-number" data-line-number="53"></td>
+        <td id="file-git-txt-LC53" class="blob-code blob-code-inner js-file-line">使用ls –show-control-chars命令来强制使用控制台字符编码显示文件名，即可查看中文文件名。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L54" class="blob-num js-line-number" data-line-number="54"></td>
+        <td id="file-git-txt-LC54" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L55" class="blob-num js-line-number" data-line-number="55"></td>
+        <td id="file-git-txt-LC55" class="blob-code blob-code-inner js-file-line">为了方便使用，可以编辑/etc/git-completion.bash ，新增一行 alias ls=”ls –show-control-chars”</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L56" class="blob-num js-line-number" data-line-number="56"></td>
+        <td id="file-git-txt-LC56" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L57" class="blob-num js-line-number" data-line-number="57"></td>
+        <td id="file-git-txt-LC57" class="blob-code blob-code-inner js-file-line">最终，还是没能解决最开始我提到的文件名提交乱码的问题。不过倒是有了一个新发现：使用git gui命令，在MsysGit下，看到的中文文件名为正常；而在cygwin下，看到的中文文件名为乱码。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L58" class="blob-num js-line-number" data-line-number="58"></td>
+        <td id="file-git-txt-LC58" class="blob-code blob-code-inner js-file-line">同样的，如果一直使用TortoiseGit（实际调用MsysGit）提交，那么中文文件名没问题；一直使用cygwin提交，中文文件名也没问题。但一定不能交叉使用。这应该是两个平台默认处理中文文件名的方式不同造成的。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L59" class="blob-num js-line-number" data-line-number="59"></td>
+        <td id="file-git-txt-LC59" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L60" class="blob-num js-line-number" data-line-number="60"></td>
+        <td id="file-git-txt-LC60" class="blob-code blob-code-inner js-file-line">分别设置LANG、LC_CTYPE、LC_ALL参数为同样的编码，问题依旧。</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L61" class="blob-num js-line-number" data-line-number="61"></td>
+        <td id="file-git-txt-LC61" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L62" class="blob-num js-line-number" data-line-number="62"></td>
+        <td id="file-git-txt-LC62" class="blob-code blob-code-inner js-file-line">cygwin官方网站提到了非拉丁语文件名的问题，也许研究后能解决该吧：Chapter 2. Setting Up Cygwin</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L63" class="blob-num js-line-number" data-line-number="63"></td>
+        <td id="file-git-txt-LC63" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L64" class="blob-num js-line-number" data-line-number="64"></td>
+        <td id="file-git-txt-LC64" class="blob-code blob-code-inner js-file-line">这里还有一篇讲解Linux系统编码文章：locale的设定及其LANG、LC_ALL、LANGUAGE环境变量的区别</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L65" class="blob-num js-line-number" data-line-number="65"></td>
+        <td id="file-git-txt-LC65" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L66" class="blob-num js-line-number" data-line-number="66"></td>
+        <td id="file-git-txt-LC66" class="blob-code blob-code-inner js-file-line">貌似终极的解决办法是通过修改git和TortoiseGit源码实现的，有网友这么做了：让Windows下Git和TortoiseGit支持中文文件名/UTF-8</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L67" class="blob-num js-line-number" data-line-number="67"></td>
+        <td id="file-git-txt-LC67" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L68" class="blob-num js-line-number" data-line-number="68"></td>
+        <td id="file-git-txt-LC68" class="blob-code blob-code-inner js-file-line">本文参考链接：</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L69" class="blob-num js-line-number" data-line-number="69"></td>
+        <td id="file-git-txt-LC69" class="blob-code blob-code-inner js-file-line">
+</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L70" class="blob-num js-line-number" data-line-number="70"></td>
+        <td id="file-git-txt-LC70" class="blob-code blob-code-inner js-file-line">搞定Git中文乱码、用TortoiseMerge实现Diff/Merge</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L71" class="blob-num js-line-number" data-line-number="71"></td>
+        <td id="file-git-txt-LC71" class="blob-code blob-code-inner js-file-line">MsysGit乱码与跨平台版本管理</td>
+      </tr>
+      <tr>
+        <td id="file-git-txt-L72" class="blob-num js-line-number" data-line-number="72"></td>
+        <td id="file-git-txt-LC72" class="blob-code blob-code-inner js-file-line">git中文文件名、目录名乱码应该怎么解决？</td>
+      </tr>
+</table>
+
+
+  </div>
+
+  </div>
+</div>
+
+
+    <a name="comments"></a>
+    <div class=" js-quote-selection-container" data-quote-markdown=".js-comment-body">
+      <div class="js-discussion js-socket-channel" data-channel="marked-as-read:gist:1079783">
+        <div class="ml-6 pl-3">
+        
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=443663" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vincentcn"><img class="avatar rounded-1" height="40" width="40" alt="@vincentcn" src="https://avatars3.githubusercontent.com/u/443663?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-1213504">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="899353b1943a2ab7563e0c5c4e0e924a">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1213504-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1213504&amp;report=vincentcn+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=443663" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vincentcn"><img class="avatar" height="28" width="28" alt="@vincentcn" src="https://avatars2.githubusercontent.com/u/443663?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=443663" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vincentcn">vincentcn</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-1213504" id="gistcomment-1213504-minimized-permalink" class="timestamp"><relative-time datetime="2014-04-18T04:15:11Z">Apr 18, 2014</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <p>Where is git-diff-wrapper.sh</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="899353b1943a2ab7563e0c5c4e0e924a"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="FJLEsL3AHwpUa91ADP9ybPW/ITkW/gpXKyDMzUHWZ/f39OaCC4rY/6sMM1G9LD9WYe6YVYzH+1Z14qsuC0fF5Q==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1213504-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1213504&amp;report=vincentcn+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=443663" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/vincentcn">vincentcn</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-1213504" id="gistcomment-1213504-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2014-04-18T04:15:11Z">Apr 18, 2014</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <p>Where is git-diff-wrapper.sh</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=240080" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/Yincan"><img class="avatar rounded-1" height="40" width="40" alt="@Yincan" src="https://avatars2.githubusercontent.com/u/240080?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-1241923">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="e659653cd6810ab163b6434a1e18474c">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1241923-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1241923&amp;report=Yincan+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=240080" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/Yincan"><img class="avatar" height="28" width="28" alt="@Yincan" src="https://avatars3.githubusercontent.com/u/240080?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=240080" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/Yincan">Yincan</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-1241923" id="gistcomment-1241923-minimized-permalink" class="timestamp"><relative-time datetime="2014-06-07T02:40:06Z">Jun 7, 2014</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <p>在mac下面如果是乱码，添加了</p>
+<pre><code>[gui]
+    encoding = utf-8
+[i18n]
+   logoutputencoding = utf-8
+</code></pre>
+<p>在.gitconfig下面。logoutputencoding 需要和其他地方设置成统一的编码。</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="e659653cd6810ab163b6434a1e18474c"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="FsnKC/0at75jwpcAZqgGKw7e4Ls4pxMmtODCBfFSq3f1r+g5S1BwS5yleRHXe0sRmo9Z16Ke4ifqIqXmu8MJZQ==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1241923-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1241923&amp;report=Yincan+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=240080" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/Yincan">Yincan</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-1241923" id="gistcomment-1241923-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2014-06-07T02:40:06Z">Jun 7, 2014</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <p>在mac下面如果是乱码，添加了</p>
+<pre><code>[gui]
+    encoding = utf-8
+[i18n]
+   logoutputencoding = utf-8
+</code></pre>
+<p>在.gitconfig下面。logoutputencoding 需要和其他地方设置成统一的编码。</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=237062" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/tvrcgo"><img class="avatar rounded-1" height="40" width="40" alt="@tvrcgo" src="https://avatars1.githubusercontent.com/u/237062?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-1306812">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="8288bcc91fa62b5c7b6e73692a774efb">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1306812-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1306812&amp;report=tvrcgo+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=237062" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/tvrcgo"><img class="avatar" height="28" width="28" alt="@tvrcgo" src="https://avatars0.githubusercontent.com/u/237062?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=237062" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/tvrcgo">tvrcgo</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-1306812" id="gistcomment-1306812-minimized-permalink" class="timestamp"><relative-time datetime="2014-09-25T09:21:42Z">Sep 25, 2014</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <p>在 Windows 下，把目录名和文件名乱码的文件删了，本地也提交了。<br>
+本地再次提交时，乱码的文件仍然待提交状态，一提交又提示 changes not staged for commit。<br>
+Git库里面删不掉它了。这种有解决办法吗？</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="8288bcc91fa62b5c7b6e73692a774efb"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="BSodBKCYa2BzM2eKwXkKBS+a4qJnzUcdlZi7QdxSi/LmTD82FtKslYxUiZtwqkc/u8tbzv30thzLWtyilsMp4A==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-1306812-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-1306812&amp;report=tvrcgo+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=237062" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/tvrcgo">tvrcgo</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-1306812" id="gistcomment-1306812-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2014-09-25T09:21:42Z">Sep 25, 2014</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <p>在 Windows 下，把目录名和文件名乱码的文件删了，本地也提交了。<br>
+本地再次提交时，乱码的文件仍然待提交状态，一提交又提示 changes not staged for commit。<br>
+Git库里面删不掉它了。这种有解决办法吗？</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=16138408" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/pengcgithub"><img class="avatar rounded-1" height="40" width="40" alt="@pengcgithub" src="https://avatars1.githubusercontent.com/u/16138408?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-2103572">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="4f2bb8b64441adaaaf3fea534fbc3739">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2103572-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2103572&amp;report=pengcgithub+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=16138408" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/pengcgithub"><img class="avatar" height="28" width="28" alt="@pengcgithub" src="https://avatars0.githubusercontent.com/u/16138408?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=16138408" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/pengcgithub">pengcgithub</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-2103572" id="gistcomment-2103572-minimized-permalink" class="timestamp"><relative-time datetime="2017-05-23T10:03:19Z">May 23, 2017</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <p>解决方案：<br>
+在bash提示符下输入：<br>
+git config –global core.quotepath false</p>
+<p>这条语句中的global前面应该是两个"-"。<br>
+如下：<br>
+git config --global core.quotepath false</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="4f2bb8b64441adaaaf3fea534fbc3739"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="qZpNLpCSlNAH8t8SRnjTuPZWX3OIUgltzeCe76UbabdK/G8cJthTJfiVMQP3q56CYgfmHxJr+GyTIvkM74rLpQ==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2103572-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2103572&amp;report=pengcgithub+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=16138408" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/pengcgithub">pengcgithub</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-2103572" id="gistcomment-2103572-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2017-05-23T10:03:19Z">May 23, 2017</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <p>解决方案：<br>
+在bash提示符下输入：<br>
+git config –global core.quotepath false</p>
+<p>这条语句中的global前面应该是两个"-"。<br>
+如下：<br>
+git config --global core.quotepath false</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=14845843" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/zongxiaomi"><img class="avatar rounded-1" height="40" width="40" alt="@zongxiaomi" src="https://avatars3.githubusercontent.com/u/14845843?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-2243988">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="b7c95dbf9ec14f19d648b21bbbee9efd">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2243988-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2243988&amp;report=zongxiaomi+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=14845843" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/zongxiaomi"><img class="avatar" height="28" width="28" alt="@zongxiaomi" src="https://avatars2.githubusercontent.com/u/14845843?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=14845843" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/zongxiaomi">zongxiaomi</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-2243988" id="gistcomment-2243988-minimized-permalink" class="timestamp"><relative-time datetime="2017-10-31T13:58:27Z">Oct 31, 2017</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <p>@ Yican在mac下面如果是乱码，添加了</p>
+<p>[gui]<br>
+encoding = utf-8<br>
+[i18n]<br>
+logoutputencoding = utf-8<br>
+在.gitconfig下面。logoutputencoding 需要和其他地方设置成统一的编码。</p>
+<p>这个答案是正确的</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="b7c95dbf9ec14f19d648b21bbbee9efd"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="qohESVS7QxUHrDezMahZjV5CyLKJgcCcETtDALq/BndJ7mZ74vGE4PjL2aKAexS3yhNx3hO4MZ1P+STj8C6kZQ==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2243988-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2243988&amp;report=zongxiaomi+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=14845843" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/zongxiaomi">zongxiaomi</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-2243988" id="gistcomment-2243988-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2017-10-31T13:58:27Z">Oct 31, 2017</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <p>@ Yican在mac下面如果是乱码，添加了</p>
+<p>[gui]<br>
+encoding = utf-8<br>
+[i18n]<br>
+logoutputencoding = utf-8<br>
+在.gitconfig下面。logoutputencoding 需要和其他地方设置成统一的编码。</p>
+<p>这个答案是正确的</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+  <div class="TimelineItem js-comment-container">
+      
+<div class="avatar-parent-child TimelineItem-avatar">
+    <a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=25722632" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/qq1623299667"><img class="avatar rounded-1" height="40" width="40" alt="@qq1623299667" src="https://avatars2.githubusercontent.com/u/25722632?s=88&amp;v=4" /></a>
+
+</div>
+
+
+    
+<div class="timeline-comment-group js-minimizable-comment-group js-targetable-comment TimelineItem-body my-0 " id="gistcomment-2284841">
+    <div class="ml-n3 minimized-comment position-relative  d-none ">
+      
+
+  
+
+  <details class="Details-element details-reset border rounded-1 bg-white"
+       data-body-version="a0dacd2f55f7f0b85714c19ed7482f4e">
+    <summary class="bg-gray border-bottom-0 py-0 px-2">
+      <div class="d-flex flex-justify-between flex-items-center">
+        <h3 class="timeline-comment-header-text f5 text-gray text-normal text-italic">
+              This comment has been minimized.
+
+        </h3>
+        <div class="Details-content--closed text-gray f6"><svg class="octicon octicon-unfold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 7.5L14 10c0 .55-.45 1-1 1H9v-1h3.5l-2-2h-7l-2 2H5v1H1c-.55 0-1-.45-1-1l2.5-2.5L0 5c0-.55.45-1 1-1h4v1H1.5l2 2h7l2-2H9V4h4c.55 0 1 .45 1 1l-2.5 2.5zM6 6h2V3h2L7 0 4 3h2v3zm2 3H6v3H4l3 3 3-3H8V9z"/></svg>Show comment</div>
+        <div class="Details-content--open text-gray f6"><svg class="octicon octicon-fold position-relative mr-1" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7 9l3 3H8v3H6v-3H4l3-3zm3-6H8V0H6v3H4l3 3 3-3zm4 2c0-.55-.45-1-1-1h-2.5l-1 1h3l-2 2h-7l-2-2h3l-1-1H1c-.55 0-1 .45-1 1l2.5 2.5L0 10c0 .55.45 1 1 1h2.5l1-1h-3l2-2h7l2 2h-3l1 1H13c.55 0 1-.45 1-1l-2.5-2.5L14 5z"/></svg>Hide comment</div>
+      </div>
+    </summary>
+    <div class="review-comment border-top pt-3">
+      <div class="previewable-edit  js-task-list-container reorderable-task-lists">
+        <div class="edit-comment-hide">
+          <div class="timeline-comment-actions">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2284841-minimized-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2284841&amp;report=qq1623299667+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+          </div>
+            <a class="float-left mt-1" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=25722632" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/qq1623299667"><img class="avatar" height="28" width="28" alt="@qq1623299667" src="https://avatars3.githubusercontent.com/u/25722632?s=60&amp;v=4" /></a>
+          <div class="review-comment-contents">
+            <h4 class="f5 text-normal d-inline text-gray-dark">
+              <strong class="text-gray">
+                
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=25722632" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/qq1623299667">qq1623299667</a>
+  
+
+              </strong>
+              <span class="text-gray">
+                  <a href="#gistcomment-2284841" id="gistcomment-2284841-minimized-permalink" class="timestamp"><relative-time datetime="2017-12-13T02:04:13Z">Dec 13, 2017</relative-time></a>
+              </span>
+            </h4>
+            
+
+            
+            <task-lists disabled sortable>
+              <div class="comment-body markdown-body p-0 pt-1 js-comment-body ">
+                  <h2>你好，我在Windows上用gitgui在本地commit的时候输入的中文，在本地显示正常，但是当上传代码到github上面的时候就乱码了。效果比如这个仓库：<a href="https://github.com/qq1623299667/blogtest">https://github.com/qq1623299667/blogtest</a><br>
+我代码中都是utf8编码的，所以都是正常显示，但是commit的中文是在gui中写的，我没有设置gui commit的编码，gui的commit可能默认按照windows的gbk编码来实现，请问我该怎么操作才可以让我的提交信息到了github上面也能正常显示？</h2>
+<p>ps：如果你说：那你直接设置gui commit编码就好了啊？哦天，这个我就是不知道才问的。。。<br>
+我需要的是一个方法，在github代码编码和windows本地编码的界面不乱码的前提下，能够按照你给的操作让github上面的commit信息也恢复正常编码，而不是一句简单的你百度啊你谷歌之类的~</p>
+              </div>
+            </task-lists>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+
+    </div>
+  <div class="ml-n3 timeline-comment unminimized-comment comment previewable-edit js-task-list-container js-comment timeline-comment--caret reorderable-task-lists "
+       data-body-version="a0dacd2f55f7f0b85714c19ed7482f4e"
+       data-unfurl-hide-url="/content_reference_attachments/hide"
+       data-unfurl-authenticity-token="hZsYP4q5wDSWUlKLPTpzCZVUlUog1FufzXqW/lJ5WvZm/ToNPPMHwWk1vJqM6T4zAQUsJrrtqp6TuPEdGOj45A==">
+
+    
+<div class="timeline-comment-header clearfix">
+  <div class="timeline-comment-actions js-timeline-comment-actions" >
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="details-overlay details-reset position-relative d-inline-block ">
+  <summary class="btn-link timeline-comment-action link-gray">
+    <svg aria-label="Show options" class="octicon octicon-kebab-horizontal" viewBox="0 0 13 16" version="1.1" width="13" height="16" role="img"><path fill-rule="evenodd" d="M1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM13 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+  </summary>
+  <details-menu class="dropdown-menu dropdown-menu-sw show-more-popover text-gray-dark anim-scale-in" style="width:185px">
+        <clipboard-copy
+    class="dropdown-item btn-link"
+    for="gistcomment-2284841-permalink"
+    role="menuitem"
+    
+    >
+    Copy link
+  </clipboard-copy>
+
+        <button
+    type="button"
+    class="dropdown-item btn-link d-none js-comment-quote-reply"
+    role="menuitem">
+    Quote reply
+  </button>
+
+        <div role="none" class="dropdown-divider"></div>
+
+          <a aria-label="Report abusive content" role="menuitem" class="dropdown-item btn-link" data-ga-click="Report content, reported by NONE" href="/contact/report-content?content_url=https%3A%2F%2Fgist.github.com%2F1079783%23gistcomment-2284841&amp;report=qq1623299667+%28user%29">
+      Report abuse
+</a>
+      
+  </details-menu>
+</details>
+
+  </div>
+
+
+    
+
+
+  
+
+
+  <h3 class="timeline-comment-header-text f5 text-normal">
+
+
+    <strong class="css-truncate expandable">
+      
+
+  <a class="author link-gray-dark css-truncate-target" show_full_name="false" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=25722632" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/qq1623299667">qq1623299667</a>
+  
+
+    </strong>
+
+    commented
+
+
+      <a href="#gistcomment-2284841" id="gistcomment-2284841-permalink" class="link-gray timestamp js-timestamp"><relative-time datetime="2017-12-13T02:04:13Z">Dec 13, 2017</relative-time></a>
+
+
+    <span class="js-comment-edit-history">
+        
+  <span class="d-inline-block text-gray-light">&#8226;</span>
+
+  <details class="details-overlay details-reset d-inline-block dropdown">
+    <summary class="btn-link no-underline text-gray js-notice">
+      <div class="position-relative">
+        <span>
+            edited
+        </span>
+        <svg height="11" class="octicon octicon-triangle-down v-align-middle" viewBox="0 0 12 16" version="1.1" width="8" aria-hidden="true"><path fill-rule="evenodd" d="M0 5l6 6 6-6H0z"/></svg>
+      </div>
+    </summary>
+    <details-menu class="anim-scale-in dropdown-menu dropdown-menu-se py-0" style="width:352px" src="/_render_node/MDExOkdpc3RDb21tZW50MTA3OTc4MzoyMjg0ODQx/comments/comment_edit_history_log" preload>
+      <include-fragment class="octocat-spinner my-3" aria-label="Loading"></include-fragment>
+    </details-menu>
+  </details>
+
+    </span>
+  </h3>
+</div>
+
+
+    <div class="edit-comment-hide js-edit-comment-hide" >
+
+      
+<task-lists disabled sortable>
+<table class="d-block">
+  <tbody class="d-block">
+    <tr class="d-block">
+      <td class="d-block comment-body markdown-body  js-comment-body">
+          <h2>你好，我在Windows上用gitgui在本地commit的时候输入的中文，在本地显示正常，但是当上传代码到github上面的时候就乱码了。效果比如这个仓库：<a href="https://github.com/qq1623299667/blogtest">https://github.com/qq1623299667/blogtest</a><br>
+我代码中都是utf8编码的，所以都是正常显示，但是commit的中文是在gui中写的，我没有设置gui commit的编码，gui的commit可能默认按照windows的gbk编码来实现，请问我该怎么操作才可以让我的提交信息到了github上面也能正常显示？</h2>
+<p>ps：如果你说：那你直接设置gui commit编码就好了啊？哦天，这个我就是不知道才问的。。。<br>
+我需要的是一个方法，在github代码编码和windows本地编码的界面不乱码的前提下，能够按照你给的操作让github上面的commit信息也恢复正常编码，而不是一句简单的你百度啊你谷歌之类的~</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</task-lists>
+
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+
+<!-- Rendered timeline since 2019-09-06 01:33:19 -->
+<div id="partial-timeline-marker"
+      class="js-timeline-marker js-updatable-content"
+      data-url="/vkyii/1079783/show_partial?partial=gist%2Ftimeline_marker&amp;since=1567758799"
+      data-last-modified="Fri, 06 Sep 2019 08:33:19 GMT"
+      >
+</div>
+
+        </div>
+
+        <div class="discussion-timeline-actions">
+            <div class="timeline-comment-wrapper timeline-new-comment js-comment-container width-fit">
+  <span class="timeline-comment-avatar "><a class="d-inline-block" data-hovercard-type="user" data-hovercard-url="/hovercards?user_id=1357447" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="/gtu001"><img class="avatar" src="https://avatars2.githubusercontent.com/u/1357447?s=80&amp;v=4" width="40" height="40" alt="@gtu001" /></a></span>
+
+  <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="js-new-comment-form js-needs-timeline-marker-header" action="/vkyii/1079783/comments" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="Z/qFRyVa6f27tkb3v51gyloTIkhtoTeGCK2bJhxJ6JyDKqx7R/nTKvcARECJ6rwZAGOoyrgLXhMX8SzOfJKP2A==" />
+    <div class="timeline-comment">
+      <tab-container class="js-previewable-comment-form previewable-comment-form write-selected" data-preview-url="/preview?markdown_unsupported=false&amp;subject=1079783&amp;subject_type=Gist" data-preview-authenticity-token="rNSHE16I0H5dMmvbLixJwK74Xgbz8jW6GopfIjKCL5HcKQHV9SnBaiAdspg6oZ/sCwQV50T3ImDRNu/YT/Ln3A==">
+  <div class="comment-form-head tabnav d-flex flex-justify-between ">
+      <div class="tabnav-tabs " role="tablist">
+        <button type="button" class="btn-link tabnav-tab write-tab js-write-tab  " role="tab" aria-selected="true">Write</button>
+        <button type="button" class="btn-link tabnav-tab preview-tab js-preview-tab " role="tab">Preview</button>
+      </div>
+      
+<markdown-toolbar for="new_comment_field" class="js-details-container Details toolbar-commenting d-flex no-wrap flex-items-start flex-wrap ml-n3 mr-n3 px-3 ">
+
+
+  <div class="flex-nowrap d-inline-block mr-3">
+    <md-header tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add header text" data-ga-click="Markdown Toolbar, click, header">
+      <svg class="octicon octicon-text-size" viewBox="0 0 18 16" version="1.1" width="18" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M13.62 9.08L12.1 3.66h-.06l-1.5 5.42h3.08zM5.7 10.13S4.68 6.52 4.53 6.02h-.08l-1.13 4.11H5.7zM17.31 14h-2.25l-.95-3.25h-4.07L9.09 14H6.84l-.69-2.33H2.87L2.17 14H0l3.3-9.59h2.5l2.17 6.34L10.86 2h2.52l3.94 12h-.01z"/></svg>
+    </md-header>
+
+    <md-bold tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add bold text <ctrl+b>" data-ga-click="Markdown Toolbar, click, bold">
+      <svg class="octicon octicon-bold" viewBox="0 0 10 16" version="1.1" width="10" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1 2h3.83c2.48 0 4.3.75 4.3 2.95 0 1.14-.63 2.23-1.67 2.61v.06c1.33.3 2.3 1.23 2.3 2.86 0 2.39-1.97 3.52-4.61 3.52H1V2zm3.66 4.95c1.67 0 2.38-.66 2.38-1.69 0-1.17-.78-1.61-2.34-1.61H3.13v3.3h1.53zm.27 5.39c1.77 0 2.75-.64 2.75-1.98 0-1.27-.95-1.81-2.75-1.81h-1.8v3.8h1.8v-.01z"/></svg>
+    </md-bold>
+
+    <md-italic tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add italic text <ctrl+i>" data-ga-click="Markdown Toolbar, click, italic">
+      <svg class="octicon octicon-italic" viewBox="0 0 6 16" version="1.1" width="6" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.81 5h1.98L3 14H1l1.81-9zm.36-2.7c0-.7.58-1.3 1.33-1.3.56 0 1.13.38 1.13 1.03 0 .75-.59 1.3-1.33 1.3-.58 0-1.13-.38-1.13-1.03z"/></svg>
+    </md-italic>
+  </div>
+
+  <div class="d-inline-block mr-3">
+    <md-quote tabindex="-1" class="toolbar-item tooltipped tooltipped-n p-1 mx-1" aria-label="Insert a quote" data-ga-click="Markdown Toolbar, click, quote">
+      <svg class="octicon octicon-quote" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.16 3.5C3.73 5.06 2.55 6.67 2.55 9.36c.16-.05.3-.05.44-.05 1.27 0 2.5.86 2.5 2.41 0 1.61-1.03 2.61-2.5 2.61-1.9 0-2.99-1.52-2.99-4.25 0-3.8 1.75-6.53 5.02-8.42L6.16 3.5zm7 0c-2.43 1.56-3.61 3.17-3.61 5.86.16-.05.3-.05.44-.05 1.27 0 2.5.86 2.5 2.41 0 1.61-1.03 2.61-2.5 2.61-1.89 0-2.98-1.52-2.98-4.25 0-3.8 1.75-6.53 5.02-8.42l1.14 1.84h-.01z"/></svg>
+    </md-quote>
+
+    <md-code tabindex="-1" class="toolbar-item tooltipped tooltipped-n p-1 mx-1" aria-label="Insert code" data-ga-click="Markdown Toolbar, click, code">
+      <svg class="octicon octicon-code" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg>
+    </md-code>
+
+
+    <md-link tabindex="-1" class="toolbar-item tooltipped tooltipped-n p-1 d-inline-block mx-1" aria-label="Add a link <ctrl+k>" data-ga-click="Markdown Toolbar, click, link">
+      <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"/></svg>
+    </md-link>
+  </div>
+
+  <div class="d-inline-block mr-3">
+    <md-unordered-list tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add a bulleted list" data-ga-click="Markdown Toolbar, click, unordered list">
+      <svg class="octicon octicon-list-unordered" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2 13c0 .59 0 1-.59 1H.59C0 14 0 13.59 0 13c0-.59 0-1 .59-1h.81c.59 0 .59.41.59 1H2zm2.59-9h6.81c.59 0 .59-.41.59-1 0-.59 0-1-.59-1H4.59C4 2 4 2.41 4 3c0 .59 0 1 .59 1zM1.41 7H.59C0 7 0 7.41 0 8c0 .59 0 1 .59 1h.81c.59 0 .59-.41.59-1 0-.59 0-1-.59-1h.01zm0-5H.59C0 2 0 2.41 0 3c0 .59 0 1 .59 1h.81c.59 0 .59-.41.59-1 0-.59 0-1-.59-1h.01zm10 5H4.59C4 7 4 7.41 4 8c0 .59 0 1 .59 1h6.81c.59 0 .59-.41.59-1 0-.59 0-1-.59-1h.01zm0 5H4.59C4 12 4 12.41 4 13c0 .59 0 1 .59 1h6.81c.59 0 .59-.41.59-1 0-.59 0-1-.59-1h.01z"/></svg>
+    </md-unordered-list>
+
+    <md-ordered-list tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add a numbered list" data-ga-click="Markdown Toolbar, click, ordered list">
+      <svg class="octicon octicon-list-ordered" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M12.01 13c0 .59 0 1-.59 1H4.6c-.59 0-.59-.41-.59-1 0-.59 0-1 .59-1h6.81c.59 0 .59.41.59 1h.01zM4.6 4h6.81C12 4 12 3.59 12 3c0-.59 0-1-.59-1H4.6c-.59 0-.59.41-.59 1 0 .59 0 1 .59 1zm6.81 3H4.6c-.59 0-.59.41-.59 1 0 .59 0 1 .59 1h6.81C12 9 12 8.59 12 8c0-.59 0-1-.59-1zm-9.4-6h-.72c-.3.19-.58.25-1.03.34V2h.75v2.14H.17V5h2.84v-.86h-1V1zm.392 8.12c-.129 0-.592.04-.802.07.53-.56 1.14-1.25 1.14-1.89C2.72 6.52 2.18 6 1.38 6c-.59 0-.97.2-1.38.64l.58.58c.19-.19.38-.38.64-.38.28 0 .48.16.48.52 0 .53-.77 1.2-1.7 2.06V10h3v-.88h-.598zm-.222 3.79v-.03c.44-.19.64-.47.64-.86 0-.7-.56-1.11-1.44-1.11-.48 0-.89.19-1.28.52l.55.64c.25-.2.44-.31.69-.31.27 0 .42.13.42.36 0 .27-.2.44-.86.44v.75c.83 0 .98.17.98.47 0 .25-.23.38-.58.38-.28 0-.56-.14-.81-.38l-.48.66c.3.36.77.56 1.41.56.83 0 1.53-.41 1.53-1.16 0-.5-.31-.81-.77-.94v.01z"/></svg>
+    </md-ordered-list>
+
+    <md-task-list tabindex="-1" class="toolbar-item tooltipped tooltipped-n mx-1" aria-label="Add a task list" data-ga-click="Markdown Toolbar, click, task list">
+      <svg class="octicon octicon-tasklist" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M15.41 9H7.59C7 9 7 8.59 7 8c0-.59 0-1 .59-1h7.81c.59 0 .59.41.59 1 0 .59 0 1-.59 1h.01zM9.59 4C9 4 9 3.59 9 3c0-.59 0-1 .59-1h5.81c.59 0 .59.41.59 1 0 .59 0 1-.59 1H9.59zM0 3.91l1.41-1.3L3 4.2 7.09 0 8.5 1.41 3 6.91l-3-3zM7.59 12h7.81c.59 0 .59.41.59 1 0 .59 0 1-.59 1H7.59C7 14 7 13.59 7 13c0-.59 0-1 .59-1z"/></svg>
+    </md-task-list>
+  </div>
+
+  <div class="d-inline-block">
+    <md-mention tabindex="-1" class="flex-auto text-center toolbar-item tooltipped tooltipped-nw p-1 mx-1" aria-label="Directly mention a user or team" data-ga-click="Markdown Toolbar, click, mention">
+      <svg class="octicon octicon-mention" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.58 15c1.25 0 2.52-.31 3.56-.94l-.42-.94c-.84.52-1.89.83-3.03.83-3.23 0-5.64-2.08-5.64-5.72 0-4.37 3.23-7.18 6.58-7.18 3.45 0 5.22 2.19 5.22 5.2 0 2.39-1.34 3.86-2.5 3.86-1.05 0-1.36-.73-1.05-2.19l.73-3.75H8.98l-.11.72c-.41-.63-.94-.83-1.56-.83-2.19 0-3.66 2.39-3.66 4.38 0 1.67.94 2.61 2.3 2.61.84 0 1.67-.53 2.3-1.25.11.94.94 1.45 1.98 1.45 1.67 0 3.77-1.67 3.77-5C14 2.61 11.59 0 7.83 0 3.66 0 0 3.33 0 8.33 0 12.71 2.92 15 6.58 15zm-.31-5c-.73 0-1.36-.52-1.36-1.67 0-1.45.94-3.22 2.41-3.22.52 0 .84.2 1.25.83l-.52 3.02c-.63.73-1.25 1.05-1.78 1.05V10z"/></svg>
+    </md-mention>
+
+
+    <md-ref tabindex="-1" class="flex-auto text-center toolbar-item tooltipped tooltipped-nw p-1 mx-1" aria-label="Reference an issue or pull request" data-ga-click="Markdown Toolbar, click, reference">
+      <svg class="octicon octicon-bookmark" viewBox="0 0 10 16" version="1.1" width="10" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M9 0H1C.27 0 0 .27 0 1v15l5-3.09L10 16V1c0-.73-.27-1-1-1zm-.78 4.25L6.36 5.61l.72 2.16c.06.22-.02.28-.2.17L5 6.6 3.12 7.94c-.19.11-.25.05-.2-.17l.72-2.16-1.86-1.36c-.17-.16-.14-.23.09-.23l2.3-.03.7-2.16h.25l.7 2.16 2.3.03c.23 0 .27.08.09.23h.01z"/></svg>
+    </md-ref>
+
+
+  </div>
+
+</markdown-toolbar>
+
+  </div>
+
+
+  <div class="comment-form-error js-comment-form-error" hidden>
+    There was an error creating your Gist.
+  </div>
+
+  <file-attachment class="js-upload-markdown-image is-default" role="tabpanel" data-upload-policy-url="/upload/policies/assets" data-upload-policy-authenticity-token="mOLRv6ttfa3TbB0+Smo2TWW8+4oZ4UCJRA3uAsjDDTqGeCfIVAnqFYNvrknblVvwukVnzKUjegCUmcaVts/bCg==">
+    <div class="write-content js-write-bucket tooltipped tooltipped-ne tooltipped-no-delay tooltipped-align-left-1 hide-reaction-suggestion upload-enabled" >
+
+
+      <text-expander keys=":"
+        data-emoji-url="/vkyii/1079783/suggestions"
+        >
+        <textarea name="comment[body]"
+                  id="new_comment_field"
+                  
+                  
+                  placeholder="Leave a comment"
+                  aria-label="Comment body"
+                  class="form-control input-contrast comment-form-textarea js-comment-field js-paste-markdown js-task-list-field js-quick-submit js-size-to-fit js-session-resumable "
+                  ></textarea>
+      </text-expander>
+        
+  <p class="drag-and-drop hx_drag-and-drop position-relative d-flex flex-justify-between">
+    <input accept=".gif,.jpeg,.jpg,.png" type="file"
+      multiple
+      class="manual-file-chooser manual-file-chooser-transparent top-0 right-0 bottom-0 left-0 width-full ml-0 js-manual-file-chooser form-control"
+      aria-label="Attach files to your comment"
+        id="fc-new_comment_field"
+      >
+    <span class="bg-gray-light position-absolute top-0 left-0 width-full height-full rounded-1" style="pointer-events: none;"></span>
+    <span class="position-relative pr-2" style="pointer-events: none;">
+      <span class="default">
+          Attach files by dragging &amp; dropping, selecting or pasting them.
+      </span>
+      <span class="loading">
+        <img alt="" width="16" height="16" src="https://github.githubassets.com/images/spinners/octocat-spinner-32.gif" /> Uploading your files…
+      </span>
+      <span class="error bad-file">
+        We don’t support that file type.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with a
+          GIF, JPEG, JPG or PNG.
+        </span>
+      </span>
+      <span class="error bad-permissions">
+        Attaching documents requires write permission to this repository.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with a GIF, JPEG, JPG or PNG.
+        </span>
+      </span>
+      <span class="error repository-required">
+        We don’t support that file type.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with a GIF, JPEG, JPG or PNG.
+        </span>
+      </span>
+      <span class="error too-big">
+        Yowza, that’s a big file
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with a file smaller than 10MB.
+        </span>
+      </span>
+      <span class="error empty">
+        This file is empty.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with a file that’s not empty.
+        </span>
+      </span>
+      <span class="error hidden-file">
+        This file is hidden.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again</button> with another file.
+        </span>
+      </span>
+      <span class="error failed-request">
+        Something went really wrong, and we can’t process that file.
+        <span class="drag-and-drop-error-info">
+          <button type="button" class="btn-link manual-file-chooser-text">Try again.</button>
+        </span>
+      </span>
+    </span>
+    <span class="tooltipped tooltipped-nw" aria-label="Styling with Markdown is supported">
+      <a
+        class="muted-link position-relative d-inline"
+        href="https://guides.github.com/features/mastering-markdown/"
+        target="_blank"
+        data-ga-click="Markdown Toolbar, click, help"
+        aria-label="Learn about styling with Markdown"
+        
+      >
+        <svg class="octicon octicon-markdown v-align-bottom" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"/></svg>
+      </a>
+    </span>
+  </p>
+
+    </div>
+</file-attachment>
+  <div role="tabpanel" class="js-preview-panel mx-2 mb-2 overflow-auto border-bottom " hidden>
+    <input type="hidden" name="original-line" value="" class="js-original-line">
+    <input type="hidden" name="path" value="" class="js-path">
+    <input type="hidden" name="line" value="" class="js-line-number">
+    <input type="hidden" name="start_line" value="">
+    <div class="comment js-suggested-changes-container" data-thread-side="">
+  <div class="comment-body markdown-body js-preview-body">
+    <p>Nothing to preview</p>
+  </div>
+</div>
+
+  </div>
+
+
+
+  <div class="comment-form-error mb-2 js-comment-update-error" hidden></div>
+</tab-container>
+
+      <input type="text" name="required_field_6b1d" id="required_field_6b1d" hidden="hidden" class="form-control" />
+<input type="hidden" name="timestamp" value="1568882998131" class="form-control" />
+<input type="hidden" name="timestamp_secret" value="c8cc3c37b4e4fb8a88211cef6c63ee12e9cf053cb6a322fe0a6d5739d121ff8e" class="form-control" />
+
+      <div class="form-actions">
+        <div id="partial-new-comment-form-actions">
+  <button type="submit" class="btn btn-primary" data-disable-with data-disable-invalid>
+    Comment
+  </button>
+</div>
+
+      </div>
+    </div>
+</form></div>
+
+        </div>
+      </div>
+    </div>
+</div>
+  </div>
+</div><!-- /.container -->
+
+    </main>
+  </div>
+
+  </div>
+
+        
+<div class="footer container-lg width-full px-3" role="contentinfo">
+  <div class="position-relative d-flex flex-justify-between pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <ul class="list-style-none d-flex flex-wrap ">
+      <li class="mr-3">&copy; 2019 <span title="0.36601s from unicorn-566665c4c6-2nlzw">GitHub</span>, Inc.</li>
+        <li class="mr-3"><a data-ga-click="Footer, go to terms, text:terms" href="https://github.com/site/terms">Terms</a></li>
+        <li class="mr-3"><a data-ga-click="Footer, go to privacy, text:privacy" href="https://github.com/site/privacy">Privacy</a></li>
+        <li class="mr-3"><a data-ga-click="Footer, go to security, text:security" href="https://github.com/security">Security</a></li>
+        <li class="mr-3"><a href="https://githubstatus.com/" data-ga-click="Footer, go to status, text:status">Status</a></li>
+        <li><a data-ga-click="Footer, go to help, text:help" href="https://help.github.com">Help</a></li>
+    </ul>
+
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mx-lg-4" href="https://github.com">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+</a>
+   <ul class="list-style-none d-flex flex-wrap ">
+        <li class="mr-3"><a data-ga-click="Footer, go to contact, text:contact" href="https://github.com/contact">Contact GitHub</a></li>
+        <li class="mr-3"><a href="https://github.com/pricing" data-ga-click="Footer, go to Pricing, text:Pricing">Pricing</a></li>
+      <li class="mr-3"><a href="https://developer.github.com" data-ga-click="Footer, go to api, text:api">API</a></li>
+      <li class="mr-3"><a href="https://training.github.com" data-ga-click="Footer, go to training, text:training">Training</a></li>
+        <li class="mr-3"><a href="https://github.blog" data-ga-click="Footer, go to blog, text:blog">Blog</a></li>
+        <li><a data-ga-click="Footer, go to about, text:about" href="https://github.com/about">About</a></li>
+
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+</div>
+
+
+
+  <div id="ajax-error-message" class="ajax-error-message flash flash-error">
+    <svg class="octicon octicon-alert" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"/></svg>
+    <button type="button" class="flash-close js-ajax-error-dismiss" aria-label="Dismiss error">
+      <svg class="octicon octicon-x" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>
+    </button>
+    You can’t perform that action at this time.
+  </div>
+
+
+    
+    
+    
+    
+    
+      <script crossorigin="anonymous" async="async" integrity="sha512-H/ltLl+93NbOrJHBephFfeDfXDwZVnANIWvCKlme1OJkVCEYKg0+KQXrz0oPfNlXQSTaOdV1oBumOr78OgT02w==" type="application/javascript" src="https://github.githubassets.com/assets/gist-bootstrap-6a12475b.js"></script>
+
+    
+  <div class="js-stale-session-flash stale-session-flash flash flash-warn flash-banner" hidden
+    >
+    <svg class="octicon octicon-alert" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"/></svg>
+    <span class="signed-in-tab-flash">You signed in with another tab or window. <a href="">Reload</a> to refresh your session.</span>
+    <span class="signed-out-tab-flash">You signed out in another tab or window. <a href="">Reload</a> to refresh your session.</span>
+  </div>
+  <template id="site-details-dialog">
+  <details class="details-reset details-overlay details-overlay-dark lh-default text-gray-dark hx_rsm" open>
+    <summary role="button" aria-label="Close dialog"></summary>
+    <details-dialog class="Box Box--overlay d-flex flex-column anim-fade-in fast hx_rsm-dialog hx_rsm-modal">
+      <button class="Box-btn-octicon m-0 btn-octicon position-absolute right-0 top-0" type="button" aria-label="Close dialog" data-close-dialog>
+        <svg class="octicon octicon-x" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>
+      </button>
+      <div class="octocat-spinner my-6 js-details-dialog-spinner"></div>
+    </details-dialog>
+  </details>
+</template>
+
+  <div class="Popover js-hovercard-content position-absolute" style="display: none; outline: none;" tabindex="0">
+  <div class="Popover-message Popover-message--bottom-left Popover-message--large Box box-shadow-large" style="width:360px;">
+  </div>
+</div>
+
+  <div aria-live="polite" class="js-global-screen-reader-notice sr-only"></div>
+
+  </body>
+</html>
+

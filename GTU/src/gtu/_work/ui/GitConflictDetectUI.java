@@ -768,7 +768,7 @@ public class GitConflictDetectUI extends JFrame {
             this.projectDir = projectDir;
             GitUtil.StatusInfo statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
             for (String[] line : statusInfo.stageLst) {
-                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                GitFile g = new GitFile(line[1], GitUtil.getGitOrignFile(projectDir, line[1]));
                 g.stageColor = "blue";
                 g.stageDesc = "commit";
                 this.applyStatus(g, line[0]);
@@ -776,7 +776,7 @@ public class GitConflictDetectUI extends JFrame {
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.conflictLst) {
-                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                GitFile g = new GitFile(line[1], GitUtil.getGitOrignFile(projectDir, line[1]));
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
@@ -787,7 +787,7 @@ public class GitConflictDetectUI extends JFrame {
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.unstageLst) {
-                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                GitFile g = new GitFile(line[1], GitUtil.getGitOrignFile(projectDir, line[1]));
                 g.stageColor = "green";
                 g.stageDesc = "uncommit";
                 this.applyStatus(g, line[0]);
@@ -795,7 +795,7 @@ public class GitConflictDetectUI extends JFrame {
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.untractedLst) {
-                GitFile g = new GitFile(line[1], new File(projectDir, line[1]));
+                GitFile g = new GitFile(line[1], GitUtil.getGitOrignFile(projectDir, line[1]));
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
@@ -889,6 +889,17 @@ public class GitConflictDetectUI extends JFrame {
             return "";
         }
 
+        private static File getGitOrignFile(File projectDir, String gitOrignPathName) {
+            String fixOrignName = getGitOrignPathName(gitOrignPathName);
+            Pattern ptn2 = Pattern.compile("^\"(.+)\"$");
+            Matcher mth2 = ptn2.matcher(fixOrignName);
+            if (mth2.find()) {
+                fixOrignName = mth2.group(1);
+            }
+            File file = new File(projectDir, fixOrignName);
+            return file;
+        }
+
         private static String getGitOrignPathName(String gitOrignPathName) {
             Pattern ptn = Pattern.compile("(?:modified|new\\sfile|deleted)\\:\\s*(.*)");
             Matcher mth = ptn.matcher(gitOrignPathName);
@@ -964,6 +975,10 @@ public class GitConflictDetectUI extends JFrame {
 
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
+            run.command("git config core.quotepath false");
+            // run.command("git config gui.encoding BIG5");
+            // run.command("git config i18n.commitencoding BIG5");
+            // run.command("git config i18n.logoutputencoding BIG5");
             run.command("git status");
 
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());

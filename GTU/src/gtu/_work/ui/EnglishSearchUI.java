@@ -69,8 +69,6 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -110,7 +108,6 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
-import gtu.swing.util.HistoryComboBox;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFontChooserHelper;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -169,7 +166,7 @@ public class EnglishSearchUI extends JFrame {
         File tmpFile = new File("D:\\my_tool\\EnglishSearchUI\\EnglishSearchUI_win10_config.properties");
         if (tmpFile.exists()) {
             propertyBean = new PropertiesUtilBean(tmpFile);
-        }else {
+        } else {
             tmpFile = new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties");
             propertyBean = new PropertiesUtilBean(tmpFile);
         }
@@ -513,11 +510,23 @@ public class EnglishSearchUI extends JFrame {
                             }
                         }, new ActionListener() {// skip
                                                  // all
+                            Pattern ptn = Pattern.compile("\\d+\\-\\d+");
+
+                            private Range getMinRange(String strVal) {
+                                Matcher mth = ptn.matcher(strVal);
+                                if (mth.matches()) {
+                                    return Range.between(Integer.parseInt(mth.group(1)), Integer.parseInt(mth.group(2)));
+                                } else {
+                                    int min = Integer.parseInt(strVal);
+                                    return Range.between(min, min);
+                                }
+                            }
+
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-                                    int min = Integer.valueOf(JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?", "5"));
-                                    memory.suspend(Range.between(min, min + 40));
+                                    String strVal = JCommonUtil._jOptionPane_showInputDialog("請輸入延後分鐘數?(\\d+ or \\d+-\\d+)", "1-40");
+                                    memory.suspend(getMinRange(strVal));
                                 } catch (Exception ex) {
                                     memory.suspend();
                                 }
