@@ -178,7 +178,7 @@ public class HermannEbbinghaus_Memory {
         startPause.set(false);
         for (Pair<Timer, MemData> t : timerMap.values()) {
             try {
-                t.getLeft().cancel();
+                TimerUtil.killTimer(t.getLeft());
             } catch (Exception ex) {
             }
         }
@@ -194,7 +194,7 @@ public class HermannEbbinghaus_Memory {
         Timer t = new Timer();
         String key = d.getKey();
         if (timerMap.containsKey(key)) {
-            timerMap.get(key).getLeft().cancel();
+            TimerUtil.killTimer(timerMap.get(key).getLeft());
         }
         timerMap.put(key, Pair.of(t, d));
         return t;
@@ -330,6 +330,9 @@ public class HermannEbbinghaus_Memory {
             nextPeroid.set(this.getExecuteTime(d.fixedTime, nextRuntime));
         }
 
+        // 下次顯示時間
+        d.setNextShowTime("" + (System.currentTimeMillis() + nextPeroid.get()));
+
         System.out.println("## 排成  " + d.getKey() + " - " + d.reviewTime + " - " + nextPeroid + " - " + DateUtil.wasteTotalTime(nextPeroid.get()));
 
         Timer timer = newClock(d);
@@ -369,8 +372,7 @@ public class HermannEbbinghaus_Memory {
 
                 // 紀錄下次執行
                 if (!d.isCustomWaitingTrigger()) {
-                    System.out.println("1----->" + ReflectionToStringBuilder.toString(act.getSource(), ToStringStyle.MULTI_LINE_STYLE));
-                    System.out.println("2----->" + ReflectionToStringBuilder.toString(d, ToStringStyle.MULTI_LINE_STYLE));
+                    System.out.println("MemData----->" + ReflectionToStringBuilder.toString(d, ToStringStyle.MULTI_LINE_STYLE));
 
                     // 計算下次執行起算點
                     d.fixedTime = getCaculateFixedTime(d.reviewTime, d);
@@ -407,23 +409,16 @@ public class HermannEbbinghaus_Memory {
      */
     public List<String> getWaitingList() {
         TreeMap<Long, List<MemData>> map = new TreeMap<Long, List<MemData>>();
-        // for (MemData d : getAllMemData(true)) {
         for (Pair<Timer, MemData> d2 : timerMap.values()) {
             MemData d = d2.getRight();
-            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
-            if (reviewTime == ReviewTime.NONE) {
-                continue;
-            }
-
-            long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            long nextPeroid = this.getExecuteTime(d.fixedTime, nextRuntime);
 
             List<MemData> lst = new ArrayList<MemData>();
-            if (map.containsKey(nextPeroid)) {
-                lst = map.get(nextPeroid);
+            Long key = Long.parseLong(d.getNextShowTime());
+            if (map.containsKey(key)) {
+                lst = map.get(key);
             }
             lst.add(d);
-            map.put(nextPeroid, lst);
+            map.put(key, lst);
         }
 
         List<MemData> allLst = new ArrayList<MemData>();
@@ -434,11 +429,12 @@ public class HermannEbbinghaus_Memory {
 
         List<String> rtnLst = new ArrayList<String>();
         for (MemData d : allLst) {
-            ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
-            long nextRuntime = (long) (reviewTime.min * 60 * 1000);
-            long nextPeroid = this.getExecuteTime(d.fixedTime, nextRuntime);
-            String nextPeriodDesc = nextPeroid == 0 ? "馬上" : DateUtil.wasteTotalTime(nextPeroid);
-            String detail = String.format("[%s] %s : %s -> %s", d.reviewTime, d.getKey(), nextPeriodDesc, d.getRemark());
+            Long nextShowTime = Long.parseLong(d.getNextShowTime());
+            String nextPeriodDesc = "馬上";
+            if (nextShowTime > (System.currentTimeMillis() + 60 * 1000)) {
+                nextPeriodDesc = DateUtil.wasteTotalTime(nextShowTime - System.currentTimeMillis());
+            }
+            String detail = String.format("[%s] %s : %s -> %s ", d.reviewTime, d.getKey(), nextPeriodDesc, d.getRemark());
             rtnLst.add(detail);
         }
         return rtnLst;
@@ -489,6 +485,8 @@ public class HermannEbbinghaus_Memory {
         String category;
         long waitingTriggerTime = -1;// 設定值於此 則可自訂trigger時間
         boolean isRetry = false;
+        String remark2;
+        String nextShowTime;
 
         public MemData() {
         }
@@ -502,6 +500,8 @@ public class HermannEbbinghaus_Memory {
                 this.fixedTime = __getDateFromString(getArry(2, arry));
                 this.remark = getArry(3, arry);
                 this.category = getArry(4, arry);
+                this.remark2 = getArry(5, arry);
+                this.nextShowTime = getArry(6, arry);
             } catch (Exception e) {
                 throw new RuntimeException("MemData ERR : " + e.getMessage(), e);
             }
@@ -512,7 +512,9 @@ public class HermannEbbinghaus_Memory {
                     DateFormatUtils.format(this.registerTime, DATE_FORMAT) + "^" + //
                     DateFormatUtils.format(this.fixedTime, DATE_FORMAT) + "^" + //
                     StringUtils.defaultString(this.remark) + "^" + //
-                    StringUtils.trimToEmpty(this.category) + "" //
+                    StringUtils.trimToEmpty(this.category) + "^" + //
+                    StringUtils.defaultString(this.remark2) + "^" + //
+                    StringUtils.defaultString(this.nextShowTime) //
             ;
         }
 
@@ -619,6 +621,22 @@ public class HermannEbbinghaus_Memory {
 
         public void setRetry(boolean isRetry) {
             this.isRetry = isRetry;
+        }
+
+        public String getRemark2() {
+            return remark2;
+        }
+
+        public void setRemark2(String remark2) {
+            this.remark2 = remark2;
+        }
+
+        public String getNextShowTime() {
+            return nextShowTime;
+        }
+
+        public void setNextShowTime(String nextShowTime) {
+            this.nextShowTime = nextShowTime;
         }
     }
 

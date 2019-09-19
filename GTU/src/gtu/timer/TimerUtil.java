@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.lang.reflect.FieldUtils;
@@ -89,7 +90,7 @@ public class TimerUtil {
         }
         return map;
     }
-    
+
     public Map<Thread.State, Integer> getTimerThreadStatus() {
         Thread[] ths = getCurrentThreads();
 
@@ -106,5 +107,10 @@ public class TimerUtil {
             }
         }
         return map;
+    }
+
+    public static void killTimer(Timer timer) {
+        timer.cancel();
+        timer.purge();
     }
 }
