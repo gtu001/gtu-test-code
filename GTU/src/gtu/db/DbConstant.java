@@ -12,10 +12,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class DbConstant {
 
     public static void main(String[] args) {
-        DataSource ds = getDerbyDataSource();
+        DataSource ds = null;
         Connection conn = null;
         try {
-            conn = ds.getConnection();
+            conn = getTestConnection_H2();
             System.out.println("test fine ...");
 
             int v = Integer.parseInt("01");
@@ -36,6 +36,15 @@ public class DbConstant {
         bds.setMaxActive(10);
         bds.setInitialSize(1);
         bds.setMaxIdle(600000);
+    }
+
+    public static Connection getTestConnection_H2() throws SQLException {
+        DriverManager.registerDriver(new org.h2.Driver());
+        String url = "jdbc:h2:tcp://localhost/~/test";
+        String user = "sa";
+        String pwd = "";
+        Connection conn = DriverManager.getConnection(url, user, pwd);
+        return conn;
     }
 
     public static Connection getTestConnection() throws SQLException {
