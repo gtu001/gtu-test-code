@@ -226,6 +226,15 @@ public class HermannEbbinghaus_Memory {
         }
     }
 
+    public MemData get(String key) {
+        for (MemData d : memLst) {
+            if (StringUtils.equals(d.getKey(), key)) {
+                return d;
+            }
+        }
+        return null;
+    }
+
     /**
      * 加入新項目
      * 
@@ -549,6 +558,10 @@ public class HermannEbbinghaus_Memory {
             this.registerTime = registerTime;
         }
 
+        public Float getReviewTimeMin() {
+            return getReviewTimeMin(reviewTime);
+        }
+
         public String getReviewTime() {
             return reviewTime;
         }
@@ -637,6 +650,15 @@ public class HermannEbbinghaus_Memory {
 
         public void setNextShowTime(String nextShowTime) {
             this.nextShowTime = nextShowTime;
+        }
+
+        private static float getReviewTimeMin(String reviewTime) {
+            try {
+                ReviewTime r = ReviewTime.valueOf(reviewTime);
+                return r.min;
+            } catch (Exception ex) {
+                return -9999;
+            }
         }
     }
 

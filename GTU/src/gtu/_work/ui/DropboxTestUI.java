@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 
 import com.dropbox.core.DbxException;
@@ -174,6 +175,30 @@ public class DropboxTestUI extends JFrame {
                 }
             }
         });
+
+        JButton downloadAllFolderBtn = new JButton("download folder");
+        downloadAllFolderBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
+                    JFile jfile = (JFile) selectItem.getUserObject();
+                    File targetDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
+                    if (targetDir == null || !targetDir.exists()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
+                        return;
+                    }
+                    if (jfile == null || !jfile.isFolder) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("請選擇上傳目錄");
+                        return;
+                    }
+                    int downloadCount = util.downloadAllFolderFiles(jfile.path, targetDir);
+                    JCommonUtil._jOptionPane_showMessageDialog_info("下載成功:" + downloadCount);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_2.add(downloadAllFolderBtn);
         panel_2.add(button_1);
 
         JButton btnNewButton = new JButton("delete");
@@ -267,6 +292,35 @@ public class DropboxTestUI extends JFrame {
 
         protected DbxClientV2 getClient() {
             return DropboxUtilV2.getClient(TOKEN);
+        }
+
+        private void __inner_download__(JFile file, File targetDir) {
+            FileOutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(new File(targetDir, file.name));
+                DropboxUtilV2.download(file.path, outputStream, getClient());
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                CloseUtil.close(outputStream);
+            }
+        }
+
+        private int downloadAllFolderFiles(String path, File targetFolder) {
+            File[] files = targetFolder.listFiles();
+            if (files != null && files.length > 0) {
+                Validate.isTrue(false, "目錄必須為空！");
+            }
+            int count = 0;
+            List<DropboxUtilV2_DropboxFile> list = DropboxUtilV2.listFilesV2(path, getClient());
+            for (DropboxUtilV2_DropboxFile f : list) {
+                JFile f2 = new JFile(f);
+                if (!f2.isFolder) {
+                    __inner_download__(f2, targetFolder);
+                    count++;
+                }
+            }
+            return count;
         }
 
         protected boolean beforeUpload(File inputFile, String basePath) {

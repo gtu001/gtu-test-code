@@ -56,7 +56,7 @@ public class ProcessWatcher {
         return this;
     }
 
-    public ProcessWatcher getStreamAsync() throws IOException, TimeoutException {
+    public ProcessWatcher getStreamAsync() {
         System.out.println("watcher --- input start -----");
         processInputStreamAsync("input");
         System.out.println("watcher --- input end");
@@ -70,7 +70,7 @@ public class ProcessWatcher {
         return new ProcessWatcher(process);
     }
 
-    private void processInputStreamAsync(final String type) throws IOException, TimeoutException {
+    private void processInputStreamAsync(final String type) {
         // linux 不work
         new Thread(new Runnable() {
             @Override

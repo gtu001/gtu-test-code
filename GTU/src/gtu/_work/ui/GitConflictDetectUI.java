@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -113,6 +115,14 @@ public class GitConflictDetectUI extends JFrame {
     private JButton gitLogBtn;
     private JLabel lblNewLabel;
     private JTextField editorExeText;
+    private JPanel panel_9;
+    private JPanel panel_10;
+    private JPanel panel_11;
+    private JPanel panel_12;
+    private JPanel panel_13;
+    private JTextField gitHistoryText;
+    private JList gitHistoryList;
+    private JButton gitHistoryClearBtn;
 
     /**
      * Launch the application.
@@ -328,6 +338,49 @@ public class GitConflictDetectUI extends JFrame {
         });
         panel_1.add(JCommonUtil.createScrollComponent(gitConflictList), BorderLayout.CENTER);
 
+        panel_9 = new JPanel();
+        tabbedPane.addTab("過去歷史", null, panel_9, null);
+        panel_9.setLayout(new BorderLayout(0, 0));
+
+        panel_10 = new JPanel();
+        panel_9.add(panel_10, BorderLayout.NORTH);
+
+        gitHistoryText = new JTextField();
+        gitHistoryText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                swingUtil.invokeAction("gitHistoryText.lost", e);
+            }
+        });
+        panel_10.add(gitHistoryText);
+        gitHistoryText.setColumns(40);
+
+        gitHistoryClearBtn = new JButton("清除");
+        gitHistoryClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitHistoryClearBtn.Click", e);
+            }
+        });
+        panel_10.add(gitHistoryClearBtn);
+
+        panel_11 = new JPanel();
+        panel_9.add(panel_11, BorderLayout.WEST);
+
+        panel_12 = new JPanel();
+        panel_9.add(panel_12, BorderLayout.SOUTH);
+
+        panel_13 = new JPanel();
+        panel_9.add(panel_13, BorderLayout.EAST);
+
+        gitHistoryList = new JList();
+        gitHistoryList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("gitHistoryList.Click", e);
+            }
+        });
+        panel_9.add(JCommonUtil.createScrollComponent(gitHistoryList), BorderLayout.CENTER);
+
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -437,6 +490,12 @@ public class GitConflictDetectUI extends JFrame {
                                         GitUtil.discardChange(projectDir, gitFile.orignName);
                                         new GitCheckProc(projectDir, gitFile.orignName);
                                     }
+                                }
+                            })//
+                            .addJMenuItem("gitk", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.gitk(projectDir, gitFile.orignName);
                                 }
                             })//
                             .addJMenuItem("delete file", new ActionListener() {
@@ -595,6 +654,57 @@ public class GitConflictDetectUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
             }
         });
+        swingUtil.addActionHex("gitHistoryText.lost", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "專案目錄為空");
+                Validate.notBlank(gitHistoryText.getText(), "搜尋條件為空");
+                final File projectDir = new File(gitFolderPathText.getText());
+                String searchText = StringUtils.trimToEmpty(gitHistoryText.getText());
+                List<File> fileLst = new ArrayList<File>();
+                FileUtil.searchFilefind(projectDir, searchText, fileLst);
+                DefaultListModel model = JListUtil.createModel();
+                gitHistoryList.setModel(model);
+                for (File f : fileLst) {
+                    model.addElement(new PFile(f));
+                }
+                JCommonUtil._jOptionPane_showMessageDialog_info("完成!");
+            }
+        });
+        swingUtil.addActionHex("gitHistoryClearBtn.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                gitHistoryText.setText("");
+                DefaultListModel model = JListUtil.createModel();
+                gitHistoryList.setModel(model);
+            }
+        });
+        swingUtil.addActionHex("gitHistoryList.Click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                Validate.notBlank(gitFolderPathText.getText(), "專案目錄為空");
+                final File projectDir = new File(gitFolderPathText.getText());
+                if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+                    PFile file = JListUtil.getLeadSelectionObject(gitHistoryList);
+                    GitUtil.gitk(projectDir, file.file.getAbsolutePath());
+                }
+            }
+        });
+    }
+
+    private class PFile {
+        File file;
+        String name;
+
+        PFile(File f) {
+            this.file = f;
+            this.name = f.getName();
+        }
+
+        @Override
+        public String toString() {
+            return StringUtils.trimToEmpty(name);
+        }
     }
 
     private void applyAppMenu() {
@@ -819,7 +929,7 @@ public class GitConflictDetectUI extends JFrame {
         if (StringUtils.isNotBlank(gitCmdEncodingText.getText())) {
             return StringUtils.trimToEmpty(gitCmdEncodingText.getText());
         }
-        gitCmdEncodingText.setText("BIG5");
+        gitCmdEncodingText.setText("UTF8");
         return "BIG5";
     }
 
@@ -957,6 +1067,15 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
         }
 
+        private static void gitk(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command("gitk " + fileGitPath);
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamAsync();
+        }
+
         /**
          * Left : stage// middle : unstage// right : untraced
          * 
@@ -1054,13 +1173,16 @@ public class GitConflictDetectUI extends JFrame {
             run.command(username);
             run.command(password);
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
-            p.getStreamSync();
-            String resultString = p.getInputStreamToString();
-            if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
-            }
-            System.out.println(resultString);
-            return resultString;
+            p.getStreamAsync();
+            // String resultString = p.getInputStreamToString();
+            // if (OsInfoUtil.isWindows()) {
+            // resultString =
+            // RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 +
+            // 4) * 2, 0);
+            // }
+            // System.out.println(resultString);
+            // return resultString;
+            return "TODO";
         }
 
         private static String pull(File projectDir) {

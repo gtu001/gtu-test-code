@@ -2060,10 +2060,16 @@ public class EnglishSearchUI extends JFrame {
 
     private void reviewMemoryMergeBtnAction() {
         try {
-            File dir = JCommonUtil._jFileChooser_selectFileAndDirectory();
-            if (!dir.isDirectory()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("必須是dropbox目錄!");
-                return;
+            File dir = null;
+            File dir2 = memory.getFile().getParentFile();
+            if (memory.isInitDone() && dir2.isDirectory() && dir2.exists()) {
+                dir = dir2;
+            } else {
+                dir = JCommonUtil._jFileChooser_selectFileAndDirectory();
+                if (!dir.isDirectory()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("必須是dropbox目錄!");
+                    return;
+                }
             }
 
             List<String> mergeFileLst = new ArrayList<String>();
@@ -2081,7 +2087,20 @@ public class EnglishSearchUI extends JFrame {
                         if (!memory.containsKey(d.getKey())) {
                             memory.append(d);
                             addCount++;
+                        } else {
+                            Float d1 = d.getReviewTimeMin();
+                            MemData d2Data = memory.get(d.getKey());
+                            if (d2Data != null) {
+                                Float d2 = d2Data.getReviewTimeMin();
+                                if (d1 < d2) {
+                                    memory.append(d2Data);
+                                }
+                            }
                         }
+                    }
+
+                    if (!f.getName().equals("EnglishSearchUI_MemoryBank.properties")) {
+                        f.delete();// /media/gtu001/OLD_D/gtu001_dropbox/Dropbox/Apps/gtu001_test/etc_config
                     }
                 }
             }
