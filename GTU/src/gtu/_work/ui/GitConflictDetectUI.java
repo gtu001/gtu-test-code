@@ -123,6 +123,7 @@ public class GitConflictDetectUI extends JFrame {
     private JTextField gitHistoryText;
     private JList gitHistoryList;
     private JButton gitHistoryClearBtn;
+    private JButton gitHistorySearchBtn;
 
     /**
      * Launch the application.
@@ -361,6 +362,14 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitHistoryClearBtn.Click", e);
             }
         });
+
+        gitHistorySearchBtn = new JButton("搜尋");
+        gitHistorySearchBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitHistorySearchBtn.Click", e);
+            }
+        });
+        panel_10.add(gitHistorySearchBtn);
         panel_10.add(gitHistoryClearBtn);
 
         panel_11 = new JPanel();
@@ -654,7 +663,7 @@ public class GitConflictDetectUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
             }
         });
-        swingUtil.addActionHex("gitHistoryText.lost", new Action() {
+        swingUtil.addActionHex("gitHistorySearchBtn.Click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 Validate.notBlank(gitFolderPathText.getText(), "專案目錄為空");
@@ -1173,16 +1182,13 @@ public class GitConflictDetectUI extends JFrame {
             run.command(username);
             run.command(password);
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
-            p.getStreamAsync();
-            // String resultString = p.getInputStreamToString();
-            // if (OsInfoUtil.isWindows()) {
-            // resultString =
-            // RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 +
-            // 4) * 2, 0);
-            // }
-            // System.out.println(resultString);
-            // return resultString;
-            return "TODO";
+            p.getStreamSync();
+            String resultString = p.getInputStreamToString();
+            if (OsInfoUtil.isWindows()) {
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+            }
+            System.out.println(resultString);
+            return resultString;
         }
 
         private static String pull(File projectDir) {
