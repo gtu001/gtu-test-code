@@ -79,6 +79,18 @@ public class AppListFilterActivity extends Activity {
             }
         });
 
+//        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+//                                           int pos, long id) {
+//                // TODO Auto-generated method stub
+//
+//                Log.v("long clicked", "pos: " + pos);
+//
+//                return true;
+//            }
+//        });
+
         initListViewHandler = new InitListViewHandler(this);
         initListViewHandler.init();
     }

@@ -23,8 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -589,21 +591,62 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private static String fixWindowUrl(String url) {
+        if (OsInfoUtil.isWindows()) {
+            url = StringUtils.defaultString(url);
+            if (url.startsWith("file:")) {
+                try {
+                    url = URLDecoder.decode(url, "UTF-8");
+                } catch (UnsupportedEncodingException e1) {
+                    e1.printStackTrace();
+                }
+                Pattern ptn = Pattern.compile("file\\:[\\/]+(.*)");
+                Matcher mth = ptn.matcher(url);
+                if (mth.find()) {
+                    File file = new File(mth.group(1));
+                    System.out.println("orign file : " + file);
+                    if (file.exists()) {
+                        try {
+                            return file.toURL().toString();
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    String paddingUrl = file.getAbsolutePath();
+                    paddingUrl = paddingUrl.replaceAll("^\\w+\\:", "");
+                    for (File root : File.listRoots()) {
+                        File tmpFile = new File(root + File.separator + paddingUrl);
+                        if (tmpFile.exists()) {
+                            try {
+                                return tmpFile.toURL().toString();
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return url;
+    }
+
     private enum CommandTypeEnum {
         DEFAULT("預設") {
             @Override
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
                     String dValue = _this.bookmarkConfig.getConfigProp().getProperty(url);
+                    String fixUrl = fixWindowUrl(url);
                     if (StringUtils.isNotBlank(dValue)) {
                         UrlConfig d = UrlConfig.parseTo(url, dValue);
                         if (!"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
-                            DesktopUtil.browse(url);
+                            DesktopUtil.browse(fixUrl);
                         } else {
                             _this.doOpenWithRemark(d, false);
                         }
                     } else {
-                        DesktopUtil.browse(url);
+                        DesktopUtil.browse(fixUrl);
                     }
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
@@ -1966,7 +2009,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             Pattern ptn = Pattern.compile("\\%(?:1\\$|)s");
             Matcher mth = ptn.matcher(command);
             if (mth.find()) {
-                File file = DesktopUtil.getFile(d.url);
+                String fixUrl = fixWindowUrl(d.url);
+                File file = DesktopUtil.getFile(fixUrl);
                 if (file == null || !file.exists() || !file.isFile()) {
                     JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
                     return;
