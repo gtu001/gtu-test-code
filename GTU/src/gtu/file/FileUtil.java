@@ -675,6 +675,37 @@ public class FileUtil {
      * @param fileList
      *            找到符合的檔案
      */
+    public static void searchFileContains(File file, String containsText, boolean ignoreCase, List<File> fileList) {
+        if (!file.exists()) {
+            return;
+        }
+        if (file.isDirectory() && file.listFiles() != null) {
+            for (File f : file.listFiles()) {
+                searchFileContains(f, containsText, ignoreCase, fileList);
+            }
+        } else {
+            if (!ignoreCase && file.getName().contains(containsText)) {
+                if (!fileList.contains(file)) {
+                    fileList.add(file);
+                }
+            } else if (ignoreCase && file.getName().toLowerCase().contains(containsText.toLowerCase())) {
+                if (!fileList.contains(file)) {
+                    fileList.add(file);
+                }
+            }
+        }
+    }
+
+    /**
+     * 搜尋目標符合pattern的檔案(matches)
+     * 
+     * @param file
+     *            搜尋的目錄
+     * @param pattern
+     *            regex pattern
+     * @param fileList
+     *            找到符合的檔案
+     */
     public static void searchFileMatchs(File file, String pattern, List<File> fileList) {
         if (!file.exists()) {
             return;

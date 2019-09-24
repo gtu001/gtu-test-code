@@ -340,7 +340,7 @@ public class GitConflictDetectUI extends JFrame {
         panel_1.add(JCommonUtil.createScrollComponent(gitConflictList), BorderLayout.CENTER);
 
         panel_9 = new JPanel();
-        tabbedPane.addTab("過去歷史", null, panel_9, null);
+        tabbedPane.addTab("目錄瀏覽", null, panel_9, null);
         panel_9.setLayout(new BorderLayout(0, 0));
 
         panel_10 = new JPanel();
@@ -388,6 +388,14 @@ public class GitConflictDetectUI extends JFrame {
                 swingUtil.invokeAction("gitHistoryList.Click", e);
             }
         });
+
+        JListUtil.newInstance(gitHistoryList).applyOnHoverEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("gitHistoryList.hover", e);
+            }
+        });
+
         panel_9.add(JCommonUtil.createScrollComponent(gitHistoryList), BorderLayout.CENTER);
 
         panel_2 = new JPanel();
@@ -671,7 +679,7 @@ public class GitConflictDetectUI extends JFrame {
                 final File projectDir = new File(gitFolderPathText.getText());
                 String searchText = StringUtils.trimToEmpty(gitHistoryText.getText());
                 List<File> fileLst = new ArrayList<File>();
-                FileUtil.searchFilefind(projectDir, searchText, fileLst);
+                FileUtil.searchFileContains(projectDir, searchText, true, fileLst);
                 DefaultListModel model = JListUtil.createModel();
                 gitHistoryList.setModel(model);
                 for (File f : fileLst) {
@@ -693,9 +701,81 @@ public class GitConflictDetectUI extends JFrame {
             public void action(EventObject evt) throws Exception {
                 Validate.notBlank(gitFolderPathText.getText(), "專案目錄為空");
                 final File projectDir = new File(gitFolderPathText.getText());
+                PFile pFile = JListUtil.getLeadSelectionObject(gitHistoryList);
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
-                    PFile file = JListUtil.getLeadSelectionObject(gitHistoryList);
-                    GitUtil.gitk(projectDir, file.file.getAbsolutePath());
+                    if (pFile.file.isFile()) {
+                        if (StringUtils.isBlank(editorExeText.getText())) {
+                            try {
+                                DesktopUtil.browse(pFile.file.toURL().toString());
+                            } catch (MalformedURLException e1) {
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                            run.runInBatFile(false);
+                            run.command(String.format("\"%s\" \"%s\"", editorExeText.getText(), pFile.file));
+                            run.apply();
+                        }
+                    }
+                } else if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                    JPopupMenuUtil.newInstance(gitHistoryList)//
+                            .addJMenuItem("gitk", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    GitUtil.gitk(projectDir, pFile.file.getAbsolutePath());
+                                }
+                            })//
+                            .addJMenuItem("open file", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    if (pFile.file.isFile()) {
+                                        if (StringUtils.isBlank(editorExeText.getText())) {
+                                            try {
+                                                DesktopUtil.browse(pFile.file.toURL().toString());
+                                            } catch (MalformedURLException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                        } else {
+                                            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+                                            run.runInBatFile(false);
+                                            run.command(String.format("\"%s\" \"%s\"", editorExeText.getText(), pFile.file));
+                                            run.apply();
+                                        }
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("open dir", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    File targetDir = pFile.file;
+                                    if (pFile.file.isFile()) {
+                                        pFile.file.getParentFile();
+                                    }
+                                    DesktopUtil.openDir(targetDir);
+                                }
+                            })//
+                            .addJMenuItem("delete file", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除：" + pFile.file, "刪除");
+                                    if (confirm) {
+                                        pFile.file.delete();
+                                    }
+                                }
+                            })//
+                            .applyEvent(evt)//
+                            .show();
+                }
+            }
+        });
+        swingUtil.addActionHex("gitHistoryList.hover", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                PFile file = (PFile) evt.getSource();
+                if (file.file.exists()) {
+                    gitHistoryList.setToolTipText(file.file.getAbsolutePath());
+                } else {
+                    gitHistoryList.setToolTipText(null);
                 }
             }
         });

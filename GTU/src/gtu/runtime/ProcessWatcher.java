@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
@@ -66,6 +67,24 @@ public class ProcessWatcher {
         return this;
     }
 
+    public ProcessWatcher getStreamAsyncAndPrintStream(PrintStream inputStream, PrintStream errorStream) {
+        System.out.println("watcher --- input start -----");
+        if (inputStream == null) {
+            processInputStreamAsync("input");
+        } else {
+            processInputStreamAsync("input", inputStream);
+        }
+        System.out.println("watcher --- input end");
+        System.out.println("watcher --- error start");
+        if (errorStream == null) {
+            processInputStreamAsync("error");
+        } else {
+            processInputStreamAsync("error", errorStream);
+        }
+        System.out.println("watcher --- error end   -----");
+        return this;
+    }
+
     public static ProcessWatcher newInstance(Process process) {
         return new ProcessWatcher(process);
     }
@@ -105,6 +124,49 @@ public class ProcessWatcher {
                 } finally {
                     CloseUtil.close(bis);
                     CloseUtil.close(baos);
+                }
+            }
+        }).start();
+    }
+
+    private void processInputStreamAsync(final String type, final PrintStream out) {
+        // linux 不work
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BufferedInputStream bis = null;
+                ByteArrayOutputStream baos = null;
+                try {
+                    InputStream is = null;
+                    if ("input".equals(type)) {
+                        is = process.getInputStream();
+                    } else if ("error".equals(type)) {
+                        is = process.getErrorStream();
+                    }
+                    bis = new BufferedInputStream(is);
+                    baos = new ByteArrayOutputStream();
+                    byte[] content = new byte[1024];
+                    int pos = -1;
+                    while ((pos = bis.read(content)) != -1) {
+                        baos.write(content, 0, pos);
+                        out.write(content, 0, pos);
+                    }
+                    baos.flush();
+                    out.flush();
+                    byte[] arry = baos.toByteArray();
+                    if ("input".equals(type)) {
+                        inputStreamBytes.set(arry);
+                        System.out.println("# input stream done!!!");
+                    } else if ("error".equals(type)) {
+                        errorStreamBytes.set(arry);
+                        System.out.println("# error stream done!!!");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    CloseUtil.close(bis);
+                    CloseUtil.close(baos);
+                    CloseUtil.close(out);
                 }
             }
         }).start();

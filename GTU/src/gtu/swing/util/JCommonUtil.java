@@ -805,6 +805,14 @@ public class JCommonUtil {
                                 }
                             }
                         });
+                        if (file.isFile()) {
+                            popUtil.addJMenuItem("開啟目錄", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    DesktopUtil.openDir(file.getParentFile());
+                                }
+                            });
+                        }
                         popUtil.applyEvent(evt);//
                         popUtil.show();
                     }
