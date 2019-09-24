@@ -32,7 +32,7 @@ public class JTextPaneTextStyle {
     public JTextPaneTextStyle startEnd(Integer startPos, Integer endPos) {
         this.startPos = startPos;
         this.endPos = endPos;
-        this.offset = endPos - startPos + 1;
+        this.offset = endPos - startPos;
         return this;
     }
 
