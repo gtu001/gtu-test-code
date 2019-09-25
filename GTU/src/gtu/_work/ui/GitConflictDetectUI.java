@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
@@ -448,15 +449,17 @@ public class GitConflictDetectUI extends JFrame {
         swingUtil.addActionHex("gitConflictList.Click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                final GitFile gitFile = (GitFile) JListUtil.getLeadSelectionObject(gitConflictList);
+                final List<GitFile> gitFileArry = JListUtil.getLeadSelectionArry(gitConflictList);
                 mResolveConflictFileProcess = null;
-                System.out.println(gitFile.file);
 
                 final File projectDir = new File(gitFolderPathText.getText());
                 String exePath = gitExePathText.getText();
 
                 if (JMouseEventUtil.buttonLeftClick(2, (MouseEvent) evt)) {
                     Validate.notBlank(gitExePathText.getText(), "未輸入diff執行檔pattern");
+                    Validate.isTrue(!gitFileArry.isEmpty(), "未選擇檔案");
+
+                    GitFile gitFile = gitFileArry.get(0);
 
                     if (!gitFile.mGitLeftRight.isCheck) {
                         gitFile.load();
@@ -488,46 +491,58 @@ public class GitConflictDetectUI extends JFrame {
                             .addJMenuItem("stage", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    GitUtil.stage(projectDir, gitFile.orignName);
-                                    new GitCheckProc(projectDir, gitFile.orignName);
+                                    for (GitFile gitFile : gitFileArry) {
+                                        GitUtil.stage(projectDir, gitFile.orignName);
+                                    }
+                                    new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
                                 }
                             })//
                             .addJMenuItem("unstage", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    GitUtil.unstage(projectDir, gitFile.orignName);
-                                    new GitCheckProc(projectDir, gitFile.orignName);
+                                    for (GitFile gitFile : gitFileArry) {
+                                        GitUtil.unstage(projectDir, gitFile.orignName);
+                                    }
+                                    new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
                                 }
                             })//
                             .addJMenuItem("discard change", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + gitFile.file, "回覆到未改變");
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
                                     if (confirm) {
-                                        GitUtil.discardChange(projectDir, gitFile.orignName);
-                                        new GitCheckProc(projectDir, gitFile.orignName);
+                                        for (GitFile gitFile : gitFileArry) {
+                                            GitUtil.discardChange(projectDir, gitFile.orignName);
+                                        }
+                                        new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
                                     }
                                 }
                             })//
                             .addJMenuItem("gitk", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    GitUtil.gitk(projectDir, gitFile.orignName);
+                                    for (GitFile gitFile : gitFileArry) {
+                                        GitUtil.gitk(projectDir, gitFile.orignName);
+                                    }
                                 }
                             })//
                             .addJMenuItem("delete file", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除：" + gitFile.file, "刪除");
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除：" + _MyGitTestUtil.getFileNames(gitFileArry), "刪除");
                                     if (confirm) {
-                                        gitFile.file.delete();
-                                        new GitCheckProc(projectDir, gitFile.orignName);
+                                        for (GitFile gitFile : gitFileArry) {
+                                            gitFile.file.delete();
+                                        }
+                                        new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
                                     }
                                 }
                             })//
                             .addJMenuItem("open file", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
+                                    Validate.isTrue(!gitFileArry.isEmpty(), "未選擇檔案");
+                                    GitFile gitFile = gitFileArry.get(0);
                                     if (gitFile.file.isFile()) {
                                         if (StringUtils.isBlank(editorExeText.getText())) {
                                             try {
@@ -547,6 +562,8 @@ public class GitConflictDetectUI extends JFrame {
                             .addJMenuItem("open dir", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
+                                    Validate.isTrue(!gitFileArry.isEmpty(), "未選擇檔案");
+                                    GitFile gitFile = gitFileArry.get(0);
                                     File targetDir = gitFile.file;
                                     if (gitFile.file.isFile()) {
                                         gitFile.file.getParentFile();
@@ -612,7 +629,7 @@ public class GitConflictDetectUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 File gitFolder = new File(gitFolderPathText.getText());
-                new GitCheckProc(gitFolder, "");
+                new GitCheckProc(gitFolder, Collections.EMPTY_LIST);
 
                 // 取得branch
                 gitBranchNameText.setText(GitUtil.getCurrentBranch(gitFolder, getEncoding()));
@@ -781,6 +798,24 @@ public class GitConflictDetectUI extends JFrame {
         });
     }
 
+    private static class _MyGitTestUtil {
+        private static String getFileNames(List<GitFile> gitFileArry) {
+            List<String> lst = new ArrayList<String>();
+            for (GitFile g : gitFileArry) {
+                lst.add(g.file.getName());
+            }
+            return "\n[" + StringUtils.join(lst, "\n") + "]\n";
+        }
+
+        private static List<String> getOrignNames(List<GitFile> gitFileArry) {
+            List<String> lst = new ArrayList<String>();
+            for (GitFile g : gitFileArry) {
+                lst.add(g.orignName);
+            }
+            return lst;
+        }
+    }
+
     private class PFile {
         File file;
         String name;
@@ -945,14 +980,18 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
-        private void copyFromOld(GitFile f, String reloadGitFilePath) {
+        private void copyFromOld(GitFile f, List<String> reloadGitFilePathLst) {
             if (statusFileLstBak == null && statusFileLstBak.isEmpty()) {
                 return;
             }
-            if (StringUtils.isNotBlank(reloadGitFilePath)) {
-                String ignoreOriginName = GitUtil.getGitOrignPathName(reloadGitFilePath);
-                if (StringUtils.equals(f.orignName, ignoreOriginName)) {
-                    return;
+            if (!reloadGitFilePathLst.isEmpty()) {
+                for (String reloadGitFilePath : reloadGitFilePathLst) {
+                    if (StringUtils.isNotBlank(reloadGitFilePath)) {
+                        String ignoreOriginName = GitUtil.getGitOrignPathName(reloadGitFilePath);
+                        if (StringUtils.equals(f.orignName, ignoreOriginName)) {
+                            return;
+                        }
+                    }
                 }
             }
             for (GitFile g : statusFileLstBak) {
@@ -963,7 +1002,7 @@ public class GitConflictDetectUI extends JFrame {
             }
         }
 
-        GitCheckProc(File projectDir, String reloadGitFilePath) {
+        GitCheckProc(File projectDir, List<String> reloadGitFilePathLst) {
             this.projectDir = projectDir;
             GitUtil.StatusInfo statusInfo = GitUtil.getStatusInfo(projectDir, getEncoding());
             for (String[] line : statusInfo.stageLst) {
@@ -971,7 +1010,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "blue";
                 g.stageDesc = "commit";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g, reloadGitFilePath);
+                copyFromOld(g, reloadGitFilePathLst);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.conflictLst) {
@@ -979,7 +1018,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g, reloadGitFilePath);
+                copyFromOld(g, reloadGitFilePathLst);
                 if (!g.mGitLeftRight.isCheck) {
                     g.load();
                 }
@@ -990,7 +1029,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "green";
                 g.stageDesc = "uncommit";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g, reloadGitFilePath);
+                copyFromOld(g, reloadGitFilePathLst);
                 statusFileLst.add(g);
             }
             for (String[] line : statusInfo.untractedLst) {
@@ -998,7 +1037,7 @@ public class GitConflictDetectUI extends JFrame {
                 g.stageColor = "yellow";
                 g.stageDesc = "untracted";
                 this.applyStatus(g, line[0]);
-                copyFromOld(g, reloadGitFilePath);
+                copyFromOld(g, reloadGitFilePathLst);
                 statusFileLst.add(g);
             }
 
