@@ -1206,28 +1206,45 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
-        List<FileZ> lst = new ArrayList<FileZ>();
-        if (fileLst == null) {
-            File dirFile = new File(dirCheckText.getText());
-            fileLst = new ArrayList<File>();
-            gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.VIDEO_PATTERN, fileLst);
-        }
+    private class DropFileChecker {
         List<File> forReturnLst = new ArrayList<File>();
-        for (File f : fileLst) {
-            if (f.getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN)) {
-                lst.add(new FileZ(f));
-                forReturnLst.add(f);
+
+        DropFileChecker(List<File> fileLst) {
+            if (fileLst == null) {
+                File dirFile = new File(dirCheckText.getText());
+                fileLst = new ArrayList<File>();
+                gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.VIDEO_PATTERN, fileLst);
+            }
+
+            for (File f : fileLst) {
+                appendFile(f, forReturnLst);
+            }
+
+            DefaultListModel model = JListUtil.createModel();
+            for (File f : forReturnLst) {
+                model.addElement(new FileZ(f));
+            }
+            dirCheckList.setModel(model);
+
+            // 設定以看數
+            movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), forReturnLst.size()));
+        }
+
+        private void appendFile(File startFile, List<File> appendLst) {
+            if (startFile.isDirectory()) {
+                if (startFile.listFiles() != null) {
+                    for (File f : startFile.listFiles()) {
+                        appendFile(f, appendLst);
+                    }
+                }
+            } else if (startFile.getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN)) {
+                appendLst.add(startFile);
             }
         }
-        DefaultListModel model = JListUtil.createModel();
-        for (FileZ f : lst) {
-            model.addElement(f);
-        }
-        dirCheckList.setModel(model);
-        // 設定以看數
-        movCountLabel.setText(String.format("以看%d, 總數%d", clickAvSet.size(), forReturnLst.size()));
-        return forReturnLst;
+    }
+
+    private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
+        return new DropFileChecker(fileLst).forReturnLst;
     }
 
     private void dirCheckListMouseClicked() {
