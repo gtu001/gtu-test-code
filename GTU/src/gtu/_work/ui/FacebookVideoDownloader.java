@@ -1028,12 +1028,21 @@ public class FacebookVideoDownloader extends JFrame {
 
     private void cleanDownloadListBtnAction() {
         try {
+            File targetDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
+            List<File> downloadToFileLst = new ArrayList<File>();
             Pattern ptn = Pattern.compile("100\\%.*");
             for (int ii = 0; ii < downloadListModel.getRowCount(); ii++) {
+                VideoUrlConfigZ vo2 = (VideoUrlConfigZ) downloadListModel.getValueAt(ii, DownloadTableConfig.VO.ordinal());
                 String percent = (String) downloadListModel.getValueAt(ii, DownloadTableConfig.進度.ordinal());
                 if (ptn.matcher(percent).find()) {
+                    downloadToFileLst.add(vo2.downloadToFile);
                     downloadListModel.removeRow(ii);
                     ii--;
+                }
+            }
+            if (targetDir != null && targetDir.isDirectory() && targetDir.exists()) {
+                for (File aviFile : downloadToFileLst) {
+                    aviFile.renameTo(new File(targetDir, aviFile.getName()));
                 }
             }
             JCommonUtil._jOptionPane_showMessageDialog_info("完成!");
