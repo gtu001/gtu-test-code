@@ -129,6 +129,7 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
+import java.awt.Font;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -1438,6 +1439,8 @@ public class FastDBQueryUI extends JFrame {
                 hideInSystemTrayHelper.get().apply(this);
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
+            
+            JCommonUtil.setUIFontSize(this, 12, 20);
         }
     }
 

@@ -147,8 +147,9 @@ public class JCommonUtil {
         }
     }
 
-    public static void setUIFont() {
-        FontUIResource f = new javax.swing.plaf.FontUIResource("新細明體", Font.PLAIN, 12);
+    public static void setUIFont(String fontStyleName, int size) {
+        fontStyleName = StringUtils.isBlank(fontStyleName) ? "新細明體" : StringUtils.trimToEmpty(fontStyleName);
+        FontUIResource f = new javax.swing.plaf.FontUIResource(fontStyleName, Font.PLAIN, size);
         java.util.Enumeration keys = UIManager.getDefaults().keys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
@@ -157,6 +158,39 @@ public class JCommonUtil {
                 UIManager.put(key, f);
             }
         }
+    }
+
+    private static class _SetUIFontSizeHelper {
+        private static Font DEFAULT_FONT = new Font("新細明體", Font.PLAIN, 12);
+
+        private static void changeSizeFromTo(Component comp, Integer orignSize, Integer targetSize) {
+            Font font = DEFAULT_FONT;
+            if (comp.getFont() != null) {
+                font = comp.getFont();
+            }
+            if (orignSize == null || font.getSize() == orignSize) {
+                comp.setFont(font.deriveFont((float) targetSize));
+            }
+        }
+
+        private static void setUIFontSize(Component comp, Integer orignSize, Integer targetSize) {
+            if (targetSize == null || targetSize <= 0) {
+                return;
+            }
+            if (comp instanceof Container) {
+                Container comp2 = (Container) comp;
+                changeSizeFromTo(comp2, orignSize, targetSize);
+                for (int ii = 0; ii < comp2.getComponentCount(); ii++) {
+                    setUIFontSize(comp2.getComponent(ii), orignSize, targetSize);
+                }
+            } else {
+                changeSizeFromTo(comp, orignSize, targetSize);
+            }
+        }
+    }
+
+    public static void setUIFontSize(Component comp, Integer orignSize, Integer targetSize) {
+        _SetUIFontSizeHelper.setUIFontSize(comp, orignSize, targetSize);
     }
 
     /**
