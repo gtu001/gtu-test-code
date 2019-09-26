@@ -75,12 +75,10 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
     private ExtensionChecker extensionChecker;
     private RootDirHolder rootDirHolder;
     private CommonImageHolder commonImageHolder;
-    private boolean isEpubOverCountBool;
     private AtomicBoolean isLongItemClick = new AtomicBoolean(false);
 
     public static final String FILE_PATTERN_KEY = FileFind4EpubActivity.class.getName() + "_FILE_PATTERN_KEY";
     public static final String FILE_START_DIRS = FileFind4EpubActivity.class.getName() + "_FILE_START_DIRS";
-    private static final int EPUB_OVER_COUNT = 5;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -227,11 +225,8 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
         }
     }
 
-    private void addPathMap(String name, String path) {
-        addPathMap(name, path, true);
-    }
 
-    private void addPathMap(String name, String path, boolean isOverCount) {
+    private void addPathMap(String name, String path) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("file_name", name);
         map.put("path", path);
@@ -239,17 +234,7 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
         if (file.isDirectory() || StringUtils.isBlank(path)) {
             map.put("icon", commonImageHolder.getFolder());
         } else if (extensionChecker.isMatch(file)) {
-//            map.put("icon", R.drawable.icon_file);
-            if (!isOverCount) {
-                EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
-                map.put("icon", e.getImage());
-                if (StringUtils.isNotBlank(e.getTitle())) {
-                    map.put("file_name", e.getTitle());
-                }
-                map.put("file_name_desc", e.getAuthor());
-            } else {
-                map.put("icon", commonImageHolder.getNotfound());
-            }
+            map.put("icon", commonImageHolder.getNotfound());
         } else {
             map.put("icon", null);
         }
@@ -302,12 +287,10 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
         if (!ignoreSubdirLst) {
             List<File> sortFileList = getCurrentDirLst(currentDir);
 
-            isEpubOverCountBool = isEpubFileOverCount(sortFileList);
-
             for (int ii = 0; ii < sortFileList.size(); ii++) {
                 File file = sortFileList.get(ii);
                 String fileName = file.getName();
-                addPathMap(fileName, file.getPath(), isEpubOverCountBool);
+                addPathMap(fileName, file.getPath());
             }
         }
 
@@ -334,19 +317,6 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
         listView.setAdapter(new MyBaseAdapter(this, pathList));
     }
 
-    private boolean isEpubFileOverCount(List<File> sortFileList) {
-        int count = 0;
-        for (File f : sortFileList) {
-            if (f.exists() && f.isFile() && f.getName().toLowerCase().endsWith(".epub")) {
-                count++;
-            }
-        }
-        if (count > EPUB_OVER_COUNT) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * 排序 : 目錄在上, 檔案在下
      */
@@ -369,6 +339,7 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+        isLongItemClick.set(false);
         onListItemClick((ListView) l, v, position, id);
     }
 
@@ -399,19 +370,21 @@ public class FileFind4EpubActivity extends Activity implements AdapterView.OnIte
                         //一般開檔
                         returnChoiceFile(file);
                         isLongItemClick.set(false);
-                    } else if (isEpubOverCountBool) {
+                    } else {
                         //顯示封面
-                        EpubCoverImageFetcher mEpubCoverImageFetcher = new EpubCoverImageFetcher(path);
                         Map<String, Object> map = pathList.get(position);
+                        if (!map.containsKey("IconDone")) {
+                            EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
+                            map.put("icon", e.getImage());
+                            if (StringUtils.isNotBlank(e.getTitle())) {
+                                map.put("file_name", e.getTitle());
+                            }
+                            map.put("file_name_desc", e.getAuthor());
 
-                        EpubCoverImageFetcher e = new EpubCoverImageFetcher(path);
-                        map.put("icon", e.getImage());
-                        if (StringUtils.isNotBlank(e.getTitle())) {
-                            map.put("file_name", e.getTitle());
+                            ((MyBaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+
+                            map.put("IconDone", true);
                         }
-                        map.put("file_name_desc", e.getAuthor());
-
-                        ((MyBaseAdapter) listView.getAdapter()).notifyDataSetChanged();
                     }
                 }
                 // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 取得檔案回傳
