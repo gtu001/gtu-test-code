@@ -1,0 +1,14 @@
+VisualCode 快速切換project
+	opt 1) Ctrl + R
+	
+	opt 2)  安裝 plugin : Project Manager
+		Ctrl + Shift + P 
+			輸入 Project Manager: Save Project 儲存目前專案
+			輸入 Project Manager: List Projects to open 快速切換專案
+
+---
+
+Sublime 快速切換project
+	安裝 Ctrl + Shift + P -> Package control : install package
+	加入專案 Ctrl + Shift + P -> Project Manager : Add New Project
+	開啟專案 Ctrl + Shift + P -> Project Manager : Open Project

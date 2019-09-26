@@ -9,7 +9,7 @@ from gtu.reflect import checkSelf
 '''
 
 
-def checkMembersToHtml(testObj, fileName) :
+def checkMembersToHtml(testObj, fileName=None) :
     '''檢查物件成員'''
     def getDiv(html, tag='div', id=None, header='') :
         if id is not None :
@@ -74,6 +74,8 @@ def checkMembersToHtml(testObj, fileName) :
         </script>
     </head>
     '''
+    if not fileName :
+        fileName = getClassFullName(testObj)
     print("testObj ==> ", getClassFullName(testObj))
     dlist = inspect.getmembers(testObj)
     htmlDoc = ''

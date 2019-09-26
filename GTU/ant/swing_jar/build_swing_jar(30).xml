@@ -74,6 +74,7 @@
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
 		</jarfinder>
 
