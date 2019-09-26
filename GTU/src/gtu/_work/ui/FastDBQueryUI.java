@@ -1425,7 +1425,7 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/big_boobs.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/Pig_SC.ico");// big_boobs.ico
             this.setTitle("You Set My World On Fire");
 
             if (jFrameRGBColorPanel.get() == null) {
@@ -1439,7 +1439,7 @@ public class FastDBQueryUI extends JFrame {
                 hideInSystemTrayHelper.get().apply(this);
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
-            
+
             JCommonUtil.setUIFontSize(this, 12, 20);
         }
     }
