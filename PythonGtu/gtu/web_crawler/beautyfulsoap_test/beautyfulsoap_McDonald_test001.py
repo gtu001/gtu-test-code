@@ -30,7 +30,7 @@ def main() :
 
         if not showDoc :
             showDoc = True
-            # checkSelf.checkMembersToHtml(v, "bs4.element.Tag.htm")
+            checkSelf.checkMembersToHtml(v, "bs4.element.Tag.htm")
 
 
 if __name__ == '__main__' :

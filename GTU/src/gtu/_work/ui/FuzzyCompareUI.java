@@ -334,8 +334,8 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
         resultTable.setModel(model);
 
         Pattern pattern = Pattern.compile("[^\\s\\t]+");
-        Pattern pattern2 = Pattern.compile("\\{c\\:(.*?),v\\:(.*?)\\}");
-        Pattern pattern21 = Pattern.compile("\\{v\\:(.*?),c\\:(.*?)\\}");
+        Pattern pattern2 = Pattern.compile("\\{c\\:((?:[^\\n]|\\n)*?),v\\:((?:[^\\n]|\\n)*?)\\}");
+        Pattern pattern21 = Pattern.compile("\\{v\\:((?:[^\\n]|\\n)*?),c\\:((?:[^\\n]|\\n)*?)\\}");
         Matcher matcher = pattern.matcher(text1);
         Matcher matcher2 = pattern.matcher(text2);
         Matcher matcher3 = pattern2.matcher(text2);
@@ -353,12 +353,11 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
         while (matcher31.find()) {
             text2Map.put(StringUtils.trimToEmpty(matcher31.group(2)), StringUtils.trimToEmpty(matcher31.group(1)));
         }
-        while (matcher2.find()) {
-            text2List.add(StringUtils.trimToEmpty(matcher2.group()));
-        }
-        for (String text2Key : text2Map.keySet()) {
-            if (!text2List.contains(text2Key)) {
-                text2List.add(text2Key);
+        if (!text2Map.isEmpty()) {
+            text2List = new ArrayList<String>(text2Map.keySet());
+        } else {
+            while (matcher2.find()) {
+                text2List.add(StringUtils.trimToEmpty(matcher2.group()));
             }
         }
 
@@ -382,9 +381,11 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
                 float fuzzyPersent = compareList.get(0).getParcent().floatValue();
                 if (fuzzyPersent < sliderValue) {
                     compare2Str = "";
-                }
-                if (text2Map.containsKey(compare2Str)) {
-                    comment = text2Map.get(compare2Str);
+                    comment = "";
+                } else {
+                    if (text2Map.containsKey(compare2Str)) {
+                        comment = text2Map.get(compare2Str);
+                    }
                 }
             }
 

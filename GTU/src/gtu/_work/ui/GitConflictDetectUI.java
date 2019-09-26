@@ -718,7 +718,7 @@ public class GitConflictDetectUI extends JFrame {
             public void action(EventObject evt) throws Exception {
                 Validate.notBlank(gitFolderPathText.getText(), "專案目錄為空");
                 final File projectDir = new File(gitFolderPathText.getText());
-                PFile pFile = JListUtil.getLeadSelectionObject(gitHistoryList);
+                final PFile pFile = JListUtil.getLeadSelectionObject(gitHistoryList);
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                     if (pFile.file.isFile()) {
                         if (StringUtils.isBlank(editorExeText.getText())) {
