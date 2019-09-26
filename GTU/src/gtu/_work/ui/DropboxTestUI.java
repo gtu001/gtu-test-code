@@ -330,9 +330,10 @@ public class DropboxTestUI extends JFrame {
                     DropboxUtilV2.delete(uploadPath, getClient());
                     return true;
                 } else {
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
 
         protected void upload(File inputFile, String basePath) throws DbxException, IOException {
