@@ -11,12 +11,12 @@ from gtu.reflect import checkSelf
 
 def checkMembersToHtml(testObj, fileName=None) :
     '''檢查物件成員'''
-    def getDiv(html, tag='div', id=None, header='') :
+    def getDiv(html, tag='div', id=None, header='', suffixHeader='') :
         if id is not None :
             id = "id=\"" + id + "\""
         else :
             id = ""
-        return "<" + tag + " " + id + " style='font-family: Consolas'>" + header + html + "</" + tag + ">"
+        return "<" + tag + " " + id + " style='font-family: Consolas'>" + header + html + suffixHeader + "</" + tag + ">"
     def replaceNbsp(strVal) :
         def getNbspStr(strVal2) : 
             return strVal2.replace(' ', '&nbsp;')
@@ -60,6 +60,9 @@ def checkMembersToHtml(testObj, fileName=None) :
                     }
                 }
             }
+            function gotoTop() {
+                window.scrollTo(0, 0);//document.body.scrollHeight
+            }
             document.addEventListener("DOMContentLoaded", function(){
                 var aa = document.querySelectorAll("a");
                 for(var ii = 0 ; ii < aa.length ; ii ++){
@@ -75,7 +78,7 @@ def checkMembersToHtml(testObj, fileName=None) :
     </head>
     '''
     if not fileName :
-        fileName = getClassFullName(testObj)
+        fileName = getClassFullName(testObj, notFoundName="__module_name_not_found__")
     print("testObj ==> ", getClassFullName(testObj))
     dlist = inspect.getmembers(testObj)
     htmlDoc = ''
@@ -84,11 +87,12 @@ def checkMembersToHtml(testObj, fileName=None) :
     html += "<body>"
     html += "<input type='text' class='search' onblur='javascript:search();' /><br/><br/>"
     html += "<ul>"
-    header = "<a id='{0}'><h3><font color='red'>{1}</font></h3></a>"
+    header = "<a id='{0}'><font style='font-size:18px;' color='red'>{1}</font></a>"
+    gotoTopHtml = "&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a>"
     for i, mem in enumerate(dlist, 0):        
         print("<<", i, ">>", mem[0], "\t", mem[1])
         html += "<li id='li_{0}'><a href='#{0}'>{1}</a></li>\n".format(mem[0], getDiv(mem[0], tag='span'))
-        headerContent = header.format(mem[0], getDiv(mem[0]))
+        headerContent = header.format(mem[0], getDiv(mem[0], suffixHeader=gotoTopHtml))
         divContent = "<br/>{0}<br/><br/><br/>\n\n".format(getDoc(mem[1]))
         htmlDoc += getDiv(divContent, id=mem[0], header=headerContent)
     html += "</ul>\n"
@@ -189,8 +193,8 @@ def __isPrivateMember(name):
     return False
         
         
-def getClassFullName(o):
-    module = "<module not found>"
+def getClassFullName(o, notFoundName="<module not found>"):
+    module = notFoundName
     if hasattr(o, "__module__") : 
         module = o.__module__
     return module + "." + o.__class__.__qualname__
