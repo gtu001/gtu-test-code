@@ -1,0 +1,4 @@
+﻿點右邊那排按鈕
+	第四個按鈕"我的電腦"->"APK文件"->
+		"打開手機資料夾" : 打開手機資料夾 mnt/shared/App
+		"打開電腦資料夾" : 打開電腦資料夾 C:\Users\<user folder>\Nox_share\AppShare
