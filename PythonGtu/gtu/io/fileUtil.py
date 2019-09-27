@@ -10,6 +10,17 @@ import sys
 
 '''
 from gtu.io import fileUtil
+
+| 操作模式 | 具体含义                         |
+| -------- | -------------------------------- |
+| `'r'`    | 读取 （默认）                    |
+| `'w'`    | 写入（会先截断之前的内容）       |
+| `'x'`    | 写入，如果文件已经存在会产生异常 |
+| `'a'`    | 追加，将内容写入到已有文件的末尾 |
+| `'b'`    | 二进制模式                       |
+| `'t'`    | 文本模式（默认）                 |
+| `'+'`    | 更新（既可以读又可以写）         |
+
 '''
 
 
@@ -44,17 +55,17 @@ def get_line_number2(phrase, file_name):
 	return -1
 	
 	
-def getDesktopDir():
+def getDesktopDir(fileName=''):
 	'''取得桌面路徑'''
 # 	home = str(Path.home())
 	home = expanduser("~")
 	if sys.platform != 'linux' :
 		if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
-			return home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep
+			return home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep + fileName
 		else :
-			return home + os.sep + "Desktop" + os.sep
+			return home + os.sep + "Desktop" + os.sep + fileName
 	else :
-		return "/home/gtu001/桌面" + os.sep
+		return "/home/gtu001/桌面" + os.sep + fileName
 	
 	
 def getAbsPath(path):
