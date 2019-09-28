@@ -1215,6 +1215,16 @@ public class JCommonUtil {
         });
     }
 
+    /**
+     * 刷新component狀態
+     */
+    public static void updateUI(Component... comps) {
+        for (Component comp : comps) {
+            comp.repaint();
+            comp.revalidate();
+        }
+    }
+
     public static void main(String[] args) {
     }
 }

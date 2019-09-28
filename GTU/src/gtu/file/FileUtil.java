@@ -45,6 +45,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -973,6 +974,16 @@ public class FileUtil {
         }
     }
 
+    public static File getNewSubName(File orginFile, String subName) {
+        String name = orginFile.getName();
+        subName = StringUtils.trimToEmpty(subName);
+        Validate.notBlank(subName, "副檔名不可為空");
+        if (!subName.startsWith(".")) {
+            subName = "." + subName;
+        }
+        return new File(orginFile.getParentFile(), getNameNoSubName(name) + subName);
+    }
+
     /**
      * 取得副檔名 不含"."
      * 
@@ -1015,12 +1026,21 @@ public class FileUtil {
      * @return
      */
     public static String getNameNoSubName(File file) {
-        String name = file.getName();
-        int pos = name.lastIndexOf(".");
-        if (file.isFile() && pos != -1) {
-            return name.substring(0, pos);
+        return getNameNoSubName(file.getName());
+    }
+
+    /**
+     * 取得檔名不含副檔名 速度慢(如果檔案不存在更慢)
+     * 
+     * @param file
+     * @return
+     */
+    public static String getNameNoSubName(String filename) {
+        int pos = filename.lastIndexOf(".");
+        if (pos != -1) {
+            return filename.substring(0, pos);
         }
-        return name;
+        return filename;
     }
 
     /**

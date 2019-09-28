@@ -10,12 +10,12 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import gtu.base.CloseUtil;
-import gtu.file.OsInfoUtil;
 import gtu.thread.util.ThreadUtil;
 
 public class ProcessWatcher {
@@ -59,27 +59,27 @@ public class ProcessWatcher {
 
     public ProcessWatcher getStreamAsync() {
         System.out.println("watcher --- input start -----");
-        processInputStreamAsync("input");
+        processInputStreamAsync("input", true);
         System.out.println("watcher --- input end");
         System.out.println("watcher --- error start");
-        processInputStreamAsync("error");
+        processInputStreamAsync("error", true);
         System.out.println("watcher --- error end   -----");
         return this;
     }
 
-    public ProcessWatcher getStreamAsyncAndPrintStream(PrintStream inputStream, PrintStream errorStream) {
+    public ProcessWatcher getStreamAndPrintStream(PrintStream inputStream, PrintStream errorStream, boolean isAsync) {
         System.out.println("watcher --- input start -----");
         if (inputStream == null) {
-            processInputStreamAsync("input");
+            processInputStreamAsync("input", isAsync);
         } else {
-            processInputStreamAsync("input", inputStream);
+            processInputStreamAsync("input", inputStream, isAsync);
         }
         System.out.println("watcher --- input end");
         System.out.println("watcher --- error start");
         if (errorStream == null) {
-            processInputStreamAsync("error");
+            processInputStreamAsync("error", isAsync);
         } else {
-            processInputStreamAsync("error", errorStream);
+            processInputStreamAsync("error", errorStream, isAsync);
         }
         System.out.println("watcher --- error end   -----");
         return this;
@@ -89,7 +89,28 @@ public class ProcessWatcher {
         return new ProcessWatcher(process);
     }
 
-    private void processInputStreamAsync(final String type) {
+    private void _waittingProcess(ArrayBlockingQueue<String> waitingQueue) {
+        if (false) {
+            while (waitingQueue.peek() == null) {
+                try {
+                    Thread.sleep(200L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println(waitingQueue.peek());
+        }
+        if (true) {
+            try {
+                String finalMsg = waitingQueue.take();
+                System.out.println("_waittingProcess : " + finalMsg);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    private void processInputStreamAsync(final String type, boolean isAsync) {
+        final ArrayBlockingQueue<String> waitingQueue = new ArrayBlockingQueue<String>(1);
         // linux 不work
         new Thread(new Runnable() {
             @Override
@@ -127,9 +148,13 @@ public class ProcessWatcher {
                 }
             }
         }).start();
+        if (!isAsync) {
+            _waittingProcess(waitingQueue);
+        }
     }
 
-    private void processInputStreamAsync(final String type, final PrintStream out) {
+    private void processInputStreamAsync(final String type, final PrintStream out, boolean isAsync) {
+        final ArrayBlockingQueue<String> waitingQueue = new ArrayBlockingQueue<String>(1);
         // linux 不work
         new Thread(new Runnable() {
             @Override
@@ -163,13 +188,18 @@ public class ProcessWatcher {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    waitingQueue.offer("ERR : " + ex.getMessage());
                 } finally {
                     CloseUtil.close(bis);
                     CloseUtil.close(baos);
                     CloseUtil.close(out);
+                    waitingQueue.offer("done");
                 }
             }
         }).start();
+        if (!isAsync) {
+            _waittingProcess(waitingQueue);
+        }
     }
 
     public void processAsyncCallback(final ActionListener listener, final long waittimeLimit) {

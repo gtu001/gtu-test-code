@@ -1,0 +1,7 @@
+{
+    "python.dataScience.sendSelectionToInteractiveWindow": true,
+    //"editor.fontFamily": "Consolas",
+    "editor.fontFamily": "Courier",
+    "editor.fontSize": 16,
+    "terminal.integrated.fontFamily": "monospace"
+}

@@ -1172,7 +1172,7 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command("git add " + fileGitPath);
+            run.command(String.format("git add \"%s\"", fileGitPath));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
         }
@@ -1181,7 +1181,7 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command("git reset " + fileGitPath);
+            run.command(String.format("git reset \"%s\"", fileGitPath));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
         }
@@ -1190,7 +1190,7 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command("git checkout HEAD " + fileGitPath);
+            run.command(String.format("git checkout HEAD \"%s\"", fileGitPath));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
         }
@@ -1199,7 +1199,7 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            run.command("gitk " + fileGitPath);
+            run.command(String.format("gitk \"%s\"", fileGitPath));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamAsync();
         }
