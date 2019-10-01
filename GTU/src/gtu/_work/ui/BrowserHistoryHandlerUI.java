@@ -792,17 +792,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
                 int width = _this.urlTable.getRowHeight();
                 try {
-                    File f = DesktopUtil.getFile(fixWindowUrl(d.url));
-                    if (f.exists()) {
-                        Image image = null;
-                        if (OsInfoUtil.isWindows()) {
-                            Icon icon = ImageUtil.getInstance().getIconFromExe(f);
-                            image = ImageUtil.getInstance().iconToImage(icon);
-                        } else {
-                            image = ImageUtil.getInstance().getIcoImage("resource/images/ico/Pig_SC.ico");
+                    String newUrl = fixWindowUrl(d.url);
+                    if(StringUtils.equals(newUrl, d.url)) {
+                        File f = DesktopUtil.getFile(newUrl);
+                        if (f.exists()) {
+                            Image image = null;
+                            if (OsInfoUtil.isWindows()) {
+                                Icon icon = ImageUtil.getInstance().getIconFromExe(f);
+                                image = ImageUtil.getInstance().iconToImage(icon);
+                            } else {
+                                image = ImageUtil.getInstance().getIcoImage("resource/images/ico/Pig_SC.ico");
+                            }
+                            Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
+                            return ImageUtil.getInstance().imageToIcon(image2);
                         }
-                        Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
-                        return ImageUtil.getInstance().imageToIcon(image2);
                     }
                     return ImageUtil.getInstance().createTransparentIcon(width, width);
                 } catch (Exception ex) {
