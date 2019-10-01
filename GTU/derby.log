@@ -1,0 +1,2 @@
+Mon Sep 02 02:13:53 CST 2019 : 無法監聽主機 localhost 上的連接埠 1527：
+ java.net.BindException: 位址已經有在使用 (Bind failed)

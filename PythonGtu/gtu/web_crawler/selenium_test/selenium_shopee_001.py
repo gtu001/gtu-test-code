@@ -9,7 +9,20 @@ from threading import Thread
 from gtu.net import ssl_util
 
 import sys
+import time
 
+
+class MyPageInfoFetcher(Thread) :
+    pageLst = list()
+    def run(self) :
+        while True :
+            print("XXXXXXX")
+            time.sleep(1)
+
+
+def main():
+    t = MyPageInfoFetcher()
+    t.start()
 
 
 
@@ -31,7 +44,7 @@ class ShopeeItem :
         
 
 
-def main() :
+def mainXXX() :
 
     driver = seleniumUtil.getDriver(1280, 720)
 

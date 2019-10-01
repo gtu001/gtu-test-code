@@ -20,6 +20,10 @@ def showAll():
         
 def getOS():
     return platform.system()
+
+
+def isWindows() :
+    platform.system()
     
     
 if __name__ == '__main__' :

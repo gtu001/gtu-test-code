@@ -42,6 +42,9 @@ def __test_network(url) :
 
 
 def getDriver(width=1280, height=720) :
+    
+    /media/gtu001/OLD_D/apps/webdriver/chromedriver
+    
     driverPath = r"D:/apps/selenium/chromedriver.exe"
     # webdriver.Firefox()
     driver = webdriver.Chrome(executable_path=driverPath)

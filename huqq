@@ -1,0 +1,1197 @@
+[33mcommit a7b0aa2c5e7e647c58f031684be1f270536fd12b[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 23:45:29 2019 +0800
+
+    ok
+
+ "GTU/txt/linux/linux_alternatives_\346\214\207\344\273\244.txt" | 3 [32m+++[m
+ 1 file changed, 3 insertions(+)
+
+[33mcommit 2a89f9bd490c34e757cb6cfabcc1f857ebfd7e0e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 17:23:37 2019 +0800
+
+    ok
+
+ GTU/ant/swing_jar/build_swing_jar(29).xml | 3 [32m++[m[31m-[m
+ GTU/pom.xml                               | 2 [32m+[m[31m-[m
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+[33mcommit 0a1970f2183ec0becc5435364a35c56f2e86ade6[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 16:55:45 2019 +0800
+
+    ok
+
+ GTU/pom.xml                                      |  6 [31m----[m
+ GTU/src/gtu/youtube/DownloadProgressHandler.java | 41 [32m+++++++++++[m[31m-------------[m
+ GTU/src/gtu/youtube/Porn91Downloader.java        | 22 [32m+++++++++[m[31m----[m
+ 3 files changed, 34 insertions(+), 35 deletions(-)
+
+[33mcommit 33618f7307e18a7fdf45e87c0aac2775beacb800[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 16:24:08 2019 +0800
+
+    ok
+
+ .../tensorflow/ex2/tmp/data/t10k-images-idx3-ubyte.gz | Bin [31m1648877[m -> [32m0[m bytes
+ .../tensorflow/ex2/tmp/data/t10k-labels-idx1-ubyte.gz | Bin [31m4542[m -> [32m0[m bytes
+ .../ex2/tmp/data/train-images-idx3-ubyte.gz           | Bin [31m9912422[m -> [32m0[m bytes
+ .../ex2/tmp/data/train-labels-idx1-ubyte.gz           | Bin [31m28881[m -> [32m0[m bytes
+ 4 files changed, 0 insertions(+), 0 deletions(-)
+
+[33mcommit 8d9fc3355ba7e50ae20ee31406c985c2bfc41294[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 16:23:14 2019 +0800
+
+    ok
+
+ GTU/pom.xml                                      | 12 [32m+++++++[m[31m--[m
+ GTU/src/gtu/youtube/DownloadProgressHandler.java | 33 [32m+++++++++++++++[m[31m---------[m
+ 2 files changed, 31 insertions(+), 14 deletions(-)
+
+[33mcommit ec981ac9a28ed64195a70fb5d5d0487a8869f3ca[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 22 02:52:07 2019 +0800
+
+    ok
+
+ GTU/.classpath                                     |  67 [32m++++++++++[m[31m-----------[m
+ GTU/WebContent/WEB-INF/lib/jfxrt.jar               | Bin [31m0[m -> [32m18449916[m bytes
+ GTU/pom.xml                                        |   2 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/AVChoicerUI.java              |   6 [32m+[m[31m-[m
+ "GTU/txt/linux/Ubuntu\350\243\235java.txt"         |   3 [32m+[m
+ ...04\241\346\263\225\345\210\252\351\231\244.txt" |  58 [32m+++++++++++++++++[m[31m-[m
+ .../.settings/com.googlecode.goclipse.core.prefs   |   4 [32m+[m[31m-[m
+ PythonGtu/.env                                     |   4 [32m+[m[31m-[m
+ PythonGtu/.vscode/launch.json                      |   2 [32m+[m[31m-[m
+ PythonGtu/.vscode/settings.json                    |   9 [32m++[m[31m-[m
+ .../gtu/tensorflow/ex3/tensorflow_test_new_001.py  |  30 [32m+++++++++[m
+ ScalaGTU/.cache-main                               | Bin [31m5400[m -> [32m5076[m bytes
+ 12 files changed, 141 insertions(+), 44 deletions(-)
+
+[33mcommit 829c8f8a6baddc7d4468c65c1656b6e09533d562[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Aug 17 13:28:02 2019 +0800
+
+    ok
+
+ GTU/ant/swing_jar/build_swing_jar(29).xml         |   6 [32m+[m[31m-[m
+ GTU/pom.xml                                       |  10 [32m+[m[31m-[m
+ GTU/src/gtu/_work/ui/FacebookVideoDownloader.java |   2 [32m+[m[31m-[m
+ GTU/src/gtu/orderby/OrderbyComparatorUtil.java    | 286 [32m++++++++++++++++++++++[m
+ GTU/src/gtu/orderby/OrderbyUtil.java              |  20 [32m+[m[31m-[m
+ GTU/src/gtu/youtube/Porn91Downloader.java         |   1 [32m+[m
+ 6 files changed, 308 insertions(+), 17 deletions(-)
+
+[33mcommit 6a1613df676fc9ae15faa8dcc7bcbbee014fa9ae[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 15 18:49:39 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/regex/tag/TagMatcher2.java | 30 [32m+++++++++++++[m[31m-----------------[m
+ 1 file changed, 13 insertions(+), 17 deletions(-)
+
+[33mcommit 309cb3b484bbd264504defb38065b68d721e9d9c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 15 00:43:13 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/RegexDirReplacer.java | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 465d3d6878190e0041990ccda486c64abb7dddd5[m
+Merge: 32ac39f3 30fd7cfb
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Aug 14 23:34:50 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 32ac39f3341bf0801b3f4e31db40d16a20732c6d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Aug 14 23:33:44 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/filter/ContentFilterReqHelper.java | 115 [32m+++++++++++++++++++++++++[m
+ GTU/src/gtu/regex/tag/TagMatcher2.java         |  12 [32m++[m[31m-[m
+ 2 files changed, 123 insertions(+), 4 deletions(-)
+
+[33mcommit 30fd7cfbdd604c98fbc4ab418d3c39363b6e90df[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Aug 10 20:25:45 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 11 [32m++++++++++[m[31m-[m
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+[33mcommit ab8f949f9c02e46e55995dcfe777a81b333fa590[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Aug 10 03:56:43 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 15 [32m++++++++[m[31m-------[m
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+[33mcommit 520d4ab9a5f001d3c1d02653ce2e61c7642d57b4[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Aug 10 03:52:20 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java          | 40 [32m+++++++++++++++[m[31m-----------[m
+ GTU/src/gtu/constant/FileExtenstion.java       |  7 [32m+++++[m
+ GTU/src/gtu/youtube/PornVideoUrlDetection.java | 12 [32m++++[m[31m----[m
+ 3 files changed, 36 insertions(+), 23 deletions(-)
+
+[33mcommit 499bac03ed392c609521a4e9a525e2089f76d970[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 9 22:07:42 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 10 [32m+++++++++[m[31m-[m
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+[33mcommit ce09e4a3d81d348991a830a118049b2e4748be0a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 9 02:33:33 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit c6bc2f625dc368bfd6c713e49e7de0afd62c8e05[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 9 02:33:17 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 16 [32m+++++++++[m[31m-------[m
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+[33mcommit 0feccaedd7943fd663788eb72f467280c38e18e2[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 9 02:30:33 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 56 [32m++++++++++++++++++++++++++++++[m[31m-----[m
+ 1 file changed, 49 insertions(+), 7 deletions(-)
+
+[33mcommit d5986df21760f0c43eb9b174bbc5085d710ecce6[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 8 03:46:48 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java | 19 [32m+++++++++++++++++[m
+ GTU/src/gtu/swing/util/JListUtil.java | 40 [32m+++++++++++++++++++++++++++++++++++[m
+ 2 files changed, 59 insertions(+)
+
+[33mcommit 68006e0ffb32c4f5a1bf25669b501272560bb7c0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 8 03:26:41 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java       | 15 [32m+++++++++++[m[31m--[m
+ GTU/src/gtu/binary/CmdEncodingDisplay.java  | 32 [32m++++++++++++++++++++++++++[m
+ GTU/src/gtu/swing/util/JTabbedPaneUtil.java | 35 [32m+++++++++++++++++++++++++++++[m
+ 3 files changed, 80 insertions(+), 2 deletions(-)
+
+[33mcommit 8376ea60cb7fe7312c4096807f515a87fc7ff6ac[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Aug 7 09:59:52 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/txt/git/git_command.txt | 11 [32m++++++++++[m[31m-[m
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+[33mcommit 1c0de803242b204f2d7e32a6302736676ba8170a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Aug 6 15:53:44 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ PythonGtu/gtu/tensorflow/ex2/tensorflow_test_004.py | 3 [32m+[m[31m--[m
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+[33mcommit a5929d9ecb4497ae3ee0bcc6207457e1c9f3a8e0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Aug 6 13:04:34 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../Porn91Crawler/Porn91Crawler/spiders/porn_91_spider_001.py      | 7 [32m+++++[m[31m--[m
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+[33mcommit 263e068be47a23c06a699a53ecbc32e8bb16feea[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Aug 6 12:06:40 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ PythonGtu/gtu/io/fileUtil.py                       |   2 [32m+[m[31m-[m
+ .../{scrapy => scrapy_test}/ex1/scrapy_test_001.py | 286 [32m+++++++++[m[31m---------[m
+ .../ex1/scrpay_crawler_worker.py                   | 112 [32m++++[m[31m----[m
+ .../ex1/scrpay_crawler_worker2.py                  | 152 [32m+++++[m[31m-----[m
+ .../PttBeautyCrawler/PttBeautyCrawler/__init__.py  |   0
+ .../PttBeautyCrawler/PttBeautyCrawler/items.py     |  28 [32m+[m[31m-[m
+ .../PttBeautyCrawler/middlewares.py                | 206 [32m++++++[m[31m-------[m
+ .../PttBeautyCrawler/PttBeautyCrawler/pipelines.py |  22 [32m+[m[31m-[m
+ .../PttBeautyCrawler/PttBeautyCrawler/settings.py  | 180 [32m++++++[m[31m------[m
+ .../PttBeautyCrawler}/spiders/__init__.py          |   8 [32m+[m[31m-[m
+ .../spiders/ptt_beauty_spider_001.py               | 318 [32m++++++++++[m[31m-----------[m
+ .../ex2_ptt_beauty/PttBeautyCrawler/scrapy.cfg     |  22 [32m+[m[31m-[m
+ .../Porn91Crawler/Porn91Crawler/__init__.py        |   0
+ .../Porn91Crawler/Porn91Crawler/items.py           |  28 [32m+[m[31m-[m
+ .../Porn91Crawler/Porn91Crawler/middlewares.py     | 206 [32m++++++[m[31m-------[m
+ .../Porn91Crawler/Porn91Crawler/pipelines.py       |  22 [32m+[m[31m-[m
+ .../Porn91Crawler/Porn91Crawler/settings.py        | 180 [32m++++++[m[31m------[m
+ .../Porn91Crawler}/spiders/__init__.py             |   8 [32m+[m[31m-[m
+ .../Porn91Crawler/spiders/porn_91_spider_001.py    | 226 [32m+++++++[m[31m--------[m
+ .../ex3_91porn_001/Porn91Crawler/scrapy.cfg        |  22 [32m+[m[31m-[m
+ .../Plus28AvPorn/Plus28AvPorn/__init__.py          |   0
+ .../Plus28AvPorn/Plus28AvPorn/items.py             |  28 [32m+[m[31m-[m
+ .../Plus28AvPorn/Plus28AvPorn/middlewares.py       | 206 [32m++++++[m[31m-------[m
+ .../Plus28AvPorn/Plus28AvPorn/pipelines.py         |  22 [32m+[m[31m-[m
+ .../Plus28AvPorn/Plus28AvPorn/settings.py          | 180 [32m++++++[m[31m------[m
+ .../Plus28AvPorn/Plus28AvPorn}/spiders/__init__.py |   8 [32m+[m[31m-[m
+ .../Plus28AvPorn/spiders/plus28_porn_spider_001.py | 196 [32m++++++[m[31m-------[m
+ .../ex4_plus28_porn/Plus28AvPorn/scrapy.cfg        |  22 [32m+[m[31m-[m
+ .../DilbertCrawler/DilbertCrawler/__init__.py      |   0
+ .../DilbertCrawler/DilbertCrawler/items.py         |  28 [32m+[m[31m-[m
+ .../DilbertCrawler/DilbertCrawler/middlewares.py   | 206 [32m++++++[m[31m-------[m
+ .../DilbertCrawler/DilbertCrawler/pipelines.py     |  22 [32m+[m[31m-[m
+ .../DilbertCrawler/DilbertCrawler/settings.py      | 180 [32m++++++[m[31m------[m
+ .../DilbertCrawler}/spiders/__init__.py            |   8 [32m+[m[31m-[m
+ .../DilbertCrawler/spiders/dilbert_spider_001.py   | 296 [32m+++++++++[m[31m----------[m
+ .../ex5_dilbert/DilbertCrawler/scrapy.cfg          |  22 [32m+[m[31m-[m
+ .../gtu/{scrapy => scrapy_test}/scrapy_runner.py   |  94 [32m+++[m[31m---[m
+ .../gtu/{scrapy => scrapy_test}/scrapy_util.py     | 120 [32m++++[m[31m----[m
+ PythonGtu/gtu/sys/{os_info_001.py => os_info.py}   | 100 [32m++++[m[31m---[m
+ 39 files changed, 1893 insertions(+), 1873 deletions(-)
+
+[33mcommit 604d1b514ab1d5db8f3e77d161bb23bfd1f9a7c7[m
+Merge: 7ce2f5f4 c4c31594
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Aug 5 16:44:47 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 7ce2f5f4b34d7aa3c2a2512b426bdcc734f17afd[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Aug 5 16:44:14 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../vscode/python_vscode_\350\250\255\345\256\232.txt"     | 14 [32m++++++++++++++[m
+ 1 file changed, 14 insertions(+)
+
+[33mcommit 426dd9279b5e428cef6b3416f161f04e117dacf3[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Aug 5 16:32:07 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ ...70\215\344\275\263\350\247\243\346\263\225.txt" |  43 [32m+++++++++++[m
+ .../\345\276\256\350\273\237case response.docx"    | Bin [31m0[m -> [32m401734[m bytes
+ PythonGtu/.env                                     |   1 [32m+[m
+ PythonGtu/.vscode/launch.json                      |  17 [32m+++++[m
+ PythonGtu/.vscode/settings.json                    |   3 [32m+[m
+ PythonGtu/__init__.py                              |   0
+ .../gtu/tensorflow/ex2/tensorflow_test_004.py      |  36 [32m++++++++++[m
+ .../ex2/tmp/data/t10k-images-idx3-ubyte.gz         | Bin [31m0[m -> [32m1648877[m bytes
+ .../ex2/tmp/data/t10k-labels-idx1-ubyte.gz         | Bin [31m0[m -> [32m4542[m bytes
+ .../ex2/tmp/data/train-images-idx3-ubyte.gz        | Bin [31m0[m -> [32m9912422[m bytes
+ .../ex2/tmp/data/train-labels-idx1-ubyte.gz        | Bin [31m0[m -> [32m28881[m bytes
+ .../gtu/{thread => thread_test}/kill_thread.py     |  26 [32m+++[m[31m----[m
+ .../gtu/{thread => thread_test}/threadUtil.py      |  70 [32m+++++++++[m[31m---------[m
+ .../gtu/{thread => thread_test}/thread_test_001.py |  80 [32m++++++++++[m[31m-----------[m
+ .../gtu/{thread => thread_test}/thread_test_002.py |  58 [32m+++++++[m[31m--------[m
+ .../gtu/{thread => thread_test}/thread_test_003.py |  38 [32m+++++[m[31m-----[m
+ 16 files changed, 236 insertions(+), 136 deletions(-)
+
+[33mcommit c4c31594a9aa31ee55a8e538cc54a522be96813d[m
+Merge: 81caa2e6 1aeebff6
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 2 01:56:03 2019 +0800
+
+    ok
+
+[33mcommit 81caa2e68d466a301739858177ccf6f8f71b3450[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Aug 2 01:52:57 2019 +0800
+
+    ok
+
+ GTU/pom.xml                                        |   9 [32m+[m[31m-[m
+ GTU/txt/ubuntu/linux_run_shell_by_dbclick.txt      |   5 [32m+[m[31m-[m
+ ...52\224\346\241\210\346\257\224\345\260\215.txt" |   0
+ ...63\273\347\265\261\345\256\211\350\243\235.txt" |  28 [32m++[m[31m--[m
+ ...05\245\346\263\225\345\256\211\350\243\235.txt" |   4 [32m+[m[31m-[m
+ .../spmallick_learnopencv/ColorSpaces/README.md    |   3 [32m+[m
+ .../ColorSpaces/dataAnalysis.py                    | 141 [32m+++++++++++++++++[m
+ .../ColorSpaces/images/rub00.jpg                   | Bin [31m0[m -> [32m28785[m bytes
+ .../ColorSpaces/images/rub01.jpg                   | Bin [31m0[m -> [32m20412[m bytes
+ .../ColorSpaces/images/rub02.jpg                   | Bin [31m0[m -> [32m24052[m bytes
+ .../ColorSpaces/images/rub03.jpg                   | Bin [31m0[m -> [32m24097[m bytes
+ .../ColorSpaces/images/rub04.jpg                   | Bin [31m0[m -> [32m19618[m bytes
+ .../ColorSpaces/images/rub05.jpg                   | Bin [31m0[m -> [32m27214[m bytes
+ .../ColorSpaces/images/rub06.jpg                   | Bin [31m0[m -> [32m40374[m bytes
+ .../ColorSpaces/images/rub07.jpg                   | Bin [31m0[m -> [32m33204[m bytes
+ .../ColorSpaces/images/rub08.jpg                   | Bin [31m0[m -> [32m30914[m bytes
+ .../ColorSpaces/images/rub09.jpg                   | Bin [31m0[m -> [32m29708[m bytes
+ .../ColorSpaces/interactiveColorDetect.py          |  65 [32m++++++++[m
+ .../ColorSpaces/interactiveColorSegment.py         | 171 [32m+++++++++++++++++++++[m
+ .../ColorSpaces/pieces/blue1r1.jpg                 | Bin [31m0[m -> [32m19417[m bytes
+ .../ColorSpaces/pieces/blue1r2.jpg                 | Bin [31m0[m -> [32m19389[m bytes
+ .../ColorSpaces/pieces/blue1r3.jpg                 | Bin [31m0[m -> [32m19417[m bytes
+ .../ColorSpaces/pieces/blue1r4.jpg                 | Bin [31m0[m -> [32m18972[m bytes
+ .../ColorSpaces/pieces/blue1r5.jpg                 | Bin [31m0[m -> [32m19327[m bytes
+ .../ColorSpaces/pieces/blue1r6.jpg                 | Bin [31m0[m -> [32m20045[m bytes
+ .../ColorSpaces/pieces/blue1r7.jpg                 | Bin [31m0[m -> [32m19453[m bytes
+ .../ColorSpaces/pieces/blue1r8.jpg                 | Bin [31m0[m -> [32m19662[m bytes
+ .../ColorSpaces/pieces/blue2r1.jpg                 | Bin [31m0[m -> [32m1030[m bytes
+ .../ColorSpaces/pieces/blue2r2.jpg                 | Bin [31m0[m -> [32m910[m bytes
+ .../ColorSpaces/pieces/blue2r3.jpg                 | Bin [31m0[m -> [32m984[m bytes
+ .../ColorSpaces/pieces/blue2r4.jpg                 | Bin [31m0[m -> [32m884[m bytes
+ .../ColorSpaces/pieces/blue2r5.jpg                 | Bin [31m0[m -> [32m975[m bytes
+ .../ColorSpaces/pieces/blue2r6.jpg                 | Bin [31m0[m -> [32m1517[m bytes
+ .../ColorSpaces/pieces/blue2r7.jpg                 | Bin [31m0[m -> [32m1227[m bytes
+ .../ColorSpaces/pieces/blue2r8.jpg                 | Bin [31m0[m -> [32m1290[m bytes
+ .../ColorSpaces/pieces/greenr1.jpg                 | Bin [31m0[m -> [32m976[m bytes
+ .../ColorSpaces/pieces/greenr2.jpg                 | Bin [31m0[m -> [32m817[m bytes
+ .../ColorSpaces/pieces/greenr3.jpg                 | Bin [31m0[m -> [32m951[m bytes
+ .../ColorSpaces/pieces/greenr4.jpg                 | Bin [31m0[m -> [32m965[m bytes
+ .../ColorSpaces/pieces/greenr5.jpg                 | Bin [31m0[m -> [32m1229[m bytes
+ .../ColorSpaces/pieces/greenr6.jpg                 | Bin [31m0[m -> [32m1591[m bytes
+ .../ColorSpaces/pieces/greenr7.jpg                 | Bin [31m0[m -> [32m1301[m bytes
+ .../ColorSpaces/pieces/greenr8.jpg                 | Bin [31m0[m -> [32m1301[m bytes
+ .../ColorSpaces/pieces/orange1r1.jpg               | Bin [31m0[m -> [32m18959[m bytes
+ .../ColorSpaces/pieces/orange1r2.jpg               | Bin [31m0[m -> [32m18947[m bytes
+ .../ColorSpaces/pieces/orange1r3.jpg               | Bin [31m0[m -> [32m19117[m bytes
+ .../ColorSpaces/pieces/orange1r4.jpg               | Bin [31m0[m -> [32m18933[m bytes
+ .../ColorSpaces/pieces/orange1r5.jpg               | Bin [31m0[m -> [32m19155[m bytes
+ .../ColorSpaces/pieces/orange1r6.jpg               | Bin [31m0[m -> [32m19761[m bytes
+ .../ColorSpaces/pieces/orange1r7.jpg               | Bin [31m0[m -> [32m19311[m bytes
+ .../ColorSpaces/pieces/orange1r8.jpg               | Bin [31m0[m -> [32m19192[m bytes
+ .../ColorSpaces/pieces/orange2r1.jpg               | Bin [31m0[m -> [32m1002[m bytes
+ .../ColorSpaces/pieces/orange2r2.jpg               | Bin [31m0[m -> [32m894[m bytes
+ .../ColorSpaces/pieces/orange2r3.jpg               | Bin [31m0[m -> [32m1124[m bytes
+ .../ColorSpaces/pieces/orange2r4.jpg               | Bin [31m0[m -> [32m1043[m bytes
+ .../ColorSpaces/pieces/orange2r5.jpg               | Bin [31m0[m -> [32m1107[m bytes
+ .../ColorSpaces/pieces/orange2r6.jpg               | Bin [31m0[m -> [32m1508[m bytes
+ .../ColorSpaces/pieces/orange2r7.jpg               | Bin [31m0[m -> [32m1233[m bytes
+ .../ColorSpaces/pieces/orange2r8.jpg               | Bin [31m0[m -> [32m1137[m bytes
+ .../ColorSpaces/pieces/redr1.jpg                   | Bin [31m0[m -> [32m1070[m bytes
+ .../ColorSpaces/pieces/redr2.jpg                   | Bin [31m0[m -> [32m1248[m bytes
+ .../ColorSpaces/pieces/redr3.jpg                   | Bin [31m0[m -> [32m1182[m bytes
+ .../ColorSpaces/pieces/redr4.jpg                   | Bin [31m0[m -> [32m1063[m bytes
+ .../ColorSpaces/pieces/redr5.jpg                   | Bin [31m0[m -> [32m1178[m bytes
+ .../ColorSpaces/pieces/redr6.jpg                   | Bin [31m0[m -> [32m1400[m bytes
+ .../ColorSpaces/pieces/redr7.jpg                   | Bin [31m0[m -> [32m1454[m bytes
+ .../ColorSpaces/pieces/redr8.jpg                   | Bin [31m0[m -> [32m1568[m bytes
+ .../ColorSpaces/pieces/yellow-zoom.png             | Bin [31m0[m -> [32m69445[m bytes
+ .../ColorSpaces/pieces/yellowr1.jpg                | Bin [31m0[m -> [32m1216[m bytes
+ .../ColorSpaces/pieces/yellowr2.jpg                | Bin [31m0[m -> [32m1225[m bytes
+ .../ColorSpaces/pieces/yellowr3.jpg                | Bin [31m0[m -> [32m1167[m bytes
+ .../ColorSpaces/pieces/yellowr4.jpg                | Bin [31m0[m -> [32m986[m bytes
+ .../ColorSpaces/pieces/yellowr5.jpg                | Bin [31m0[m -> [32m1246[m bytes
+ .../ColorSpaces/pieces/yellowr6.jpg                | Bin [31m0[m -> [32m1631[m bytes
+ .../ColorSpaces/pieces/yellowr7.jpg                | Bin [31m0[m -> [32m1560[m bytes
+ .../ColorSpaces/pieces/yellowr8.jpg                | Bin [31m0[m -> [32m1362[m bytes
+ .../gtu/opencv/spmallick_learnopencv/README.md     |   2 [32m+[m
+ 77 files changed, 412 insertions(+), 16 deletions(-)
+
+[33mcommit 1aeebff621dd4c6bf7c07ad32d5ecc241ec80f26[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Aug 1 18:11:43 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/txt/git/git_command.txt                         |  4 [32m++++[m
+ PythonGtu/gtu/tensorflow/ex1/tensorflow_test_001.py | 15 [32m++++++++++++++[m[31m-[m
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+[33mcommit d39677d6fca142d44d81189d6c26eb373a570012[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 31 14:46:43 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ "GTU/HtcVive\347\216\2513D\351\201\212\346\210\262.txt" | 15 [31m---------------[m
+ 1 file changed, 15 deletions(-)
+
+[33mcommit 15d5d9e1309857b852faf3c317775601eadb85b2[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 30 17:09:34 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../tensorflow_test_002.py}                         |  0
+ PythonGtu/gtu/tensorflow/ex1/tensorflow_test_003.py | 21 [32m+++++++++++++++++++++[m
+ 2 files changed, 21 insertions(+)
+
+[33mcommit fcbd0870b29683d8175f77802186d6f9cc2db25e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 29 17:28:00 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/BrowserHistoryHandlerUI.java       |  14 [32m+++++++[m[31m-------[m
+ ...344\275\240\347\232\204\346\235\261\350\245\277.png" | Bin [31m0[m -> [32m12495[m bytes
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+[33mcommit f166a1364dc09ecfcc34ad07454b3fffe80a67ee[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 29 17:20:11 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../spmallick_learnopencv/CharClassification/generate_images.py    | 2 [32m++[m
+ .../opencv/spmallick_learnopencv/CharClassification/test/README.md | 0
+ .../spmallick_learnopencv/CharClassification/train/README.md       | 0
+ PythonGtu/gtu/tensorflow/ex1/tensorflow_test_001.py                | 7 [32m+++++++[m
+ 4 files changed, 9 insertions(+)
+
+[33mcommit 7738e175546a84feabd47193cccf6bbfd0658656[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 29 14:33:12 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../gtu/data_science/keras/ex1/dataGenerator.py    | 55 [32m++++++++++++++++++++++[m
+ .../gtu/data_science/keras/ex1/keras_script_001.py | 32 [32m+++++++++++++[m
+ PythonGtu/gtu/opencv/ex2/model_train_001.py        | 13 [31m-----[m
+ 3 files changed, 87 insertions(+), 13 deletions(-)
+
+[33mcommit b80ebbe49750986146e57479ab6235aa4f4df344[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sun Jul 28 15:47:51 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/javafx/traynotification/TrayNotification.java | 7 [32m++++[m[31m---[m
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+[33mcommit f433672bf14081c8b8377388a1f8fe8cd4ee4b4d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sun Jul 28 15:41:32 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar.properties | 31 [32m+++++++++++++++++++[m[31m---------[m
+ GTU/pom.xml                                  |  9 [32m+++++++[m[31m-[m
+ GTU/src/gtu/_work/ui/AVChoicerUI.java        | 16 [32m++++++++[m[31m------[m
+ GTU/src/gtu/runtime/ProcessWatcher.java      | 26 [32m+++++++++++++++++++++++[m
+ 4 files changed, 65 insertions(+), 17 deletions(-)
+
+[33mcommit fe6842f17c9e34db802f58c1089596d201e09090[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sun Jul 28 02:15:28 2019 +0800
+
+    ok
+
+ GTU/src/gtu/_work/ui/AVChoicerUI.java              |  38 [32m++++[m[31m--[m
+ GTU/src/gtu/reflect/FakeBeanXmlFiller.java         |  31 [32m++++[m[31m-[m
+ .../python/setup/pip_\346\214\207\344\273\244.txt" |   9 [32m+[m[31m-[m
+ .../{ => ex_readCard}/ocr-b-font-254x300.png       | Bin
+ .../{ => ex_readCard}/ocr_a_font-254x300.jpg       | Bin
+ .../opencv/{ => ex_readCard}/read_creditcard.py    |   0
+ .../opencv/{ => ex_readCard}/read_creditcard3.py   |   0
+ .../spmallick_learnopencv/BlobDetector/blob.jpg    | Bin [31m0[m -> [32m16934[m bytes
+ .../spmallick_learnopencv/BlobDetector/blob.py     |  60 [32m+++++++++[m
+ .../CenterofBlob/center_of_multiple_blob.py        |  37 [32m++++++[m
+ .../spmallick_learnopencv/CenterofBlob/circle.png  | Bin [31m0[m -> [32m2885[m bytes
+ .../CenterofBlob/multiple-blob.png                 | Bin [31m0[m -> [32m24784[m bytes
+ .../CenterofBlob/single_blob.py                    |  33 [32m+++++[m
+ .../CharClassification/dark_backgrounds/dark1.jpg  | Bin [31m0[m -> [32m27779[m bytes
+ .../CharClassification/fonts/Galada-Regular.ttf    | Bin [31m0[m -> [32m187776[m bytes
+ .../CharClassification/fonts/Roboto-Black.ttf      | Bin [31m0[m -> [32m171480[m bytes
+ .../CharClassification/generate_images.py          | 138 [32m+++++++++++++++++++++[m
+ .../light_backgrounds/light1.jpg                   | Bin [31m0[m -> [32m15978[m bytes
+ .../CharClassification/make_predictions.py         |  79 [32m++++++++++++[m
+ .../CharClassification/net.py                      |  51 [32m++++++++[m
+ .../CharClassification/train_model.py              |  97 [32m+++++++++++++++[m
+ 21 files changed, 559 insertions(+), 14 deletions(-)
+
+[33mcommit ffde88adf7403a3d7e1fa79cbb6cd81ef70809d0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Jul 26 16:30:48 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ PythonGtu/gtu/opencv/ex2/model_train_001.py        |   13 [32m+[m
+ .../AgeGender}/AgeGender.py                        |    0
+ .../AgeGender/age_deploy.prototxt                  |  175 [32m++[m
+ .../AgeGender/gender_deploy.prototxt               |  175 [32m++[m
+ .../AgeGender/opencv_face_detector.pbtxt           | 2362 [32m++++++++++++++++++++[m
+ .../AgeGender/opencv_face_detector_uint8.pb        |  Bin [31m0[m -> [32m2727750[m bytes
+ .../AlphaBlending/alphaBlend.py                    |   43 [32m+[m
+ .../AlphaBlending/backGround.jpg                   |  Bin [31m0[m -> [32m495797[m bytes
+ .../AlphaBlending/foreGroundAsset.png              |  Bin [31m0[m -> [32m1718187[m bytes
+ .../BatchNormalization/cifar10_cnn_100epochs.py    |  129 [32m++[m
+ .../BatchNormalization/cifar10_cnn_bn_100epochs.py |  137 [32m++[m
+ 11 files changed, 3034 insertions(+)
+
+[33mcommit 420b5c9ca7b4e85de5f45d25f09bfa5a941c62df[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Jul 26 10:56:53 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ ...Vive\347\216\2513D\351\201\212\346\210\262.txt" | 15 [32m++++[m
+ GTU/src/gtu/number/NumberUtil.java                 | 12 [32m+++[m
+ .../jpa/ex1/SimpleJpaTest001Application.java       | 45 [32m++++++++[m[31m---[m
+ ...Vive\347\216\2513D\351\201\212\346\210\262.txt" | 15 [32m++++[m
+ GTU/txt/git/git_command.txt                        |  5 [32m++[m
+ ...ript_localStorage_\346\270\254\350\251\246.htm" | 48 [32m+++++++++++[m
+ GTU/txt/jquery/jquery_ajax_crossDomain.txt         | 24 [32m++++++[m
+ .../opencv/opencv_\345\256\211\350\243\235.txt"    | 11 [32m+++[m
+ .../python/setup/pip_\346\214\207\344\273\244.txt" | 11 [32m+++[m
+ ...11\210\346\234\254\346\270\205\345\226\256.txt" |  5 [31m--[m
+ PythonGtu/gtu/args/arg_test_001.py                 | 22 [32m+++++[m
+ PythonGtu/gtu/opencv/ex2/AgeGender.py              | 93 [32m++++++++++++++++++++++[m
+ README.md                                          |  1 [32m+[m
+ 13 files changed, 291 insertions(+), 16 deletions(-)
+
+[33mcommit c5d7e7369a2507038c05dd870b896ee65bf42841[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 24 23:48:59 2019 +0800
+
+    ok
+
+ GTU/src/gtu/springdata/jpa/ex1/Employee1.java      | 72 [32m++++++++++++++++++++++[m
+ .../springdata/jpa/ex1/Employee1Repository.java    | 15 [32m+++++[m
+ .../jpa/ex1/SimpleJpaTest001Application.java       | 57 [32m++++++++++++[m[31m-----[m
+ 3 files changed, 129 insertions(+), 15 deletions(-)
+
+[33mcommit 38a45cee8ca7941b4471ac4a2f756656daef2785[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 24 17:34:12 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/pom.xml                                        |   7 [32m+[m[31m-[m
+ ...st001.java => AopAspectTest001Application.java} |   6 [32m+[m[31m-[m
+ GTU/src/gtu/springdata/jpa/ex1/Employee.java       |  91 [32m+++++++++++++[m
+ .../gtu/springdata/jpa/ex1/EmployeeRepository.java |  49 [32m+++++++[m
+ .../jpa/ex1/SimpleJpaTest001Application.java       | 142 [32m+++++++++++++++++++++[m
+ .../jpa/{ => tool001}/ManyToManyCreaterTest.java   |   2 [32m+[m[31m-[m
+ .../ManyToManyCreaterTest_appenderUI.java          |   4 [32m+[m[31m-[m
+ .../jpa/{ => tool001}/OneToManyCreaterTest.java    |   2 [32m+[m[31m-[m
+ .../OneToManyCreaterTest__appenderUI.java          |   2 [32m+[m[31m-[m
+ .../jpa/{ => tool001}/OneToOneCreaterTest.java     |   2 [32m+[m[31m-[m
+ .../OneToOneCreaterTest__appenderUI.java           |   4 [32m+[m[31m-[m
+ .../tool002}/EntityColumnAnnotationAppender.java   |   2 [32m+[m[31m-[m
+ .../tool002}/EntityFieldNameRevamper__Test.java    |   2 [32m+[m[31m-[m
+ .../{ => jpa/tool002}/EntitySimpleCreater.java     |   2 [32m+[m[31m-[m
+ .../tool002}/EntitySimpleCreater_MAIN.java         |   4 [32m+[m[31m-[m
+ .../{ => jpa/tool002}/GetterSetterAppender.java    |   2 [32m+[m[31m-[m
+ .../tool002}/JavaSourceCleaner___Test.java         |   2 [32m+[m[31m-[m
+ .../tool002}/RepositoryNameRevamper__Test.java     |   2 [32m+[m[31m-[m
+ .../tool002}/SimpleCrudRepositoryGenerater.java    |   2 [32m+[m[31m-[m
+ ...Test001.java => SwaggerTest001Application.java} |   4 [32m+[m[31m-[m
+ ...eTest002.java => FutureTest002Application.java} |   4 [32m+[m[31m-[m
+ 21 files changed, 312 insertions(+), 25 deletions(-)
+
+[33mcommit 2d4cebb33110685d641e2aa619d95c26a470b8df[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 22 13:59:19 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../.idea/caches/build_file_checksums.ser          | Bin [31m535[m -> [32m542[m bytes
+ EnglishTester_new/.idea/caches/gradle_models.ser   | Bin [31m216302[m -> [32m0[m bytes
+ EnglishTester_new/.idea/gradle.xml                 |  37 [32m++[m[31m--[m
+ EnglishTester_new/.idea/misc.xml                   |  16 [32m+[m[31m-[m
+ EnglishTester_new/.idea/modules.xml                |  16 [32m+[m[31m-[m
+ EnglishTester_new/.idea/runConfigurations.xml      |  22 [32m+[m[31m--[m
+ GTU/.classpath                                     |  18 [32m+[m[31m-[m
+ GTU/.settings/org.eclipse.jdt.core.prefs           |   2 [32m+[m[31m-[m
+ GTU/WebContent/pages/js_util/html_debug.js         |   8 [32m+[m
+ GTU/ant/swing_jar/build_swing_jar.properties       |  18 [32m+[m[31m-[m
+ GTU/pom.xml                                        |   2 [32m+[m[31m-[m
+ .../FakeBeanExcelFiller.java}                      |  80 [32m++++[m[31m----[m
+ GTU/src/gtu/reflect/FakeBeanFiller.java            | 165 [32m++++++++++++[m[31m----[m
+ GTU/src/gtu/reflect/FakeBeanXmlFiller.java         | 211 [32m+++++++++++++++++++++[m
+ ...33\273\346\226\207\350\275\211\345\207\272.xml" | 209 [32m++++++++++++++++++++[m
+ ...63\273\347\265\261\345\217\203\346\225\270.txt" |   1 [32m+[m
+ .../.settings/com.googlecode.goclipse.core.prefs   |   4 [32m+[m[31m-[m
+ ScalaGTU/.cache-main                               | Bin [31m5340[m -> [32m5400[m bytes
+ 18 files changed, 670 insertions(+), 139 deletions(-)
+
+[33mcommit 7d71887d9970d86325cb37d320ded0b58cdcf039[m
+Merge: 1fe725e1 1c9d1d3d
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 22 09:27:05 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 1c9d1d3d9ba9cacfaaaaf795702297163442b6b7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 22 02:06:26 2019 +0800
+
+    ok
+
+ GTU/src/gtu/apache/FillBeanFromExcel.java          | 111 [32m++++++++++++++++[m[31m-----[m
+ ...73\272\347\253\213\346\206\221\350\255\211.txt" |  56 [32m+++++++++++[m
+ 2 files changed, 141 insertions(+), 26 deletions(-)
+
+[33mcommit 29c584a9d0f86a3dac8831eb428cda5b2bf29c57[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Jul 20 00:41:10 2019 +0800
+
+    ok
+
+ GTU/src/gtu/apache/FillBeanFromExcel.java | 131 [32m++++++++++++++++++++++++++++++[m
+ 1 file changed, 131 insertions(+)
+
+[33mcommit 1fe725e158dd8f22b644e82b673487e5622abab1[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jul 18 15:10:37 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/binary/EncryptDecrypterFileUtil.java   | 245 [32m+++++++++++++++++++++[m
+ .../txt/k8s/minikube_\351\207\215\347\201\214.txt" |  15 [31m--[m
+ ...70\213\350\274\211\345\256\211\350\243\235.txt" |  15 [32m++[m
+ .../minikube_Linux\345\256\211\350\243\235.txt"    |   0
+ GTU/txt/{k8s => kubernetes}/minikube_command.txt   |   0
+ .../minikube_deploy_command.txt                    |   0
+ ...26\207\344\273\266\351\203\250\345\261\254.txt" |   0
+ .../minikube_\351\207\215\347\201\214.txt"         |  48 [32m++++[m
+ ...ing_boot_\345\217\226\345\276\227_profiles.txt" |  16 [32m++[m
+ .../gtu001/qrcodemaker/common/AppListService.java  |   4 [32m+[m
+ .../com/example/gtu001/qrcodemaker/common/Log.java |  71 [32m++++++[m
+ 11 files changed, 399 insertions(+), 15 deletions(-)
+
+[33mcommit 888136971a3cb2bd92de17d780efd8a24a9ff47b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Jul 13 23:44:43 2019 +0800
+
+    ok
+
+ GTU/src/gtu/orderby/OrderbyUtil.java   | 86 [32m+++++++++++++++++++++++++++++[m[31m-----[m
+ GTU/src/gtu/orderby/page_order_css.txt | 65 [32m+++++++++++++++++[m[31m--------[m
+ 2 files changed, 120 insertions(+), 31 deletions(-)
+
+[33mcommit d6e06594fe961d2fee277756a2a4c5e75d5cd68e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Jul 13 23:38:14 2019 +0800
+
+    ok
+
+ EnglishTester_new/.idea/misc.xml                   |   2 [32m+[m[31m-[m
+ GTU/tokens/StoredCredential                        | Bin [31m0[m -> [32m979[m bytes
+ McDonald_new/.idea/caches/build_file_checksums.ser | Bin [31m0[m -> [32m535[m bytes
+ McDonald_new/.idea/caches/gradle_models.ser        | Bin [31m0[m -> [32m66676[m bytes
+ McDonald_new/.idea/gradle.xml                      |   3 [32m++[m
+ McDonald_new/.idea/misc.xml                        |  16 [32m+++++[m[31m--[m
+ McDonald_new/.idea/modules.xml                     |   2 [32m+[m
+ McDonald_new/.idea/vcs.xml                         |   6 [32m+++[m
+ .../java/com/example/mcdonald/MainActivity.java    |   5 [32m+++[m
+ .../app/src/main/res/drawable/f_fiber_coke_01.jpg  | Bin [31m0[m -> [32m171446[m bytes
+ .../app/src/main/res/drawable/f_fiber_coke_02.jpg  | Bin [31m0[m -> [32m196834[m bytes
+ .../app/src/main/res/drawable/f_fiber_coke_03.jpg  | Bin [31m0[m -> [32m144798[m bytes
+ .../app/src/main/res/drawable/f_fiber_coke_04.jpg  | Bin [31m0[m -> [32m178854[m bytes
+ .../app/src/main/res/drawable/f_fiber_coke_05.jpg  | Bin [31m0[m -> [32m148354[m bytes
+ .../app/src/main/res/drawable/f_latte_01.jpg       | Bin [31m0[m -> [32m211810[m bytes
+ .../app/src/main/res/drawable/f_latte_02.jpg       | Bin [31m0[m -> [32m230345[m bytes
+ .../app/src/main/res/drawable/f_latte_03.jpg       | Bin [31m0[m -> [32m155241[m bytes
+ .../app/src/main/res/drawable/f_latte_04.jpg       | Bin [31m0[m -> [32m207930[m bytes
+ .../app/src/main/res/drawable/f_latte_05.jpg       | Bin [31m0[m -> [32m177489[m bytes
+ .../app/src/main/res/drawable/f_nugget_new_01.jpg  | Bin [31m0[m -> [32m211652[m bytes
+ .../app/src/main/res/drawable/f_nugget_new_02.jpg  | Bin [31m0[m -> [32m234407[m bytes
+ .../app/src/main/res/drawable/f_nugget_new_03.jpg  | Bin [31m0[m -> [32m148036[m bytes
+ .../app/src/main/res/drawable/f_nugget_new_04.jpg  | Bin [31m0[m -> [32m224569[m bytes
+ .../app/src/main/res/drawable/f_nugget_new_05.jpg  | Bin [31m0[m -> [32m173428[m bytes
+ .../src/main/res/drawable/f_shrimp_burger_01.jpg   | Bin [31m0[m -> [32m229119[m bytes
+ .../src/main/res/drawable/f_shrimp_burger_02.jpg   | Bin [31m0[m -> [32m240743[m bytes
+ .../src/main/res/drawable/f_shrimp_burger_03.jpg   | Bin [31m0[m -> [32m152372[m bytes
+ .../src/main/res/drawable/f_shrimp_burger_04.jpg   | Bin [31m0[m -> [32m230721[m bytes
+ .../src/main/res/drawable/f_shrimp_burger_05.jpg   | Bin [31m0[m -> [32m194473[m bytes
+ .../app/src/main/res/drawable/f_spicywing_01.jpg   | Bin [31m0[m -> [32m192297[m bytes
+ .../app/src/main/res/drawable/f_spicywing_02.jpg   | Bin [31m0[m -> [32m253047[m bytes
+ .../app/src/main/res/drawable/f_spicywing_03.jpg   | Bin [31m0[m -> [32m152897[m bytes
+ .../app/src/main/res/drawable/f_spicywing_04.jpg   | Bin [31m0[m -> [32m243220[m bytes
+ .../app/src/main/res/drawable/f_spicywing_05.jpg   | Bin [31m0[m -> [32m155715[m bytes
+ McDonald_new/app/src/main/res/menu/main.xml        |  20 [32m+++++++++[m
+ QRCodeMaker/.idea/caches/gradle_models.ser         | Bin [31m0[m -> [32m107256[m bytes
+ QRCodeMaker/.idea/gradle.xml                       |   3 [32m++[m
+ QRCodeMaker/.idea/misc.xml                         |  46 [32m+++++++++++++++++++++[m
+ QRCodeMaker/.idea/vcs.xml                          |   6 [32m+++[m
+ 39 files changed, 105 insertions(+), 4 deletions(-)
+
+[33mcommit ead4777e4692e182a17024a792709c115b5ae074[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 10 12:29:38 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GolangGTU/src/gtu/gtu/date/dateUtil.go | 1 [31m-[m
+ 1 file changed, 1 deletion(-)
+
+[33mcommit 6cdc82b46081c1102363f60e2469003087f13131[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 10 10:53:24 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GolangGTU/src/gtu/gtu/date/dateUtil.go | 5 [32m++++[m[31m-[m
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+[33mcommit 2a496dc8a15aefe99e0a3e0c13dc412950258480[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jul 10 10:37:05 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/_temp/Test55.java                      | 57 [32m++++++[m[31m--------------------[m
+ GTU/src/gtu/_work/ui/EnglishSearchUI.java      | 13 [32m+++++[m[31m-[m
+ GTU/src/gtu/date/DateUtil.java                 |  1 [32m+[m
+ GolangGTU/src/gtu/gtu/date/dateUtil.go         | 51 [32m+++++++++++++++++++++++[m
+ GolangGTU/src/gtu/gtu/string/regexpReplacer.go | 10 [32m++[m[31m---[m
+ GolangGTU/src/gtu/gtu/string/stringUtil.go     | 34 [32m+++++++[m[31m--------[m
+ 6 files changed, 98 insertions(+), 68 deletions(-)
+
+[33mcommit 43e8ffd5aa56c772cb89890bc1a44669b39082a2[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 9 01:47:26 2019 +0800
+
+    ok
+
+ GTU/src/gtu/orderby/OrderbyUtil.java               | 266 [32m+++++++++++++++[m
+ GTU/src/gtu/orderby/page_order_css.txt             |  56 [32m++++[m
+ .../jquery.cookie_001/jquery.cookie-1.4.1.min.js   |   2 [32m+[m
+ .../jquery_cookie_\346\225\231\345\255\270.txt"    |   1 [32m+[m
+ ...\345\210\266cookie\345\255\230\345\217\226.txt" |  71 [32m+++++[m
+ ...jquery.datepicker_\350\250\255\345\256\232.txt" |   9 [32m+[m
+ ...34\200\345\276\214\347\213\200\346\205\213.txt" | 355 [32m+++++++++++[m[31m----------[m
+ ...hymeleaf_if_unless\345\257\253\346\263\225.txt" |   4 [32m+[m
+ 8 files changed, 588 insertions(+), 176 deletions(-)
+
+[33mcommit d03e8e2780d526948d003e8d79c128529a4b00df[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jul 4 09:54:06 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ ...16\222\345\272\217\345\212\237\350\203\275.htm" | 50 [32m++++++++++++++++[m[31m------[m
+ 1 file changed, 38 insertions(+), 12 deletions(-)
+
+[33mcommit e24bb28ba59c9895b1ad7f49c3f889c905abf8a4[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 2 17:38:45 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/string/StringUtil_.java        |  2 [32m+[m[31m-[m
+ GolangGTU/src/gtu/gtu/string/stringUtil.go | 43 [32m+++++++++++++++++++++++++[m[31m-----[m
+ 2 files changed, 37 insertions(+), 8 deletions(-)
+
+[33mcommit 671f182bc364bf74d1380211ef5c4ac8c77f3642[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 2 17:08:08 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GolangGTU/src/gtu/gtu/string/regexpReplacer.go | 1 [31m-[m
+ 1 file changed, 1 deletion(-)
+
+[33mcommit c66fe1610db29a39d93053def614dd4374c243a7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 2 16:59:48 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GolangGTU/src/gtu/gtu/string/regexpReplacer.go | 14 [32m++++++++++++[m[31m--[m
+ GolangGTU/src/gtu/gtu/string/stringUtil.go     |  7 [32m+[m[31m------[m
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+[33mcommit bbffa51afd727dd51fb125131e60a68cebcfc8e1[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 2 16:34:49 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/txt/go/go_command.txt                      |  8 [32m+++++[m
+ GolangGTU/src/gtu/gtu/string/regexpReplacer.go | 30 [32m++++++++++++++++++[m
+ GolangGTU/src/gtu/gtu/string/stringUtil.go     | 44 [32m++++++++++++++++++++++++[m[31m--[m
+ 3 files changed, 79 insertions(+), 3 deletions(-)
+
+[33mcommit 4572c255501320487d61c8eba7d5dd565270788f[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jul 2 14:57:55 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/txt/go/go_install.txt                          |   3 [32m+[m
+ ...34\200\345\276\214\347\213\200\346\205\213.txt" | 194 [32m+++++++++++++++++++++[m
+ 2 files changed, 197 insertions(+)
+
+[33mcommit 85e0e32a99fe52cbb4fe119cb9c27849b83c7133[m
+Merge: 74b52787 84e8c1e0
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 1 17:36:14 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 74b52787f3c80100d920ec623af46baa2fa87ae7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jul 1 17:35:46 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ ...\347\216\251oculus\346\226\271\346\263\225.txt" | 34 [32m++++++++++++++++++++++[m
+ ...05\266\344\273\226\347\224\250\346\263\225.txt" | 32 [32m++++++++++[m[31m----------[m
+ 2 files changed, 50 insertions(+), 16 deletions(-)
+
+[33mcommit 84e8c1e0dfa269af9f92b35e5ccb00f9e65a87cc[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Jun 29 14:19:01 2019 +0800
+
+    ok
+
+ "GTU/C:\\Users\\gtu001\\Desktop\\ws-rolling.log"   |   0
+ GTU/txt/go/go_install.txt                          |  24 [32m+++++++++++++++++++[m
+ ...60\270\344\271\205\350\250\255\345\256\232.txt" |  16 [32m++++++++[m[31m-----[m
+ GolangGTU/.gitignore                               |   1 [32m+[m
+ GolangGTU/.project                                 |  24 [32m+++++++++++++++++++[m
+ GolangGTU/.pydevproject                            |   5 [32m++++[m
+ .../.settings/com.googlecode.goclipse.core.prefs   |   6 [32m+++++[m
+ GolangGTU/pkg/linux_amd64/test.a                   | Bin [31m0[m -> [32m2988[m bytes
+ GolangGTU/src/gtu/gtu/string/stringUtil.go         |  26 [32m+++++++++++++++++++++[m
+ GolangGTU/src/gtu/test1/test001.go                 |   7 [32m++++++[m
+ 10 files changed, 103 insertions(+), 6 deletions(-)
+
+[33mcommit bad8ba4230491c7253d8bab02d7c243eeebd892c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Jun 28 17:16:15 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/WebContent/pages/jquery/Deferred_test001.html | 29 [32m++++++++++++++++++++++[m[31m-[m
+ GTU/src/gtu/bean/SimpleBeanCopyUtil.java          |  1 [32m+[m
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+[33mcommit 733991050204118b85f1874061204b034f908792[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jun 27 12:28:02 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/bean/SimpleBeanCopyUtil.java | 102 [32m+++++++++++++++++++++++++++++++[m
+ 1 file changed, 102 insertions(+)
+
+[33mcommit 26a48eb8ac02eec8448841eb0483b83735f25f34[m
+Merge: 414c11ae caa5705b
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jun 27 10:37:00 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 414c11ae0b703fde91e221d567bf5aa30e525592[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jun 27 10:36:34 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/WebContent/WEB-INF/lib/webTest2.jar            | Bin [31m37558[m -> [32m42436[m bytes
+ GTU/ant/swing_jar/build_swing_jar.xml              |   7 [32m+[m[31m-[m
+ GTU/src/gtu/log/finder/MainTest.java               |   2 [32m+[m[31m-[m
+ ...350\267\221_swing_\350\247\243\346\263\225.txt" |  18 [32m+++[m
+ .../custom_dialog/UrlPlayerDialog_bg.java          |  49 [32m++++[m[31m---[m
+ .../qrcodemaker/services/UrlPlayerService.java     |   4 [32m+[m[31m-[m
+ .../{DurningMointer.java => DuringMointer.java}    | 150 [32m++++++++++++++++[m[31m-----[m
+ 7 files changed, 168 insertions(+), 62 deletions(-)
+
+[33mcommit caa5705b6e96162fa8fb11ea54a6b392fc8a6910[m
+Merge: 1cb5b151 0bd7cfb0
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 26 01:36:07 2019 +0800
+
+    Merge branch 'QRCodeTest001'
+
+[33mcommit 0bd7cfb0c99e656f4bbbd3ff723a2363c1a54cad[m[33m ([m[1;31morigin/QRCodeTest001[m[33m, [m[1;32mQRCodeTest001[m[33m)[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 26 01:34:20 2019 +0800
+
+    ok
+
+ .../englishtester/EpubReaderEpubActivity.java      |  2 [32m+[m[31m-[m
+ .../java/com/example/englishtester/common/Log.java | 57 [32m+++++++++++++++++++++[m[31m-[m
+ .../common/TxtReaderAppenderPageDivider.java       |  2 [32m+[m[31m-[m
+ 3 files changed, 58 insertions(+), 3 deletions(-)
+
+[33mcommit 1cb5b15108c537fdb710ae62abc6e2db5901b77a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 13:42:26 2019 +0800
+
+    ok
+
+ GTU/txt/git/git_command.txt | 11 [32m+++++[m[31m------[m
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+[33mcommit f0d5c537150a5c5a8dda9892a9a4579c8c8a0cdb[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 13:39:17 2019 +0800
+
+    ok
+
+ .../java/com/example/gtu001/qrcodemaker/common/Mp3PlayerHandler.java | 5 [32m+++[m[31m--[m
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+[33mcommit ed6e3a4f31a99c3394635c3851fe0e7f9a0ea571[m
+Merge: d85bc674 33d9dae5
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 13:29:20 2019 +0800
+
+    Merge branch 'master' into QRCodeTest001
+
+[33mcommit d85bc674915f98da109c477ff240e9a5e6ff62e3[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 13:28:23 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../qrcodemaker/common/Mp3PlayerHandler.java       | 74 [32m+++++++++++++[m[31m---------[m
+ .../custom_dialog/UrlPlayerDialog_bg.java          |  2 [32m+[m[31m-[m
+ 2 files changed, 46 insertions(+), 30 deletions(-)
+
+[33mcommit 33d9dae51c0bc8d1a9fe3be78ed3352e8fbcb52b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 10:42:59 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/ant/swing_jar/build_swing_jar(37).xml           |  2 [32m++[m
+ GTU/ant/swing_jar/build_swing_jar_commonSetting.xml |  3 [32m+++[m
+ GTU/src/gtu/_work/ui/RegexReplacer.java             | 12 [32m+++++++++++[m[31m-[m
+ 3 files changed, 16 insertions(+), 1 deletion(-)
+
+[33mcommit 655f535070d5874ba67eef71f100d58a9ff2f073[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 09:53:49 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/_work/ui/RegexReplacer.java | 15 [32m+++++++[m[31m--[m
+ GTU/src/gtu/yaml/util/YamlUtil.java     | 54 [32m+++++++++++++++++++++++++[m[31m--------[m
+ 2 files changed, 54 insertions(+), 15 deletions(-)
+
+[33mcommit 237fff4bc54766a16733ff956a8e934e79d93642[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 25 02:26:30 2019 +0800
+
+    ok
+
+ .../qrcodemaker/common/Mp3PlayerHandler.java       | 43 [32m++++++[m[31m-------[m
+ .../custom_dialog/FilePlayerDialog.java            |  5 [32m+[m[31m-[m
+ .../custom_dialog/UrlPlayerDialog_bg.java          | 13 [32m++[m[31m--[m
+ .../qrcodemaker/services/UrlPlayerService.java     | 70 [32m+++++++++++[m[31m-----------[m
+ 4 files changed, 67 insertions(+), 64 deletions(-)
+
+[33mcommit 4fbd809955030097ff07f5442ab6048697130245[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jun 24 17:32:34 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../gtu001/qrcodemaker/common/Mp3PlayerHandler.java  | 20 [32m++++++++++++++++[m[31m----[m
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+[33mcommit 01c8d7caadffe1bc4baec828af6809de8b6fffff[m
+Merge: 6a01bdca 6b385c0e
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jun 24 14:27:33 2019 +0800
+
+    Merge branch 'master' of https://github.com/gtu001/gtu-test-code
+
+[33mcommit 6a01bdcae2bc2ddb45a6a9cc09792c96f69f0b3c[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jun 24 14:26:45 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../gtu001/qrcodemaker/common/DateUtil.java        | 25 [32m++++++++++++[m
+ .../qrcodemaker/common/Mp3PlayerHandler.java       | 25 [32m+++++++++[m[31m---[m
+ .../custom_dialog/UrlPlayerDialog_bg.java          | 46 [32m++++++++++++++++[m[31m------[m
+ .../qrcodemaker/services/UrlPlayerService.java     | 36 [32m+++[m[31m--------------[m
+ .../main/res/layout/subview_dialog_audioplayer.xml |  3 [32m+[m[31m-[m
+ 5 files changed, 85 insertions(+), 50 deletions(-)
+
+[33mcommit aa31b3b5ded2121cf5b0ea720761d19cad2c30a7[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jun 24 13:02:43 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ .../gtu001/qrcodemaker/IUrlPlayerService.aidl      |  4 [32m++[m
+ .../qrcodemaker/common/Mp3PlayerHandler.java       | 19 [32m++++++[m
+ .../custom_dialog/UrlPlayerDialog_bg.java          | 67 [32m+++++++++++++++++++++[m[31m-[m
+ .../qrcodemaker/services/UrlPlayerService.java     | 38 [32m+++++++++[m[31m---[m
+ .../main/res/layout/subview_dialog_audioplayer.xml | 11 [32m+++[m[31m-[m
+ 5 files changed, 129 insertions(+), 10 deletions(-)
+
+[33mcommit 6b385c0ec16a18f2bcb10f399e6b8f0221c183c3[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Mon Jun 24 00:04:06 2019 +0800
+
+    ok
+
+ GTU/pom.xml                                 |  37 [32m+++++[m[31m--[m
+ GTU/src/gtu/mail/gmail/GmailApiTest001.java | 163 [32m++++++++++++++++++++++++++++[m
+ 2 files changed, 190 insertions(+), 10 deletions(-)
+
+[33mcommit ea636f0313cb9e5f2a9c46bc1cbc6e42b431486b[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Sat Jun 22 00:19:49 2019 +0800
+
+    ok
+
+ .../{DurningMointer.java => DuringMointer.java}    | 526 [32m++++++++++++[m[31m---------[m
+ 1 file changed, 309 insertions(+), 217 deletions(-)
+
+[33mcommit e5cb91173201eb8dfee0376f065abe9ec5738b82[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Fri Jun 21 14:18:08 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/aop/AopAspectTest001.java   | 13 [32m+++++++++[m[31m----[m
+ GTU/src/gtu/swagger/SwaggerTest001.java | 23 [32m++++++++++++[m[31m-----------[m
+ GTU/src/gtu/thread/FutureTest002.java   | 11 [32m+++++++++[m[31m--[m
+ GTU/txt/git/git_command.txt             |  2 [32m+[m[31m-[m
+ 4 files changed, 31 insertions(+), 18 deletions(-)
+
+[33mcommit e1375de825099d88801701dddd6bea9952f98ded[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jun 20 14:50:44 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/aop/AopAspectTest001.java | 142 [32m++++++++++++++++++++++++++++++++++[m
+ 1 file changed, 142 insertions(+)
+
+[33mcommit c849c6b745ca6e3664aad64a4c0d9f2b14c89ce6[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Thu Jun 20 11:58:27 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/txt/git/git_command.txt | 25 [32m+++++++++++++++++[m[31m--------[m
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+[33mcommit f7f2c6c8e756d7efbf518bc966cf2a3e48184cc0[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 19 15:48:15 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/swagger/SwaggerTest001.java | 8 [32m++++++++[m
+ GTU/src/quartz.properties               | 8 [32m++++++++[m
+ 2 files changed, 16 insertions(+)
+
+[33mcommit e7646ecbdc580aef5e593412210343e9d2c181ec[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 19 15:45:10 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/pom.xml                                 | 10 [32m++++[m
+ GTU/src/gtu/quartz/ex2/BatchConfig.java     | 53 [32m+++++++++++++++++[m
+ GTU/src/gtu/quartz/ex2/CustomQuartzJob.java | 58 [32m++++++++++++++++++[m
+ GTU/src/gtu/quartz/ex2/MyTaskOne.java       | 17 [32m++++++[m
+ GTU/src/gtu/quartz/ex2/MyTaskTwo.java       | 18 [32m++++++[m
+ GTU/src/gtu/quartz/ex2/QuartzConfig.java    | 92 [32m+++++++++++++++++++++++++++++[m
+ GTU/src/gtu/swagger/SwaggerTest001.java     |  7 [32m++[m[31m-[m
+ 7 files changed, 253 insertions(+), 2 deletions(-)
+
+[33mcommit 3b7b0c0412f96ed1e067caf24c249cfdb39a237e[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 19 15:26:28 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/pom.xml                                        |  26 [32m++[m[31m--[m
+ GTU/src/application.yml                            |   0
+ GTU/src/gtu/hibernate2/User.hbm.xml                |   3 [32m+[m
+ GTU/src/gtu/spring/hibernate/LobTest.hbm.xml       |  41 [32m++[m[31m---[m
+ GTU/src/gtu/swagger/SwaggerTest001.java            | 101 [32m++++++++++++[m
+ GTU/src/gtu/thread/FutureTest002.java              |  10 [32m+[m[31m-[m
+ .../org/quartz/impl/jdbcjobstore/tables_derby.sql  | 173 [32m+++++++++++++++++++++[m
+ 7 files changed, 320 insertions(+), 34 deletions(-)
+
+[33mcommit 6a6609979ae2653cde09fc924be334ad0997b0a1[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 19 12:42:00 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/fonts/SEGUISYM.TTF                             | Bin [31m0[m -> [32m2454728[m bytes
+ GTU/fonts/fontsfamily1357718355503.xml             |  21 [32m++[m
+ GTU/fonts/kaiu.ttf                                 | Bin [31m0[m -> [32m5178844[m bytes
+ GTU/fonts/times.ttf                                | Bin [31m0[m -> [32m1195688[m bytes
+ GTU/pom.xml                                        | 135 [32m+++[m[31m----[m
+ .../gtu/ireport/ex1/BlowfishCipherProcessor.java   |  98 [32m+++++[m
+ GTU/src/gtu/ireport/ex1/CipherProcessor.java       |  19 [32m+[m
+ GTU/src/gtu/ireport/ex1/CipherUtil.java            | 185 [32m+++++++++[m
+ .../gtu/ireport/ex1/INVFJasperRptController.java   | 145 [32m+++++++[m
+ .../gtu/ireport/ex1/INVFundJasperReportUtil.java   | 192 [32m++++++++++[m
+ GTU/src/gtu/ireport/ex1/INV_RptDoc016_17.java      | 172 [32m+++++++++[m
+ GTU/src/gtu/ireport/ex1/JasperReportUtil.java      | 417 [32m+++++++++++++++++++++[m
+ .../gtu/ireport/ex1/JavaCryptoCipherProcessor.java |  69 [32m++++[m
+ GTU/src/gtu/ireport/ex1/OneWayCipherProcessor.java |  19 [32m+[m
+ GTU/src/gtu/ireport/ex1/PdfPwdUtil.java            |  60 [32m+++[m
+ .../gtu/ireport/ex1/report/DOC016/DOC016.jasper    | Bin [31m0[m -> [32m67241[m bytes
+ GTU/src/gtu/ireport/ex1/report/DOC016/DOC016.jpg   | Bin [31m0[m -> [32m475105[m bytes
+ GTU/src/gtu/ireport/ex1/report/DOC016/DOC016.jrxml | 277 [32m++++++++++++++[m
+ .../gtu/ireport/ex1/report/DOC017/DOC017.jasper    | Bin [31m0[m -> [32m70235[m bytes
+ GTU/src/gtu/ireport/ex1/report/DOC017/DOC017.jpg   | Bin [31m0[m -> [32m567119[m bytes
+ GTU/src/gtu/ireport/ex1/report/DOC017/DOC017.jrxml | 304 [32m+++++++++++++++[m
+ GTU/src/gtu/quartz/ex1/BranchIdFetcherService.java |   2 [32m+[m[31m-[m
+ GTU/src/gtu/thread/FutureTest002.java              |   2 [32m+[m
+ GTU/src/jasperreports_extension.properties         |   2 [32m+[m
+ GTU/src/log4j2.xml                                 |  43 [32m+++[m
+ 25 files changed, 2098 insertions(+), 64 deletions(-)
+
+[33mcommit 593fe10c7e543640b12a6d45e7c751a18fcdf91d[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Wed Jun 19 00:39:34 2019 +0800
+
+    ok
+
+ GTU/pom.xml                           | 39 [32m++++++++++++++++++[m[31m--[m
+ GTU/src/gtu/thread/FutureTest002.java | 68 [32m+++++++++++++++++++++++++++++++++++[m
+ 2 files changed, 105 insertions(+), 2 deletions(-)
+
+[33mcommit e88e1666c1d0ab1b7852bea85e37505df23c9aef[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 18 17:35:43 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/quartz/ex1/BranchIdFetcherJob.java     | 4 [32m++[m[31m--[m
+ GTU/src/gtu/quartz/ex1/BranchIdFetcherService.java | 2 [32m+[m[31m-[m
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+[33mcommit 72485b6b5c54bfeb64008f20272e44f3f4006f5a[m
+Author: gtu001 <gtu001@gmail.com>
+Date:   Tue Jun 18 17:33:44 2019 +0800
+
+    Signed-off-by: gtu001 <gtu001@gmail.com>
+
+ GTU/src/gtu/quartz/ex1/BranchIdFetcherJob.java     |  81 [32m+++++++++++++++++++++[m
+ GTU/src/gtu/quartz/ex1/BranchIdFetcherService.java |  78 [32m++++++++++++++++++++[m
+ ...0\255\345\256\232\346\255\245\351\251\237.docx" | Bin [31m0[m -> [32m13675[m bytes
+ ...75\277\347\224\250\346\226\271\345\274\217.txt" |  30 [32m++++++++[m
+ 4 files changed, 189 insertions(+)
