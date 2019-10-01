@@ -21,7 +21,7 @@ class LogWriter :
     def __init__(self) :
         self.fs = open(fileUtil.getDesktopDir("nintendo_switch_files.txt"), 'a', encoding='UTF8', buffering=30)
     def write(self, line):
-        self.fs.write(line)
+        self.fs.write(str(line))
         self.fs.flush()
     def close(self) :
         self.fs.flush()
@@ -123,7 +123,7 @@ class ShopeeItem :
         THREAD.append(v)
 
     def __str__(self) :
-        return "{name} \n {href} \n {prodInfo} \n".format(name=self.name, href=self.href, prodInfo=self.prodInfo)
+        return "============================================== \n Name : {name} \n Price : {price} \n Link : {href} \n Detail : {prodInfo} \n".format(name=self.name, price=self.priceRange, href=self.href, prodInfo=self.prodInfo)
         
 
 
