@@ -62,14 +62,26 @@ class NintendoSwitchPatternEnum(Enum) :
 
 
 class MyPageInfoFetcher(Thread) :
+    matchCount = 0
+
     def __init__(self) :
         super().__init__()
         self.queue = queue_test_001.DequeObj()
         self.driver = seleniumUtil.getDriver()
         self.start()
 
+    def reflashName(self) :
+        newName = "all[{all}],queue[{queue}],match[{match}]".format(\
+            all=self.queue.allCount(), \
+            queue=self.queue.length(), \
+            match=MyPageInfoFetcher.matchCount \
+            )
+        self.setName(newName)
+        print(newName)
+
     def append(self, v) :
         self.queue.appendright(v)
+        
 
     def getMatchSerialNumber(self, prodInfo) :
         mth = re.findall(r"[a-zA-Z]{3}[\s\t]*\d{6}", prodInfo, flags=re.I)
@@ -86,10 +98,15 @@ class MyPageInfoFetcher(Thread) :
         prodinfo = soup.select("div.product-detail.page-product__detail")
         if len(prodinfo) != 0 :
             v.prodInfo = prodinfo[0].getText().strip()
-            matchSerialNo = self.getMatchSerialNumber(v.prodInfo)
-            if stringUtil.isNotBlank(matchSerialNo) :
-                v.matchSerialNo = matchSerialNo
-                log.write(v)
+            self.checkProdInfo(v)
+            
+
+    def checkProdInfo(self, v) :
+        matchSerialNo = self.getMatchSerialNumber(v.prodInfo)
+        if stringUtil.isNotBlank(matchSerialNo) :
+            v.matchSerialNo = matchSerialNo
+            MyPageInfoFetcher.matchCount += 1
+            log.write(v)
         
 
     def run(self) :
@@ -97,10 +114,9 @@ class MyPageInfoFetcher(Thread) :
             if self.queue.length() > 0 :
                 v = self.queue.popleft()
                 self.getPageInfo(v)
-            time.sleep(0.2)
+            self.reflashName()
+            # time.sleep(0.2)
 
-
-            
 
 
 THREAD = MyPageInfoFetcher()
@@ -110,13 +126,17 @@ class ShopeeItem :
     baseUrl = "https://shopee.tw/"
 
     def __init__(self, v) :
-        self.href = ShopeeItem.baseUrl + v.select("[data-sqe='link']")[0].get("href")
-        self.name = v.select("[data-sqe='name']")[0].getText().strip()
-        self.priceRange = v.select("[data-sqe='name']")[0].find_next_siblings('div')[0].getText().strip()
-        self.prodInfo = None
-        self.matchSerialNo = None
-        t1 = Thread(target=self.getProdInfo, args=(self, ))
-        t1.start()
+        try :
+            self.href = ShopeeItem.baseUrl + v.select("[data-sqe='link']")[0].get("href")
+            self.name = v.select("[data-sqe='name']")[0].getText().strip()
+            self.priceRange = v.select("[data-sqe='name']")[0].find_next_siblings('div')[0].getText().strip()
+            self.prodInfo = None
+            self.matchSerialNo = None
+            self.isInitOk = True
+            t1 = Thread(target=self.getProdInfo, args=(self, ))
+            t1.start()
+        except :
+            self.isInitOk = False
 
     # @classmethod
     def getProdInfo(self, v):
@@ -133,9 +153,7 @@ class ShopeeItem :
 def main() :
     driver = seleniumUtil.getDriver(1280, 720)
 
-    driver.get("https://shopee.tw/search?keyword=switch&page=0&sortBy=relevancy&usedItem=true")
-
-    prodLst = list()
+    driver.get("https://shopee.tw/search?facet=14602&keyword=switch&page=0&sortBy=relevancy")
 
     for pageIdx in range(0, 100) :
         seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(driver, smooth=True, scrollCount=2)
@@ -145,8 +163,7 @@ def main() :
         products = soup.select("div.col-xs-2-4.shopee-search-item-result__item[data-sqe='item']")
  
         for i,v in enumerate(products) :
-            item = ShopeeItem(v)
-            prodLst.append(item)
+            ShopeeItem(v)
 
         btn = driver.find_element_by_css_selector("button.shopee-button-solid.shopee-button-solid--primary ~ button")
         btn.click()
