@@ -2,8 +2,9 @@ import os
 import platform
 
 
-
-# ## from gtu.os import envUtil
+'''
+from gtu.os import envUtil
+'''
 
 def export(key, val):
     os.environ[key] = val
@@ -23,7 +24,7 @@ def getOS():
 
 
 def isWindows() :
-    platform.system()
+    return getOS() == 'Windows'
     
     
 if __name__ == '__main__' :

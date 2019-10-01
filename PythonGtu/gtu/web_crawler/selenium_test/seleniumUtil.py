@@ -7,6 +7,7 @@ from gtu.reflect import checkSelf
 from selenium.webdriver.remote.webdriver import WebDriver as WD
 import time
 from gtu.datetime import duringMointer
+from gtu.os import envUtil
 
 '''
 from gtu.web_crawler.selenium_test import seleniumUtil
@@ -42,10 +43,11 @@ def __test_network(url) :
 
 
 def getDriver(width=1280, height=720) :
+    if envUtil.isWindows() :
+        driverPath = r"D:/apps/selenium/chromedriver.exe"
+    else :
+        driverPath = r"/media/gtu001/OLD_D/apps/webdriver/chromedriver"
     
-    /media/gtu001/OLD_D/apps/webdriver/chromedriver
-    
-    driverPath = r"D:/apps/selenium/chromedriver.exe"
     # webdriver.Firefox()
     driver = webdriver.Chrome(executable_path=driverPath)
 
