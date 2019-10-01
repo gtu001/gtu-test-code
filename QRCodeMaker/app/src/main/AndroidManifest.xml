@@ -105,6 +105,10 @@
         <activity
             android:name=".HtmlLoaderActivity"
             android:label="HTML讀取" />
+        <activity
+            android:name=".NintendoSwitchCheckerActivity"
+            android:label="任天堂Switch確認" />
+
 
     </application>
 

@@ -109,6 +109,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.html_loader) {
             gotoActivity(HtmlLoaderActivity.class, null);
 
+        } else if (id == R.id.nintendo_switch_checker) {
+            gotoActivity(NintendoSwitchCheckerActivity.class, null);
+
         } else if (id == R.id.nav_send) {
 
         }

@@ -31,6 +31,11 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="html讀取" />
 
+        <item
+            android:id="@+id/nintendo_switch_checker"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="任天堂Switch確認" />
+
         <!-- no use -->
         <item
             android:id="@+id/nav_gallery"
