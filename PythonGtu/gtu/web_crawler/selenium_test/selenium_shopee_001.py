@@ -151,7 +151,7 @@ def main() :
         btn = driver.find_element_by_css_selector("button.shopee-button-solid.shopee-button-solid--primary ~ button")
         btn.click()
          
-    log.close()
+    # log.close()
 
 
 if __name__ == '__main__' :
