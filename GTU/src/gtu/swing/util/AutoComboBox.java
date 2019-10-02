@@ -276,10 +276,6 @@ public class AutoComboBox extends PlainDocument {
         }
     }
 
-    public AutoComboBox applyComboxBoxList(List<String> lst) {
-        return applyComboxBoxList(lst, "");
-    }
-
     private Comparator<String> ignoreCaseSort = new Comparator<String>() {
         @Override
         public int compare(String arg0, String arg1) {
@@ -287,7 +283,21 @@ public class AutoComboBox extends PlainDocument {
         }
     };
 
+    // -------------------------------------------------------------------------------------------
+
+    public AutoComboBox applyComboxBoxList(List<String> lst) {
+        return applyComboxBoxList(lst, "", true);
+    }
+
+    public AutoComboBox applyComboxBoxList(List<String> lst, boolean doSort) {
+        return applyComboxBoxList(lst, "", doSort);
+    }
+
     public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText) {
+        return applyComboxBoxList(lst, defaultText, true);
+    }
+
+    public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText, boolean doSort) {
         LinkedList<String> cloneLst = new LinkedList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
             if (StringUtils.isBlank(cloneLst.get(ii))) {
@@ -296,7 +306,10 @@ public class AutoComboBox extends PlainDocument {
             }
         }
         cloneLst.push("");// 塞個空的放第一個
-        Collections.sort(cloneLst, ignoreCaseSort);
+
+        if (doSort) {
+            Collections.sort(cloneLst, ignoreCaseSort);
+        }
 
         final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
         for (String s : cloneLst) {
@@ -316,19 +329,31 @@ public class AutoComboBox extends PlainDocument {
 
     public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst, String defaultText) {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        autoComboBox.applyComboxBoxList(lst, defaultText);
+        autoComboBox.applyComboxBoxList(lst, defaultText, true);
+        return autoComboBox;
+    }
+
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst, String defaultText, boolean doSort) {
+        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
+        autoComboBox.applyComboxBoxList(lst, defaultText, doSort);
+        return autoComboBox;
+    }
+
+    public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst, boolean doSort) {
+        AutoComboBox autoComboBox = new AutoComboBox(comboBox);
+        autoComboBox.applyComboxBoxList(lst, "", doSort);
         return autoComboBox;
     }
 
     public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst) {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        autoComboBox.applyComboxBoxList(lst, "");
+        autoComboBox.applyComboxBoxList(lst, "", true);
         return autoComboBox;
     }
 
     public static AutoComboBox applyAutoComboBox(JComboBox comboBox) {
         AutoComboBox autoComboBox = new AutoComboBox(comboBox);
-        autoComboBox.applyComboxBoxList(new ArrayList<String>(), "");
+        autoComboBox.applyComboxBoxList(new ArrayList<String>(), "", true);
         return autoComboBox;
     }
 

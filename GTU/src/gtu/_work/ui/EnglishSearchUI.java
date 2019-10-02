@@ -30,6 +30,7 @@ import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -152,6 +153,7 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox simpleSentanceChk;
     private JCheckBox robotFocusChk;
     private AutoComboBox searchEnglishIdText_auto;
+    private List<String> englishLst;
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
@@ -700,7 +702,15 @@ public class EnglishSearchUI extends JFrame {
             public void mouseClicked(MouseEvent arg0) {
                 if (JMouseEventUtil.buttonRightClick(1, arg0)) {
                     JPopupMenuUtil.newInstance(searchEnglishIdTextController.get())//
-                            .addJMenuItem("貼上", new ActionListener() {
+                            .addJMenuItem("複製", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    String text = searchEnglishIdTextController.get().getText();
+                                    if (StringUtils.isNotBlank(text)) {
+                                        ClipboardUtil.getInstance().setContents(text);
+                                    }
+                                }
+                            }).addJMenuItem("貼上", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent arg0) {
                                     String text = ClipboardUtil.getInstance().getContents();
@@ -723,25 +733,30 @@ public class EnglishSearchUI extends JFrame {
                                         JCommonUtil.handleException(ex);
                                     }
                                 }
-                            }).addJMenuItem("google圖片搜尋", new ActionListener() {
+                            }).addJMenuItem("下拉字典", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent arg0) {
-                                    try {
-                                        String text = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
-                                        if (StringUtils.isBlank(text)) {
-                                            return;
-                                        }
-                                        text = URLEncoder.encode(text, "UTF-8");
-                                        String url = String.format(
-                                                "https://www.google.com/search?client=ubuntu&hs=uR4&channel=fs&biw=1533&bih=746&tbm=isch&sa=1&ei=CRayXJbwHIbH5gL1_LGICw&q=%1$s&oq=%1$s&gs_l=img", text);
-                                        DesktopUtil.browse(url);
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex);
+                                    searchEnglishIdText_auto.applyComboxBoxList(englishLst);
+                                }
+                            }).addJMenuItem("下拉歷史紀錄", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    File newWordFile = new File(StringUtils.trimToEmpty(newWordTxtPathText.getText()));
+                                    if (newWordFile.exists()) {
+                                        List<String> lst = FileUtil.loadFromFile_asList(newWordFile, "UTF8");
+                                        Collections.reverse(lst);
+                                        searchEnglishIdText_auto.applyComboxBoxList(lst, false);
                                     }
                                 }
                             }).applyEvent(arg0)//
                             .show();
                 }
+            }
+        });
+        
+        searchEnglishIdText.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                queryButtonAction(true);
             }
         });
 
@@ -1349,7 +1364,7 @@ public class EnglishSearchUI extends JFrame {
                         System.out.println("read --- " + "exportFileJson.bin");
                         String content = FileUtil.loadFromFile(file, "utf8");
                         JSONArray arry = new JSONArray(content);
-                        List<String> englishLst = new ArrayList<String>();
+                        englishLst = new ArrayList<String>();
                         for (int ii = 0; ii < arry.length(); ii++) {
                             JSONObject obj = (JSONObject) arry.get(ii);
                             String englishId = obj.getString("englishId");
@@ -1369,7 +1384,7 @@ public class EnglishSearchUI extends JFrame {
                     FileInputStream fis = new FileInputStream(file);
                     ObjectInputStream input = new ObjectInputStream(fis);
                     List<EnglishwordInfoDAO.EnglishWord> list = new ArrayList<EnglishwordInfoDAO.EnglishWord>();
-                    List<String> englishLst = new ArrayList<String>();
+                    englishLst = new ArrayList<String>();
                     try {
                         for (Object readObj = null; (readObj = input.readObject()) != null;) {
                             EnglishwordInfoDAO.EnglishWord word = (EnglishwordInfoDAO.EnglishWord) readObj;

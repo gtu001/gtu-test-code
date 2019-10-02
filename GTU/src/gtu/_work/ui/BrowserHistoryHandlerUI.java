@@ -184,6 +184,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JToggleButton toggleChangeColorBtn;
     private HyperlinkJTextPaneHandler mHyperlinkJTextPaneHandler;
+    private ImageIconConst mImageIconConst;
 
     /**
      * Launch the application.
@@ -567,6 +568,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             }
 
+            mImageIconConst = new ImageIconConst(urlTable);
+
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
             JCommonUtil.setLocationToRightBottomCorner(this);
@@ -753,6 +756,36 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private static class ImageIconConst {
+        private static Icon pigIcon;
+        private static Icon transparentIcon;
+        private static int width = -1;
+
+        ImageIconConst(JTable urlTable) {
+            width = urlTable.getRowHeight();
+        }
+
+        private Icon getPigIcon() {
+            if (pigIcon == null) {
+                Image image = ImageUtil.getInstance().getIcoImage("resource/images/ico/Pig_SC.ico");
+                pigIcon = getIcon(image);
+            }
+            return pigIcon;
+        }
+
+        private Icon getIcon(Image image) {
+            Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
+            return ImageUtil.getInstance().imageToIcon(image2);
+        }
+
+        private Icon getTransparentIcon() {
+            if (transparentIcon == null) {
+                transparentIcon = ImageUtil.getInstance().createTransparentIcon(width, width);
+            }
+            return transparentIcon;
+        }
+    }
+
     private enum UrlTableConfigEnum {
         刪除(5) {
             @Override
@@ -793,23 +826,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 int width = _this.urlTable.getRowHeight();
                 try {
                     String newUrl = fixWindowUrl(d.url);
-                    if(StringUtils.equals(newUrl, d.url)) {
+                    if (!StringUtils.equals(newUrl, d.url)) {
+                        return _this.mImageIconConst.getPigIcon();
+                    } else {
                         File f = DesktopUtil.getFile(newUrl);
                         if (f.exists()) {
                             Image image = null;
                             if (OsInfoUtil.isWindows()) {
                                 Icon icon = ImageUtil.getInstance().getIconFromExe(f);
                                 image = ImageUtil.getInstance().iconToImage(icon);
+                                Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
+                                return ImageUtil.getInstance().imageToIcon(image2);
                             } else {
-                                image = ImageUtil.getInstance().getIcoImage("resource/images/ico/Pig_SC.ico");
+                                return _this.mImageIconConst.getPigIcon();
                             }
-                            Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
-                            return ImageUtil.getInstance().imageToIcon(image2);
                         }
                     }
-                    return ImageUtil.getInstance().createTransparentIcon(width, width);
+                    return _this.mImageIconConst.getTransparentIcon();
                 } catch (Exception ex) {
-                    return ImageUtil.getInstance().createTransparentIcon(width, width);
+                    return _this.mImageIconConst.getTransparentIcon();
                 }
             }
         }, //
