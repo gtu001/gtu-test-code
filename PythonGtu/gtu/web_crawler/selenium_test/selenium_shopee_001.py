@@ -16,6 +16,9 @@ import time
 import re
 from enum import Enum
 from gtu.io import fileUtil
+from gtu.error import errorHandler
+
+
 
 class LogWriter :
     def __init__(self) :
@@ -77,7 +80,7 @@ class MyPageInfoFetcher(Thread) :
             match=MyPageInfoFetcher.matchCount \
             )
         self.setName(newName)
-        print(newName)
+        # print(newName)
 
     def append(self, v) :
         self.queue.appendright(v)
@@ -135,7 +138,9 @@ class ShopeeItem :
             self.isInitOk = True
             t1 = Thread(target=self.getProdInfo, args=(self, ))
             t1.start()
-        except :
+        except Exception as ex :
+            errorHandler.printStackTrace2(ex)
+            print("nextPageClick ERROR ")
             self.isInitOk = False
 
     # @classmethod
@@ -146,8 +151,14 @@ class ShopeeItem :
         return "============================================== \n Name : {name} \n Price : {price} \n Link : {href} \n Detail : {prodInfo} \n".format(name=self.name, price=self.priceRange, href=self.href, prodInfo=self.prodInfo)
         
 
-
-
+def nextPageClick(driver) :
+    try:
+        btn = driver.find_element_by_css_selector("button.shopee-button-solid.shopee-button-solid--primary ~ button")
+        btn.click()
+    except Exception as ex :
+        errorHandler.printStackTrace2(ex)
+        print("nextPageClick ERROR ")
+        time.sleep(0.5)
 
 
 def main() :
@@ -155,7 +166,7 @@ def main() :
 
     driver.get("https://shopee.tw/search?facet=14602&keyword=switch&page=0&sortBy=relevancy")
 
-    for pageIdx in range(0, 100) :
+    for pageIdx in range(0, 20) :
         seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(driver, smooth=True, scrollCount=2)
         
         soup = bs(driver.page_source, "html.parser")
@@ -165,8 +176,7 @@ def main() :
         for i,v in enumerate(products) :
             ShopeeItem(v)
 
-        btn = driver.find_element_by_css_selector("button.shopee-button-solid.shopee-button-solid--primary ~ button")
-        btn.click()
+        nextPageClick(driver)
          
     # log.close()
 
