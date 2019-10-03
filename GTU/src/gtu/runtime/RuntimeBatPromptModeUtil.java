@@ -215,7 +215,7 @@ public class RuntimeBatPromptModeUtil {
                 startPos = ii + 1 + startOffset;
             }
             if (line.contains(BAT_END_TAG)) {
-                endPos = ii - 1 + endOffset;
+                endPos = ii + endOffset;
             }
         }
         return StringUtils.join(dataLst.subList(startPos, endPos), "\r\n");

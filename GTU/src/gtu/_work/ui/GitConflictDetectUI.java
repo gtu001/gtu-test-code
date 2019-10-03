@@ -46,6 +46,7 @@ import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
+import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
@@ -97,10 +98,16 @@ public class GitConflictDetectUI extends JFrame {
     private JPasswordField gitPasswordText;
 
     private File configFile = new File(PropertiesUtil.getJarCurrentPath(GitConflictDetectUI.class), GitConflictDetectUI.class.getSimpleName() + "_config.properties");
-    // private File configFile = new
-    // File("/media/gtu001/OLD_D/my_tool/GitConflictDetectUI_config.properties");
-
     private PropertiesGroupUtils config = new PropertiesGroupUtils(configFile);
+    {
+        for (String path : new String[] { "/media/gtu001/OLD_D/my_tool/GitConflictDetectUI_config.properties", "D:\\my_tool\\GitConflictDetectUI_config.properties" }) {
+            File tmpFile = new File(path);
+            if (tmpFile.exists()) {
+                config = new PropertiesGroupUtils(tmpFile);
+            }
+        }
+    }
+
     private static final String DIFF_PATH_KEY = "diff_path_key";
     private static final String ENCODING_KEY = "encoding_key";
     private static final String PROJECT_KEY = "project_key";
