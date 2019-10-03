@@ -20,21 +20,9 @@ from gtu.error import errorHandler
 
 from abc import ABCMeta, abstractmethod
 
+from gtu.io import LogWriter
 
-
-class LogWriter :
-    def __init__(self) :
-        self.fs = open(fileUtil.getDesktopDir("google_translate_log.txt"), 'a', encoding='UTF8', buffering=30)
-    def write(self, line):
-        self.fs.write(str(line))
-        self.fs.flush()
-    def close(self) :
-        self.fs.flush()
-        self.fs.close()
-
-
-log = LogWriter()
-
+log = LogWriter.LogWriter()
 
 class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
     baseURL = "https://translate.google.com.tw/?sxsrf=ACYBGNSXtWb9L-KnXJftDoKBonTteGPxRA:1570063273809&biw=1372&bih=758&um=1&ie=UTF-8&hl=zh-CN&client=tw-ob#en/zh-TW/"
@@ -81,6 +69,7 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
 class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
     def myProcess(self, sourceStr, resultStr) :
         print("\t", sourceStr, "\t->\t", resultStr)
+        log.write(sourceStr + "\t->\t" + resultStr)
 
 
 THREAD = MyImplMyGoogleTranslateFetcher()
