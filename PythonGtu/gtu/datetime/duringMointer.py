@@ -54,6 +54,17 @@ def getCurrentStack(file) :
     
 
 
+def printCurrentStack() :
+    lst = list()
+    for i,v in enumerate(inspect.stack()):
+        s = MyStackInfo(v)
+        lst.append(s)
+    print("stack - start ---------------------------------------------------")
+    for i,v in enumerate(lst):
+        print(i , v.filename, v.lineNumber, "\t", v.line)
+    print("stack - end   ---------------------------------------------------")
+
+
 class MyStackInfo:
     def __init__(self, stack) :
         self.allLine = stack[0]
