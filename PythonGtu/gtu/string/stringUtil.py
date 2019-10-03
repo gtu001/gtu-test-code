@@ -88,3 +88,23 @@ def concat(*arry):
 
 def isNoneType(s):
     return s is None
+
+
+def javaParameterToDbName(strVal, delimit="_") :
+    strVal = strVal.strip()
+    length = len(strVal)
+    sb = ""
+    for i in range(0, length) :
+        if strVal[i].islower() and i + 1 < length and strVal[i + 1].isupper() :
+            sb += strVal[i].lower() + delimit
+        else:
+            sb += strVal[i].lower()
+    return sb
+
+
+if __name__ == '__main__' :
+    strVal = "aaaBbbbCcccDddd"
+    result = javaParameterToDbName(strVal)
+    print(result)
+    print("done..")
+    

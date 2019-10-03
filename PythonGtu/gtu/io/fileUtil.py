@@ -7,6 +7,8 @@ from gtu.reflect import checkSelf
 import re
 from gtu.string import stringUtil
 import sys
+import collections
+
 
 '''
 from gtu.io import fileUtil
@@ -151,6 +153,26 @@ def loadFileBytes(filePath):
 	file = open(filePath, "rb") 
 	return file.read() 
 
+
+def loadFile_asList(filePath, trim=False, distinct=False) :
+	lst = list()
+	if distinct :
+		lst = collections.OrderedDict()
+	fs = open(filePath, "r", encoding='utf8')
+	for line in fs.readlines() :
+		if trim :
+			line = line.strip()
+		line = re.sub(r"\n+$", "", line)
+		if not distinct :
+			lst.append(line)
+		else:
+			lst[line] = ""
+	if not distinct :
+		return lst
+	else:
+		return list(lst.keys())
+
+	
 
 
 def getCurrentDir(filename=None):
@@ -311,7 +333,9 @@ def rename(fromDir, fromName, toDir, toName):
 
 
 if __name__ == '__main__':
-	dirPath = "D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/english_txt"
-	listFileOnly(dirPath)
+	dirPath = "C:/Users/E123474/Desktop/FundQryRoiWebRequestDto.txt"
+	lst = loadFile_asList(dirPath, distinct=True)
+	for i,v in enumerate(lst) :
+		print(i, v)
 	print("done..")
 	

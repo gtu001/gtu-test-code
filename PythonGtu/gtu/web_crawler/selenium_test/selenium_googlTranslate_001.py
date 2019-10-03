@@ -41,7 +41,8 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         # self.setName(newName)
 
     def translate(self, sourceStr) :
-        self.driver.find_element_by_css_selector("textarea[id=source]").send_keys(sourceStr)
+        textarea = self.driver.find_element_by_css_selector("textarea[id=source]")
+        textarea.send_keys(sourceStr)
         targetLst = None
         while targetLst is None or len(targetLst) == 0:
             targetLst = self.driver.find_elements_by_css_selector(".tlid-translation.translation")
@@ -49,6 +50,7 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         sb = ""
         for i,v in enumerate(targetLst) :
             sb += v.text.strip()
+        clearInput(textarea)
         return sb
          
     def run(self) :
@@ -56,27 +58,58 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         while True :
             if self.queue.length() > 0 :
                 sourceStr = self.queue.popleft()
-                resultStr = self.translate(sourceStr)
+                _sourceStr = self.beforeProcess(sourceStr)
+                resultStr = self.translate(_sourceStr)
                 self.myProcess(sourceStr, resultStr)
             self.reflashName()
             time.sleep(0.2)
+
+    @abstractmethod
+    def beforeProcess(self, sourceStr) :
+        pass
 
     @abstractmethod
     def myProcess(self, sourceStr, resultStr) :
         pass
 
 
+def clearInput(element) :
+    from selenium.webdriver.common import keys
+    element.send_keys(keys.Keys.CONTROL + "a")
+    element.send_keys(keys.Keys.DELETE)
+
+
 class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
+    def javaParameterToDbName(self, strVal) :
+        strVal = strVal.strip()
+        length = len(strVal)
+        sb = ""
+        for i in range(0, length) :
+            if strVal[i].islower() and i + 1 < length and strVal[i + 1].isupper() :
+                sb += strVal[i].lower() + " "
+            elif strVal[i] =="_" :
+                sb += " "
+            else:
+                sb += strVal[i].lower()
+        return sb
+
+    def beforeProcess(self, sourceStr) :
+        return self.javaParameterToDbName(sourceStr)
+
     def myProcess(self, sourceStr, resultStr) :
         print("\t", sourceStr, "\t->\t", resultStr)
-        log.write(sourceStr + "\t->\t" + resultStr)
+        strVal = "{javaName}\t{type}\t{require}\t{defaultVal}\t{description}".format(javaName=sourceStr,type="字串",require="Y",defaultVal="無",description=resultStr)
+        log.write(strVal + "\r\n")
 
 
 THREAD = MyImplMyGoogleTranslateFetcher()
 
 
+
 def main() :
-    THREAD.queue.appendleft("go go power ranger")
+    lst = fileUtil.loadFile_asList("C:/Users/E123474/Desktop/FundQryRoiWebRequestDto.txt")
+    for i,v in enumerate(lst) :
+        THREAD.queue.appendleft(v)
     pass
 
 
