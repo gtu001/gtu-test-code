@@ -50,7 +50,7 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         sb = ""
         for i,v in enumerate(targetLst) :
             sb += v.text.strip()
-        clearInput(textarea)
+        seleniumUtil.WebElementControl.clearInput(textarea)
         return sb
          
     def run(self) :
@@ -73,14 +73,11 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         pass
 
 
-def clearInput(element) :
-    from selenium.webdriver.common import keys
-    element.send_keys(keys.Keys.CONTROL + "a")
-    element.send_keys(keys.Keys.DELETE)
+
 
 
 class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
-    def javaParameterToDbName(self, strVal) :
+    def javaParameterToDbColumn(self, strVal) :
         strVal = strVal.strip()
         length = len(strVal)
         sb = ""
@@ -94,7 +91,7 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
         return sb
 
     def beforeProcess(self, sourceStr) :
-        return self.javaParameterToDbName(sourceStr)
+        return self.javaParameterToDbColumn(sourceStr)
 
     def myProcess(self, sourceStr, resultStr) :
         print("\t", sourceStr, "\t->\t", resultStr)

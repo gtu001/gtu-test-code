@@ -90,7 +90,7 @@ def isNoneType(s):
     return s is None
 
 
-def javaParameterToDbName(strVal, delimit="_") :
+def javaParameterToDbColumn(strVal, delimit="_") :
     strVal = strVal.strip()
     length = len(strVal)
     sb = ""
@@ -102,9 +102,26 @@ def javaParameterToDbName(strVal, delimit="_") :
     return sb
 
 
+def dbColumnToJavaParameter(strVal, delimit="_") :
+    strVal = strVal.strip()
+    length = len(strVal)
+    sb = ""
+    toUpperCase = False
+    for i in range(0, length) :
+        if strVal[i] == delimit :
+            toUpperCase = True
+            continue
+        if not toUpperCase :
+            sb += strVal[i].lower()
+        else :
+            sb += strVal[i].upper()
+            toUpperCase = False
+    return sb
+
+
 if __name__ == '__main__' :
-    strVal = "aaaBbbbCcccDddd"
-    result = javaParameterToDbName(strVal)
+    strVal = "aaa_bbb_cccc_dddd"
+    result = dbColumnToJavaParameter(strVal)
     print(result)
     print("done..")
     

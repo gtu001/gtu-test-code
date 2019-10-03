@@ -57,6 +57,14 @@ def getDriver(width=1280, height=720) :
     return driver
 
 
+class WebElementControl :
+    @staticmethod
+    def clearInput(webElement) :
+        from selenium.webdriver.common import keys
+        webElement.send_keys(keys.Keys.CONTROL + "a")
+        webElement.send_keys(keys.Keys.DELETE)
+
+
 class ScrollHandler :
     @staticmethod
     def getScrollPosition(driver) :
