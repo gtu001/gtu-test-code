@@ -61,6 +61,8 @@
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
 			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
+			
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
@@ -72,6 +74,7 @@
 			<packagename mode="small">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 
+			<packagename mode="pom">org.jsoup.Jsoup</packagename>
 			<packagename mode="small">org.springframework.web.util.HtmlUtils</packagename>
 			<packagename mode="small">org/springframework/util/Assert</packagename>
 		</jarfinder>

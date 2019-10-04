@@ -346,11 +346,12 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                         setMeaning(memoryProp.getProperty(english), rowPos);
                                     } else {
                                         if (StringUtils.isBlank(desc) || !hasChinese(desc)) {
-                                            if (!english.contains(" ")) {
-                                                setMeaningEn1(english, rowPos, errSb);
-                                            } else {
-                                                setMeaningEn2(english, rowPos, errSb);
-                                            }
+                                            // if (!english.contains(" ")) {
+                                            // setMeaningEn1(english, rowPos,
+                                            // errSb);
+                                            // } else {
+                                            setMeaningEn2(english, rowPos, errSb);
+                                            // }
                                         }
                                     }
 

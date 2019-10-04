@@ -79,9 +79,9 @@ public class SimpleHttpsUtil {
             url.setRequestProperty("User-agent", DEFAULT_USER_AGENT);
 
             Map<String, String> map = new LinkedHashMap<String, String>();
-            map.put("_ga", "GA1.2.439902964.1521730335");
-            map.put("_gid", "GA1.2.95311867.1525080045");
-            map.put("PHPSESSID", "khotctt1pfa7mgvfbutsgs2bui");
+//            map.put("_ga", "GA1.2.439902964.1521730335");
+//            map.put("_gid", "GA1.2.95311867.1525080045");
+//            map.put("PHPSESSID", "khotctt1pfa7mgvfbutsgs2bui");
 
             StringBuilder cookie = new StringBuilder();
             for (String key : map.keySet()) {

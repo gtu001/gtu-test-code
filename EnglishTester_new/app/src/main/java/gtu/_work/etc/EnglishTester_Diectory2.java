@@ -23,6 +23,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import taobe.tec.jcc.JChineseConvertor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class EnglishTester_Diectory2 {
 
@@ -80,12 +82,28 @@ public class EnglishTester_Diectory2 {
             if (StringUtils.isBlank(fullStr)) {
                 return new WordInfo2();
             }
-            WordInfo2 wordInfo = parseToWordInfo(word, fullStr);
-            return wordInfo;
+			WordInfo2 wordInfo1 = parseToWordInfo(word, fullStr);
+	        WordInfo2 wordInfo2 = parseToWordInfoByJsoup(word, fullStr);
+	        wordInfo2.setExampleSentanceList(wordInfo1.getExampleSentanceList());
+            return wordInfo2;
         } catch (Exception ex) {
             Log.e(TAG, "parseToWordInfo ERR : " + ex.getMessage(), ex);
             return new WordInfo2();
         }
+    }
+
+    private WordInfo2 parseToWordInfoByJsoup(String word, String fullStr) {
+        WordInfo2 wordInfo = new WordInfo2();
+        try {
+            Document doc = Jsoup.parse(fullStr);
+            String meaning = doc.select("div.base section ul").get(0).text();
+            System.out.println("meaning = " + meaning);
+            wordInfo.meaning2 = meaning;
+            wordInfo.meaningList.add(meaning);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return wordInfo;
     }
 
     public static class WordInfo2 {
@@ -132,7 +150,7 @@ public class EnglishTester_Diectory2 {
 
         LineNumberReader reader = new LineNumberReader(new StringReader(fullStr));
         try {
-            for (String line = null; (line = reader.readLine()) != null; ) {
+            for (String line = null; (line = reader.readLine()) != null;) {
                 if (line.contains(find2)) {
                     exampleSentanceOrign = line.substring(line.indexOf(find2) + find2.length());
                 }

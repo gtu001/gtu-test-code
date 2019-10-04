@@ -1,6 +1,7 @@
 package gtu._work.etc;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -19,7 +20,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
+import gtu.file.FileUtil;
 import gtu.net.https.SimpleHttpsUtil;
 
 public class EnglishTester_Diectory2 {
@@ -29,7 +33,7 @@ public class EnglishTester_Diectory2 {
 
         System.out.println(t.testPing());
 
-        WordInfo2 wordInfo = t.parseToWordInfo("disentangle", 1);
+        WordInfo2 wordInfo = t.parseToWordInfo("book", 1);
         System.out.println("meaning=" + wordInfo.meaningList);
         System.out.println("meaning2=" + wordInfo.meaning2);
         System.out.println("sentance=" + wordInfo.exampleSentanceList);
@@ -71,17 +75,29 @@ public class EnglishTester_Diectory2 {
 
         word = word.trim().replaceAll(" ", "%20");
         System.out.println(word);
-        // String fullStr =
-        // searchWordOnline(String.format("http://www.ichacha.net/m/%s.html",
-        // word));
-        // String fullStr =
-        // searchWordOnline(String.format("https://tw.ichacha.net/m/%s.html",
-        // word));
         String fullStr = SimpleHttpsUtil.newInstance().queryPage(String.format("https://tw.ichacha.net/m.aspx?q=%s&p=" + page + "&l=en#bilingual", word));
+        // FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "aaaaaa.htm"),
+        // fullStr, "UTF8");
         if (StringUtils.isBlank(fullStr)) {
             return new WordInfo2();
         }
-        WordInfo2 wordInfo = parseToWordInfo(word, fullStr);
+        WordInfo2 wordInfo1 = parseToWordInfo(word, fullStr);
+        WordInfo2 wordInfo2 = parseToWordInfoByJsoup(word, fullStr);
+        wordInfo2.setExampleSentanceList(wordInfo1.getExampleSentanceList());
+        return wordInfo2;
+    }
+
+    private WordInfo2 parseToWordInfoByJsoup(String word, String fullStr) {
+        WordInfo2 wordInfo = new WordInfo2();
+        try {
+            Document doc = Jsoup.parse(fullStr);
+            String meaning = doc.select("div.base section ul").get(0).text();
+            System.out.println("meaning = " + meaning);
+            wordInfo.meaning2 = meaning;
+            wordInfo.meaningList.add(meaning);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return wordInfo;
     }
 

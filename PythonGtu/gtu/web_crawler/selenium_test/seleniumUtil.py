@@ -64,6 +64,11 @@ class WebElementControl :
         webElement.send_keys(keys.Keys.CONTROL + "a")
         webElement.send_keys(keys.Keys.DELETE)
 
+    @staticmethod
+    def enter(webElement) :
+        from selenium.webdriver.common import keys
+        webElement.send_keys(keys.Keys.ENTER)
+
 
 class ScrollHandler :
     @staticmethod
