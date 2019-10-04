@@ -124,8 +124,7 @@ public class JTableUtil {
      * //設定為展開的JTeatArea
      */
     public void columnIsJTextArea(final String columnTitle, final Integer fontSize) {
-        class CellArea1 extends JComponent {
-
+        class CellArea1 extends DefaultTableCellRenderer {
             private String text;
             protected int rowIndex;
             protected int columnIndex;
@@ -182,16 +181,21 @@ public class JTableUtil {
                     table.setRowHeight(rowIndex, (int) drawPosY);
                 }
             }
-        }
 
-        table.getColumn(columnTitle).setCellRenderer(new TableCellRenderer() {
+            @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                CellArea1 jTextArea = new CellArea1();
-                jTextArea.text = value == null ? "" : value.toString();
-                jTextArea.rowIndex = row;
-                jTextArea.columnIndex = column;
-                jTextArea.table = table;
-                return jTextArea;
+                return this;
+            }
+        }
+        table.getColumn(columnTitle).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                CellArea1 t = new CellArea1();
+                t.text = value == null ? "" : value.toString();
+                t.columnIndex = column;
+                t.rowIndex = row;
+                t.table = table;
+                return t;
             }
         });
     }
@@ -417,7 +421,8 @@ public class JTableUtil {
             public void sorterChanged(RowSorterEvent evt) {
                 int indexOfNoColumn = 0;
                 for (int i = 0; i < table.getRowCount(); i++) {
-                    //System.out.println("sorterChanged - " + i + " -> " + table.getValueAt(i, columnIndex));
+                    // System.out.println("sorterChanged - " + i + " -> " +
+                    // table.getValueAt(i, columnIndex));
                 }
             }
         });

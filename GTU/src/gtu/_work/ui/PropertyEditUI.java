@@ -35,16 +35,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -730,12 +727,14 @@ public class PropertyEditUI extends javax.swing.JFrame {
     }
 
     private void resetPropTable_onlyWorngEnglish() {
+        List<String> wordLst = new ArrayList<String>();
         propTable.setFont(new Font("Serif", Font.PLAIN, 20));
         DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
         for (Triple<Integer, String, String> p : backupModel) {
             String desc = p.getRight();
             if (StringUtils.isBlank(desc) || !StringUtil_.hasChineseWord(desc)) {
                 model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+                wordLst.add(p.getMiddle());
             }
         }
         propTable.setModel(model);
@@ -743,6 +742,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
         JTableUtil.newInstance(propTable).columnIsJTextArea("value", 20);
         JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
         applyPropTableOnBlurEvent();
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "GoogleWord.txt"), StringUtils.join(wordLst, "\r\n"), "utf8");
     }
 
     private void resetPropTable(String text) {
