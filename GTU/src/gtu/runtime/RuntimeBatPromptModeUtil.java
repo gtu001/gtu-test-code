@@ -138,6 +138,10 @@ public class RuntimeBatPromptModeUtil {
         return this.apply("tmp_", encoding);
     }
 
+    public Process apply(String encoding) {
+        return this.apply("tmp_", encoding);
+    }
+
     private String getBatChcpMapping(String encode) {
         if (StringUtils.equalsIgnoreCase("big5", encode) || StringUtils.equalsIgnoreCase("big-5", encode)) {
             return "950";

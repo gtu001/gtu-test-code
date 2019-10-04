@@ -1395,7 +1395,7 @@ public class GitConflictDetectUI extends JFrame {
             remoteBranch = remote + branch;
 
             run.command(String.format("git log %s -%d --stat", remoteBranch, topCount));
-            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply("UTF8"));
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
