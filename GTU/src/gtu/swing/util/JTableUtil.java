@@ -75,6 +75,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
@@ -82,6 +86,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
+import sun.swing.DefaultLookup;
 
 public class JTableUtil {
 
@@ -130,12 +135,14 @@ public class JTableUtil {
             protected int columnIndex;
             protected JTable table;
             protected Font font;
+            protected boolean isSelected;
+            protected boolean hasFocus;
 
             private int paragraphStart, paragraphEnd;
             private LineBreakMeasurer lineMeasurer;
 
             public void paintComponent(Graphics gr) {
-                super.paintComponent(gr);
+                // super.paintComponent(gr);
 
                 if (text != null && !text.isEmpty()) {
                     Graphics2D g = (Graphics2D) gr;
@@ -144,6 +151,12 @@ public class JTableUtil {
                         if (fontSize != null) {
                             mAttributedString.addAttribute(TextAttribute.FONT, new Font("Serif", Font.PLAIN, fontSize));
                         }
+                        if (isSelected) {
+                            mAttributedString.addAttribute(TextAttribute.BACKGROUND, DefaultLookup.getColor(this, ui, "Table.dropCellBackground"));
+                        } else {
+                            mAttributedString.addAttribute(TextAttribute.BACKGROUND, null);
+                        }
+                        
                         AttributedCharacterIterator paragraph = mAttributedString.getIterator();
                         paragraphStart = paragraph.getBeginIndex();
                         paragraphEnd = paragraph.getEndIndex();
@@ -180,22 +193,36 @@ public class JTableUtil {
                     }
                     table.setRowHeight(rowIndex, (int) drawPosY);
                 }
-            }
 
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                return this;
+                getTableCellRendererComponent(table, text, isSelected, hasFocus, rowIndex, columnIndex);
             }
         }
         table.getColumn(columnTitle).setCellRenderer(new DefaultTableCellRenderer() {
+
+            private List<CellArea1> lst = new ArrayList<CellArea1>();
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                CellArea1 t = new CellArea1();
-                t.text = value == null ? "" : value.toString();
-                t.columnIndex = column;
-                t.rowIndex = row;
-                t.table = table;
-                return t;
+                CellArea1 tmp = null;
+                for (CellArea1 c : lst) {
+                    if (c.columnIndex == column && c.rowIndex == row) {
+                        tmp = c;
+                        break;
+                    }
+                }
+                if (tmp == null) {
+                    CellArea1 d = new CellArea1();
+                    d.columnIndex = column;
+                    d.rowIndex = row;
+                    d.table = table;
+                    tmp = d;
+                    lst.add(tmp);
+                }
+                tmp.text = value == null ? "" : value.toString();
+                tmp.isSelected = isSelected;
+                tmp.hasFocus = hasFocus;
+                tmp.lineMeasurer = null;
+                return tmp;
             }
         });
     }
