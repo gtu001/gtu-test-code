@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -129,7 +130,6 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
-import java.awt.Font;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -290,6 +290,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
 
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
+    private JPanel panel_25;
 
     /**
      * Launch the application.
@@ -473,7 +474,7 @@ public class FastDBQueryUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
-        JTextAreaUtil.applyCommonSetting(sqlTextArea);
+        JTextAreaUtil.applyCommonSetting(sqlTextArea, false);
         sqlTextArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -522,8 +523,7 @@ public class FastDBQueryUI extends JFrame {
 
         mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
 
-        JCommonUtil.createScrollComponent(panel_2, sqlTextArea);
-        // panel_2.add(sqlTextArea, BorderLayout.CENTER);
+        panel_2.add(JCommonUtil.createScrollComponent(sqlTextArea));
 
         JPanel sqlIdPanel = new JPanel();
         lblNewLabel_10 = new JLabel("顏色");
@@ -575,7 +575,7 @@ public class FastDBQueryUI extends JFrame {
 
                 sqlIdCommentArea = new JTextArea();
                 sqlIdCommentArea.setToolTipText("SQL註解");
-                JTextAreaUtil.applyCommonSetting(sqlIdCommentArea);
+                JTextAreaUtil.applyCommonSetting(sqlIdCommentArea, false);
                 sqlIdCommentArea.addKeyListener(new KeyAdapter() {
                     @Override
                     public void keyPressed(KeyEvent e) {
@@ -636,46 +636,54 @@ public class FastDBQueryUI extends JFrame {
         sqlIdPanel.add(sqlIdFixNameBtn);
 
         JPanel panel_3 = new JPanel();
+        panel_3.setLayout(new BorderLayout(0, 0));
         panel_2.add(panel_3, BorderLayout.SOUTH);
 
-        label_1 = new JLabel("max rows :");
-        panel_3.add(label_1);
+        {
+            panel_25 = new JPanel();
+            panel_3.add(panel_25, BorderLayout.SOUTH);
+            panel_3.add(panel_25);
 
-        maxRowsText = new JTextField();
-        maxRowsText.setToolTipText("設定最大筆數,小於等於0則無限制");
-        maxRowsText.setText("1000");
-        maxRowsText.setColumns(5);
-        panel_3.add(maxRowsText);
+            label_1 = new JLabel("max rows :");
+            panel_25.add(label_1);
 
-        sqlSaveButton = new JButton("儲存");
-        sqlSaveButton.setToolTipText("快速鍵 Ctrl+S");
-        panel_3.add(sqlSaveButton);
+            maxRowsText = new JTextField();
+            maxRowsText.setToolTipText("設定最大筆數,小於等於0則無限制");
+            maxRowsText.setText("1000");
+            maxRowsText.setColumns(5);
+            panel_25.add(maxRowsText);
 
-        clearButton = new JButton("清除");
-        clearButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                clearButtonClick();
-            }
-        });
-        panel_3.add(clearButton);
+            sqlSaveButton = new JButton("儲存");
+            sqlSaveButton.setToolTipText("快速鍵 Ctrl+S");
+            panel_25.add(sqlSaveButton);
 
-        querySqlRadio = new JRadioButton("查詢模式");
-        querySqlRadio.setSelected(true);
-        panel_3.add(querySqlRadio);
+            clearButton = new JButton("清除");
+            clearButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    clearButtonClick();
+                }
+            });
+            panel_25.add(clearButton);
 
-        updateSqlRadio = new JRadioButton("修改模式");
-        JButtonGroupUtil.createRadioButtonGroup(querySqlRadio, updateSqlRadio);
+            querySqlRadio = new JRadioButton("查詢模式");
+            querySqlRadio.setSelected(true);
+            panel_25.add(querySqlRadio);
 
-        panel_3.add(updateSqlRadio);
+            updateSqlRadio = new JRadioButton("修改模式");
+            JButtonGroupUtil.createRadioButtonGroup(querySqlRadio, updateSqlRadio);
 
-        executeSqlButton = new JButton("執行Sql");
-        executeSqlButton.setToolTipText("快速鍵 F5");
-        executeSqlButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                executeSqlButtonClick();
-            }
-        });
-        panel_3.add(executeSqlButton);
+            panel_25.add(updateSqlRadio);
+
+            executeSqlButton = new JButton("執行Sql");
+            executeSqlButton.setToolTipText("快速鍵 F5");
+            executeSqlButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    executeSqlButtonClick();
+                }
+            });
+            panel_25.add(executeSqlButton);
+        }
+
         sqlSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 saveSqlButtonClick(true);
@@ -697,7 +705,7 @@ public class FastDBQueryUI extends JFrame {
 
             sqlParamCommentArea = new JTextArea();
             sqlParamCommentArea.setToolTipText("SQL參數註解");
-            JTextAreaUtil.applyCommonSetting(sqlParamCommentArea);
+            JTextAreaUtil.applyCommonSetting(sqlParamCommentArea, false);
 
             innerPanel11.setLayout(new FormLayout(
                     new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
@@ -1029,7 +1037,7 @@ public class FastDBQueryUI extends JFrame {
         panel_7.add(panel_11, BorderLayout.EAST);
 
         queryResultJsonTextArea = new JTextArea();
-        JTextAreaUtil.applyCommonSetting(queryResultJsonTextArea);
+        JTextAreaUtil.applyCommonSetting(queryResultJsonTextArea, false);
         panel_7.add(JCommonUtil.createScrollComponent(queryResultJsonTextArea), BorderLayout.CENTER);
 
         panel_18 = new JPanel();
@@ -1089,7 +1097,7 @@ public class FastDBQueryUI extends JFrame {
 
         refContentArea = new JTextArea();
         refContentArea.setToolTipText("參考備註");
-        JTextAreaUtil.applyCommonSetting(refContentArea);
+        JTextAreaUtil.applyCommonSetting(refContentArea, false);
         refContentArea.setRows(3);
         refContentArea.setColumns(25);
         panel_19.add(JCommonUtil.createScrollComponent(refContentArea));
@@ -1440,6 +1448,7 @@ public class FastDBQueryUI extends JFrame {
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
 
+            JCommonUtil.setUIFont("Serif", 20);
             JCommonUtil.setUIFontSize(this, 12, 20);
         }
     }
@@ -3014,6 +3023,7 @@ public class FastDBQueryUI extends JFrame {
         try {
             JListUtil.newInstance(sqlList).defaultJListKeyPressed(evt, false);
             // 刪除
+            System.out.println("click del key : " + (evt.getKeyCode() == 127));
             if (evt.getKeyCode() == 127) {
                 SqlIdConfigBean sqlBean = JListUtil.getLeadSelectionObject(sqlList);
                 this.deleteSqlIdConfigBean(sqlBean);

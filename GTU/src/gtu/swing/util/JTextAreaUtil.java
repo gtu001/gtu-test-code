@@ -250,7 +250,13 @@ public class JTextAreaUtil {
     }
 
     public static void applyCommonSetting(JTextComponent jTextComponent) {
-        JTextAreaUtil.applyFont(jTextComponent);
+        applyCommonSetting(jTextComponent, true);
+    }
+
+    public static void applyCommonSetting(JTextComponent jTextComponent, boolean isSetupFont) {
+        if (isSetupFont) {
+            JTextAreaUtil.applyFont(jTextComponent);
+        }
         try {
             JTextUndoUtil.applyUndoProcess1(jTextComponent);
         } catch (Exception ex) {

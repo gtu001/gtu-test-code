@@ -1162,7 +1162,7 @@ public class GitConflictDetectUI extends JFrame {
             String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
-            String startTagCommand = String.format("git show %s:%s", localBranchName, fileGitPath);
+            String startTagCommand = String.format("git show %s:\"%s\"", localBranchName, fileGitPath);
             run.command(startTagCommand);
 
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
