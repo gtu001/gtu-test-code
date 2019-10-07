@@ -8,6 +8,7 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -156,7 +157,7 @@ public class JTableUtil {
                         } else {
                             mAttributedString.addAttribute(TextAttribute.BACKGROUND, null);
                         }
-                        
+
                         AttributedCharacterIterator paragraph = mAttributedString.getIterator();
                         paragraphStart = paragraph.getBeginIndex();
                         paragraphEnd = paragraph.getEndIndex();
@@ -344,6 +345,14 @@ public class JTableUtil {
 
     public void setRowHeight(int rowPos, int height) {
         table.setRowHeight(rowPos, height);
+    }
+
+    /**
+     * 設定欄位高度by Font
+     */
+    public void setRowHeightByFontSize() {
+        Dimension dim = JTextFieldUtil.getTextBoundary("測", table.getFont());
+        table.setRowHeight((int) dim.getHeight());
     }
 
     public void columnIsComponent(int index, JComponent component) {

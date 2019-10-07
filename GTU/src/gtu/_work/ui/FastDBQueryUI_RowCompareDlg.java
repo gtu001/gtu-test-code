@@ -388,6 +388,8 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
 
             model.addRow(df.toArry());
         }
+        
+        JTableUtil.newInstance(importRowTable).setRowHeightByFontSize();
         System.out.println("-------------init size : " + rowMap.get().size());
     }
 
@@ -427,6 +429,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
             for (int ii = 0; ii < queryList.getRight().size(); ii++) {
                 model.addRow(queryList.getRight().get(ii));
             }
+            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
             if (queryList.getRight().isEmpty()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("此SQL無資料,查無比對來源!");
                 return;

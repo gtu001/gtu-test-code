@@ -219,6 +219,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 model.addRow(df.toArry());
                 dialog.columnsLst.add(col);
             }
+            
+            JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
             System.out.println("-------------init size : " + dialog.rowMap.get().size());
 
             dialog.searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
@@ -742,6 +744,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
             }
         }
+        JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
         System.out.println("-------------searchTextFilter size = " + rowMap.get().size());
     }
 

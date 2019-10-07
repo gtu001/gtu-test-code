@@ -1,6 +1,10 @@
 package gtu.swing.util;
 
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -11,7 +15,6 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -130,5 +133,27 @@ public class JTextFieldUtil {
         public Rectangle getRect() {
             return rect;
         }
+    }
+
+    /**
+     * 取得文字邊界
+     * 
+     * @param text
+     * @param font
+     * @return
+     */
+    public static Dimension getTextBoundary(String text, Font font) {
+        // get metrics from the graphics
+        FontMetrics metrics = Toolkit.getDefaultToolkit().getFontMetrics(font);
+        // get the height of a line of text in this
+        // font and render context
+        int hgt = metrics.getHeight();
+        // get the advance of my text in this font
+        // and render context
+        int adv = metrics.stringWidth(text);
+        // calculate the size of a box to hold the
+        // text with some padding.
+        Dimension size = new Dimension(adv + 2, hgt + 2);
+        return size;
     }
 }

@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +41,6 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.swing.AbstractButton;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -291,6 +291,7 @@ public class FastDBQueryUI extends JFrame {
 
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
     private JPanel panel_25;
+    private static final String ICO_FILENAME = "Pig_SC.ico";// "big_boobs.ico";
 
     /**
      * Launch the application.
@@ -307,7 +308,7 @@ public class FastDBQueryUI extends JFrame {
             System.out.println("=====" + info.getClassName());
             // javax.swing.UIManager.setLookAndFeel(info.getClassName());
         }
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "big_boobs.ico", FastDBQueryUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, ICO_FILENAME, FastDBQueryUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
             @Override
             public void beforeInit(SwingTabTemplateUI self) {
                 if (jFrameRGBColorPanel.get() == null) {
@@ -331,7 +332,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
-        tabUI.setSize(1000, 600);
+        tabUI.setSize(1280, 760);
         tabUI.startUI();
         TAB_UI1 = tabUI;
     }
@@ -345,7 +346,7 @@ public class FastDBQueryUI extends JFrame {
      */
     public FastDBQueryUI() throws FileNotFoundException, IOException, ClassNotFoundException {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 910, 550);
+        setBounds(100, 100, 999, 734);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
@@ -1433,7 +1434,7 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil.setJFrameCenter(this);
             JCommonUtil.defaultToolTipDelay();
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/Pig_SC.ico");// big_boobs.ico
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/" + ICO_FILENAME);// big_boobs.ico
             this.setTitle("You Set My World On Fire");
 
             if (jFrameRGBColorPanel.get() == null) {
@@ -1448,8 +1449,16 @@ public class FastDBQueryUI extends JFrame {
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
 
-            JCommonUtil.setUIFont("Serif", 20);
-            JCommonUtil.setUIFontSize(this, 12, 20);
+            {
+                JCommonUtil.setUIFont("Serif", 20);
+                JCommonUtil.setUIFontSize(this, 12, 20);
+
+                sqlTextArea.setFont(sqlTextArea.getFont().deriveFont((float) 20));
+                queryResultJsonTextArea.setFont(queryResultJsonTextArea.getFont().deriveFont((float) 20));
+                refContentArea.setFont(refContentArea.getFont().deriveFont((float) 20));
+                sqlParamCommentArea.setFont(sqlParamCommentArea.getFont().deriveFont((float) 20));
+                sqlIdCommentArea.setFont(sqlIdCommentArea.getFont().deriveFont((float) 20));
+            }
         }
     }
 
@@ -1457,6 +1466,7 @@ public class FastDBQueryUI extends JFrame {
         JTableUtil.defaultSetting_AutoResize(parametersTable);
         DefaultTableModel createModel = JTableUtil.createModel(false, new Object[] { "參數", "值", "類型" });
         parametersTable.setModel(createModel);
+        JTableUtil.newInstance(parametersTable).setRowHeightByFontSize();
 
         // column = "Data Type"
         TableColumn sportColumn = parametersTable.getColumnModel().getColumn(2);
@@ -1957,6 +1967,7 @@ public class FastDBQueryUI extends JFrame {
         } finally {
             long duringTime = (System.currentTimeMillis() - startTime) / 1000;
             queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
+            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
         }
     }
 
@@ -2001,6 +2012,7 @@ public class FastDBQueryUI extends JFrame {
                 queryResultTable.setModel(createModel);
             }
             queryResultCountLabel.setText("0");
+            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
             return;
         } else {
             if (!silent) {
@@ -2013,6 +2025,7 @@ public class FastDBQueryUI extends JFrame {
         // 查詢結果table
         DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, queryList.getLeft(), queryList.getMiddle());
         queryResultTable.setModel(createModel);
+        JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
 
         // 設定 Value 顯示方式
         JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
@@ -2728,6 +2741,7 @@ public class FastDBQueryUI extends JFrame {
                     }
                     model = JTableUtil.createModel(true, titles.toArray());
                     queryResultTable.setModel(model);
+                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
                 }
 
                 for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
