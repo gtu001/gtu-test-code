@@ -8,6 +8,9 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
+import com.example.gtu001.qrcodemaker.services.AppInfoService;
+
+
 import org.apache.commons.lang3.reflect.MethodUtils;
 
 import java.lang.reflect.Method;
@@ -57,7 +60,84 @@ public class AppListService {
         public Drawable getIcon() {
             return icon;
         }
+
+        public void setInstalledPackage(String installedPackage) {
+            this.installedPackage = installedPackage;
+        }
+
+        public void setSourceDir(String sourceDir) {
+            this.sourceDir = sourceDir;
+        }
+
+        public void setLaunchActivity(Intent launchActivity) {
+            this.launchActivity = launchActivity;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public void setIcon(Drawable icon) {
+            this.icon = icon;
+        }
     }
+
+    //------------------------------------------------------------------------DB Process START
+
+    public static List<AppInfo> loadAllAppListMaster(Context context, boolean isReload) {
+        DBHolder d = new DBHolder(context);
+        return d.loadAllAppListMaster(isReload);
+    }
+
+
+    private static class DBHolder {
+        AppInfoService service;
+        Context context;
+
+        private DBHolder(Context context) {
+            service = new AppInfoService(context);
+            this.context = context;
+        }
+
+        public List<AppInfo> loadAllAppListMaster(boolean isReload) {
+            List<AppInfo> lst = null;
+            int countSize = service.countAll();
+            if (countSize == 0 || isReload) {
+                reloadAllAppListToDB();
+            }
+            return loadAllAppListFromDB();
+        }
+
+        private void reloadAllAppListToDB() {
+            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.queryAll();
+            for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
+                service.deleteId(vo.getInstalledPackage());
+            }
+            List<AppInfo> lst = loadAllAppList(context);
+            for (AppInfo vo : lst) {
+                com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo2 = new com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo();
+                vo2.setInstalledPackage(vo.getInstalledPackage());
+                vo2.setSourceDir(vo.getSourceDir());
+                vo2.setLabel(vo.getLabel());
+                service.insertData(vo2);
+            }
+        }
+
+        public List<AppInfo> loadAllAppListFromDB() {
+            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.findAll();
+            List<AppInfo> lst = new ArrayList<AppInfo>();
+            for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
+                AppInfo vo2 = new AppInfo();
+                vo2.setInstalledPackage(vo.getInstalledPackage());
+                vo2.setSourceDir(vo.getSourceDir());
+                vo2.setLabel(vo.getLabel());
+                lst.add(vo2);
+            }
+            return lst;
+        }
+    }
+
+    //------------------------------------------------------------------------DB Process END
 
     public List<AppInfo> loadAllAppList(Context context) {
         List<AppInfo> lst = new ArrayList<>();

@@ -1,2 +1,5 @@
 
 	选择菜单  File-->去掉Power Save Mode前面的勾
+	
+---
+	File->Invalidate Caches/Restart...->Invalidate Caches/Restart之后会重启Android studio然后就好了

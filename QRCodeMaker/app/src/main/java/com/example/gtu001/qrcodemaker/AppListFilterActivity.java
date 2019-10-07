@@ -63,6 +63,16 @@ public class AppListFilterActivity extends Activity {
         });
         layout.addView(filterText);
 
+        btn1 = new Button(this);
+        layout.addView(btn1);
+        btn1.setText("重新整理");
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initListViewHandler.init(true);
+            }
+        });
+
         //初始listView
         listView = new ListView(this);
         layout.addView(listView, //
@@ -92,7 +102,7 @@ public class AppListFilterActivity extends Activity {
 //        });
 
         initListViewHandler = new InitListViewHandler(this);
-        initListViewHandler.init();
+        initListViewHandler.init(false);
     }
 
     private class InitListViewHandler {
@@ -114,9 +124,9 @@ public class AppListFilterActivity extends Activity {
             return map;
         }
 
-        private List<Map<String, Object>> findAll() {
+        private List<Map<String, Object>> findAll(boolean isReload) {
             List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
-            List<AppListService.AppInfo> lst = AppListService.getInstance().loadAllAppList(context);
+            List<AppListService.AppInfo> lst = AppListService.getInstance().loadAllAppListMaster(context, isReload);
             for (AppListService.AppInfo app : lst) {
                 listItem.add(getItem2Map(app));
             }
@@ -125,7 +135,7 @@ public class AppListFilterActivity extends Activity {
 
         public List<Map<String, Object>> _findByText(String text) {
             if (listItem.isEmpty()) {
-                listItem = findAll();
+                listItem = findAll(false);
             }
             if (StringUtils.isBlank(text)) {
                 return listItem;
@@ -156,7 +166,7 @@ public class AppListFilterActivity extends Activity {
             return listItemAdapter;
         }
 
-        public void init() {
+        public void init(boolean isReload) {
             final ProgressDialog proc = new ProgressDialog(context);
             proc.setIndeterminate(true);
             proc.setMessage("loading");
@@ -166,7 +176,7 @@ public class AppListFilterActivity extends Activity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    baseAdapter = createSimpleAdapter(findAll());
+                    baseAdapter = createSimpleAdapter(findAll(isReload));
 
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
