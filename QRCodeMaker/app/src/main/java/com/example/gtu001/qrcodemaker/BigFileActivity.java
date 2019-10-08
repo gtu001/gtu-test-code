@@ -163,6 +163,8 @@ public class BigFileActivity extends Activity {
                 if (StringUtils.equals(vo2.file.getAbsolutePath(), f.getAbsolutePath())) {
                     listItem.remove(vo);
                     ii--;
+                    deleteOk = true;
+                    break;
                 }
             }
             Toast.makeText(BigFileActivity.this, "刪除" + (deleteOk ? "成功" : "失敗"), Toast.LENGTH_SHORT).show();
