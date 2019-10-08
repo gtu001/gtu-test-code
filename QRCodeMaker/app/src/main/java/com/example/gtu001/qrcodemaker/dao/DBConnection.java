@@ -12,7 +12,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "Youtube_DB";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 3;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -35,6 +35,8 @@ public class DBConnection extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
         sb = new StringBuilder();
+
+        //youtube清單
         sb.append("  create table Youtube_Video (                  ");
         sb.append("      video_id text primary key not null,        ");
         sb.append("      title text ,                               ");
@@ -43,6 +45,14 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("      insert_date long not null,                  ");
         sb.append("      latest_click_date long not null               ");
         sb.append("  );                                              ");
+
+        //APP清單
+        sb.append("  create table App_Info (                  ");
+        sb.append("      installed_package text primary key not null,        ");
+        sb.append("      source_dir text ,                               ");
+        sb.append("      label text                            ");
+        sb.append("  );                                              ");
+
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
         sb.setLength(0);
@@ -62,6 +72,15 @@ public class DBConnection extends SQLiteOpenHelper {
 
 
             Log.i("haiyang:createDB 1=", sb.toString());
+            db.execSQL(sb.toString());
+        }
+
+        if (newVersion == 3) {
+            sb = new StringBuilder();
+
+            sb.append("  alter table App_Info add icon text    ");//add column
+
+            Log.i("haiyang:createDB 2=", sb.toString());
             db.execSQL(sb.toString());
         }
     }

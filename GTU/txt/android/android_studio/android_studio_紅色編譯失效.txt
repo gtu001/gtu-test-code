@@ -3,3 +3,12 @@
 	
 ---
 	File->Invalidate Caches/Restart...->Invalidate Caches/Restart之后会重启Android studio然后就好了
+	
+	
+---
+	看專案module狀況
+		File -> Project Structure
+		
+---
+	看gradle-wrapper.properties版本是否正確 gradle-4.6-all.zip
+		distributionUrl=https\://services.gradle.org/distributions/gradle-4.6-all.zip

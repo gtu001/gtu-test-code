@@ -26,4 +26,22 @@ public class CipherBase64 {
             throw new RuntimeException("encode ERR : " + e.getMessage(), e);
         }
     }
+
+    public static byte[] decodeToByteArry(String str) {
+        try {
+            BASE64Decoder b64d = new BASE64Decoder();
+            return b64d.decodeBuffer(str);
+        } catch (Exception e) {
+            throw new RuntimeException("decode ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public static String encode(byte[] arry) {
+        try {
+            BASE64Encoder b64e = new BASE64Encoder();
+            return (b64e.encode(arry));
+        } catch (Exception e) {
+            throw new RuntimeException("encode ERR : " + e.getMessage(), e);
+        }
+    }
 }

@@ -124,6 +124,7 @@ public class NintendoSwitchCheckerActivity extends Activity implements ActivityC
         }
     }
 
+    //----------------------------------------------------------------------------------------
 
     static int REQUEST_CODE = 5566;
     static int MENU_FIRST = Menu.FIRST;

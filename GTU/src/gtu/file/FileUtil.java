@@ -402,11 +402,15 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static boolean copyFile(File copyFrom, File copyTo) throws IOException {
-        if (!isLockingSupported()) {
-            return copyFileNormal(copyFrom, copyTo);
-        } else {
-            return copyFileLocking(copyFrom, copyTo);
+    public static boolean copyFile(File copyFrom, File copyTo) {
+        try {
+            if (!isLockingSupported()) {
+                return copyFileNormal(copyFrom, copyTo);
+            } else {
+                return copyFileLocking(copyFrom, copyTo);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("copyFile ERR : " + ex.getMessage(), ex);
         }
     }
 

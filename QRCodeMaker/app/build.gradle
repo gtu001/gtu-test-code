@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
     defaultConfig {
@@ -30,29 +30,31 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'com.android.support:design:28+'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:support-v4:28+'
 
-    compile 'com.google.zxing:core:2.0'//qrCode
-    compile 'com.google.zxing:javase:2.0'//qrCode
-    compile 'com.github.kenglxn.QRGen:android:2.4.0' //https://github.com/kenglxn/QRGen
+    implementation 'com.google.zxing:core:2.0'//qrCode
+    implementation 'com.google.zxing:javase:2.0'//qrCode
+    implementation 'com.github.kenglxn.QRGen:android:2.4.0' //https://github.com/kenglxn/QRGen
 
-    compile 'com.jaredrummler:android-processes:1.1.1'
+    implementation 'com.jaredrummler:android-processes:1.1.1'
     //https://github.com/jaredrummler/AndroidProcesses
 
-    compile "com.brightcove.player:exoplayer:4.+" //for HLS 需要額外 repositories
+    implementation "com.brightcove.player:exoplayer:4.+" //for HLS 需要額外 repositories
 
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-collections4:4.1'
 
-    compile files('libs/httpclient-4.5.2.jar')
-    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
+    implementation files('libs/httpclient-4.5.2.jar')
+    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
 
-    testCompile 'junit:junit:4.12'
+    implementation 'junit:junit:4.12'
+
 }

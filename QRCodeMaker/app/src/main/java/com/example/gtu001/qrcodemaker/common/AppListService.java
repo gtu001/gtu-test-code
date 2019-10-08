@@ -93,10 +93,12 @@ public class AppListService {
     private static class DBHolder {
         AppInfoService service;
         Context context;
+        final PackageManager pm;
 
         private DBHolder(Context context) {
             service = new AppInfoService(context);
             this.context = context;
+            pm = context.getPackageManager();
         }
 
         public List<AppInfo> loadAllAppListMaster(boolean isReload) {
@@ -113,27 +115,39 @@ public class AppListService {
             for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
                 service.deleteId(vo.getInstalledPackage());
             }
-            List<AppInfo> lst = loadAllAppList(context);
+            List<AppInfo> lst = AppListService.getInstance().loadAllAppList(context);
             for (AppInfo vo : lst) {
                 com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo2 = new com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo();
                 vo2.setInstalledPackage(vo.getInstalledPackage());
                 vo2.setSourceDir(vo.getSourceDir());
                 vo2.setLabel(vo.getLabel());
+                vo2.setIcon(ImageBase64Util.encodeToBase64(vo.getIcon(), "png", 100));
                 service.insertData(vo2);
             }
         }
 
         public List<AppInfo> loadAllAppListFromDB() {
-            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.findAll();
+            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.queryAll();
             List<AppInfo> lst = new ArrayList<AppInfo>();
             for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
                 AppInfo vo2 = new AppInfo();
                 vo2.setInstalledPackage(vo.getInstalledPackage());
                 vo2.setSourceDir(vo.getSourceDir());
                 vo2.setLabel(vo.getLabel());
+                try {
+                    vo2.setIcon(ImageBase64Util.decodeBase64ToDrawable(vo.getIcon(), context));
+                } catch (Exception ex) {
+                    Log.e(TAG, "loadAllAppListFromDB ERR : " + ex.getMessage(), ex);
+                }
                 lst.add(vo2);
             }
             return lst;
+        }
+
+        private void setDetailVo(AppInfo vo2) {
+            vo2.setLaunchActivity(pm.getLaunchIntentForPackage(vo2.getInstalledPackage()));
+            vo2.label = getAppLabel(context, vo2.getInstalledPackage());
+            vo2.icon = getIcon(context, vo2.getInstalledPackage());
         }
     }
 

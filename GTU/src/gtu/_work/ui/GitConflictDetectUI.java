@@ -10,6 +10,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1078,7 +1079,8 @@ public class GitConflictDetectUI extends JFrame {
         }
 
         private boolean resolve() {
-            return resolveFile.renameTo(gitFile.file);
+            // return resolveFile.renameTo(gitFile.file);
+            return FileUtil.copyFile(resolveFile, gitFile.file);
         }
     }
 
