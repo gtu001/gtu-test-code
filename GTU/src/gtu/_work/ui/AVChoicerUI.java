@@ -63,6 +63,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.jdk8.ex1.StreamUtil;
 import gtu.number.NumberUtil;
 import gtu.properties.PropertiesGroupUtils_ByKey;
@@ -1208,12 +1209,14 @@ public class AVChoicerUI extends JFrame {
 
     private class DropFileChecker {
         List<File> forReturnLst = new ArrayList<File>();
+        List<File> imgReturnLst = new ArrayList<File>();
 
         DropFileChecker(List<File> fileLst) {
             if (fileLst == null) {
                 File dirFile = new File(dirCheckText.getText());
                 fileLst = new ArrayList<File>();
                 gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.VIDEO_PATTERN, fileLst);
+                gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.PICTURE_PATTERN, imgReturnLst);
             }
 
             for (File f : fileLst) {
@@ -1222,7 +1225,10 @@ public class AVChoicerUI extends JFrame {
 
             DefaultListModel model = JListUtil.createModel();
             for (File f : forReturnLst) {
-                model.addElement(new FileZ(f));
+                model.addElement(new FileZ(f, true));
+            }
+            for (File f : imgReturnLst) {
+                model.addElement(new FileZ(f, false));
             }
             dirCheckList.setModel(model);
 
@@ -1243,8 +1249,11 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
+    private DropFileChecker mDropFileChecker = null;
+
     private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
-        return new DropFileChecker(fileLst).forReturnLst;
+        mDropFileChecker = new DropFileChecker(fileLst);
+        return mDropFileChecker.forReturnLst;
     }
 
     private void dirCheckListMouseClicked() {
@@ -1258,7 +1267,19 @@ public class AVChoicerUI extends JFrame {
             }
         } else if (fileZ.file.getName().matches(".*\\." + PatternCollection.PICTURE_PATTERN)) {
             try {
-                Desktop.getDesktop().open(fileZ.file);
+                if (OsInfoUtil.isWindows()) {
+                    Desktop.getDesktop().open(fileZ.file);
+                } else {
+                    if (mDropFileChecker != null) {
+                        List<String> lst = new ArrayList<String>();
+                        for (File f : mDropFileChecker.imgReturnLst) {
+                            lst.add("\"" + f.getAbsolutePath() + "\"");
+                        }
+                        RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                        inst.command("eog " + StringUtils.join(lst, " "));
+                        inst.apply();
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1278,10 +1299,12 @@ public class AVChoicerUI extends JFrame {
 
         File file;
         String name;
+        boolean isMovie = true;
 
-        FileZ(File file) {
+        FileZ(File file, boolean isMovie) {
             this.file = file;
             this.name = file.getName();
+            this.isMovie = isMovie;
         }
 
         @Override

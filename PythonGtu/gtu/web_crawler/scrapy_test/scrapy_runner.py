@@ -11,7 +11,7 @@ from twisted.internet import reactor
 from multiprocessing import Pool
 
 '''
-from gtu.scrapy import scrapy_runner
+from gtu.web_crawler.scrapy_test import scrapy_runner
 '''
 
 def runCrawl(spider_name=None):

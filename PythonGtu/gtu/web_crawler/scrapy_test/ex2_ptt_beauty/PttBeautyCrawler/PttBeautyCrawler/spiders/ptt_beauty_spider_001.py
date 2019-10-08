@@ -15,7 +15,7 @@ from twisted.internet import reactor
 from gtu.io import fileUtil
 from gtu.net import simple_request_handler_001
 from gtu.reflect import checkSelf
-from gtu.scrapy_test import scrapy_runner
+from gtu.web_crawler.scrapy_test import scrapy_runner
 from gtu.datetime import dateUtil
 
 from requests import Request, Session
