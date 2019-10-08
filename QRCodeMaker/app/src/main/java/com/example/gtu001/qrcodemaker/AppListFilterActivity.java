@@ -253,7 +253,11 @@ public class AppListFilterActivity extends Activity {
         }
 
         public boolean updateAppInfoTag(AppListService.AppInfo vo) {
-            return AppListService.getInstance().updateAppInfoTag(vo, context);
+            boolean result = AppListService.getInstance().updateAppInfoTag(vo, context);
+            if (result) {
+                baseAdapter.notifyDataSetChanged();
+            }
+            return result;
         }
     }
 
