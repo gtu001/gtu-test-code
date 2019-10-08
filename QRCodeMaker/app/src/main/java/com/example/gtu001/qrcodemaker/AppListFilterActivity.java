@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import taobe.tec.jcc.JChineseConvertor;
+
 public class AppListFilterActivity extends Activity {
 
     private static final String TAG = AppListFilterActivity.class.getSimpleName();
@@ -196,7 +198,8 @@ public class AppListFilterActivity extends Activity {
                 AppListService.AppInfo app = (AppListService.AppInfo) map.get("item");
 
                 boolean matchOk = false;
-                if (StringUtils.trimToEmpty(app.getLabel()).toLowerCase().contains(text) || //
+
+                if (StringUtils.trimToEmpty(s2t(app.getLabel())).toLowerCase().contains(text) || //
 //                        StringUtils.trimToEmpty(app.getInstalledPackage()).toLowerCase().contains(text) ||
                         StringUtils.trimToEmpty(app.getTag()).toLowerCase().contains(text)) {
                     matchOk = true;
@@ -207,6 +210,14 @@ public class AppListFilterActivity extends Activity {
                 }
             }
             return listItem22;
+        }
+
+        private String s2t(String strVal) {
+            try {
+                return JChineseConvertor.getInstance().s2t(strVal);
+            } catch (Exception ex) {
+                return strVal;
+            }
         }
 
         private SimpleAdapter createSimpleAdapter(List<Map<String, Object>> listItem) {
@@ -255,6 +266,12 @@ public class AppListFilterActivity extends Activity {
         public boolean updateAppInfoTag(AppListService.AppInfo vo) {
             boolean result = AppListService.getInstance().updateAppInfoTag(vo, context);
             if (result) {
+                for (Map<String, Object> map : listItem) {
+                    AppListService.AppInfo vo2 = (AppListService.AppInfo) map.get("item");
+                    if (vo2 == vo) {
+                        map.put("item_text_desc", StringUtils.trimToEmpty(vo2.getTag()));
+                    }
+                }
                 baseAdapter.notifyDataSetChanged();
             }
             return result;
