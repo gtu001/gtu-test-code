@@ -144,20 +144,49 @@ public class AppListService {
             return loadAllAppListFromDB();
         }
 
-        private void reloadAllAppListToDB() {
-            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.queryAll();
-            for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
-                service.deleteId(vo.getInstalledPackage());
+        private AppInfo _findByLst1(String installedPackage, List<AppInfo> lst) {
+            for (int jj = 0; jj < lst.size(); jj++) {
+                AppInfo vo_ = lst.get(jj);
+                if (StringUtils.equals(vo_.getInstalledPackage(), vo_.getInstalledPackage())) {
+                    return vo_;
+                }
             }
+            return null;
+        }
+
+        private AppInfoDAO.AppInfo _findByLst2(String installedPackage, List<AppInfoDAO.AppInfo> lst) {
+            for (int jj = 0; jj < lst.size(); jj++) {
+                AppInfoDAO.AppInfo vo_ = lst.get(jj);
+                if (StringUtils.equals(vo_.getInstalledPackage(), vo_.getInstalledPackage())) {
+                    return vo_;
+                }
+            }
+            return null;
+        }
+
+        private void reloadAllAppListToDB() {
             List<AppInfo> lst = AppListService.getInstance().loadAllAppList(context);
-            for (AppInfo vo : lst) {
-                com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo2 = new com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo();
-                vo2.setInstalledPackage(vo.getInstalledPackage());
-                vo2.setSourceDir(vo.getSourceDir());
-                vo2.setLabel(vo.getLabel());
-                vo2.setIcon(ImageBase64Util.encodeToBase64(vo.getIcon(), "png", 100));
-                vo2.setTag(vo.getTag());
-                service.insertData(vo2);
+            List<AppInfoDAO.AppInfo> lst2 = service.queryAll();
+            for (int ii = 0; ii < lst.size(); ii++) {
+                AppInfo vo = lst.get(ii);
+                service.deleteId(vo.getInstalledPackage());
+                AppInfoDAO.AppInfo vo2 = _findByLst2(vo.getInstalledPackage(), lst2);
+                if (vo2 == null) {
+                    vo2 = new AppInfoDAO.AppInfo();
+                    vo2.setInstalledPackage(vo.getInstalledPackage());
+                    vo2.setSourceDir(vo.getSourceDir());
+                    vo2.setLabel(vo.getLabel());
+                    vo2.setIcon(ImageBase64Util.encodeToBase64(vo.getIcon(), "png", 100));
+                    vo2.setTag(vo.getTag());
+                    service.insertData(vo2);
+                }
+            }
+            for(int ii = 0 ; ii < lst2.size(); ii ++) {
+                AppInfoDAO.AppInfo vo = lst2.get(ii);
+                AppInfo vo2 = _findByLst1(vo.getInstalledPackage(), lst);
+                if (vo2 == null) {
+                    service.deleteId(vo2.getInstalledPackage());
+                }
             }
         }
 
@@ -175,16 +204,18 @@ public class AppListService {
                             break A;
                         }
                     }
-                    tagLst.add(t);
+                    if (!alreadyHas) {
+                        tagLst.add(t);
+                    }
                 }
             }
         }
 
         public List<AppInfo> loadAllAppListFromDB() {
-            List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.queryAll();
+            List<AppInfoDAO.AppInfo> lst2 = service.queryAll();
             List<AppInfo> lst = new ArrayList<AppInfo>();
             List<String> tagLst = new ArrayList<>();
-            for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
+            for (AppInfoDAO.AppInfo vo : lst2) {
                 AppInfo vo2 = new AppInfo();
                 vo2.setInstalledPackage(vo.getInstalledPackage());
                 vo2.setSourceDir(vo.getSourceDir());
@@ -199,12 +230,6 @@ public class AppListService {
                 lst.add(vo2);
             }
             return lst;
-        }
-
-        private void setDetailVo(AppInfo vo2) {
-            vo2.setLaunchActivity(pm.getLaunchIntentForPackage(vo2.getInstalledPackage()));
-            vo2.label = getAppLabel(context, vo2.getInstalledPackage());
-            vo2.icon = getIcon(context, vo2.getInstalledPackage());
         }
     }
 
@@ -257,6 +282,11 @@ public class AppListService {
     public static void launchApp(Context context, String packageName) {
         Intent mIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
         if (mIntent != null) {
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);//不work
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);//不work
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);//不work
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);//不work
+            mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//不work
             context.startActivity(mIntent);
         }
     }

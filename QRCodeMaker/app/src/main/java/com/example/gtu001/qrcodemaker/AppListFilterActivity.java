@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,9 +19,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -29,8 +32,9 @@ import com.example.gtu001.qrcodemaker.common.AppListService;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.SimpleAdapterDecorator;
-import com.example.gtu001.qrcodemaker.common.SingleInputDialog;
+import com.example.gtu001.qrcodemaker.common.SingleAutoCompleteDialog;
 import com.example.gtu001.qrcodemaker.common.TitleUtil;
+
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,7 +55,9 @@ public class AppListFilterActivity extends Activity {
     private InitListViewHandler initListViewHandler;
 
     private Button btn1;
-    private EditText filterText;
+    private AutoCompleteTextView filterText;
+
+    private static final int AUTO_COMPLETE_HINT_THRESHOLD = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +77,9 @@ public class AppListFilterActivity extends Activity {
             }
         });
 
-        filterText = new EditText(this);
+        filterText = new AutoCompleteTextView(this);
         layout.addView(filterText);
+        filterText.setThreshold(AUTO_COMPLETE_HINT_THRESHOLD);
         filterText.setMaxLines(1);
         filterText.setSingleLine();
         filterText.setHint("請按Enter鍵");
@@ -86,7 +93,6 @@ public class AppListFilterActivity extends Activity {
                 return false;
             }
         });
-
         filterText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -100,6 +106,7 @@ public class AppListFilterActivity extends Activity {
             public void afterTextChanged(Editable editable) {
             }
         });
+
 
 
         //初始listView
@@ -128,7 +135,14 @@ public class AppListFilterActivity extends Activity {
                                         app.run(AppListFilterActivity.this);
                                         break;
                                     case 1:
-                                        final SingleInputDialog dialog = new SingleInputDialog(AppListFilterActivity.this, app.getTag(), "修改Tag", "修改Tag");
+                                        final SingleAutoCompleteDialog dialog = new SingleAutoCompleteDialog(//
+                                                AppListFilterActivity.this,//
+                                                app.getTag(),//
+                                                AppListFilterActivity.this.initListViewHandler.tagLst,//
+                                                AUTO_COMPLETE_HINT_THRESHOLD,//
+                                                "修改Tag",//
+                                                "修改Tag"//
+                                        );
                                         dialog.confirmButton(new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -246,6 +260,7 @@ public class AppListFilterActivity extends Activity {
                         @Override
                         public void run() {
                             listView.setAdapter(baseAdapter);
+                            filterText.setAdapter(getTagLstAdapter());
                         }
                     });
 
@@ -275,6 +290,11 @@ public class AppListFilterActivity extends Activity {
                 baseAdapter.notifyDataSetChanged();
             }
             return result;
+        }
+
+        public ArrayAdapter<String> getTagLstAdapter() {
+            return new ArrayAdapter<String>(context,
+                    android.R.layout.simple_dropdown_item_1line, tagLst);
         }
     }
 
@@ -382,3 +402,38 @@ public class AppListFilterActivity extends Activity {
     }
 }
 
+
+
+//import com.pchmn.materialchips.ChipsInput;
+//import com.pchmn.materialchips.model.ChipInterface;
+//
+//        chipsInput = new ChipsInput(this);
+//        layout.addView(chipsInput, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        List<ChipObj> contactList = new ArrayList<>();
+//        contactList.add(new ChipObj("aaaa"));
+//        contactList.add(new ChipObj("bbbb"));
+//        contactList.add(new ChipObj("cccc"));
+//        chipsInput.setFilterableList(contactList);
+//        chipsInput.addChipsListener(new ChipsInput.ChipsListener() {
+//            @Override
+//            public void onChipAdded(ChipInterface chip, int newSize) {
+//                // chip added
+//                List<ChipObj> contactsSelected = (List<ChipObj>) chipsInput.getSelectedChipList();
+//                Toast.makeText(AppListFilterActivity.this, contactsSelected.toString(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onChipRemoved(ChipInterface chip, int newSize) {
+//                // chip removed
+//                List<ChipObj> contactsSelected = (List<ChipObj>) chipsInput.getSelectedChipList();
+//                Toast.makeText(AppListFilterActivity.this, contactsSelected.toString(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence text) {
+//                // text changed
+//                List<ChipObj> contactsSelected = (List<ChipObj>) chipsInput.getSelectedChipList();
+//                Toast.makeText(AppListFilterActivity.this, contactsSelected.toString(), Toast.LENGTH_SHORT).show();
+//            }
+//        });

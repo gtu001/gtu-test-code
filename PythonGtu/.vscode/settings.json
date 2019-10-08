@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\wistronits\\Anaconda3\\python.exe",
+    "python.pythonPath": "/home/gtu001/anaconda3/bin/python",
     "python.testing.pytestArgs": [
         "gtu"
     ],

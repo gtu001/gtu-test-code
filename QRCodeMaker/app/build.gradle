@@ -57,6 +57,7 @@ dependencies {
 
     implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
 
-    implementation 'junit:junit:4.12'
+    implementation 'com.github.pchmn:MaterialChipsInput:1.0.8' //autoComplete Tag Chip
 
+    implementation 'junit:junit:4.12'
 }
