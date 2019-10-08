@@ -21,7 +21,7 @@ public class DataUriUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        String text = DataUriUtil.getInstance().generateUri("C:\\Users\\wistronits\\Desktop\\ChMlWV1KPLiIZBt8ACGQMeXJTrYAAMbJwGpN_4AIZBJ230.jpg", "jpg");
+        String text = DataUriUtil.getInstance().generateUri("C:\\Users\\wistronits\\Desktop\\索引.png", "png");
         System.out.println(String.format("<html><body><img src=\"%s\" /></body></html>", text));
         System.out.println(text.length());
         System.out.println("done...");

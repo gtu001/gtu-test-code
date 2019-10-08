@@ -1,19 +1,16 @@
 package com.example.gtu001.qrcodemaker.common;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 
+import com.example.gtu001.qrcodemaker.dao.AppInfoDAO;
 import com.example.gtu001.qrcodemaker.services.AppInfoService;
 
+import org.apache.commons.lang3.StringUtils;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
-
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +33,7 @@ public class AppListService {
         Intent launchActivity;
         String label;
         Drawable icon;
+        String tag;
 
         public void run(Context context) {
             AppListService.launchApp(context, installedPackage);
@@ -80,15 +78,45 @@ public class AppListService {
         public void setIcon(Drawable icon) {
             this.icon = icon;
         }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
     }
 
     //------------------------------------------------------------------------DB Process START
 
-    public static List<AppInfo> loadAllAppListMaster(Context context, boolean isReload) {
+    public boolean updateAppInfoTag(AppInfo vo, Context context) {
         DBHolder d = new DBHolder(context);
-        return d.loadAllAppListMaster(isReload);
+        return d.updateTag(vo);
     }
 
+    public DataWrapper loadAllAppListMaster(Context context, boolean isReload) {
+        DataWrapper rtnObj = new DataWrapper();
+        DBHolder d = new DBHolder(context);
+        rtnObj.appLst = d.loadAllAppListMaster(isReload);
+        for (AppInfo vo : rtnObj.appLst) {
+            d.appendTagToLst(vo.getTag(), rtnObj.getTagLst());
+        }
+        return rtnObj;
+    }
+
+    public static class DataWrapper {
+        List<AppInfo> appLst = new ArrayList<>();
+        List<String> tagLst = new ArrayList<>();
+
+        public List<AppInfo> getAppLst() {
+            return appLst;
+        }
+
+        public List<String> getTagLst() {
+            return tagLst;
+        }
+    }
 
     private static class DBHolder {
         AppInfoService service;
@@ -99,6 +127,12 @@ public class AppListService {
             service = new AppInfoService(context);
             this.context = context;
             pm = context.getPackageManager();
+        }
+
+        public boolean updateTag(AppInfo vo) {
+            AppInfoDAO.AppInfo vo2 = service.findByPk(vo.getInstalledPackage());
+            vo2.setTag(vo.getTag());
+            return service.update(vo2);
         }
 
         public List<AppInfo> loadAllAppListMaster(boolean isReload) {
@@ -122,23 +156,46 @@ public class AppListService {
                 vo2.setSourceDir(vo.getSourceDir());
                 vo2.setLabel(vo.getLabel());
                 vo2.setIcon(ImageBase64Util.encodeToBase64(vo.getIcon(), "png", 100));
+                vo2.setTag(vo.getTag());
                 service.insertData(vo2);
+            }
+        }
+
+        private void appendTagToLst(String tag, List<String> tagLst) {
+            tag = StringUtils.trimToEmpty(tag);
+            String[] tags = tag.split(",", -1);
+            for (String t : tags) {
+                t = StringUtils.trimToEmpty(t);
+                if (StringUtils.isNotBlank(t)) {
+                    boolean alreadyHas = false;
+                    A:
+                    for (String t1 : tagLst) {
+                        if (t1.equalsIgnoreCase(t)) {
+                            alreadyHas = true;
+                            break A;
+                        }
+                    }
+                    tagLst.add(t);
+                }
             }
         }
 
         public List<AppInfo> loadAllAppListFromDB() {
             List<com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo> lst2 = service.queryAll();
             List<AppInfo> lst = new ArrayList<AppInfo>();
+            List<String> tagLst = new ArrayList<>();
             for (com.example.gtu001.qrcodemaker.dao.AppInfoDAO.AppInfo vo : lst2) {
                 AppInfo vo2 = new AppInfo();
                 vo2.setInstalledPackage(vo.getInstalledPackage());
                 vo2.setSourceDir(vo.getSourceDir());
                 vo2.setLabel(vo.getLabel());
+                vo2.setTag(vo.getTag());
                 try {
                     vo2.setIcon(ImageBase64Util.decodeBase64ToDrawable(vo.getIcon(), context));
                 } catch (Exception ex) {
                     Log.e(TAG, "loadAllAppListFromDB ERR : " + ex.getMessage(), ex);
                 }
+                appendTagToLst(vo.getTag(), tagLst);
                 lst.add(vo2);
             }
             return lst;

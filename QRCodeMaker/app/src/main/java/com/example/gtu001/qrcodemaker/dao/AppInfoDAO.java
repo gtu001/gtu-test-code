@@ -216,6 +216,7 @@ public class AppInfoDAO {
         vo.sourceDir = c.getString(c.getColumnIndex(AppInfoSchema.SOURCE_DIR));
         vo.label = c.getString(c.getColumnIndex(AppInfoSchema.LABEL));
         vo.icon = c.getString(c.getColumnIndex(AppInfoSchema.ICON));
+        vo.tag = c.getString(c.getColumnIndex(AppInfoSchema.TAG));
         return vo;
     }
 
@@ -225,6 +226,7 @@ public class AppInfoDAO {
         values.put(AppInfoSchema.SOURCE_DIR, vo.sourceDir);
         values.put(AppInfoSchema.LABEL, vo.label);
         values.put(AppInfoSchema.ICON, vo.icon);
+        values.put(AppInfoSchema.TAG, vo.tag);
         return values;
     }
 
@@ -241,6 +243,7 @@ public class AppInfoDAO {
         String sourceDir;
         String label;
         String icon;
+        String tag;
 
         public String getInstalledPackage() {
             return installedPackage;
@@ -273,6 +276,14 @@ public class AppInfoDAO {
         public void setIcon(String icon) {
             this.icon = icon;
         }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
     }
 
     public interface AppInfoSchema {
@@ -282,7 +293,8 @@ public class AppInfoDAO {
         String SOURCE_DIR = "source_dir";
         String LABEL = "label";
         String ICON = "icon";
+        String TAG = "tag";
 
-        final String[] FROM = {INSTALLED_PACKAGE, SOURCE_DIR, LABEL, ICON};
+        final String[] FROM = {INSTALLED_PACKAGE, SOURCE_DIR, LABEL, ICON, TAG};
     }
 }

@@ -1,8 +1,10 @@
 package com.example.gtu001.qrcodemaker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,20 +16,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.common.AppListService;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.SimpleAdapterDecorator;
+import com.example.gtu001.qrcodemaker.common.SingleInputDialog;
 import com.example.gtu001.qrcodemaker.common.TitleUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -109,8 +111,37 @@ public class AppListFilterActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
-                AppListService.AppInfo app = (AppListService.AppInfo) item.get("item");
-                app.run(AppListFilterActivity.this);
+                final AppListService.AppInfo app = (AppListService.AppInfo) item.get("item");
+
+                String[] items = new String[]{"開啟", "修改Tag"};
+
+                new AlertDialog.Builder(AppListFilterActivity.this)//
+                        .setTitle(app.getLabel())//
+//                        .setMessage(app.getInstalledPackage())//
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0:
+                                        app.run(AppListFilterActivity.this);
+                                        break;
+                                    case 1:
+                                        final SingleInputDialog dialog = new SingleInputDialog(AppListFilterActivity.this, app.getTag(), "修改Tag", "修改Tag");
+                                        dialog.confirmButton(new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                String newTag = dialog.getEditText(true, true);
+                                                app.setTag(newTag);
+                                                boolean updateResult = initListViewHandler.updateAppInfoTag(app);
+                                                Toast.makeText(AppListFilterActivity.this, "修改" + (updateResult ? "成功" : "失敗"), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        dialog.show();
+                                        break;
+                                }
+                            }
+                        })//
+                        .show();
             }
         });
 
@@ -120,6 +151,7 @@ public class AppListFilterActivity extends Activity {
 
     private class InitListViewHandler {
         List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
+        List<String> tagLst = new ArrayList<String>();
 
         Context context;
 
@@ -133,13 +165,16 @@ public class AppListFilterActivity extends Activity {
             map.put("item_title", item.getLabel());
             map.put("item_text", item.getInstalledPackage());
             map.put("item_image_check", item.getIcon());
+            map.put("item_text_desc", StringUtils.trimToEmpty(item.getTag()));
             map.put("item", item);
             return map;
         }
 
         private List<Map<String, Object>> findAll(boolean isReload) {
             List<Map<String, Object>> listItem = new ArrayList<Map<String, Object>>();
-            List<AppListService.AppInfo> lst = AppListService.getInstance().loadAllAppListMaster(context, isReload);
+            AppListService.DataWrapper wrapper = AppListService.getInstance().loadAllAppListMaster(context, isReload);
+            tagLst = wrapper.getTagLst();
+            List<AppListService.AppInfo> lst = wrapper.getAppLst();
             for (AppListService.AppInfo app : lst) {
                 listItem.add(getItem2Map(app));
             }
@@ -160,8 +195,14 @@ public class AppListFilterActivity extends Activity {
             for (Map<String, Object> map : listItem) {
                 AppListService.AppInfo app = (AppListService.AppInfo) map.get("item");
 
-                if (app.getLabel().toLowerCase().contains(text) || //
-                        app.getInstalledPackage().toLowerCase().contains(text)) {
+                boolean matchOk = false;
+                if (StringUtils.trimToEmpty(app.getLabel()).toLowerCase().contains(text) || //
+//                        StringUtils.trimToEmpty(app.getInstalledPackage()).toLowerCase().contains(text) ||
+                        StringUtils.trimToEmpty(app.getTag()).toLowerCase().contains(text)) {
+                    matchOk = true;
+                }
+
+                if (matchOk) {
                     listItem22.add(map);
                 }
             }
@@ -171,8 +212,8 @@ public class AppListFilterActivity extends Activity {
         private SimpleAdapter createSimpleAdapter(List<Map<String, Object>> listItem) {
             SimpleAdapter listItemAdapter = new SimpleAdapter(AppListFilterActivity.this, listItem,// 資料來源
                     R.layout.subview_listview_icon, //
-                    new String[]{"item_title", "item_text", "item_image", "item_image_check"}, //
-                    new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01}//
+                    new String[]{"item_title", "item_text", "item_image", "item_image_check", "item_text_desc"}, //
+                    new int[]{R.id.ItemTitle, R.id.ItemText, R.id.ItemImage, R.id.ImageView01, R.id.ItemTextDesc}//
             );
 
             SimpleAdapterDecorator.apply4Bitmap(listItemAdapter);
@@ -209,6 +250,10 @@ public class AppListFilterActivity extends Activity {
             baseAdapter = createSimpleAdapter(_findByText(text));
             listView.setAdapter(baseAdapter);
             baseAdapter.notifyDataSetChanged();
+        }
+
+        public boolean updateAppInfoTag(AppListService.AppInfo vo) {
+            return AppListService.getInstance().updateAppInfoTag(vo, context);
         }
     }
 

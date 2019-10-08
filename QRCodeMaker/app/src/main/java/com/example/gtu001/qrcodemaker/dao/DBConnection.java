@@ -12,7 +12,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "Youtube_DB";
-    static final int DATABASE_VERSION = 3;
+    static final int DATABASE_VERSION = 4;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -50,7 +50,9 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("  create table App_Info (                  ");
         sb.append("      installed_package text primary key not null,        ");
         sb.append("      source_dir text ,                               ");
-        sb.append("      label text                            ");
+        sb.append("      label text ,                           ");
+        sb.append("      icon text ,                           ");
+        sb.append("      tag text                            ");
         sb.append("  );                                              ");
 
         Log.i("haiyang:createDB 1=", sb.toString());
@@ -75,10 +77,10 @@ public class DBConnection extends SQLiteOpenHelper {
             db.execSQL(sb.toString());
         }
 
-        if (newVersion == 3) {
+        if (newVersion == 4) {
             sb = new StringBuilder();
 
-            sb.append("  alter table App_Info add icon text    ");//add column
+            sb.append("  alter table App_Info add tag text    ");//add column
 
             Log.i("haiyang:createDB 2=", sb.toString());
             db.execSQL(sb.toString());
