@@ -489,7 +489,13 @@ public class GitConflictDetectUI extends JFrame {
 
                         String localBranchName = StringUtils.trimToEmpty(gitBranchNameText.getText());
                         FileUtil.saveToFile(leftFile, GitUtil.getLocalRepoContent(projectDir, localBranchName, gitFile.orignName, getEncoding()), "UTF8");
-                        String command = String.format(exePath, leftFile, gitFile.file);
+
+                        File myCurrentFile = gitFile.file;
+                        if (!gitFile.file.exists()) {
+                            myCurrentFile = File.createTempFile("TEMPLOCAL_", ".txt");
+                            mResolveConflictFileProcess = new ResolveConflictFileProcess(myCurrentFile, gitFile);
+                        }
+                        String command = String.format(exePath, leftFile, myCurrentFile);
                         RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
                         run.command(command);
                         run.apply();

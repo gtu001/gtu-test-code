@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -396,6 +398,48 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                     return;
                                 }
                                 resetPropTable_onlyWorngEnglish();
+                            }
+                        });
+                    }
+
+                    {
+                        JMenuItem jMenuItem8 = new JMenuItem();
+                        jMenu1.add(jMenuItem8);
+                        jMenuItem8.setText("載入校正檔");
+                        jMenuItem8.addActionListener(new ActionListener() {
+
+                            private void setFixWord(String oldWord, String newWord, List<String> logLst) {
+                                for (int ii = 0; ii < backupModel.size(); ii++) {
+                                    Triple<Integer, String, String> t = backupModel.get(ii);
+                                    if (StringUtils.equalsIgnoreCase(t.getMiddle(), oldWord)) {
+                                        backupModel.set(ii, Triple.of(t.getLeft(), newWord, t.getRight()));
+                                        System.out.println("setFixWord : \t" + ii + "\t" + oldWord + "\t" + newWord);
+                                        logLst.add(oldWord + " -> " + newWord);
+                                    }
+                                }
+                            }
+
+                            public void actionPerformed(ActionEvent evt) {
+                                File selectFile = JCommonUtil._jFileChooser_selectFileOnly();
+                                if (selectFile == null) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
+                                    return;
+                                }
+                                List<String> lst = FileUtil.loadFromFile_asList(selectFile, "UTF8");
+                                List<String> logLst = new ArrayList<String>();
+                                Pattern ptn = Pattern.compile("(.*)?\t(.*)");
+                                for (String strVal : lst) {
+                                    Matcher mth = ptn.matcher(strVal);
+                                    if (mth.find()) {
+                                        String oldWord = StringUtils.trimToEmpty(mth.group(1));
+                                        String newWord = StringUtils.trimToEmpty(mth.group(2));
+                                        if (StringUtils.isNotBlank(newWord)) {
+                                            setFixWord(oldWord, newWord, logLst);
+                                        }
+                                    }
+                                }
+                                resetPropTable("");
+                                JCommonUtil._jOptionPane_showMessageDialog_info("修正以下單字 : \n" + StringUtils.join(logLst, "\n"));
                             }
                         });
                     }

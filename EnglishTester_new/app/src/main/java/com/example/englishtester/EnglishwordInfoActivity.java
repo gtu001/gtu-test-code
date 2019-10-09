@@ -137,7 +137,7 @@ public class EnglishwordInfoActivity extends Activity {
         autoCompleteTextView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> paramAdapterView, View paramView, int paramInt, long paramLong) {
-                onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(), true);
+                onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(true), true);
             }
         });
 
@@ -153,7 +153,7 @@ public class EnglishwordInfoActivity extends Activity {
                         break;
                     case KeyEvent.ACTION_UP:
                         if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                            onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(), true);
+                            onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(true), true);
                         }
                         return true;
                 }
@@ -167,7 +167,7 @@ public class EnglishwordInfoActivity extends Activity {
         searchBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(), true);
+                onAutoCompleteTextView1Click(getAutoCompleteTextViewEnglishId(false), true);
             }
         });
 
@@ -300,7 +300,7 @@ public class EnglishwordInfoActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                final String englishId = getAutoCompleteTextViewEnglishId();
+                final String englishId = getAutoCompleteTextViewEnglishId(true);
                 if (StringUtils.isBlank(englishId)) {
                     Toast.makeText(getApplicationContext(), "請輸入單字,不可為空白!", Toast.LENGTH_SHORT).show();
                     Log.v(TAG, "englishId is empty");
@@ -368,8 +368,12 @@ public class EnglishwordInfoActivity extends Activity {
         Log.v(TAG, "currentDTO = " + dto);
     }
 
-    private String getAutoCompleteTextViewEnglishId() {
-        return fixSearchWord(autoCompleteTextView1.getText().toString());
+    private String getAutoCompleteTextViewEnglishId(boolean fixWord) {
+        if (fixWord) {
+            return fixSearchWord(autoCompleteTextView1.getText().toString());
+        } else {
+            return StringUtils.trimToEmpty(autoCompleteTextView1.getText().toString()).toLowerCase();
+        }
     }
 
     public static String fixSearchWord(String englishId) {
