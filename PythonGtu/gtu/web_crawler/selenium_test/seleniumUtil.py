@@ -69,6 +69,10 @@ class WebElementControl :
         from selenium.webdriver.common import keys
         webElement.send_keys(keys.Keys.ENTER)
 
+    @staticmethod
+    def getHtml(element) :
+        return element.get_attribute('innerHTML')
+
 
 class ScrollHandler :
     @staticmethod
@@ -102,11 +106,11 @@ class ScrollHandler :
 
 
     @staticmethod
-    def scroll2Buttom_Repeat(driver, smooth=False, scrollCount=10, sleepSecond=2) :
+    def scroll2Buttom_Repeat(driver, smooth=False, repeatButtomCount=10, sleepSecond=2, scrollSize=10) :
         height = ScrollHandler.getScrollMaxHeight(driver)
         print("init h : ", height)
-        for i in range(0, scrollCount) :
-            ScrollHandler.scroll2Button(driver, smooth)
+        for i in range(0, repeatButtomCount) :
+            ScrollHandler.scroll2Button(driver, smooth, scrollSize)
 
             if sleepSecond and smooth == False :
                 time.sleep(sleepSecond)
