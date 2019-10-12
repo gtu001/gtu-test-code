@@ -28,13 +28,14 @@ from gtu.reflect import toStringUtil
 
 
 
-log = LogWriter.LogWriter(filename="wishList.csv")
+log = LogWriter.LogWriter(filename="wishList.csv", mode="w")
 
 class SteamWishListFetcher() :
     def __init__(self, user_account, password, mMySteamWishListFetcher) :
         self.driver = seleniumUtil.getDriver()
         self.baseURL = "https://store.steampowered.com/wishlist/id/{user_account}/#sort=discount&type=all&platform_windows=1".format(user_account=urllib.parse.quote_plus(user_account))
         self.wishLst = list()
+        self.mMySteamWishListFetcher = mMySteamWishListFetcher
 
         # bs(self.driver.page_source, "html.parser")
         self.driver.get(self.baseURL)
@@ -65,40 +66,40 @@ class SteamWishListFetcher() :
         self.driver.get(self.baseURL)
         time.sleep(1)
 
-        games = list()
+        self.games = list()
 
-        def pageChangeListenerFunc(driver) :
-            webElements = self.driver.find_elements_by_css_selector("div.wishlist_row")
-            print("len - webElements= ", len(webElements))
+        seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(self.driver, smooth=True, scrollSize=10, pageChangeListener=self.pageChangeListenerFunc)
 
-            for i,v in enumerate(webElements) :
+
+    def pageChangeListenerFunc(self, driver) :
+        webElements = self.driver.find_elements_by_css_selector("div.wishlist_row")
+        print("len - webElements= ", len(webElements))
+
+        for i,v in enumerate(webElements) :
+            try :
+                html = seleniumUtil.WebElementControl.getHtml(v)
+                soup = bs(html, "html.parser")
+
+                gameName = soup.select("a.title")[0].getText().strip()
+                currentPrice = ""
                 try :
-                    html = seleniumUtil.WebElementControl.getHtml(v)
-                    soup = bs(html, "html.parser")
-
-                    gameName = soup.select("a.title")[0].getText().strip()
-                    currentPrice = ""
-                    try :
-                        currentPrice = soup.select("div.discount_final_price")[0].getText().strip()
-                    except Exception as ex :
-                        pass
-
-                    if gameName not in games :
-                        d = dict()
-                        d['name'] = gameName
-                        d['price'] = currentPrice
-                        print("game", d)
-                        self.wishLst.append(d)
-
-                        # 寫入檔案
-                        mMySteamWishListFetcher.queue.appendleft(d)
-                    else :
-                        games.append(gameName) 
-                except Exception as ex2 : 
+                    currentPrice = soup.select("div.discount_final_price")[0].getText().strip()
+                except Exception as ex :
                     pass
 
-        seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(self.driver, smooth=True, scrollSize=10, pageChangeListener=pageChangeListenerFunc)
+                if gameName not in self.games :
+                    d = dict()
+                    d['name'] = gameName
+                    d['price'] = currentPrice
+                    print("game", d)
+                    self.wishLst.append(d)
 
+                    # 寫入檔案
+                    self.mMySteamWishListFetcher.queue.appendleft(d)
+
+                    self.games.append(gameName) 
+            except Exception as ex2 : 
+                pass        
 
 
 
@@ -148,7 +149,7 @@ class CheckSteamGame :
 
     def getGameName(self, card, defaultGameName) :
         try:
-            return card.select(".card__head.card__row")[0].getText()
+            return card.select("div.card__head.card__row a.card__title")[0].getText()
         except Exception as ex :
             return defaultGameName
 
@@ -156,7 +157,7 @@ class CheckSteamGame :
     def fixCsvString(self, strVal):
         strVal = strVal.strip()
         strVal = re.sub(r"[\t]+", " ", strVal)
-        strVal = re.sub(r"[,]+", " ", strVal)
+        strVal = re.sub(r"[,]+", "", strVal)
         return strVal
 
         
@@ -182,16 +183,21 @@ class CheckSteamGame :
     
 
     def __str__(self) :
+        def g(map, key) :
+            if key in map :
+                return map[key]
+            return ""
+
         return "{name}\t{currentPrice}\t{currentLowStore}\t{currentLow}\t{currentLowPercent}\t{historyLowStore}\t{historyLow}\t{historyLowPercent}"\
                 .format(name=self.name, currentPrice=self.currentPrice, \
-                    currentLowStore=self.bestprice['store'],currentLow=self.bestprice['price'],currentLowPercent=self.bestprice['percent'], \
-                    historyLowStore=self.history['store'],historyLow=self.history['price'],historyLowPercent=self.history['percent'], \
+                    currentLowStore=g(self.bestprice, 'store'),currentLow=g(self.bestprice, 'price'),currentLowPercent=g(self.bestprice, 'percent'), \
+                    historyLowStore=g(self.history, 'store'),historyLow=g(self.history, 'price'),historyLowPercent=g(self.history, 'percent'), \
                 )
 
 
 def main() :
     THREAD = MySteamWishListFetcher()
-    wish = SteamWishListFetcher("gtu001", "XXXXXXXXXXXXXXXXXXXXXXXX", THREAD)
+    wish = SteamWishListFetcher("gtu001", "XXXXXXXXXXXXXXXXXXX", THREAD)
     pass
 
 if __name__ == '__main__' :
