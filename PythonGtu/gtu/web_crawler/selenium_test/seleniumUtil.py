@@ -9,6 +9,7 @@ import time
 from gtu.datetime import duringMointer
 from gtu.os import envUtil
 import inspect
+from gtu.string import stringUtil
 
 '''
 from gtu.web_crawler.selenium_test import seleniumUtil
@@ -74,6 +75,18 @@ class WebElementControl :
         return element.get_attribute('innerHTML')
 
 
+class _PageChangeCallback :
+    def __init__(self, driver, func) :
+        self.func = func
+        self.driver = driver
+        self.page_source = ""
+    def checkPageSource(self) :
+        page_source = self.driver.page_source
+        if self.func and self.page_source != page_source :
+            self.page_source = page_source
+            self.func(self.driver)
+
+
 class ScrollHandler :
     @staticmethod
     def getScrollPosition(driver) :
@@ -93,24 +106,29 @@ class ScrollHandler :
         scrollHeight = driver.execute_script(script)
         return int(scrollHeight)
 
+    
 
     @staticmethod
-    def scroll2Button(driver, smooth=False, scrollSize=10) :
+    def scroll2Button(driver, smooth=False, scrollSize=10, pageChangeListener=None) :
         if not smooth :
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         else:
             start = ScrollHandler.getScrollPosition(driver)
             end = ScrollHandler.getScrollMaxHeight(driver)
+
+            listener = _PageChangeCallback(driver, pageChangeListener)         
             for i in range(start, end, scrollSize) :
                 driver.execute_script("window.scrollBy(0, arguments[0])", i)
+                listener.checkPageSource()
+
 
 
     @staticmethod
-    def scroll2Buttom_Repeat(driver, smooth=False, repeatButtomCount=10, sleepSecond=2, scrollSize=10) :
+    def scroll2Buttom_Repeat(driver, smooth=False, repeatButtomCount=10, sleepSecond=2, scrollSize=10, pageChangeListener=None) :
         height = ScrollHandler.getScrollMaxHeight(driver)
         print("init h : ", height)
         for i in range(0, repeatButtomCount) :
-            ScrollHandler.scroll2Button(driver, smooth, scrollSize)
+            ScrollHandler.scroll2Button(driver, smooth, scrollSize, pageChangeListener)
 
             if sleepSecond and smooth == False :
                 time.sleep(sleepSecond)

@@ -28,10 +28,10 @@ from gtu.reflect import toStringUtil
 
 
 
-log = LogWriter.LogWriter()
+log = LogWriter.LogWriter(filename="wishList.csv")
 
 class SteamWishListFetcher() :
-    def __init__(self, user_account, password) :
+    def __init__(self, user_account, password, mMySteamWishListFetcher) :
         self.driver = seleniumUtil.getDriver()
         self.baseURL = "https://store.steampowered.com/wishlist/id/{user_account}/#sort=discount&type=all&platform_windows=1".format(user_account=urllib.parse.quote_plus(user_account))
         self.wishLst = list()
@@ -67,35 +67,37 @@ class SteamWishListFetcher() :
 
         games = list()
 
-        webElements = self.driver.find_elements_by_css_selector("div.wishlist_row")
-        print("len - webElements= ", len(webElements))
+        def pageChangeListenerFunc(driver) :
+            webElements = self.driver.find_elements_by_css_selector("div.wishlist_row")
+            print("len - webElements= ", len(webElements))
 
-        for i,v in enumerate(webElements) :
-            try :
-                html = seleniumUtil.WebElementControl.getHtml(v)
-                soup = bs(html, "html.parser")
-
-                gameName = soup.select("a.title")[0].getText().strip()
-                currentPrice = ""
+            for i,v in enumerate(webElements) :
                 try :
-                    currentPrice = soup.select("div.discount_final_price")[0].getText().strip()
-                except Exception as ex :
+                    html = seleniumUtil.WebElementControl.getHtml(v)
+                    soup = bs(html, "html.parser")
+
+                    gameName = soup.select("a.title")[0].getText().strip()
+                    currentPrice = ""
+                    try :
+                        currentPrice = soup.select("div.discount_final_price")[0].getText().strip()
+                    except Exception as ex :
+                        pass
+
+                    if gameName not in games :
+                        d = dict()
+                        d['name'] = gameName
+                        d['price'] = currentPrice
+                        print("game", d)
+                        self.wishLst.append(d)
+
+                        # 寫入檔案
+                        mMySteamWishListFetcher.queue.appendleft(d)
+                    else :
+                        games.append(gameName) 
+                except Exception as ex2 : 
                     pass
 
-                if gameName not in games :
-                    d = dict()
-                    d['name'] = gameName
-                    d['price'] = currentPrice
-                    print("game", d)
-                    self.wishLst.append(d)
-                else :
-                    games.append(gameName) 
-
-            except Exception as ex2 : 
-                pass
-
-
-        seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(self.driver, smooth=True, scrollSize=10)
+        seleniumUtil.ScrollHandler.scroll2Buttom_Repeat(self.driver, smooth=True, scrollSize=10, pageChangeListener=pageChangeListenerFunc)
 
 
 
@@ -113,65 +115,80 @@ class MySteamWishListFetcher(Thread, metaclass=ABCMeta) :
         # self.setName(newName)
          
     def run(self) :
+
+        log.writeline("名稱\t現在價格\t現在最低店家\t現在最低價\t現在折扣\t歷史最低店家\t歷史最低價\t歷史最低折扣")
         while True :
             if self.queue.length() > 0 :
                 d = self.queue.popright()
-                g = CheckSteamGame(d['name'])
-                log.write(g)
-            time.sleep(0.1)
+                g = CheckSteamGame(d)
+                log.writeline(g)
+            time.sleep(0.2)
 
 
 class CheckSteamGame :
-    def __init__(self, gameName) :
+    def __init__(self, dictObj) :
+        gameName = dictObj['name']
+
         baseURL = "https://isthereanydeal.com/search/?q={game}".format(game=urllib.parse.quote_plus(gameName))
         resp = requests.get(baseURL, verify=False)
         soup = bs(resp.text, "html.parser")
+        
+        self.currentPrice = dictObj['price']
 
         self.name = gameName
         self.history = dict()
         self.bestprice = dict()
         try :
             card = soup.select("div.card__content")[0]
-            cardName = card.select(".card__head.card__row")[0].getText()
-            historyLow = card.select("div.card__row")[1]
-            bestprice = card.select("div.card__row")[2]
-            self.name = cardName
-            self.history = self.findInfo(historyLow)
-            self.bestprice = self.findInfo(bestprice)
+            self.name = self.getGameName(card, gameName)
+            self.history = self.findInfo(card, 1)
+            self.bestprice = self.findInfo(card, 2)
         except Exception as ex :
             pass
+
+    def getGameName(self, card, defaultGameName) :
+        try:
+            return card.select(".card__head.card__row")[0].getText()
+        except Exception as ex :
+            return defaultGameName
         
-    def findInfo(self, card) :
+    def findInfo(self, card, index) :
         rtnObj = dict()
+        try :
+            card = card.select("div.card__row")[index]
+        except Exception as ex :
+            pass
         try:
             rtnObj['price'] = card.select("div.numtag__primary")[0].getText().strip()
         except Exception as ex :
-            pass
+            rtnObj['price'] = "ERR"
         try:
             rtnObj['percent'] = card.select("div.numtag__second")[0].getText().strip()
         except Exception as ex :
-            pass
+            rtnObj['percent'] = "ERR"
         try:
             rtnObj['store'] = card.select("span.shopTitle")[0].getText().strip()
         except Exception as ex :
-            pass
+            rtnObj['store'] = "ERR"
         return rtnObj
     
+
     def __str__(self) :
-        return toStringUtil.toString(self)
+        return "{name}\t{currentPrice}\t{currentLowStore}\t{currentLow}\t{currentLowPercent}\t{historyLowStore}\t{historyLow}\t{historyLowPercent}"\
+                .format(name=self.name, currentPrice=self.currentPrice, \
+                    currentLowStore=self.bestprice['store'],currentLow=self.bestprice['price'],currentLowPercent=self.bestprice['percent'], \
+                    historyLowStore=self.history['store'],historyLow=self.history['price'],historyLowPercent=self.history['percent'], \
+                )
 
 
 def main() :
     THREAD = MySteamWishListFetcher()
-    wish = SteamWishListFetcher("gtu001", "luv90cxc048c")
-    for i,v in enumerate(wish.wishLst):
-        gameName = v['name']
-        gameSteamPrice = v['price']
-        THREAD.queue.appendleft(v)
+    wish = SteamWishListFetcher("gtu001", "luv90cxc048c", THREAD)
     pass
 
 if __name__ == '__main__' :
     main()
+    print("done...")
     # network("http://www.gamer.com.tw") # http://www.91porn.com/view_video.php?viewkey=a9a7ceb02bab655e0e6a
 
 
