@@ -151,6 +151,14 @@ class CheckSteamGame :
             return card.select(".card__head.card__row")[0].getText()
         except Exception as ex :
             return defaultGameName
+
+
+    def fixCsvString(self, strVal):
+        strVal = strVal.strip()
+        strVal = re.sub(r"[\t]+", " ", strVal)
+        strVal = re.sub(r"[,]+", " ", strVal)
+        return strVal
+
         
     def findInfo(self, card, index) :
         rtnObj = dict()
@@ -159,15 +167,15 @@ class CheckSteamGame :
         except Exception as ex :
             pass
         try:
-            rtnObj['price'] = card.select("div.numtag__primary")[0].getText().strip()
+            rtnObj['price'] = self.fixCsvString(card.select("div.numtag__primary")[0].getText())
         except Exception as ex :
             rtnObj['price'] = "ERR"
         try:
-            rtnObj['percent'] = card.select("div.numtag__second")[0].getText().strip()
+            rtnObj['percent'] = self.fixCsvString(card.select("div.numtag__second")[0].getText())
         except Exception as ex :
             rtnObj['percent'] = "ERR"
         try:
-            rtnObj['store'] = card.select("span.shopTitle")[0].getText().strip()
+            rtnObj['store'] = self.fixCsvString(card.select("span.shopTitle")[0].getText())
         except Exception as ex :
             rtnObj['store'] = "ERR"
         return rtnObj
@@ -183,7 +191,7 @@ class CheckSteamGame :
 
 def main() :
     THREAD = MySteamWishListFetcher()
-    wish = SteamWishListFetcher("gtu001", "luv90cxc048c", THREAD)
+    wish = SteamWishListFetcher("gtu001", "XXXXXXXXXXXXXXXXXXXXXXXX", THREAD)
     pass
 
 if __name__ == '__main__' :
