@@ -201,7 +201,16 @@ def readStringVariableByLine(textData):
 	    print(line)
 	    
 
-def searchFilefind(file, pattern, fileList, debug=False):
+def __searchFileIgnoreSubFileNameLst__(name, ignoreSubFileNameLst) :
+	if ignoreSubFileNameLst :
+		name = name[name.rfind(".") + 1:]
+		for subName in ignoreSubFileNameLst :
+			if name.lower() == subName.lower() :
+				return True
+	return False
+
+
+def searchFilefind(file, pattern, fileList, debug=False, ignoreSubFileNameLst=None):
 	if type(pattern).__name__ == 'str':
 		pattern = re.compile(pattern, re.IGNORECASE)
 	
@@ -212,20 +221,26 @@ def searchFilefind(file, pattern, fileList, debug=False):
 		listFile = os.listdir(file)
 		for i, f in enumerate(listFile, 0):
 			f = Path(currentDir , f)
-			searchFilefind(f, pattern, fileList, debug)
+			searchFilefind(f, pattern, fileList, debug, ignoreSubFileNameLst)
 	elif file.is_file() :
 		name = getName(file)
-		mth = pattern.search(name)
-		
-		if mth is not None :
+
+		if __searchFileIgnoreSubFileNameLst__(name, ignoreSubFileNameLst) :
 			if debug :
-				print("符合 :", file)
-			fileList.append(file.resolve())
-		elif debug :
-			print("不符合 :", file)
+				print("忽略附檔名 :", file)
+		else :
+			mth = pattern.search(name)
+		
+			if mth is not None :
+				if debug :
+					print("符合 :", file)
+				fileList.append(file.resolve())
+			elif debug :
+				print("不符合 :", file)
+		
 
 
-def searchFileMatchs(file, pattern, fileList, debug=False):
+def searchFileMatchs(file, pattern, fileList, debug=False, ignoreSubFileNameLst=None):
 	if type(pattern).__name__ == 'str':
 		pattern = re.compile(pattern, re.IGNORECASE)
 	
@@ -236,17 +251,22 @@ def searchFileMatchs(file, pattern, fileList, debug=False):
 		listFile = os.listdir(file)
 		for i, f in enumerate(listFile, 0):
 			f = Path(currentDir , f)
-			searchFileMatchs(f, pattern, fileList, debug)
+			searchFileMatchs(f, pattern, fileList, debug, ignoreSubFileNameLst)
 	elif file.is_file() :
 		name = getName(file)
-		mth = pattern.match(name)
-		
-		if mth is not None :
+
+		if __searchFileIgnoreSubFileNameLst__(name, ignoreSubFileNameLst) :
 			if debug :
-				print("符合 :", file)
-			fileList.append(file.resolve())
-		elif debug :
-			print("不符合 :", file)
+				print("忽略附檔名 :", file)
+		else :
+			mth = pattern.match(name)
+			
+			if mth is not None :
+				if debug :
+					print("符合 :", file)
+				fileList.append(file.resolve())
+			elif debug :
+				print("不符合 :", file)
 
 
 def sep():

@@ -18,8 +18,17 @@ class LogWriter :
     def write(self, line):
         self.fs.write(str(line))
         self.fs.flush()
+    def write(self, *args):
+        for i,line in enumerate(args) :
+            self.fs.write(str(line))
+        self.fs.flush()     
     def writeline(self, line):
         self.fs.write(str(line))
+        self.fs.write("\r\n")
+        self.fs.flush()
+    def writeline(self, *args) :
+        for i,line in enumerate(args) :
+            self.fs.write(str(line))
         self.fs.write("\r\n")
         self.fs.flush()
     def close(self) :
