@@ -30,7 +30,10 @@ def checkFile(file, main_find_str, second_finds, ignoreCase, encoding) :
     main_find_str = main_find_str.strip()
 
     fileContent = dict()
-    matchLst = list()
+    secondFindsMap = dict()
+
+    for i,v in enumerate(second_finds) :
+        secondFindsMap[v] = None
 
     with open(file, "r", encoding=encoding, buffering=30) as fs :
         try :
@@ -38,7 +41,7 @@ def checkFile(file, main_find_str, second_finds, ignoreCase, encoding) :
                 fileContent[num] = line
         except UnicodeDecodeError as ex :
             print("檔案編碼失敗 : ", str(file))
-    
+
     for i,num in enumerate(fileContent.keys()) :
         line = fileContent[num]
         line = getIgnoreCaseText(line, ignoreCase)
@@ -46,8 +49,8 @@ def checkFile(file, main_find_str, second_finds, ignoreCase, encoding) :
             for i,v in enumerate(second_finds) :
                 matchLineLst = checkFileDetail(fileContent, num, v, ignoreCase)
                 if len(matchLineLst) != 0 :
-                    return matchLineLst
-    return list()
+                    secondFindsMap[v] = matchLineLst
+    return secondFindsMap
 
 
 
@@ -70,15 +73,27 @@ def checkFileDetail(fileContent, lineNumber, mSecondFindDef, ignoreCase) :
 
 
 
+def checkSecondFindsMapCondition(secondFindsMap, isAnd) :
+    if isAnd :
+        for i,key in enumerate(secondFindsMap.keys()) :
+            if secondFindsMap[key] is not None and len(secondFindsMap[key]) == 0:
+                return False
+        return True
+    else :
+        for i,key in enumerate(secondFindsMap.keys()) :
+            if secondFindsMap[key] is not None and len(secondFindsMap[key]) != 0:
+                return True
+        return False
 
-def main(dir_path, main_find_str, second_finds, ignoreCase, encoding) :
+
+def main(dir_path, main_find_str, second_finds, ignoreCase, encoding, isAnd) :
     fileLst = list()
     fileUtil.searchFileMatchs(dir_path, r'.*', fileLst, debug=False, ignoreSubFileNameLst=["jar", "class"])
     for i,f in enumerate(fileLst) :
         print("start ", str(f))
-        matchLineLst = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
-        if len(matchLineLst) != 0:
-            log.writeline(str(f), str(matchLineLst))
+        secondFindsMap = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
+        if checkSecondFindsMapCondition(secondFindsMap, isAnd) != 0:
+            log.writeline(f, secondFindsMap)
     pass
 
 
@@ -93,14 +108,23 @@ class SecondFindDef () :
                 flags |= re.I
             self.findPtn = re.compile(findStr, flags)
 
+    def __str__(self) :
+        return "(strFind:" + self.findStr + ")"
+
+    def __repr__(self) :
+        return "(reprFind:" + self.findStr + ")"
+
+
 
 if __name__ == '__main__' :
-    dir_path = "D:/workstuff/gtu-test-code/GTU/"
+    dir_path = "D:/workspace/inv-Fund-web-Query"
     main_find_str = "productType"
-    second_finds = [
-        SecondFindDef("\"0\"", 3, False, True)
-    ]
     ignoreCase = True
+    second_finds = [
+        SecondFindDef("[\"\']0[\"\']", 3, True, ignoreCase),
+        SecondFindDef("check", 3, False, ignoreCase),
+    ]
     encoding = "UTF8"
-    main(dir_path, main_find_str, second_finds, ignoreCase, encoding)
+    isAnd = True
+    main(dir_path, main_find_str, second_finds, ignoreCase, encoding, isAnd)
     print("done..")

@@ -1110,6 +1110,7 @@ public class GitConflictDetectUI extends JFrame {
             inst.command("git config gui.encoding UTF8");
             inst.command("git config i18n.commitencoding UTF8");
             inst.command("git config i18n.logoutputencoding UTF8");
+            inst.command("git config core.safecrlf false");
             String rootFile = FileUtil.getFileRoot(projectDir);
             if (rootFile != null) {
                 inst.command("" + rootFile);
@@ -1178,7 +1179,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String fileContent = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                fileContent = RuntimeBatPromptModeUtil.getFixBatInputString(fileContent, (3 + 4) * 2, 0);
+                fileContent = RuntimeBatPromptModeUtil.getFixBatInputString(fileContent, (4 + 4) * 2, 0);
             }
             return fileContent;
         }
@@ -1248,7 +1249,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String statusContent = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                statusContent = RuntimeBatPromptModeUtil.getFixBatInputString(statusContent, (3 + 4) * 2, 0);
+                statusContent = RuntimeBatPromptModeUtil.getFixBatInputString(statusContent, (4 + 4) * 2, 0);
             }
 
             List<String> lst = StringUtil_.readContentToList(statusContent, true, true, false);
@@ -1303,7 +1304,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
@@ -1319,7 +1320,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
@@ -1333,7 +1334,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
@@ -1349,7 +1350,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
@@ -1363,7 +1364,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             Pattern ptn = Pattern.compile("\\w+");
             Matcher mth = ptn.matcher(resultString);
@@ -1382,7 +1383,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println(resultString);
             return resultString;
@@ -1407,7 +1408,7 @@ public class GitConflictDetectUI extends JFrame {
             p.getStreamSync();
             String resultString = p.getInputStreamToString();
             if (OsInfoUtil.isWindows()) {
-                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (3 + 4) * 2, 0);
+                resultString = RuntimeBatPromptModeUtil.getFixBatInputString(resultString, (4 + 4) * 2, 0);
             }
             System.out.println("branch : " + remoteBranch);
             System.out.println(resultString);

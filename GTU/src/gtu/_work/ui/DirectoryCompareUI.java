@@ -578,7 +578,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     private void dirCompareTableMouseClicked(MouseEvent evt) {
         try {
             final JTableUtil util = JTableUtil.newInstance(dirCompareTable);
-            InfoObj obj = getInfoObj(util.getSelectedRow(), util);
+            InfoObj obj = getInfoObj(util.getRealRowPos(util.getSelectedRow(), dirCompareTable), util);
 
             if (evt.getClickCount() == 2 && evt.getButton() == MouseEvent.BUTTON1) {
                 File mainFile = obj.mainFile.getFile().exists() ? obj.mainFile.getFile() : NOT_EXIST_FILE;
@@ -595,7 +595,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                 DiffMergeCommand diffCommand = (DiffMergeCommand) diffToolComboBox.getSelectedItem();
                 String command = diffCommand.getCommand(this, fileA, fileB);
                 System.out.println(command);
-                //ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();//XXXXXXXXXXXXXX
+                // ProcessWatcher.newInstance(Runtime.getRuntime().exec(command)).getStreamSync();//XXXXXXXXXXXXXX
                 RuntimeBatPromptModeUtil.newInstance().command(command).apply();
             }
             if (evt.getClickCount() == 1 && evt.getButton() == MouseEvent.BUTTON3) {
