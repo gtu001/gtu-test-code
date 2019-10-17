@@ -169,7 +169,6 @@ public class AppListService {
             List<AppInfoDAO.AppInfo> lst2 = service.queryAll();
             for (int ii = 0; ii < lst.size(); ii++) {
                 AppInfo vo = lst.get(ii);
-                service.deleteId(vo.getInstalledPackage());
                 AppInfoDAO.AppInfo vo2 = _findByLst2(vo.getInstalledPackage(), lst2);
                 if (vo2 == null) {
                     vo2 = new AppInfoDAO.AppInfo();

@@ -12,7 +12,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "Youtube_DB";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -25,7 +25,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static DBConnection _INST;
 
     public static synchronized DBConnection getInstance(Context context) {
-        if (_INST == null){
+        if (_INST == null) {
             _INST = new DBConnection(context);
         }
         return _INST;
@@ -64,6 +64,7 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.setLength(0);
     }
 
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
@@ -89,6 +90,20 @@ public class DBConnection extends SQLiteOpenHelper {
             Log.i("haiyang:createDB 2=", sb.toString());
             db.execSQL(sb.toString());
         }
+
+        if (newVersion == 2) {
+            sb.setLength(0);
+            sb.append("  create table App_Info (                  ");
+            sb.append("      installed_package text primary key not null,        ");
+            sb.append("      source_dir text ,                               ");
+            sb.append("      label text ,                           ");
+            sb.append("      icon text ,                           ");
+            sb.append("      tag text                            ");
+            sb.append("  );                                              ");
+
+            Log.i("haiyang:createDB 1=", sb.toString());
+            db.execSQL(sb.toString());
+        }
     }
 
     /**
@@ -99,11 +114,11 @@ public class DBConnection extends SQLiteOpenHelper {
     }
 
     /**
-    * 判斷是否可存取DB
+     * 判斷是否可存取DB
      */
-    public static boolean isAccessDBPermission(Context context){
+    public static boolean isAccessDBPermission(Context context) {
         //    If only the main process in the application database operations there, while other applications related to the process does not require operation of the database, I recommend to initialize the database plus operating conditions, like this:
-        if(getCurrentProcessName(context).equals(BuildConfig.APPLICATION_ID)) {
+        if (getCurrentProcessName(context).equals(BuildConfig.APPLICATION_ID)) {
             // initialize the database
             return true;
         }

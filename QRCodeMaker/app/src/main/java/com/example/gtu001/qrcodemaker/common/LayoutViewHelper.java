@@ -16,6 +16,8 @@ public class LayoutViewHelper {
 
     public static LinearLayout createContentView_simple(Activity activity) {
         LinearLayout layout = new LinearLayout(activity);
+        layout.setFocusable(true);
+        layout.setFocusableInTouchMode(true);
         activity.setContentView(layout);
         layout.setOrientation(LinearLayout.VERTICAL);
         return layout;
@@ -23,6 +25,8 @@ public class LayoutViewHelper {
 
     public static LinearLayout createContentView(Activity activity) {
         LinearLayout layout = new LinearLayout(activity);
+        layout.setFocusable(true);
+        layout.setFocusableInTouchMode(true);
         ScrollView scroll = new ScrollView(activity);
         activity.setContentView(scroll);
         layout.setOrientation(LinearLayout.VERTICAL);

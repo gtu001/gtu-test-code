@@ -108,7 +108,6 @@ public class AppListFilterActivity extends Activity {
         });
 
 
-
         //初始listView
         listView = new ListView(this);
         layout.addView(listView, //
@@ -121,6 +120,10 @@ public class AppListFilterActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, Object> item = (Map<String, Object>) listView.getAdapter().getItem(position);
                 final AppListService.AppInfo app = (AppListService.AppInfo) item.get("item");
+                if (app == null) {
+                    Toast.makeText(AppListFilterActivity.this, "修改項目為空請刷新!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 String[] items = new String[]{"開啟", "修改Tag"};
 
@@ -401,7 +404,6 @@ public class AppListFilterActivity extends Activity {
         super.onDestroy();
     }
 }
-
 
 
 //import com.pchmn.materialchips.ChipsInput;

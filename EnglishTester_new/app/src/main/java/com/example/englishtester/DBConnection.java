@@ -4,7 +4,9 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.example.englishtester.common.Log;
+
 import android.widget.Toast;
 
 public class DBConnection extends SQLiteOpenHelper {
@@ -24,7 +26,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static DBConnection _INST;
 
     public static synchronized DBConnection getInstance(Context context) {
-        if (_INST == null){
+        if (_INST == null) {
             _INST = new DBConnection(context);
         }
         return _INST;
@@ -87,6 +89,16 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append(" );                                                 ");
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
+
+        sb.setLength(0);
+        sb.append(" create table Dropbox_Html (                        ");
+        sb.append("     file_name  text  primary key not null,         ");
+        sb.append("     upload_date  long not null,                    ");
+        sb.append("     file_size  long not null,                      ");
+        sb.append("     full_path  text not null                       ");
+        sb.append(" );                                                 ");
+        Log.i("haiyang:createDB 1=", sb.toString());
+        db.execSQL(sb.toString());
     }
 
     @Override
@@ -99,14 +111,6 @@ public class DBConnection extends SQLiteOpenHelper {
 //            sb.append("  alter table recent_txt_mark add insert_Date_Dtype DATETIME   ");//add column
 //            sb.append("  DROP table recent_txt_mark ;   ");//add column
 //            sb.append("  alter table recent_search add sentance text    ");//add column
-
-            sb.setLength(0);
-            sb.append(" create table Dropbox_Html (                        ");
-            sb.append("     file_name  text  primary key not null,         ");
-            sb.append("     upload_date  long not null,                    ");
-            sb.append("     file_size  long not null,                      ");
-            sb.append("     full_path  text not null                       ");
-            sb.append(" );                                                 ");
 
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());
@@ -121,11 +125,11 @@ public class DBConnection extends SQLiteOpenHelper {
     }
 
     /**
-    * 判斷是否可存取DB
+     * 判斷是否可存取DB
      */
-    public static boolean isAccessDBPermission(Context context){
+    public static boolean isAccessDBPermission(Context context) {
         //    If only the main process in the application database operations there, while other applications related to the process does not require operation of the database, I recommend to initialize the database plus operating conditions, like this:
-        if(getCurrentProcessName(context).equals(BuildConfig.APPLICATION_ID)) {
+        if (getCurrentProcessName(context).equals(BuildConfig.APPLICATION_ID)) {
             // initialize the database
             return true;
         }
