@@ -30,6 +30,27 @@ from gtu.reflect import toStringUtil
 
 log = LogWriter.LogWriter(filename="wishList.csv", mode="w")
 
+
+class SteamGameEasyModeFetcher() :
+    def __init__(self, nameLst, mMySteamWishListFetcher) :
+        self.wishLst = list()
+        self.games = list()
+        self.mMySteamWishListFetcher = mMySteamWishListFetcher
+
+        for i, name in enumerate(nameLst) :
+            if name not in self.games :
+                d = dict()
+                d['name'] = name
+                d['price'] = -1
+                print("game", d)
+                self.wishLst.append(d)
+
+                # 寫入檔案
+                self.mMySteamWishListFetcher.queue.appendleft(d)
+
+                self.games.append(name) 
+
+
 class SteamWishListFetcher() :
     def __init__(self, user_account, password, mMySteamWishListFetcher) :
         self.driver = seleniumUtil.getDriver()
@@ -197,7 +218,22 @@ class CheckSteamGame :
 
 def main() :
     THREAD = MySteamWishListFetcher()
-    wish = SteamWishListFetcher("gtu001", "XXXXXXXXXXXXXXXXXXX", THREAD)
+    # SteamWishListFetcher("gtu001", "XXXXXXXXXXXXXXXXXXX", THREAD)
+
+    lst = list()
+    lst.append("Elite: Dangerous")
+    lst.append("Grand Theft Auto V")
+    lst.append("Don't Knock Twice")
+    lst.append("侠客风云传(Tale of Wuxia)")
+    lst.append("Kingdom Come: Deliverance")
+    lst.append("ARK Park")
+    lst.append("DOOM VFR")
+    lst.append("ProjectM : Daydream")
+    lst.append("FlyInside Flight Simulator")
+    lst.append("VR Paradise")
+    lst.append("Catch & release")
+    lst.append("Ultimate Fishing Simulator VR")
+    SteamGameEasyModeFetcher(lst, THREAD)
     pass
 
 if __name__ == '__main__' :
