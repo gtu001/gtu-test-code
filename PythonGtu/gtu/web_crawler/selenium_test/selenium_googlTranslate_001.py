@@ -93,6 +93,8 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
         return self.javaParameterToDbColumn(sourceStr)
 
     def myProcess(self, sourceStr, fixSourceStr, resultStr) :
+        sourceStr = sourceStr.strip()
+        fixSourceStr = fixSourceStr.strip()
         resultStr = CustomTranslateEnum.replace(fixSourceStr, resultStr)
         print("\t", sourceStr, "\t->\t", resultStr)
         strVal = "{javaName}\t{type}\t{require}\t{defaultVal}\t{description}".format(javaName=sourceStr,type="字串",require="Y",defaultVal="無",description=resultStr)
@@ -102,7 +104,7 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
 
 
 class CustomTranslateEnum(Enum) :
-    t1 = ("robo", ["機器", "機器人"], "智能投資")
+    t1 = (["robo"], ["機器", "機器人"], "智能投資")
 
     def __init__(self, english, chineseFromArry, chineseTo) :
         self.english = english
@@ -120,13 +122,17 @@ class CustomTranslateEnum(Enum) :
         return listUtil.sort(chineseFromArry, comparatorFunc)
 
     @classmethod
-    def replace(clz, sourceWord, targetWord) :
+    def replace(clz, sourceWordArry, targetWord) :
         for i, name in enumerate(CustomTranslateEnum.__members__, 0):
             e = CustomTranslateEnum[name]
-            if e.english in sourceWord.lower() :
-                for chineseFrom in e.chineseFromArry :
-                    if chineseFrom in targetWord :
-                        return targetWord.replace(chineseFrom, e.chineseTo)
+            for compareEnglish in sourceWordArry :
+                if e.english in compareEnglish.lower() :
+                    for chineseFrom in e.chineseFromArry :
+                        if chineseFrom in targetWord :
+                            # return targetWord.replace(chineseFrom, e.chineseTo)
+                            return re.sub(chineseFrom, e.chineseTo, targetWord, flags=re.I)
+                        elif chineseFrom == "*" :
+                            return e.chineseTo
         return targetWord
 
 

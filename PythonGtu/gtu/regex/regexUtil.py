@@ -43,6 +43,11 @@ def __test_pattern_match_group_key():
 
 
 
+def replace(pattern, toStr, fromStr, flags=0) :
+    return re.sub(pattern, toStr, fromStr, flags=flags)
+    
+
+
 if __name__ == '__main__' :
     __test_pattern_match_group_key()
     print("done...")
