@@ -21,6 +21,7 @@ from gtu.error import errorHandler
 from abc import ABCMeta, abstractmethod
 
 from gtu.io import LogWriter
+from gtu.collection import listUtil
 
 log = LogWriter.LogWriter()
 
@@ -101,33 +102,43 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
 
 
 class CustomTranslateEnum(Enum) :
-    t1 = ("robo", "機器人", "智能投資")
+    t1 = ("robo", ["機器", "機器人"], "智能投資")
 
-    def __init__(self, english, chineseFrom, chineseTo) :
+    def __init__(self, english, chineseFromArry, chineseTo) :
         self.english = english
-        self.chineseFrom = chineseFrom
+        self.chineseFromArry = self.sortChineseFromArry(chineseFromArry)
         self.chineseTo = chineseTo
+
+    def sortChineseFromArry(self, chineseFromArry) :
+        def comparatorFunc(x, y) :
+            if len(x) > len(y) : 
+                return -1
+            elif len(x) < len(y) :
+                return 1
+            else :
+                return 0
+        return listUtil.sort(chineseFromArry, comparatorFunc)
 
     @classmethod
     def replace(clz, sourceWord, targetWord) :
         for i, name in enumerate(CustomTranslateEnum.__members__, 0):
             e = CustomTranslateEnum[name]
             if e.english in sourceWord.lower() :
-                if e.chineseFrom in targetWord :
-                    return targetWord.replace(e.chineseFrom, e.chineseTo)
+                for chineseFrom in e.chineseFromArry :
+                    if chineseFrom in targetWord :
+                        return targetWord.replace(chineseFrom, e.chineseTo)
         return targetWord
 
 
 
-THREAD = MyImplMyGoogleTranslateFetcher()
-
-
 
 def main() :
+    THREAD = MyImplMyGoogleTranslateFetcher()
     lst = fileUtil.loadFile_asList(fileUtil.getDesktopDir(fileName="googleTranslate.txt"))
     for i,v in enumerate(lst) :
         THREAD.queue.appendleft(v)
     pass
+
 
 
 if __name__ == '__main__' :

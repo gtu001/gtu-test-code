@@ -6,6 +6,9 @@ from gtu.datetime import dateUtil
 from gtu.reflect import checkSelf
 import numpy as np
 
+'''
+from gtu.collection import listUtil
+'''
 
 def __test_upper(lst):
     return [k.upper() for k in lst]
@@ -36,6 +39,7 @@ def __test_filter_useFunc():
 def _test_strArry_to_dateArry(npArry):
     xdate = [dateUtil.getDatetimeByJavaFormat(i, "yyyy-MM-dd") for i in npArry]
     return xdate
+
 
 '''
 --------------------------------------------------------------------------------------------------------
@@ -107,7 +111,14 @@ def removeDuplicate(lst):
     from collections import OrderedDict
     return list(OrderedDict.fromkeys(lst).keys())
     
-    
+
+
+def sort(lst, comparatorFunc, reverse=False) :
+    import functools
+    return sorted(lst, key=functools.cmp_to_key(comparatorFunc), reverse=reverse)
+
+
+
     
 if __name__ == '__main__' :
     print(removeDuplicate([1,3,2,3]))

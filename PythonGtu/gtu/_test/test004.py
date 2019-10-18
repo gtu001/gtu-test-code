@@ -1,5 +1,6 @@
 from gtu.reflect import checkSelf
 import re
+from gtu.collection import listUtil
 
 
 def main():
