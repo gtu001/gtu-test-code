@@ -37,7 +37,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
+    <!--發送SMS-->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/qr_code_icon"
         android:label="@string/app_name"
@@ -66,6 +70,18 @@
             <intent-filter android:priority="1000">
                 <action android:name="urlPlayerService" />
             </intent-filter>
+        </service>
+
+        <service
+            android:label="accessibility_service_name"
+            android:name="com.example.gtu001.qrcodemaker.common.WindowChangeDetectingService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibilityservice"/>
         </service>
 
         <activity

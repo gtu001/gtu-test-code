@@ -1,5 +1,6 @@
 package com.example.gtu001.qrcodemaker.custom_dialog;
 
+import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -133,9 +134,9 @@ public class UrlPlayerDialog_bg {
 //                        }
 //                        Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
 //                    } else {
-                        urlPlayerServiceHander.get().getMService().pauseAndResume();
-                        String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
-                        Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
+                    urlPlayerServiceHander.get().getMService().pauseAndResume();
+                    String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
+                    Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
 //                    }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -425,6 +426,7 @@ public class UrlPlayerDialog_bg {
     }
 
     private class UrlPlayerServiceHander {
+        private boolean isClose = false;
         private IUrlPlayerService mService;
         private ServiceConnection mConnection;
 
@@ -458,6 +460,7 @@ public class UrlPlayerDialog_bg {
                 public void onServiceConnected(ComponentName className, IBinder service) {
                     Log.v(TAG, "[onServiceConnected] called");
                     mService = IUrlPlayerService.Stub.asInterface(service);
+                    isClose = false;
                     Log.v(TAG, "[mService] init " + mService);
                 }
 
@@ -465,6 +468,7 @@ public class UrlPlayerDialog_bg {
                 public void onServiceDisconnected(ComponentName arg0) {
                     Log.v(TAG, "[onServiceDisconnected] called");
                     mService = null;
+                    isClose = true;
                     Log.v(TAG, "[mService] setNull ");
                 }
             };
@@ -474,16 +478,7 @@ public class UrlPlayerDialog_bg {
          * 開啟/停止 服務
          */
         private void startStopService(boolean isStart, Context context) {
-            boolean isRunning = ServiceUtil.isServiceRunning(context, UrlPlayerService.class);
-            if (!isRunning && isStart) {
-                Intent intent = new Intent(context, UrlPlayerService.class);
-                context.startService(intent);
-                Log.v(TAG, "[startStopService] start");
-            } else {
-                Intent intent = new Intent(context, UrlPlayerService.class);
-                context.stopService(intent);
-                Log.v(TAG, "[startStopService] end");
-            }
+            ServiceUtil.startStopService(isStart, context, UrlPlayerService.class);
         }
 
         private boolean initNotDone(Context context) {

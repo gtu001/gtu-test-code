@@ -3,22 +3,17 @@ package gtu.swing.util;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtil;
 
@@ -88,6 +83,30 @@ public class JFrameUtil {
         return false;
     }
 
+    public static boolean lockInstance_delable(Class<?> clz) {
+        return lockInstance_delable(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_lockfile.lock"));
+    }
+
+    public static boolean lockInstance_delable(final File lockFile) {
+        if (lockFile.exists()) {
+            System.out.println("Unable to create and/or lock file: " + lockFile);
+            return false;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS");
+        FileUtil.saveToFile(lockFile, sdf.format(new Date()), "utf8");
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    lockFile.delete();
+                } catch (Exception e) {
+                    System.out.println("Unable to remove lock file: " + lockFile);
+                    e.printStackTrace();
+                }
+            }
+        });
+        return true;
+    }
+    
     public static void showBoundSize(Component component) {
         component.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {

@@ -1,5 +1,6 @@
 package com.example.gtu001.qrcodemaker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,10 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver;
+import com.example.gtu001.qrcodemaker.common.ServiceUtil;
+import com.example.gtu001.qrcodemaker.common.WindowChangeDetectingService;
+import com.example.gtu001.qrcodemaker.services.UrlPlayerService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,9 @@ public class MainActivity extends AppCompatActivity
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(YoutubePlayerActivity.YOUTUBE_KEY)) {
             gotoActivity(YoutubePlayerActivity.class, getIntent());
         }
+
+        //啟動service
+        ServiceUtil.startStopService(true, this, WindowChangeDetectingService.class);
     }
 
     @Override

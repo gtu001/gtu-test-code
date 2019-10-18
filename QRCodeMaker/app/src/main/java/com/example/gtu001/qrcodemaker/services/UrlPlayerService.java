@@ -20,6 +20,7 @@ import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.Mp3BroadcastReceiver;
 import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
 import com.example.gtu001.qrcodemaker.common.ServiceKeepAliveHelper;
+import com.example.gtu001.qrcodemaker.common.WindowChangeDetectingService;
 import com.example.gtu001.qrcodemaker.util.RandomUtil;
 
 import org.apache.commons.lang3.StringUtils;
