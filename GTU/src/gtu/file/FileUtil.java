@@ -54,7 +54,7 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class FileUtil {
 
-    public static void main(String[] args) {
+    public static void mainXXX(String[] args) {
         List<String> lst = new ArrayList<String>();
         lst.add("267.44mb");
         lst.add("1.81kb");
@@ -76,6 +76,12 @@ public class FileUtil {
         for (String v : lst) {
             System.out.println("\t>> " + v);
         }
+        System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
+    }
+
+    public static void main(String[] args) {
+        File f = FileUtil.getParentFolder(new File("D:\\gtu001_dropbox\\Dropbox\\Apps\\gtu001_test\\bak_20191009_164954\\exportFileXml.bin"));
+        System.out.println(f);
         System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
     }
 
@@ -1350,6 +1356,16 @@ public class FileUtil {
             }
         }
         throw new RuntimeException("找不到根目錄：" + file);
+    }
+
+    public static File getParentFolder(File file) {
+        File tmpFile = file;
+        do {
+            if (tmpFile.isFile() || !tmpFile.exists()) {
+                tmpFile = file.getParentFile();
+            }
+        } while (!(tmpFile != null && tmpFile.isDirectory()));
+        return tmpFile;
     }
 
     public static class FileZ {

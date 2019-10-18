@@ -76,6 +76,7 @@
 			<packagename mode="small">org.jnativehook.GlobalScreen</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 
+			<packagename mode="small">org.jsoup.Jsoup</packagename>
 			<packagename mode="small">org.json.JSONObject</packagename>
 			<packagename mode="small">say.swing.JFontChooser</packagename>
 

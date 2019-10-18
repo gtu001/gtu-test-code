@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import gtu.file.FileUtil;
 import gtu.log.JdkLoggerUtil;
 
 public class DesktopUtil {
@@ -116,6 +117,9 @@ public class DesktopUtil {
             }
             if (f.isDirectory()) {
                 Desktop.getDesktop().open(f);
+            }
+            if (!f.exists()) {
+                Desktop.getDesktop().open(FileUtil.getParentFolder(f));
             }
         } catch (Exception e) {
             throw new RuntimeException("openDir ERR : " + e.getMessage(), e);

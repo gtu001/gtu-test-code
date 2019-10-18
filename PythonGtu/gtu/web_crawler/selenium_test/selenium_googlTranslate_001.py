@@ -60,7 +60,7 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
                 sourceStr = self.queue.popleft()
                 _sourceStr = self.beforeProcess(sourceStr)
                 resultStr = self.translate(_sourceStr)
-                self.myProcess(sourceStr, resultStr)
+                self.myProcess(sourceStr, _sourceStr, resultStr)
             self.reflashName()
             time.sleep(0.2)
 
@@ -69,10 +69,8 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         pass
 
     @abstractmethod
-    def myProcess(self, sourceStr, resultStr) :
+    def myProcess(self, sourceStr, fixSourceStr, resultStr) :
         pass
-
-
 
 
 
@@ -93,10 +91,32 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
     def beforeProcess(self, sourceStr) :
         return self.javaParameterToDbColumn(sourceStr)
 
-    def myProcess(self, sourceStr, resultStr) :
+    def myProcess(self, sourceStr, fixSourceStr, resultStr) :
+        resultStr = CustomTranslateEnum.replace(fixSourceStr, resultStr)
         print("\t", sourceStr, "\t->\t", resultStr)
         strVal = "{javaName}\t{type}\t{require}\t{defaultVal}\t{description}".format(javaName=sourceStr,type="字串",require="Y",defaultVal="無",description=resultStr)
         log.write(strVal + "\r\n")
+
+
+
+
+class CustomTranslateEnum(Enum) :
+    t1 = ("robo", "機器人", "智能投資")
+
+    def __init__(self, english, chineseFrom, chineseTo) :
+        self.english = english
+        self.chineseFrom = chineseFrom
+        self.chineseTo = chineseTo
+
+    @classmethod
+    def replace(clz, sourceWord, targetWord) :
+        for i, name in enumerate(CustomTranslateEnum.__members__, 0):
+            e = CustomTranslateEnum[name]
+            if e.english in sourceWord.lower() :
+                if e.chineseFrom in targetWord :
+                    return targetWord.replace(e.chineseFrom, e.chineseTo)
+        return targetWord
+
 
 
 THREAD = MyImplMyGoogleTranslateFetcher()
@@ -104,7 +124,7 @@ THREAD = MyImplMyGoogleTranslateFetcher()
 
 
 def main() :
-    lst = fileUtil.loadFile_asList("C:/Users/E123474/Desktop/FundQryRoiWebRequestDto.txt")
+    lst = fileUtil.loadFile_asList(fileUtil.getDesktopDir(fileName="googleTranslate.txt"))
     for i,v in enumerate(lst) :
         THREAD.queue.appendleft(v)
     pass

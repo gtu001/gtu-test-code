@@ -827,8 +827,8 @@ public class JCommonUtil {
                     }
                 } else if (JMouseEventUtil.buttonRightClick(1, evt)) {
                     final File file = new File(jTextField1.getText());
+                    JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
                     if (file.exists()) {
-                        JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
                         popUtil.addJMenuItem("開啟" + (file.isFile() ? "檔案" : "目錄"), new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -839,18 +839,17 @@ public class JCommonUtil {
                                 }
                             }
                         });
-                        if (file.isFile()) {
-                            popUtil.addJMenuItem("開啟目錄", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    DesktopUtil.openDir(file.getParentFile());
-                                }
-                            });
-                        }
-                        popUtil.applyEvent(evt);//
-                        popUtil.show();
                     }
+                    popUtil.addJMenuItem("開啟目錄", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            DesktopUtil.openDir(file.getParentFile());
+                        }
+                    });
+                    popUtil.applyEvent(evt);//
+                    popUtil.show();
                 }
+
             }
         });
     }

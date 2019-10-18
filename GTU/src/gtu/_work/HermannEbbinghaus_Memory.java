@@ -324,7 +324,13 @@ public class HermannEbbinghaus_Memory {
      * 排成記憶內容
      */
     private void schedule(final MemData d) {
-        ReviewTime reviewTime = ReviewTime.valueOf(d.reviewTime);
+        ReviewTime reviewTime = null;
+        try {
+            reviewTime = ReviewTime.valueOf(d.reviewTime);
+        } catch (Exception ex) {
+            System.err.println("enum [reviewTime] not found : " + ReflectionToStringBuilder.toString(d));
+            return;
+        }
 
         if (reviewTime == ReviewTime.NONE) {
             return;
@@ -588,7 +594,7 @@ public class HermannEbbinghaus_Memory {
 
         public String getRemark() {
             try {
-                return Base64JdkUtil.decode(remark);
+                return Base64JdkUtil.decodeToString(remark);
             } catch (Exception ex) {
                 System.out.println("remark => " + remark);
                 ex.printStackTrace();
@@ -789,7 +795,7 @@ public class HermannEbbinghaus_Memory {
                             return false;
                         }
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                     m.cancel();
                 }
