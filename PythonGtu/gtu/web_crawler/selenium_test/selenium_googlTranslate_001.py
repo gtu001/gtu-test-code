@@ -114,6 +114,7 @@ class CustomTranslateEnum(Enum) :
     t8 = (["CTFType"], ["ctftype"], "境內外")
     t9 = (["trust"], ["信任"], "信託")
     t10 = (["Res"], ["Res", "資源"], "回應")
+    t11 = (["from"], ["from"], "來源")
     tXXXXX = (["xxxxxxxxxxxxxxx"], ["xxxxxxxxxxxxxxx"], "xxxxxxxxxxxxxxx")
 
     def __init__(self, englishArry, chineseFromArry, chineseTo) :
