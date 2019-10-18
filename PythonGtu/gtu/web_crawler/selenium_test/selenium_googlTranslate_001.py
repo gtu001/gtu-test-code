@@ -95,7 +95,7 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
     def myProcess(self, sourceStr, fixSourceStr, resultStr) :
         sourceStr = sourceStr.strip()
         fixSourceStr = fixSourceStr.strip()
-        resultStr = CustomTranslateEnum.replace(fixSourceStr, resultStr)
+        resultStr = CustomTranslateEnum.replace([sourceStr, fixSourceStr], resultStr)
         print("\t", sourceStr, "\t->\t", resultStr)
         strVal = "{javaName}\t{type}\t{require}\t{defaultVal}\t{description}".format(javaName=sourceStr,type="字串",require="Y",defaultVal="無",description=resultStr)
         log.write(strVal + "\r\n")
@@ -105,9 +105,19 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
 
 class CustomTranslateEnum(Enum) :
     t1 = (["robo"], ["機器", "機器人"], "智能投資")
+    t2 = (["shore Type"], ["岸型"], "境內外")
+    t3 = (["Req"], ["要求"], "請求")
+    t4 = (["idOnlyRadio"], ["僅ID電台"], "只輸入radio button")
+    t5 = (["TrustAcctPeriod"], ["*"], "Y=定期不定額,N=定期定額") #"*"=表示全部替換
+    t6 = (["ShortNM"], ["短缺"], "名稱")
+    t7 = (["Branch"], ["分支"], "分行")
+    t8 = (["CTFType"], ["ctftype"], "境內外")
+    t9 = (["trust"], ["信任"], "信託")
+    t10 = (["Res"], ["Res", "資源"], "回應")
+    tXXXXX = (["xxxxxxxxxxxxxxx"], ["xxxxxxxxxxxxxxx"], "xxxxxxxxxxxxxxx")
 
-    def __init__(self, english, chineseFromArry, chineseTo) :
-        self.english = english
+    def __init__(self, englishArry, chineseFromArry, chineseTo) :
+        self.englishArry = self.sortChineseFromArry(englishArry)
         self.chineseFromArry = self.sortChineseFromArry(chineseFromArry)
         self.chineseTo = chineseTo
 
@@ -125,14 +135,15 @@ class CustomTranslateEnum(Enum) :
     def replace(clz, sourceWordArry, targetWord) :
         for i, name in enumerate(CustomTranslateEnum.__members__, 0):
             e = CustomTranslateEnum[name]
-            for compareEnglish in sourceWordArry :
-                if e.english in compareEnglish.lower() :
-                    for chineseFrom in e.chineseFromArry :
-                        if chineseFrom in targetWord :
-                            # return targetWord.replace(chineseFrom, e.chineseTo)
-                            return re.sub(chineseFrom, e.chineseTo, targetWord, flags=re.I)
-                        elif chineseFrom == "*" :
-                            return e.chineseTo
+            for english in e.englishArry :
+                for compareEnglish in sourceWordArry :
+                    if english.lower() in compareEnglish.lower() :
+                        for chineseFrom in e.chineseFromArry :
+                            if chineseFrom.lower() in targetWord.lower() :
+                                # return targetWord.replace(chineseFrom, e.chineseTo)
+                                targetWord = re.sub(chineseFrom, e.chineseTo, targetWord, flags=re.I)
+                            elif chineseFrom == "*" :
+                                return e.chineseTo
         return targetWord
 
 
