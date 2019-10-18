@@ -106,7 +106,7 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
 class CustomTranslateEnum(Enum) :
     t1 = (["robo"], ["機器", "機器人"], "智能投資")
     t2 = (["shore Type"], ["岸型"], "境內外")
-    t3 = (["Req"], ["要求"], "請求")
+    t3 = (["Req"], ["Req", "要求"], "請求")
     t4 = (["idOnlyRadio"], ["僅ID電台"], "只輸入radio button")
     t5 = (["TrustAcctPeriod"], ["*"], "Y=定期不定額,N=定期定額") #"*"=表示全部替換
     t6 = (["ShortNM"], ["短缺"], "名稱")
@@ -143,7 +143,7 @@ class CustomTranslateEnum(Enum) :
                                 # return targetWord.replace(chineseFrom, e.chineseTo)
                                 targetWord = re.sub(chineseFrom, e.chineseTo, targetWord, flags=re.I)
                             elif chineseFrom == "*" :
-                                return e.chineseTo
+                                targetWord = e.chineseTo
         return targetWord
 
 
