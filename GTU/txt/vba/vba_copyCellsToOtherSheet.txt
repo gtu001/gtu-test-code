@@ -1,0 +1,104 @@
+
+
+
+
+
+Sub 按鈕12_Click()
+    
+
+    Dim dateSheet As String
+    Dim rangeStr As String
+    Dim destinationSheet As String
+    Dim destinationRowCnt As Integer
+    Dim destinationRowCnt2 As Integer
+    Dim driverSheet As String
+    Dim driverCarRangeStr As String
+    Dim monthSize As Integer
+    
+    dateSheet = "巨集起始值"
+    rangeStr = "B2:B32"
+    destinationSheet = "12月安獎"
+    driverSheet = "車號"
+    driverCarRangeStr = "A2:A246"
+    
+
+    destinationRowCnt2 = 0
+    
+    For Each rw In Worksheets(driverSheet).Range(driverCarRangeStr).Rows
+        Debug.Print (rw(1).Value)
+        
+        destinationRowCnt = getRowCount(destinationSheet) + 1
+        
+        Call copyPaste(dateSheet, rangeStr, destinationSheet, destinationRowCnt, 2)
+        
+        destinationRowCnt2 = getRowCount(destinationSheet) + 1
+        
+        Debug.Print ("destinationRowCnt=" + CStr(destinationRowCnt))
+        Debug.Print ("destinationRowCnt2=" + CStr(destinationRowCnt2))
+        
+        For rowIdx = destinationRowCnt To destinationRowCnt2
+            Call setCellValue(destinationSheet, rowIdx, "H", rw(1).Value)
+        Next rowIdx
+    Next
+    
+
+End Sub
+
+
+
+'設定Cell值
+Private Sub setCellValue(sheetName, rowIdx, colIdx, cellValue)
+    Worksheets(sheetName).Cells(rowIdx, colIdx).Value = cellValue
+End Sub
+
+
+'複製貼上
+Private Sub copyPaste(fromSheetName As String, fromRangeStr, destSheetName As String, destStartRowIdx As Integer, destStartColIdx As Integer)
+    Application.ScreenUpdating = False
+    
+    Dim columnStr As String
+    columnStr = columnPos2Letter(destStartColIdx)
+    
+    Worksheets(fromSheetName).Range(fromRangeStr).Copy
+    Worksheets(destSheetName).Paste Destination:=Worksheets(destSheetName).Range(columnStr & destStartRowIdx)
+    
+    Application.ScreenUpdating = True
+End Sub
+
+
+
+Private Function getRowCount(sheetTitle As String) As Integer
+    Dim cnt As Integer
+    'cnt = Worksheets(sheetTitle).Cells(1, 1).End(xlDown).Row
+    'cnt = Worksheets(sheetTitle).UsedRange.Rows.Count
+    'cnt = Cells(Sheets(sheetTitle).Rows.Count, 1).End(xlUp).Row
+    
+    With Sheets(sheetTitle)
+        cnt = .Cells(.Rows.Count, "B").End(xlUp).Row '取得B列的最後一筆
+    End With
+    getRowCount = cnt
+End Function
+
+
+Private Function getColCount(sheetTitle As String) As Integer
+    Dim cnt As Integer
+    cnt = Worksheets(sheetTitle).Cells(1, 1).End(xlToRight).Column
+    getColCount = cnt
+End Function
+
+
+'取得欄轉index
+Private Function columnLetter2Pos(columnStr As String) As Integer
+    columnLetter2Pos = Range(columnStr & 1).Column
+End Function
+
+'取得index轉欄
+Private Function columnPos2Letter(columnPos As Integer) As String
+    columnPos2Letter = Split(Cells(1, columnPos).Address, "$")(1)
+End Function
+
+
+'未證實可用
+Private Function getTimeInMillsec() As Long
+    getTimeInMillsec = (Now - Date) * 24 * 60 * 60 * 1000
+End Function
