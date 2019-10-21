@@ -55,15 +55,17 @@ End Sub
 
 Private Function getRowCount(sheetTitle As String) As Integer
     Dim cnt As Integer
-    cnt = Sheets(sheetTitle).UsedRange.Rows.Count
-    cnt = Sheets(sheetTitle).UsedRange.Rows(cnt).row
+    'cnt = Sheets(sheetTitle).UsedRange.Rows.Count
+    'cnt = Sheets(sheetTitle).UsedRange.Rows(cnt).row
+    cnt = Worksheets(sheetTitle).Cells(1, 1).End(xlDown).Row
     getRowCount = cnt
 End Function
 
 Private Function getColCount(sheetTitle As String) As Integer
     Dim cnt As Integer
-    cnt = Sheets(sheetTitle).UsedRange.Columns.Count
-    cnt = Sheets(sheetTitle).UsedRange.Columns(cnt).Column
+    'cnt = Sheets(sheetTitle).UsedRange.Columns.Count
+    'cnt = Sheets(sheetTitle).UsedRange.Columns(cnt).Column
+    cnt = Worksheets(sheetTitle).Cells(1, 1).End(xlToRight).Column
     getColCount = cnt
 End Function
 
@@ -148,4 +150,22 @@ Private Sub sheetDelete(sheetTitle As String)
     Next i
 End Sub
 
+
+Private Sub copyPaste(fromSheetName As String, fromRangeStr, destSheetName As String, destStartRowIdx As Integer, destStartColIdx As Integer)
+    Worksheets(fromSheetName).Range(fromRangeStr).Copy
+    Worksheets(destSheetName).Paste Destination:=Worksheets(destSheetName).Cells(destStartRowIdx, destStartColIdx)
+End Sub
+
+
+Private Sub testForRow() 
+	Dim driverSheet As String
+    Dim driverCarRangeStr As String
+    
+    driverSheet = "車號"
+    driverCarRangeStr = "A2:A246"
+
+    For Each rw In Worksheets(driverSheet).Range(driverCarRangeStr).Rows
+        Debug.Print (rw(1).Value)
+    Next
+End Sub
 
