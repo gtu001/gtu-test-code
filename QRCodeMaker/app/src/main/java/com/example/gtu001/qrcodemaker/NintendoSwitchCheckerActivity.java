@@ -85,6 +85,10 @@ public class NintendoSwitchCheckerActivity extends Activity implements ActivityC
         T5("XAW", "100501", "100793", 100f),//
         T6("XAW", "700001", "700173", 100f),//
         T7("XAK", "100000", "100053", 100f),//
+        T8("XAJ", "100001", "100285", 100f),//
+        T9("XAJ", "400001", "400533", 100f),//
+        T10("XAW", "700001", "700178", 100f),//
+        T11("XAK", "100000", "100047", 100f),//
         ;
 
         final String prefix;
