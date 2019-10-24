@@ -2,7 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="top" >
+    android:gravity="top"
+
+    android:focusable="true"
+    android:focusableInTouchMode="true"><!-- 為了讓focus不往下傳  android:descendantFocusability="blocksDescendants"-->
 
     <!-- 自訂layout -->
 
