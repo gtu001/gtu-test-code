@@ -412,7 +412,15 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 for (int ii = 0; ii < backupModel.size(); ii++) {
                                     Triple<Integer, String, String> t = backupModel.get(ii);
                                     if (StringUtils.equalsIgnoreCase(t.getMiddle(), oldWord)) {
-                                        backupModel.set(ii, Triple.of(t.getLeft(), newWord, t.getRight()));
+
+                                        if (!StringUtil_.hasChineseWord(newWord)) {
+                                            // 英文替換原來的
+                                            backupModel.set(ii, Triple.of(t.getLeft(), newWord, t.getRight()));
+                                        } else {
+                                            // 中文放右邊
+                                            backupModel.set(ii, Triple.of(t.getLeft(), t.getMiddle(), newWord));
+                                        }
+
                                         System.out.println("setFixWord : \t" + ii + "\t" + oldWord + "\t" + newWord);
                                         logLst.add(oldWord + " -> " + newWord);
                                     }
