@@ -49,11 +49,19 @@ class MyGoogleSearchFetcher(Thread, metaclass=ABCMeta) :
             return fixWordNode.text
         except Exception as ex :
             errorHandler.printStackTrace()
-            try :
-                fixWordNode = self.driver.find_element_by_xpath("//span[contains(text(),'您是不是要查：')]/following-sibling::a")
-                return fixWordNode.text
-            except Exception as ex2 :
-                errorHandler.printStackTrace()
+        try :
+            fixWordNode = self.driver.find_element_by_xpath("//span[contains(text(),'您是不是要查：')]/following-sibling::a")
+            return fixWordNode.text
+        except Exception as ex2 :
+            errorHandler.printStackTrace()
+        try :
+            targetLst = self.driver.find_elements_by_css_selector("pre.tw-data-text.tw-text-large.tw-ta")
+            sb = ""
+            for i,v in enumerate(targetLst) :
+                sb += v.text.strip()
+            return sb
+        except Exception as ex :
+            errorHandler.printStackTrace()
         return ""
          
     def run(self) :
