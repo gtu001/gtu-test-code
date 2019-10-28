@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -84,6 +86,8 @@ public class Mp3TransferUI extends JFrame {
     private JPanel panel_11;
     private JPanel panel_12;
     private JTextArea logArea;
+    private JLabel lblNewLabel_2;
+    private JTextField volumnFixText;
 
     /**
      * Launch the application.
@@ -137,13 +141,27 @@ public class Mp3TransferUI extends JFrame {
         panel.add(ffmpegText, "4, 2, fill, default");
         ffmpegText.setColumns(10);
 
+        lblNewLabel_2 = new JLabel("音量調整");
+        panel.add(lblNewLabel_2, "2, 4, right, default");
+
+        volumnFixText = new JTextField();
+        volumnFixText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                swingUtil.invokeAction("volumnFixTextFocus", e);
+            }
+        });
+        volumnFixText.setText("1");
+        panel.add(volumnFixText, "4, 4, fill, default");
+        volumnFixText.setColumns(10);
+
         lblNewLabel_1 = new JLabel("目的目錄");
-        panel.add(lblNewLabel_1, "2, 4, right, default");
+        panel.add(lblNewLabel_1, "2, 6, right, default");
 
         targetDirText = new JTextField();
         targetDirText.setText(FileUtil.DESKTOP_PATH);
         JCommonUtil.jTextFieldSetFilePathMouseEvent(targetDirText, false);
-        panel.add(targetDirText, "4, 4, fill, default");
+        panel.add(targetDirText, "4, 6, fill, default");
         targetDirText.setColumns(10);
 
         panel_7 = new JPanel();
@@ -306,10 +324,11 @@ public class Mp3TransferUI extends JFrame {
             private void run_inner(final ZFile aviFile, final File targetDir, final PrintStream outStream) {
                 RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
                 File newMp3File = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp3");
-                String command = String.format("\"%s\" -i \"%s\" -b:a 192K -vn \"%s\"", //
+                String command = String.format("\"%1$s\" -i \"%2$s\" -b:a 192K -vn -af \"volume=%4$s\" \"%3$s\"", //
                         StringUtils.trimToEmpty(ffmpegText.getText()), //
                         StringUtils.trimToEmpty(aviFile.file.getAbsolutePath()), //
-                        newMp3File.getAbsolutePath() //
+                        newMp3File.getAbsolutePath(), //
+                        getVolumnFixTextValue() //
                 );
                 inst.command(command);
                 aviFile.isStart = true;
@@ -340,6 +359,31 @@ public class Mp3TransferUI extends JFrame {
                 t.start();
             }
         });
+        swingUtil.addActionHex("volumnFixTextFocus", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                try {
+                    double d = Double.parseDouble(volumnFixText.getText());
+                    if (d <= 0) {
+                        throw new Exception("error");
+                    }
+                } catch (Exception ex) {
+                    volumnFixText.setText("1");
+                }
+            }
+        });
+    }
+
+    private Double getVolumnFixTextValue() {
+        try {
+            double d = Double.parseDouble(volumnFixText.getText());
+            if (d <= 0) {
+                throw new Exception("error");
+            }
+            return d;
+        } catch (Exception ex) {
+            return 1d;
+        }
     }
 
     private class ZFile {
