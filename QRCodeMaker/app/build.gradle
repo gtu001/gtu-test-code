@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -59,5 +60,12 @@ dependencies {
 
     implementation 'com.github.pchmn:MaterialChipsInput:1.0.8' //autoComplete Tag Chip
 
+//    implementation 'org.seleniumhq.selenium:selenium-server:3.0.1' //webdriver
+    implementation group: 'io.appium', name: 'java-client', version: '4.1.2' //webdriver
+
     implementation 'junit:junit:4.12'
+
+    implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1") {
+        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
+    }
 }

@@ -36,6 +36,12 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="任天堂Switch確認" />
 
+        <item
+            android:id="@+id/youtube_webdriver_go"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Youtube背景播放器" />
+
+
         <!-- no use -->
         <item
             android:id="@+id/nav_gallery"

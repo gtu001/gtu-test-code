@@ -124,6 +124,9 @@
         <activity
             android:name=".NintendoSwitchCheckerActivity"
             android:label="任天堂Switch確認" />
+        <activity
+            android:name=".YoutubeWebdriverGOActivity"
+            android:label="Youtube背景播放器" />
 
 
     </application>
