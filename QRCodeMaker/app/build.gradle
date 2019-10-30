@@ -70,13 +70,9 @@ dependencies {
 
     implementation 'com.github.pchmn:MaterialChipsInput:1.0.8' //autoComplete Tag Chip
 
-//    implementation 'org.seleniumhq.selenium:selenium-server:3.0.1' //webdriver
-//    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
-//    implementation 'com.github.appium:java-client:7.0.0'
-
-//    implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1") {
-//        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
-//    }
+    implementation files('libs/java-client-5.0.4.jar')
+    implementation files('libs/selenium-api-3.141.59.jar')
+    implementation files('libs/selenium-remote-driver-3.141.59.jar')
 
     implementation 'com.android.support:multidex:1.0.1'
 }
