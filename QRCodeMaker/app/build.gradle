@@ -7,19 +7,27 @@ android {
     defaultConfig {
         applicationId "com.example.gtu001.qrcodemaker"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     useLibrary 'org.apache.http.legacy'//使用httpclient
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError true
@@ -32,6 +40,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -61,11 +71,12 @@ dependencies {
     implementation 'com.github.pchmn:MaterialChipsInput:1.0.8' //autoComplete Tag Chip
 
 //    implementation 'org.seleniumhq.selenium:selenium-server:3.0.1' //webdriver
-    implementation group: 'io.appium', name: 'java-client', version: '4.1.2' //webdriver
+//    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+//    implementation 'com.github.appium:java-client:7.0.0'
 
-    implementation 'junit:junit:4.12'
+//    implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1") {
+//        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
+//    }
 
-    implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1") {
-        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
-    }
+    implementation 'com.android.support:multidex:1.0.1'
 }

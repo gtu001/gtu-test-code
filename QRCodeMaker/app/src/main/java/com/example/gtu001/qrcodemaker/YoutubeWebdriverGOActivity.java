@@ -16,14 +16,16 @@ import android.widget.TextView;
 import com.example.gtu001.qrcodemaker.common.LayoutViewHelper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
+//import org.openqa.selenium.WebDriver;
+//import org.openqa.selenium.WebElement;
+//import org.openqa.selenium.remote.DesiredCapabilities;
+//import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
+//import io.appium.java_client.AppiumDriver;
+//import io.appium.java_client.android.AndroidDriver;
 
 public class YoutubeWebdriverGOActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -74,20 +76,25 @@ public class YoutubeWebdriverGOActivity extends Activity implements ActivityComp
 
         private void playVod() {
             try {
-                DesiredCapabilities capabilities = new DesiredCapabilities();
+//                DesiredCapabilities capabilities = new DesiredCapabilities();
+//
+//                capabilities.setCapability("deviceName", "Android Emulator");
+//                capabilities.setCapability("platformName", "Android");
+//                capabilities.setCapability("app", "com.example.gtu001.qrcodemaker");
+//                capabilities.setCapability("appActivity", "com.google.android.apps.messaging.ui.conversationlist.ConversationListActivity");
+//
+//                String url = "https://www.youtube.com/watch?v=" + StringUtils.trimToEmpty(youtubeId);
+//
+//                URL url2 = new URL("http://0.0.0.0:4723/wd/hub");
 
-                capabilities.setCapability("deviceName", "Android Emulator");
-                capabilities.setCapability("platformName", "Android");
-                capabilities.setCapability("app", "com.example.gtu001.qrcodemaker");
+//                AppiumDriver<WebElement> driver = new AndroidDriver<WebElement>(
+//                        url2,
+//                        capabilities);
 
-                String url = "https://www.youtube.com/watch?v=" + StringUtils.trimToEmpty(youtubeId);
+//                WebDriver driver = new RemoteWebDriver(url2, capabilities);
 
-                AppiumDriver<WebElement> driver = new AndroidDriver<WebElement>(
-                        new URL(url),
-                        capabilities);
-
-                driver.runAppInBackground(10);
-                driver.launchApp();
+//                driver.runAppInBackground(10);
+//                driver.launchApp();
             } catch (Exception e) {
                 e.printStackTrace();
             }
