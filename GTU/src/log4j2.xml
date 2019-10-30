@@ -11,7 +11,7 @@
 		<!--輸出控制台的配置 -->
 		<Console name="Console" target="SYSTEM_OUT">
 			<ThresholdFilter level="info" onMatch="ACCEPT"
-				onMismatch="DENY" />
+				onMismatch="DENY" /><!-- 只接受info -->
 			<PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}[%-5p][%C{1}.%M()(%L)] - %m%n" />
 		</Console>
 
