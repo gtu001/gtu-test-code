@@ -88,6 +88,8 @@ public class Mp3TransferUI extends JFrame {
     private JTextArea logArea;
     private JLabel lblNewLabel_2;
     private JTextField volumnFixText;
+    private JLabel lblNewLabel_3;
+    private JTextField encodingText;
 
     /**
      * Launch the application.
@@ -129,9 +131,9 @@ public class Mp3TransferUI extends JFrame {
         tabbedPane.addTab("基本設定", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        RowSpec.decode("default:grow"), }));
 
         lblNewLabel = new JLabel("ffmepg");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -163,6 +165,13 @@ public class Mp3TransferUI extends JFrame {
         JCommonUtil.jTextFieldSetFilePathMouseEvent(targetDirText, false);
         panel.add(targetDirText, "4, 6, fill, default");
         targetDirText.setColumns(10);
+
+        lblNewLabel_3 = new JLabel("編碼");
+        panel.add(lblNewLabel_3, "2, 8, right, default");
+
+        encodingText = new JTextField();
+        panel.add(encodingText, "4, 8, fill, default");
+        encodingText.setColumns(10);
 
         panel_7 = new JPanel();
         panel.add(panel_7, "4, 18, fill, fill");
@@ -303,6 +312,7 @@ public class Mp3TransferUI extends JFrame {
             public void action(EventObject evt) throws Exception {
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("ffmepg", ffmpegText.getText());
+                map.put("encoding", encodingText.getText());
                 config.saveConfig(map);
             }
         });
@@ -312,6 +322,7 @@ public class Mp3TransferUI extends JFrame {
                 config.next();
                 Map<String, String> map = config.loadConfig();
                 ffmpegText.setText(map.get("ffmepg"));
+                encodingText.setText(map.get("encoding"));
             }
         });
         swingUtil.addActionHex("clearFfmpegListBtn.click", new Action() {
@@ -321,8 +332,18 @@ public class Mp3TransferUI extends JFrame {
             }
         });
         swingUtil.addActionHex("executeFfmpegBtn.click", new Action() {
+
+            private String getEncoding() {
+                if (StringUtils.isBlank(encodingText.getText())) {
+                    encodingText.setText("UTF8");
+                    return "UTF8";
+                }
+                return StringUtils.trimToEmpty(encodingText.getText());
+            }
+
             private void run_inner(final ZFile aviFile, final File targetDir, final PrintStream outStream) {
                 RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                inst.runInBatFile(true);
                 File newMp3File = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp3");
                 String command = String.format("\"%1$s\" -i \"%2$s\" -b:a 192K -vn -af \"volume=%4$s\" \"%3$s\"", //
                         StringUtils.trimToEmpty(ffmpegText.getText()), //
@@ -333,7 +354,7 @@ public class Mp3TransferUI extends JFrame {
                 inst.command(command);
                 aviFile.isStart = true;
                 JCommonUtil.updateUI(ffmpegList, logArea);
-                ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
+                ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply(getEncoding()));
                 watcher.getStreamAndPrintStream(outStream, outStream, false);
                 aviFile.isDone = true;
                 JCommonUtil.updateUI(ffmpegList, logArea);

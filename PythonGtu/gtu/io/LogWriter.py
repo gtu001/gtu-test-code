@@ -36,3 +36,8 @@ class LogWriter :
         self.fs.close()
 
         
+if __name__ == '__main__' :
+    log = LogWriter()
+    log.write("aaaa" + "\r\n")
+    log.write("bbbb" + "\r\n")
+    log.close()

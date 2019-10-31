@@ -42,12 +42,16 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         # self.setName(newName)
 
     def translate(self, sourceStr) :
+        if stringUtil.isBlank(sourceStr) :
+            return ""
         textarea = self.driver.find_element_by_css_selector("textarea[id=source]")
         textarea.send_keys(sourceStr)
         targetLst = None
-        while targetLst is None or len(targetLst) == 0:
+        count = 0
+        while ( targetLst is None or len(targetLst) == 0 ) and count <= 30 :
             targetLst = self.driver.find_elements_by_css_selector(".tlid-translation.translation")
             time.sleep(0.2)
+            count += 1
         sb = ""
         for i,v in enumerate(targetLst) :
             sb += v.text.strip()
@@ -58,7 +62,8 @@ class MyGoogleTranslateFetcher(Thread, metaclass=ABCMeta) :
         # bs(self.driver.page_source, "html.parser")
         while True :
             if self.queue.length() > 0 :
-                sourceStr = self.queue.popleft()
+                # sourceStr = self.queue.popleft()
+                sourceStr = self.queue.popright()
                 _sourceStr = self.beforeProcess(sourceStr)
                 resultStr = self.translate(_sourceStr)
                 self.myProcess(sourceStr, _sourceStr, resultStr)
@@ -98,7 +103,7 @@ class MyImplMyGoogleTranslateFetcher(MyGoogleTranslateFetcher) :
         resultStr = CustomTranslateEnum.replace([sourceStr, fixSourceStr], resultStr)
         print("\t", sourceStr, "\t->\t", resultStr)
         strVal = "{javaName}\t{type}\t{require}\t{defaultVal}\t{description}".format(javaName=sourceStr,type="字串",require="Y",defaultVal="無",description=resultStr)
-        log.write(strVal + "\r\n")
+        log.writeline(strVal)
 
 
 

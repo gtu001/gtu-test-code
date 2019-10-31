@@ -68,7 +68,7 @@ class MyGoogleSearchFetcher(Thread, metaclass=ABCMeta) :
         # bs(self.driver.page_source, "html.parser")
         while True :
             if self.queue.length() > 0 :
-                sourceStr = self.queue.popleft()
+                sourceStr = self.queue.popright()
                 _sourceStr = self.beforeProcess(sourceStr)
                 resultStr = self.searchInput(_sourceStr)
                 self.myProcess(sourceStr, resultStr)
