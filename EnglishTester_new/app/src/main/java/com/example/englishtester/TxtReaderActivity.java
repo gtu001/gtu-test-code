@@ -53,6 +53,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.SingleInputDialog;
+import com.example.englishtester.common.SingleSliderbarDialog;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TxtReaderAppender;
 import com.example.englishtester.common.TxtReaderAppenderSpanClass;
@@ -155,6 +156,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * FloatViewService 間聽
      */
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
+
 
     EditText editText1;
     Button clearBtn;
@@ -826,6 +828,23 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     /**
+     * 開啟改變行距Dialog
+     */
+    private void openSpacingSizeDialog() {
+        final SingleSliderbarDialog dlg = new SingleSliderbarDialog(this, 30, 15, 0.3f, 1.4f, true);
+        dlg.confirmButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                float val = dlg.getEditTextValue();
+                if (val > 0) {
+                    txtView.setLineSpacing(10, val);
+                }
+            }
+        });
+        dlg.show();
+    }
+
+    /**
      * 儲存翻譯結果
      */
     private void saveContentToFile() {
@@ -1262,6 +1281,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 activity.openFontSizeDialog();
+            }
+        }, //
+        CHANGE_SPACING_SIZE("改變行距", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.openSpacingSizeDialog();
             }
         }, //
         CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {

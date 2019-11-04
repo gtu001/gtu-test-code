@@ -44,6 +44,7 @@ import com.example.englishtester.common.LoadingProgressDlg;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.RecyclerPagerAdapter;
+import com.example.englishtester.common.SingleSliderbarDialog;
 import com.example.englishtester.common.TextView4SpannableString;
 import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppenderSpanClass;
@@ -365,6 +366,23 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
             }
         });
         dialog.show();
+    }
+
+    /**
+     * 開啟改變行距Dialog
+     */
+    private void openSpacingSizeDialog() {
+        final SingleSliderbarDialog dlg = new SingleSliderbarDialog(this, 30, 15, 0.3f, 1.4f, true);
+        dlg.confirmButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                float val = dlg.getEditTextValue();
+                if (val > 0) {
+                    txtReaderView.setLineSpacing(10, val);
+                }
+            }
+        });
+        dlg.show();
     }
 
     public void setTitle(String titleVal) {
@@ -1107,6 +1125,11 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final MobiReaderMobiActivity activity, Intent intent, Bundle bundle) {
                 activity.openFontSizeDialog();
+            }
+        }, //
+        CHANGE_SPACING_SIZE("改變行距", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onOptionsItemSelected(final MobiReaderMobiActivity activity, Intent intent, Bundle bundle) {
+                activity.openSpacingSizeDialog();
             }
         }, //
         CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {
