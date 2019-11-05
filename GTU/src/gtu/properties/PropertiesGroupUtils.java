@@ -50,6 +50,7 @@ public class PropertiesGroupUtils {
     }
 
     public void init() {
+        System.out.println("[configFile] : " + configFile);
         FileInputStream fis = null;
         try {
             if (!configFile.exists()) {

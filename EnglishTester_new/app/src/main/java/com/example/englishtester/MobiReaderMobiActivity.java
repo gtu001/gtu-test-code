@@ -102,6 +102,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
     Thread translateThread;
     BackButtonPreventer backButtonPreventer;
     AutoScrollDownHandler autoScrollDownHandler;
+    ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
 
     TextView txtReaderView;
     TextView translateView;
@@ -350,6 +351,8 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
         });
         homeKeyWatcher.startWatch();
 
+        mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
+
         this.doOnoffService(true);
     }
 
@@ -366,23 +369,6 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
             }
         });
         dialog.show();
-    }
-
-    /**
-     * 開啟改變行距Dialog
-     */
-    private void openSpacingSizeDialog() {
-        final SingleSliderbarDialog dlg = new SingleSliderbarDialog(this, 30, 15, 0.3f, 1.4f, true);
-        dlg.confirmButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                float val = dlg.getEditTextValue();
-                if (val > 0) {
-                    txtReaderView.setLineSpacing(10, val);
-                }
-            }
-        });
-        dlg.show();
     }
 
     public void setTitle(String titleVal) {
@@ -750,6 +736,8 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
                 initScrollView1YPos();
 
                 setTitle(epubViewerMainHandler.getCurrentTitle(position));
+
+                mLineSpacingAdjuster.apply(getTxtReaderView());
             }
 
             @Override
@@ -1129,7 +1117,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
         }, //
         CHANGE_SPACING_SIZE("改變行距", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final MobiReaderMobiActivity activity, Intent intent, Bundle bundle) {
-                activity.openSpacingSizeDialog();
+                activity.mLineSpacingAdjuster.openSpacingSizeDialog(activity.getTxtReaderView());
             }
         }, //
         CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {

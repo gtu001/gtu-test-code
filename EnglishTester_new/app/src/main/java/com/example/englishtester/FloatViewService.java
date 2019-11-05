@@ -930,6 +930,14 @@ public class FloatViewService extends Service {
                 AppOpenHelper.openApp(self.getApplicationContext(), "jp.naver.line.android", null);
             }
         },//
+        LINE_SEND("發送Line", R.drawable.line_app_me) {//
+
+            @Override
+            void process(FloatViewService self) {
+                String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
+                Log.lineFix(TAG, inputText);
+            }
+        },//
         MY_APP("開啟MyApp", R.drawable.qr_code_icon) {//
 
             @Override

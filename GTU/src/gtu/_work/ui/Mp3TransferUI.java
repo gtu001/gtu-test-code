@@ -75,7 +75,7 @@ public class Mp3TransferUI extends JFrame {
     private JList ffmpegList;
     private JPanel panel_7;
     private JButton saveConfigBtn;
-    private static final File configFile = new File(PropertiesUtil.getJarCurrentPath(Mp3TransferUI.class), Mp3TransferUI.class.getName() + "_config.properties");
+    private static final File configFile = new File(PropertiesUtil.getJarCurrentPath(Mp3TransferUI.class), Mp3TransferUI.class.getSimpleName() + "_config.properties");
     private PropertiesGroupUtils config = new PropertiesGroupUtils(configFile);
     private JButton nextConfigBtn;
     private JButton clearFfmpegListBtn;

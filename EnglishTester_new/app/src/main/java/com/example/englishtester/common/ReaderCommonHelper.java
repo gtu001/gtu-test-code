@@ -61,6 +61,47 @@ public class ReaderCommonHelper {
         return _INST;
     }
 
+
+    /**
+     * 調整行距
+     */
+    public static class LineSpacingAdjuster {
+        float defaultVal = 1.4f;
+        TextView tmpTextView;
+        Context context;
+
+        public LineSpacingAdjuster(Context context) {
+            this.context = context;
+        }
+
+        public void apply(TextView v) {
+            if (v != null) {
+                tmpTextView = v;
+            }
+            if (tmpTextView != null) {
+                tmpTextView.setLineSpacing(10, defaultVal);
+            }
+        }
+
+        /**
+         * 開啟改變行距Dialog
+         */
+        public void openSpacingSizeDialog(final TextView v) {
+            final SingleSliderbarDialog dlg = new SingleSliderbarDialog(context, 30, 15, 0.3f, 1.4f, true);
+            dlg.confirmButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    float val = dlg.getEditTextValue();
+                    if (val > 0) {
+                        defaultVal = val;
+                        apply(v);
+                    }
+                }
+            });
+            dlg.show();
+        }
+    }
+
     public static class PaddingAdjuster {
         Display d;
         int padWidth;
