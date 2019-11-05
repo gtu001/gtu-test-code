@@ -87,6 +87,9 @@ public class ReaderCommonHelper {
          * 開啟改變行距Dialog
          */
         public void openSpacingSizeDialog(final TextView v) {
+            if (v == null) {
+                Toast.makeText(context, "TextView is NULL", Toast.LENGTH_SHORT).show();
+            }
             final SingleSliderbarDialog dlg = new SingleSliderbarDialog(context, 30, 15, 0.3f, 1.4f, true);
             dlg.confirmButton(new DialogInterface.OnClickListener() {
                 @Override
