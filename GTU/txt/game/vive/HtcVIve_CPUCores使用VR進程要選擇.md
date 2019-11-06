@@ -1,8 +1,13 @@
 CPUCores使用VR進程要選擇以下
 ---
-	fpsVR
-	vivelink
-	vrcompositor
-	vrserver
-	vrmonitor
-	vrdashboard
+	## 必須開
+		fpsVR
+		ovrtoolkit-launcher
+
+		vivelink
+		vrcompositor
+		vrserver
+		vrmonitor
+
+	### 以下有沒有開不確定有用
+		vrdashboard
