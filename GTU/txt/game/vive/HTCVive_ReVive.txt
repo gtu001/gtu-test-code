@@ -1,0 +1,9 @@
+ [HOWTO] Works on HTC Vive with ReVive
+So I bought it with hope that it would work with HTC Vive and ReVive injector and guess what it works, looks beautiful I really look forward to playing it through.
+
+So how to do it:
+
+1.Download the revive injectors steam patch
+2.Copy all three files to The Town Of Light\ttol_Data\Plugins
+3. Run SteamVR, boot up the game and press CTRL + L
+4. PROFIT 
