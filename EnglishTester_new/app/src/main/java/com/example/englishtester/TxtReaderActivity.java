@@ -156,6 +156,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * FloatViewService 間聽
      */
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
+    /**
+     * 行距控制
+     */
+    ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
 
 
     EditText editText1;
@@ -520,6 +524,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         });
         homeKeyWatcher.startWatch();
 
+        mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
+
         doOnoffService(true);
     }
 
@@ -825,23 +831,6 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
             }
         });
         dialog.show();
-    }
-
-    /**
-     * 開啟改變行距Dialog
-     */
-    private void openSpacingSizeDialog() {
-        final SingleSliderbarDialog dlg = new SingleSliderbarDialog(this, 30, 15, 0.3f, 1.4f, true);
-        dlg.confirmButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                float val = dlg.getEditTextValue();
-                if (val > 0) {
-                    txtView.setLineSpacing(10, val);
-                }
-            }
-        });
-        dlg.show();
     }
 
     /**
@@ -1285,7 +1274,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }, //
         CHANGE_SPACING_SIZE("改變行距", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.openSpacingSizeDialog();
+                activity.mLineSpacingAdjuster.openSpacingSizeDialog(activity.txtView);
             }
         }, //
         CHOICE_FONT("選擇字型", MENU_FIRST++, REQUEST_CODE++, null, true) {

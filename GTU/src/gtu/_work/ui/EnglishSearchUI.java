@@ -702,7 +702,20 @@ public class EnglishSearchUI extends JFrame {
             public void mouseClicked(MouseEvent arg0) {
                 if (JMouseEventUtil.buttonRightClick(1, arg0)) {
                     JPopupMenuUtil.newInstance(searchEnglishIdTextController.get())//
-                            .addJMenuItem("複製", new ActionListener() {
+                            .addJMenuItem("輸入錯誤單字", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    String text = searchEnglishIdTextController.get().getText();
+                                    if (StringUtils.isNotBlank(text)) {
+                                        try {
+                                            int wordSize = writeNewData2(text, true);
+                                            setTitle("生字數 : " + wordSize);
+                                        } catch (Exception e) {
+                                            JCommonUtil.handleException(e);
+                                        }
+                                    }
+                                }
+                            }).addJMenuItem("複製", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent arg0) {
                                     String text = searchEnglishIdTextController.get().getText();
@@ -753,8 +766,8 @@ public class EnglishSearchUI extends JFrame {
                 }
             }
         });
-        
-        searchEnglishIdText.addActionListener (new ActionListener () {
+
+        searchEnglishIdText.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 queryButtonAction(true);
             }
@@ -1541,7 +1554,7 @@ public class EnglishSearchUI extends JFrame {
             }
 
             // writeNewData(text);
-            int wordSize = writeNewData2(text);
+            int wordSize = writeNewData2(text, false);
             setTitle("生字數 : " + wordSize);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -1619,19 +1632,28 @@ public class EnglishSearchUI extends JFrame {
         return word;
     }
 
-    private int writeNewData2(String word) throws IOException {
+    private int writeNewData2(String word, boolean isDelete) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getAppendTextFile()), "utf8"));
         Set<String> set = new LinkedHashSet<String>();
+        word = getFixWord(word);
         for (String line = null; (line = reader.readLine()) != null;) {
             line = StringUtils.trimToEmpty(line);
             if (StringUtils.isNotBlank(line)) {
-                set.add(getFixWord(line));
+                String tmpWord = getFixWord(line);
+                if (isDelete) {
+                    if (StringUtils.equalsIgnoreCase(tmpWord, word)) {
+                        continue;
+                    }
+                }
+                set.add(tmpWord);
             }
         }
         reader.close();
         // 空白太多當成句子不處理
         if (StringUtils.countMatches(StringUtils.trimToEmpty(word), " ") < 4) {
-            set.add(getFixWord(word));
+            if (!isDelete) {
+                set.add(getFixWord(word));
+            }
         }
         StringBuffer sb = new StringBuffer();
         for (String v : set) {
