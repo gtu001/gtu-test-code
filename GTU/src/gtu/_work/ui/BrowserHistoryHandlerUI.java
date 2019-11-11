@@ -2052,18 +2052,22 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String command = d.remark;
             command = StringUtils.trimToEmpty(command);
 
-            Pattern ptn = Pattern.compile("\\%(?:1\\$|)s");
-            Matcher mth = ptn.matcher(command);
-            if (mth.find()) {
-                String fixUrl = fixWindowUrl(d.url);
-                File file = DesktopUtil.getFile(fixUrl);
-                if (file == null || !file.exists() || !file.isFile()) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
-                    return;
-                }
-                command = String.format(command, file);
+            if (StringUtil_.isUUID(d.url) && StringUtils.isNotBlank(command) && "Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                // 純BAT命令
             } else {
-                // do nothing
+                Pattern ptn = Pattern.compile("\\%(?:1\\$|)s");
+                Matcher mth = ptn.matcher(command);
+                if (mth.find()) {
+                    String fixUrl = fixWindowUrl(d.url);
+                    File file = DesktopUtil.getFile(fixUrl);
+                    if (file == null || !file.exists() || !file.isFile()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("無法執行此連結!");
+                        return;
+                    }
+                    command = String.format(command, file);
+                } else {
+                    // do nothing
+                }
             }
 
             RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance().command(command);
