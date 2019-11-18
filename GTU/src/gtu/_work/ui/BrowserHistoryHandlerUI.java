@@ -325,6 +325,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JButton saveBtn = new JButton("儲存");
             saveBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    beforeSaveCheckBrowser();
                     saveCurrentBookmarkBtnAction();
                 }
             });
@@ -734,7 +735,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
             if (d != null && StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                 // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
             } else {
-                _doOpen(url, _this);
+                if (OsInfoUtil.isWindows()) {
+                    _doOpen(url, _this);
+                } else {
+                    CommandTypeEnum.DEFAULT._doOpen(url, _this);
+                }
             }
 
             if (d != null) {
@@ -943,6 +948,24 @@ public class BrowserHistoryHandlerUI extends JFrame {
             bookmarkConfig.store();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void beforeSaveCheckBrowser() {
+        String url = StringUtils.trimToEmpty(urlText.getText());
+        if (StringUtils.isNotBlank(url)) {
+            if (!bookmarkConfig.getConfigProp().containsKey(url)) {
+                // no use
+            }
+            if (url.matches("https?\\:.*")) {
+                String commandType = commandTypeSetting.getValue().name();
+                if (ArrayUtils.contains(new String[] { CommandTypeEnum.DEFAULT.name(), CommandTypeEnum.IE_EAGE.name() }, commandType)) {
+                    boolean changeBrowser = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("目前使用瀏覽器" + commandType + "是否要改變瀏覽器?(換成firefox)", "切換瀏覽器");
+                    if (changeBrowser) {
+                        commandTypeSetting.setValue(CommandTypeEnum.FIREFOX.name());
+                    }
+                }
+            }
         }
     }
 
@@ -1981,6 +2004,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 public void keyReleased(KeyEvent e) {
                     if (e.getModifiers() == KeyEvent.CTRL_MASK && e.getKeyCode() == KeyEvent.VK_S) {
                         System.out.println("do save");
+                        beforeSaveCheckBrowser();
                         saveCurrentBookmarkBtnAction();
                     }
                 }
