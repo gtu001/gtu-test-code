@@ -22,11 +22,11 @@ public class JComboBoxUtil {
         this.comboBox = comboBox;
     }
 
-    public static <T> DefaultComboBoxModel<T> createModel() {
-        return new DefaultComboBoxModel<T>();
+    public static <T> DefaultComboBoxModel createModel() {
+        return new DefaultComboBoxModel();
     }
-
-    public static <T> DefaultComboBoxModel<T> createModel(T[] arry) {
+    
+    public static <T> DefaultComboBoxModel createModel(T... arry) {
         DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
         for (int ii = 0; ii < arry.length; ii++) {
             model.addElement(arry[ii]);
@@ -34,7 +34,7 @@ public class JComboBoxUtil {
         return model;
     }
 
-    public static <T> DefaultComboBoxModel<T> createModel(List<T> arry) {
+    public static <T> DefaultComboBoxModel createModel(List<T> arry) {
         DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
         for (int ii = 0; ii < arry.size(); ii++) {
             model.addElement(arry.get(ii));

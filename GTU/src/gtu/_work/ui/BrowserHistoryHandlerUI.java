@@ -300,8 +300,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
             commandTypComboBox.setModel(commandTypeComboModel);
             panel.add(commandTypComboBox, "4, 10, fill, default");
 
+            JPanel panel_11 = new JPanel();
+            panel.add(panel_11, "4, 11, fill, fill");
+
+            JLabel lblNewLabel_5 = new JLabel("置頂排序");
+            panel_11.add(lblNewLabel_5);
+
+            orderMarkComboBox = new JComboBox();
+            orderMarkComboBox.setModel(JComboBoxUtil.createModel("", "1", "2", "3", "4", "5"));
+            panel_11.add(orderMarkComboBox);
+
             JPanel panel_4 = new JPanel();
-            panel.add(panel_4, "4, 11, fill, fill");
+            panel.add(panel_4, "4, 13, fill, fill");
 
             useRemarkOpenChk = new JCheckBox("使用remark開啟");
             panel_4.add(useRemarkOpenChk);
@@ -318,7 +328,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_4.add(hiddenChk);
 
             JPanel panel_2 = new JPanel();
-            panel.add(panel_2, "4, 13, fill, fill");
+            panel.add(panel_2, "4, 15, fill, fill");
             modifyTimeLabel = new JLabel("修改時間");
             panel_2.add(modifyTimeLabel);
 
@@ -661,16 +671,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
             @Override
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
-                    if (System.getProperty("os.name").equals("Windows 10")) {
-                        Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
-                        return;
+                    if (OsInfoUtil.isWindows()) {
+                        if (System.getProperty("os.name").equals("Windows 10")) {
+                            Runtime.getRuntime().exec("cmd /c start microsoft-edge:" + url);
+                            return;
+                        }
+                        String exePath = "C:/Program Files/Internet Explorer/iexplore.exe";
+                        if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_IE)) {
+                            exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_IE;
+                        }
+                        String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
+                        Runtime.getRuntime().exec(command);
+                    } else {
+                        CommandTypeEnum.DEFAULT.doOpen(title, _this);
                     }
-                    String exePath = "C:/Program Files/Internet Explorer/iexplore.exe";
-                    if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_IE)) {
-                        exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_IE;
-                    }
-                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
-                    Runtime.getRuntime().exec(command);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -681,11 +695,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
                     String exePath = "C:/Program Files/Mozilla Firefox/firefox.exe";
+                    String commandFormat = "cmd /c call \"%s\" \"%s\" ";
+                    if (!OsInfoUtil.isWindows()) {
+                        exePath = "/usr/bin/firefox ";
+                        commandFormat = "%s %s";
+                    }
                     if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_FIREFOX)) {
                         exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_FIREFOX;
                     }
-                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
-                    Runtime.getRuntime().exec(command);
+                    String finalCommand = String.format(commandFormat, exePath, url);
+                    System.out.println(finalCommand);
+                    Runtime.getRuntime().exec(finalCommand);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -696,11 +716,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
             void _doOpen(String url, BrowserHistoryHandlerUI _this) {
                 try {
                     String exePath = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe";
+                    String commandFormat = "cmd /c call \"%s\" \"%s\" ";
+                    if (!OsInfoUtil.isWindows()) {
+                        exePath = "/opt/google/chrome/google-chrome ";// --enable-plugins
+                        commandFormat = "%s %s";
+                    }
                     if (StringUtils.isNotBlank(BrowserHistoryHandlerUI.otherOpenPath.PATH_CHROME)) {
                         exePath = BrowserHistoryHandlerUI.otherOpenPath.PATH_CHROME;
                     }
-                    String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
-                    Runtime.getRuntime().exec(command);
+                    String finalCommand = String.format(commandFormat, exePath, url);
+                    System.out.println(finalCommand);
+                    Runtime.getRuntime().exec(finalCommand);
                 } catch (Exception e1) {
                     JCommonUtil.handleException(e1);
                 }
@@ -735,11 +761,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
             if (d != null && StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                 // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
             } else {
-                if (OsInfoUtil.isWindows()) {
-                    _doOpen(url, _this);
-                } else {
-                    CommandTypeEnum.DEFAULT._doOpen(url, _this);
-                }
+                // if (OsInfoUtil.isWindows()) {
+                _doOpen(url, _this);
+                // } else {
+                // CommandTypeEnum.DEFAULT._doOpen(url, _this);
+                // }
             }
 
             if (d != null) {
@@ -978,6 +1004,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String commandType = commandTypeSetting.getValue().name();
             String isUseRemarkOpen = useRemarkOpenChk.isSelected() ? "Y" : "N";
             String isHidden = hiddenChk.isSelected() ? "Y" : "N";
+            String orderMark = StringUtils.trimToEmpty((String) orderMarkComboBox.getSelectedItem());//
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             // Validate.notEmpty(url, "url 為空");
@@ -1005,6 +1032,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.timestampLastest = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
             d.isUseRemarkOpen = isUseRemarkOpen;
             d.isHidden = isHidden;
+            d.orderMark = orderMark;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -1027,6 +1055,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
         searchComboBoxUtil.getTextComponent().setText("");
         remarkArea.setText("");
         modifyTimeLabel.setText("");
+        commandTypComboBox.setSelectedItem(CommandTypeEnum.DEFAULT.name());
+        orderMarkComboBox.setSelectedItem("");
     }
 
     private void urlTableResize() {
@@ -1039,6 +1069,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     }
 
     private AtomicBoolean searchBool = new AtomicBoolean(false);
+    private JComboBox orderMarkComboBox;
 
     private void initLoading(final JProgressBarHelper progressBarHelper) {
         try {
@@ -1326,10 +1357,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             // 設定urlTable
             Collections.sort(lst, new Comparator<UrlConfig>() {
-
                 @Override
                 public int compare(UrlConfig o1, UrlConfig o2) {
-                    return o1.timestamp.compareTo(o2.timestamp);
+                    if (StringUtils.isBlank(o1.orderMark) && StringUtils.isBlank(o2.orderMark)) {
+                        return o1.timestamp.compareTo(o2.timestamp);
+                    }
+                    if (StringUtils.isNotBlank(o1.orderMark) && StringUtils.isNotBlank(o2.orderMark)) {
+                        return o1.orderMark.compareTo(o2.orderMark);
+                    }
+                    if (StringUtils.isNotBlank(o1.orderMark) && StringUtils.isBlank(o2.orderMark)) {
+                        return -1;
+                    }
+                    if (StringUtils.isBlank(o1.orderMark) && StringUtils.isNotBlank(o2.orderMark)) {
+                        return 1;
+                    }
+                    return 0;
                 }
             });
 
@@ -1540,6 +1582,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String commandType;
         String isUseRemarkOpen;// 是否使用remarkOpen
         String isHidden;// 是否隱藏此項目
+        String orderMark; // 特許排序
 
         private static SpecialCharHandler specialCharHandler;
 
@@ -1557,7 +1600,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String isUseRemarkOpen = specialCharHandler.getBeforeSave(d.isUseRemarkOpen);
             String isHidden = specialCharHandler.getBeforeSave(d.isHidden);
             String remark = specialCharHandler.getBeforeSave(d.remark);
-            return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden;
+            String orderMark = specialCharHandler.getBeforeSave(d.orderMark);
+            return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -1579,6 +1623,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String clickTimes = getArryStr(args, 6);
                 String isUseRemarkOpen = getArryStr(args, 7);
                 String isHidden = getArryStr(args, 8);
+                String orderMark = getArryStr(args, 9);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -1591,6 +1636,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.clickTimes = clickTimes;
                 d.isUseRemarkOpen = isUseRemarkOpen;
                 d.isHidden = isHidden;
+                d.orderMark = orderMark;
 
                 return d;
             }
