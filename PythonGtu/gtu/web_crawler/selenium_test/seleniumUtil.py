@@ -66,6 +66,14 @@ class WebElementControl :
         webElement.send_keys(keys.Keys.DELETE)
 
     @staticmethod
+    def setValue(element, text) :
+        return element.send_keys(text)
+
+    @staticmethod
+    def click(element) :
+        return element.click()
+
+    @staticmethod
     def enter(webElement) :
         from selenium.webdriver.common import keys
         webElement.send_keys(keys.Keys.ENTER)
@@ -73,6 +81,24 @@ class WebElementControl :
     @staticmethod
     def getHtml(element) :
         return element.get_attribute('innerHTML')
+
+    @staticmethod
+    def getCurrentUrl(driver):
+        return driver.current_url
+
+    @staticmethod
+    def until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=None) :
+        from selenium.webdriver.support.wait import WebDriverWait
+        #回傳False會繼續等
+        if waitUntilFunc is None :
+            def waitUntilFuncDefault(driver) :
+                try :
+                    print("waitUntilFunc try...")
+                    return False
+                except Exception as ex :
+                    return True
+            waitUntilFunc = waitUntilFuncDefault
+        WebDriverWait(driver, timeout, frequence).until(waitUntilFunc, message)
 
 
 class _PageChangeCallback :
