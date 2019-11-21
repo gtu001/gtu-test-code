@@ -3030,6 +3030,12 @@ public class FastDBQueryUI extends JFrame {
             mSqlIdColumnHolder.remove(mSqlIdColumnHolder.getSqlId());
 
             JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
+
+            try {
+                initLoadSqlListConfig();
+            } catch (IOException e) {
+                JCommonUtil.handleException(e);
+            }
         }
     }
 
@@ -3486,7 +3492,7 @@ public class FastDBQueryUI extends JFrame {
             this.jList.setModel(model);
 
             refSearchCategoryCombobox_Auto.applyComboxBoxList(new ArrayList<String>(categoryLst));
-            refSearchCategoryCombobox_Auto.getTextComponent().setText(category);
+            refSearchCategoryCombobox_Auto.setSelectItemAndText(category);
         }
 
         private void add(String category, String searchKey, String content, String categoryColor) {

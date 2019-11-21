@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<!-- saved from url=(0171)https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/db2_%E6%8C%87%E4%BB%A4%E8%A9%B3%E7%B4%B0.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+.blackandgrey {
+    BACKGROUND-COLOR: #000000;
+    COLOR: #999999;
+    TEXT-DECORATION: none
+}
+b {
+    COLOR: #000066;
+    FONT-WEIGHT: bold
+}
+td {
+    COLOR: #000000;
+}
+th {
+    COLOR: #000066;
+}
+h1 {
+    COLOR: #000066;
+   }
+h2 {
+    COLOR: #000066;
+   }
+h3 {
+    COLOR: #000066;
+   }
+h4 {
+    COLOR: #000066;
+   }
+A {
+    COLOR: #000099;
+    TEXT-DECORATION: none
+}
+A:hover {
+    COLOR: #CC0000;
+    TEXT-DECORATION: none
+}
+pre {
+    COLOR: #000000;
+   }
+</style>
+
+<title> DB2 commands </title>
+</head>
+<body><p><a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/index.html">HOME</a>
+ </p><center> <form action="http://setgetweb.com/cgi-bin/ksearch_portal85.cgi" method="get" name="search"> <input type="text" size="40" name="terms" value="" onfocus="select(this);"> <input type="submit" value="Search portal85"> <input type="checkbox" name="all" value="1" checked="">+ <p> <font size="-1"><a href="http://setgetweb.com/cgi-bin/ksearch_portal85.cgi?p=1&amp;help=1&amp;display=5&amp;all=1&amp;b=1&amp;t=1&amp;d=1&amp;sort=Matches"> Search Tips</a> &nbsp; <font color="#FF6633">|</font>  &nbsp; <a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/ksearch/search.html"> Advanced Search</a></font> </p></form> </center><font class="grey2"><blockquote>
+
+<h2> DB2 commands </h2>
+
+
+
+
+
+<p><br></p><h4> Connect to database </h4>
+
+<pre>sudo su - <a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/users.html">db2admin</a>
+
+v8host: /home/db2admin==&gt; db2 connect to db001sa user db2admin using foo
+
+   Database Connection Information
+
+ Database server        = DB2/AIX64 9.7.3
+ SQL authorization ID   = WASADMIN
+ Local database alias   = DAT012SA
+</pre>
+
+
+<p><br></p><h4> List instances</h4>
+
+<p>db2ilist
+
+<a name="getinstance"></a> </p><p><br></p><h4> List current instance</h4>
+<pre>v8host: /home/db2admin==&gt; db2 get instance
+
+ The current database manager instance is:  db2con01
+</pre>
+
+
+
+<p><br></p><h4> List catalog for node</h4>
+<pre>v8host: /home/db2admin==&gt; db2 list node directory show detail
+
+ Node Directory
+
+ Number of entries in the directory = 2
+
+Node 1 entry:
+
+ Node name                      = A1SA12
+ Comment                        =
+ Directory entry type           = LOCAL
+ Protocol                       = TCPIP
+ Hostname                       = devdb.myco.com
+ Service name                   = 50121
+ Remote instance name           =
+ System                         =
+ Operating system type          = None
+
+Node 2 entry:
+
+ Node name                      = POCSA12
+ Comment                        =
+ Directory entry type           = LOCAL
+ Protocol                       = TCPIP
+ Hostname                       = devdb.myco.com
+ Service name                   = 50010
+ Remote instance name           =
+ System                         =
+ Operating system type          = None
+
+</pre>
+
+<p><br></p><h4> Attach to Node</h4>
+
+<p>db2 attach to db001saN user db2admin using db2admin1 
+
+</p><p><br></p><h4> List tables</h4>
+
+<p>db2 list tables [for {user | all | system | schema schema-name}] [show detail]
+
+</p><p><br></p><h4> View table space information</h4>
+
+<p>db2 list tablespaces [show detail
+
+</p><p><br></p><h4> Attach to db</h4>
+
+<p>db2 attach to db001sa  user db2admin using db2admin1
+
+</p><p><br></p><h4> Find DB2 version </h4>
+
+<p>db2level 
+<br>db2licm l
+
+</p><p><br></p><h4> Check for SVCENAME from database manager configuration </h4>
+
+<p>db2 get dbm cfg
+
+</p><p><br></p><h4> Update SVCENAME if needed (require restart of db2 instance)</h4>
+
+<p>db2 update dbm cfg using SVCENAME DB2_svr20aix
+
+</p><p><br></p><h4> Set TCPIP communication protocol (require restart of db2 instance)</h4>
+
+<p>db2set DB2COMM=tcpip
+
+</p><p><br></p><h4> Check registry to TCPIP changes</h4>
+
+<p>db2set -a
+<br>db2set -lr
+
+</p><p><br></p><h4> Stop Instance </h4>
+
+<p>db2stop 
+
+</p><p><br></p><h4> Stop (FORCE) Instance</h4>
+
+<p>db2stop force
+
+</p><p><br></p><h4> Start Instance</h4>
+
+<p>db2start
+
+</p><p><br></p><h4> Create Instance </h4>
+
+<p>db2icrt u 
+
+</p><p><br></p><h4> Delete Instance</h4>
+
+<p>db2idrop 
+
+</p><p><br></p><h4> Find all databases for a certain instance</h4>
+
+<p>db2 list database directory
+
+</p><p><br></p><h4> Check for active databases</h4>
+
+<p>db2 list active databases
+
+</p><p><br></p><h4> Create database</h4>
+
+<p>db2 create db 
+
+</p><p><br></p><h4> Drop database</h4>
+
+<p>db2 drop db 
+
+</p><p><br></p><h4> Start/Activate database</h4>
+
+<p>db2 activate db 
+
+</p><p><br></p><h4> Deactivate database</h4>
+
+<p>db2 deactivate db 
+
+</p><p><br></p><h4> Delete tables</h4>
+
+<p>db2 drop table 
+
+</p><p><br></p><h4> Find table structure</h4>
+
+<p>db2 describe table  
+
+</p><p><br></p><h4> Catalog remote node</h4>
+
+<p>db2 catalog tcpip node remote server 
+
+</p><p><br></p><h4> Catalog remote database (node must be calatalog first)</h4>
+
+<p>db2 catalog db at node 
+
+</p><p><br></p><h4> List catalog for db</h4>
+
+<p>db2 list db directory show detail
+
+</p><p><br></p><h4> Delete db catalog</h4>
+
+<p>db2 uncatalog db <i>dbname</i> 
+
+</p><p><br></p><h4> Delete node catalog</h4>
+
+<p>db2 uncatalog node  <i>nodename</i>
+
+</p><p><br></p><h4> Enable a user account that has been disabled.</h4>
+
+<p> db2 connect to sky_stg user db2admin using db2admin1
+<br> db2 "update userreg set status=1 where LOGONID='wcsadmin'"
+
+
+</p><p><br></p><h4> Catalog a remote database</h4>
+
+<p>### Sample commands
+<br>sudo su - <a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/users.html">db2admin</a>
+<br> db2 catalog tcpip node db001sa remote hostname server 60004
+<br> db2 terminate
+<br>db2 list node directory show detail 
+<br> db2 catalog database db001sa at node db001sa
+<br> db2 terminate
+<br> db2 list database directory 
+<br> db2 connect to db001sa user db2admin using db2admin1
+<br> db2 list tables 
+<br> db2 "terminate"
+<br> db2 "quit"
+
+
+</p><p>### Another catalog example
+db2 catalog tcpip node qasa12 remote s1qa8b.myco.com server 50120
+<br>db2 CATALOG DATABASE <a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/db2.html#QA%20Live">dqa012sa</a> AT NODE qasa12 AUTHENTICATION SERVER
+<br>db2 update cli cfg for section dqa012sa using LockTimeout 300
+
+</p><p><br></p><h4> Set instance for user</h4>
+
+<p>/opt/db2/db2_97_03/instance/db2icrt -u <a href="https://trello-attachments.s3.amazonaws.com/5dd49186d201a12b30105eb0/5dd49187dcdae3514714639e/31582b90d69f402f10b6f15c912c8959/users.html">db2admin</a>
+
+
+
+<a name="install"></a> </p><p><br></p><h3>Install the DB2 client</h3>
+
+<p></p><ol>
+
+<p></p><li> Download <a href="http://www-01.ibm.com/support/docview.wss?rs=4020&amp;uid=swg21385217"> IBM DB2 Data Server Runtime Client</a>.
+
+<p></p></li><li> Copy client software to target portal host...
+
+<p></p><ul>
+scp ibm_data_server_runtime_client_aix64_v10.5.tar.gz wpsadmin@v8host:/opt/IBM/software
+
+</ul>
+
+<p></p></li><li>Unarchive
+
+<p></p><ul>
+cd /opt/IBM/software
+<br>gunzip ibm_data_server_runtime_client_aix64_v10.5.tar.gz
+<br>tar xvf ibm_data_server_runtime_client_aix64_v10.5.tar
+
+</ul>
+
+<p></p></li><li>Kick off install program...
+
+<p></p><ul>
+./db2setup 
+
+</ul>
+
+<p></p></li><li>When the DB2 Launchpad opens, choose Install a Product.
+
+<p></p></li><li>Select the client to install.
+
+<p>Follow the prompts in the DB2 Setup wizard. 
+</p></li></ol>
+
+<p>When installation is complete, the IBM data server client is installed in...
+
+</p><p></p><ul>
+/opt/IBM/db2/V10.5
+
+</ul>
+
+
+
+
+<p>For more info, see: <a href="http://pic.dhe.ibm.com/infocenter/db2luw/v10r5/topic/com.ibm.swg.im.dbclient.install.doc/doc/t0007317.html">Installing IBM data server clients</a>
+
+
+
+</p><p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+</blockquote></font></body></html>

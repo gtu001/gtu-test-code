@@ -1,8 +1,8 @@
-WebSphere_§ä¤£¹Dclasses¿ù»~
+WebSphere_æ‰¾ä¸é“classeséŒ¯èª¤
 
-­×§ï¦¹ÀÉ
+ä¿®æ”¹æ­¤æª”
         D:\workspace_test_IM\.metadata\.plugins\com.ibm.etools.wrd.websphere\looseconfigurations\was.base.v61\RI_EAR\looseconfig.xmi
-½T»{¸ô®|¬O§_¥¿½T
+ç¢ºèªè·¯å¾‘æ˜¯å¦æ­£ç¢º
         --> uri , binariesPath, resourcesPath
 
 
