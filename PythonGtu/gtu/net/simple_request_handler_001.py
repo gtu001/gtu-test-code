@@ -1,8 +1,8 @@
 import urllib.request
 from urllib.request import urlretrieve
 from gtu.io import fileUtil\
-import ssl
-import urllib2
+# import ssl
+# import urllib2
 
 
 '''
