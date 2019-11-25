@@ -151,6 +151,15 @@ public class JListUtil {
         return (DefaultListModel) jList1.getModel();
     }
 
+    public <T> List<T> getModelToList() {
+        List<T> lst = new ArrayList<T>();
+        DefaultListModel model = (DefaultListModel) jList1.getModel();
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            lst.add((T) model.getElementAt(ii));
+        }
+        return lst;
+    }
+
     public <T> JListUtil defaultJListKeyPressed(EventObject event) {
         return defaultJListKeyPressed(event, true);
     }

@@ -292,6 +292,8 @@ public class FastDBQueryUI extends JFrame {
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
     private JPanel panel_25;
     private static final String ICO_FILENAME = "Pig_SC.ico";// "big_boobs.ico";
+    private JButton setFontSizeBtn;
+    private JComboBox sqlPageDbConnCombox;
 
     /**
      * Launch the application.
@@ -558,7 +560,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText = new JTextField();
         sqlIdPanel.add(sqlIdText);
         sqlIdText.setToolTipText("設定SQL ID");
-        sqlIdText.setColumns(40);
+        sqlIdText.setColumns(30);
         sqlIdText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
@@ -634,6 +636,15 @@ public class FastDBQueryUI extends JFrame {
                         .show();
             }
         });
+
+        sqlPageDbConnCombox = new JComboBox();
+        sqlPageDbConnCombox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dbNameIdText_Auto.getTextComponent().setText(String.valueOf(sqlPageDbConnCombox.getSelectedItem()));
+                JCommonUtil.triggerButtonActionPerformed(dbNameIdText);
+            }
+        });
+        sqlIdPanel.add(sqlPageDbConnCombox);
         sqlIdPanel.add(sqlIdFixNameBtn);
 
         JPanel panel_3 = new JPanel();
@@ -1352,6 +1363,21 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+
+        setFontSizeBtn = new JButton("設定字型大小");
+        setFontSizeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String val = JCommonUtil._jOptionPane_showInputDialog("輸入字型大小", "20");
+                    if (val != null) {
+                        setAllFontSize(Integer.parseInt(val));
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_23.add(setFontSizeBtn);
         panel_23.add(exportYamlConfigBtn);
         panel_23.add(saveEtcConfigBtn);
 
@@ -1448,18 +1474,18 @@ public class FastDBQueryUI extends JFrame {
                 hideInSystemTrayHelper.get().apply(this);
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
-
-            {
-                JCommonUtil.setUIFont("Serif", 20);
-                JCommonUtil.setUIFontSize(this, 12, 20);
-
-                sqlTextArea.setFont(sqlTextArea.getFont().deriveFont((float) 20));
-                queryResultJsonTextArea.setFont(queryResultJsonTextArea.getFont().deriveFont((float) 20));
-                refContentArea.setFont(refContentArea.getFont().deriveFont((float) 20));
-                sqlParamCommentArea.setFont(sqlParamCommentArea.getFont().deriveFont((float) 20));
-                sqlIdCommentArea.setFont(sqlIdCommentArea.getFont().deriveFont((float) 20));
-            }
         }
+    }
+
+    private void setAllFontSize(int size) {
+        JCommonUtil.setUIFont("Serif", size);
+        JCommonUtil.setUIFontSize(this, 12, size);
+
+        sqlTextArea.setFont(sqlTextArea.getFont().deriveFont((float) size));
+        queryResultJsonTextArea.setFont(queryResultJsonTextArea.getFont().deriveFont((float) size));
+        refContentArea.setFont(refContentArea.getFont().deriveFont((float) size));
+        sqlParamCommentArea.setFont(sqlParamCommentArea.getFont().deriveFont((float) size));
+        sqlIdCommentArea.setFont(sqlIdCommentArea.getFont().deriveFont((float) size));
     }
 
     private void initParametersTable() {
@@ -1660,18 +1686,23 @@ public class FastDBQueryUI extends JFrame {
         sqlList.setModel(model);
     }
 
+    // ---------------------------------------------db conn combox ↓↓↓↓↓↓
     private String dbNameIdText_getText() {
         return StringUtils.defaultString(dbNameIdText_Auto.getTextComponent().getText());
     }
 
     private void dbNameIdText_setText(String text) {
+        // dbNameIdText_Auto.setSelectItemAndText(text);
         dbNameIdText_Auto.getTextComponent().setText(text);
+        sqlPageDbConnCombox.setSelectedItem(text);
     }
 
     private void reload_DataSourceConfig_autoComplete() {
         dbNameIdText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
         sqlMappingFilterText_Auto.applyComboxBoxList(dataSourceConfig.getSaveKeys(), dbNameIdText_getText());
+        sqlPageDbConnCombox.setModel(JComboBoxUtil.createModel(dataSourceConfig.getSaveKeys()));
     }
+    // ---------------------------------------------db conn combox ↑↑↑↑↑↑
 
     /**
      * 初始化dataSource
@@ -2830,7 +2861,8 @@ public class FastDBQueryUI extends JFrame {
             boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定要刪除:" + dbNameId, "刪除設定");
             if (confirm) {
                 dataSourceConfig.removeConfig(dbNameId);
-                JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功! : dbNameId");
+                JCommonUtil._jOptionPane_showMessageDialog_info("刪除成功! : " + dbNameId);
+                reload_DataSourceConfig_autoComplete();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

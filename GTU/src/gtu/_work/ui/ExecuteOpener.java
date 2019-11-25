@@ -152,8 +152,10 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
     private JFrameRGBColorPanel jFrameRGBColorPanel = null;
     private PropertiesUtilBean config = new PropertiesUtilBean(ExecuteOpener.class);
+    private PropertiesUtilBean searchConfig = new PropertiesUtilBean(ExecuteOpener.class, ExecuteOpener.class.getSimpleName() + "_SearchCfg");
     private PropertiesUtilBean remarkConfig = new PropertiesUtilBean(ExecuteOpener.class, ExecuteOpener.class.getSimpleName() + "_Remark");
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
+    private SearchConfigHandler mSearchConfigHandler = new SearchConfigHandler();
 
     /**
      * Auto-generated main method to display this JFrame
@@ -1294,6 +1296,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 arrayBackupForInnerScan = ((DefaultListModel) scanList.getModel()).toArray();
 
                                 currentScannerThreadStop = false;
+
+                                mSearchConfigHandler.store();
                             }
                         }, "file_scann_main_" + System.currentTimeMillis());
                         scanMainThread.setDaemon(true);
@@ -1601,6 +1605,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
             });
 
             config.reflectInit(this);
+            mSearchConfigHandler.reflect();
+            
             this.setSize(870, 561);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1654,6 +1660,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             }
         }, //
         ;
+
         ScanType() {
         }
 
@@ -2003,6 +2010,61 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         }
                     });
             popupUtil.show();//
+        }
+    }
+
+    private class SearchConfigHandler {
+        SearchConfigHandler() {
+        }
+
+        private void reflect() {
+            String $scanDirText = searchConfig.getConfigProp().getProperty("scanDirText");
+            String $scannerText = searchConfig.getConfigProp().getProperty("scannerText");
+            String $useRegexOnly = searchConfig.getConfigProp().getProperty("useRegexOnly");
+            String $scanType = searchConfig.getConfigProp().getProperty("scanType");
+            String $fileOrDirTypeCombo = searchConfig.getConfigProp().getProperty("fileOrDirTypeCombo");
+            String $ignoreScanText = searchConfig.getConfigProp().getProperty("ignoreScanText");
+            String $ignoreScanList = searchConfig.getConfigProp().getProperty("ignoreScanList");
+            String $innerScannerText = searchConfig.getConfigProp().getProperty("innerScannerText");
+            String $innerContentFilterText = searchConfig.getConfigProp().getProperty("innerContentFilterText");
+            String $scanLstShowDetailChk = searchConfig.getConfigProp().getProperty("scanLstShowDetailChk");
+
+            scanDirText.setText($scanDirText);
+            scannerText.setText($scannerText);
+            useRegexOnly.setSelected("y".equalsIgnoreCase($useRegexOnly));
+            scanType.setSelectedItem($scanType);
+            fileOrDirTypeCombo.setSelectedItem($fileOrDirTypeCombo);
+            ignoreScanText.setText($ignoreScanText);
+            ignoreScanList.setModel(JListUtil.createModel(StringUtils.trimToEmpty($scanDirText).split("^", -1)));
+            innerScannerText.setText($innerScannerText);
+            innerContentFilterText.setText($innerContentFilterText);
+            scanLstShowDetailChk.setSelected("y".equalsIgnoreCase($scanLstShowDetailChk));
+        }
+
+        private void store() {
+            String $scanDirText = scanDirText.getText();
+            String $scannerText = scannerText.getText();
+            String $useRegexOnly = useRegexOnly.isSelected() ? "y" : "n";
+            String $scanType = String.valueOf(scanType.getSelectedItem());
+            String $fileOrDirTypeCombo = String.valueOf(fileOrDirTypeCombo);
+            String $ignoreScanText = ignoreScanText.getText();
+            String $ignoreScanList = StringUtils.join(JListUtil.newInstance(ignoreScanList).getModelToList(), "^");
+            String $innerScannerText = innerScannerText.getText();
+            String $innerContentFilterText = innerContentFilterText.getText();
+            String $scanLstShowDetailChk = scanLstShowDetailChk.isSelected() ? "y" : "n";
+
+            searchConfig.getConfigProp().setProperty("scanDirText", $scanDirText);
+            searchConfig.getConfigProp().setProperty("scannerText", $scannerText);
+            searchConfig.getConfigProp().setProperty("useRegexOnly", $useRegexOnly);
+            searchConfig.getConfigProp().setProperty("scanType", $scanType);
+            searchConfig.getConfigProp().setProperty("fileOrDirTypeCombo", $fileOrDirTypeCombo);
+            searchConfig.getConfigProp().setProperty("ignoreScanText", $ignoreScanText);
+            searchConfig.getConfigProp().setProperty("ignoreScanList", $ignoreScanList);
+            searchConfig.getConfigProp().setProperty("innerScannerText", $innerScannerText);
+            searchConfig.getConfigProp().setProperty("innerContentFilterText", $innerContentFilterText);
+            searchConfig.getConfigProp().setProperty("scanLstShowDetailChk", $scanLstShowDetailChk);
+            
+            searchConfig.store();
         }
     }
 
