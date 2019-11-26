@@ -39,9 +39,9 @@ public class IReportTestMain {
     }
     
     public void exceute() throws JRException, IOException, ClassNotFoundException{
-        List<gtu.ireport.Ex5203mDo> sourceBeanList = new ArrayList<gtu.ireport.Ex5203mDo>();
-        ObjectInputStream ois = new ObjectInputStream(this.getClass().getResourceAsStream("output_5203_ver2.txt"));
-        sourceBeanList = (List<gtu.ireport.Ex5203mDo>) ois.readObject();
+        List<Ex5203mDo> sourceBeanList = new ArrayList<Ex5203mDo>();
+        ObjectInputStream ois = new ObjectInputStream(this.getClass().getResourceAsStream("ex5203_hard.txt"));
+        sourceBeanList = (List<Ex5203mDo>) ois.readObject();
         ois.close();
 
         for (Ex5203mDo mdo : sourceBeanList) {
@@ -54,11 +54,6 @@ public class IReportTestMain {
         
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         try {
-            /*
-             * File file = new File("Person.jrxml"); 
-             * InputStream in = new FileInputStream(file); 
-             * JasperCompileManager.compileReport(in);// 编译报表 jasperReport =
-             */
             
             logger.info("載入主報表設計檔    E5203MasterTemplate.jasper");
             //載入主報表模板

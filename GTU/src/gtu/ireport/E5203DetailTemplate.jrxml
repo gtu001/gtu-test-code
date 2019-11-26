@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="E5203DetailTemplate" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7bf066f7-4cae-4b36-9b08-b33111dd46d1">
 	<property name="ireport.zoom" value="1.2100000000000009"/>
-	<property name="ireport.x" value="3"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="Other_Decl_Item_Report_Parameter" class="java.lang.Object" isForPrompting="false"/>
 	<parameter name="OtherDeclItemDataSource" class="java.lang.Object" isForPrompting="false"/>
@@ -13,6 +13,7 @@
 	<parameter name="totalPackageNumber" class="java.lang.String"/>
 	<parameter name="boxNo" class="java.lang.String"/>
 	<parameter name="brokerNo" class="java.lang.String"/>
+	<parameter name="brokerName" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -350,8 +351,8 @@
 		<fieldDescription><![CDATA[transactionId]]></fieldDescription>
 	</field>
 	<field name="isFirstPage" class="java.lang.Boolean"/>
-	<field name="unitPrice" class="java.lang.String">
-		<fieldDescription><![CDATA[unitPrice]]></fieldDescription>
+	<field name="declUnitPrice" class="java.lang.String">
+		<fieldDescription><![CDATA[declUnitPrice]]></fieldDescription>
 	</field>
 	<field name="fobCurrentCode" class="java.lang.String">
 		<fieldDescription><![CDATA[fobCurrentCode]]></fieldDescription>
@@ -359,6 +360,11 @@
 	<field name="tradeTermCode" class="java.lang.String">
 		<fieldDescription><![CDATA[tradeTermCode]]></fieldDescription>
 	</field>
+	<field name="bondGoodsMark" class="java.lang.String"/>
+	<field name="govAssignNo" class="java.lang.String"/>
+	<field name="goodsDesc_secondLine" class="java.lang.String"/>
+	<field name="goodsDesc_firstLine" class="java.lang.String"/>
+	<field name="goodsDescFix" class="java.lang.String"/>
 	<variable name="permitNo" class="java.lang.String">
 		<variableExpression><![CDATA[($F{permitItemNo1}==null || $F{permitItemNo1}.equals("") ? "" : $F{permitNo1} + "-" ) +
 ($F{permitItemNo1}==null || $F{permitItemNo1}.equals("") ? "" : $F{permitItemNo1} ) +" "+
@@ -600,7 +606,7 @@
 					<text><![CDATA[]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="477" y="182" width="78" height="20" isRemoveLineWhenBlank="true">
+					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="489" y="182" width="66" height="20" isRemoveLineWhenBlank="true">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
 					<box>
@@ -697,7 +703,7 @@
 					<text><![CDATA[]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="408" y="182" width="69" height="20" isRemoveLineWhenBlank="true">
+					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="408" y="182" width="81" height="20" isRemoveLineWhenBlank="true">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
 					<box>
@@ -707,13 +713,13 @@
 						<rightPen lineWidth="0.5" lineStyle="Solid"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
+						<font fontName="標楷體" size="7" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
 						<paragraph lineSpacing="Single" rightIndent="1"/>
 					</textElement>
-					<text><![CDATA[報關人(47)]]></text>
+					<text><![CDATA[報關人/AEO編號(47)]]></text>
 				</staticText>
 				<textField>
-					<reportElement uuid="6e43a1bd-41be-42af-afdf-ebe127ecf2e5" x="408" y="202" width="69" height="37">
+					<reportElement uuid="6e43a1bd-41be-42af-afdf-ebe127ecf2e5" x="408" y="202" width="81" height="37">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
 					<box>
@@ -722,18 +728,18 @@
 						<bottomPen lineWidth="0.5"/>
 						<rightPen lineWidth="0.5"/>
 					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" pdfEncoding="Identity-H"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$P{boxNo}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement uuid="9639aa0a-15b3-4247-858c-453b28ae196a" x="477" y="202" width="78" height="37">
+					<reportElement uuid="9639aa0a-15b3-4247-858c-453b28ae196a" x="489" y="202" width="66" height="36">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
-					<box>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" size="10" pdfEncoding="Identity-H"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$P{brokerNo}]]></textFieldExpression>
 				</textField>
 				<staticText>
@@ -753,7 +759,7 @@
 					<text><![CDATA[]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="477" y="100" width="78" height="16" isRemoveLineWhenBlank="true">
+					<reportElement uuid="9a91ddba-a91b-4148-bfb6-cc3a1a1acbb6" x="477" y="101" width="78" height="16" isRemoveLineWhenBlank="true">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
 					<box>
@@ -798,6 +804,9 @@
 					<reportElement uuid="d1931f7e-06d1-431e-a08e-387d072d0172" x="1" y="239" width="554" height="1" isRemoveLineWhenBlank="true">
 						<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 					</reportElement>
+				</line>
+				<line>
+					<reportElement uuid="ae93c50e-754c-4833-9819-9b58abf34225" x="0" y="0" width="555" height="1"/>
 				</line>
 			</band>
 		</groupFooter>
@@ -1051,55 +1060,54 @@ FOB Value
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
+					<font fontName="標楷體" size="7" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single" rightIndent="1"/>
 				</textElement>
-				<text><![CDATA[(主管機關指定代號)]]></text>
+				<text><![CDATA[ 保稅貨物註記/(主管機關指定代號)]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="80" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="41dd4921-aa79-49e0-9d44-b71eefcd1d8b" stretchType="RelativeToBandHeight" x="389" y="0" width="70" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="41dd4921-aa79-49e0-9d44-b71eefcd1d8b" stretchType="RelativeToBandHeight" x="389" y="0" width="70" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="73cce756-7cae-4d28-bc68-3d8d38460b65" stretchType="RelativeToBandHeight" x="513" y="0" width="42" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="73cce756-7cae-4d28-bc68-3d8d38460b65" stretchType="RelativeToBandHeight" x="513" y="0" width="42" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b8603d59-fd57-4aae-95ab-dd9c224e0f73" stretchType="RelativeToBandHeight" x="459" y="0" width="54" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="b8603d59-fd57-4aae-95ab-dd9c224e0f73" stretchType="RelativeToBandHeight" x="459" y="0" width="54" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0f441cdf-0efc-4aeb-b742-1a6cdc1ef51b" stretchType="RelativeToBandHeight" x="318" y="0" width="71" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="0f441cdf-0efc-4aeb-b742-1a6cdc1ef51b" stretchType="RelativeToBandHeight" x="318" y="0" width="71" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2b3021f-09c3-404b-a1e2-5f61573ee410" stretchType="RelativeToBandHeight" x="205" y="0" width="113" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="d2b3021f-09c3-404b-a1e2-5f61573ee410" stretchType="RelativeToBandHeight" x="205" y="0" width="113" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement/>
@@ -1118,10 +1126,10 @@ FOB Value
 				<textFieldExpression><![CDATA[$F{currencyCode}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="4df7e6ca-3930-4dc5-bcd1-9a70eefdfaaa" stretchType="RelativeToBandHeight" x="1" y="0" width="20" height="80" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="4df7e6ca-3930-4dc5-bcd1-9a70eefdfaaa" stretchType="RelativeToBandHeight" x="1" y="0" width="20" height="80"/>
 				<box>
 					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement>
@@ -1140,7 +1148,7 @@ FOB Value
 					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
 					<paragraph leftIndent="2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{declUnitPrice}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="93873cfd-c89e-410d-8fb9-cda429473e1d" x="389" y="25" width="70" height="18"/>
@@ -1207,18 +1215,6 @@ FOB Value
 				</textElement>
 				<textFieldExpression><![CDATA[$F{fobValueTwd}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="93873cfd-c89e-410d-8fb9-cda429473e1d" stretchType="RelativeToBandHeight" x="21" y="0" width="184" height="80" isPrintWhenDetailOverflows="true"/>
-				<box>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
-					<paragraph leftIndent="2"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{goodsDesc}]]></textFieldExpression>
-			</textField>
 			<line>
 				<reportElement uuid="c27ebb2a-124a-40cd-a42a-8df8b1df5928" stretchType="RelativeToBandHeight" x="555" y="0" width="1" height="80" isPrintWhenDetailOverflows="true"/>
 			</line>
@@ -1244,9 +1240,7 @@ FOB Value
 					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
 					<paragraph leftIndent="2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{govAssignNo1}==null
-? ""
-: "("+$F{govAssignNo1}+")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{govAssignNo}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="93873cfd-c89e-410d-8fb9-cda429473e1d" x="389" y="50" width="70" height="18"/>
@@ -1275,17 +1269,20 @@ FOB Value
 				</graphicElement>
 			</line>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="93873cfd-c89e-410d-8fb9-cda429473e1d" x="318" y="0" width="44" height="18"/>
+				<reportElement uuid="93873cfd-c89e-410d-8fb9-cda429473e1d" stretchType="RelativeToBandHeight" x="21" y="0" width="184" height="80"/>
 				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dashed"/>
-					<rightPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement verticalAlignment="Middle">
+				<textElement>
 					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
 					<paragraph leftIndent="2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tradeTermCode}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{goodsDescFix}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement uuid="f1fbf6bd-8066-474e-9a13-89dbfbb533c5" positionType="FixRelativeToBottom" x="2" y="79" width="554" height="1"/>
+			</line>
 		</band>
 	</detail>
 </jasperReport>

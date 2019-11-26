@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="E5203出口報表" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="39ddaa16-914b-4cf0-9b5f-a0af6a9cd9c5">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="141"/>
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="150"/>
+	<property name="ireport.y" value="264"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["D:\\Workspace\\pbkis_web\\src\\main\\resources\\PDF\\"]]></defaultValueExpression>
 	</parameter>
@@ -569,6 +569,31 @@
 	</background>
 	<pageHeader>
 		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="6d7039cc-88bc-4b6e-9c11-af9fdecef77b" x="332" y="32" width="48" height="20">
+					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}>1]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" rightIndent="1"/>
+				</textElement>
+				<text><![CDATA[託運單分號]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement uuid="228435a3-e84c-44ef-a53e-84e297bc92ef" x="312" y="32" width="146" height="20">
+					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
+				</reportElement>
+				<jr:Code39 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="bottom">
+					<jr:codeExpression><![CDATA[$F{declNo}]]></jr:codeExpression>
+				</jr:Code39>
+			</componentElement>
 			<textField evaluationTime="Group" evaluationGroup="TransactionIdGroup" isBlankWhenNull="true">
 				<reportElement uuid="62878653-6904-4d10-854b-27a3cd91493c" x="312" y="32" width="146" height="20">
 					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
@@ -935,23 +960,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{mawbNo}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="6d7039cc-88bc-4b6e-9c11-af9fdecef77b" x="332" y="32" width="48" height="20">
-					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}>1]]></printWhenExpression>
-				</reportElement>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="標楷體" size="8" isUnderline="false" pdfFontName="fonts/kaiu.ttf" pdfEncoding="Identity-H" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single" rightIndent="1"/>
-				</textElement>
-				<text><![CDATA[託運單分號]]></text>
-			</staticText>
 			<textField evaluationTime="Group" evaluationGroup="TransactionIdGroup" isBlankWhenNull="true">
 				<reportElement uuid="62878653-6904-4d10-854b-27a3cd91493c" x="380" y="32" width="175" height="20">
 					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}>1]]></printWhenExpression>
@@ -969,14 +977,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{hawbNo}]]></textFieldExpression>
 			</textField>
-			<componentElement>
-				<reportElement uuid="228435a3-e84c-44ef-a53e-84e297bc92ef" x="312" y="32" width="146" height="20">
-					<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
-				</reportElement>
-				<jr:Code39 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="bottom">
-					<jr:codeExpression><![CDATA[$F{declNo}]]></jr:codeExpression>
-				</jr:Code39>
-			</componentElement>
 		</band>
 	</pageHeader>
 	<columnHeader>

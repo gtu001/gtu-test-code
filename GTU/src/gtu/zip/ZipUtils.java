@@ -7,11 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import gtu.file.FileUtil;
 
 public class ZipUtils {
 
@@ -149,6 +148,38 @@ public class ZipUtils {
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZip));
         String dir = "";
         recurseFiles(srcFile, zos, dir);
+        zos.close();
+    }
+
+    public void zipMultiFile(List<File> fileLst, File destinationFile) throws IOException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
+        String dir = "";
+        for (File file : fileLst) {
+            if (file.isFile()) {
+                System.out.println("壓縮檔案:" + file.getName());
+                byte[] buf = new byte[1024];
+                int len;
+                dir = dir.substring(dir.indexOf(File.separator) + 1);
+                ZipEntry zipEntry = new ZipEntry(dir + file.getName());
+                FileInputStream fin = new FileInputStream(file);
+                BufferedInputStream in = new BufferedInputStream(fin);
+                zos.putNextEntry(zipEntry);
+                while ((len = in.read(buf)) >= 0) {
+                    zos.write(buf, 0, len);
+                }
+                in.close();
+                zos.closeEntry();
+            } else {
+                System.out.println("找到資料夾:" + file.getName());
+                dir += file.getName() + File.separator;
+                String[] fileNames = file.list();
+                if (fileNames != null) {
+                    for (int i = 0; i < fileNames.length; i++) {
+                        recurseFiles(new File(file, fileNames[i]), zos, dir);
+                    }
+                }
+            }
+        }
         zos.close();
     }
 

@@ -2,6 +2,7 @@ package gtu.runtime;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.log.JdkLoggerUtil;
 
 public class DesktopUtil {
@@ -123,6 +125,16 @@ public class DesktopUtil {
             }
         } catch (Exception e) {
             throw new RuntimeException("openDir ERR : " + e.getMessage(), e);
+        }
+    }
+
+    public static void browseFileDirectory(File file) {
+        if (OsInfoUtil.isWindows()) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select,\"" + file + "\"");
+            } catch (IOException e) {
+                throw new RuntimeException("browseFileDirectory ERR : " + e.getMessage(), e);
+            }
         }
     }
 

@@ -1,10 +1,17 @@
 package gtu.ireport;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Ex5203dDo  implements Serializable{
-	private String field2="";//測試用欄位
+import org.apache.commons.lang.StringUtils;
+
+public class Ex5203dDo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String field2="";//測試用欄位
 	
 	public String getField2() {
 		return field2;
@@ -68,8 +75,8 @@ public class Ex5203dDo  implements Serializable{
 	private String carUnleaded; // 車輛使用供鉛汽油
 	private String carCatalyst; // 車輛觸媒轉化器
 	private String carLeftSide; // 車輛左駕駛
-	private String origDeclNo; // 保稅倉庫原進倉報單號碼
-	private String origItemNo; // 保稅倉庫原進倉報單項次
+	private String origDeclNo; // 原進口報單號碼
+	private String origItemNo; // 原進口報單項次
 	private String govAssignNo1; // 主管機關指定代號1
 	private String govAssignNo2; // 主管機關指定代號2
 	private String govAssignNo3; // 主管機關指定代號3
@@ -152,14 +159,67 @@ public class Ex5203dDo  implements Serializable{
 	private String origBondDeclNo; //保稅倉庫原進倉報單號碼
 	private String origBondItemNo; //保稅倉庫原進倉報單項次
 	
-	private String unitPrice;//有錯顧家 by gtu001
-	
-	public String getUnitPrice() {
-        return unitPrice;
+	List<String> goodsBrandList = new ArrayList<String>();//用來判斷是否靠右
+
+    public String getGoodsDesc_firstLine() {
+        BufferedReader reader = new BufferedReader(new StringReader(goodsDesc));
+        StringBuilder sb = new StringBuilder();
+        try {
+            for(String line = null; (line = reader.readLine())!=null;){
+                if(goodsBrandList.contains(line)){
+                    sb.append(line + "\n");
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("getGoodsDesc_firstLine =" + sb);
+        return sb.toString();
     }
 
-    public void setUnitPrice(String unitPrice) {
-        this.unitPrice = unitPrice;
+    public String getGoodsDesc_secondLine() {
+        BufferedReader reader = new BufferedReader(new StringReader(goodsDesc));
+        StringBuilder sb = new StringBuilder();
+        try {
+            for(String line = null; (line = reader.readLine())!=null;){
+                if(!goodsBrandList.contains(line)){
+                    sb.append(line + "\n");
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("getGoodsDesc_secondLine =" + sb);
+        return sb.toString();
+    }
+    
+    public String getGoodsDescFix(){
+        BufferedReader reader = new BufferedReader(new StringReader(goodsDesc));
+        StringBuilder sb = new StringBuilder();
+        try {
+            for(String line = null; (line = reader.readLine())!=null;){
+                if(goodsBrandList.contains(line)){
+                    sb.append(StringUtils.leftPad(line, 45) + "\n");
+                }else{
+                    sb.append(line + "\n");
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("getGoodDescFix =" + sb);
+        return sb.toString();
+    }
+
+	public List<String> getGoodsBrandList() {
+        return goodsBrandList;
+    }
+
+    public void setGoodsBrandList(List<String> goodsBrandList) {
+        this.goodsBrandList = goodsBrandList;
     }
 
     public String getTradeTermCode() {
@@ -858,14 +918,13 @@ public class Ex5203dDo  implements Serializable{
 	public String getOrigBondDeclNo() {
 		return origBondDeclNo;
 	}
-	public void setOrigBondDeclNo(String origDeclNo) {
+	public void setOrigBondDeclNo(String origBondDeclNo) {
 		this.origBondDeclNo = origBondDeclNo;
 	}
 	public String getOrigBondItemNo() {
 		return origBondItemNo;
 	}
-	public void setOrigBondItemNo(String origItemNo) {
+	public void setOrigBondItemNo(String origBondItemNo) {
 		this.origBondItemNo = origBondItemNo;
 	}
-	
 }

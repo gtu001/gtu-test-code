@@ -4,8 +4,11 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -17,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
 
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
+import gtu.zip.ZipUtils;
 
 public class JFileExecuteUtil {
 
@@ -113,6 +118,24 @@ public class JFileExecuteUtil {
                 });
                 list.add(item);
             }
+            {
+                JMenuItem item = new JMenuItem();
+                item.setText("zip directory");
+                item.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent paramActionEvent) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                        File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
+                        ZipUtils t = new ZipUtils();
+                        try {
+                            t.makeZip(file, zipfile);
+                            JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip dir : \n" + zipfile, "zip");
+                        } catch (Exception e) {
+                            JCommonUtil.handleException(e);
+                        }
+                    }
+                });
+                list.add(item);
+            }
         } else {
             this.ifFileIsFile_addDefaultJMenuItem(file, list);
         }
@@ -163,11 +186,12 @@ public class JFileExecuteUtil {
             item.setText("file open target dir");
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent paramActionEvent) {
-                    try {
-                        Desktop.getDesktop().open(file.getParentFile());
-                    } catch (IOException ex) {
-                        JCommonUtil.handleException(ex);
-                    }
+                    // try {
+                    // Desktop.getDesktop().open(file.getParentFile());
+                    // } catch (IOException ex) {
+                    // JCommonUtil.handleException(ex);
+                    // }
+                    DesktopUtil.browseFileDirectory(file);
                 }
             });
             list.add(item);
@@ -238,6 +262,24 @@ public class JFileExecuteUtil {
                     }
                     boolean result = file.delete();
                     JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog("delete file " + (result ? "successd" : "failed"), "DELETE");
+                }
+            });
+            list.add(item);
+        }
+        {
+            JMenuItem item = new JMenuItem();
+            item.setText("zip file");
+            item.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent paramActionEvent) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
+                    ZipUtils t = new ZipUtils();
+                    try {
+                        t.makeZip(file, zipfile);
+                        JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip file : \n" + zipfile, "zip");
+                    } catch (Exception e) {
+                        JCommonUtil.handleException(e);
+                    }
                 }
             });
             list.add(item);

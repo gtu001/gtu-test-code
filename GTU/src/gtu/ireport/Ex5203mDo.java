@@ -7,7 +7,8 @@ import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
 
 public class Ex5203mDo implements Serializable{
-	private String field1="";//測試用欄位
+    private static final long serialVersionUID = 1L;
+    private String field1="";//測試用欄位
 	
 	public String getField1() {
 		return field1;
@@ -239,7 +240,8 @@ public class Ex5203mDo implements Serializable{
 	private String totInvoiceAmt;//發票總金額
 	private String vanId;//網路別
 	private String voyageFlightNo;//船舶航次(海)/航機班次(空)
-	
+	private String brokerAeoNo; //AEO編號
+
 	/**
 	 * 標記/貨櫃號碼(45)/其它申報事項(46)
 	 */
@@ -1770,6 +1772,14 @@ public class Ex5203mDo implements Serializable{
 
 	public void setVoyageFlightNo(String voyageFlightNo) {
 		this.voyageFlightNo = voyageFlightNo;
+	}
+	
+	public String getBrokerAeoNo() {
+		return brokerAeoNo;
+	}
+
+	public void setBrokerAeoNo(String brokerAeoNo) {
+		this.brokerAeoNo = brokerAeoNo;
 	}
 
 }

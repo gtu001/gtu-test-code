@@ -684,6 +684,9 @@ public class RegexDirReplacer extends javax.swing.JFrame {
                     }
 
                     newFile = oldFile;
+                    if (!newFile.canWrite()) {
+                        newFile.setWritable(true);
+                    }
 
                     FileUtil.saveToFile(newFile, replaceText, getCharset());
                     successMsg.append(newFile.getName() + "\n");

@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -90,6 +92,7 @@ import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.zip.ZipUtils;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -1135,6 +1138,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                 public void action(EventObject evt) throws Exception {
                     System.out.println("index = " + scanList.getLeadSelectionIndex());
+                    jlistMouseLeftClickEvent(scanList, evt);
                     jlistMouseRightClickEvent(scanList, true, evt);
                 }
             });
@@ -1143,6 +1147,16 @@ public class ExecuteOpener extends javax.swing.JFrame {
                 Thread scanMainThread = null;
 
                 public void action(EventObject evt) throws Exception {
+                    // init
+                    {
+                        if (fileOrDirTypeCombo.getSelectedItem() == null) {
+                            fileOrDirTypeCombo.setSelectedIndex(0);
+                        }
+                        if (scanType.getSelectedItem() == null) {
+                            scanType.setSelectedIndex(0);
+                        }
+                    }
+
                     String scanText_ = scannerText.getText();
                     final boolean anyFileMatch = StringUtils.isEmpty(scanText_);
                     final String scanText = anyFileMatch ? UUID.randomUUID().toString() : scanText_;
@@ -1606,7 +1620,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
             config.reflectInit(this);
             mSearchConfigHandler.reflect();
-            
+
             this.setSize(870, 561);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2009,7 +2023,44 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             }
                         }
                     });
+            popupUtil//
+                    .addJMenuItem("zip selected", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            Object[] files = (Object[]) scanList.getSelectedValues();
+                            List<File> fileLst = new ArrayList<File>();
+                            for (Object f : files) {
+                                fileLst.add((ZFile) f);
+                            }
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                            File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
+                            ZipUtils t = new ZipUtils();
+                            try {
+                                t.zipMultiFile(fileLst, zipfile);
+                                JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip selected : \n" + zipfile, "zip");
+                            } catch (Exception e1) {
+                                JCommonUtil.handleException(e1);
+                            }
+                        }
+                    });
             popupUtil.show();//
+        }
+    }
+
+    private void jlistMouseLeftClickEvent(final JList scanList, EventObject evt) {
+        if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+            final Object[] vals = scanList.getSelectedValues();
+            if (vals == null || vals.length == 0) {
+                return;
+            }
+            for (Object v : vals) {
+                File file = (File) v;
+                try {
+                    Desktop.getDesktop().open(file);
+                } catch (IOException e) {
+                    JCommonUtil.handleException(e);
+                }
+                break;
+            }
         }
     }
 
@@ -2035,7 +2086,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             scanType.setSelectedItem($scanType);
             fileOrDirTypeCombo.setSelectedItem($fileOrDirTypeCombo);
             ignoreScanText.setText($ignoreScanText);
-            ignoreScanList.setModel(JListUtil.createModel(StringUtils.trimToEmpty($scanDirText).split("^", -1)));
+            ignoreScanList.setModel(JListUtil.createModel(StringUtils.trimToEmpty($ignoreScanList).split("\\^", -1)));
             innerScannerText.setText($innerScannerText);
             innerContentFilterText.setText($innerContentFilterText);
             scanLstShowDetailChk.setSelected("y".equalsIgnoreCase($scanLstShowDetailChk));
@@ -2063,7 +2114,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             searchConfig.getConfigProp().setProperty("innerScannerText", $innerScannerText);
             searchConfig.getConfigProp().setProperty("innerContentFilterText", $innerContentFilterText);
             searchConfig.getConfigProp().setProperty("scanLstShowDetailChk", $scanLstShowDetailChk);
-            
+
             searchConfig.store();
         }
     }
