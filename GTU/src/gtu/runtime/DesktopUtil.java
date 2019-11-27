@@ -129,12 +129,14 @@ public class DesktopUtil {
     }
 
     public static void browseFileDirectory(File file) {
-        if (OsInfoUtil.isWindows()) {
-            try {
+        try {
+            if (OsInfoUtil.isWindows()) {
                 Runtime.getRuntime().exec("explorer.exe /select,\"" + file + "\"");
-            } catch (IOException e) {
-                throw new RuntimeException("browseFileDirectory ERR : " + e.getMessage(), e);
+            } else {
+                Desktop.getDesktop().open(file);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("browseFileDirectory ERR : " + e.getMessage(), e);
         }
     }
 

@@ -367,7 +367,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         String url = StringUtils.trimToEmpty(urlText.getText());
                         File file = DesktopUtil.getFile(url);
                         if (file.exists()) {
-                            DesktopUtil.openDir(url);
+                            DesktopUtil.browseFileDirectory(file);
                         }
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);

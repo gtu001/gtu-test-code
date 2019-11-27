@@ -288,6 +288,17 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                         swingUtil.invokeAction("execList.mouseClicked", evt);
                                     }
                                 });
+
+                                JCommonUtil.applyDropFiles(execList, new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        List<File> lst = (List<File>) e.getSource();
+                                        DefaultListModel model = (DefaultListModel) execList.getModel();
+                                        for (File f : lst) {
+                                            model.addElement(new ZFile(f.getAbsolutePath()));
+                                        }
+                                    }
+                                });
                             }
                         }
                     }
@@ -693,6 +704,16 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             scanList.addKeyListener(new KeyAdapter() {
                                 public void keyPressed(KeyEvent evt) {
                                     swingUtil.invokeAction("scanList.keyPressed", evt);
+                                }
+                            });
+                            JCommonUtil.applyDropFiles(scanList, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    List<File> lst = (List<File>) e.getSource();
+                                    DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                    for (File f : lst) {
+                                        model.addElement(new ZFile(f.getAbsolutePath()));
+                                    }
                                 }
                             });
                         }
