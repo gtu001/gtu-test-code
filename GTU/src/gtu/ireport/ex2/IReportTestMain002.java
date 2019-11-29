@@ -67,6 +67,8 @@ public class IReportTestMain002 {
         map.put("CLASS_21", "CLASS_21");
         map.put("BARCODE_APLY_NO", "BARCODE_APLY_NO");
         map.put("APLY_NO", "APLY_NO");
+        map.put("PHONE", "PHONE");
+        map.put("EMAIL", "EMAIL");
         colst.add(map);
 
         // 為主報表所使用的外部參數

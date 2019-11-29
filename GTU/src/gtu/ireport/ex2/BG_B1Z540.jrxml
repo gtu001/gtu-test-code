@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BG_B1Z540" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="REPORT_ID" class="java.lang.String"/>
 	<parameter name="PATH" class="java.lang.String"/>
 	<field name="POLICY_NO" class="java.lang.String"/>
@@ -48,11 +51,13 @@
 	<field name="CLASS_3F" class="java.lang.String"/>
 	<field name="BARCODE_APLY_NO" class="java.lang.String"/>
 	<field name="APLY_NO" class="java.lang.String"/>
+	<field name="PHONE" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
 	<detail>
 		<band height="802" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="0" width="555" height="802"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{PATH}]]></imageExpression>
+				<reportElement x="1" y="0" width="555" height="802"/>
+				<imageExpression><![CDATA[$P{PATH}]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement mode="Opaque" x="91" y="134" width="203" height="15" forecolor="#FFFFFF"/>
@@ -66,175 +71,175 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{POLICY_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{POLICY_NO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="260" y="55" width="262" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{COMP_NAME}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{COMP_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="91" y="91" width="99" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_NAME}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="257" y="93" width="95" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BIRTH_DATE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BIRTH_DATE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="421" y="92" width="100" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_ID}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_ID}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="92" y="111" width="98" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{DIV_NM}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{DIV_NM}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="259" y="112" width="95" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{WRK_TITLE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{WRK_TITLE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="422" y="111" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{EMP_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{EMP_NO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="92" y="131" width="415" height="18"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{MailingAddress}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{MailingAddress}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="140" y="218" width="56" height="35"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_NAME_0}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_NAME_0}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="140" y="259" width="56" height="35"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_NAME_1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_NAME_1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="140" y="298" width="56" height="35"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_NAME_20}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_NAME_20}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="140" y="338" width="56" height="35"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_NAME_21}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_NAME_21}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="221" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BIRTH_DATE_0}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BIRTH_DATE_0}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="260" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BIRTH_DATE_1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BIRTH_DATE_1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="298" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BIRTH_DATE_20}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BIRTH_DATE_20}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="338" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BIRTH_DATE_21}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BIRTH_DATE_21}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="240" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_ID_0}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_ID_0}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="279" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_ID_1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_ID_1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="318" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_ID_20}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_ID_20}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="201" y="357" width="60" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{INSR_ID_21}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{INSR_ID_21}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="262" y="219" width="42" height="34"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{CLASS_0}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CLASS_0}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="263" y="259" width="42" height="34"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{CLASS_1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CLASS_1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="264" y="298" width="41" height="34"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{CLASS_20}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CLASS_20}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="264" y="338" width="40" height="34"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{CLASS_21}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{CLASS_21}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="70" y="238" width="10" height="10">
@@ -274,7 +279,6 @@
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="411" y="26" width="116" height="27"/>
-				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
@@ -282,14 +286,28 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="3 of 9 Barcode" size="18" pdfFontName="reports/fonts/3of9_new.TTF" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{BARCODE_APLY_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{BARCODE_APLY_NO}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="380" y="36" width="151" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{APLY_NO}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{APLY_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="93" y="149" width="201" height="18"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PHONE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="321" y="149" width="201" height="18"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" pdfFontName="reports/fonts/merged-4.ttf" pdfEncoding="Identity-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
