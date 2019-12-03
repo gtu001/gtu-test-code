@@ -1,5 +1,6 @@
 package gtu._work.etc;
 
+import com.example.englishtester.DropboxEnglishService;
 import com.example.englishtester.common.Log;
 
 import java.io.BufferedReader;
@@ -15,14 +16,17 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import taobe.tec.jcc.JChineseConvertor;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -72,7 +76,7 @@ public class EnglishTester_Diectory2 {
 
     public WordInfo2 parseToWordInfo(String word, int page) {
         try {
-            if(page <= 0){
+            if (page <= 0) {
                 throw new Exception("頁碼不可小於等於0");
             }
             word = word.trim().replaceAll(" ", "%20");
@@ -82,9 +86,9 @@ public class EnglishTester_Diectory2 {
             if (StringUtils.isBlank(fullStr)) {
                 return new WordInfo2();
             }
-			WordInfo2 wordInfo1 = parseToWordInfo(word, fullStr);
-	        WordInfo2 wordInfo2 = parseToWordInfoByJsoup(word, fullStr);
-	        wordInfo2.setExampleSentanceList(wordInfo1.getExampleSentanceList());
+            WordInfo2 wordInfo1 = parseToWordInfo(word, fullStr);
+            WordInfo2 wordInfo2 = parseToWordInfoByJsoup(word, fullStr);
+            wordInfo2.setExampleSentanceList(wordInfo1.getExampleSentanceList());
             return wordInfo2;
         } catch (Exception ex) {
             Log.e(TAG, "parseToWordInfo ERR : " + ex.getMessage(), ex);
@@ -150,7 +154,7 @@ public class EnglishTester_Diectory2 {
 
         LineNumberReader reader = new LineNumberReader(new StringReader(fullStr));
         try {
-            for (String line = null; (line = reader.readLine()) != null;) {
+            for (String line = null; (line = reader.readLine()) != null; ) {
                 if (line.contains(find2)) {
                     exampleSentanceOrign = line.substring(line.indexOf(find2) + find2.length());
                 }
@@ -243,8 +247,14 @@ public class EnglishTester_Diectory2 {
         return value;
     }
 
-    private String searchWordOnline(String urls) {
-        return SimpleHttpsUtil.newInstance().queryPage(urls);
+    private String searchWordOnline(final String urls) {
+        String strVal = DropboxEnglishService.getRunOnUiThread(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return SimpleHttpsUtil.newInstance().queryPage(urls);
+            }
+        }, -1L);
+        return strVal;
     }
 
     @Deprecated

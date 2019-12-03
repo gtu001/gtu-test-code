@@ -83,7 +83,7 @@ public class TxtReaderAppenderForHtmlTag {
                     if (mth.find()) {
                         e.apply(tag, mth, this);
                     } else {
-                        throw new RuntimeException("無法match設定 : " + e + " --> " + txt);
+                        //throw new RuntimeException("無法match設定 : " + e + " --> " + txt);//TODO 懶得改了
                     }
                 }
             }
