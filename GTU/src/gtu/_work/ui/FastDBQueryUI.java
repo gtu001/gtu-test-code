@@ -3,7 +3,6 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -857,6 +856,16 @@ public class FastDBQueryUI extends JFrame {
                                     JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                                     List<Object> lst = tabUtil.getColumnTitleArray();
                                     ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
+                                }
+                            }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    doSetColumnSqlInProcess(name, false);
+                                }
+                            }).addJMenuItem("Sql Column IN (...) [distinct]", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    doSetColumnSqlInProcess(name, true);
                                 }
                             }).applyEvent(e)//
                             .show();
@@ -2394,25 +2403,28 @@ public class FastDBQueryUI extends JFrame {
             if (sqlIdListDSMappingHandler.containsKey(bean.getUniqueKey())) {
                 String saveKey = sqlIdListDSMappingHandler.getProperty(bean.getUniqueKey());
                 if (!StringUtils.equals(dbNameIdText_getText(), saveKey)) {
-                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("目前DS為 : [" + dbNameIdText_getText() + "] \n 是否要切換為最後一次成功使用的DS :[" + saveKey + "], ", "切換dataSource");
-                    if (confirm) {
-                        Map<String, String> param = dataSourceConfig.getConfig(saveKey);
-                        if (param.containsKey(PropertiesGroupUtils_ByKey.SAVE_KEYS) && StringUtils.isNotBlank(param.get(PropertiesGroupUtils_ByKey.SAVE_KEYS))) {
-                            dbNameIdText_setText(param.get(PropertiesGroupUtils_ByKey.SAVE_KEYS));
-                        }
-                        if (param.containsKey("url") && StringUtils.isNotBlank(param.get("url"))) {
-                            dbUrlText.setText(param.get("url"));
-                        }
-                        if (param.containsKey("user") && StringUtils.isNotBlank(param.get("user"))) {
-                            dbUserText.setText(param.get("user"));
-                        }
-                        if (param.containsKey("pwd")) {// 密碼可以空
-                            dbPwdText.setText(param.get("pwd"));
-                        }
-                        if (param.containsKey("driver") && StringUtils.isNotBlank(param.get("driver"))) {
-                            dbDriverText.setText(param.get("driver"));
-                        }
-                    }
+                    System.out.println("切換為最後一次成功使用的DS :[" + saveKey + "], ");
+                    dbNameIdText_setText(saveKey);
+                    /*
+                     * Map<String, String> param =
+                     * dataSourceConfig.getConfig(saveKey); if
+                     * (param.containsKey(PropertiesGroupUtils_ByKey. SAVE_KEYS)
+                     * && StringUtils.isNotBlank(param.get(
+                     * PropertiesGroupUtils_ByKey.SAVE_KEYS))) {
+                     * dbNameIdText_setText(param.get(
+                     * PropertiesGroupUtils_ByKey.SAVE_KEYS)); } if
+                     * (param.containsKey("url") &&
+                     * StringUtils.isNotBlank(param.get("url"))) {
+                     * dbUrlText.setText(param.get("url")); } if
+                     * (param.containsKey("user") &&
+                     * StringUtils.isNotBlank(param.get("user"))) {
+                     * dbUserText.setText(param.get("user")); } if
+                     * (param.containsKey("pwd")) {// 密碼可以空
+                     * dbPwdText.setText(param.get("pwd")); } if
+                     * (param.containsKey("driver") &&
+                     * StringUtils.isNotBlank(param.get("driver"))) {
+                     * dbDriverText.setText(param.get("driver")); }
+                     */
                 }
             }
         } catch (Exception ex) {
@@ -3452,6 +3464,7 @@ public class FastDBQueryUI extends JFrame {
         綠("GREEN"), //
         紅("RED"),//
         ;
+
         final String colorCode;
 
         RefSearchColor(String colorCode) {
@@ -4434,6 +4447,41 @@ public class FastDBQueryUI extends JFrame {
                 tableAlias = queryText.replaceAll("\\.+$", "");
                 columnIndex = null;
             }
+        }
+    }
+
+    private void doSetColumnSqlInProcess(String columnName, boolean distinct) {
+        try {
+            List<String> lst = new ArrayList<String>();
+            int index = -1;
+            for (int idx = 0; idx <= queryList.getLeft().size(); idx++) {
+                if (StringUtils.equalsIgnoreCase(columnName, queryList.getLeft().get(idx))) {
+                    index = idx;
+                    break;
+                }
+            }
+            if (index == -1) {
+                Validate.isTrue(false, "找不到欄位 :" + columnName);
+            }
+            for (Object[] arry : queryList.getRight()) {
+                Object val = arry[index];
+                if (val == null) {
+                    continue;
+                }
+                String strVal = StringUtils.trimToEmpty(String.valueOf(val));
+                if (distinct) {
+                    if (!lst.contains(strVal)) {
+                        lst.add(strVal);
+                    }
+                } else {
+                    lst.add(strVal);
+                }
+            }
+            String resultSql = StringUtils.join(lst, "','");
+            resultSql = "'" + resultSql + "'";
+            ClipboardUtil.getInstance().setContents(resultSql);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
