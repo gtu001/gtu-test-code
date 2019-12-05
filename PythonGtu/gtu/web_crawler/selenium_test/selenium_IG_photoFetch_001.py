@@ -100,6 +100,19 @@ class MyGoogleSearchFetcherImpl(MyGoogleSearchFetcher) :
 # THREAD = MyGoogleSearchFetcherImpl()
 
 
+class PicClass() :
+    def __init__(self, picLink) :
+        self.picLink = picLink
+        self.name = self.getPicName(picLink)
+        print(self.name, self.picLink)
+
+    def getPicName(self, picLink) :
+        mth = re.search(r"\w+\.(jpg|png)", picLink, re.I)
+        if mth :
+            return mth[0]
+        raise Exception("無法取得picName : " + picLink)
+
+
 
 def main() :
     #lst = fileUtil.loadFile_asList(fileUtil.getDesktopDir(fileName="GoogleWord.txt"))
@@ -122,17 +135,12 @@ def main() :
         mth = re.search(r"[A-Z0-9]+", clzVal)
         if mth :
             picLink = v.get("src")
-            picLst.append(picLink)
+            picLst.append(PicClass(picLink))
 
-            filepath = fileUtil.getDesktopDir(getPicName(picLink))
-            simple_request_handler_001.doDownload(picLink, filepath)
+    for i,v in enumerate(picLst) :
+        filepath = fileUtil.getDesktopDir(v.name)
+        simple_request_handler_001.doDownload(v.picLink, filepath)
 
-
-def getPicName(picLink) :
-    mth = re.search(r"\w+\.jpg", picLink)
-    if mth :
-        return mth[0]
-    raise Exception("無法取得picName : " + picLink)
 
 
 

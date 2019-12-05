@@ -46,6 +46,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -66,6 +67,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -90,8 +92,10 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
+import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.zip.ZipUtils;
 
 /**
@@ -164,13 +168,28 @@ public class ExecuteOpener extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                ExecuteOpener inst = new ExecuteOpener();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        /*
+         * SwingUtilities.invokeLater(new Runnable() { public void run() {
+         * ExecuteOpener inst = new ExecuteOpener();
+         * inst.setLocationRelativeTo(null);
+         * gtu.swing.util.JFrameUtil.setVisible(true, inst); } });
+         */
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "gtu001.ico", ExecuteOpener.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
+            public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
+            }
+        });
+        tabUI.setSize(870, 576);
+        tabUI.startUI();
+        System.out.println("start...");
     }
 
     static Properties prop = new Properties();
@@ -1166,6 +1185,19 @@ public class ExecuteOpener extends javax.swing.JFrame {
             swingUtil.addAction("fileScan.actionPerformed", new Action() {
 
                 Thread scanMainThread = null;
+                
+                private String[] getIgnoreAry() {
+                    Object[] igArry_ = ((DefaultListModel) ignoreScanList.getModel()).toArray();
+                    String[] igArry = new String[igArry_.length];
+                    for (int ii = 0; ii < igArry.length; ii++) {
+                        igArry[ii] = (String) igArry_[ii];
+                        if (StringUtils.isBlank(igArry[ii])) {
+                            igArry = ArrayUtils.remove(igArry, ii);
+                            ii--;
+                        }
+                    }
+                    return igArry;
+                }
 
                 public void action(EventObject evt) throws Exception {
                     // init
@@ -1194,11 +1226,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         return;
                     }
 
-                    Object[] igArry_ = ((DefaultListModel) ignoreScanList.getModel()).toArray();
-                    final String[] igArry = new String[igArry_.length];
-                    for (int ii = 0; ii < igArry.length; ii++) {
-                        igArry[ii] = (String) igArry_[ii];
-                    }
+                    final String[] igArry = getIgnoreAry();
                     final boolean ignoreCheck = igArry.length > 0;
 
                     final DefaultListModel model = new DefaultListModel();
@@ -1223,7 +1251,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
 
                                     Pattern ppp = null;
                                     try {
-                                        ppp = Pattern.compile(scanVal);
+                                        ppp = Pattern.compile(scanVal, Pattern.CASE_INSENSITIVE);
                                     } catch (Exception ex) {
                                         System.out.println(ex);
                                     }
@@ -1534,7 +1562,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     if (!JMouseEventUtil.buttonLeftClick(2, evt)) {
                         return;
                     }
-                    final String innerText = innerScannerText.getText();
+                    final String innerText = innerScannerText.getText().toLowerCase();
                     if (arrayBackupForInnerScan == null) {
                         return;
                     }
@@ -1548,7 +1576,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 System.out.println(toString() + " ... start!! ==> " + innerScanStop);
                                 DefaultListModel model = new DefaultListModel();
                                 for (int ii = 0; ii < arrayBackupForInnerScan.length; ii++) {
-                                    if (arrayBackupForInnerScan[ii].toString().contains(innerText)) {
+                                    if (arrayBackupForInnerScan[ii].toString().toLowerCase().contains(innerText)) {
                                         model.addElement(arrayBackupForInnerScan[ii]);
                                     }
                                     if (innerScanStop) {
@@ -1665,7 +1693,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         return false;
                     }
                 }
-                if (filename.contains(text)) {
+                if (filename.toLowerCase().contains(text.toLowerCase())) {
                     return true;
                 }
                 if (pattern == null) {
@@ -1685,7 +1713,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         return false;
                     }
                 }
-                if (filename.contains(text)) {
+                if (filename.toLowerCase().contains(text.toLowerCase())) {
                     return true;
                 }
                 if (pattern == null) {
