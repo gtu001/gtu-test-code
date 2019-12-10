@@ -497,7 +497,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         this.backButtonPreventer = new BackButtonPreventer(this);
 
-        this.autoScrollDownHandler = new AutoScrollDownHandler(this.scrollView1);
+        this.autoScrollDownHandler = new AutoScrollDownHandler(this, this.scrollView1);
 
         this.floatViewServiceOpenStatusReceiverHelper = new ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper();
         this.floatViewServiceOpenStatusReceiverHelper.registerReceiver(this, new Function<Boolean, Boolean>() {

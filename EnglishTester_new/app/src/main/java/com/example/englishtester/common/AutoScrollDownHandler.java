@@ -1,6 +1,8 @@
 package com.example.englishtester.common;
 
+import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.widget.ScrollView;
 
 import java.util.concurrent.Callable;
@@ -13,6 +15,7 @@ public class AutoScrollDownHandler {
     boolean isStop = false;
     Handler handler = new Handler();
     SpeedType speedType = SpeedType.SLOW;
+    Context context;
 
     public enum SpeedType {
         SLOW(50, 3),//
@@ -28,7 +31,8 @@ public class AutoScrollDownHandler {
         }
     }
 
-    public AutoScrollDownHandler(final ScrollView scrollView) {
+    public AutoScrollDownHandler(final Context context, final ScrollView scrollView) {
+        this.context = context;
         this.scrollViewGetter = new Callable<ScrollView>() {
             @Override
             public ScrollView call() throws Exception {
@@ -37,7 +41,8 @@ public class AutoScrollDownHandler {
         };
     }
 
-    public AutoScrollDownHandler(final Callable<ScrollView> scrollViewGetter) {
+    public AutoScrollDownHandler(final Context context, final Callable<ScrollView> scrollViewGetter) {
+        this.context = context;
         this.scrollViewGetter = scrollViewGetter;
     }
 

@@ -60,6 +60,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.cglib.core.internal.Function;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -103,6 +104,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
     BackButtonPreventer backButtonPreventer;
     AutoScrollDownHandler autoScrollDownHandler;
     ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
+    ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
 
     TextView txtReaderView;
     TextView translateView;
@@ -331,10 +333,25 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
                 return false;
             }
         });
-        this.autoScrollDownHandler = new AutoScrollDownHandler(new Callable<ScrollView>() {
+        this.autoScrollDownHandler = new AutoScrollDownHandler(this, new Callable<ScrollView>() {
             @Override
             public ScrollView call() throws Exception {
                 return getScrollView1();
+            }
+        });
+
+        this.floatViewServiceOpenStatusReceiverHelper = new ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper();
+        this.floatViewServiceOpenStatusReceiverHelper.registerReceiver(this, new Function<Boolean, Boolean>() {
+            @Override
+            public Boolean apply(Boolean aBoolean) {
+                if (aBoolean && autoScrollDownHandler.isRunning()) {
+                    autoScrollDownHandler.stop();
+                    floatBtn.setTag(true);
+                } else if (floatBtn.getTag() != null && aBoolean == false) {
+                    autoScrollDownHandler.start();
+                    floatBtn.setTag(null);
+                }
+                return false;
             }
         });
 
