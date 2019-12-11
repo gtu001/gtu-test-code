@@ -5,7 +5,7 @@ DiRT_Rally_啟動方式
 	2.開啟後去系統列點右鍵, 選Patch
 	3.選擇執行檔 "F:\SteamLibrary\steamapps\common\DiRT Rally\drt.exe"
 	4.退出舊版 revive, 開啟新版即可
-(B)
+(B)<--不做也可跑
 	將以下兩個檔案放到drt.exe所在目錄
 	C:\Program Files\Oculus\Support\oculus-runtime
 		LibOVRRT32_1.dll
