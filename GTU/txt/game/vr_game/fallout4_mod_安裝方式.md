@@ -13,6 +13,7 @@
 	或開啟 C:\Users\gtu001\Documents\my games\Fallout4VR\Fallout4Prefs.ini
 
 	在 [Launcher] 下面加入
+		bLastAspectRatio=1
 		bEnableFileSelection=1
 
 (3)
