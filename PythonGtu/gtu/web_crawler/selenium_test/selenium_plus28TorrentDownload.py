@@ -142,7 +142,10 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
         try :
             av.torrentUrl = self.getAttachFileUrl(av.url)
             print("downloadAV", av.torrentUrl)
-            simple_request_handler_001.doDownload(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent"))
+            out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent"))
+            print("out", out)
+            print("out", err)
+            print("out", errcode)
         except Exception as ex :
             errorHandler.printStackTrace()
 
