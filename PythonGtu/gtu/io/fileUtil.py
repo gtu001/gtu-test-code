@@ -374,6 +374,12 @@ def rename(fromDir, fromName, toDir, toName):
 
 
 
+def length(filepath) :
+	statinfo = os.stat(filepath)
+	return statinfo.st_size
+
+
+
 if __name__ == '__main__':
 	dirPath = getDesktopDir("xxxxx/DDDDD/dfdfdffd.txt")
 	print("done..")

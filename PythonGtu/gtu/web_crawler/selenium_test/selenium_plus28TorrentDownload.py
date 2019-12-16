@@ -6,6 +6,7 @@ from gtu.reflect import checkSelf
 from selenium.webdriver.remote.webdriver import WebDriver as WD
 from gtu.web_crawler.selenium_test import seleniumUtil
 from threading import Thread
+from threading import Timer
 from gtu.net import ssl_util
 
 from gtu.util import queue_test_001
@@ -24,6 +25,7 @@ from gtu.io import LogWriter
 from gtu.datetime import dateUtil
 
 from gtu.net import simple_request_handler_001
+import time
 import os
 
 
@@ -92,7 +94,7 @@ class AvClass :
 
 
 def plus28ListPage() :
-    for page in range(1, 20) : 
+    for page in range(1, 2) : #222222222222222222222222222222222222222
         DRIVER.get("https://p.plus28.com/forum-717-{page}.html".format(page=page))
         soup = bs(DRIVER.page_source, "html.parser")
         tbodies = soup.select("tbody[id^='stickthread_']")
@@ -101,7 +103,7 @@ def plus28ListPage() :
             href = aa.get("href")
             title = aa.text
             print(i, href, title)
-            THREAD.queue.appendleft(AvClass(title, href))
+            THREAD.addNewAV(AvClass(title, href))
 
         tbodies = soup.select("tbody[id^='normalthread_']")
         for i,v in enumerate(tbodies) :
@@ -109,7 +111,34 @@ def plus28ListPage() :
             href = aa.get("href")
             title = aa.text
             print(i, href, title)
-            THREAD.queue.appendleft(AvClass(title, href))
+            THREAD.addNewAV(AvClass(title, href))
+
+
+class ChromeDownloadRenameFileWatcher(Thread, metaclass=ABCMeta) :
+    def __init__(self, watchDir) :
+        super().__init__()
+        self.watchDir = watchDir
+        print("watchDir", self.watchDir)
+        self.queue = queue_test_001.DequeObj()
+        self.start()
+
+    def addFileName(self, fileName) :
+        print("## addFileName", fileName)
+        self.queue.appendleft(fileName)
+
+    def run(self) :
+        while True :
+            before = os.listdir(self.watchDir)
+            after = os.listdir(self.watchDir)
+            change = set(after) - set(before)
+            if len(change) == 1 and self.queue.length() > 0 :
+                file_name = change.pop()
+                if not file_name.endswith('.crdownload') :
+                    real_name = self.queue.popright()
+                    real_name = real_name.replace(os.sep, "_")
+                    fileUtil.rename(self.watchDir, file_name, self.watchDir, real_name)
+                    print("change name : ", file_name, "->", real_name)
+                    
 
 
 class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
@@ -120,6 +149,7 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
         self.queue = queue_test_001.DequeObj()
         config = dict()
         config['downloadPath'] = self.getDownloadDir()
+        self.saveDir = config['downloadPath']
         self.driver = seleniumUtil.getDriver(config=config)
         plus28Login_forPorn(self.driver, retry=0)
         self.start()
@@ -137,7 +167,7 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
             )
         # self.setName(newName)
 
-    def getAttachFileUrl(self, url) :
+    def getAttachFileUrl(self, url, realFileName) :
         print("url", url)
         self.driver.get(url)
         # soup = bs(self.driver.page_source, "html.parser")
@@ -153,12 +183,13 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
             aa = aaa[0]
             attachUrl = aa.get_attribute("href")
             if attachUrl :
+                RENAME_THD.addFileName(realFileName)
                 seleniumUtil.WebElementControl.click(aa)
         return ""
 
     def myProcess(self, av) :
         try :
-            av.torrentUrl = self.getAttachFileUrl(av.url)
+            av.torrentUrl = self.getAttachFileUrl(av.url, av.title + ".torrent")
             # print("downloadAV", av.torrentUrl)
             # out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent", self.pornDir))
             # print("out", err)
@@ -174,6 +205,9 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
             self.reflashName()
             time.sleep(0.2)
 
+    def addNewAV(self, av):
+        self.queue.appendleft(av)
+
     # @abstractmethod
     # def beforeProcess(self, sourceStr) :
     #     pass
@@ -183,6 +217,7 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
 
 THREAD = MyPlus28TorrentFetcher()
 
+RENAME_THD = ChromeDownloadRenameFileWatcher(THREAD.saveDir)
 
 
 # https://p.plus28.com/thread-6833518-1-1.html
