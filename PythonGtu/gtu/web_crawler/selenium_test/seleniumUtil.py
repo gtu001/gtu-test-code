@@ -44,14 +44,24 @@ def __test_network(url) :
 
 
 
-def getDriver(width=1280, height=720) :
+def _getChromeConfig(config) :
+    chromeOptions = webdriver.ChromeOptions()
+    prefs = {}
+    if "downloadPath" in config :
+        prefs["download.default_directory"] = config["downloadPath"]
+        prefs["profile.default_content_settings.popups"] = 0
+    chromeOptions.add_experimental_option("prefs",prefs)
+    return chromeOptions
+
+
+def getDriver(width=1280, height=720, config={}) :
     if envUtil.isWindows() :
         driverPath = r"D:/apps/selenium/chromedriver.exe"
     else :
         driverPath = r"/media/gtu001/OLD_D/apps/webdriver/chromedriver"
     
     # webdriver.Firefox()
-    driver = webdriver.Chrome(executable_path=driverPath)
+    driver = webdriver.Chrome(executable_path=driverPath, chrome_options=_getChromeConfig(config))
 
     driver.set_window_position(0,0) #瀏覽器位置
     driver.set_window_size(width, height) #瀏覽器大小

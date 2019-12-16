@@ -92,7 +92,7 @@ class AvClass :
 
 
 def plus28ListPage() :
-    for page in range(1, 20) :
+    for page in range(1, 20) : 
         DRIVER.get("https://p.plus28.com/forum-717-{page}.html".format(page=page))
         soup = bs(DRIVER.page_source, "html.parser")
         tbodies = soup.select("tbody[id^='stickthread_']")
@@ -118,10 +118,18 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
     def __init__(self) :
         super().__init__()
         self.queue = queue_test_001.DequeObj()
-        self.driver = seleniumUtil.getDriver()
-        self.pornDir = "plus28_porn_" + dateUtil.formatDatetimeByJavaFormat(None, "yyyyMMdd") + os.sep
+        config = dict()
+        config['downloadPath'] = self.getDownloadDir()
+        self.driver = seleniumUtil.getDriver(config=config)
         plus28Login_forPorn(self.driver, retry=0)
         self.start()
+
+
+    def getDownloadDir(self) :
+        path = fileUtil.getDesktopDir() + os.sep + "plus28_porn_" + dateUtil.formatDatetimeByJavaFormat(None, "yyyyMMdd")
+        fileUtil.mkdirs(path)
+        return path
+
 
     def reflashName(self) :
         newName = "".format(\
@@ -132,21 +140,28 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
     def getAttachFileUrl(self, url) :
         print("url", url)
         self.driver.get(url)
-        soup = bs(self.driver.page_source, "html.parser")
-        aaa = soup.select("div[class='box postattachlist'] a[href^='attachment.php?']")
+        # soup = bs(self.driver.page_source, "html.parser")
+        # aaa = soup.select("div[class='box postattachlist'] a[href^='attachment.php?']")
+        # if aaa :
+        #     aa = aaa[0]
+        #     attachUrl = aa.get("href")
+        #     if attachUrl :
+        #         return "https://p.plus28.com/" + attachUrl
+        # raise Exception("Attach File Not Found!")
+        aaa = self.driver.find_elements_by_css_selector("div[class='box postattachlist'] a[href^='attachment.php?']")
         if aaa :
             aa = aaa[0]
-            attachUrl = aa.get("href")
+            attachUrl = aa.get_attribute("href")
             if attachUrl :
-                return "https://p.plus28.com/" + attachUrl
-        raise Exception("Attach File Not Found!")
+                seleniumUtil.WebElementControl.click(aa)
+        return ""
 
     def myProcess(self, av) :
         try :
             av.torrentUrl = self.getAttachFileUrl(av.url)
-            print("downloadAV", av.torrentUrl)
-            out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent", self.pornDir))
-            print("out", err)
+            # print("downloadAV", av.torrentUrl)
+            # out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent", self.pornDir))
+            # print("out", err)
         except Exception as ex :
             errorHandler.printStackTrace()
 
