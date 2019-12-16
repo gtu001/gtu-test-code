@@ -2,6 +2,7 @@ import urllib.request
 from urllib.request import urlretrieve
 from gtu.io import fileUtil
 from gtu.os import runtimeUtil
+from gtu.sys import os_info
 # import ssl
 # import urllib2
 
@@ -22,13 +23,21 @@ def doDownload(url, filepath):
     urlretrieve(url, filepath)
 
 
+def _getWget() :
+    wget = ""
+    if os_info.isWindows():
+        wget = " D:/apps/wget.exe "
+    else:
+        wget = " wget "
+    return wget
+
 
 def doDownload_ver2(url, filepath) :
-    # command = " curl {url} --ssl-no-revoke -o {filepath} "
-    command = " D:/apps/wget.exe  -O  {filepath}  --no-check-certificate  {url} " # https://eternallybored.org/misc/wget/
-    finalCommand = command.format(url=url, filepath=filepath)
-    print("finalCommand ===== ", finalCommand)
-    return runtimeUtil.runtimeExec3(finalCommand, "BIG5")
+    # command = " curl {url} --ssl-no-revoke -o \"{filepath}\" "
+    command = " {wget} -O  \"{filepath}\"  --no-check-certificate  {url} " # https://eternallybored.org/misc/wget/
+    finalCommand = command.format(wget=_getWget(), url=url, filepath=filepath)
+    print("doDownload_ver2 : ", finalCommand)
+    return runtimeUtil.runtimeExec3(finalCommand)
 
 
 

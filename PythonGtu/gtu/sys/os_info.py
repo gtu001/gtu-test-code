@@ -1,6 +1,9 @@
 import platform
 import sys
 
+'''
+from gtu.sys import os_info
+'''
 
 def linux_distribution():
     try:

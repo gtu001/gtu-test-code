@@ -3,6 +3,8 @@ import subprocess
 import os
 from gtu.reflect import checkSelf
 import io
+from gtu.sys import os_info
+from gtu.string import stringUtil
 
 '''
 from gtu.os import runtimeUtil
@@ -17,7 +19,12 @@ def runtimeExec2(command):
     os.system(command)
     
     
-def runtimeExec3(command, decode):
+def runtimeExec3(command, decode=""):
+    if stringUtil.isBlank(decode) :
+        decode = "UTF8"
+        if os_info.isWindows() :
+            decode = "BIG5"
+
     process = subprocess.Popen(command, shell=True,
                            stdout=subprocess.PIPE, 
                            stderr=subprocess.PIPE)

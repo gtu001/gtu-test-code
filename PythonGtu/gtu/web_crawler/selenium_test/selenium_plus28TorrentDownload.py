@@ -21,8 +21,10 @@ from gtu.error import errorHandler
 from abc import ABCMeta, abstractmethod
 from gtu.net import ssl_util
 from gtu.io import LogWriter
+from gtu.datetime import dateUtil
 
 from gtu.net import simple_request_handler_001
+import os
 
 
 DRIVER = seleniumUtil.getDriver()
@@ -90,24 +92,24 @@ class AvClass :
 
 
 def plus28ListPage() :
-    avLst = list()
-    DRIVER.get("https://p.plus28.com/forum-717-1.html")
-    soup = bs(DRIVER.page_source, "html.parser")
-    tbodies = soup.select("tbody[id^='stickthread_']")
-    for i,v in enumerate(tbodies) :
-        aa = v.select("span[id^='thread_'] a[href^='thread-']")[0]
-        href = aa.get("href")
-        title = aa.text
-        print(i, href, title)
-        avLst.append(AvClass(title, href))
-    tbodies = soup.select("tbody[id^='normalthread_']")
-    for i,v in enumerate(tbodies) :
-        aa = v.select("span[id^='thread_'] a[href^='thread-']")[0]
-        href = aa.get("href")
-        title = aa.text
-        print(i, href, title)
-        avLst.append(AvClass(title, href))
-    return avLst
+    for page in range(1, 20) :
+        DRIVER.get("https://p.plus28.com/forum-717-{page}.html".format(page=page))
+        soup = bs(DRIVER.page_source, "html.parser")
+        tbodies = soup.select("tbody[id^='stickthread_']")
+        for i,v in enumerate(tbodies) :
+            aa = v.select("span[id^='thread_'] a[href^='thread-']")[0]
+            href = aa.get("href")
+            title = aa.text
+            print(i, href, title)
+            THREAD.queue.appendleft(AvClass(title, href))
+
+        tbodies = soup.select("tbody[id^='normalthread_']")
+        for i,v in enumerate(tbodies) :
+            aa = v.select("span[id^='thread_'] a[href^='thread-']")[0]
+            href = aa.get("href")
+            title = aa.text
+            print(i, href, title)
+            THREAD.queue.appendleft(AvClass(title, href))
 
 
 class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
@@ -117,6 +119,7 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
         super().__init__()
         self.queue = queue_test_001.DequeObj()
         self.driver = seleniumUtil.getDriver()
+        self.pornDir = "plus28_porn_" + dateUtil.formatDatetimeByJavaFormat(None, "yyyyMMdd") + os.sep
         plus28Login_forPorn(self.driver, retry=0)
         self.start()
 
@@ -142,10 +145,8 @@ class MyPlus28TorrentFetcher(Thread, metaclass=ABCMeta) :
         try :
             av.torrentUrl = self.getAttachFileUrl(av.url)
             print("downloadAV", av.torrentUrl)
-            out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent"))
-            print("out", out)
+            out, err, errcode = simple_request_handler_001.doDownload_ver2(av.torrentUrl, fileUtil.getDesktopDir(av.title + ".torrent", self.pornDir))
             print("out", err)
-            print("out", errcode)
         except Exception as ex :
             errorHandler.printStackTrace()
 
@@ -177,11 +178,7 @@ THREAD = MyPlus28TorrentFetcher()
 
 def main() :
     plus28Login_forPorn(DRIVER, retry=0)
-
-    avLst = plus28ListPage()
-
-    for i, av in enumerate(avLst) :
-        THREAD.queue.appendleft(av)
+    plus28ListPage()
     
 
     

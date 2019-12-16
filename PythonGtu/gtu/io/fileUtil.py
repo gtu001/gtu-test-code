@@ -57,17 +57,39 @@ def get_line_number2(phrase, file_name):
 	return -1
 	
 	
-def getDesktopDir(fileName=''):
+def getDesktopDir(fileName="", folder=""):
 	'''取得桌面路徑'''
 # 	home = str(Path.home())
 	home = expanduser("~")
-	if sys.platform != 'linux' :
-		if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
-			return home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep + fileName
+	if stringUtil.isBlank(folder) :
+		mPath = ""
+		if sys.platform != 'linux' :
+			if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
+				mPath = home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep + fileName
+			else :
+				mPath = home + os.sep + "Desktop" + os.sep + fileName
 		else :
-			return home + os.sep + "Desktop" + os.sep + fileName
+			mPath = "/home/gtu001/桌面" + os.sep + fileName
+		if os.sep in fileName :
+			dirPath = getParentDir(mPath)
+			mkdirs(dirPath)
+		return mPath
 	else :
-		return "/home/gtu001/桌面" + os.sep + fileName
+		mDir = ""
+		if sys.platform != 'linux' :
+			if os.path.isdir(home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep):
+				mDir = home + os.sep + "OneDrive" + os.sep + "Desktop" + os.sep + folder
+			else :
+				mDir = home + os.sep + "Desktop" + os.sep + folder
+		else :
+			mDir = "/home/gtu001/桌面" + os.sep + folder
+		mkdirs(mDir)
+		return mDir + os.sep + fileName
+
+
+def getParentDir(yourpath) :
+	import os.path
+	return os.path.abspath(os.path.join(yourpath, os.pardir))
 	
 	
 def getAbsPath(path):
@@ -353,9 +375,6 @@ def rename(fromDir, fromName, toDir, toName):
 
 
 if __name__ == '__main__':
-	dirPath = "C:/Users/E123474/Desktop/FundQryRoiWebRequestDto.txt"
-	lst = loadFile_asList(dirPath, distinct=True)
-	for i,v in enumerate(lst) :
-		print(i, v)
+	dirPath = getDesktopDir("xxxxx/DDDDD/dfdfdffd.txt")
 	print("done..")
 	

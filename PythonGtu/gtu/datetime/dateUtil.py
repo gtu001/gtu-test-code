@@ -96,9 +96,14 @@ def formatDatetime(datetimeObj, format):
     return datetimeObj.strftime(format)
 
 
+
 def formatDatetimeByJavaFormat(datetimeObj, javaFormat):
+    if not datetimeObj or datetimeObj is None : 
+        datetimeObj = datetime.datetime.now()
     format = getForamtFromJava(javaFormat)
     return datetimeObj.strftime(format)
+
+
 
 if __name__ == '__main__' :
     dateObj = currentDate()
