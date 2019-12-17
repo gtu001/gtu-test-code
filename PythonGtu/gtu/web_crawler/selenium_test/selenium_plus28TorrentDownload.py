@@ -120,7 +120,7 @@ class ChromeDownloadRenameFileWatcher(Thread, metaclass=ABCMeta) :
         self.watchDir = watchDir
         print("watchDir", self.watchDir)
         self.queue = queue_test_001.DequeObj()
-        self.start()
+        # self.start()
 
     def addFileName(self, fileName) :
         print("## addFileName", fileName)
@@ -135,7 +135,8 @@ class ChromeDownloadRenameFileWatcher(Thread, metaclass=ABCMeta) :
                 file_name = change.pop()
                 if not file_name.endswith('.crdownload') :
                     real_name = self.queue.popright()
-                    real_name = real_name.replace(os.sep, "_")
+                    real_name = real_name.replace('\\', "_")
+                    real_name = real_name.replace('/', "_")
                     fileUtil.rename(self.watchDir, file_name, self.watchDir, real_name)
                     print("change name : ", file_name, "->", real_name)
                     

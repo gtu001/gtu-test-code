@@ -51,6 +51,9 @@ def _getChromeConfig(config) :
     if "downloadPath" in config :
         prefs["download.default_directory"] = config["downloadPath"]
         prefs["profile.default_content_settings.popups"] = 0
+        prefs["download.prompt_for_download"] = False
+        prefs["download.directory_upgrade"] = True
+        prefs["safebrowsing.enabled"] = True
     chromeOptions.add_experimental_option("prefs",prefs)
     return chromeOptions
 

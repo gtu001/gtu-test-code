@@ -156,7 +156,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlParameterConfigLoadHandler sqlParameterConfigLoadHandler = new SqlParameterConfigLoadHandler();
     private SqlIdColumnHolder mSqlIdColumnHolder = new SqlIdColumnHolder();
     public LoggerAppender updateLogger = new LoggerAppender(new File(JAR_PATH_FILE, "updateLog_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".txt"));
-
+    private static final String SQL_PARAM_PTN = "\\:([a-zA-Z]\\w*)";
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
 
     private JPanel contentPane;
@@ -2172,7 +2172,7 @@ public class FastDBQueryUI extends JFrame {
 
         public static SqlParam parseToSqlParam(String sql) {
             // 一般處理
-            Pattern ptn = Pattern.compile("\\:(\\w+)");
+            Pattern ptn = Pattern.compile(SQL_PARAM_PTN);
             Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));// <----------------
 
             List<String> paramList = new ArrayList<String>();
@@ -2250,7 +2250,7 @@ public class FastDBQueryUI extends JFrame {
             SqlParam_IfExists sqlParam = new SqlParam_IfExists();
             sqlParam.orginialSql = sql;
 
-            Pattern ptn = Pattern.compile("(\\[((?:.|\n)*?)\\]|\\:(\\w+))");
+            Pattern ptn = Pattern.compile("(\\[((?:.|\n)*?)\\]|" + SQL_PARAM_PTN + ")");
             Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));
 
             while (mth.find()) {
@@ -2259,7 +2259,7 @@ public class FastDBQueryUI extends JFrame {
                 // 非必填檢查
                 if (quoteLine.matches("^\\[(.|\n)*\\]")) {
                     String realQuoteLine = mth.group(2);
-                    Pattern ptn2 = Pattern.compile("\\:(\\w+)");
+                    Pattern ptn2 = Pattern.compile(SQL_PARAM_PTN);
                     Pattern ptn3 = Pattern.compile("\\_\\#.*?\\#\\_");
                     Matcher mth2 = ptn2.matcher(realQuoteLine);
                     Matcher mth3 = ptn3.matcher(realQuoteLine);
@@ -2956,6 +2956,44 @@ public class FastDBQueryUI extends JFrame {
                             }
                             mth.appendTail(sb);
                             return sb.toString();
+                        }
+                    })//
+                    .addJMenuItem("SQL 基礎 Select", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String tableName = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(tableName)) {
+                                tableName = "TABLE_NAME";
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("\t\r\n");
+                            sb.append("\t\r\n");
+                            sb.append("\tselect t.* \r\n");
+                            sb.append("\tfrom ").append(tableName).append(" t \r\n");
+                            sb.append("\twhere 1=1 \r\n");
+                            sb.append("\t\r\n");
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
+                    .addJMenuItem("SQL 基礎 Update", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String tableName = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(tableName)) {
+                                tableName = "TABLE_NAME";
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("\t\r\n");
+                            sb.append("\t\r\n");
+                            sb.append("\tupdate ").append(tableName).append(" t \r\n");
+                            sb.append("\tset t.AAAAAAA = 'xxxxxx' ").append(" t \r\n");
+                            sb.append("\twhere t.AAAAAAA = 'xxxxxx' \r\n");
+                            sb.append("\t\r\n");
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
                         }
                     })//
                     .addJMenuItem("插入系統日", new ActionListener() {
