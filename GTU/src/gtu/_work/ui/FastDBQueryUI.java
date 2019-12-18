@@ -777,28 +777,60 @@ public class FastDBQueryUI extends JFrame {
         });
 
         parametersTable.addMouseListener(new MouseAdapter() {
+
+            Pattern ptn = Pattern.compile("\\w+|\\w+\\s\\d{2}\\:\\d{2}\\:\\d{2}");
+
+            private void updateColumnParameter(List<String> params) {
+                DefaultTableModel model = (DefaultTableModel)parametersTable.getModel();
+                A : for(int ii = 0 ; ii < model.getRowCount() ; ii ++ ) {
+                    String column = (String)model.getValueAt(ii, 0);
+                    int pos = ListUtil.indexOfIgnorecase(column, params);
+                    if(pos != -1) {
+                        for(int jj = 0 ; jj < params.size() ; jj ++) {
+                            if(jj > pos) {
+                                model.setValueAt(params.get(jj), ii, jj);
+                                break A;
+                            }
+                        }
+                    }
+                }
+            }
+
+            private void updateColumnParameters() {
+                BufferedReader reader = null;
+                Matcher mth = null;
+                try {
+                    String content = ClipboardUtil.getInstance().getContents();
+                    reader = new BufferedReader(new StringReader(content));
+                    for (String line = null; (line = reader.readLine()) != null;) {
+                        List<String> lst = new ArrayList<String>();
+                        mth = ptn.matcher(line);
+                        while (mth.find()) {
+                            String word = StringUtils.trimToEmpty(mth.group());
+                            if (StringUtils.isNotBlank(word)) {
+                                lst.add(word);
+                            }
+                        }
+                        updateColumnParameter(lst);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                    }
+                }
+            }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (JMouseEventUtil.buttonRightClick(1, e)) {
                     JPopupMenuUtil.newInstance(parametersTable)//
-                            .addJMenuItem("複製欄位", new ActionListener() {
+                            .addJMenuItem("從剪貼簿貼上", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    BufferedReader reader = null;
-                                    try {
-                                        String content = ClipboardUtil.getInstance().getContents();
-                                        reader = new BufferedReader(new StringReader(content));
-                                        for (String line = null; (line = reader.readLine()) != null;) {
-                                            
-                                        }
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex);
-                                    } finally {
-                                        try {
-                                            reader.close();
-                                        } catch (IOException e1) {
-                                        }
-                                    }
+                                    updateColumnParameters();
                                 }
                             }).applyEvent(e)//
                             .show();

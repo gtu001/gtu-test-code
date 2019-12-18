@@ -218,13 +218,17 @@ public class ListUtil {
      * @return
      */
     public static boolean constainIgnorecase(String value, List<String> list) {
+        return -1 != indexOfIgnorecase(value, list);
+    }
+
+    public static int indexOfIgnorecase(String value, List<String> list) {
         for (int ii = 0; ii < list.size(); ii++) {
             String val = list.get(ii);
             if (StringUtils.equalsIgnoreCase(val, value)) {
-                return true;
+                return ii;
             }
         }
-        return false;
+        return -1;
     }
 
     /**
