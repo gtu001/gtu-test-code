@@ -120,7 +120,7 @@ class ChromeDownloadRenameFileWatcher(Thread, metaclass=ABCMeta) :
         self.watchDir = watchDir
         print("watchDir", self.watchDir)
         self.queue = queue_test_001.DequeObj()
-        # self.start()
+        self.start()
 
     def addFileName(self, fileName) :
         print("## addFileName", fileName)
