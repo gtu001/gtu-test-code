@@ -12,9 +12,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -767,6 +769,36 @@ public class FastDBQueryUI extends JFrame {
                                         }
                                     }
                                     ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "^"));
+                                }
+                            }).applyEvent(e)//
+                            .show();
+                }
+            }
+        });
+
+        parametersTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(parametersTable)//
+                            .addJMenuItem("複製欄位", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    BufferedReader reader = null;
+                                    try {
+                                        String content = ClipboardUtil.getInstance().getContents();
+                                        reader = new BufferedReader(new StringReader(content));
+                                        for (String line = null; (line = reader.readLine()) != null;) {
+                                            
+                                        }
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    } finally {
+                                        try {
+                                            reader.close();
+                                        } catch (IOException e1) {
+                                        }
+                                    }
                                 }
                             }).applyEvent(e)//
                             .show();
