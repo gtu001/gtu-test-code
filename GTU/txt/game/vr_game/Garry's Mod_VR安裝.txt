@@ -1,0 +1,18 @@
+
+安裝
+	VRMod (需要下載並解壓縮到遊戲目錄)
+	VR Pistol
+	[Half Life : Alyx] FPS Hands Replacement + PM
+ 
+
+OPT:桌面右鍵->Nvidia控制面板->管理3D設定->DSR因素(2.25x)
+
+
+進遊戲按Q->右邊Utilities->選Virtual Reality->VRMod
+
+
+進遊戲按C->選PlayerModel VR
+
+
+開始遊戲選(第一關)
+	Half-life2 -> 右邊選 d1_trainstation_01
