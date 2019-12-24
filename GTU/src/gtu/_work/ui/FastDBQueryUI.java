@@ -778,7 +778,7 @@ public class FastDBQueryUI extends JFrame {
 
         parametersTable.addMouseListener(new MouseAdapter() {
 
-            Pattern ptn = Pattern.compile("\\w+|\\w+\\s\\d{2}\\:\\d{2}\\:\\d{2}");
+            Pattern ptn = Pattern.compile("[\\w\\-\\:\\/]+\\s\\d{2}\\:\\d{2}\\:\\d{2}|[\\w\\-\\:\\/]+|\\w+");
 
             private void updateColumnParameter(List<String> params) {
                 DefaultTableModel model = (DefaultTableModel)parametersTable.getModel();
@@ -2361,7 +2361,7 @@ public class FastDBQueryUI extends JFrame {
 
         private String toQuestionMarkSql(String markSql, List<Object> rtnParamLst, Map<String, Object> paramMap, Map<String, String> sqlInjectionMap) {
             // -----------------------------------------------------------------------------
-            Pattern ptn = Pattern.compile(":(\\w+)");
+            Pattern ptn = Pattern.compile(SQL_PARAM_PTN);
             Matcher mth = ptn.matcher(markSql);
             StringBuffer sb = new StringBuffer();
 
