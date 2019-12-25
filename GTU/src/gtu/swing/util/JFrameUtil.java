@@ -10,6 +10,8 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
@@ -106,7 +108,7 @@ public class JFrameUtil {
         });
         return true;
     }
-    
+
     public static void showBoundSize(Component component) {
         component.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
@@ -122,5 +124,23 @@ public class JFrameUtil {
             w = w.getParent();
         }
         return (Frame) w;
+    }
+
+    public static class FrameAlwaysOnTopHandler {
+        Map<Frame, Boolean> allFrameMap = new HashMap<Frame, Boolean>();
+
+        public FrameAlwaysOnTopHandler() {
+            Frame[] allFrames = Frame.getFrames();
+            for (Frame f : allFrames) {
+                allFrameMap.put(f, f.isAlwaysOnTop());
+                f.setAlwaysOnTop(false);
+            }
+        }
+
+        public void done() {
+            for (Frame f : allFrameMap.keySet()) {
+                f.setAlwaysOnTop(allFrameMap.get(f));
+            }
+        }
     }
 }

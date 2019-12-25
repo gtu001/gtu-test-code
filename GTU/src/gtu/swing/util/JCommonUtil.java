@@ -76,6 +76,7 @@ import gtu.date.DateUtil;
 import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
 import gtu.runtime.DesktopUtil;
+import gtu.swing.util.JFrameUtil.FrameAlwaysOnTopHandler;
 
 /**
  * @author gtu001
@@ -424,21 +425,29 @@ public class JCommonUtil {
      * 顯示prompt視窗
      */
     public static String _jOptionPane_showInputDialog(Object message, String defaultValue) {
-        return (String) JOptionPaneUtil.newInstance().showInputDialog(message, "INPUT", defaultValue);
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        String strVal = (String) JOptionPaneUtil.newInstance().showInputDialog(message, "INPUT", defaultValue);
+        t.done();
+        return strVal;
     }
 
     /**
      * 顯示prompt視窗
      */
     public static String _jOptionPane_showInputDialog(Object message) {
-        return JOptionPaneUtil.newInstance().showInputDialog(message, "INPUT");
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        String strVal = (String) JOptionPaneUtil.newInstance().showInputDialog(message, "INPUT");
+        t.done();
+        return strVal;
     }
 
     /**
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_error(Object message) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
         JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
+        t.done();
     }
 
     /**
@@ -448,8 +457,10 @@ public class JCommonUtil {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
                 int icon = isError ? JOptionPane.ERROR_MESSAGE : JOptionPane.INFORMATION_MESSAGE;
                 JOptionPane.showMessageDialog(null, message, title, icon);
+                t.done();
             }
         });
     }
@@ -478,7 +489,9 @@ public class JCommonUtil {
                 }
                 sb.append(replaceHtml(strMessage.substring(startPos)));
                 strMessage = "<html>" + sb + "</html>";
+                FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
                 JOptionPane.showMessageDialog(null, strMessage);
+                t.done();
             }
         });
     }
@@ -488,7 +501,9 @@ public class JCommonUtil {
      */
     public static void _jOptionPane_showMessageDialog_error_NonUICompatible(Object message) {
         try {
+            FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
             JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
+            t.done();
         } catch (java.awt.HeadlessException ex) {
             System.out.println("<<showMessageDialog>> " + "ERROR" + " : " + message);
             System.err.println("Non UI Mode!");
@@ -499,7 +514,9 @@ public class JCommonUtil {
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_error(Object message, String title) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+        t.done();
     }
 
     /**
@@ -507,7 +524,9 @@ public class JCommonUtil {
      */
     public static void _jOptionPane_showMessageDialog_error_NonUICompatible(Object message, String title) {
         try {
+            FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
             JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+            t.done();
         } catch (java.awt.HeadlessException ex) {
             System.out.println("<<showMessageDialog>>[ERR] " + title + " : " + message);
             System.err.println("Non UI Mode!");
@@ -518,12 +537,16 @@ public class JCommonUtil {
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_info(Object message, String title) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+        t.done();
     }
 
     public static void _jOptionPane_showMessageDialog_info_NonUICompatible(Object message, String title) {
         try {
+            FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
             JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
+            t.done();
         } catch (java.awt.HeadlessException ex) {
             System.out.println("<<showMessageDialog>>[INFO] " + title + " : " + message);
             System.err.println("Non UI Mode!");
@@ -534,12 +557,16 @@ public class JCommonUtil {
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_info(Object message) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
         JOptionPane.showMessageDialog(null, message, "INFO", JOptionPane.INFORMATION_MESSAGE);
+        t.done();
     }
 
     public static void _jOptionPane_showMessageDialog_info_NonUICompatible(Object message) {
         try {
+            FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
             JOptionPane.showMessageDialog(null, message, "INFO", JOptionPane.INFORMATION_MESSAGE);
+            t.done();
         } catch (java.awt.HeadlessException ex) {
             System.out.println("<<showMessageDialog>> " + "INFO" + " : " + message);
             System.err.println("Non UI Mode!");
@@ -550,7 +577,9 @@ public class JCommonUtil {
      * 顯示alert視窗
      */
     public static void _jOptionPane_showMessageDialog_info_byComponent(Component component, Object message) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
         JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent(component), message);
+        t.done();
     }
 
     /**
@@ -585,18 +614,27 @@ public class JCommonUtil {
      * 顯示confirm視窗, 按OK回傳true
      */
     public static boolean _JOptionPane_showConfirmDialog_yesNoOption(Object message, String title) {
-        return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        boolean rtnVal = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
+        t.done();
+        return rtnVal;
     }
 
     /**
      * 顯示輸入下拉項目
      */
     public static Object _JOptionPane_showInputDialog(Object message, String title, Object[] drowdown, Object defaultValue) {
-        return JOptionPaneUtil.newInstance().showInputDialog_drowdown(message, title, drowdown, defaultValue);
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        Object rtnVal = JOptionPaneUtil.newInstance().showInputDialog_drowdown(message, title, drowdown, defaultValue);
+        t.done();
+        return rtnVal;
     }
 
     public static Object _JOptionPane_showInputDialog_top(Object message, String title, Object[] drowdown, Object defaultValue) {
-        return JOptionPaneUtil.newInstance().showInputDialog_drowdown_top(message, title, drowdown, defaultValue);
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        Object rtnVal = JOptionPaneUtil.newInstance().showInputDialog_drowdown_top(message, title, drowdown, defaultValue);
+        t.done();
+        return rtnVal;
     }
 
     /**
@@ -1029,11 +1067,16 @@ public class JCommonUtil {
     /**
      * 將視窗帶到最上層顯示
      */
-    public static void setFrameAtop(Window window, boolean alaysOnTop) {
+    public static void setFrameAtop(Window window, Boolean alaysOnTop) {
         if (window instanceof JDialog) {
             JDialog d = (JDialog) window;
             d.setModal(true);
         }
+
+        if (alaysOnTop == null) {
+            alaysOnTop = window.isAlwaysOnTop();
+        }
+        window.setAlwaysOnTop(true);
 
         // 設定顯示
         window.setVisible(true);
