@@ -1067,16 +1067,16 @@ public class JCommonUtil {
     /**
      * 將視窗帶到最上層顯示
      */
-    public static void setFrameAtop(Window window, Boolean alaysOnTop) {
+    public static void setFrameAtop(Window window, boolean forceBringToTop) {
         if (window instanceof JDialog) {
             JDialog d = (JDialog) window;
             d.setModal(true);
         }
 
-        if (alaysOnTop == null) {
-            alaysOnTop = window.isAlwaysOnTop();
+        boolean alaysOnTop = window.isAlwaysOnTop();
+        if (forceBringToTop) {
+            window.setAlwaysOnTop(true);
         }
-        window.setAlwaysOnTop(true);
 
         // 設定顯示
         window.setVisible(true);

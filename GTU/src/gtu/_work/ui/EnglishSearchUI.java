@@ -635,7 +635,7 @@ public class EnglishSearchUI extends JFrame {
         JCommonUtil.defaultToolTipDelay();
         addWindowFocusListener(new WindowFocusListener() {
             public void windowGainedFocus(WindowEvent e) {
-                focusSearchEnglishIdText();
+                // focusSearchEnglishIdText(); TODO
             }
 
             public void windowLostFocus(WindowEvent e) {
@@ -912,7 +912,7 @@ public class EnglishSearchUI extends JFrame {
 
         this.addWindowListener(new WindowAdapter() {
             public void windowOpened(WindowEvent e) {
-                focusSearchEnglishIdText();
+                // focusSearchEnglishIdText(); TODO
             }
         });
 
@@ -1518,6 +1518,8 @@ public class EnglishSearchUI extends JFrame {
                 }
                 searchResultArea.setText(sb.toString());
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
+                
+                searchEnglishIdText.hidePopup();
             }
         }).start();
     }
@@ -1531,6 +1533,8 @@ public class EnglishSearchUI extends JFrame {
 
     private void queryButtonAction(boolean bringToFront) {
         try {
+            searchEnglishIdText.hidePopup();
+            
             if (!queryButton.isEnabled()) {
                 return;
             }
@@ -1563,18 +1567,25 @@ public class EnglishSearchUI extends JFrame {
             if (bringToFront) {
                 bringToTop();
             }
+            searchEnglishIdText.hidePopup();
         }
     }
 
     private boolean focusSearchEnglishIdText() {
+        // boolean cancelSelectAll = listenClipboardChk.isSelected() &&
+        // mouseSelectionChk.isSelected();
         boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent paramActionEvent) {
-                searchEnglishIdTextController.setSelectAll();
-            }
+                // if (!cancelSelectAll) {
+                // searchEnglishIdTextController.setSelectAll();
+                // }
+            }//
         });
         if (!isRobotFocus) {
-            searchEnglishIdTextController.setSelectAll();
+            // if (!cancelSelectAll) {
+            // searchEnglishIdTextController.setSelectAll();
+            // }
         }
         return isRobotFocus;
     }
