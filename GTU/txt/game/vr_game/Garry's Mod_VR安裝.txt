@@ -1,4 +1,7 @@
 https://www.youtube.com/watch?v=WEd1TaGd-xA&feature=youtu.be
+https://www.reddit.com/r/Lambda1VR/comments/e8ghgl/detailed_guide_halflife_2_campaign_in_vr_via/
+
+https://www.reddit.com/r/hlvr/comments/ef3882/halflife_vr_the_one_for_the_one_from_1998_public/?st=k4pz14ke&sh=74b44d41
 
 安裝
 	VRMod (需要下載並解壓縮到遊戲目錄)
@@ -17,3 +20,9 @@ OPT:桌面右鍵->Nvidia控制面板->管理3D設定->DSR因素(2.25x)
 
 開始遊戲選(第一關)
 	Half-life2 -> 右邊選 d1_trainstation_01
+
+
+
+
+
+	

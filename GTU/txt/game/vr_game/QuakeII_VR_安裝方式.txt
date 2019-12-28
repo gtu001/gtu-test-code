@@ -1,0 +1,4 @@
+開啟 http://www.malcolm-s.net/q2vr/
+下載 quake2vr-2.0.0-bin.zip
+解開直接蓋到目錄
+用 revive injector 開啟 quake2vr.exe
