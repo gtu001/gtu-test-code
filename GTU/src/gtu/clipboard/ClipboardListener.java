@@ -25,7 +25,8 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
 
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-    boolean isMointerOn = true;
+    boolean mMointerOn = true;
+    boolean mWatchException = true;
 
     public void run() {
         Transferable trans = getContentsTransferable();
@@ -78,7 +79,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
                     }
                 }
 
-                if (exceptoin != null) {
+                if (exceptoin != null && mWatchException) {
                     JCommonUtil.handleException(exceptoin);
                 }
             }
@@ -121,7 +122,7 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
     public abstract void processText(String text);
 
     public boolean processContents(Transferable t) {
-        if (!isMointerOn) {
+        if (!mMointerOn) {
             return false;
         }
         try {
@@ -145,11 +146,19 @@ public abstract class ClipboardListener extends Thread implements ClipboardOwner
     }
 
     public boolean isMointerOn() {
-        return isMointerOn;
+        return mMointerOn;
     }
 
     public void setMointerOn(boolean isMointerOn) {
         System.out.println(getTimestamp() + " " + "setMointerOn = " + isMointerOn);
-        this.isMointerOn = isMointerOn;
+        this.mMointerOn = isMointerOn;
+    }
+
+    public void setWatchException(boolean mWatchException) {
+        this.mWatchException = mWatchException;
+    }
+
+    public boolean isWatchException() {
+        return mWatchException;
     }
 }

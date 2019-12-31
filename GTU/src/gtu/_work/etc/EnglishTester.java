@@ -19,15 +19,13 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
@@ -36,10 +34,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -65,6 +65,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -129,11 +130,11 @@ public class EnglishTester extends javax.swing.JFrame {
     private File configFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), this.getClass().getSimpleName() + ".properties");
     private PropertiesUtilBean configProp = new PropertiesUtilBean(EnglishTester.class);
     private ConfigPropHelper configHelper = new ConfigPropHelper();
-    
+
     private interface ConfigKey {
         String PIC_DIR_KEY = "picDir";
     }
-    
+
     private static final int DELAY_TIME = 100;
 
     /**
@@ -143,9 +144,9 @@ public class EnglishTester extends javax.swing.JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 EnglishTester inst = new EnglishTester();
-//                inst.setLocationRelativeTo(null);
+                // inst.setLocationRelativeTo(null);
                 JCommonUtil.setLocationToRightBottomCorner(inst);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -238,14 +239,14 @@ public class EnglishTester extends javax.swing.JFrame {
                             jPanel5.add(questionCountLabel);
                             questionCountLabel.setPreferredSize(new java.awt.Dimension(47, 21));
                             questionCountLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                            questionCountLabel.setToolTipText("剩餘數");
+                            questionCountLabel.setToolTipText("問題剩餘數");
                         }
                         {
                             propCountLabel = new JLabel();
                             jPanel5.add(propCountLabel);
                             propCountLabel.setPreferredSize(new java.awt.Dimension(45, 21));
                             propCountLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                            propCountLabel.setToolTipText("總數");
+                            propCountLabel.setToolTipText("加入Prop總數");
                         }
                         {
                             googleSearchBtn = new JButton();
@@ -259,7 +260,9 @@ public class EnglishTester extends javax.swing.JFrame {
                                         ClipboardUtil.getInstance().setContents(word);
                                         word = word.replace(" ", "%20");
                                         URI uri = new URI("https://www.google.com.tw/search?num=10&hl=zh-TW&site=imghp&tbm=isch&source=hp&biw=1280&bih=696&q=" + word);
-                                        //URI uri = new URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word=" + word);
+                                        // URI uri = new
+                                        // URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word="
+                                        // + word);
                                         Desktop.getDesktop().browse(uri);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);
@@ -310,6 +313,7 @@ public class EnglishTester extends javax.swing.JFrame {
                         }
                         {
                             scanPicBtn = new JButton();
+                            scanPicBtn.setToolTipText("顯示圖片");
                             scanPicBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e) {
                                 }
@@ -338,7 +342,9 @@ public class EnglishTester extends javax.swing.JFrame {
                                         ClipboardUtil.getInstance().setContents(text);
                                         text = text.replace(" ", "%20");
                                         URI uri = new URI("https://www.google.com.tw/search?num=10&hl=zh-TW&site=imghp&tbm=isch&source=hp&biw=1280&bih=696&q=" + text);
-                                        //URI uri = new URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word=" + text);
+                                        // URI uri = new
+                                        // URI("http://image.baidu.com/search/index?tn=baiduimage&ps=1&ct=201326592&lm=-1&cl=2&nc=1&ie=utf-8&word="
+                                        // + text);
                                         Desktop.getDesktop().browse(uri);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);
@@ -350,6 +356,7 @@ public class EnglishTester extends javax.swing.JFrame {
                             showChineseOption = new JCheckBox();
                             showChineseOption.setSelected(true);
                             jPanel5.add(showChineseOption);
+                            showChineseOption.setToolTipText("顯示中文");
                         }
                     }
                 }
@@ -592,6 +599,7 @@ public class EnglishTester extends javax.swing.JFrame {
                         picOnly = new JCheckBox();
                         jPanel4.add(picOnly);
                         picOnly.setText("picOnly");
+                        picOnly.setToolTipText("只問有圖的");
                     }
                     {
                         sortChkBox = new JCheckBox();
@@ -606,6 +614,15 @@ public class EnglishTester extends javax.swing.JFrame {
                     }
                     {
                         JCommonUtil.defaultToolTipDelay();
+                        {
+                            wrongAnswerOpenDictComboBox = new JComboBox();
+                            DefaultComboBoxModel comModel = new DefaultComboBoxModel();
+                            for (WrongAnswerOpenDictComboBox_Choice e : WrongAnswerOpenDictComboBox_Choice.values()) {
+                                comModel.addElement(e);
+                            }
+                            wrongAnswerOpenDictComboBox.setModel(comModel);
+                            jPanel4.add(wrongAnswerOpenDictComboBox);
+                        }
                         fontSizeSliber = new JSlider(JSlider.HORIZONTAL);
                         jPanel4.add(fontSizeSliber);
                         fontSizeSliber.setPreferredSize(new java.awt.Dimension(419, 35));
@@ -645,7 +662,7 @@ public class EnglishTester extends javax.swing.JFrame {
                         jScrollPane4.setPreferredSize(new java.awt.Dimension(420, 211));
                         {
                             fileList = new JList();
-                            reloadFileList();
+                            reloadFileList(null);
                             jScrollPane4.setViewportView(fileList);
                             fileList.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(MouseEvent evt) {
@@ -655,7 +672,7 @@ public class EnglishTester extends javax.swing.JFrame {
                                                 .addJMenuItem("reload", new ActionListener() {
                                                     @Override
                                                     public void actionPerformed(ActionEvent e) {
-                                                        reloadFileList();
+                                                        reloadFileList(null);
                                                     }
                                                 })//
                                                 .addJMenuItem("delete : " + file.getName(), new ActionListener() {
@@ -664,7 +681,7 @@ public class EnglishTester extends javax.swing.JFrame {
                                                         boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("delete : " + file.getName() + " ?", "confirm");
                                                         if (result) {
                                                             file.delete();
-                                                            reloadFileList();
+                                                            reloadFileList(null);
                                                         }
                                                     }//
                                                 }).show();
@@ -762,7 +779,7 @@ public class EnglishTester extends javax.swing.JFrame {
                                     JCommonUtil._jOptionPane_showMessageDialog_error("picDir is null");
                                     return;
                                 }
-                                if(!picDir.exists() || !picDir.isDirectory()) {
+                                if (!picDir.exists() || !picDir.isDirectory()) {
                                     JCommonUtil._jOptionPane_showMessageDialog_error("picDir 路徑錯誤");
                                     return;
                                 }
@@ -790,33 +807,41 @@ public class EnglishTester extends javax.swing.JFrame {
                     }
                 }
             }
-            
+
+            JCommonUtil.applyDropFiles(this, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<File> fileLst = (List<File>) e.getSource();
+                    reloadFileList(fileLst);
+                }
+            });
+
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/english_tester.ico");
-            
+
             pack();
             this.setSize(423, 314);
-            
+
             configHelper.init();
         } catch (Exception e) {
             // add your error handling code here
             e.printStackTrace();
         }
     }
-    
+
     private class ConfigPropHelper {
         private void init() {
-            if(configProp.getConfigProp().containsKey(ConfigKey.PIC_DIR_KEY)) {
+            if (configProp.getConfigProp().containsKey(ConfigKey.PIC_DIR_KEY)) {
                 String v1 = configProp.getConfigProp().getProperty(ConfigKey.PIC_DIR_KEY);
                 picFolderDirText.setText(v1);
             }
         }
-        
+
         private void save() {
             File f1 = new File(picFolderDirText.getText());
-            if(f1.exists() && f1.isDirectory()) {
+            if (f1.exists() && f1.isDirectory()) {
                 String fPath = f1.getAbsolutePath();
                 configProp.getConfigProp().put(ConfigKey.PIC_DIR_KEY, fPath);
-            }else {
+            } else {
                 JCommonUtil._jOptionPane_showMessageDialog_error("路徑錯誤 :" + f1);
                 return;
             }
@@ -824,15 +849,44 @@ public class EnglishTester extends javax.swing.JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
         }
     }
-    
+
+    private enum WrongAnswerOpenDictComboBox_Choice {
+        無() {
+            String getURL(String text) {
+                return "";
+            }
+        }, //
+        英英字典() {
+            String getURL(String text) {
+                return "http://www.thefreedictionary.com/" + text;
+            }
+        }, //
+        搜圖() {
+            String getURL(String text) {
+                return "https://www.google.com.tw/search?num=10&hl=zh-TW&site=imghp&tbm=isch&source=hp&biw=1280&bih=696&q=" + text;
+            }
+        }, //
+        ;
+
+        WrongAnswerOpenDictComboBox_Choice() {
+        }
+
+        abstract String getURL(String text);
+    }
 
     void browseOnlineDictionary() {
         try {
-            String text = currentWordIndex.trim().toLowerCase();
-            ClipboardUtil.getInstance().setContents(text);
-            text = text.replace(" ", "%20");
-            URI uri = new URI("http://www.thefreedictionary.com/" + text);
-            Desktop.getDesktop().browse(uri);
+            String text1 = currentWordIndex.trim().toLowerCase();
+            ClipboardUtil.getInstance().setContents(text1);
+            String text = text1.replace(" ", "%20");
+
+            WrongAnswerOpenDictComboBox_Choice e = (WrongAnswerOpenDictComboBox_Choice) wrongAnswerOpenDictComboBox.getSelectedItem();
+            String strUrl = e.getURL(text);
+
+            if (StringUtils.isNotBlank(strUrl)) {
+                URI uri = new URI(strUrl);
+                Desktop.getDesktop().browse(uri);
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -923,20 +977,43 @@ public class EnglishTester extends javax.swing.JFrame {
         return "<html>" + sb.toString() + "</html>";
     }
 
-    /**
-     * 載入所有檔案清單
-     */
-    void reloadFileList() {
-        DefaultListModel fileListModel = new DefaultListModel();
-        File targetDir = PropertiesUtil.getJarCurrentPath(EnglishTester.class); // FIXME
-//        targetDir = new File("D:/my_tool/english"); // FIXME
+    private void appendDirFileLst(File targetDir, List<File> fileLst) {
         File[] list = targetDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return name.matches(".*\\.properties");
             }
         });
-        Arrays.sort(list, new Comparator<File>() {
+        if (list != null) {
+            for (File f : list) {
+                fileLst.add(f);
+            }
+        }
+    }
+
+    /**
+     * 載入所有檔案清單
+     */
+    void reloadFileList(List<File> fileLst) {
+        if (fileLst == null) {
+            File targetDir = PropertiesUtil.getJarCurrentPath(EnglishTester.class); // FIXME
+            // targetDir = new File("D:/my_tool/english"); // FIXME
+            fileLst = new ArrayList<File>();
+            appendDirFileLst(targetDir, fileLst);
+        } else {
+            List<File> fileLst2 = new ArrayList<File>();
+            for (File f : fileLst) {
+                if (f.isDirectory()) {
+                    appendDirFileLst(f, fileLst2);
+                } else {
+                    fileLst2.add(f);
+                }
+            }
+            fileLst = fileLst2;
+        }
+
+        DefaultListModel fileListModel = new DefaultListModel();
+        Collections.sort(fileLst, new Comparator<File>() {
             @Override
             public int compare(File o1, File o2) {
                 if (o1.lastModified() < o2.lastModified()) {
@@ -948,7 +1025,7 @@ public class EnglishTester extends javax.swing.JFrame {
                 return 0;
             }
         });
-        for (File f : list) {
+        for (File f : fileLst) {
             fileListModel.addElement(f);
         }
         fileList.setModel(fileListModel);
@@ -1082,9 +1159,10 @@ public class EnglishTester extends javax.swing.JFrame {
     private JPanel panel;
     private JLabel inputTestLabel;
     private JCheckBox inputTestChk;
-    
+
     SysTrayUtil trayUtil = SysTrayUtil.newInstance();
     private JTextField picFolderDirText;
+    private JComboBox wrongAnswerOpenDictComboBox;
 
     void filterHasPicProp() {
         picDir = new File(picFolderDirText.getText());
@@ -1092,7 +1170,7 @@ public class EnglishTester extends javax.swing.JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_error("picDir null 2");
             return;
         }
-        if(!picDir.exists() || !picDir.isDirectory()) {
+        if (!picDir.exists() || !picDir.isDirectory()) {
             JCommonUtil._jOptionPane_showMessageDialog_error("picDir 路徑錯誤2");
             return;
         }
@@ -1166,32 +1244,32 @@ public class EnglishTester extends javax.swing.JFrame {
             }
             initSizeLabel();
         }
-        
+
         /**
          * 將單字加入背誦清單
          */
-        private void addToRecitePickProperties(KeyEvent e){
+        private void addToRecitePickProperties(KeyEvent e) {
             String v = wordsList.get(0);
             String desc = englishProp.getProperty(v);
-            if(KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_C){
-                if(pickProp == null){
+            if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_C) {
+                if (pickProp == null) {
                     pickProp = new Properties();
                 }
                 trayUtil.createDefaultTray();
-                if(pickProp.containsKey(v)){
+                if (pickProp.containsKey(v)) {
                     pickProp.remove(v);
                     trayUtil.getTrayIcon().displayMessage("移除成功!", v + " " + desc, MessageType.INFO);
-                }else{
+                } else {
                     pickProp.setProperty(v, desc);
                     trayUtil.getTrayIcon().displayMessage("加入成功!", v + " " + desc, MessageType.INFO);
                 }
             }
         }
-        
+
         /**
          * 判斷書入是否正確 若正確救下一提
          */
-        private void compareInputIfSuccess(){
+        private void compareInputIfSuccess() {
             String v = wordsList.get(0);
             String v2 = inputTestArea2.getText();
             if (StringUtils.equalsIgnoreCase(v, v2)) {
@@ -1203,7 +1281,7 @@ public class EnglishTester extends javax.swing.JFrame {
                         @Override
                         public void run() {
                             try {
-                                if(!inputTestChk.isSelected()){
+                                if (!inputTestChk.isSelected()) {
                                     Thread.sleep(1000L);
                                 }
                             } catch (InterruptedException e) {
@@ -1278,7 +1356,7 @@ public class EnglishTester extends javax.swing.JFrame {
                 // jTabbedPane1.setSelectedIndex(tabSelectedCombo.getSelectedIndex());//
                 // 設定顯示英文還中文
 
-                if(!EnglishTester.gtu.swing.util.JFrameUtil.isVisible(this)){
+                if (!JFrameUtil.isVisible(EnglishTester.this)) {
                     setVisible(true);
                 }
 
@@ -1332,7 +1410,7 @@ public class EnglishTester extends javax.swing.JFrame {
             showPicDialog.setLocation((int) this.getLocation().getX(), (int) this.getLocation().getY());
         }
         if (show == false) {
-             gtu.swing.util.JFrameUtil.setVisible(false,showPicDialog);
+            gtu.swing.util.JFrameUtil.setVisible(false, showPicDialog);
             return;
         } else {
             // 設定圖片背景
@@ -1346,10 +1424,10 @@ public class EnglishTester extends javax.swing.JFrame {
                 showPicDialog.repaint();
 
                 if (!gtu.swing.util.JFrameUtil.isVisible(showPicDialog)) {
-                     gtu.swing.util.JFrameUtil.setVisible(true,showPicDialog);
+                    gtu.swing.util.JFrameUtil.setVisible(true, showPicDialog);
                 }
             } else {
-                 gtu.swing.util.JFrameUtil.setVisible(false,showPicDialog);
+                gtu.swing.util.JFrameUtil.setVisible(false, showPicDialog);
             }
         }
     }
@@ -1382,11 +1460,11 @@ public class EnglishTester extends javax.swing.JFrame {
         File file;
         String name;
     }
-    
+
     private void saveConfigBtnAction() {
         try {
             configHelper.save();
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }

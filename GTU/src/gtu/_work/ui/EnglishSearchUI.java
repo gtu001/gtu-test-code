@@ -43,8 +43,12 @@ import java.util.Observer;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +66,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -187,6 +192,7 @@ public class EnglishSearchUI extends JFrame {
     private Properties offlineProp;
     private HermannEbbinghaus_Memory memory = new HermannEbbinghaus_Memory();
     private DialogTitleUpdaterObervable dialogObervable = new DialogTitleUpdaterObervable();
+    private EnglishIdDropdownHandler mEnglishIdDropdownHandler;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
 
     /**
@@ -682,6 +688,8 @@ public class EnglishSearchUI extends JFrame {
         searchEnglishIdTextController.get().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                mEnglishIdDropdownHandler.restoreDropdownLst();
+
                 // System.out.println("keyPressed ---- " + e);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     System.out.println("key ENTER");
@@ -1248,6 +1256,9 @@ public class EnglishSearchUI extends JFrame {
         lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
         offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
 
+        // service ----------------------------
+        mEnglishIdDropdownHandler = new EnglishIdDropdownHandler();
+
         JCommonUtil.frameCloseDo(this, new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 propertyBean.getConfigProp().setProperty("focusTopChk", String.valueOf(focusTopChk.isSelected()));
@@ -1287,6 +1298,7 @@ public class EnglishSearchUI extends JFrame {
                 listenClipboardThread.setDaemon(true);
                 listenClipboardThread.start();
                 listenClipboardThread.setMointerOn(listenClipboardChk.isSelected());
+                listenClipboardThread.setWatchException(false);
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -1300,28 +1312,38 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
+    private Lock brinToTopLock = new ReentrantLock();
+
     private void bringToTop() {
-        JCommonUtil.setFrameAtop(EnglishSearchUI.this, focusTopChk.isSelected());
+        try {
+            brinToTopLock.lock();
 
-        for (; true;) {
-            this.tabbedPane.setSelectedIndex(0);
-            if (this.tabbedPane.getSelectedIndex() == 0) {
-                break;
+            JCommonUtil.setFrameAtop(EnglishSearchUI.this, focusTopChk.isSelected());
+
+            for (; true;) {
+                this.tabbedPane.setSelectedIndex(0);
+                if (this.tabbedPane.getSelectedIndex() == 0) {
+                    break;
+                }
+                sleep(10);
             }
-            sleep(10);
-        }
 
-        // 判斷是否鎖定右下角
-        if (rightBottomCornerChk.isSelected()) {
-            JCommonUtil.setLocationToRightBottomCorner(this);
-        }
+            // 判斷是否鎖定右下角
+            if (rightBottomCornerChk.isSelected()) {
+                JCommonUtil.setLocationToRightBottomCorner(this);
+            }
 
-        focusSearchEnglishIdText();
+            focusSearchEnglishIdText();
 
-        // 開啟時自動查詢
-        if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
-                autoSearchChk.isSelected()) {
-            queryButtonAction(false);
+            // 開啟時自動查詢
+            if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
+                    autoSearchChk.isSelected()) {
+                queryButtonAction(false);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        } finally {
+            brinToTopLock.unlock();
         }
     }
 
@@ -1518,8 +1540,8 @@ public class EnglishSearchUI extends JFrame {
                 }
                 searchResultArea.setText(sb.toString());
                 meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
-                
-                searchEnglishIdText.hidePopup();
+
+                mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
             }
         }).start();
     }
@@ -1533,8 +1555,8 @@ public class EnglishSearchUI extends JFrame {
 
     private void queryButtonAction(boolean bringToFront) {
         try {
-            searchEnglishIdText.hidePopup();
-            
+            mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+
             if (!queryButton.isEnabled()) {
                 return;
             }
@@ -1567,25 +1589,62 @@ public class EnglishSearchUI extends JFrame {
             if (bringToFront) {
                 bringToTop();
             }
-            searchEnglishIdText.hidePopup();
+            mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+        }
+    }
+
+    private class EnglishIdDropdownHandler {
+        int maxRowCount = 0;
+        DefaultComboBoxModel empty;
+
+        EnglishIdDropdownHandler() {
+            maxRowCount = searchEnglishIdText.getMaximumRowCount();
+            empty = new DefaultComboBoxModel();
+        }
+
+        private void restoreDropdownLst() {
+            // searchEnglishIdText_auto.applyComboxBoxList(englishLst);
+            // searchEnglishIdText.setPopupVisible(true);
+        }
+
+        private void hidePopup4EnglishIdText() {
+            // searchEnglishIdText.setModel(empty);
+            new Timer().schedule(new TimerTask() {
+                public void run() {
+                    int time = 0;
+                    while (true) {
+                        if (searchEnglishIdText.isPopupVisible()) {
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    searchEnglishIdText.hidePopup();
+                                    searchEnglishIdText.setPopupVisible(false);
+                                }
+                            });
+                        }
+                        time++;
+                        if (time >= 30) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+            }, 0);
         }
     }
 
     private boolean focusSearchEnglishIdText() {
-        // boolean cancelSelectAll = listenClipboardChk.isSelected() &&
-        // mouseSelectionChk.isSelected();
         boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent paramActionEvent) {
-                // if (!cancelSelectAll) {
-                // searchEnglishIdTextController.setSelectAll();
-                // }
+                mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
             }//
         });
         if (!isRobotFocus) {
-            // if (!cancelSelectAll) {
-            // searchEnglishIdTextController.setSelectAll();
-            // }
+            mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
         }
         return isRobotFocus;
     }

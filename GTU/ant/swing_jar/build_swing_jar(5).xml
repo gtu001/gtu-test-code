@@ -17,7 +17,7 @@
 
 
 	<!-- ant-contrib -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+	<!--<taskdef resource="net/sf/antcontrib/antcontrib.properties" />-->
 
 	<path id="my_test_classpath">
 		<pathelement path="${bin_dir}" />
@@ -30,6 +30,7 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -60,12 +61,15 @@
 		<jarfinder copyTo="${jars_dir}" repsitory="${jar_repsitory}">
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
+			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
+			
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
-			<packagename mode="small">org.apache.commons.lang3.Validate</packagename>
-			<packagename mode="small">org.apache.commons.io.IOUtils</packagename>
-
+			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
+			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 		</jarfinder>
 
@@ -107,7 +111,9 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" />
+		</antcall>
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -143,11 +149,23 @@
 		</antcall>
 	</target>
 
-	<target name="compiler">
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
+		<exec executable="cmd">
+			<arg value="/c start echo create ${main_class}.jar complete!!" />
+		</exec>
+		-->
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
+	</target>
+
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
 		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
-			<classpath path="${build_dir}" />
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
 		</javac>
 	</target>
 
@@ -162,28 +180,34 @@
 
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
-		<!--<jar destfile="${main_class}.jar" basedir="${build_dir}">
-			<manifest>
-				<attribute name="Main-Class" value="${main_class_full}" />
-			</manifest>
-		</jar>-->
+		<!--
+			<jar destfile="${main_class}.jar" basedir="${build_dir}">
+				<manifest>
+					<attribute name="Main-Class" value="${main_class_full}" />
+				</manifest>
+			</jar>
+			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<include name="**/*" />
 			</zipfileset>
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />
 				<attribute name="Class-Path" value="." />
-				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
+				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
 			</manifest>
 		</jar>
 	</target>
 
 	<target name="runJar" if="${enable}">
 		<echo># run ${main_class}.jar</echo>
-		<java jar="${main_class}.jar" fork="true" />
+		<java jar="${main_class}.jar" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
 	</target>
 
 	<target name="moveJarToDesktop" if="${enable}">
@@ -223,5 +247,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>
