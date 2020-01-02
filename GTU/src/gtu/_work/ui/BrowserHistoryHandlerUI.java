@@ -327,6 +327,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             hiddenChk = new JCheckBox("隱藏");
             panel_4.add(hiddenChk);
 
+            bootstartCombobox = new JComboBox();
+            bootstartCombobox.setToolTipText("boot啟動順序");
+            DefaultComboBoxModel b1model = new DefaultComboBoxModel();
+            b1model.addElement("");
+            for (int ii = 0; ii < 10; ii++) {
+                b1model.addElement("" + String.valueOf(ii + 1));
+            }
+            bootstartCombobox.setModel(b1model);
+            panel_4.add(bootstartCombobox);
+
             JPanel panel_2 = new JPanel();
             panel.add(panel_2, "4, 15, fill, fill");
             modifyTimeLabel = new JLabel("修改時間");
@@ -599,10 +609,53 @@ public class BrowserHistoryHandlerUI extends JFrame {
             // final do
             initLoading();
 
+            bootstartStarting();
+
             otherOpenPath = new OtherOpenPath(configSelf);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private List<UrlConfig> getUrlConfigList() {
+        List<UrlConfig> lst = new ArrayList<UrlConfig>();
+        for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
+            String url = (String) enu.nextElement();
+            final String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
+            AtomicReference<UrlConfig> dd = new AtomicReference<UrlConfig>();
+            try {
+                dd.set(UrlConfig.parseTo(url, title_tag_remark_time));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                continue;
+            }
+            final UrlConfig d = dd.get();
+            lst.add(d);
+        }
+        return lst;
+    }
+
+    private void bootstartStarting() {
+        List<UrlConfig> bootLst = new ArrayList<UrlConfig>();
+        List<UrlConfig> lst = getUrlConfigList();
+        for (UrlConfig d : lst) {
+            if (StringUtils.isNotBlank(d.bootStart)) {
+                bootLst.add(d);
+            }
+        }
+        Collections.sort(bootLst, new Comparator<UrlConfig>() {
+            @Override
+            public int compare(UrlConfig arg0, UrlConfig arg1) {
+                return StringUtils.trimToEmpty(arg0.bootStart).compareTo(StringUtils.trimToEmpty(arg1.bootStart));
+            }
+        });
+        StringBuilder sb = new StringBuilder();
+        for (UrlConfig d : bootLst) {
+            CommandTypeEnum e = CommandTypeEnum.valueOfFrom(d.commandType);
+            e.doOpen(d.url, this);
+            sb.append("bootstart -> ").append(d.url).append("\r\n");
+        }
+        batLogArea.setText(sb.toString());
     }
 
     private static String fixWindowUrl(String url) {
@@ -921,6 +974,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return d.remark;
             }
         }, //
+        bootStart(5) {
+            @Override
+            Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
+                return d.bootStart;
+            }
+        },
         VO(0) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
@@ -1005,6 +1064,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String isUseRemarkOpen = useRemarkOpenChk.isSelected() ? "Y" : "N";
             String isHidden = hiddenChk.isSelected() ? "Y" : "N";
             String orderMark = StringUtils.trimToEmpty((String) orderMarkComboBox.getSelectedItem());//
+            String bootStart = StringUtils.trimToEmpty(String.valueOf(bootstartCombobox.getSelectedItem()));
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             // Validate.notEmpty(url, "url 為空");
@@ -1033,6 +1093,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.isUseRemarkOpen = isUseRemarkOpen;
             d.isHidden = isHidden;
             d.orderMark = orderMark;
+            d.bootStart = bootStart;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -1070,6 +1131,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private AtomicBoolean searchBool = new AtomicBoolean(false);
     private JComboBox orderMarkComboBox;
+    private JComboBox bootstartCombobox;
 
     private void initLoading(final JProgressBarHelper progressBarHelper) {
         try {
@@ -1583,6 +1645,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String isUseRemarkOpen;// 是否使用remarkOpen
         String isHidden;// 是否隱藏此項目
         String orderMark; // 特許排序
+        String bootStart; // 開啟馬上執行
 
         private static SpecialCharHandler specialCharHandler;
 
@@ -1601,7 +1664,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String isHidden = specialCharHandler.getBeforeSave(d.isHidden);
             String remark = specialCharHandler.getBeforeSave(d.remark);
             String orderMark = specialCharHandler.getBeforeSave(d.orderMark);
-            return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark;
+            String bootStart = specialCharHandler.getBeforeSave(d.bootStart);
+            return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark + "^"
+                    + bootStart;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -1624,6 +1689,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String isUseRemarkOpen = getArryStr(args, 7);
                 String isHidden = getArryStr(args, 8);
                 String orderMark = getArryStr(args, 9);
+                String bootStart = getArryStr(args, 10);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -1637,6 +1703,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.isUseRemarkOpen = isUseRemarkOpen;
                 d.isHidden = isHidden;
                 d.orderMark = orderMark;
+                d.bootStart = bootStart;
 
                 return d;
             }
@@ -1748,6 +1815,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             commandTypeSetting.setValue(d.commandType);
             useRemarkOpenChk.setSelected("Y".equals(d.isUseRemarkOpen));
             hiddenChk.setSelected("Y".equals(d.isHidden));
+            bootstartCombobox.setSelectedItem(StringUtils.trimToEmpty(d.bootStart));
         } catch (Exception ex) {
             if (throwEx) {
                 throw new RuntimeException(ex);
