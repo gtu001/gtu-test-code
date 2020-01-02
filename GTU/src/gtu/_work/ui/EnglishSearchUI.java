@@ -70,6 +70,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -772,12 +774,6 @@ public class EnglishSearchUI extends JFrame {
                             }).applyEvent(arg0)//
                             .show();
                 }
-            }
-        });
-
-        searchEnglishIdText.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                queryButtonAction(true);
             }
         });
 
@@ -1517,25 +1513,29 @@ public class EnglishSearchUI extends JFrame {
                 int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
 
                 for (int ii = 0; ii < maxLoop; ii++) {
-                    WordInfo2 info2 = t2.parseToWordInfo(text, 1);
-                    List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
-                    if (exampleSentanceList.isEmpty()) {
+                    try {
+                        WordInfo2 info2 = t2.parseToWordInfo(text, 1);
+                        List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
+                        if (exampleSentanceList.isEmpty()) {
+                            break;
+                        }
+                        for (Pair<String, String> p : exampleSentanceList) {
+                            sb.append(p.getKey() + "\n");
+                            sb.append(p.getValue() + "\n");
+                            sb.append("\n");
+                        }
+
+                        meaningSet.add(info2.getMeaning2());
+                        if (ii == 0) {
+                            googleTranslateArea_SetTooltip(text, info2.getMeaning2());
+                        }
+
+                        if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
+                            findOk.set(true);
+                            appendMemoryBank(text, info2.getMeaning2());
+                        }
+                    } catch (Exception ex) {
                         break;
-                    }
-                    for (Pair<String, String> p : exampleSentanceList) {
-                        sb.append(p.getKey() + "\n");
-                        sb.append(p.getValue() + "\n");
-                        sb.append("\n");
-                    }
-
-                    meaningSet.add(info2.getMeaning2());
-                    if (ii == 0) {
-                        googleTranslateArea_SetTooltip(text, info2.getMeaning2());
-                    }
-
-                    if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
-                        findOk.set(true);
-                        appendMemoryBank(text, info2.getMeaning2());
                     }
                 }
                 searchResultArea.setText(sb.toString());
@@ -1646,6 +1646,9 @@ public class EnglishSearchUI extends JFrame {
         if (!isRobotFocus) {
             mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
         }
+        searchEnglishIdTextController.getCombobox().hidePopup();
+        searchEnglishIdTextController.setSelectAll();
+        searchEnglishIdTextController.getCombobox().hidePopup();
         return isRobotFocus;
     }
 
@@ -2016,7 +2019,7 @@ public class EnglishSearchUI extends JFrame {
     public void setVisible(boolean b) {
         if (b == false) {
             System.out.println("Hidden  ----------------------------------------");
-            Thread.dumpStack();
+            // Thread.dumpStack();
             System.out.println("Hidden  ----------------------------------------");
         }
         super.setVisible(b);
