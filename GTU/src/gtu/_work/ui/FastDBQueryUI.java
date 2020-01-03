@@ -335,7 +335,9 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
-        tabUI.setSize(1280, 760);
+
+        java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        tabUI.setSize((int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
         tabUI.startUI();
         TAB_UI1 = tabUI;
     }
@@ -781,13 +783,13 @@ public class FastDBQueryUI extends JFrame {
             Pattern ptn = Pattern.compile("[\\w\\-\\:\\/]+\\s\\d{2}\\:\\d{2}\\:\\d{2}|[\\w\\-\\:\\/]+|\\w+");
 
             private void updateColumnParameter(List<String> params) {
-                DefaultTableModel model = (DefaultTableModel)parametersTable.getModel();
-                A : for(int ii = 0 ; ii < model.getRowCount() ; ii ++ ) {
-                    String column = (String)model.getValueAt(ii, 0);
+                DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
+                A: for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    String column = (String) model.getValueAt(ii, 0);
                     int pos = ListUtil.indexOfIgnorecase(column, params);
-                    if(pos != -1) {
-                        for(int jj = 0 ; jj < params.size() ; jj ++) {
-                            if(jj > pos) {
+                    if (pos != -1) {
+                        for (int jj = 0; jj < params.size(); jj++) {
+                            if (jj > pos) {
                                 model.setValueAt(params.get(jj), ii, jj);
                                 break A;
                             }
