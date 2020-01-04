@@ -1,0 +1,17 @@
+https://dbrown.id.au/arcanum-windows-10.html
+
+	1. 下載 https://assets.dbrown.id.au/arcanum-windows-10/UAP091225.exe
+		安裝位置為(第二層) F:\SteamLibrary\steamapps\common\Arcanum\Arcanum\
+
+
+	2. 下載 https://assets.dbrown.id.au/arcanum-windows-10/HighRes1.5.zip
+		安裝位置為(第二層) 複製資料夾至 F:\SteamLibrary\steamapps\common\Arcanum\Arcanum\HighRes\
+		修改 config.ini 但 DDrawWrapper 必須為 0 
+		執行 _install.bat
+
+
+	3. 安裝 https://assets.dbrown.id.au/arcanum-windows-10/DxWrapper.zip
+		解壓縮到 (第二層) F:\SteamLibrary\steamapps\common\Arcanum\Arcanum\
+		蓋掉原來ddraw.dll
+		將settings.ini 裡面 DDrawCompat 改為 1
+		將setiings.ini 改名為 ddraw.ini

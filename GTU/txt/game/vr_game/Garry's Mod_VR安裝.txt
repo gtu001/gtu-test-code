@@ -9,7 +9,7 @@ https://www.reddit.com/r/hlvr/comments/ef3882/halflife_vr_the_one_for_the_one_fr
 	[Half Life : Alyx] FPS Hands Replacement + PM
  
 
-OPT:桌面右鍵->Nvidia控制面板->管理3D設定->DSR因素(2.25x)
+OPT:桌面右鍵->Nvidia控制面板->管理3D設定->DSR因素(3.00x), DSR平滑度(0%)
 
 
 進遊戲按Q->右邊Utilities->選Virtual Reality->VRMod
