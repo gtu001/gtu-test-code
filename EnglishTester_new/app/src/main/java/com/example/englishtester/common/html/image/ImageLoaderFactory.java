@@ -6,6 +6,7 @@ import com.example.englishtester.common.OnlinePicLoader;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
+import com.example.englishtester.common.txtbuffer.base.TxtBufferViewerMainHandler;
 
 /**
  * Created by gtu001 on 2018/8/8.
@@ -35,6 +36,8 @@ public class ImageLoaderFactory {
         Log.v(TAG, "altData - " + altData);
         if (this.dto instanceof TxtReaderActivity.TxtReaderActivityDTO) {
             return new ImageLoaderCandidate4WordHtml(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
+        } else if (this.dto instanceof TxtBufferViewerMainHandler.TxtBufferDTO) {
+            return new ImageLoaderCandidate4WordHtml_BufferVer(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
         } else if (this.dto instanceof EpubViewerMainHandler.EpubDTO) {
             return new ImageLoaderCandidate4EpubHtml(srcData, altData, isNeedLoadImage, onlinePicLoader, dto);
         } else if (this.dto instanceof MobiViewerMainHandler.MobiDTO) {

@@ -64,6 +64,13 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
         //----------------------------------------------------------------
         contentView.addView(createLabel(""));
+        contentView.addView(createLabel("純文字閱讀器,可開啟剪貼簿內容或Dropbox內容"));
+        contentView.addView(createButton("文字閱讀器[分頁]",//
+                createOnClickListener(TxtReaderBufferActivity.class, new Bundle(), null),
+                R.drawable.answer_button_lightblue));
+
+        //----------------------------------------------------------------
+        contentView.addView(createLabel(""));
         contentView.addView(createLabel("Epub閱讀器(beta)"));
         contentView.addView(createButton("Epub閱讀器(beta)",//
                 createOnClickListener(EpubReaderEpubActivity.class, new Bundle(), null),

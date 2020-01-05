@@ -13,6 +13,7 @@ import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
+import com.example.englishtester.common.txtbuffer.base.TxtBufferViewerMainHandler;
 
 public class TxtReaderAppenderSpanClass {
 
@@ -26,7 +27,7 @@ public class TxtReaderAppenderSpanClass {
     };//
 
     public static ClickableSpan createLinkSpan(Context context, String url, ITxtReaderActivityDTO dto) {
-        if (dto instanceof TxtReaderActivity.TxtReaderActivityDTO) {
+        if (dto instanceof TxtReaderActivity.TxtReaderActivityDTO || dto instanceof TxtBufferViewerMainHandler.TxtBufferDTO) {
             Log.v(TAG, ">> create Link [SimpleUrlLinkSpan] : " + url);
             return new SimpleUrlLinkSpan(context, url);
         } else if (dto instanceof EpubViewerMainHandler.EpubDTO) {

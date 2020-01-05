@@ -16,6 +16,7 @@ import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 import com.example.englishtester.common.pdf.base.PdfViewerMainHandler;
+import com.example.englishtester.common.txtbuffer.base.TxtBufferViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -387,6 +388,46 @@ public class TxtReaderAppender {
         long duringTime = System.currentTimeMillis() - startTime;
 
         Log.v(TAG, "duringTime : " + duringTime);
+
+        return Triple.of(pageDividLst, pages, orign4TranslateLst);
+    }
+
+    /**
+     * 建立可點擊文件
+     */
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4TxtBuffer(int spinePos, String txtContent, int maxPicWidth) {
+        long startTime = System.currentTimeMillis();
+
+        List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
+        Pair<List<String>, List<String>> pair = TxtReaderAppenderPageDivider.getInst().getPages(txtContent);
+        List<String> pages = pair.getLeft();
+        List<String> orign4TranslateLst = pair.getRight();
+
+        String fileName = dto.getFileName().toString();
+
+        //拿掉原本[*]部分
+        Pattern ptn = Pattern.compile("^(.*)\\[.*?\\]$");
+        Matcher mth = ptn.matcher(fileName);
+        if (mth.find()) {
+            fileName = mth.group(1);
+        }
+
+        int pageSize = pages.size();
+        TxtBufferViewerMainHandler.TxtPageTitleHandler titleHandler = new TxtBufferViewerMainHandler.TxtPageTitleHandler(fileName, spinePos, pageSize);
+
+        for (int ii = 0; ii < pages.size(); ii++) {
+            String page = pages.get(ii);
+
+            dto.setFileName(titleHandler.getTitle(ii));
+
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
+            pageDividLst.add(appender);
+        }
+
+        long duringTime = System.currentTimeMillis() - startTime;
+
+        Log.v(TAG, "duringTime : " + duringTime);
+
         return Triple.of(pageDividLst, pages, orign4TranslateLst);
     }
 }

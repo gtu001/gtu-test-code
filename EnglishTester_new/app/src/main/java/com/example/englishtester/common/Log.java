@@ -104,6 +104,10 @@ public class Log {
         });
     }
 
+    public static void line(String tag, final String message, int times) {
+        line(tag, message);
+    }
+
     public static void lineFix(String tag, String message) {
         final ClassInfo info = new ClassInfo(Log.class, tag);
         android.util.Log.v(info.getTag(), message);

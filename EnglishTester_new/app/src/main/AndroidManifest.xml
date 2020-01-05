@@ -136,6 +136,9 @@
             android:name="TxtReaderActivity"
             android:label="文字閱讀器" />
         <activity
+            android:name="TxtReaderBufferActivity"
+            android:label="文字閱讀器[Buffer]" />
+        <activity
             android:name=".EpubReaderEpubActivity"
             android:label="Epub閱讀器" />
         <activity
