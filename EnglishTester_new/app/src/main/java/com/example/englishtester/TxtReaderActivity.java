@@ -1185,7 +1185,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         } finally {
             try {
                 writer.close();
-                Log.line(TAG, writer.toString());
+                  Log.line(TAG, writer.toString());
             } catch (Exception ex) {
             }
         }
