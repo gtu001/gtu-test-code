@@ -6,7 +6,10 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TagMatcher;
+import com.nostra13.universalimageloader.utils.L;
 
+import org.apache.commons.collections.TransformerUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -16,6 +19,13 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.LinkedList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -275,17 +285,34 @@ public abstract class HtmlBaseParser {
         }
     }
 
-    protected String _step1_fontSize_Indicate(String content, boolean isPure) {
+    protected String _getSelectionString(String orignText, Callable<String> task) {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<String> future = executor.submit(task);
+        try {
+            return future.get(10000, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            return orignText;
+        }
+    }
+
+    protected String _step1_fontSize_Indicate(String content, final boolean isPure) {
         Matcher mth = null;
         try {
             Pattern ptn = Pattern.compile("\\<span(?:.|\n)*?\\<\\/span\\>", Pattern.MULTILINE | Pattern.DOTALL);
             mth = ptn.matcher(content);
-            StringBuffer sb = new StringBuffer();
+            final StringBuffer sb = new StringBuffer();
             while (mth.find()) {
-                String spanContent = mth.group();
-                spanContent = HtmlBaseParser.FontSizeIndicateEnum.SPAN001.apply(spanContent, isPure);
-                spanContent = StringUtil_.appendReplacementEscape(spanContent);
-                mth.appendReplacement(sb, spanContent);
+                final String spanContent = mth.group();
+                String spanContent1 = _getSelectionString(spanContent, new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        String spanContent1 = spanContent;
+                        spanContent1 = HtmlBaseParser.FontSizeIndicateEnum.SPAN001.apply(spanContent1, isPure);
+                        spanContent1 = StringUtil_.appendReplacementEscape(spanContent1);
+                        return spanContent1;
+                    }
+                });
+                mth.appendReplacement(sb, spanContent1);
             }
             mth.appendTail(sb);
             return sb.toString();

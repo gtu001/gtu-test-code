@@ -476,8 +476,6 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                     try {
                         File file = epubFileZ.get();
 
-                        Log.line(TAG, "file exists - " + file.exists() + " , " + file);
-
                         //設定書籍 及 初始化
                         txtBufferViewerMainHandler.initBook(file, TxtReaderBufferActivity.this);
 
@@ -485,19 +483,11 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                             @Override
                             public void run() {
 
-                                Log.line(TAG, "ALL_start ---- A");
-
                                 initViewPager();
-
-                                Log.line(TAG, "ALL_start ---- B");
 
                                 viewPager.setCurrentItem(0);
 
-                                Log.line(TAG, "ALL_start ---- 1");
-
                                 gotoViewPagerPosition(0);
-
-                                Log.line(TAG, "ALL_start ---- 2");
 
                                 if (translateView != null) {
                                     translateView.setText("");
@@ -760,27 +750,19 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
      * 初始化ViewPager
      */
     private void initViewPager() {
-        Log.line(TAG, "initViewPager --- 1");
-
         pageAdapter = new MyPageAdapter(this); //getSupportFragmentManager()
 
-        Log.line(TAG, "initViewPager --- 2");
-
         viewPager.setAdapter(pageAdapter);
-
-        Log.line(TAG, "initViewPager --- 3");
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 Log.v(TAG, "##### onPageScrolled");
-                Log.line(TAG, "initViewPager --- onPageScrolled");
             }
 
             @Override
             public void onPageSelected(final int position) {
-                Log.line(TAG, "initViewPager --- onPageSelected " + position);
                 Log.v(TAG, "##### onPageSelected");
                 txtBufferViewerMainHandler.getDto().setPageIndex(position);
 
@@ -796,12 +778,8 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
             @Override
             public void onPageScrollStateChanged(int state) {
                 Log.v(TAG, "##### onPageScrollStateChanged");
-
-                Log.line(TAG, "initViewPager --- onPageScrollStateChanged");
             }
         });
-
-        Log.line(TAG, "initViewPager --- 4");
     }
 
     //懸浮按鈕
@@ -901,13 +879,12 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
         TxtBufferViewerMainHandler.PageContentHolder pageHolder;
         MyViewHolder my;
         int position;
+        Handler handler = new Handler();
 
         PageForwardThread(final MyViewHolder my, int position) {
-            Log.line(TAG, "PageForwardThread - init - 1");
             this.my = my;
             this.self = TxtReaderBufferActivity.this;
             this.position = position;
-            Log.line(TAG, "PageForwardThread - init - 2");
         }
 
         protected boolean debugMode = false;
@@ -924,7 +901,6 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
         public void run() {
             while (true) {
-                Log.line(TAG, "PageForwardThread - run - 1");
                 if (txtBufferViewerMainHandler != null && txtBufferViewerMainHandler.isInitDone()) {
                     if (firstPageInit.get() == null && !txtBufferViewerMainHandler.isReady4Position()) {
 
@@ -947,27 +923,23 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                     }
 
                     //設定此頁內容
-                    Log.line(TAG, "PageForwardThread - run - 1-1");
                     setTextViewContent();
-                    Log.line(TAG, "PageForwardThread - run - 1-2");
                     break;
                 }
 
-                Log.line(TAG, "PageForwardThread - run - 1-3");
                 sleep_t(100);
-                Log.line(TAG, "PageForwardThread - run - 1-4");
                 continue;
             }
-            Log.line(TAG, "PageForwardThread - run - 2");
         }
 
         protected void setTextViewContent() {
-            Log.line(TAG, "PageForwardThread -  - setTextViewContent");
+            long startTime = System.currentTimeMillis();
 
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+            pageHolder = txtBufferViewerMainHandler.gotoPosition(position);
+
+            handler.post(new Runnable() {
 
                 private void processContent() {
-                    Log.line(TAG, "setTextViewContent ---- processContent 1");
                     if (!debugMode) {
                         SpannableString spannable = pageHolder.getCurrentPage();
                         my.txtReaderView.setText(spannable);
@@ -977,37 +949,18 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                     }
 
                     my.translateView.setText(StringUtils.trimToEmpty(pageHolder.getTranslateDoneText()));
-                    Log.line(TAG, "setTextViewContent ---- processContent 2");
                 }
 
                 @Override
                 public void run() {
-                    Log.line(TAG, "setTextViewContent ---- 1");
-
-                    long startTime = System.currentTimeMillis();
-
-                    Log.line(TAG, "setTextViewContent ---- 2 - " + position);
-
-                    pageHolder = txtBufferViewerMainHandler.gotoPosition(position);
-
-                    Log.line(TAG, "setTextViewContent ---- 3");
-
                     this.processContent();
-
-                    Log.line(TAG, "setTextViewContent ---- 4");
-
-                    my.isDone = true;
-
-                    long duringTime = System.currentTimeMillis() - startTime;
-                    Log.v(TAG, "duringTime : " + duringTime);
-
-                    Log.line(TAG, "setTextViewContent ---- 4");
                 }
             });
 
-//            handler.post();
+            my.isDone = true;
 
-            Log.line(TAG, "PageForwardThread -  - setTextViewContent END");
+            long duringTime = System.currentTimeMillis() - startTime;
+            Log.v(TAG, "duringTime : " + duringTime);
         }
     }
 

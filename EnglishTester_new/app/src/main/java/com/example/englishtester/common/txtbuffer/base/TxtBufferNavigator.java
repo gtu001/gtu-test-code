@@ -40,26 +40,11 @@ public class TxtBufferNavigator {
     }
 
     public void gotoFirstSpineSection(Object self) {
-
-        StringBuffer sb = new StringBuffer();
-        for(StackTraceElement s : Thread.currentThread().getStackTrace()){
-            sb.append(s + "\r\n");
-        }
-        Log.line(TAG, "# gotoFirstSpineSection #" + sb);
-
-
         String htmlContent = this.mTxtBookHandler.getFirstPage();
         this.initSpine(htmlContent);
     }
 
     public void gotoNextSpineSection(Runnable pagesReadyEvent) {
-
-        StringBuffer sb = new StringBuffer();
-        for(StackTraceElement s : Thread.currentThread().getStackTrace()){
-            sb.append(s + "\r\n");
-        }
-        Log.line(TAG, "# gotoNextSpineSection #" + sb);
-
         this.pagesReadyEvent = pagesReadyEvent;
         this.mTxtBookHandler.next();
         String htmlContent = this.mTxtBookHandler.getPage();
@@ -67,49 +52,37 @@ public class TxtBufferNavigator {
     }
 
     public void initSpine(String htmlContent) {
-        Log.line(TAG, "1----");
         if (this.mTxtBookHandler.hasNext()) {
-            Log.line(TAG, "2----");
             TxtBufferViewerMainHandler.PageContentHolder pageContentHolder = new TxtBufferViewerMainHandler.PageContentHolder();
 
-            Log.line(TAG, "3----");
             HtmlWordParser wordParser = HtmlWordParser.newInstance();
             String $tempResultContent = wordParser.getFromContent(htmlContent);
 
-            Log.line(TAG, "4----");
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(txtBufferActivityInterface, txtBufferActivityInterface.getRecentTxtMarkService(), dto, this.dto.getTxtView());
             Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4TxtBuffer(currentInitSpinePos, $tempResultContent, txtBufferActivityInterface.getFixScreenWidth());
 
-            Log.line(TAG, "5----");
             dto.setFileName(dto.getBookFile().getName());
             pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
             pageContentHolder.setSpinePos(currentInitSpinePos);
 
-            Log.line(TAG, ">>> Spine : " + currentInitSpinePos + " , pages : " + pageHolder.getMiddle().size(), 10);
+            Log.v(TAG, ">>> Spine : " + currentInitSpinePos + " , pages : " + pageHolder.getMiddle().size(), 10);
 
             spineRangeHolder.put(currentInitSpinePos, pageContentHolder, dto.getBookFile());
-
-            Log.line(TAG, "7----");
 
             currentInitSpinePos++;
 
             if (pagesReadyEvent != null) {
-                Log.line(TAG, "8----");
                 pagesReadyEvent.run();
             }
-            Log.line(TAG, "9----");
         }
-
-        Log.line(TAG, "10----");
     }
 
     public TxtBufferViewerMainHandler.PageContentHolder gotoPosition(int position) {
-        Log.line(TAG, "P---1");
         Log.v(TAG, ">> gotoPosition " + position);
         List keys = new ArrayList<Integer>(spineRangeHolder.spineHolder.get().keySet());
+
         Collections.sort(keys);
 
-        Log.line(TAG, "P---2");
         for (int ii = 0; ii < keys.size(); ii++) {
             Pair<Integer, Integer> pair = spineRangeHolder.getPageRange(ii);
 
@@ -118,6 +91,7 @@ public class TxtBufferNavigator {
                 boolean b2 = pair.getRight() >= position;
 
                 if (b1 && b2) {
+
                     TxtBufferViewerMainHandler.PageContentHolder pageContentHolder = spineRangeHolder.spineHolder.get().get(ii);
                     int currPos = position - pair.getLeft();
                     pageContentHolder.setCurrentPageIndex(currPos);
@@ -129,18 +103,15 @@ public class TxtBufferNavigator {
 
         final ArrayBlockingQueue<Boolean> blockQueue = new ArrayBlockingQueue<Boolean>(1);
         synchronized (this) {
-            Log.line(TAG, "P---3-block");
             //觸發取得下個頁面
             gotoNextSpineSection(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         blockQueue.offer(true, 10, TimeUnit.SECONDS);
-                        Log.line(TAG, "P---3-offer");
                     } catch (InterruptedException e) {
                         blockQueue.clear();
                         blockQueue.add(false);
-                        Log.line(TAG, "P---3-exception");
                     }
                 }
             });
@@ -149,7 +120,6 @@ public class TxtBufferNavigator {
         try {
 //            Log.line(TAG, "!!取得下個頁面");
             boolean isOk = blockQueue.take();
-            Log.line(TAG, "P---4-" + isOk);
             if (!isOk) {
                 throw new Exception("Spine取得超時:" + position);
             }
