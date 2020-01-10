@@ -351,7 +351,8 @@ public class FastDBQueryUI extends JFrame {
      */
     public FastDBQueryUI() throws FileNotFoundException, IOException, ClassNotFoundException {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 999, 734);
+        java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds(100, 100, (int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
