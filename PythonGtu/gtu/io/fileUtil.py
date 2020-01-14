@@ -8,6 +8,7 @@ import re
 from gtu.string import stringUtil
 import sys
 import collections
+import glob
 
 
 '''
@@ -355,10 +356,15 @@ def listFile_example2(dirpath):
                 
                 
 def listFile_example3():
-	import glob
 	print(glob.glob("/home/adam/*.txt"))
 	
 	
+
+def listFile_example4() :
+	path = Path("D:\\")
+	for i, file in enumerate(path.glob("*")) :
+		print(i, file)
+
 	
 	
 def deleteDir(dirPath):
@@ -381,6 +387,6 @@ def length(filepath) :
 
 
 if __name__ == '__main__':
-	dirPath = getDesktopDir("xxxxx/DDDDD/dfdfdffd.txt")
+	listFile_example4()
 	print("done..")
 	
