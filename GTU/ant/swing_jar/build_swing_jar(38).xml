@@ -157,9 +157,9 @@
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac compiler="javac1.6" source="1.8" target="1.8" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
+		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
 			<classpath>
 				<path location="${build_dir}" />

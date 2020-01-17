@@ -1,45 +1,28 @@
 package _temp;
 
-import java.io.IOException;
-import java.math.BigDecimal;
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import gtu.file.FileUtil;
 
 public class Test56 {
 
     public static void main(String[] args) {
-		String msg = "^.jar^.class";
-        String[] arry = StringUtils.trimToEmpty(msg).split("\\^", -1);
-        // System.out.println(Arrays.toString(arry));
-        Pattern ptn = Pattern.compile("[\\w\\-\\:\\/]+\\s\\d{2}\\:\\d{2}\\:\\d{2}|[\\w\\-\\:\\/]+|\\w+");
-        Matcher mth = ptn.matcher("2018-33-22");
+        File file = new File("D:\\work_tool\\20200114_sister_workspace\\cashweb\\src\\conf\\com\\wistron\\cashweb\\spring\\applicationContext-ibatis.xml");
+        String content = FileUtil.loadFromFile(file, "UTF8");
+
+        Pattern ptn = Pattern.compile("[\\x80-\\xFF]", Pattern.DOTALL | Pattern.MULTILINE);
+        Matcher mth = ptn.matcher(content);
+
+        int findCount= 0;
+        StringBuffer sb = new StringBuffer();
         while (mth.find()) {
-            System.out.println(mth.group());
+            mth.appendReplacement(sb, "^^^" + mth.group() + "^^^");
+            findCount ++;
         }
-        System.out.println("done...");
-
-
-        TTTT t = new TTTT();
-        t.xxxx = BigDecimal.TEN;
-        ObjectMapper mapper =new ObjectMapper();
-        try {
-            String thingString = mapper.writeValueAsString(t);
-            System.out.println(thingString);
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private static class TTTT {
-        @JsonFormat(shape=Shape.NUMBER)
-        private BigDecimal xxxx;
+        mth.appendTail(sb);
+        System.out.println("FindCount = " + findCount);
+        System.out.println(sb);
     }
 }

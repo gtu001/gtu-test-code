@@ -326,7 +326,7 @@ public class JarFinderUI extends javax.swing.JFrame {
                                         System.out.println("yes..");
                                         try {
                                             FileUtil.copyFile(srcFile, copyDestFile);
-                                        } catch (IOException e) {
+                                        } catch (Exception e) {
                                             JCommonUtil.handleException(e.toString(), e);
                                         }
                                         if (srcFile != null && //
@@ -339,6 +339,8 @@ public class JarFinderUI extends javax.swing.JFrame {
                                         break;
                                     case NO_OPTION:
                                         System.out.println("no..");
+                                        break;
+                                    default:
                                         break;
                                     }
                                 }
@@ -513,7 +515,7 @@ public class JarFinderUI extends javax.swing.JFrame {
             }
 
             if (result == ComfirmDialogResult.NO_OPTION) {
-                DesktopUtil.openDir(new File(fileName).getParentFile());
+                DesktopUtil.browseFileDirectory(new File(fileName));
             }
 
         } catch (Exception ex) {

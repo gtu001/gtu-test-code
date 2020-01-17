@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -45,6 +46,10 @@ public class JdbcDBUtil {
         // List<String> list =
         // JdbcDBUtil.queryColumnName("select * from V_AI_CO_SITE_FIND ", conn);
         // System.out.println(list);
+
+        Connection conn = DbConstant.getTestConnection_CTBC();
+        List<String> list = JdbcDBUtil.queryColumnName("select * from [dbo].[ZT_SystemLog] ", conn);
+        System.out.println(list);
     }
 
     /**

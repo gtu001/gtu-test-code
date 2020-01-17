@@ -31,6 +31,16 @@ public class DbConstant {
             }
         }
     }
+    
+    public static DataSource getTestDataSource_CTBC() {
+        BasicDataSource ds2 = new BasicDataSource();
+        ds2.setUrl("jdbc:sqlserver://10.1.117.144;databaseName=CASH_UUAT");
+        ds2.setUsername("sa");
+        ds2.setPassword("1qaz@WSX#");
+        ds2.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        applyToConnectionPool(ds2);
+        return ds2;
+    }
 
     private static void applyToConnectionPool(BasicDataSource bds) {
         bds.setMaxActive(10);

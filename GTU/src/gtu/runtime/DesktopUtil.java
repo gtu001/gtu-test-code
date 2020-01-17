@@ -133,7 +133,7 @@ public class DesktopUtil {
             if (OsInfoUtil.isWindows()) {
                 Runtime.getRuntime().exec("explorer.exe /select,\"" + file + "\"");
             } else {
-                Desktop.getDesktop().open(file);
+                openDir(file);
             }
         } catch (IOException e) {
             throw new RuntimeException("browseFileDirectory ERR : " + e.getMessage(), e);
