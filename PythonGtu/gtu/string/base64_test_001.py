@@ -31,7 +31,8 @@ if __name__ == '__main__' :
     strValArry2 = [
         'sa',
         '1qaz@WSX#',
-        'jdbc:sqlserver://10.1.117.144;databaseName=CASH_UUAT'
+        'jdbc:sqlserver://10.1.117.144;databaseName=CASH_UUAT',
+        'jdbc:jtds:sqlserver://10.1.117.144:1433/CASH_UUAT'
     ]
 
     for i, strVal in enumerate(strValArry2) :
