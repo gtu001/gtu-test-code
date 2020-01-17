@@ -42,6 +42,16 @@ public class DbConstant {
         return ds2;
     }
 
+    public static DataSource getTestDataSource_CTBC_jdts() {
+        BasicDataSource ds2 = new BasicDataSource();
+        ds2.setUrl("jdbc:jtds:sqlserver://10.1.117.144:1433/CASH_UUAT");
+        ds2.setUsername("sa");
+        ds2.setPassword("1qaz@WSX#");
+        ds2.setDriverClassName("net.sourceforge.jtds.jdbc.Driver");
+        applyToConnectionPool(ds2);
+        return ds2;
+    }
+
     private static void applyToConnectionPool(BasicDataSource bds) {
         bds.setMaxActive(10);
         bds.setInitialSize(1);

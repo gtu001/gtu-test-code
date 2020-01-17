@@ -20,17 +20,26 @@ def saveValidUTF8File(filepath):
 
 
 def findErrorLineInFile(filepath, errLst) :
-    findLineNumber = 127
+    findLineNumber = 125
     linePattern = r'\-{2}'
     # ------
     contentLst = fileUtil.loadFile_asList(filepath, False, False)
     if len(contentLst) < findLineNumber :
         return
+
+    findOk1 = False
+    findOk2 = False
+
+    # if re.search('ibatis', filepath, re.IGNORECASE):
+    findOk1 = True
+
     if regexUtil.find(linePattern, False, contentLst[findLineNumber - 1]) :
         # raise Exception("ERR File : " + filepath)
         print("\t [ERR File] : ",filepath)
-        errLst.append(filepath)
+        findOk2 = True
 
+    if findOk1 and findOk2 :
+        errLst.append(filepath)
 
 if __name__ == '__main__':
 
@@ -51,7 +60,7 @@ if __name__ == '__main__':
     for i,f in enumerate(fileList) :
         try:
             # print(i, f)
-            saveValidUTF8File(f)
+            # saveValidUTF8File(f)
             findErrorLineInFile(f, errLst)
         except Exception as ex :
             print("ERR File : ", f)
