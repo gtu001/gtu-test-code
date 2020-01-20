@@ -63,6 +63,7 @@ import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
+import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.string.StringUtilForDb;
@@ -106,6 +107,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         columnName("欄位", 25), //
         value("值", 25), //
         currentLength("現在長度", 5), //
+        maxLength("最大長度", 5), //
         dtype("資料類型", 25), //
         isPk("過濾條件", 13), //
         isIgnore("省略", 12), //
@@ -144,13 +146,18 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         boolean isPk;
         boolean isIgnore;
         boolean isModify = false;
+        Integer maxLength;
 
         Object[] toArry() {
             int currentLength = 0;
             if (value != null) {
                 currentLength = StringUtils.defaultString(String.valueOf(value)).length();
             }
-            Object[] arry = new Object[] { columnName, value, currentLength, dtype, isPk, isIgnore, };
+            String maxLengthStr = "";
+            if (maxLength != null) {
+                maxLengthStr = String.valueOf(maxLength);
+            }
+            Object[] arry = new Object[] { columnName, value, currentLength, maxLength, dtype, isPk, isIgnore, };
             System.out.println(Arrays.toString(arry));
             return arry;
         }
@@ -591,7 +598,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         ColumnOrderDef.resetColumnWidth(rowTable);
 
         // column = "Data Type"
-        TableColumn sportColumn = rowTable.getColumnModel().getColumn(2);
+        TableColumn sportColumn = rowTable.getColumnModel().getColumn(ColumnOrderDef.dtype.ordinal());
         JComboBox comboBox = new JComboBox();
         for (DataType e : DataType.values()) {
             comboBox.addItem(e);
@@ -599,7 +606,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
         // column = "where condition"
-        TableColumn sportColumn4 = rowTable.getColumnModel().getColumn(3);
+        TableColumn sportColumn4 = rowTable.getColumnModel().getColumn(ColumnOrderDef.isPk.ordinal());
         sportColumn4.setCellEditor(new DefaultCellEditor(new JCheckBox()));
 
         // onblur 修改
@@ -647,7 +654,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         });
 
         // column = "value"
-        TableColumn valueColumn = rowTable.getColumnModel().getColumn(1);
+        TableColumn valueColumn = rowTable.getColumnModel().getColumn(ColumnOrderDef.value.ordinal());
         JTextField valueText = new JTextField();
         JTextUndoUtil.applyUndoProcess1(valueText);
         valueColumn.setCellEditor(new DefaultCellEditor(valueText) {
@@ -689,6 +696,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 for (String columnName : rowMap.get().keySet()) {
                     ColumnConf df = rowMap.get().get(columnName);
                     df.isPk = false;
+                }
+
+                for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                    FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
+                    if (rowMap.get().containsKey(columnName)) {
+                        rowMap.get().get(columnName).maxLength = info.getColumnDisplaySize();
+                    }
                 }
 
                 for (String columnName : tableInfo.getNoNullsCol()) {
