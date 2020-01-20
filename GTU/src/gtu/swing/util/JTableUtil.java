@@ -737,6 +737,12 @@ public class JTableUtil {
         return getModel().getValueAt(rowPos, colPos);
     }
 
+    public void setRealValueAt(Object value, int rowPos, int colPos) {
+        rowPos = getRealRowPos(rowPos, table);
+        colPos = getRealColumnPos(colPos, table);
+        getModel().setValueAt(value, rowPos, colPos);
+    }
+
     /**
      * 取得已修正row arry
      */

@@ -54,6 +54,7 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
@@ -101,6 +102,40 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     private static final String KEY_DBDateFormat = FastDBQueryUI_CrudDlgUI.class.getSimpleName() + "_" + DBDateFormat.class.getSimpleName();
 
+    private enum ColumnOrderDef {
+        columnName("欄位", 25), //
+        value("值", 25), //
+        currentLength("現在長度", 5), //
+        dtype("資料類型", 25), //
+        isPk("過濾條件", 13), //
+        isIgnore("省略", 12), //
+        ;
+
+        final int width;
+        final String label;
+
+        ColumnOrderDef(String label, int width) {
+            this.label = label;
+            this.width = width;
+        }
+
+        private static DefaultTableModel createDefaultTableModel() {
+            List<String> dlst = new ArrayList<String>();
+            for (ColumnOrderDef d : ColumnOrderDef.values()) {
+                dlst.add(d.label);
+            }
+            return JTableUtil.createModel(false, dlst.toArray(new String[0]));
+        }
+
+        private static void resetColumnWidth(JTable rowTable) {
+            List<Float> dlst = new ArrayList<Float>();
+            for (ColumnOrderDef d : ColumnOrderDef.values()) {
+                dlst.add((float) d.width);
+            }
+            JTableUtil.setColumnWidths_Percent(rowTable, ArrayUtils.toPrimitive(dlst.toArray(new Float[0])));
+        }
+    }
+
     static class ColumnConf {
         String columnName;
         Object value;
@@ -111,7 +146,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         boolean isModify = false;
 
         Object[] toArry() {
-            Object[] arry = new Object[] { columnName, value, dtype, isPk, isIgnore };
+            int currentLength = 0;
+            if (value != null) {
+                currentLength = StringUtils.defaultString(String.valueOf(value)).length();
+            }
+            Object[] arry = new Object[] { columnName, value, currentLength, dtype, isPk, isIgnore, };
             System.out.println(Arrays.toString(arry));
             return arry;
         }
@@ -125,7 +164,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 String val = (String) value;
                 java.sql.Date newVal = java.sql.Date.valueOf(val);
-                table.setValueAt(newVal, row, 1);
+                table.setValueAt(newVal, row, ColumnOrderDef.value.ordinal());
             }
         }, //
         timestamp(java.sql.Timestamp.class) {
@@ -133,7 +172,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 System.out.println("-------" + value + " -> " + value.getClass());
                 String val = (String) value;
                 java.sql.Timestamp newVal = java.sql.Timestamp.valueOf(val);
-                table.setValueAt(newVal, row, 1);
+                table.setValueAt(newVal, row, ColumnOrderDef.value.ordinal());
             }
         }, //
         number(Number.class) {
@@ -219,7 +258,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 model.addRow(df.toArry());
                 dialog.columnsLst.add(col);
             }
-            
+
             JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
             System.out.println("-------------init size : " + dialog.rowMap.get().size());
 
@@ -229,7 +268,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     try {
                         dialog.updateJTableToRowMap();
                         dialog.searchTextFilter();
-                        dialog.resetColumnWidth();
+                        ColumnOrderDef.resetColumnWidth(dialog.rowTable);
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
@@ -546,10 +585,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         JTableUtil.defaultSetting(rowTable);
 
-        DefaultTableModel model = JTableUtil.createModel(false, "欄位", "值", "資料類型", "過濾條件", "省略");
+        DefaultTableModel model = ColumnOrderDef.createDefaultTableModel();
         rowTable.setModel(model);
 
-        resetColumnWidth();
+        ColumnOrderDef.resetColumnWidth(rowTable);
 
         // column = "Data Type"
         TableColumn sportColumn = rowTable.getColumnModel().getColumn(2);
@@ -583,9 +622,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                  */
                 // etc... all your data processing...
                 String valueStr = "ERR";
+                Object currentOrignValue = null;
                 try {
-                    Object value = JTableUtil.newInstance(rowTable).getRealValueAt(row, col);
-                    valueStr = value != null ? (value + " -> " + value.getClass()) : "null";
+                    currentOrignValue = JTableUtil.newInstance(rowTable).getRealValueAt(row, col);
+                    valueStr = currentOrignValue != null ? (currentOrignValue + " -> " + currentOrignValue.getClass()) : "null";
                 } catch (Exception ex) {
                     ex.getMessage();
                 }
@@ -593,6 +633,16 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 // 刷新table紀錄！！！ onBlur !!!!!
                 updateJTableToRowMap();
+                updateCurrentValueLength(currentOrignValue, row, col);
+            }
+
+            private void updateCurrentValueLength(Object currentOrignValue, int row, int col) {
+                if (col == ColumnOrderDef.value.ordinal()) {
+                    String valueStr = currentOrignValue == null ? "" : String.valueOf(currentOrignValue);
+                    int currentLength = valueStr.length();
+                    System.out.println(" currentLength : " + valueStr + " -> " + currentLength);
+                    rowTable.setValueAt(currentLength, row, ColumnOrderDef.currentLength.ordinal());
+                }
             }
         });
 
@@ -988,6 +1038,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }, //
         ;
+
         final String label;
 
         OthersDBColumnProcess(String label) {
@@ -1223,7 +1274,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             if ($rowPos != -1) {
                                 $rowPos = JTableUtil.getRealRowPos($rowPos, rowTable);
                                 rowPos.set($rowPos);
-                                String column = (String) rowTable.getValueAt($rowPos, 0);
+                                String column = (String) rowTable.getValueAt($rowPos, ColumnOrderDef.columnName.ordinal());
                                 column = StringUtils.trimToEmpty(column);//
                                 valueLst.set(_parent.getEditColumnConfig().getColumnValues(column));
                             }
@@ -1252,7 +1303,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 chdMenu.addMenuItem(val, new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        rowTable.setValueAt(val, rowPos.get(), 1);
+                                        rowTable.setValueAt(val, rowPos.get(), ColumnOrderDef.value.ordinal());
                                     }
                                 });
                             }
@@ -1358,9 +1409,5 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
         _parent.getEditColumnConfig().store();
-    }
-
-    private void resetColumnWidth() {
-        JTableUtil.setColumnWidths_Percent(rowTable, new float[] { 25, 25, 25, 13, 12 });
     }
 }

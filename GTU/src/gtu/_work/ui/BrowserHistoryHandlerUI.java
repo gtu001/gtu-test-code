@@ -811,18 +811,24 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("[doOpen]>>>" + this.name());
 
             // 判斷是否為自動產生
-            if (d != null && StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
-                // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
-            } else {
-                // if (OsInfoUtil.isWindows()) {
-                _doOpen(url, _this);
-                // } else {
-                // CommandTypeEnum.DEFAULT._doOpen(url, _this);
-                // }
+            if (d != null) {
+                if (StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                    // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
+                } else if ("Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                    _this.doOpenWithRemark(d, false);
+                } else {
+                    // if (OsInfoUtil.isWindows()) {
+                    _doOpen(url, _this);
+                    // } else {
+                    // CommandTypeEnum.DEFAULT._doOpen(url, _this);
+                    // }
+                }
+
+                _this.clickUrlDoLogAction(d);
             }
 
-            if (d != null) {
-                _this.clickUrlDoLogAction(d);
+            if (d == null) {
+                System.out.println("!!![error] 無法執行任何操作 : " + url);
             }
         }
 

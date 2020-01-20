@@ -26,12 +26,15 @@ import javax.swing.border.EmptyBorder;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 
@@ -43,6 +46,10 @@ public class ScheduleBatRunnerUI_SwingAntDlg extends JDialog {
     private JTextField swingAntDirText;
     private JList swingAntList;
     private PropertiesUtilBean config = new PropertiesUtilBean(ScheduleBatRunnerUI_SwingAntDlg.class);
+    {
+        config = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, ScheduleBatRunnerUI.class, ScheduleBatRunnerUI_SwingAntDlg.class.getSimpleName());
+    }
+
     private ActionListener actionEvent;
     private JTextField filterText;
     private DefaultListModel allModel;

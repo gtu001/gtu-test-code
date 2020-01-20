@@ -16,6 +16,7 @@
 	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
 	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
 	-->
+	<property name="obfuscator_dir" value="/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/Allatori-6.9" />
 	<!--${main_class}-->
 
 
@@ -33,6 +34,7 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -73,6 +75,7 @@
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="small">org.apache.commons.beanutils</packagename>
 
 		</jarfinder>
 
@@ -111,7 +114,9 @@
 			<param name="enable" value="true" />
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -123,6 +128,10 @@
 
 		<antcall target="runJar">
 			<param name="enable" value="false" />
+		</antcall>
+	
+		<antcall target="obfuscator">
+			<param name="enable" value="false" /><!--true -->
 		</antcall>
 
 		<antcall target="moveJarToDesktop">
@@ -245,5 +254,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>

@@ -1012,12 +1012,13 @@ public class AVChoicerUI extends JFrame {
 
         private void openContainDir() {
             try {
-                File dir = tempDir.get();
-                if (!dir.exists()) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
-                    return;
-                }
-                Desktop.getDesktop().open(dir);
+//                File dir = tempDir.get();
+//                if (!dir.exists()) {
+//                    JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
+//                    return;
+//                }
+//                Desktop.getDesktop().open(dir);
+                DesktopUtil.browseFileDirectory(getAvFile());
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
             }

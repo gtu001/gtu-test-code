@@ -5,11 +5,16 @@ import java.awt.EventQueue;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.DefaultListModel;
@@ -28,18 +33,20 @@ import javax.swing.event.ChangeListener;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.clipboard.ClipboardUtil;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class ScheduleBatRunnerUI extends JFrame {
 
@@ -144,6 +151,12 @@ public class ScheduleBatRunnerUI extends JFrame {
         panel.add(panel_5, BorderLayout.SOUTH);
 
         batList = new JList();
+        batList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("batList.click", e);
+            }
+        });
         batList.addKeyListener((KeyAdapter) SwingActionUtil.ActionAdapter.KeyAdapter.create(ActionDefine.batList_KeyEvent.name(), swingUtil));
         panel.add(JCommonUtil.createScrollComponent(batList), BorderLayout.CENTER);
 
@@ -207,25 +220,25 @@ public class ScheduleBatRunnerUI extends JFrame {
     }
 
     private void applyAllEvents() {
-        swingUtil.addAction(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("====Test Default Event!!====");
             }
         });
-        swingUtil.addAction(ActionDefine.JTabbedPane_ChangeIndex.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.JTabbedPane_ChangeIndex.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());
             }
         });
-        swingUtil.addAction(ActionDefine.addBatBtn_Click.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.addBatBtn_Click.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 addCommand(batTextArea.getText());
             }
         });
-        swingUtil.addAction(ActionDefine.goBtn_Click.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.goBtn_Click.name(), new Action() {
             private void updateLst() {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -309,7 +322,7 @@ public class ScheduleBatRunnerUI extends JFrame {
                 }
             }
         });
-        swingUtil.addAction(ActionDefine.cleanBtn_Click.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.cleanBtn_Click.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 for (int ii = 0; ii < listModel.getSize(); ii++) {
@@ -322,13 +335,13 @@ public class ScheduleBatRunnerUI extends JFrame {
                 batList.updateUI();
             }
         });
-        swingUtil.addAction(ActionDefine.clearLogBtn_Click.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.clearLogBtn_Click.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 logArea.setText("");
             }
         });
-        swingUtil.addAction(ActionDefine.swingJarBuilderBtn_Click.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.swingJarBuilderBtn_Click.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 ScheduleBatRunnerUI_SwingAntDlg.newInstance(new ActionListener() {
@@ -341,13 +354,51 @@ public class ScheduleBatRunnerUI extends JFrame {
                 });
             }
         });
-        swingUtil.addAction(ActionDefine.batList_KeyEvent.name(), new Action() {
+        swingUtil.addActionHex(ActionDefine.batList_KeyEvent.name(), new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
                 JListUtil.newInstance(batList).defaultJListKeyPressed(evt);
+
+                final List<CommandBean> lst = JListUtil.getLeadSelectionArry(batList);
+                KeyEvent k = (KeyEvent) evt;
+                if (KeyEventUtil.isMaskKeyPress(k, "c") && k.getKeyCode() == KeyEvent.VK_C) {
+                    System.out.println("BatList___Ctrl+C");
+                    final List<String> commands = new ArrayList<String>();
+                    for (CommandBean v : lst) {
+                        commands.add(v.command.toString());
+                    }
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            ClipboardUtil.getInstance().setContents(StringUtils.join(commands, "\r\n"));
+                        }
+                    }, 500);
+                }
             }
         });
-        swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
+        swingUtil.addActionHex("batList.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                final List<CommandBean> lst = JListUtil.getLeadSelectionArry(batList);
+                if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                    JPopupMenuUtil.newInstance(batList)//
+                            .addJMenuItem("重設", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    for (CommandBean v : lst) {
+                                        v.errMsg.setLength(0);
+                                        v.okMsg.setLength(0);
+                                        v.commandBeanStatue = CommandBeanStatue.WAITING;
+                                    }
+                                    batList.updateUI();
+                                }
+                            })//
+                            .applyEvent(evt)//
+                            .show();
+                }
+            }
+        });
+        swingUtil.addActionHex("XXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
             }
