@@ -760,17 +760,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private void updateJTableToRowMap() {
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
         for (int ii = 0; ii < tableUtil.getModel().getRowCount(); ii++) {
-            String columnName = (String) tableUtil.getRealValueAt(ii, 0);
+            String columnName = (String) tableUtil.getRealValueAt(ii, ColumnOrderDef.columnName.ordinal());
             columnName = StringUtils.trimToEmpty(columnName);
             if (columnName == null || StringUtils.isBlank(columnName)) {
                 columnName = "";
             }
 
-            String value = String.valueOf(tableUtil.getRealValueAt(ii, 1));
+            String value = String.valueOf(tableUtil.getRealValueAt(ii, ColumnOrderDef.value.ordinal()));
 
             DataType dtype = DataType.varchar;
             try {
-                Object dtypeVal = tableUtil.getRealValueAt(ii, 2);
+                Object dtypeVal = tableUtil.getRealValueAt(ii, ColumnOrderDef.dtype.ordinal());
                 if (dtypeVal instanceof String) {
                     dtype = DataType.valueOf((String) dtypeVal);
                 } else {
@@ -782,14 +782,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             boolean isPk = false;
             try {
-                isPk = (Boolean) tableUtil.getRealValueAt(ii, 3);
+                isPk = (Boolean) tableUtil.getRealValueAt(ii, ColumnOrderDef.isPk.ordinal());
             } catch (Exception ex) {
                 System.out.println("isPk---ERR--" + ex.getMessage());
             }
 
             boolean isIgnore = false;
             try {
-                isIgnore = (Boolean) tableUtil.getRealValueAt(ii, 4);
+                isIgnore = (Boolean) tableUtil.getRealValueAt(ii, ColumnOrderDef.isIgnore.ordinal());
             } catch (Exception ex) {
                 System.out.println("isIgnore---ERR--" + ex.getMessage());
             }

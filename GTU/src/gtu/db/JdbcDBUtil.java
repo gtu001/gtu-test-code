@@ -47,9 +47,10 @@ public class JdbcDBUtil {
         // JdbcDBUtil.queryColumnName("select * from V_AI_CO_SITE_FIND ", conn);
         // System.out.println(list);
 
-        Connection conn = DbConstant.getTestConnection_CTBC();
-        List<String> list = JdbcDBUtil.queryColumnName("select * from [dbo].[ZT_SystemLog] ", conn);
-        System.out.println(list);
+        // Connection conn = DbConstant.getTestConnection_CTBC();
+        // List<String> list = JdbcDBUtil.queryColumnName("select * from
+        // [dbo].[ZT_SystemLog] ", conn);
+        // System.out.println(list);
     }
 
     /**
