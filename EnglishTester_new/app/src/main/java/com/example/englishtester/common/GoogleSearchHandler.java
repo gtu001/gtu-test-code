@@ -1,11 +1,16 @@
 package com.example.englishtester.common;
 
 import android.app.SearchManager;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
 import org.apache.commons.lang3.StringUtils;
+
+import android.app.SearchManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -25,5 +30,26 @@ public class GoogleSearchHandler {
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, inputText); // query contains search string
         context.startActivity(intent);
+    }
+
+    public static AppWidgetProviderInfo getAppWidgetProviderInfo(Context context) {
+        SearchManager searchManager = (SearchManager) context.getSystemService(Context.SEARCH_SERVICE);
+        ComponentName searchComponent = searchManager.getGlobalSearchActivity();
+        if (searchComponent == null) {
+            return null;
+        }
+        String providerPkg = searchComponent.getPackageName();
+        AppWidgetProviderInfo defaultWidgetForSearchPackage = null;
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        for (AppWidgetProviderInfo info : appWidgetManager.getInstalledProviders()) {
+            if (info.provider.getPackageName().equals(providerPkg) && info.configure == null) {
+                if ((info.widgetCategory & AppWidgetProviderInfo.WIDGET_CATEGORY_SEARCHBOX) != 0) {
+                    return info;
+                } else if (defaultWidgetForSearchPackage == null) {
+                    defaultWidgetForSearchPackage = info;
+                }
+            }
+        }
+        return defaultWidgetForSearchPackage;
     }
 }

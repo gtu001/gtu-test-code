@@ -48,6 +48,12 @@ public class Log {
         android.util.Log.d(info.getTag(), message);
     }
 
+    public static void d(String tag, String message, int times) {
+        ClassInfo info = new ClassInfo(Log.class, tag);
+        for (int ii = 0; ii < times; ii++)
+            android.util.Log.d(info.getTag(), message);
+    }
+
     public static void v(String tag, String message, int times) {
         ClassInfo info = new ClassInfo(Log.class, tag);
         for (int ii = 0; ii < times; ii++)

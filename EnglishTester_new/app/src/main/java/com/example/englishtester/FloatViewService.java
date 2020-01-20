@@ -969,6 +969,7 @@ public class FloatViewService extends Service {
                 } catch (Exception ex) {
                     Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
                     Toast.makeText(self, "無法開啟網頁!", Toast.LENGTH_SHORT).show();
+                } finally {
                 }
             }
         },//

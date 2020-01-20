@@ -737,10 +737,22 @@ public class JTableUtil {
         return getModel().getValueAt(rowPos, colPos);
     }
 
-    public void setRealValueAt(Object value, int rowPos, int colPos) {
-        rowPos = getRealRowPos(rowPos, table);
-        colPos = getRealColumnPos(colPos, table);
-        getModel().setValueAt(value, rowPos, colPos);
+    public Object getValueAt(boolean covertRealPos, int rowPos, int colPos) {
+        if (covertRealPos) {
+            rowPos = getRealRowPos(rowPos, table);
+            colPos = getRealColumnPos(colPos, table);
+            return getModel().getValueAt(rowPos, colPos);
+        } else {
+            return getModel().getValueAt(rowPos, colPos);
+        }
+    }
+
+    public void setValueAt(boolean covertRealPos, Object value, int rowPos, int colPos) {
+        if (covertRealPos) {
+            table.setValueAt(value, rowPos, colPos);
+        } else {
+            getModel().setValueAt(value, rowPos, colPos);
+        }
     }
 
     /**
@@ -1435,7 +1447,7 @@ public class JTableUtil {
                 Object orignVal = null;
                 String strVal = "ERR";
                 try {
-                    orignVal = JTableUtil.newInstance(table).getRealValueAt(row, col);
+                    orignVal = JTableUtil.newInstance(table).getValueAt(false, row, col);
                     strVal = orignVal != null ? (orignVal + " -> " + orignVal.getClass()) : "null";
                 } catch (Exception ex) {
                     ex.getMessage();
@@ -1605,5 +1617,16 @@ public class JTableUtil {
                 }
             }
         });
+    }
+
+    public static void setColumnAlign(JTable table, int columnIndex, int JLabel_RIGNH_LEFT_CENTER_ETC) {
+        DefaultTableCellRenderer rightRenderer = null;
+        if (table.getColumnModel().getColumn(columnIndex).getCellRenderer() != null && table.getColumnModel().getColumn(columnIndex).getCellRenderer() instanceof DefaultTableCellRenderer) {
+            rightRenderer = (DefaultTableCellRenderer) table.getColumnModel().getColumn(columnIndex).getCellRenderer();
+        } else {
+            rightRenderer = new DefaultTableCellRenderer();
+        }
+        rightRenderer.setHorizontalAlignment(JLabel_RIGNH_LEFT_CENTER_ETC);
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
     }
 }

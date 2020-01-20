@@ -51,14 +51,17 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.binary.StringUtil4FullChar;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
@@ -74,6 +77,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.TableColorDef;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 
@@ -157,7 +161,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             if (maxLength != null) {
                 maxLengthStr = String.valueOf(maxLength);
             }
-            Object[] arry = new Object[] { columnName, value, currentLength, maxLength, dtype, isPk, isIgnore, };
+            Object[] arry = new Object[] { columnName, value, currentLength, maxLengthStr, dtype, isPk, isIgnore, };
             System.out.println(Arrays.toString(arry));
             return arry;
         }
@@ -597,6 +601,34 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         ColumnOrderDef.resetColumnWidth(rowTable);
 
+        JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.currentLength.ordinal(), JLabel.RIGHT);
+        JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.maxLength.ordinal(), JLabel.RIGHT);
+
+        JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.currentLength.ordinal(), new JTableUtil.TableColorDef() {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JTableUtil util = JTableUtil.newInstance(rowTable);
+                Integer v1 = (Integer) util.getRealValueAt(row, ColumnOrderDef.currentLength.ordinal());
+                String v2 = (String) util.getRealValueAt(row, ColumnOrderDef.maxLength.ordinal());
+                if (StringUtils.isNotBlank(v2)) {
+                    if (v1 > Integer.parseInt(v2)) {
+                        return Pair.of(Color.RED, null);
+                    }
+                }
+                return null;
+            }
+        });
+
+        JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.maxLength.ordinal(), new JTableUtil.TableColorDef() {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JTableUtil util = JTableUtil.newInstance(rowTable);
+                String v2 = (String) util.getRealValueAt(row, ColumnOrderDef.maxLength.ordinal());
+                if (StringUtils.isNotBlank(v2)) {
+                    return Pair.of(Color.YELLOW, null);
+                }
+                return null;
+            }
+        });
+
         // column = "Data Type"
         TableColumn sportColumn = rowTable.getColumnModel().getColumn(ColumnOrderDef.dtype.ordinal());
         JComboBox comboBox = new JComboBox();
@@ -618,6 +650,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             public void tableChanged(TableModelEvent e) {
                 int row = e.getFirstRow();
                 int col = e.getColumn();
+
                 /*
                  * Perform actions only if the first column is the source of the
                  * change.
@@ -631,7 +664,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 String valueStr = "ERR";
                 Object currentOrignValue = null;
                 try {
-                    currentOrignValue = JTableUtil.newInstance(rowTable).getRealValueAt(row, col);
+                    currentOrignValue = JTableUtil.newInstance(rowTable).getValueAt(false, row, col);
                     valueStr = currentOrignValue != null ? (currentOrignValue + " -> " + currentOrignValue.getClass()) : "null";
                 } catch (Exception ex) {
                     ex.getMessage();
@@ -646,9 +679,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             private void updateCurrentValueLength(Object currentOrignValue, int row, int col) {
                 if (col == ColumnOrderDef.value.ordinal()) {
                     String valueStr = currentOrignValue == null ? "" : String.valueOf(currentOrignValue);
-                    int currentLength = valueStr.length();
+                    int currentLength = StringUtil4FullChar.length(valueStr);
                     System.out.println(" currentLength : " + valueStr + " -> " + currentLength);
-                    rowTable.setValueAt(currentLength, row, ColumnOrderDef.currentLength.ordinal());
+                    JTableUtil.newInstance(rowTable).setValueAt(false, currentLength, row, ColumnOrderDef.currentLength.ordinal());
                 }
             }
         });
