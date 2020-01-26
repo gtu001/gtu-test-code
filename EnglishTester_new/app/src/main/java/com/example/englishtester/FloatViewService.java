@@ -953,24 +953,13 @@ public class FloatViewService extends Service {
 
             @Override
             void process(FloatViewService self) {
-                GoogleSearchHandler.search(self.getApplicationContext(), self.noteText.getText().toString());
+                GoogleSearchHandler.search(self, self.noteText.getText().toString());
             }
         },//
         OPEN_BROWSER("以瀏覽器開啟", R.drawable.icon_chrome) {
             @Override
             void process(FloatViewService self) {
-                try {
-                    String inputText = StringUtils.trimToEmpty(self.noteText.getText().toString());
-                    if (!inputText.matches("^https?\\:\\/.*")) {
-                        inputText = "http://" + inputText;
-                    }
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(inputText));
-                    self.startActivity(browserIntent);
-                } catch (Exception ex) {
-                    Log.e(TAG, this.name() + " ERR : " + ex.getMessage(), ex);
-                    Toast.makeText(self, "無法開啟網頁!", Toast.LENGTH_SHORT).show();
-                } finally {
-                }
+                GoogleSearchHandler.openWithBrowser(self.noteText.getText().toString(), self);
             }
         },//
         OPEN_TXT_READER("以閱讀器開啟[beta]", R.drawable.icon_book_stack) {
