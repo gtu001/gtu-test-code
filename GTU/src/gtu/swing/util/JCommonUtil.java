@@ -1,6 +1,5 @@
 package gtu.swing.util;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -15,6 +14,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -1272,6 +1272,37 @@ public class JCommonUtil {
             comp.repaint();
             comp.revalidate();
         }
+    }
+
+    /**
+     * 確認螢幕含不含這個點
+     * 
+     * Verifies if the given point is visible on the screen.
+     * 
+     * @param location
+     *            The given location on the screen.
+     * @return True if the location is on the screen, false otherwise.
+     */
+    public static boolean isLocationInScreenBounds(Point location) {
+        // Check if the location is in the bounds of one of the graphics
+        // devices.
+        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] graphicsDevices = graphicsEnvironment.getScreenDevices();
+        Rectangle graphicsConfigurationBounds = new Rectangle();
+        // Iterate over the graphics devices.
+        for (int j = 0; j < graphicsDevices.length; j++) {
+            // Get the bounds of the device.
+            GraphicsDevice graphicsDevice = graphicsDevices[j];
+            graphicsConfigurationBounds.setRect(graphicsDevice.getDefaultConfiguration().getBounds());
+            // Is the location in this bounds?
+            graphicsConfigurationBounds.setRect(graphicsConfigurationBounds.x, graphicsConfigurationBounds.y, graphicsConfigurationBounds.width, graphicsConfigurationBounds.height);
+            if (graphicsConfigurationBounds.contains(location.x, location.y)) {
+                // The location is in this screengraphics.
+                return true;
+            }
+        }
+        // We could not find a device that contains the given point.
+        return false;
     }
 
     public static void main(String[] args) {

@@ -1326,38 +1326,43 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
-    private Lock brinToTopLock = new ReentrantLock();
+    private ReentrantLock brinToTopLock = new ReentrantLock();
 
     private void bringToTop() {
-        try {
-            brinToTopLock.lock();
+        if (searchEnglishIdTextController.isFocusOwner()) {
+            return;
+        }
+        if (brinToTopLock.tryLock()) {
+            try {
+                JCommonUtil.setFrameAtop(EnglishSearchUI.this, focusTopChk.isSelected());
 
-            JCommonUtil.setFrameAtop(EnglishSearchUI.this, focusTopChk.isSelected());
-
-            for (; true;) {
-                this.tabbedPane.setSelectedIndex(0);
-                if (this.tabbedPane.getSelectedIndex() == 0) {
-                    break;
+                for (; true;) {
+                    this.tabbedPane.setSelectedIndex(0);
+                    if (this.tabbedPane.getSelectedIndex() == 0) {
+                        break;
+                    }
+                    sleep(10);
                 }
-                sleep(10);
-            }
 
-            // 判斷是否鎖定右下角
-            if (rightBottomCornerChk.isSelected()) {
-                JCommonUtil.setLocationToRightBottomCorner(this);
-            }
+                // 判斷是否鎖定右下角
+                if (rightBottomCornerChk.isSelected()) {
+                    JCommonUtil.setLocationToRightBottomCorner(this);
+                }
 
-            focusSearchEnglishIdText();
+                focusSearchEnglishIdText();
 
-            // 開啟時自動查詢
-            if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
-                    autoSearchChk.isSelected()) {
-                queryButtonAction(false);
+                // 開啟時自動查詢
+                if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
+                        autoSearchChk.isSelected()) {
+                    queryButtonAction(false);
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                if (brinToTopLock.isLocked()) {
+                    brinToTopLock.unlock();
+                }
             }
-        } catch (Exception ex) {
-            JCommonUtil.handleException(ex);
-        } finally {
-            brinToTopLock.unlock();
         }
     }
 
