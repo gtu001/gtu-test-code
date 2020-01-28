@@ -9,6 +9,6 @@ VisualCode 快速切換project
 ---
 
 Sublime 快速切換project
-	安裝 Ctrl + Shift + P -> Package control : install package
+	安裝 Ctrl + Shift + P -> Package control : install package -> 輸入 Project Manager
 	加入專案 Ctrl + Shift + P -> Project Manager : Add New Project
 	開啟專案 Ctrl + Shift + P -> Project Manager : Open Project

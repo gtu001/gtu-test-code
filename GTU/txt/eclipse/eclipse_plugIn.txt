@@ -15,6 +15,7 @@ http://pluginbox.sourceforge.net
 
 JD-Eclipse
 http://jd.benow.ca/jd-eclipse/update
+https://marketplace.eclipse.org/content/enhanced-class-decompiler
 
 Jigloo
 http://cloudgarden.org/update-site[可能掛了]
