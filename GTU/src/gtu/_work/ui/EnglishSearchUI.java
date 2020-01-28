@@ -124,6 +124,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
+import gtu.swing.util.KeyEventUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishSearchUI extends JFrame {
@@ -161,6 +162,7 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox robotFocusChk;
     private AutoComboBox searchEnglishIdText_auto;
     private List<String> englishLst;
+    Integer tvModeDlgFontSize = null;
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
     {
@@ -703,6 +705,13 @@ public class EnglishSearchUI extends JFrame {
                     if (gtu.swing.util.JFrameUtil.isVisible(EnglishSearchUI.this)) {
                         gtu.swing.util.JFrameUtil.setVisible(false, EnglishSearchUI.this);
                     }
+                } else if (//
+                (KeyEventUtil.isMaskKeyPress(e, "c") || //
+                KeyEventUtil.isMaskKeyPress(e, "s") || //
+                KeyEventUtil.isMaskKeyPress(e, "a")//
+                ) && e.getKeyCode() == KeyEvent.VK_I//
+                ) {
+                    showTvModeDialog();
                 }
             }
         });
@@ -806,7 +815,7 @@ public class EnglishSearchUI extends JFrame {
                 if (JMouseEventUtil.buttonLeftClick(1, e) && //
                 StringUtils.isNotBlank(meaningText.getText()) //
                 ) {
-                    JCommonUtil._jOptionPane_showInputDialog("", meaningText.getText());
+                    showTvModeDialog();
                 }
             }
         });
@@ -1285,6 +1294,15 @@ public class EnglishSearchUI extends JFrame {
 
         // 設定記憶時鐘功能
         this.init_HermannEbbinghaus_Memory();
+    }
+
+    private void showTvModeDialog() {
+        EnglishSearchUI_TVModeDlg.newInstance(meaningText.getText(), tvModeDlgFontSize, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tvModeDlgFontSize = e.getID();
+            }
+        });
     }
 
     private void startListenClipboardThread() {

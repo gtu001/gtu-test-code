@@ -1,8 +1,10 @@
 package gtu.swing.util;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
@@ -142,5 +144,10 @@ public class JFrameUtil {
                 f.setAlwaysOnTop(allFrameMap.get(f));
             }
         }
+    }
+
+    public static void setSizeWithPercent(float widthPercent, float heightPercent, Window frame) {
+        java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setSize(new Dimension((int) (scr_size.width * widthPercent), (int) (scr_size.height * heightPercent)));
     }
 }

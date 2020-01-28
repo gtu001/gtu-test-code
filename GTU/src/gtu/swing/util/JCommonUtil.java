@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.DisplayMode;
 import java.awt.FocusTraversalPolicy;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -1068,9 +1069,14 @@ public class JCommonUtil {
      * 將視窗帶到最上層顯示
      */
     public static void setFrameAtop(Window window, boolean forceBringToTop) {
+        if (window instanceof Frame) {
+            Frame f = ((Frame) window);
+            if (f.getState() == Frame.NORMAL) {
+                f.setState(Frame.ICONIFIED);// 先縮小
+            }
+        }
         if (window instanceof JDialog) {
-            JDialog d = (JDialog) window;
-            d.setModal(true);
+            ((JDialog) window).setModal(true);
         }
 
         boolean alaysOnTop = window.isAlwaysOnTop();
@@ -1123,7 +1129,8 @@ public class JCommonUtil {
                 if (afterRobotFocus != null) {
                     afterRobotFocus.actionPerformed(new ActionEvent(jcomponent, -1, "useRobotFocus"));
                 }
-            } catch (AWTException e) {
+            } catch (Throwable e) {
+                System.out.println("###[focusComponent]ERR : " + e.getMessage());
                 e.printStackTrace();
             }
         }
