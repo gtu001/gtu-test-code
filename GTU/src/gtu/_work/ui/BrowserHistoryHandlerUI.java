@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -129,6 +131,7 @@ import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextPaneTextStyle;
+import gtu.thread.util.ThreadUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
@@ -1740,25 +1743,44 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return file.getName();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
         }
+        String finalUrl = url;
+
+        JProgressBarHelper jProgDlg = JProgressBarHelper.newInstance(this, "取得標題")//
+                .indeterminate(true)//
+                .max(100)
+                .build()//
+                .show();//
 
         String title = "";
         try {
-            String content = __doGetRequest_UserAgent(url, DEFAULT_USER_AGENT);
-            System.out.println("-----------------------------------------------------------------------");
-            // System.out.println(content);
+            title = ThreadUtil.getFutureResult(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    String title = "";
+                    try {
+                        String content = __doGetRequest_UserAgent(finalUrl, DEFAULT_USER_AGENT);
+                        System.out.println("-----------------------------------------------------------------------");
+                        // System.out.println(content);
 
-            Pattern ptn = Pattern.compile("<title>(.*?)</title>", Pattern.DOTALL | Pattern.MULTILINE);
-            Matcher mth = ptn.matcher(content);
-            if (mth.find()) {
-                title = mth.group(1);
-                title = StringEscapeUtils.unescapeHtml(title);
-                System.out.println(title);
-            }
-            System.out.println("-----------------------------------------------------------------------");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+                        Pattern ptn = Pattern.compile("<title>(.*?)</title>", Pattern.DOTALL | Pattern.MULTILINE);
+                        Matcher mth = ptn.matcher(content);
+                        if (mth.find()) {
+                            title = mth.group(1);
+                            title = StringEscapeUtils.unescapeHtml(title);
+                            System.out.println(title);
+                        }
+                        System.out.println("-----------------------------------------------------------------------");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    return null;
+                }
+            }, 10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            jProgDlg.dismiss();
         }
         return title;
     }

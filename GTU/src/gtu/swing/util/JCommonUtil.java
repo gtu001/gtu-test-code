@@ -35,6 +35,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +44,7 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +75,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.codehaus.plexus.util.FileUtils;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
@@ -865,30 +869,35 @@ public class JCommonUtil {
                         JCommonUtil._jOptionPane_showMessageDialog_error("檔案選擇錯誤");
                     }
                 } else if (JMouseEventUtil.buttonRightClick(1, evt)) {
-                    final File file = new File(jTextField1.getText());
-                    JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
-                    if (file.exists()) {
-                        popUtil.addJMenuItem("開啟" + (file.isFile() ? "檔案" : "目錄"), new ActionListener() {
+                    final AtomicReference<File> ffile = new AtomicReference<File>();
+                    ffile.set(new File(jTextField1.getText()));
+                    if (!ffile.get().exists()) {
+                        try {
+                            ffile.set(FileUtils.toFile(new URL(jTextField1.getText())));
+                        } catch (MalformedURLException e1) {
+                            System.out.println("parse to file error :　" + ffile.get() + " , msg : " + e1.getMessage());
+                        }
+                    }
+                    if (ffile.get().exists()) {
+                        JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
+                        popUtil.addJMenuItem("開啟" + (ffile.get().isFile() ? "檔案" : "目錄"), new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 try {
-                                    DesktopUtil.browse(file.toURL().toString());
+                                    if (ffile.get().isFile()) {
+                                        DesktopUtil.browseFileDirectory(ffile.get());
+                                    } else {
+                                        DesktopUtil.openDir(ffile.get());
+                                    }
                                 } catch (Exception e1) {
                                     JCommonUtil.handleException(e1);
                                 }
                             }
                         });
+                        popUtil.applyEvent(evt);//
+                        popUtil.show();
                     }
-                    popUtil.addJMenuItem("開啟目錄", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            DesktopUtil.openDir(file.getParentFile());
-                        }
-                    });
-                    popUtil.applyEvent(evt);//
-                    popUtil.show();
                 }
-
             }
         });
     }

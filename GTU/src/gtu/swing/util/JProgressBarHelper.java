@@ -10,6 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -116,7 +118,7 @@ public class JProgressBarHelper {
     }
 
     public JProgressBarHelper dismiss() {
-        //dlg.setVisible(false);
+        // dlg.setVisible(false);
         dlg.dispose();
         return this;
     }
@@ -132,7 +134,7 @@ public class JProgressBarHelper {
             Thread.sleep(1000L);
         } catch (InterruptedException e) {
         }
-        //dlg.setVisible(false);
+        // dlg.setVisible(false);
         dlg.dispose();
         return this;
     }
