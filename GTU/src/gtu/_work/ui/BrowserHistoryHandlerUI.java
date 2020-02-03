@@ -1748,13 +1748,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         JProgressBarHelper jProgDlg = JProgressBarHelper.newInstance(this, "取得標題")//
                 .indeterminate(true)//
-                .max(100)
-                .build()//
-                .show();//
+                .modal(false)//
+                .max(100).build()//
+                .showRightNow();//
 
         String title = "";
         try {
-            title = ThreadUtil.getFutureResult(new Callable<String>() {
+            title = ThreadUtil.runUseBlockingQueue(new Callable<String>() {
                 @Override
                 public String call() throws Exception {
                     String title = "";

@@ -7,10 +7,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import javax.swing.SwingUtilities;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ThreadUtil {
+
+    public static void main(String[] args) {
+        Object rtnVal = ThreadUtil.runUseBlockingQueue(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Thread.sleep(2000);
+                return "XXXXX";
+            }
+        }, 10000);
+        System.out.println(rtnVal);
+        System.out.println("done...");
+    }
 
     public static <T> T getFutureResult(Callable<T> task, long timeout) throws TimeoutException {
         try {
@@ -31,23 +42,29 @@ public class ThreadUtil {
             throw new RuntimeException(ex);
         }
     }
-    
-    public static <T> T  xxxxxxxxxxxxxxxx(Callable<T> task, long timeout) {
-        final ArrayBlockingQueue<T> blockQueue = new ArrayBlockingQueue<T>(1);
-        SwingUtilities.invokeLater(new Runnable() {
+
+    public static <T> T runUseBlockingQueue(Callable<T> task, long timeout) {
+        final ArrayBlockingQueue<AtomicReference<T>> blockQueue = new ArrayBlockingQueue<AtomicReference<T>>(1);
+        new Thread(new Runnable() {
             public void run() {
+                AtomicReference<T> rtnObj = new AtomicReference<T>();
                 try {
-//                    blockQueue.offer(task.call(), 5, TimeUnit.MILLISECONDS);
-                    blockQueue.add(task.call());
+                    // blockQueue.offer(task.call(), 5, TimeUnit.MILLISECONDS);
+                    rtnObj.set(task.call());
                 } catch (Exception e) {
-                    blockQueue.clear();
-                    blockQueue.add(null);
+                    rtnObj.set(null);
+                    e.printStackTrace();
+                } finally {
+                    blockQueue.add(rtnObj);
                 }
             }
-        });
+        }).start();
         try {
-            // blockQueue.take();
-            return blockQueue.poll(timeout, TimeUnit.MILLISECONDS);
+            if (timeout <= 0) {
+                return blockQueue.take().get();
+            } else {
+                return blockQueue.poll(timeout, TimeUnit.MILLISECONDS).get();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -139,6 +139,12 @@ public class JProgressBarHelper {
         return this;
     }
 
+    public JProgressBarHelper showRightNow() {
+        Validate.notNull(dlg, "請先執行build!");
+        dlg.show();
+        return this;
+    }
+
     public JProgressBarHelper show() {
         Validate.notNull(dlg, "請先執行build!");
         SwingUtilities.invokeLater(new Runnable() {
