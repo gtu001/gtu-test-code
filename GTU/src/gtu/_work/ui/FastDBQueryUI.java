@@ -3016,7 +3016,7 @@ public class FastDBQueryUI extends JFrame {
                     .addJMenuItem("SQL 格式化", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String sql = sqlTextArea.getText();
+                            String sql = StringUtils.defaultString(sqlTextArea.getText());
                             sql = getSqlFormater(sql);
                             sql = getSelectColumnFormater(sql);
                             sqlTextArea.setText(sql);
