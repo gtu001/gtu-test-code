@@ -1877,6 +1877,9 @@ public class FastDBQueryUI extends JFrame {
             bean.sql = sql;
             bean.sqlComment = sqlComment;
 
+            // 改變TabUI標題
+            changeTabUITitile(bean.sqlId);
+
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
             }
@@ -2461,6 +2464,13 @@ public class FastDBQueryUI extends JFrame {
 
         // trigger 儲存按鈕
         saveSqlButtonClick(false);
+
+        // 設定 tab標題
+        changeTabUITitile(sqlBean.sqlId);
+    }
+
+    private void changeTabUITitile(String title) {
+        TAB_UI1.setTabTitle(null, title);
     }
 
     private void loadSqlIdMappingDataSourceConfig() {

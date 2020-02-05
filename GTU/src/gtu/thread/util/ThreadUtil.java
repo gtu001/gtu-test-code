@@ -43,7 +43,7 @@ public class ThreadUtil {
         }
     }
 
-    public static <T> T runUseBlockingQueue(Callable<T> task, long timeout) {
+    public static <T> T runUseBlockingQueue(final Callable<T> task, long timeout) {
         final ArrayBlockingQueue<AtomicReference<T>> blockQueue = new ArrayBlockingQueue<AtomicReference<T>>(1);
         new Thread(new Runnable() {
             public void run() {

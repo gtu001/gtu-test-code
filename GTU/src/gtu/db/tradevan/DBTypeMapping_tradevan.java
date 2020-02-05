@@ -12,6 +12,7 @@ public class DBTypeMapping_tradevan {
 
     public enum JdbcTypeMappingToJava {
         CHAR(java.sql.Types.CHAR, String.class), //
+        NCHAR(java.sql.Types.NCHAR, String.class), //
         VARCHAR(java.sql.Types.VARCHAR, String.class), //
         NVARCHAR(java.sql.Types.NVARCHAR, String.class),//
         LONGVARCHAR(java.sql.Types.LONGVARCHAR, String.class), //

@@ -270,4 +270,11 @@ public class SwingTabTemplateUI {
     public List<JFrame> getJframeKeeperLst() {
         return jframeKeeperLst;
     }
+
+    public void setTabTitle(Integer idx, String title) {
+        if (idx == null) {
+            idx = tabbedPane.getSelectedIndex();
+        }
+        tabbedPane.setTitleAt(idx, title);
+    }
 }

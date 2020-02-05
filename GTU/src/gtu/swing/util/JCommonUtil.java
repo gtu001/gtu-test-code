@@ -71,11 +71,11 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.codehaus.plexus.util.FileUtils;
 
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;

@@ -49,6 +49,7 @@ def checkFile(file, main_find_str, second_finds, ignoreCase, encoding) :
             for i,v in enumerate(second_finds) :
                 matchLineLst = checkFileDetail(fileContent, num, v, ignoreCase)
                 if len(matchLineLst) != 0 :
+                    print("## findMatch : ", file, " --> lineNumber : ", matchLineLst)
                     secondFindsMap[v] = matchLineLst
     return secondFindsMap
 
@@ -64,31 +65,39 @@ def checkFileDetail(fileContent, lineNumber, mSecondFindDef, ignoreCase) :
             if not mSecondFindDef.isRegex :
                 findStr = getIgnoreCaseText(mSecondFindDef.findStr, ignoreCase)
                 if findStr in line :
-                    matchLineLst.append(num)
+                    matchLineLst.append(num + 1)
             else :
                 mth = mSecondFindDef.findPtn.search(line)
                 if mth :
-                    matchLineLst.append(num)
+                    matchLineLst.append(num + 1)
     return matchLineLst
 
 
 
 def checkSecondFindsMapCondition(secondFindsMap, isAnd) :
+    allLst = []
+    for i,key in enumerate(secondFindsMap.keys()) :
+        if secondFindsMap[key] is not None and len(secondFindsMap[key]) != 0:
+            allLst.append(True)
+        else :
+            allLst.append(False)
     if isAnd :
-        for i,key in enumerate(secondFindsMap.keys()) :
-            if secondFindsMap[key] is not None and len(secondFindsMap[key]) == 0:
-                return False
+        if False in allLst :
+            return False
         return True
     else :
-        for i,key in enumerate(secondFindsMap.keys()) :
-            if secondFindsMap[key] is not None and len(secondFindsMap[key]) != 0:
-                return True
+        if True in allLst :
+            return True
         return False
 
 
-def main(dir_path, main_find_str, second_finds, ignoreCase, encoding, isAnd) :
+def main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd) :
+    filePattern = '.*'
+    if not stringUtil.isBlank(subFileName) :
+        filePattern = '.*\.' + subFileName
+    print("#### filePattern : ", filePattern)
     fileLst = list()
-    fileUtil.searchFileMatchs(dir_path, r'.*', fileLst, debug=False, ignoreSubFileNameLst=["jar", "class"])
+    fileUtil.searchFileMatchs(dir_path, filePattern, fileLst, debug=False, ignoreSubFileNameLst=["jar", "class"])
     for i,f in enumerate(fileLst) :
         print("start ", str(f))
         secondFindsMap = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
@@ -117,14 +126,15 @@ class SecondFindDef () :
 
 
 if __name__ == '__main__' :
-    dir_path = "D:/workspace/inv-Fund-web-Query"
-    main_find_str = "productType"
+    dir_path = "D:/work_tool/Z-Code"
+    main_find_str = "ZT_Pay_Master"
+    subFileName = "xml"
     ignoreCase = True
     second_finds = [
-        SecondFindDef("[\"\']0[\"\']", 3, True, ignoreCase),
-        SecondFindDef("check", 3, False, ignoreCase),
+        # findStr, relativeLineNumber, isRegex, ignoreCase
+        SecondFindDef("insert", 3, False, ignoreCase),
     ]
     encoding = "UTF8"
     isAnd = True
-    main(dir_path, main_find_str, second_finds, ignoreCase, encoding, isAnd)
+    main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd)
     print("done..")
