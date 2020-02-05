@@ -53,6 +53,7 @@ public class Logger2File {
     }
 
     private String getPrefix() {
+        String tname = "[" + Thread.currentThread().getName() + "]";
         StackTraceElement[] sks = Thread.currentThread().getStackTrace();
         StackTraceElement currentElement = null;
         boolean findThisOk = false;
@@ -68,9 +69,9 @@ public class Logger2File {
         }
         String timestamp = SDF.format(new Date());
         if (currentElement != null) {
-            return timestamp + "(" + currentElement.getClassName() + ":" + currentElement.getLineNumber() + ")";
+            return tname + timestamp + "(" + currentElement.getClassName() + ":" + currentElement.getLineNumber() + ")";
         }
-        return "(" + timestamp + ")";
+        return "(" + tname + timestamp + ")";
     }
 
     public void close() {
