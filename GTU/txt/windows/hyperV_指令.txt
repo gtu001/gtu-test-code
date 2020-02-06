@@ -1,9 +1,0 @@
-﻿系統管理員權限開啟 powershell
-
-# 啟用
-
-$ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V –All
-
-# 關閉
-
-$ Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All

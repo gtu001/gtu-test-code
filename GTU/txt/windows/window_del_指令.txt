@@ -1,0 +1,5 @@
+del /F/S/Q   "C:\Users\wistronits\Desktop\VM\test_project\*.*"
+
+rmdir  /S/Q  "C:\Users\wistronits\Desktop\VM\test_project\"
+
+

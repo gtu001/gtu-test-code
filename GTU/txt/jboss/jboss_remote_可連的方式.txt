@@ -1,0 +1,12 @@
+修改 standalone.xml
+
+用以下替換掉原來的 interfaces
+
+<interfaces>
+    <interface name="management">
+       <inet-address value="127.0.0.1"/>
+    </interface>
+    <interface name="public">
+       <any-address/>
+    </interface>
+</interfaces>

@@ -1,0 +1,25 @@
+window_看開了什麼port
+---
+	netstat -an | find "LISTENING"
+
+
+window_看port狀況
+	netstat -ano | findstr <Port>
+	Ex : netstat -ano | findstr 5500
+	
+	
+window 看pid
+	tasklist | findstr <PID>
+
+
+開port軟體(純測試用)
+---
+	http://www.rjlsoftware.com/software/utility/portlistener/download.shtml
+
+
+---
+教學
+	https://geekflare.com/create-port-listener-in-windows-or-linux/
+
+
+

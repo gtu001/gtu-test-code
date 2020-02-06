@@ -1,0 +1,19 @@
+linux 開port
+安裝 nc
+	yum install nc
+
+開啟 5500 port
+	nc -l 5500 & 
+
+驗證 5500 是否開通
+	netstat -anlp |grep 5500
+
+tcp       0     0 0.0.0.0:5500               0.0.0.0:*                   LISTEN 
+   21085/nc  
+
+
+
+
+---
+教學
+	https://geekflare.com/create-port-listener-in-windows-or-linux/

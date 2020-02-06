@@ -1,0 +1,8 @@
+jboss部屬
+---
+	jboss-eap-6.4\standalone\deployments\<XXXX.war目錄>
+
+
+啟動
+---
+	\jboss-eap-6.4\bin\standalone.bat

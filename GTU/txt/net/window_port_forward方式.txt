@@ -1,0 +1,8 @@
+window_port_forward方式
+以下為外部連8081會轉到該主機8080
+---
+netsh interface portproxy add v4tov4 listenport=8081 listenaddress=* connectport=8080 connectaddress=127.0.0.1 
+
+移除方式
+---
+netsh interface portproxy delete v4tov4 listenport=8081 listenaddress=* 
