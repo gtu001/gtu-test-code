@@ -69,6 +69,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -117,6 +118,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JScrollPopupMenu;
+import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
@@ -332,6 +334,7 @@ public class FastDBQueryUI extends JFrame {
             public void afterChangeTab(int tabIndex, List<JFrame> jframeKeeperLst) {
                 if (jframeKeeperLst != null && !jframeKeeperLst.isEmpty()) {
                     ((FastDBQueryUI) jframeKeeperLst.get(tabIndex)).reloadAllProperties();
+                    ((FastDBQueryUI) jframeKeeperLst.get(tabIndex)).moveTabToQueryResultIfHasRecords();
                 }
             }
         });
@@ -1501,6 +1504,8 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
+        //-----------------------------------------------------------------------------------------------
+      //-----------------------------------------------------------------------------------------------
         {
             sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             sqlIdListDSMappingHandler = new SqlIdListDSMappingHandler();
@@ -1529,6 +1534,40 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void run() {
                     executeSqlButtonClick();
+                }
+            });
+
+            KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
+                public Object transform(Object input) {
+                    KeyEvent e = (KeyEvent) input;
+                    if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                        return true;
+                    }
+                    return false;
+                }
+            }, new Runnable() {
+                @Override
+                public void run() {
+                    if (tabbedPane.getSelectedIndex() > 0) {
+                        tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
+                    }
+                }
+            });
+
+            KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
+                public Object transform(Object input) {
+                    KeyEvent e = (KeyEvent) input;
+                    if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                        return true;
+                    }
+                    return false;
+                }
+            }, new Runnable() {
+                @Override
+                public void run() {
+                    if (tabbedPane.getSelectedIndex() <= tabbedPane.getTabCount() - 1) {
+                        tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
+                    }
                 }
             });
 
@@ -4624,6 +4663,13 @@ public class FastDBQueryUI extends JFrame {
         }
         mSqlTextAreaPromptHandler.init(event);
         mSqlTextAreaPromptHandler.mainProcess();
+    }
+
+    private void moveTabToQueryResultIfHasRecords() {
+        DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
+        if (model.getRowCount() != 0) {
+            JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("查詢結果");
+        }
     }
 
     private class SearchAndReplace {

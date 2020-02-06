@@ -68,15 +68,19 @@ public class SwingTabTemplateUI {
         tabbedPane = new DraggableTabbedPane();// new
                                                // JTabbedPane(JTabbedPane.TOP);
         tabbedPane.addChangeListener(new ChangeListener() {
+            int currentIdx = -1;
+
             public void stateChanged(ChangeEvent e) {
                 System.out.println("changeTab : " + tabbedPane.getSelectedIndex());
                 try {
                     if (tabbedPane.getSelectedIndex() == -1) {
                         return;
                     }
-                    if (changeTabHandlerGtu001 != null) {
+                    if (changeTabHandlerGtu001 != null && //
+                    currentIdx != -1 && currentIdx != tabbedPane.getSelectedIndex()) {
                         changeTabHandlerGtu001.afterChangeTab(tabbedPane.getSelectedIndex(), jframeKeeperLst);
                     }
+                    currentIdx = tabbedPane.getSelectedIndex();
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }

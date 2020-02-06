@@ -6,10 +6,10 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.reflect.FieldUtils;
@@ -39,7 +39,7 @@ public class KeyEventExecuteHandler {
                     j.addKeyListener(new KeyAdapter() {
                         @Override
                         public void keyPressed(KeyEvent e) {
-                            doExecuteSqlButtonClick(e);
+                            doExecuteKeyPressProcess(e);
                         }
                     });
                 } catch (Exception e) {
@@ -50,7 +50,7 @@ public class KeyEventExecuteHandler {
         }
     }
 
-    private void doExecuteSqlButtonClick(KeyEvent e) {
+    private void doExecuteKeyPressProcess(KeyEvent e) {
         boolean doExecute = false;
         if (isDoExecuteEvent == null) {
             if ((e.getModifiers() & KeyEvent.ALT_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -74,11 +74,14 @@ public class KeyEventExecuteHandler {
                 relativeFrame = (JFrame) self;
             }
 
-            final JProgressBarHelper proHelper = JProgressBarHelper.newInstance(relativeFrame, title);
-            proHelper.indeterminate(true);
-            proHelper.modal(false);
-            proHelper.build();
-            proHelper.show();
+            final AtomicReference<JProgressBarHelper> proHelper = new AtomicReference<JProgressBarHelper>();
+            if (StringUtils.isNotBlank(title)) {
+                proHelper.set(JProgressBarHelper.newInstance(relativeFrame, title));
+                proHelper.get().indeterminate(true);
+                proHelper.get().modal(false);
+                proHelper.get().build();
+                proHelper.get().show();
+            }
 
             new Thread(new Runnable() {
                 @Override
@@ -89,7 +92,9 @@ public class KeyEventExecuteHandler {
                         JCommonUtil.handleException(ex);
                     } finally {
                         isPrecedingExeucte.set(false);
-                        proHelper.dismiss();
+                        if (proHelper.get() != null) {
+                            proHelper.get().dismiss();
+                        }
                         System.out.println("KeyEventExecuteHandler ... exe done!!");
                     }
                 }
