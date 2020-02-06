@@ -3016,12 +3016,15 @@ public class FastDBQueryUI extends JFrame {
                     .addJMenuItem("SQL 格式化", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String sql = sqlTextArea.getText();
-                            sqlTextArea.setText(getSqlFormater(sql));
+                            String sql = StringUtils.defaultString(sqlTextArea.getText());
+                            sql = getSqlFormater(sql);
+                            sql = getSelectColumnFormater(sql);
+                            sqlTextArea.setText(sql);
                         }
 
                         Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\sunion|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
                                 Pattern.CASE_INSENSITIVE);
+                        Pattern ptn2 = Pattern.compile("select\\s+((?:.|\n)*?)from\\s+.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 
                         private String getSqlFormater(String sql) {
                             List<String> lst = StringUtil_.readContentToList(sql, true, false, false);
@@ -3032,6 +3035,21 @@ public class FastDBQueryUI extends JFrame {
                                 mth.appendReplacement(sb, "\r\n" + mth.group(1));
                             }
                             mth.appendTail(sb);
+                            return sb.toString();
+                        }
+
+                        private String getSelectColumnFormater(String sql) {
+                            StringBuffer sb = new StringBuffer();
+                            Matcher mth = ptn2.matcher(sql);
+                            int startPos = 0;
+                            if (mth.find()) {
+                                sb.append(sql.substring(startPos, mth.start(1)));
+                                startPos = mth.end(1);
+                                String selectDesc = mth.group(1);
+                                selectDesc = selectDesc.replaceAll(",", ",\r\n    ");
+                                sb.append(selectDesc);
+                            }
+                            sb.append(sql.substring(startPos));
                             return sb.toString();
                         }
                     })//
