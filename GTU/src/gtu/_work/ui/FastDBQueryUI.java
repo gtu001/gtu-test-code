@@ -1504,8 +1504,8 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
-        //-----------------------------------------------------------------------------------------------
-      //-----------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------
         {
             sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             sqlIdListDSMappingHandler = new SqlIdListDSMappingHandler();
@@ -2183,8 +2183,11 @@ public class FastDBQueryUI extends JFrame {
             createModel.addRow(rows);
         }
 
-        // JTableUtil.setColumnWidths(queryResultTable, getInsets());
-        JTableUtil.setColumnWidths_ByDataContent(queryResultTable, 0.75f, getInsets());
+        if (true) {
+            JTableUtil.setColumnWidths_ByDataContent(queryResultTable, 0.75f, getInsets());
+        } else {
+            JTableUtil.setColumnWidths(queryResultTable, getInsets());
+        }
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {

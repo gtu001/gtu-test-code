@@ -83,6 +83,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.string.StringUtil_;
 import sun.swing.DefaultLookup;
 
 public class JTableUtil {
@@ -1320,7 +1321,12 @@ public class JTableUtil {
             for (int colPos = 0; colPos < table.getColumnCount(); colPos++) {
                 int realColPos = table.convertColumnIndexToModel(colPos);
                 String val = String.valueOf(model.getValueAt(rowPos, realColPos));
-                int width = val.toString().getBytes().length * 10;
+                int width = 0;
+                if (StringUtil_.hasChineseWord2(val)) {
+                    width = val.toString().getBytes().length * 10;
+                } else {
+                    width = val.length() * 10;
+                }
 
                 Integer currentWidth = 0;
                 if (widthPosMap.containsKey(realColPos)) {

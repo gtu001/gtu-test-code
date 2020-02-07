@@ -72,11 +72,50 @@ public class StringUtil_ {
      * @param isChineseBool
      * @return
      */
+    @Deprecated
     public static boolean hasChineseWord(String str) {
         Matcher mth = Pattern.compile("[\u4e00-\u9fa5]").matcher(str);
         if (mth.find()) {
             return true;
         }
+        return false;
+    }
+
+    public static boolean hasChineseWord2(String str) {
+        char[] cs = StringUtils.defaultString(str).toCharArray();
+        for (char c : cs) {
+            if (isFullChar(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Ref: http://www.micmiu.com/lang/java/java-check-chinese/
+     * 
+     * @param ch
+     * @return
+     */
+    public static boolean isFullChar(char ch) {
+        Character.UnicodeBlock ub = Character.UnicodeBlock.of(ch);
+        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+                || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Printable characters
+     * 
+     * @param ch
+     * @return
+     */
+    public static boolean isPrintableAsciiChar(char ch) {
+        if (32 <= ch && ch <= 126)
+            return true;
         return false;
     }
 
