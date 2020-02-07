@@ -1305,14 +1305,15 @@ public class JTableUtil {
      * 
      * @param table
      * @param insets
+     *            使用這個即可 JFrame.getInsets()
      * @param setMinimum
      * @param setMaximum
      */
-    public static void setColumnWidths_ByDataContent(JTable table, Insets insets) {
+    public static void setColumnWidths_ByDataContent(JTable table, Float offset, Insets insets) {
         int columnCount = table.getColumnCount();
         TableColumnModel tcm = table.getColumnModel();
         int spare = (insets == null ? 0 : insets.left + insets.right);
-
+        offset = offset == null ? 1 : offset;
         Map<Integer, Integer> widthPosMap = new HashMap<Integer, Integer>();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         for (int rowPos = 0; rowPos < table.getRowCount(); rowPos++) {
@@ -1326,6 +1327,7 @@ public class JTableUtil {
                     currentWidth = widthPosMap.get(realColPos);
                 }
                 currentWidth = Math.max(currentWidth, width);
+                currentWidth = (int) (((float) currentWidth) * offset);
                 widthPosMap.put(realColPos, currentWidth);
             }
         }

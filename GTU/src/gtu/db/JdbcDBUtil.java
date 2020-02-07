@@ -316,6 +316,9 @@ public class JdbcDBUtil {
         System.out.println("sql : " + sql);
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
+            if(maxRowsLimit > 0) {
+                ps.setMaxRows(maxRowsLimit);
+            }
             doSettingParameters(con, ps, param);
 
             rs = ps.executeQuery();

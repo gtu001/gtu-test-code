@@ -2140,10 +2140,12 @@ public class FastDBQueryUI extends JFrame {
         // 設定 Value 顯示方式
         JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
 
-        JTableUtil.setColumnWidths(queryResultTable, getInsets());
         for (Object[] rows : queryList.getRight()) {
             createModel.addRow(rows);
         }
+
+        // JTableUtil.setColumnWidths(queryResultTable, getInsets());
+        JTableUtil.setColumnWidths_ByDataContent(queryResultTable, 0.75f, getInsets());
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {

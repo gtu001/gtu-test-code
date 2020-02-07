@@ -188,7 +188,7 @@ public class LogCatFilterUI extends JFrame {
             }
         }
         logTable.setModel(defModel);
-        JTableUtil.setColumnWidths_ByDataContent(logTable, null);
+        JTableUtil.setColumnWidths_ByDataContent(logTable, null, null);
 
         JTableUtil.newInstance(logTable).setColumnColor_byCondition(0, new JTableUtil.TableColorDef() {
             public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
