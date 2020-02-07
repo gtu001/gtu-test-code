@@ -31,27 +31,33 @@ def checkFile(file, main_find_str, second_finds, ignoreCase, encoding) :
 
     fileContent = dict()
     secondFindsMap = dict()
+    masterLineNumberLst = list()
 
     for i,v in enumerate(second_finds) :
         secondFindsMap[v] = None
 
     with open(file, "r", encoding=encoding, buffering=30) as fs :
         try :
-            for num, line in enumerate(fs) :
-                fileContent[num] = line
+            for idx, line in enumerate(fs) :
+                fileContent[idx + 1] = line
         except UnicodeDecodeError as ex :
             print("檔案編碼失敗 : ", str(file))
+            fileContent.clear()
 
-    for i,num in enumerate(fileContent.keys()) :
-        line = fileContent[num]
+    for i,lineNumber in enumerate(fileContent.keys()) :
+        line = fileContent[lineNumber]
         line = getIgnoreCaseText(line, ignoreCase)
         if main_find_str in line :
-            for i,v in enumerate(second_finds) :
-                matchLineLst = checkFileDetail(fileContent, num, v, ignoreCase)
-                if len(matchLineLst) != 0 :
-                    print("## findMatch : ", file, " --> lineNumber : ", matchLineLst)
-                    secondFindsMap[v] = matchLineLst
-    return secondFindsMap
+            if len(second_finds) == 0 :
+                masterLineNumberLst.append(lineNumber)
+            else :
+                for i,v in enumerate(second_finds) :
+                    matchLineLst = checkFileDetail(fileContent, lineNumber, v, ignoreCase)
+                    if len(matchLineLst) != 0 :
+                        print("## findMatch : ", file, " --> lineNumber : ", matchLineLst)
+                        secondFindsMap[v] = matchLineLst
+                        masterLineNumberLst.append(lineNumber)
+    return (masterLineNumberLst, secondFindsMap)
 
 
 
@@ -65,16 +71,18 @@ def checkFileDetail(fileContent, lineNumber, mSecondFindDef, ignoreCase) :
             if not mSecondFindDef.isRegex :
                 findStr = getIgnoreCaseText(mSecondFindDef.findStr, ignoreCase)
                 if findStr in line :
-                    matchLineLst.append(num + 1)
+                    matchLineLst.append(num)
             else :
                 mth = mSecondFindDef.findPtn.search(line)
                 if mth :
-                    matchLineLst.append(num + 1)
+                    matchLineLst.append(num)
     return matchLineLst
 
 
 
 def checkSecondFindsMapCondition(secondFindsMap, isAnd) :
+    if len(secondFindsMap) == 0 :
+        return True
     allLst = []
     for i,key in enumerate(secondFindsMap.keys()) :
         if secondFindsMap[key] is not None and len(secondFindsMap[key]) != 0:
@@ -96,29 +104,45 @@ def main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encodin
     if not stringUtil.isBlank(subFileName) :
         filePattern = '.*\.' + subFileName
     print("#### filePattern : ", filePattern)
+
     fileLst = list()
     fileUtil.searchFileMatchs(dir_path, filePattern, fileLst, debug=False, ignoreSubFileNameLst=["jar", "class"])
+    
     for i,f in enumerate(fileLst) :
         print("start ", str(f))
-        secondFindsMap = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
+        (masterLineNumberLst, secondFindsMap) = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
+        
+        if len(masterLineNumberLst) == 0 :
+            continue
+
         if checkSecondFindsMapCondition(secondFindsMap, isAnd) != 0:
             log.writeline(f, secondFindsMap)
 
             # 紀錄檔案該行
-            writeFilesRelativeLines(f, secondFindsMap, log)
+            writeFilesRelativeLines(f, masterLineNumberLst, secondFindsMap, log)
     pass
 
 
-def writeFilesRelativeLines(file, secondFindsMap, log) :
+def writeFilesRelativeLines(file, masterLineNumberLst, secondFindsMap, log) :
     contentLst = fileUtil.loadFile_asList(file)
-    for i, k in enumerate(secondFindsMap) :
-        lineLst = secondFindsMap[k]
-        for ii, lineNumber in enumerate(lineLst) :
-            for iii in range(lineNumber - 2, lineNumber + 2) :
-                lineIdx = iii - 1
-                print(str(lineIdx) + " --- " + lineLst)
-                if lineLst.count(lineIdx) > 0 :
-                    log.writeline("\t" + "[" + str(iii) + "]" + lineLst[lineIdx])
+    if len(secondFindsMap) == 0 :
+        for i, lineNumber in enumerate(masterLineNumberLst) :
+            if lineNumber - 1 < len(contentLst):
+                prefix = "M"
+                log.writeline("\t" + prefix + "[" + str(lineNumber) + "]" + contentLst[lineNumber - 1])
+    else : 
+        for i, k in enumerate(secondFindsMap) :
+            lineLst = secondFindsMap[k]
+            for ii, lineNumber in enumerate(lineLst) :
+                findLines = contentLst[lineNumber - 1 - 2 : lineNumber - 1 + 2]
+                lineNumberArry = list(range(lineNumber - 2, lineNumber + 2))
+                for iii,line in enumerate(findLines) :
+                    prefix = " "
+                    if lineNumberArry[iii] in masterLineNumberLst :
+                        prefix = "M" #主
+                    elif lineNumber == lineNumberArry[iii] :
+                        prefix = "S" #次
+                    log.writeline("\t" + prefix + "[" + str(lineNumberArry[iii]) + "]" + line)
 
 
 class SecondFindDef () :
