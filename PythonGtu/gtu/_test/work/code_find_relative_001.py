@@ -103,7 +103,22 @@ def main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encodin
         secondFindsMap = checkFile(f, main_find_str, second_finds, ignoreCase, encoding)
         if checkSecondFindsMapCondition(secondFindsMap, isAnd) != 0:
             log.writeline(f, secondFindsMap)
+
+            # 紀錄檔案該行
+            writeFilesRelativeLines(f, secondFindsMap, log)
     pass
+
+
+def writeFilesRelativeLines(file, secondFindsMap, log) :
+    contentLst = fileUtil.loadFile_asList(file)
+    for i, k in enumerate(secondFindsMap) :
+        lineLst = secondFindsMap[k]
+        for ii, lineNumber in enumerate(lineLst) :
+            for iii in range(lineNumber - 2, lineNumber + 2) :
+                lineIdx = iii - 1
+                print(str(lineIdx) + " --- " + lineLst)
+                if lineLst.count(lineIdx) > 0 :
+                    log.writeline("\t" + "[" + str(iii) + "]" + lineLst[lineIdx])
 
 
 class SecondFindDef () :
@@ -127,7 +142,7 @@ class SecondFindDef () :
 
 if __name__ == '__main__' :
     dir_path = "D:/work_tool/Z-Code"
-    main_find_str = "ZT_Pay_Master"
+    main_find_str = "Pay_Detail"
     subFileName = "xml"
     ignoreCase = True
     second_finds = [

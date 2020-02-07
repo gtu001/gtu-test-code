@@ -2184,7 +2184,11 @@ public class FastDBQueryUI extends JFrame {
         }
 
         if (true) {
-            JTableUtil.setColumnWidths_ByDataContent(queryResultTable, 0.75f, getInsets());
+            Map<String, Object> preference = new HashMap<String, Object>();
+            preference.put("offset", 0.75f);
+            preference.put("isCaculateTitle", true);
+            preference.put("maxWidth", 500);
+            JTableUtil.setColumnWidths_ByDataContent(queryResultTable, preference, getInsets());
         } else {
             JTableUtil.setColumnWidths(queryResultTable, getInsets());
         }

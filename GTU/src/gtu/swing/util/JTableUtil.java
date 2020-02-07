@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1310,13 +1311,36 @@ public class JTableUtil {
      * @param setMinimum
      * @param setMaximum
      */
-    public static void setColumnWidths_ByDataContent(JTable table, Float offset, Insets insets) {
+    public static void setColumnWidths_ByDataContent(JTable table, Map<String, Object> preferences, Insets insets) {
+        preferences = preferences == null ? Collections.EMPTY_MAP : preferences;
+        float offset = (Float) (preferences.containsKey("offset") ? preferences.get("offset") : 1f);
+        boolean isCaculateTitle = (Boolean) (preferences.containsKey("isCaculateTitle") ? preferences.get("isCaculateTitle") : true);
+        Integer maxWidth = (Integer) (preferences.containsKey("maxWidth") ? preferences.get("maxWidth") : 0);
+        // ----------------------------------------------------------------------------------------
         int columnCount = table.getColumnCount();
         TableColumnModel tcm = table.getColumnModel();
         int spare = (insets == null ? 0 : insets.left + insets.right);
-        offset = offset == null ? 1 : offset;
         Map<Integer, Integer> widthPosMap = new HashMap<Integer, Integer>();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        if (isCaculateTitle) {
+            List<Object> titleArry = JTableUtil.newInstance(table).getColumnTitleArray();
+            for (int colPos = 0; colPos < titleArry.size(); colPos++) {
+                String val = titleArry.get(colPos) != null ? String.valueOf(titleArry.get(colPos)) : "";
+                int width = 0;
+                if (StringUtil_.hasChineseWord2(val)) {
+                    width = val.toString().getBytes().length * 10;
+                } else {
+                    width = val.length() * 10;
+                }
+                width = (int) (((float) width) * offset);
+                if (maxWidth != 0 && width > maxWidth) {
+                    width = maxWidth;
+                }
+                widthPosMap.put(colPos, width);
+            }
+        }
+
         for (int rowPos = 0; rowPos < table.getRowCount(); rowPos++) {
             for (int colPos = 0; colPos < table.getColumnCount(); colPos++) {
                 int realColPos = table.convertColumnIndexToModel(colPos);
@@ -1327,13 +1351,15 @@ public class JTableUtil {
                 } else {
                     width = val.length() * 10;
                 }
-
+                width = (int) (((float) width) * offset);
                 Integer currentWidth = 0;
                 if (widthPosMap.containsKey(realColPos)) {
                     currentWidth = widthPosMap.get(realColPos);
                 }
                 currentWidth = Math.max(currentWidth, width);
-                currentWidth = (int) (((float) currentWidth) * offset);
+                if (maxWidth != 0 && currentWidth > maxWidth) {
+                    currentWidth = maxWidth;
+                }
                 widthPosMap.put(realColPos, currentWidth);
             }
         }
