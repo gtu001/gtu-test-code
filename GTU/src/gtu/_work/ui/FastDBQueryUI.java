@@ -310,6 +310,8 @@ public class FastDBQueryUI extends JFrame {
             return false;
         }
     };
+    private JButton clearParameterBtn;
+    private AtomicReference<RecordWatcher> mRecordWatcher = new AtomicReference<RecordWatcher>();
 
     /**
      * Launch the application.
@@ -1479,6 +1481,18 @@ public class FastDBQueryUI extends JFrame {
                 sqlParameterConfigLoadHandler.deleteParameterBtnAction();
             }
         });
+
+        clearParameterBtn = new JButton("清除參數");
+        clearParameterBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
+                JTableUtil u = JTableUtil.newInstance(parametersTable);
+                for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    u.setValueAt(false, "", ii, 1);
+                }
+            }
+        });
+        panel_4.add(clearParameterBtn);
         panel_4.add(deleteParameterBtn);
 
         executeSqlButton2 = new JButton("執行Sql");
@@ -2066,6 +2080,8 @@ public class FastDBQueryUI extends JFrame {
                 int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
                 Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
                         this.getDataSource().getConnection(), true, maxRowsLimit);
+
+                createRecordWatcher(orignQueryResult, param.getQuestionSql(), parameterList.toArray(), true, maxRowsLimit);
 
                 mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
 
@@ -3491,9 +3507,9 @@ public class FastDBQueryUI extends JFrame {
         public String toString() {
             String fixStyle = "style=\"background-color: #000000;\"";
             if (StringUtils.isNotBlank(category)) {
-                return String.format("<html><body %4$s><font color=\"%1$s\"><b></b>%2$s</font>&nbsp;&nbsp;  <font color=\"black\">%3$s</font></body></html>", //
+                return String.format("<html><body %4$s><font color=\"%1$s\"><b></b>%2$s</font>&nbsp;&nbsp;<font color=\"%1$s\">%3$s</font></body></html>", //
                         StringUtils.trimToEmpty(color), //
-                        StringUtils.trimToEmpty(category), //
+                        "『" + StringUtils.trimToEmpty(category) + "』  ", //
                         StringUtils.trimToEmpty(sqlId), //
                         StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : "" //
                 );
@@ -4781,6 +4797,67 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextArea.setSelectionEnd(pos.getRight());
             }
             return true;
+        }
+    }
+
+    private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String string, Object[] objects, boolean b, int maxRowsLimit) {
+        if (mRecordWatcher.get() != null) {
+            mRecordWatcher.get().doStop = true;
+        } else {
+            mRecordWatcher.set(new RecordWatcher(orignQueryResult, string, objects, b, maxRowsLimit));
+        }
+    }
+
+    private class RecordWatcher extends Thread {
+        Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult;
+        String sql;
+        Object[] params;
+        boolean b;
+        int maxRowsLimit;
+        boolean doStop = false;
+        List<Integer> pkIndexLst = new ArrayList<Integer>();
+
+        RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
+            this.orignQueryResult = orignQueryResult;
+            this.sql = sql;
+            this.params = params;
+            this.b = b;
+            this.maxRowsLimit = maxRowsLimit;
+        }
+
+        private void compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst) {
+            Map<String, Object[]> oArry = new LinkedHashMap<String, Object[]>();
+            Map<String, Object[]> nArry = new LinkedHashMap<String, Object[]>();
+
+            if (pkIndexLst.isEmpty()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("請先設定欄位比對PK!");
+                return;
+            }
+
+            this.appendAllRecords(oldLst, oArry);
+            this.appendAllRecords(newLst, nArry);
+
+            for (String key : oArry.keySet()) {
+                if (!nArry.containsKey(key)) {
+                    
+                }
+            }
+        }
+
+        private void appendAllRecords(List<Object[]> oldLst, Map<String, Object[]> oArry) {
+            for (int ii = 0; ii < oldLst.size(); ii++) {
+                Object[] arry = oldLst.get(ii);
+                List<String> pkLst = new ArrayList<String>();
+                for (int idx : pkIndexLst) {
+                    pkLst.add(String.valueOf(arry[idx]));
+                }
+                String key = StringUtils.join(pkLst, "^");
+                oArry.put(key, arry);
+            }
+        }
+
+        public void run() {
+
         }
     }
 }

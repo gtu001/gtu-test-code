@@ -1,0 +1,1605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="541" leftMargin="34" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1f4ca090-bf24-4cb0-8ef4-ae430de62f23">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="86"/>
+	<property name="ireport.y" value="564"/>
+	<style name="style1" isDefault="true" fontName="SansSerif" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4">
+		<box>
+			<pen lineWidth="1.0" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 5">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<topPen lineWidth="0.5" lineColor="#FFFFFF"/>
+			<bottomPen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 6">
+		<box>
+			<pen lineWidth="1.0" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 7">
+		<box>
+			<pen lineWidth="1.0" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 7_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 7_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 7_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="Text Body"/>
+	<subDataset name="customFieldDataset" uuid="e97d6893-85ad-4442-86a6-1b82279ef270">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select t2.detail_no,' '+ISNULL(t1.spec_field_name,'') spec_field_name,' '+ISNULL(t1.spec_field,'') spec_field from
+(
+select a.detail_no,a.spec_field_name,a.spec_field from ZT_Pay_Detail_List a
+where a.detail_type='2' and pay_detail_uuid=$P{pay_detail_uuid}
+) t1 right join
+(
+select 1 detail_no
+union all
+select 2 detail_no
+union all
+select 3 detail_no
+union all
+select 4 detail_no
+union all
+select 5 detail_no
+union all
+select 6 detail_no
+union all
+select 7 detail_no
+union all
+select 8 detail_no
+union all
+select 9 detail_no
+union all
+select 10 detail_no
+) t2 on t1.detail_no=t2.detail_no where t2.detail_no<=4]]>
+		</queryString>
+		<field name="detail_no" class="java.lang.Integer"/>
+		<field name="spec_field_name" class="java.lang.String"/>
+		<field name="spec_field" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="customPayDetail11_20Dataset" uuid="c7ec8cd7-eafc-4383-99dd-86661b3d66f0">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select  t2.detail_no num,t1.detail_no,ISNULL(t1.pay_detail,'') pay_detail,ISNULL(t1.pay_desc,'') pay_desc,t1.pay_amount from
+(
+select pay_detail,pay_desc,pay_amount,detail_no
+from ZT_Pay_Detail_List where detail_type='1'
+and pay_detail_uuid=$P{pay_detail_uuid}
+) t1 right join
+(
+select 11 detail_no
+union all
+select 12 detail_no
+union all
+select 13 detail_no
+union all
+select 14 detail_no
+union all
+select 15 detail_no
+union all
+select 16 detail_no
+union all
+select 17 detail_no
+union all
+select 18 detail_no
+union all
+select 19 detail_no
+union all
+select 20 detail_no
+) t2 on t1.detail_no=t2.detail_no order by t2.detail_no]]>
+		</queryString>
+		<field name="num" class="java.lang.Integer"/>
+		<field name="detail_no" class="java.lang.Integer"/>
+		<field name="pay_detail" class="java.lang.String"/>
+		<field name="pay_desc" class="java.lang.String"/>
+		<field name="pay_amount" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="customPayDetail1_10Dataset" uuid="5675251d-df50-4bc2-a81f-e739b6544cd2">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select t2.detail_no num,t1.detail_no,ISNULL(t1.pay_detail,'') pay_detail,ISNULL(t1.pay_desc,'') pay_desc,t1.pay_amount from
+(
+select pay_detail,pay_desc,pay_amount,detail_no
+from ZT_Pay_Detail_List where detail_type='1'
+and pay_detail_uuid=$P{pay_detail_uuid}
+) t1 right join
+(
+select 1 detail_no
+union all
+select 2 detail_no
+union all
+select 3 detail_no
+union all
+select 4 detail_no
+union all
+select 5 detail_no
+union all
+select 6 detail_no
+union all
+select 7 detail_no
+union all
+select 8 detail_no
+union all
+select 9 detail_no
+union all
+select 10 detail_no
+) t2 on t1.detail_no=t2.detail_no order by t2.detail_no]]>
+		</queryString>
+		<field name="num" class="java.lang.Integer"/>
+		<field name="detail_no" class="java.lang.Integer"/>
+		<field name="pay_detail" class="java.lang.String"/>
+		<field name="pay_desc" class="java.lang.String"/>
+		<field name="pay_amount" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="bankBarCode" uuid="ed13fa55-3d03-4d74-8805-bb317364acd8">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select count(*) bank from
+(
+select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+and b.pay_detail_uuid=$P{pay_detail_uuid}) t1 where t1.IsBankChainGroup = '1']]>
+		</queryString>
+		<field name="bank" class="java.lang.Integer"/>
+	</subDataset>
+	<subDataset name="storeBarCode" uuid="df7692e6-0379-4123-b97d-cebc1dadeb7d">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select count(*) store from
+(
+select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+and b.pay_detail_uuid=$P{pay_detail_uuid}) t1 where t1.IsStoreChainGroup = '1']]>
+		</queryString>
+		<field name="store" class="java.lang.Integer"/>
+	</subDataset>
+	<subDataset name="postBarCode" uuid="3bda4203-771d-415e-8d61-4335366799a4">
+		<parameter name="pay_detail_uuid" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[select count(*) post from
+(
+select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+and b.pay_detail_uuid=$P{pay_detail_uuid}) t1 where t1.IsPostChainGroup = '1']]>
+		</queryString>
+		<field name="post" class="java.lang.Integer"/>
+	</subDataset>
+	<subDataset name="dataset1" uuid="a7578f53-a93a-43d6-a546-8b087bcfa615"/>
+	<subDataset name="Table Dataset 1" uuid="53c4284c-dbb3-429c-82f8-9157cd11f3a8"/>
+	<subDataset name="Table Dataset 2" uuid="29b7e7eb-1ea4-4b8b-99eb-8b71da4dfdd8"/>
+	<subDataset name="Table Dataset 3" uuid="b698fa6e-b07c-4839-83e8-b31a5a4ef0aa"/>
+	<subDataset name="Table Dataset 4" uuid="3d62690c-4735-48f5-96e0-25d74502ddde"/>
+	<subDataset name="Table Dataset 5" uuid="043b7c9f-8bcf-457d-9126-128a8da6d2b2"/>
+	<subDataset name="Table Dataset 6" uuid="684a73aa-e280-47e6-985a-06451f6e2248"/>
+	<subDataset name="Table Dataset 7" uuid="9d558e4d-5fd5-4f59-99e6-26e8719143df"/>
+	<subDataset name="Table Dataset 8" uuid="f71f74f7-0dd3-41d1-af02-f84d9180beb3"/>
+	<subDataset name="Table Dataset 9" uuid="5dbd2ee2-e664-4470-bc64-9ccf8307968c"/>
+	<parameter name="pay_detail_uuid" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="scissor" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select
+zm.PaymentName,
+b1.pay_detail_uuid,
+  b1.pay_uuid,
+  b1.serial_num,
+  b1.uniformno,
+  b1.company_name,
+  b1.company_address,
+  b1.company_tel,
+  ''+ISNULL(b1.pay_code,'') pay_code,
+  ''+ISNULL(b1.pay_name,'') pay_name,
+  b1.pay_post,
+  b1.pay_address,
+  b1.pay_email,
+  b1.deadline_time,
+  b1.barcode_agent_receive_time,
+  b1.notice,
+  b1.remark,
+  b1.spec_code_name1,
+  b1.spec_code_name2,
+  b1.spec_code_value1,
+  b1.spec_code_value2,
+  b1.bank_agent_fee,
+  b1.bank_barcode1,
+  b1.bank_barcode2,
+  b1.post_agent_fee,
+  b1.post_barcode1,
+  b1.post_barcode2,
+  b1.post_barcode3,
+  b1.store_agent_fee,
+  b1.store_barcode1,
+  b1.store_barcode2,
+  b1.store_barcode3,
+  b1.[status],
+  b1.error_status,
+  b1.pay_fee,
+  b1.pay_receive_fee,
+  b1.agent_receive_fee,
+  b1.agent_chcode,
+  b1.modify_id,
+  b1.modify_name,
+  b1.modify_time,
+  b1.is_reported,
+  b1.pin_account_code,
+  b1.pin_account_date,
+  b1.DailyIndex,
+case when REPLACE(b1.bank_barcode1,' ','')='' then Null else b1.bank_barcode1 end as bank_barcode1_d,
+case when REPLACE(b1.bank_barcode2,' ','')='' then Null else b1.bank_barcode2 end as bank_barcode2_d,
+case when REPLACE(b1.post_barcode1,' ','')='' then Null else b1.post_barcode1 end as post_barcode1_d,
+case when REPLACE(b1.post_barcode2,' ','')='' then Null else b1.post_barcode2 end as post_barcode2_d,
+case when REPLACE(b1.post_barcode3,' ','')='' then Null else b1.post_barcode3 end as post_barcode3_d,
+case when REPLACE(b1.store_barcode1,' ','')='' then Null else b1.store_barcode1 end as store_barcode1_d,
+case when REPLACE(b1.store_barcode2,' ','')='' then Null else b1.store_barcode2 end as store_barcode2_d,
+case when REPLACE(b1.store_barcode3,' ','')='' then Null else b1.store_barcode3 end as store_barcode3_d,
+convert(varchar(3),(convert(int,datepart(year,b1.deadline_time))-1911))
++'年'
++convert(varchar(2),datepart(month,b1.deadline_time))
++'月'
++convert(varchar(2),datepart(day,b1.deadline_time))
++'日止' deadline_time_M,
+convert(decimal,right(case when REPLACE(b1.store_barcode3,' ','')='' then Null else b1.store_barcode3 end,9)) store_barcode3_fee,
+'*'+b1.store_barcode1+'*' store_barcode1_M ,
+'*'+b1.store_barcode2+'*' store_barcode2_M ,
+'*'+b1.store_barcode3+'*' store_barcode3_M ,
+convert(decimal,case when REPLACE(b1.bank_barcode2,' ','')='' then Null else b1.bank_barcode2 end) bank_barcode2_M,
+'【'+reverse(stuff(reverse(convert(varchar,convert(money,case when REPLACE(b1.bank_barcode2,' ','')='' then Null else b1.bank_barcode2 end),1)),1,3,'')) +'】' bank_barcode2_M1,
+'【'+case when REPLACE(b1.bank_barcode1,' ','')='' then Null else b1.bank_barcode1 end+'】' bank_barcode1_M1,
+convert(decimal,case when REPLACE(b1.post_barcode3,' ','')='' then Null else b1.post_barcode3 end) post_barcode3_M,
+ISNULL(a1.notice,'')  msg,
+ISNULL(b1.pay_name,'')+'   ' pay_name_M,
+'('+company_name+'代收專戶)' company_name_M,
+(
+	select case count(*) when 0 then 'N' else 'Y' end bank from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid}
+	) t1 where t1.IsBankChainGroup = '1'
+) bankDisplay,
+(
+	select case count(*) when 0 then 'N' else 'Y' end store from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid} and ISNULL(b.store_barcode1,'')!=''
+	) t1 where t1.IsStoreChainGroup = '1'
+) storeDisplay,
+(
+	select case count(*) when 0 then 'N' else 'Y' end post from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid} and ISNULL(b.post_barcode1,'')!=''
+	) t1 where t1.IsPostChainGroup = '1'
+) postDisplay,
+(
+	select case count(*) when 0 then 'N' else 'Y' end bank from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid}
+	) t1 where t1.isATM = '1'
+) bankDisplay_ATM,
+(
+	select case count(*) when 0 then 'N' else 'Y' end store from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid} and ISNULL(b.bank_barcode1,'')!=''
+	) t1 where t1.isCTCB = '1'
+) bankDisplay_D00,
+(
+	select case count(*) when 0 then 'N' else 'Y' end bank from
+	(
+		select c.* from ZT_Pay_Master a,ZT_Pay_Detail b,ZT_BillerMain c
+		where a.pay_uuid=b.pay_uuid and a.biller_main_uuid=c.BillerMain_uuid
+		and b.pay_detail_uuid=$P{pay_detail_uuid} and ISNULL(b.bank_barcode1,'')!=''
+	) t1 where t1.isATM = '1'
+) atmDisplay
+
+from ZT_Pay_Master a1,ZT_Pay_Detail b1,ZT_BillerMain zm where a1.pay_uuid=b1.pay_uuid and a1.biller_main_uuid=zm.BillerMain_uuid and b1.pay_detail_uuid=$P{pay_detail_uuid}]]>
+	</queryString>
+	<field name="PaymentName" class="java.lang.String"/>
+	<field name="pay_detail_uuid" class="java.lang.String"/>
+	<field name="pay_uuid" class="java.lang.String"/>
+	<field name="serial_num" class="java.lang.Integer"/>
+	<field name="uniformno" class="java.lang.String"/>
+	<field name="company_name" class="java.lang.String"/>
+	<field name="company_address" class="java.lang.String"/>
+	<field name="company_tel" class="java.lang.String"/>
+	<field name="pay_code" class="java.lang.String"/>
+	<field name="pay_name" class="java.lang.String"/>
+	<field name="pay_post" class="java.lang.String"/>
+	<field name="pay_address" class="java.lang.String"/>
+	<field name="pay_email" class="java.lang.String"/>
+	<field name="deadline_time" class="java.sql.Timestamp"/>
+	<field name="barcode_agent_receive_time" class="java.sql.Timestamp"/>
+	<field name="notice" class="java.lang.String"/>
+	<field name="remark" class="java.lang.String"/>
+	<field name="spec_code_name1" class="java.lang.String"/>
+	<field name="spec_code_name2" class="java.lang.String"/>
+	<field name="spec_code_value1" class="java.lang.String"/>
+	<field name="spec_code_value2" class="java.lang.String"/>
+	<field name="bank_agent_fee" class="java.math.BigDecimal"/>
+	<field name="bank_barcode1" class="java.lang.String"/>
+	<field name="bank_barcode2" class="java.lang.String"/>
+	<field name="post_agent_fee" class="java.math.BigDecimal"/>
+	<field name="post_barcode1" class="java.lang.String"/>
+	<field name="post_barcode2" class="java.lang.String"/>
+	<field name="post_barcode3" class="java.lang.String"/>
+	<field name="store_agent_fee" class="java.math.BigDecimal"/>
+	<field name="store_barcode1" class="java.lang.String"/>
+	<field name="store_barcode2" class="java.lang.String"/>
+	<field name="store_barcode3" class="java.lang.String"/>
+	<field name="status" class="java.lang.String"/>
+	<field name="error_status" class="java.lang.String"/>
+	<field name="pay_fee" class="java.math.BigDecimal"/>
+	<field name="pay_receive_fee" class="java.math.BigDecimal"/>
+	<field name="agent_receive_fee" class="java.math.BigDecimal"/>
+	<field name="agent_chcode" class="java.lang.String"/>
+	<field name="modify_id" class="java.lang.String"/>
+	<field name="modify_name" class="java.lang.String"/>
+	<field name="modify_time" class="java.sql.Timestamp"/>
+	<field name="is_reported" class="java.lang.String"/>
+	<field name="pin_account_code" class="java.lang.String"/>
+	<field name="pin_account_date" class="java.lang.String"/>
+	<field name="DailyIndex" class="java.lang.Long"/>
+	<field name="bank_barcode1_d" class="java.lang.String"/>
+	<field name="bank_barcode2_d" class="java.lang.String"/>
+	<field name="post_barcode1_d" class="java.lang.String"/>
+	<field name="post_barcode2_d" class="java.lang.String"/>
+	<field name="post_barcode3_d" class="java.lang.String"/>
+	<field name="store_barcode1_d" class="java.lang.String"/>
+	<field name="store_barcode2_d" class="java.lang.String"/>
+	<field name="store_barcode3_d" class="java.lang.String"/>
+	<field name="deadline_time_M" class="java.lang.String"/>
+	<field name="store_barcode3_fee" class="java.math.BigDecimal"/>
+	<field name="store_barcode1_M" class="java.lang.String"/>
+	<field name="store_barcode2_M" class="java.lang.String"/>
+	<field name="store_barcode3_M" class="java.lang.String"/>
+	<field name="bank_barcode2_M" class="java.math.BigDecimal"/>
+	<field name="bank_barcode2_M1" class="java.lang.String"/>
+	<field name="bank_barcode1_M1" class="java.lang.String"/>
+	<field name="post_barcode3_M" class="java.math.BigDecimal"/>
+	<field name="msg" class="java.lang.String"/>
+	<field name="pay_name_M" class="java.lang.String"/>
+	<field name="company_name_M" class="java.lang.String"/>
+	<field name="bankDisplay" class="java.lang.String"/>
+	<field name="storeDisplay" class="java.lang.String"/>
+	<field name="postDisplay" class="java.lang.String"/>
+	<field name="bankDisplay_ATM" class="java.lang.String"/>
+	<field name="bankDisplay_D00" class="java.lang.String"/>
+	<field name="atmDisplay" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="630" splitType="Stretch">
+			<componentElement>
+				<reportElement key="" mode="Opaque" x="12" y="311" width="498" height="25" uuid="ad1770fb-f020-49d0-9100-bc2d4af80b3e"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="customFieldDataset" uuid="fa7d85e5-11f0-4d01-b123-a76596a5a394">
+						<datasetParameter name="pay_detail_uuid">
+							<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="237" uuid="eae43a87-8f62-49a6-b292-fd14c92ca071">
+						<jr:detailCell style="table_TD" height="17" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="237" height="17" uuid="8d081516-ff22-42dd-9ce5-d01f02a992bb"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{spec_field_name}+' ']]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="261" uuid="ee5cbfd3-0cdd-4279-b309-3309f9da51bb">
+						<jr:detailCell style="table_TD" height="17" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="261" height="17" uuid="4e16348d-1f5a-4ca0-87eb-55e5f1bd0c24"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{spec_field}+' ']]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<frame>
+				<reportElement positionType="Float" x="13" y="233" width="508" height="23" uuid="d80b879b-f3e6-4d49-8d06-8cd132c96cbe">
+					<printWhenExpression><![CDATA[new Boolean($F{bankDisplay_ATM}.equalsIgnoreCase('Y'))]]></printWhenExpression>
+				</reportElement>
+				<staticText>
+					<reportElement mode="Transparent" x="9" y="10" width="54" height="13" uuid="43128e1d-bc98-4fd7-9c76-c9df97a96651"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
+						<font fontName="標楷體" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<text><![CDATA[與繳款金額]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="53" y="11" width="149" height="12" uuid="75961507-d562-4540-bb19-ce7a2ba0b18b"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bank_barcode2_M1}+'  ']]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement x="462" y="38" width="79" height="14" uuid="7b2d5e50-5756-4df3-9f31-c14aa329cf19"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="9" isBold="false" isItalic="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[國    內      ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="25" y="10" width="436" height="18" uuid="499f8415-cf4f-4b8b-9b04-3f43808ebbf0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="10" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{company_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="65" y="28" width="384" height="18" uuid="5f1d62ce-5721-48e6-9164-d23328698344"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="10" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{company_address}+'         ']]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="459" y="4" width="62" height="66" uuid="cd78e546-9351-460c-b69a-d30987d9a5de"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="53" y="93" width="382" height="16" uuid="b77314d1-3615-49a5-8f65-54480a9ad19a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" size="10" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_address}+'  ']]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="53" y="108" width="365" height="20" uuid="12608b6f-b356-48c0-8253-90463f2198cc"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" size="10" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_name_M}+'  鈞啟    ']]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="41" y="64" width="394" height="67" uuid="a0548cda-77dc-425e-89fc-a75b47a23796"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement mode="Opaque" x="41" y="132" width="394" height="16" uuid="e74a7f3a-7258-4479-9a24-8049c03e7624"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="9" isBold="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[郵差先生，本件係為重要文件，如無法投遞時，請速退回原寄件人，謝謝您！！]]></text>
+			</staticText>
+			<line>
+				<reportElement x="39" y="147" width="1" height="86" uuid="77888a6c-a1a5-43f2-84b9-ccbbe69e87f4"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="21" y="147" width="20" height="86" uuid="ec39bf2b-0850-45f2-be16-4c7e5351effd"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" size="10" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[繳
+費
+注
+意
+事
+項]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement mode="Transparent" x="12" y="148" width="499" height="86" uuid="de0fb905-0f13-42ee-92a6-a67d2b4f2c63"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" mode="Transparent" x="41" y="149" width="469" height="85" uuid="36e3645f-37a5-4fce-9cd5-1876b28f1e4f"/>
+				<textElement verticalAlignment="Top" markup="none">
+					<font fontName="標楷體" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single" spacingBefore="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{msg}+'     ']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="249" y="293" width="95" height="18" uuid="e130db83-cf07-4fd0-a6f2-495c96cd4c19"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[ 應繳金額 ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="97" y="293" width="152" height="18" uuid="f60b556e-8074-4166-972a-f7ff679f5cd7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_name}+' ']]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="12" y="276" width="85" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="52b9525b-12a5-436e-935d-ba6eea3a284f"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#000000"/>
+					<topPen lineWidth="1.0" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="標楷體" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[' '+$F{PaymentName}+' ']]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="344" y="276" width="166" height="17" uuid="ef7f42a9-1e2d-49f9-9012-52a9e0a1445c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[' '+$F{deadline_time_M}+'  ']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="12" y="293" width="85" height="18" uuid="dae4cb10-6238-4318-b641-73d78de97dfa"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[ 姓名 ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="249" y="276" width="95" height="17" uuid="d2b7715d-88f3-4346-ac6a-0ae51819fa49"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[ 繳費期限 ]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="97" y="276" width="152" height="17" uuid="b7bf5c64-a6fc-45f9-812c-a979af33ec2c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_code}+' ']]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="12" y="256" width="498" height="20" uuid="8229962b-9ffe-42e5-b1ce-9a8edb162296"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="標楷體" size="11" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{company_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="347" y="293" width="163" height="18" uuid="12a78a78-a700-40f5-b5aa-8f9209b4311f"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					<paragraph lineSpacing="Proportional"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_fee}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="256" width="525" height="1" uuid="60b95acc-c808-4aa7-914b-a5fdde61d991"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement positionType="Float" x="448" y="336" width="62" height="20" uuid="948ab326-d149-4cfc-8961-b9b457afa778"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[收訖戳章]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="12" y="336" width="435" height="20" backcolor="#FFFFFF" uuid="0f16d06a-1ac8-48b6-ab0d-ec4b1e35661e"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[繳費明細]]></text>
+			</staticText>
+			<elementGroup>
+				<line>
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="448" y="336" width="1" height="34" uuid="86fa8bfe-836c-4bf6-b3b9-8fa8a395cb49"/>
+					<graphicElement>
+						<pen lineWidth="1.0"/>
+					</graphicElement>
+				</line>
+				<frame>
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="12" y="356" width="498" height="14" uuid="c2ac8fd0-b99b-407c-8753-2d1a215a39b5"/>
+					<box>
+						<topPen lineWidth="1.0" lineStyle="Solid"/>
+						<leftPen lineWidth="1.0" lineStyle="Solid"/>
+						<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+						<rightPen lineWidth="1.0" lineStyle="Solid"/>
+					</box>
+					<componentElement>
+						<reportElement key="table 7" style="table 7" x="0" y="0" width="222" height="14" uuid="a02c1091-4458-4d20-8146-ac565967bded"/>
+						<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+							<datasetRun subDataset="customPayDetail1_10Dataset" uuid="269bfff8-9450-4e8d-abc2-0a3a1aa9bb29">
+								<datasetParameter name="pay_detail_uuid">
+									<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:column width="20" uuid="f6c130b0-179d-4708-8985-6f05feef256d">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="20" height="14" uuid="8a11acb0-0bfa-49d9-9dc4-c7c996432ae5"/>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{detail_no}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="55" uuid="cdd96b11-ed88-4212-a5e4-5032b2be4f92">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="55" height="14" uuid="6d24108f-c5c0-4059-b41e-e44c7af32609"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_detail}+' ']]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="81" uuid="d67a86e5-72a1-4d7b-b972-3e59f0a5f7b4">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="81" height="14" uuid="87ee755c-7669-4b5a-85b9-55d1221e75cc"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_desc}+' ']]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="65" uuid="541e26ae-450d-4929-895e-cd237a535d31">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField pattern="#,##0" isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="64" height="14" uuid="993cbcdd-2c5d-4ce0-b962-d124a7b8b01b"/>
+										<textElement textAlignment="Right" verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_amount}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+						</jr:table>
+					</componentElement>
+					<componentElement>
+						<reportElement key="table 7" style="table 7" x="222" y="0" width="213" height="14" uuid="cb77ca1f-c2dd-4eb4-bac7-fdd8e89f8cf3"/>
+						<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+							<datasetRun subDataset="customPayDetail11_20Dataset" uuid="9fbfc037-3b86-4716-948a-2f184d30438f">
+								<datasetParameter name="pay_detail_uuid">
+									<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:column width="20" uuid="16c2b08f-fa67-49c2-9403-f76716f8f0f9">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="20" height="14" uuid="9a2bc8c3-a4af-4469-b53d-8be79f96ae62"/>
+										<textElement textAlignment="Center" verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{detail_no}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="55" uuid="f9629d71-45f4-4ce7-8164-16762785febf">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="55" height="14" uuid="9426b3e9-89ff-4164-9ff2-6d7d54671408"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_detail}+' ']]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="81" uuid="0b8c827b-21cf-4d46-bcc2-be180ed9f98d">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="81" height="14" uuid="44acb0ef-ceb5-47ac-98b3-ad5fb0e4db25"/>
+										<textElement verticalAlignment="Middle">
+											<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_desc}+' ']]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="53" uuid="a961217a-07c9-4a9e-908d-be3c4c4ee939">
+								<jr:detailCell style="table 7_TD" height="14" rowSpan="1">
+									<textField pattern="#,##0" isBlankWhenNull="true">
+										<reportElement x="0" y="0" width="50" height="14" uuid="c8bef647-5cfe-47e8-9386-1c0ed4ce0753"/>
+										<textElement textAlignment="Right" verticalAlignment="Middle">
+											<font size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{pay_amount}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+						</jr:table>
+					</componentElement>
+				</frame>
+			</elementGroup>
+			<line>
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="1" height="625" uuid="9b2341a5-e20f-469c-aab5-b84e0a4e08b2"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement stretchType="RelativeToBandHeight" x="525" y="0" width="1" height="625" uuid="f150684c-e69f-45ce-a74e-813e266166a2"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<frame>
+				<reportElement positionType="Float" x="30" y="423" width="204" height="80" uuid="0cc7a963-29cb-4fae-b928-1f7ce851e79b"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="45" y="32" width="153" height="12" uuid="6d3f64dc-8b0e-4a21-b896-b97a46ea490d"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bank_barcode1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="5" y="32" width="41" height="12" uuid="eaaf84aa-8e84-40c5-a27c-44b7877248b3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[繳款帳號：]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement positionType="Float" x="15" y="44" width="170" height="21" uuid="cdc2f4ee-39c3-458c-b0eb-8d7918d2ae13"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{bank_barcode2_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<staticText>
+					<reportElement positionType="Float" x="5" y="1" width="193" height="10" uuid="e744376e-ba38-4c33-ab25-9888f0bc14f1"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="7" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[中國信託商銀，執行7交易，銀行代碼:822]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement positionType="Float" x="15" y="11" width="170" height="21" uuid="6f374472-d640-4311-b9f6-26bc14d0359b"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{bank_barcode1_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="46" y="67" width="53" height="13" uuid="9ba8eb91-808c-41e6-840b-e4d0eb73208e"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MSung-Light" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bank_barcode2_M}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="83" y="67" width="60" height="13" uuid="1198cc32-6497-4c28-8da3-4cb136654a4c">
+						<printWhenExpression><![CDATA[new Boolean(!$F{bank_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[繳款人自行負擔]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="5" y="67" width="41" height="13" uuid="94c1475f-40c0-46ff-88a2-645e9510efaf"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[繳款金額：]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="163" y="67" width="38" height="13" uuid="fcc28c89-15a7-4d1a-8829-c8f4a3fd3c0c">
+						<printWhenExpression><![CDATA[new Boolean(!$F{bank_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[元手續費]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="143" y="67" width="20" height="13" uuid="28739b2c-fe89-4fb5-a25e-ae1af4a23e85">
+						<printWhenExpression><![CDATA[new Boolean(!$F{bank_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{bank_agent_fee}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement positionType="Float" x="30" y="405" width="123" height="18" uuid="a2892f45-812c-42c7-b827-dbc6c546578c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="7" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[ 戶名：中國信託商業銀行（股）公司 ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="153" y="405" width="137" height="18" uuid="8c45d5af-ad88-4ed5-bb7e-c5fe3423d502"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="標楷體" size="7" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{company_name_M}+'  ']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="290" y="405" width="20" height="113" uuid="fe40630b-1f39-4323-b70e-dacc56b2ca1d"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
+					<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[便
+利
+商
+店
+專
+用]]></text>
+			</staticText>
+			<frame>
+				<reportElement style="Text Body" positionType="Float" x="310" y="518" width="200" height="108" uuid="82de1f0b-afe6-4cc4-bedb-c980b008e576"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<componentElement>
+					<reportElement positionType="Float" x="6" y="14" width="190" height="17" uuid="448fbde6-6ec8-40ea-a1d1-e8eb0e708790"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{post_barcode1_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<staticText>
+					<reportElement positionType="Float" x="8" y="60" width="41" height="12" uuid="b5a1340a-d50d-4cd8-88a5-5a8516a5179b"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[帳單編號：]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement positionType="Float" x="6" y="43" width="190" height="17" uuid="7785e706-9cd1-47de-b231-52dbecd75f24"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{post_barcode2_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="50" y="60" width="137" height="12" uuid="faa7d86b-f9bb-4aca-9989-e7065b010cb2"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{post_barcode2}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement positionType="Float" x="6" y="72" width="190" height="17" uuid="84de9504-ddd9-4e90-94c6-033ba6572ec6"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{post_barcode3_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<staticText>
+					<reportElement positionType="Float" x="7" y="89" width="41" height="12" uuid="d7c7c47a-c17f-4a4b-a558-e17d75d5c166"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[應繳金額：]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="48" y="89" width="150" height="12" uuid="e33ab937-0d77-4039-867b-fab06f92c7b5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MSung-Light" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{post_barcode3_M}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="78" y="31" width="109" height="12" uuid="ff187375-526b-4af5-b333-1410aa9a2b08"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[戶名(中國信託商業銀行代收)     ]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement positionType="Float" x="38" y="31" width="38" height="12" uuid="c4bed1ef-9930-4678-9b69-186a74a58622"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{post_barcode1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="8" y="30" width="30" height="12" uuid="6fe5fbd5-b079-4e28-9e35-766f2bd283ee"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[編號：]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement x="67" y="93" width="20" height="15" uuid="2dd342ff-4dbf-4eb9-8fe5-83f31627fab4">
+						<printWhenExpression><![CDATA[new Boolean(!$F{post_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MSung-Light" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{post_agent_fee}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="6" y="93" width="60" height="15" uuid="5c1bf435-d41c-4054-b1ca-f3a54e676bfe">
+						<printWhenExpression><![CDATA[new Boolean(!$F{post_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[繳款人自行負擔]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="87" y="94" width="98" height="14" uuid="160a90cf-5f48-45ff-be64-18b585ac5cfa">
+						<printWhenExpression><![CDATA[new Boolean(!$F{post_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[元手續費]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="1" y="3" width="41" height="11" uuid="294b2d73-adad-4f2f-a6f6-0f1a3a5f8395"/>
+					<textElement textAlignment="Right" verticalAlignment="Top">
+						<font fontName="標楷體" size="7" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[收款專戶：]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" mode="Transparent" x="310" y="405" width="200" height="113" uuid="b970f2a4-3d2e-482f-a678-24cb4d0361ab"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<staticText>
+					<reportElement positionType="Float" mode="Transparent" x="11" y="1" width="183" height="13" backcolor="#FFFFFF" uuid="69721d48-3a19-4d7f-83f1-d282648e421e"/>
+					<box>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="0.0"/>
+						<bottomPen lineWidth="0.0"/>
+						<rightPen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[可至（7-11，全家，萊爾富，OK，美廉社）繳款]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement positionType="Float" x="8" y="14" width="190" height="20" uuid="02179630-ea87-47c7-99b9-91f1284e0e02"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{store_barcode1_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<textField isBlankWhenNull="true">
+					<reportElement x="11" y="31" width="182" height="12" uuid="1d26e059-1add-4de6-8d42-b01a8958ef4d"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{store_barcode1_M}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement positionType="Float" x="8" y="41" width="190" height="18" uuid="66306699-aabe-46bf-9c7d-a845fbb468a7"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="3of9" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{store_barcode2_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<textField isBlankWhenNull="true">
+					<reportElement x="11" y="59" width="183" height="12" uuid="0354e30a-dad9-4266-a292-4be38ad464e3"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{store_barcode2_M}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement positionType="Float" x="8" y="71" width="190" height="18" uuid="de057011-05a9-44b6-a624-03695d7eda81"/>
+					<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+						<jr:codeExpression><![CDATA[$F{store_barcode3_d}]]></jr:codeExpression>
+					</jr:barbecue>
+				</componentElement>
+				<textField isBlankWhenNull="true">
+					<reportElement x="12" y="87" width="181" height="13" uuid="84aae6de-dfae-46c5-8560-e65e6c229efa"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{store_barcode3_M}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="11" y="95" width="58" height="12" uuid="4f78fe15-0fa7-4d22-a2b2-1bb9804c31cd"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[超商應繳金額：]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="119" y="95" width="11" height="12" uuid="1416590d-4315-4fac-b964-334792d05f66"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[元]]></text>
+				</staticText>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="69" y="95" width="82" height="12" uuid="87442d45-0a1c-4da5-99be-acd1315fa4b0"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MSung-Light" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{store_barcode3_fee}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0" isBlankWhenNull="true">
+					<reportElement positionType="Float" x="72" y="100" width="36" height="13" uuid="99426f8e-7cb6-45a3-976e-d2cf94c2cf99">
+						<printWhenExpression><![CDATA[new Boolean(!$F{store_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MSung-Light" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{store_agent_fee}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement positionType="Float" x="11" y="100" width="61" height="13" uuid="93b21b97-0bf1-4f66-b9e5-78998c95aaab">
+						<printWhenExpression><![CDATA[new Boolean(!$F{store_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[繳款人自行負擔]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="92" y="100" width="102" height="13" uuid="2ccaa274-078e-4ead-aef3-52c2b77b5ef9">
+						<printWhenExpression><![CDATA[new Boolean(!$F{store_agent_fee}.intValue().toString().equals( '0' ))]]></printWhenExpression>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[元手續費]]></text>
+				</staticText>
+			</frame>
+			<staticText>
+				<reportElement positionType="Float" x="10" y="502" width="20" height="126" uuid="028cd7d7-5001-40c3-bb7e-f432b80f36d6"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
+					<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[
+確
+認
+欄]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="234" y="423" width="55" height="13" uuid="96eb99cb-f243-439f-9efc-037b2c09fcc7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[收款行蓋章]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="10" y="405" width="20" height="97" uuid="ef6589d6-b2cd-4f34-868d-0d008f32a819"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
+					<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[全
+行
+代
+收
+專
+戶]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="290" y="518" width="20" height="110" uuid="96414183-1d26-447d-a463-531252467cb5"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
+					<font fontName="標楷體" size="8" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<text><![CDATA[
+郵
+政
+專
+用]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="Float" x="10" y="503" width="280" height="1" uuid="1294df3d-080d-4b30-af9b-a649c30a932c"/>
+			</line>
+			<line>
+				<reportElement positionType="Float" x="1" y="373" width="525" height="1" uuid="3bf2b9bd-ef96-4bbc-851b-b5f9c00486ef"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<componentElement>
+				<reportElement style="table" positionType="Float" mode="Opaque" x="30" y="405" width="259" height="98" uuid="ac95d7ba-119e-428b-a746-cad0c33e6c5f">
+					<printWhenExpression><![CDATA[new Boolean(!$F{bankDisplay}.equalsIgnoreCase('Y'))]]></printWhenExpression>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="bankBarCode" uuid="7eb20002-9273-4a0e-848d-8c8c2fe20913">
+						<datasetParameter name="pay_detail_uuid">
+							<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="98" width="259">
+						<staticText>
+							<reportElement positionType="Float" x="60" y="40" width="149" height="20" uuid="bf1456a9-3878-4312-bb2c-210aac234603"/>
+							<textElement>
+								<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+							</textElement>
+							<text><![CDATA[【未開放中國信託臨櫃通路！】]]></text>
+						</staticText>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<line>
+				<reportElement positionType="Float" x="10" y="627" width="515" height="1" uuid="21423249-5161-4827-8d28-8d589d1c7706"/>
+			</line>
+			<componentElement>
+				<reportElement style="table" positionType="Float" mode="Opaque" x="310" y="405" width="200" height="113" uuid="2e21c206-34ef-4d8a-8847-c3ba3e4b3310">
+					<printWhenExpression><![CDATA[new Boolean(!$F{storeDisplay}.equalsIgnoreCase("Y"))]]></printWhenExpression>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="storeBarCode" uuid="a09da0da-95a6-4a5c-a11c-51308dbd0936">
+						<datasetParameter name="pay_detail_uuid">
+							<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="113" width="200">
+						<staticText>
+							<reportElement positionType="Float" x="30" y="44" width="149" height="20" uuid="40a8a34b-cf12-491d-862d-374271a6e493"/>
+							<textElement>
+								<font pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+							</textElement>
+							<text><![CDATA[【未開放超商通路！】]]></text>
+						</staticText>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<staticText>
+				<reportElement mode="Transparent" x="344" y="293" width="166" height="18" forecolor="#000000" backcolor="#FFFFFF" uuid="880a2ef8-9c34-4238-ac87-4c74870c9f5a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="標楷體" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Proportional"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<elementGroup>
+				<staticText>
+					<reportElement positionType="Float" x="354" y="519" width="100" height="11" uuid="80fecdf1-84c9-4893-976d-fea6431f8501"/>
+					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None">
+						<font fontName="標楷體" size="7" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					</textElement>
+					<text><![CDATA[( 請執行0509 )交易    ]]></text>
+				</staticText>
+			</elementGroup>
+			<staticText>
+				<reportElement x="457" y="69" width="68" height="14" uuid="18c34ccd-bf5b-4c42-b378-151b2bde6458"/>
+				<textElement>
+					<font fontName="標楷體" size="9"/>
+				</textElement>
+				<text><![CDATA[台北郵局許可證]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="459" y="96" width="62" height="13" uuid="4032b0c1-dc50-48b5-92db-ce03b3a41d08"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="461" y="95" width="69" height="13" uuid="961c46ca-022e-4908-aadd-be38e64fab64"/>
+				<textElement>
+					<font fontName="標楷體" size="9"/>
+				</textElement>
+				<text><![CDATA[  平    信      ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="457" y="80" width="72" height="17" uuid="b266873d-dd71-44cf-809b-f70220a48fcf"/>
+				<textElement>
+					<font fontName="標楷體" size="9"/>
+				</textElement>
+				<text><![CDATA[台北字第2204號]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="461" y="52" width="75" height="15" uuid="4451c643-454a-4650-b56a-f655faa8edad"/>
+				<textElement>
+					<font fontName="標楷體"/>
+				</textElement>
+				<text><![CDATA[郵 資 已 付   ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="48" width="52" height="18" uuid="af10f716-5c10-47ba-ac60-a03e7d4bfd42"/>
+				<textElement>
+					<font fontName="標楷體"/>
+				</textElement>
+				<text><![CDATA[TEL :    ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="65" y="48" width="131" height="18" uuid="01930768-4329-4930-8116-5bcf70d1c876"/>
+				<textElement>
+					<font fontName="標楷體"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{company_tel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="53" y="74" width="100" height="20" uuid="a91b2629-ee01-4493-9e6e-8327c4f86c5f"/>
+				<textElement>
+					<font fontName="標楷體"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pay_post}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="513" y="259" width="10" height="35" uuid="2ec6b747-663d-4773-b9e4-0d7d58a2be8b"/>
+				<textElement>
+					<font fontName="標楷體" size="8"/>
+				</textElement>
+				<text><![CDATA[第一聯
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="513" y="301" width="10" height="72" uuid="f0fb661b-595c-4a7c-a4ce-c91a44135b4b"/>
+				<textElement>
+					<font fontName="標楷體" size="8"/>
+				</textElement>
+				<text><![CDATA[繳款人存根聯]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="513" y="405" width="10" height="46" uuid="d433a686-e2ba-4fa0-9f64-9c0cef055fcb"/>
+				<textElement>
+					<font fontName="標楷體" size="8"/>
+				</textElement>
+				<text><![CDATA[第二聯
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="513" y="450" width="10" height="93" uuid="8a5bc178-ee96-4428-8838-3be3631e4f5e"/>
+				<textElement>
+					<font fontName="標楷體" size="8"/>
+				</textElement>
+				<text><![CDATA[收款行留存]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="9" y="382" width="664" height="20" uuid="d63a6b17-23b6-4743-9097-cea31cb36687"/>
+				<textElement>
+					<font fontName="標楷體" size="10" pdfFontName="MHei-Medium" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PaymentName}+'：【'+$F{pay_code}+'】 姓名：【'+$F{pay_name}+'】 繳費期限：【'+$F{deadline_time_M}+'】']]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="12" y="234" width="390" height="13" uuid="3b93d4b3-4153-475d-a5b3-93d23ef09601"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
+					<font fontName="標楷體" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[※ ATM繳款不受三萬元限制，請選擇【繳費/稅/各項繳費】→【繳費】→ 輸入銀行代號【822】→ 繳款帳號       ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="402" y="234" width="90" height="13" uuid="771e9703-87ea-4ca1-bc54-7cb955eb4e20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="標楷體" size="8" isBold="false" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bank_barcode1_M1}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="472" y="6" width="38" height="34" uuid="97ad29e5-e026-48ad-bb92-2e81a9afa1a4"/>
+				<imageExpression><![CDATA[$P{scissor}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement style="table" mode="Opaque" x="1" y="237" width="520" height="17" forecolor="#FFFFFF" backcolor="#FFFFFF" uuid="7e92b0b6-dd49-441a-9252-c6724e8e2cd5">
+					<printWhenExpression><![CDATA[new Boolean(!$F{atmDisplay}.equalsIgnoreCase("Y"))]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<componentElement>
+				<reportElement style="table" positionType="Float" mode="Opaque" x="310" y="518" width="200" height="109" uuid="ea802ae8-911e-4fba-924b-0d0928aaf75e">
+					<printWhenExpression><![CDATA[new Boolean(!$F{postDisplay}.equalsIgnoreCase("Y"))]]></printWhenExpression>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="postBarCode" uuid="306779c2-014c-4a7a-af19-cfc0637ea7e3">
+						<datasetParameter name="pay_detail_uuid">
+							<datasetParameterExpression><![CDATA[$F{pay_detail_uuid}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:listContents height="109" width="200">
+						<staticText>
+							<reportElement positionType="Float" x="32" y="43" width="107" height="20" uuid="95c7dd56-0dab-4ed9-bff4-592cf21a3939"/>
+							<textElement>
+								<font fontName="標楷體" pdfFontName="MHei-Medium" pdfEncoding="UniCNS-UCS2-H"/>
+							</textElement>
+							<text><![CDATA[【未開放郵局通路！】]]></text>
+						</staticText>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
