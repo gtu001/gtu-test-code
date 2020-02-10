@@ -24,12 +24,12 @@ class LogWriter :
         self.fs.flush()     
     def writeline(self, line):
         self.fs.write(str(line))
-        self.fs.write("\r\n")
+        self.fs.write("\n")
         self.fs.flush()
     def writeline(self, *args) :
         for i,line in enumerate(args) :
             self.fs.write(str(line))
-        self.fs.write("\r\n")
+        self.fs.write("\n")
         self.fs.flush()
     def close(self) :
         self.fs.flush()
