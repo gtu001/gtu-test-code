@@ -69,6 +69,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -297,6 +298,18 @@ public class FastDBQueryUI extends JFrame {
     private static final String ICO_FILENAME = "Pig_SC.ico";// "big_boobs.ico";
     private JButton setFontSizeBtn;
     private JComboBox sqlPageDbConnCombox;
+    private final Predicate IGNORE_PREDICT = new Predicate() {
+        @Override
+        public boolean evaluate(Object input) {
+            Class<?>[] igs = new Class[] { JTextField.class, JTextArea.class };
+            for (Class<?> c : igs) {
+                if (input.getClass() == c) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
 
     /**
      * Launch the application.
@@ -1552,7 +1565,7 @@ public class FastDBQueryUI extends JFrame {
                         tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
                     }
                 }
-            }, new Component[] { sqlTextArea });
+            }, IGNORE_PREDICT);
 
             KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
                 public Object transform(Object input) {
@@ -1569,7 +1582,7 @@ public class FastDBQueryUI extends JFrame {
                         tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
                     }
                 }
-            }, new Component[] { sqlTextArea });
+            }, IGNORE_PREDICT);
 
             editColumnHistoryHandler = new EditColumnHistoryHandler();
 

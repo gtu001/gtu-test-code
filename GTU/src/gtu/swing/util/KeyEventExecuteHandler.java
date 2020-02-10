@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,17 +25,23 @@ public class KeyEventExecuteHandler {
     private String title;
     private Transformer isDoExecuteEvent;
     private Component[] ignoreComps;
+    private Predicate isIgnoreComps;
 
     public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps) {
-        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, ignoreComps);
+        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, ignoreComps, null);
     }
 
-    private KeyEventExecuteHandler(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps) {
+    public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Predicate isIgnoreComps) {
+        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, null, isIgnoreComps);
+    }
+
+    private KeyEventExecuteHandler(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps, Predicate isIgnoreComps) {
         this.runnable = runnable;
         this.self = self;
         this.title = StringUtils.defaultIfEmpty(title, "執行中...");
         this.isDoExecuteEvent = isDoExecuteEvent;
         this.ignoreComps = ignoreComps;
+        this.isIgnoreComps = isIgnoreComps;
         A: for (Field f : self.getClass().getDeclaredFields()) {
             if (JComponent.class.isAssignableFrom(f.getType())) {
                 try {
@@ -45,6 +52,12 @@ public class KeyEventExecuteHandler {
                             if (c == j) {
                                 continue A;
                             }
+                        }
+                    }
+
+                    if (this.isIgnoreComps != null) {
+                        if (isIgnoreComps.evaluate(j)) {
+                            continue A;
                         }
                     }
 
