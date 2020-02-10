@@ -4811,6 +4811,6 @@ public class FastDBQueryUI extends JFrame {
             public Connection call() throws Exception {
                 return getDataSource().getConnection();
             }
-        }, 1000, TAB_UI1.getSysTrayUtil()));
+        }, 1000, sqlIdText.getText(), TAB_UI1.getSysTrayUtil()));
     }
 }

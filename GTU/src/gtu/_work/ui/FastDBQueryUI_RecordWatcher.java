@@ -42,12 +42,13 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     Callable<Connection> fetchConnCallable;
     long skipTime;
     SysTrayUtil sysTray;
+    String fileMiddleName;
 
     List<Integer> pkIndexLst = new ArrayList<Integer>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
-            long skipTime, SysTrayUtil sysTray) {
+            long skipTime, String fileMiddleName, SysTrayUtil sysTray) {
         this.orignQueryResult = orignQueryResult;
         this.sql = sql;
         this.params = params;
@@ -55,6 +56,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         this.fetchConnCallable = fetchConnCallable;
         this.skipTime = skipTime;
         this.sysTray = sysTray;
+        this.fileMiddleName = fileMiddleName;
     }
 
     private long compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst, List<String> titleLst, long startTime, long queryEndTime) {
@@ -92,7 +94,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
 
         if (!delArry.isEmpty() || !newArry.isEmpty() || !updArry.isEmpty()) {
-            String xlsName = "FastDBQueryUI_DiffMark_" + sdf.format(queryEndTime) + ".xls";
+            String xlsName = "FastDBQueryUI_DiffMark_" + StringUtils.trimToEmpty(this.fileMiddleName) + "_" + sdf.format(queryEndTime) + ".xls";
             this.writeExcel(titleLst, delArry, newArry, updArry, xlsName);
             showModificationMessage(xlsName);
         }
