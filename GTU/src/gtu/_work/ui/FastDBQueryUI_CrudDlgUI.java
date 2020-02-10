@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1406,7 +1407,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             public void run() {
                 JCommonUtil.triggerButtonActionPerformed(okButton);
             }
-        });
+        }, new Component[] {});
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);

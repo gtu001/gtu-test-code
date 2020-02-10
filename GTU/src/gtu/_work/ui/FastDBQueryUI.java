@@ -1535,7 +1535,7 @@ public class FastDBQueryUI extends JFrame {
                 public void run() {
                     executeSqlButtonClick();
                 }
-            });
+            }, new Component[] {});
 
             KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
                 public Object transform(Object input) {
@@ -1552,7 +1552,7 @@ public class FastDBQueryUI extends JFrame {
                         tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
                     }
                 }
-            });
+            }, new Component[] { sqlTextArea });
 
             KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
                 public Object transform(Object input) {
@@ -1569,7 +1569,7 @@ public class FastDBQueryUI extends JFrame {
                         tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
                     }
                 }
-            });
+            }, new Component[] { sqlTextArea });
 
             editColumnHistoryHandler = new EditColumnHistoryHandler();
 

@@ -1,5 +1,6 @@
 package gtu.swing.util;
 
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -22,20 +23,31 @@ public class KeyEventExecuteHandler {
     private Window self;
     private String title;
     private Transformer isDoExecuteEvent;
+    private Component[] ignoreComps;
 
-    public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
-        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable);
+    public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps) {
+        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, ignoreComps);
     }
 
-    private KeyEventExecuteHandler(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
+    private KeyEventExecuteHandler(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps) {
         this.runnable = runnable;
         this.self = self;
         this.title = StringUtils.defaultIfEmpty(title, "執行中...");
         this.isDoExecuteEvent = isDoExecuteEvent;
-        for (Field f : self.getClass().getDeclaredFields()) {
+        this.ignoreComps = ignoreComps;
+        A: for (Field f : self.getClass().getDeclaredFields()) {
             if (JComponent.class.isAssignableFrom(f.getType())) {
                 try {
                     JComponent j = (JComponent) FieldUtils.readDeclaredField(self, f.getName(), true);
+
+                    if (this.ignoreComps != null) {
+                        for (Component c : this.ignoreComps) {
+                            if (c == j) {
+                                continue A;
+                            }
+                        }
+                    }
+
                     j.addKeyListener(new KeyAdapter() {
                         @Override
                         public void keyPressed(KeyEvent e) {

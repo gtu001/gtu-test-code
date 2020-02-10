@@ -749,12 +749,11 @@ public class RegexReplacer extends javax.swing.JFrame {
             hideInSystemTrayHelper.apply(this);
 
             keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
-
                 @Override
                 public void run() {
                     exeucteActionPerformed(null);
                 }
-            });
+            }, null);
 
             setTitleByTemplateName("");
 
