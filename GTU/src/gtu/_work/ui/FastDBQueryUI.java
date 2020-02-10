@@ -129,6 +129,7 @@ import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
+import gtu.swing.util.SysTrayUtil;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
@@ -311,7 +312,7 @@ public class FastDBQueryUI extends JFrame {
         }
     };
     private JButton clearParameterBtn;
-    private AtomicReference<RecordWatcher> mRecordWatcher = new AtomicReference<RecordWatcher>();
+    private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
 
     /**
      * Launch the application.
@@ -357,6 +358,7 @@ public class FastDBQueryUI extends JFrame {
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         tabUI.setSize((int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
         tabUI.startUI();
+        tabUI.getSysTrayUtil().createDefaultTray();
         TAB_UI1 = tabUI;
     }
 
@@ -4800,64 +4802,15 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String string, Object[] objects, boolean b, int maxRowsLimit) {
+    private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
         if (mRecordWatcher.get() != null) {
             mRecordWatcher.get().doStop = true;
-        } else {
-            mRecordWatcher.set(new RecordWatcher(orignQueryResult, string, objects, b, maxRowsLimit));
         }
-    }
-
-    private class RecordWatcher extends Thread {
-        Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult;
-        String sql;
-        Object[] params;
-        boolean b;
-        int maxRowsLimit;
-        boolean doStop = false;
-        List<Integer> pkIndexLst = new ArrayList<Integer>();
-
-        RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
-            this.orignQueryResult = orignQueryResult;
-            this.sql = sql;
-            this.params = params;
-            this.b = b;
-            this.maxRowsLimit = maxRowsLimit;
-        }
-
-        private void compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst) {
-            Map<String, Object[]> oArry = new LinkedHashMap<String, Object[]>();
-            Map<String, Object[]> nArry = new LinkedHashMap<String, Object[]>();
-
-            if (pkIndexLst.isEmpty()) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("請先設定欄位比對PK!");
-                return;
+        mRecordWatcher.set(new FastDBQueryUI_RecordWatcher(orignQueryResult, sql, params, maxRowsLimit, new Callable<Connection>() {
+            @Override
+            public Connection call() throws Exception {
+                return getDataSource().getConnection();
             }
-
-            this.appendAllRecords(oldLst, oArry);
-            this.appendAllRecords(newLst, nArry);
-
-            for (String key : oArry.keySet()) {
-                if (!nArry.containsKey(key)) {
-                    
-                }
-            }
-        }
-
-        private void appendAllRecords(List<Object[]> oldLst, Map<String, Object[]> oArry) {
-            for (int ii = 0; ii < oldLst.size(); ii++) {
-                Object[] arry = oldLst.get(ii);
-                List<String> pkLst = new ArrayList<String>();
-                for (int idx : pkIndexLst) {
-                    pkLst.add(String.valueOf(arry[idx]));
-                }
-                String key = StringUtils.join(pkLst, "^");
-                oArry.put(key, arry);
-            }
-        }
-
-        public void run() {
-
-        }
+        }, 1000, TAB_UI1.getSysTrayUtil()));
     }
 }

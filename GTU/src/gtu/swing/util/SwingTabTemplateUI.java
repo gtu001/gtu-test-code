@@ -36,6 +36,7 @@ public class SwingTabTemplateUI {
     private ChangeTabHandlerGtu001 changeTabHandlerGtu001;
     private FocusTabHandlerGtu001 focusTabHandlerGtu001;
     private Map<String, Object> tempalteHoldingContainMap = new HashMap<String, Object>();
+    private SysTrayUtil sysTray = SysTrayUtil.newInstance();
 
     /**
      * Launch the application.
@@ -184,6 +185,10 @@ public class SwingTabTemplateUI {
         if (callback != null) {
             callback.afterInit(this);
         }
+    }
+
+    public SysTrayUtil getSysTrayUtil() {
+        return sysTray;
     }
 
     private void setUITitle(String title) {

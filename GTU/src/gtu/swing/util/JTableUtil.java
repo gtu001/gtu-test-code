@@ -541,6 +541,28 @@ public class JTableUtil {
         return model;
     }
 
+    public static DefaultTableModel createModel(final int[] editableColumns, final Object[] header, final Class<?>[] typeLst) {
+        DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header) {
+            private static final long serialVersionUID = 1L;
+
+            // 設定column class
+            @Override
+            public Class<?> getColumnClass(int c) {
+                return typeLst[c];
+            }
+
+            // 設定可否編輯
+            public boolean isCellEditable(int row, int column) {
+                if (!ArrayUtils.contains(editableColumns, column)) {
+                    return false;
+                } else {
+                    return super.isCellEditable(row, column);
+                }
+            }
+        };
+        return model;
+    }
+
     /**
      * 設定最大寬度 , 若設-1則無限制
      * 
