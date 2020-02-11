@@ -60,6 +60,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -129,7 +130,6 @@ import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
-import gtu.swing.util.SysTrayUtil;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
@@ -313,6 +313,7 @@ public class FastDBQueryUI extends JFrame {
     };
     private JButton clearParameterBtn;
     private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
+    private JToggleButton recordWatcherToggleBtn;
 
     /**
      * Launch the application.
@@ -1122,6 +1123,14 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_15.add(excelExportBtn);
+
+        recordWatcherToggleBtn = new JToggleButton("監聽");
+        recordWatcherToggleBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startRecordWatcher(recordWatcherToggleBtn.isSelected());
+            }
+        });
+        panel_15.add(recordWatcherToggleBtn);
 
         panel_16 = new JPanel();
         panel_12.add(panel_16, BorderLayout.EAST);
@@ -4802,6 +4811,46 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    private void startRecordWatcher(boolean isStart) {
+        boolean allOk = false;
+        if (isStart) {
+            if (this.queryList != null) {
+                if (mRecordWatcher.get() != null && //
+                        (mRecordWatcher.get().getState() == Thread.State.NEW)) {
+                    allOk = true;
+                    FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
+                            List<Integer> pkIndexLst = new ArrayList<Integer>();
+                            for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
+                                String column = queryList.getLeft().get(ii);
+                                for (String mColumn : dlg.getPkLst()) {
+                                    if (StringUtils.equals(column, mColumn)) {
+                                        pkIndexLst.add(ii);
+                                    }
+                                }
+                            }
+                            if (pkIndexLst.isEmpty()) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
+                            } else {
+                                mRecordWatcher.get().setPkIndexLst(pkIndexLst);
+                                mRecordWatcher.get().start();
+                            }
+                        }
+                    });
+                }
+            }
+            if (!allOk) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("請重新查詢");
+            }
+        } else {
+            if (mRecordWatcher.get() != null) {
+                mRecordWatcher.get().doStop = false;
+            }
+        }
+    }
+
     private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
         if (mRecordWatcher.get() != null) {
             mRecordWatcher.get().doStop = true;
@@ -4811,6 +4860,20 @@ public class FastDBQueryUI extends JFrame {
             public Connection call() throws Exception {
                 return getDataSource().getConnection();
             }
-        }, 1000, sqlIdText.getText(), TAB_UI1.getSysTrayUtil()));
+        }, 1000, sqlIdText.getText(), TAB_UI1.getSysTrayUtil(), new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                recordWatcherToggleBtn.setSelected(false);
+                Map<String, Object> map = (Map<String, Object>) input;
+                Throwable ex = (Throwable) map.get("ex");
+                String msg = (String) map.get("msg");
+                if (ex == null) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error(msg);
+                } else {
+                    JCommonUtil.handleException(msg, ex);
+                }
+                return null;
+            }
+        }));
     }
 }

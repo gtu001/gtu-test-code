@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -43,12 +45,13 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     long skipTime;
     SysTrayUtil sysTray;
     String fileMiddleName;
+    Transformer finalDo;
 
     List<Integer> pkIndexLst = new ArrayList<Integer>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
-            long skipTime, String fileMiddleName, SysTrayUtil sysTray) {
+            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo) {
         this.orignQueryResult = orignQueryResult;
         this.sql = sql;
         this.params = params;
@@ -57,6 +60,16 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         this.skipTime = skipTime;
         this.sysTray = sysTray;
         this.fileMiddleName = fileMiddleName;
+        this.finalDo = finalDo;
+    }
+
+    private void finalDoSomething(String message, Throwable ex) {
+        if (finalDo != null) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("msg", message);
+            map.put("ex", ex);
+            finalDo.transform(map);
+        }
     }
 
     private long compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst, List<String> titleLst, long startTime, long queryEndTime) {
@@ -64,8 +77,8 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         Map<String, Object[]> nArry = new LinkedHashMap<String, Object[]>();
 
         if (pkIndexLst.isEmpty()) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("請先設定欄位比對PK!");
-            throw new RuntimeException("請先設定欄位比對PK!");
+            finalDoSomething("請先設定欄位比對PK!", null);
+            return -1;
         }
 
         this.appendAllRecords(oldLst, oArry);
@@ -103,7 +116,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         return duringTime;
     }
 
-    private void showModificationMessage(String xlsName) {
+    private void showModificationMessage(final String xlsName) {
         try {
             TrayNotificationHelper.newInstance()//
                     .title("FastDBQueryUI - 資料發生異動")//
@@ -213,48 +226,60 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         try {
             return (Connection) (this.fetchConnCallable.call());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("取得連線錯誤!", e);
         }
     }
 
     public void run() {
-        while (!doStop) {
-            if (this.orignQueryResult == null) {
-                try {
-                    this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                long startTime = System.currentTimeMillis();
-                Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
-                try {
-                    compareResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                long endTime = System.currentTimeMillis();
+        try {
+            System.out.println("--------RecordWatcher start");
+            while (!doStop) {
+                if (this.orignQueryResult == null) {
+                    System.out.println("--------RecordWatcher start -- 1");
+                    try {
+                        this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
+                    } catch (Exception e) {
+                        throw new RuntimeException("查詢錯誤!", e);
+                    }
+                } else {
+                    System.out.println("--------RecordWatcher start -- 2");
+                    long startTime = System.currentTimeMillis();
+                    Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
+                    try {
+                        compareResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
+                    } catch (Exception e) {
+                        throw new RuntimeException("查詢錯誤!", e);
+                    }
+                    long endTime = System.currentTimeMillis();
 
-                if (orignQueryResult != null && compareResult != null) {
-                    List<String> titleLst = orignQueryResult.getLeft();
-                    if (titleLst.size() != compareResult.getLeft().size()) {
-                        throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
-                    } else {
-                        // 真實比對 XXX
-                        // ==============================================================
-                        long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
-                        // 真實比對 XXX
-                        // ==============================================================
-                        orignQueryResult = compareResult;
-                        if (sleepTime > 0) {
-                            try {
-                                Thread.sleep(sleepTime);
-                            } catch (InterruptedException e) {
+                    System.out.println("--------RecordWatcher start -- 3");
+                    if (orignQueryResult != null && compareResult != null) {
+                        List<String> titleLst = orignQueryResult.getLeft();
+                        System.out.println("--------RecordWatcher start -- 4");
+                        if (titleLst.size() != compareResult.getLeft().size()) {
+                            System.out.println("--------RecordWatcher start -- 5");
+                            throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
+                        } else {
+                            System.out.println("--------RecordWatcher start -- 6");
+                            // 真實比對 XXX
+                            // ==============================================================
+                            long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
+                            // 真實比對 XXX
+                            // ==============================================================
+                            orignQueryResult = compareResult;
+                            if (sleepTime > 0) {
+                                try {
+                                    Thread.sleep(sleepTime);
+                                } catch (InterruptedException e) {
+                                }
                             }
                         }
                     }
                 }
             }
+            System.out.println("--------RecordWatcher start -- 7777");
+        } catch (Throwable ex) {
+            this.finalDoSomething(ex.getMessage(), ex);
         }
     }
 

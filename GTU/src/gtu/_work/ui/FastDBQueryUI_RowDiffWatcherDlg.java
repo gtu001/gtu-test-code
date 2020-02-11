@@ -46,6 +46,7 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
+            JCommonUtil.setFrameAtop(dialog, true);
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -111,7 +112,13 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        okButtonAction.actionPerformed(new ActionEvent(FastDBQueryUI_RowDiffWatcherDlg.this, -1, "this"));
+                        List<String> pkLst = getPkLst();
+                        if (!pkLst.isEmpty()) {
+                            okButtonAction.actionPerformed(new ActionEvent(FastDBQueryUI_RowDiffWatcherDlg.this, -1, "this"));
+                            dispose();
+                        } else {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
+                        }
                     }
                 });
                 buttonPane.add(okButton);
@@ -119,6 +126,12 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
             }
             {
                 JButton cancelButton = new JButton("Cancel");
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dispose();
+                    }
+                });
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
             }
