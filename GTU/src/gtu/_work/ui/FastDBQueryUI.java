@@ -4836,6 +4836,7 @@ public class FastDBQueryUI extends JFrame {
                             } else {
                                 mRecordWatcher.get().setPkIndexLst(pkIndexLst);
                                 mRecordWatcher.get().start();
+                                recordWatcherToggleBtn.setText("監聽on");
                             }
                         }
                     });
@@ -4846,14 +4847,14 @@ public class FastDBQueryUI extends JFrame {
             }
         } else {
             if (mRecordWatcher.get() != null) {
-                mRecordWatcher.get().doStop = false;
+                mRecordWatcher.get().doStop(true);
             }
         }
     }
 
     private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
         if (mRecordWatcher.get() != null) {
-            mRecordWatcher.get().doStop = true;
+            mRecordWatcher.get().doStop(false);
         }
         mRecordWatcher.set(new FastDBQueryUI_RecordWatcher(orignQueryResult, sql, params, maxRowsLimit, new Callable<Connection>() {
             @Override
@@ -4864,12 +4865,13 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public Object transform(Object input) {
                 recordWatcherToggleBtn.setSelected(false);
+                recordWatcherToggleBtn.setText("監聽off");
                 Map<String, Object> map = (Map<String, Object>) input;
                 Throwable ex = (Throwable) map.get("ex");
                 String msg = (String) map.get("msg");
-                if (ex == null) {
+                if (ex == null && StringUtils.isNotBlank(msg)) {
                     JCommonUtil._jOptionPane_showMessageDialog_error(msg);
-                } else {
+                } else if (ex != null) {
                     JCommonUtil.handleException(msg, ex);
                 }
                 return null;

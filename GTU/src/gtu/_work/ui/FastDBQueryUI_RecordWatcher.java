@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +33,6 @@ import gtu.javafx.traynotification.animations.AnimationType;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
 import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
-import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.SysTrayUtil;
 
 public class FastDBQueryUI_RecordWatcher extends Thread {
@@ -46,9 +46,11 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     SysTrayUtil sysTray;
     String fileMiddleName;
     Transformer finalDo;
+    boolean isShowStopMessage;
 
     List<Integer> pkIndexLst = new ArrayList<Integer>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    NewNameHandler mNewNameHandler;
 
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
             long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo) {
@@ -107,20 +109,22 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
 
         if (!delArry.isEmpty() || !newArry.isEmpty() || !updArry.isEmpty()) {
-            String xlsName = "FastDBQueryUI_DiffMark_" + StringUtils.trimToEmpty(this.fileMiddleName) + "_" + sdf.format(queryEndTime) + ".xls";
-            this.writeExcel(titleLst, delArry, newArry, updArry, xlsName);
-            showModificationMessage(xlsName);
+            if (mNewNameHandler == null) {
+                mNewNameHandler = new NewNameHandler(fileMiddleName, queryEndTime);
+            }
+            File xlsFile = this.writeExcel(titleLst, delArry, newArry, updArry);
+            showModificationMessage(xlsFile);
         }
 
         long duringTime = System.currentTimeMillis() - startTime;
         return duringTime;
     }
 
-    private void showModificationMessage(final String xlsName) {
+    private void showModificationMessage(final File xlsFile) {
         try {
             TrayNotificationHelper.newInstance()//
                     .title("FastDBQueryUI - 資料發生異動")//
-                    .message(xlsName)//
+                    .message(xlsFile.getName())//
                     .notificationType(NotificationType.INFORMATION)//
                     .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
                     .animationType(AnimationType.FADE)//
@@ -128,7 +132,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             try {
-                                Desktop.getDesktop().open(new File(FileUtil.DESKTOP_PATH + xlsName));
+                                Desktop.getDesktop().open(xlsFile);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                             }
@@ -137,43 +141,85 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         } catch (Throwable ex) {
             System.err.println(ex.getMessage());
             try {
-                sysTray.displayMessage("FastDBQueryUI - 資料發生異動", xlsName, TrayIcon.MessageType.INFO);
-                System.out.println("FastDBQueryUI - 資料發生異動 : " + xlsName);
+                sysTray.displayMessage("FastDBQueryUI - 資料發生異動", xlsFile.getName(), TrayIcon.MessageType.INFO);
+                System.out.println("FastDBQueryUI - 資料發生異動 : " + xlsFile.getName());
             } catch (Throwable ex2) {
             }
         }
     }
 
-    private void writeExcel(List<String> titleLst, List<Object[]> delArry, List<Object[]> newArry, List<Pair<Object[], Object[]>> updArry, String xlsName) {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        HSSFSheet sn = wb.createSheet("new");
-        HSSFSheet sd = wb.createSheet("del");
-        HSSFSheet su = wb.createSheet("update");
+    private File writeExcel(List<String> titleLst, List<Object[]> delArry, List<Object[]> newArry, List<Pair<Object[], Object[]>> updArry) {
+        File xlsFile = new File(FileUtil.DESKTOP_DIR, mNewNameHandler.getName(false));
 
-        CellStyleHandler cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sn = null;
+        HSSFSheet sd = null;
+        HSSFSheet su = null;
+
+        boolean isExist = false;
+        if (xlsFile.exists()) {
+            isExist = true;
+            wb = ExcelUtil_Xls97.getInstance().readExcel(xlsFile);
+            sn = wb.getSheet("new");
+            sd = wb.getSheet("del");
+            su = wb.getSheet("update");
+        } else {
+            sn = wb.createSheet("new");
+            sd = wb.createSheet("del");
+            su = wb.createSheet("update");
+        }
+
+        CellStyleHandler pkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                .setForegroundColor(new HSSFColor.AQUA());
+
+        CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                 .setForegroundColor(new HSSFColor.YELLOW());
 
+        CellStyleHandler splitCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                .setForegroundColor(new HSSFColor.BLUE_GREY());
+
         Object[] titleLst2 = titleLst.toArray();
-        addRow(0, sn, titleLst2);
-        addRow(0, sd, titleLst2);
-        addRow(0, su, titleLst2);
+        if (!isExist) {
+            addRow(0, sn, titleLst2);
+            addRow(0, sd, titleLst2);
+            addRow(0, su, titleLst2);
+            applyStyleByIndex(0, sn, pkIndexLst, pkCs);
+            applyStyleByIndex(0, sd, pkIndexLst, pkCs);
+            applyStyleByIndex(0, su, pkIndexLst, pkCs);
+        } else {
+            addRowSplit(sn.getLastRowNum() + 1, sn, titleLst2, splitCs);
+            addRowSplit(sd.getLastRowNum() + 1, sd, titleLst2, splitCs);
+            addRowSplit(su.getLastRowNum() + 1, su, titleLst2, splitCs);
+        }
 
-        int dIdx = 1;
         for (Object[] d : delArry) {
-            addRow(dIdx++, sd, d);
+            addRow(sd.getLastRowNum() + 1, sd, d);
         }
 
-        int nIdx = 1;
         for (Object[] d : newArry) {
-            addRow(nIdx++, sn, d);
+            addRow(sn.getLastRowNum() + 1, sn, d);
         }
 
-        int uIdx = 1;
+        int uIdx = su.getLastRowNum() + 1;
         for (Pair<Object[], Object[]> d : updArry) {
-            addRowDiff(uIdx + 1, su, d.getLeft(), d.getRight(), cs);
+            addRowDiff(uIdx, su, d.getLeft(), d.getRight(), changeCs);
             uIdx += 2;
         }
-        ExcelUtil_Xls97.getInstance().writeExcel(FileUtil.DESKTOP_PATH + xlsName, wb);
+
+        try {
+            ExcelUtil_Xls97.getInstance().writeExcel(xlsFile, wb);
+        } catch (Exception ex) {
+            xlsFile = new File(FileUtil.DESKTOP_DIR, mNewNameHandler.getName(true));
+            ExcelUtil_Xls97.getInstance().writeExcel(xlsFile, wb);
+        }
+        return xlsFile;
+    }
+
+    private void applyStyleByIndex(int rowIdx, HSSFSheet sn, List<Integer> indexLst, CellStyleHandler pkCs) {
+        pkCs.setSheet(sn);
+        for (int celIdx : indexLst) {
+            pkCs.applyStyle(rowIdx, celIdx);
+        }
     }
 
     private void addRow(int rowIdx, HSSFSheet sn, Object[] data) {
@@ -182,6 +228,14 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             String d = String.valueOf(data[ii]);
             r1.createCell(ii).setCellValue(d);
         }
+    }
+
+    private void addRowSplit(int rowIdx, HSSFSheet sn, Object[] data, CellStyleHandler split) {
+        String[] arry = new String[data.length];
+        Arrays.fill(arry, "");
+        addRow(rowIdx, sn, arry);
+        split.setSheet(sn);
+        split.applyStyle(rowIdx, rowIdx, 0, data.length - 1);
     }
 
     private void addRowDiff(int startRowIdx, HSSFSheet sn, Object[] oldx, Object[] newx, CellStyleHandler cs) {
@@ -235,14 +289,14 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             System.out.println("--------RecordWatcher start");
             while (!doStop) {
                 if (this.orignQueryResult == null) {
-                    System.out.println("--------RecordWatcher start -- 1");
+                    System.out.println("--------RecordWatcher start -- [init query]");
                     try {
                         this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
                     } catch (Exception e) {
                         throw new RuntimeException("查詢錯誤!", e);
                     }
                 } else {
-                    System.out.println("--------RecordWatcher start -- 2");
+                    System.out.println("--------RecordWatcher start -- [requery]");
                     long startTime = System.currentTimeMillis();
                     Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
                     try {
@@ -252,15 +306,11 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
                     }
                     long endTime = System.currentTimeMillis();
 
-                    System.out.println("--------RecordWatcher start -- 3");
                     if (orignQueryResult != null && compareResult != null) {
                         List<String> titleLst = orignQueryResult.getLeft();
-                        System.out.println("--------RecordWatcher start -- 4");
                         if (titleLst.size() != compareResult.getLeft().size()) {
-                            System.out.println("--------RecordWatcher start -- 5");
                             throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
                         } else {
-                            System.out.println("--------RecordWatcher start -- 6");
                             // 真實比對 XXX
                             // ==============================================================
                             long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
@@ -277,13 +327,37 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
                     }
                 }
             }
-            System.out.println("--------RecordWatcher start -- 7777");
+            System.out.println("--------RecordWatcher start -- [end]");
+            String stopMessage = "監聽結束!!";
+            if (!isShowStopMessage) {
+                stopMessage = null;
+            }
+            this.finalDoSomething(stopMessage, null);
         } catch (Throwable ex) {
             this.finalDoSomething(ex.getMessage(), ex);
         }
     }
 
-    public void doStop() {
+    private class NewNameHandler {
+        String middleName;
+        long queryEndTime;
+
+        private NewNameHandler(String fileMiddleName, long queryEndTime) {
+            middleName = StringUtils.trimToEmpty(fileMiddleName);
+            this.queryEndTime = queryEndTime;
+        }
+
+        private String getName(boolean addOne) {
+            if (addOne) {
+                this.queryEndTime++;
+            }
+            String xlsNameTemp = "FastDBQueryUI_DiffMark_" + middleName + "_" + sdf.format(queryEndTime) + ".xls";
+            return xlsNameTemp;
+        }
+    }
+
+    public void doStop(boolean isShowStopMessage) {
+        this.isShowStopMessage = isShowStopMessage;
         this.doStop = true;
     }
 
