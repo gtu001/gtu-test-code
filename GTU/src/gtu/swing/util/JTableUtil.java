@@ -1713,7 +1713,7 @@ public class JTableUtil {
         }
     }
 
-    public void setModel_withRowsColorChange(Color color, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+    public void setModel_withRowsColorChange(Color color, final Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
         class MyRenderer extends DefaultTableCellRenderer {
             java.awt.Color color;
 

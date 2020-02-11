@@ -315,7 +315,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton clearParameterBtn;
     private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
     private JToggleButton recordWatcherToggleBtn;
-    private JCheckBox rowFilterTextChangeColorChk;
+    private JCheckBox rowFilterTextKeepMatchChk;
 
     /**
      * Launch the application.
@@ -1020,55 +1020,12 @@ public class FastDBQueryUI extends JFrame {
         panel_13.add(rowFilterText);
         rowFilterText.setColumns(20);
 
-        rowFilterTextChangeColorChk = new JCheckBox("符合標註顏色");
-        panel_13.add(rowFilterTextChangeColorChk);
+        rowFilterTextKeepMatchChk = new JCheckBox("只保留符合");
+        panel_13.add(rowFilterTextKeepMatchChk);
 
         final Runnable rowFilterTextDoFilter = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (queryList == null || queryList.getRight().isEmpty()) {
-                        return;
-                    }
 
-                    List<Object[]> qList = new ArrayList<Object[]>();
-
-                    FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
-                    boolean allMatch = finder.isAllMatch();
-
-                    List<String> cols = queryList.getLeft();
-                    for (Object[] rows : queryList.getRight()) {
-                        if (allMatch) {
-                            qList.add(rows);
-                            continue;
-                        }
-
-                        B: for (int ii = 0; ii < cols.size(); ii++) {
-                            String value = finder.valueToString(rows[ii]);
-                            for (String text : finder.getArry()) {
-                                if (value.contains(text)) {
-                                    qList.add(rows);
-                                    break B;
-                                }
-                            }
-                        }
-                    }
-
-                    System.out.println("qList - " + qList.size());
-
-                    // 過濾欄位紀錄
-                    filterRowsQueryList = fixPairToTripleQueryResult(Pair.of(cols, qList));
-
-                    queryModeProcess(filterRowsQueryList, true, null, null);
-                } catch (Exception ex) {
-                    JCommonUtil.handleException(ex);
-                }
-            }
-        };
-
-        final Runnable rowFilterTextDoFilter_withChangeColor = new Runnable() {
-
-            private void addRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+            private void addColorRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
                 List<Integer> lst = new ArrayList<Integer>();
                 for (int ii = 0; ii < cols.size(); ii++) {
                     lst.add(ii);
@@ -1077,7 +1034,7 @@ public class FastDBQueryUI extends JFrame {
                 changeColorRowCellIdxMap.put(rowIdx, lst);
             }
 
-            private void addCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+            private void addColorCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
                 List<Integer> cellLst = new ArrayList<Integer>();
                 if (changeColorRowCellIdxMap.containsKey(rowIdx)) {
                     cellLst = changeColorRowCellIdxMap.get(changeColorRowCellIdxMap);
@@ -1086,46 +1043,55 @@ public class FastDBQueryUI extends JFrame {
                 changeColorRowCellIdxMap.put(rowIdx, cellLst);
             }
 
-            @Override
-            public void run() {
-                try {
-                    if (queryList == null || queryList.getRight().isEmpty()) {
-                        return;
+            private void runProcess() {
+                if (queryList == null || queryList.getRight().isEmpty()) {
+                    return;
+                }
+
+                List<Object[]> qList = new ArrayList<Object[]>();
+
+                Map<Integer, List<Integer>> changeColorRowCellIdxMap = new HashMap<Integer, List<Integer>>();
+
+                FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
+                boolean allMatch = finder.isAllMatch();
+
+                List<String> cols = queryList.getLeft();
+                for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
+                    Object[] rows = queryList.getRight().get(rowIdx);
+                    if (allMatch) {
+                        qList.add(rows);
+                        addColorRowMatch(rowIdx, cols, changeColorRowCellIdxMap);
+                        continue;
                     }
 
-                    Map<Integer, List<Integer>> changeColorRowCellIdxMap = new HashMap<Integer, List<Integer>>();
-
-                    FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
-                    boolean allMatch = finder.isAllMatch();
-
-                    List<String> cols = queryList.getLeft();
-                    for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
-                        Object[] rows = queryList.getRight().get(rowIdx);
-
-                        if (allMatch) {
-                            addRowMatch(rowIdx, cols, changeColorRowCellIdxMap);
-                            continue;
-                        }
-
-                        B: for (int ii = 0; ii < cols.size(); ii++) {
-                            String value = finder.valueToString(rows[ii]);
-                            for (String text : finder.getArry()) {
-                                if (value.contains(text)) {
-                                    addCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
-                                    break B;
-                                }
+                    B: for (int ii = 0; ii < cols.size(); ii++) {
+                        String value = finder.valueToString(rows[ii]);
+                        for (String text : finder.getArry()) {
+                            if (value.contains(text)) {
+                                addColorCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
+                                qList.add(rows);
+                                break B;
                             }
                         }
                     }
+                }
 
-                    System.out.println("changeColorRowCellIdxMap - " + changeColorRowCellIdxMap);
+                System.out.println("qList - " + qList.size());
+                System.out.println("changeColorRowCellIdxMap - " + changeColorRowCellIdxMap);
 
+                if (rowFilterTextKeepMatchChk.isSelected()) {
                     // 過濾欄位紀錄
-                    // filterRowsQueryList =
-                    // fixPairToTripleQueryResult(Pair.of(queryList.getLeft(),
-                    // queryList.getRight()));
-
+                    filterRowsQueryList = fixPairToTripleQueryResult(Pair.of(cols, qList));
+                    queryModeProcess(filterRowsQueryList, true, null, changeColorRowCellIdxMap);
+                } else {
                     queryModeProcess(queryList, true, null, changeColorRowCellIdxMap);//
+                }
+            }
+
+            @Override
+            public void run() {
+                try {
+                    runProcess();
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -1135,21 +1101,13 @@ public class FastDBQueryUI extends JFrame {
         rowFilterText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (!rowFilterTextChangeColorChk.isSelected()) {
-                    rowFilterTextDoFilter.run();
-                } else {
-                    rowFilterTextDoFilter_withChangeColor.run();
-                }
+                rowFilterTextDoFilter.run();
             }
         });
         rowFilterText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!rowFilterTextChangeColorChk.isSelected()) {
-                    rowFilterTextDoFilter.run();
-                } else {
-                    rowFilterTextDoFilter_withChangeColor.run();
-                }
+                rowFilterTextDoFilter.run();
             }
         });
 
