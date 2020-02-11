@@ -1712,4 +1712,38 @@ public class JTableUtil {
             table.getColumnModel().getColumn(cellIdx).setCellRenderer(mMyRenderer);
         }
     }
+
+    public void setModel_withRowsColorChange(Color color, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+        class MyRenderer extends DefaultTableCellRenderer {
+            java.awt.Color color;
+
+            MyRenderer(java.awt.Color color) {
+                this.color = color;
+            }
+
+            Color backgroundColor = getBackground();
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                boolean findOk = false;
+                if (changeColorRowCellIdxMap.containsKey(row)) {
+                    List<Integer> cellLst = changeColorRowCellIdxMap.get(row);
+                    if (cellLst.contains(column)) {
+                        c.setBackground(this.color);
+                        findOk = true;
+                    }
+                }
+                if (!findOk) {
+                    c.setBackground(backgroundColor);
+                }
+                return c;
+            }
+        }
+        MyRenderer mMyRenderer = new MyRenderer(color);
+        for (int ii = 0; ii < table.getColumnModel().getColumnCount(); ii++) {
+            table.getColumnModel().getColumn(ii).setCellRenderer(mMyRenderer);
+        }
+    }
 }

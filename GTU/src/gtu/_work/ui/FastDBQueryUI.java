@@ -47,6 +47,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -135,7 +136,6 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
-import javax.swing.JCheckBox;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -1020,7 +1020,7 @@ public class FastDBQueryUI extends JFrame {
         panel_13.add(rowFilterText);
         rowFilterText.setColumns(20);
 
-        rowFilterTextChangeColorChk = new JCheckBox("標註顏色");
+        rowFilterTextChangeColorChk = new JCheckBox("符合標註顏色");
         panel_13.add(rowFilterTextChangeColorChk);
 
         final Runnable rowFilterTextDoFilter = new Runnable() {
@@ -1067,6 +1067,25 @@ public class FastDBQueryUI extends JFrame {
         };
 
         final Runnable rowFilterTextDoFilter_withChangeColor = new Runnable() {
+
+            private void addRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+                List<Integer> lst = new ArrayList<Integer>();
+                for (int ii = 0; ii < cols.size(); ii++) {
+                    lst.add(ii);
+                    ;
+                }
+                changeColorRowCellIdxMap.put(rowIdx, lst);
+            }
+
+            private void addCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+                List<Integer> cellLst = new ArrayList<Integer>();
+                if (changeColorRowCellIdxMap.containsKey(rowIdx)) {
+                    cellLst = changeColorRowCellIdxMap.get(changeColorRowCellIdxMap);
+                }
+                cellLst.add(cellIdx);
+                changeColorRowCellIdxMap.put(rowIdx, cellLst);
+            }
+
             @Override
             public void run() {
                 try {
@@ -1074,7 +1093,7 @@ public class FastDBQueryUI extends JFrame {
                         return;
                     }
 
-                    List<Integer> rowMatchIdxLst = new ArrayList<Integer>();
+                    Map<Integer, List<Integer>> changeColorRowCellIdxMap = new HashMap<Integer, List<Integer>>();
 
                     FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
                     boolean allMatch = finder.isAllMatch();
@@ -1084,7 +1103,7 @@ public class FastDBQueryUI extends JFrame {
                         Object[] rows = queryList.getRight().get(rowIdx);
 
                         if (allMatch) {
-                            rowMatchIdxLst.add(rowIdx);
+                            addRowMatch(rowIdx, cols, changeColorRowCellIdxMap);
                             continue;
                         }
 
@@ -1092,21 +1111,21 @@ public class FastDBQueryUI extends JFrame {
                             String value = finder.valueToString(rows[ii]);
                             for (String text : finder.getArry()) {
                                 if (value.contains(text)) {
-                                    rowMatchIdxLst.add(rowIdx);
+                                    addCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
                                     break B;
                                 }
                             }
                         }
                     }
 
-                    System.out.println("rowMatchIdxLst - " + rowMatchIdxLst);
+                    System.out.println("changeColorRowCellIdxMap - " + changeColorRowCellIdxMap);
 
                     // 過濾欄位紀錄
                     // filterRowsQueryList =
                     // fixPairToTripleQueryResult(Pair.of(queryList.getLeft(),
                     // queryList.getRight()));
 
-                    queryModeProcess(queryList, true, null, rowMatchIdxLst);//
+                    queryModeProcess(queryList, true, null, changeColorRowCellIdxMap);//
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -2250,7 +2269,8 @@ public class FastDBQueryUI extends JFrame {
      * 
      * @param pair
      */
-    private void queryModeProcess(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair, List<Integer> changeRowColorIdxLst) {
+    private void queryModeProcess(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair,
+            Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
         if (queryList.getRight().isEmpty()) {
             if (!silent) {
                 System.out.println("fake row----");
@@ -2285,8 +2305,8 @@ public class FastDBQueryUI extends JFrame {
             createModel.addRow(rows);
         }
 
-        if (changeRowColorIdxLst != null) {
-            JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), null, changeRowColorIdxLst);
+        if (changeColorRowCellIdxMap != null) {
+            JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), changeColorRowCellIdxMap);
         }
 
         if (true) {
