@@ -135,6 +135,7 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
+import javax.swing.JCheckBox;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -314,6 +315,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton clearParameterBtn;
     private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
     private JToggleButton recordWatcherToggleBtn;
+    private JCheckBox rowFilterTextChangeColorChk;
 
     /**
      * Launch the application.
@@ -996,7 +998,7 @@ public class FastDBQueryUI extends JFrame {
             public void process(DocumentEvent event) {
                 try {
                     if (distinctHasClicked) {
-                        queryModeProcess(queryList, true, null);
+                        queryModeProcess(queryList, true, null, null);
                         distinctHasClicked = false;
                     }
                     if (columnFilter == null || isResetQuery) {
@@ -1017,6 +1019,9 @@ public class FastDBQueryUI extends JFrame {
         rowFilterText.setToolTipText("多值用\"^\"分隔, 請按Enter執行");
         panel_13.add(rowFilterText);
         rowFilterText.setColumns(20);
+
+        rowFilterTextChangeColorChk = new JCheckBox("標註顏色");
+        panel_13.add(rowFilterTextChangeColorChk);
 
         final Runnable rowFilterTextDoFilter = new Runnable() {
             @Override
@@ -1054,7 +1059,54 @@ public class FastDBQueryUI extends JFrame {
                     // 過濾欄位紀錄
                     filterRowsQueryList = fixPairToTripleQueryResult(Pair.of(cols, qList));
 
-                    queryModeProcess(filterRowsQueryList, true, null);
+                    queryModeProcess(filterRowsQueryList, true, null, null);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        };
+
+        final Runnable rowFilterTextDoFilter_withChangeColor = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (queryList == null || queryList.getRight().isEmpty()) {
+                        return;
+                    }
+
+                    List<Integer> rowMatchIdxLst = new ArrayList<Integer>();
+
+                    FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
+                    boolean allMatch = finder.isAllMatch();
+
+                    List<String> cols = queryList.getLeft();
+                    for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
+                        Object[] rows = queryList.getRight().get(rowIdx);
+
+                        if (allMatch) {
+                            rowMatchIdxLst.add(rowIdx);
+                            continue;
+                        }
+
+                        B: for (int ii = 0; ii < cols.size(); ii++) {
+                            String value = finder.valueToString(rows[ii]);
+                            for (String text : finder.getArry()) {
+                                if (value.contains(text)) {
+                                    rowMatchIdxLst.add(rowIdx);
+                                    break B;
+                                }
+                            }
+                        }
+                    }
+
+                    System.out.println("rowMatchIdxLst - " + rowMatchIdxLst);
+
+                    // 過濾欄位紀錄
+                    // filterRowsQueryList =
+                    // fixPairToTripleQueryResult(Pair.of(queryList.getLeft(),
+                    // queryList.getRight()));
+
+                    queryModeProcess(queryList, true, null, rowMatchIdxLst);//
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -1064,13 +1116,21 @@ public class FastDBQueryUI extends JFrame {
         rowFilterText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                rowFilterTextDoFilter.run();
+                if (!rowFilterTextChangeColorChk.isSelected()) {
+                    rowFilterTextDoFilter.run();
+                } else {
+                    rowFilterTextDoFilter_withChangeColor.run();
+                }
             }
         });
         rowFilterText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                rowFilterTextDoFilter.run();
+                if (!rowFilterTextChangeColorChk.isSelected()) {
+                    rowFilterTextDoFilter.run();
+                } else {
+                    rowFilterTextDoFilter_withChangeColor.run();
+                }
             }
         });
 
@@ -2103,7 +2163,7 @@ public class FastDBQueryUI extends JFrame {
                     tabbedPane.setSelectedIndex(3);
                 }
 
-                this.queryModeProcess(queryList, false, Pair.of(param, parameterList));
+                this.queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
                 this.showJsonArry(queryList);
             } else if (updateSqlRadio.isSelected()) {
                 int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
@@ -2190,7 +2250,7 @@ public class FastDBQueryUI extends JFrame {
      * 
      * @param pair
      */
-    private void queryModeProcess(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair) {
+    private void queryModeProcess(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, boolean silent, Pair<SqlParam, List<Object>> pair, List<Integer> changeRowColorIdxLst) {
         if (queryList.getRight().isEmpty()) {
             if (!silent) {
                 System.out.println("fake row----");
@@ -2213,7 +2273,9 @@ public class FastDBQueryUI extends JFrame {
 
         // 查詢結果table
         DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, queryList.getLeft(), queryList.getMiddle());
+
         queryResultTable.setModel(createModel);
+
         JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
 
         // 設定 Value 顯示方式
@@ -2221,6 +2283,10 @@ public class FastDBQueryUI extends JFrame {
 
         for (Object[] rows : queryList.getRight()) {
             createModel.addRow(rows);
+        }
+
+        if (changeRowColorIdxLst != null) {
+            JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), null, changeRowColorIdxLst);
         }
 
         if (true) {
@@ -3078,7 +3144,7 @@ public class FastDBQueryUI extends JFrame {
 
             List<String> matchColumnLst = new ArrayList<String>(columnMapping.values());
             Triple<List<String>, List<Class<?>>, List<Object[]>> queryResultFinal = fixPairToTripleQueryResult(Pair.of(matchColumnLst, queryLst));
-            this.queryModeProcess(queryResultFinal, true, null);
+            this.queryModeProcess(queryResultFinal, true, null, null);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }

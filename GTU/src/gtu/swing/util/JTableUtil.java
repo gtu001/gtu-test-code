@@ -1681,4 +1681,35 @@ public class JTableUtil {
         rightRenderer.setHorizontalAlignment(JLabel_RIGNH_LEFT_CENTER_ETC);
         table.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
     }
+
+    public void setModel_withRowsColorChange(java.awt.Color color, Integer cellIdx, final List<Integer> colorRowIndexLst) {
+        class MyRenderer extends DefaultTableCellRenderer {
+            java.awt.Color color;
+
+            MyRenderer(java.awt.Color color) {
+                this.color = color;
+            }
+
+            Color backgroundColor = getBackground();
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (colorRowIndexLst.contains(row)) {
+                    c.setBackground(this.color);
+                } else if (!isSelected) {
+                    c.setBackground(backgroundColor);
+                }
+                return c;
+            }
+        }
+        MyRenderer mMyRenderer = new MyRenderer(color);
+        if (cellIdx == null) {
+            for (int ii = 0; ii < table.getColumnModel().getColumnCount(); ii++) {
+                table.getColumnModel().getColumn(ii).setCellRenderer(mMyRenderer);
+            }
+        } else {
+            table.getColumnModel().getColumn(cellIdx).setCellRenderer(mMyRenderer);
+        }
+    }
 }
