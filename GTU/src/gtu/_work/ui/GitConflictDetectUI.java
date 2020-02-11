@@ -700,6 +700,29 @@ public class GitConflictDetectUI extends JFrame {
                 String[] result = GitUtil.log_stat_repo(projectDir, 3, getEncoding());
                 String resultString = String.format("<font color='blue'>Remote Branch : %s</font>\r\n%s", result);
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
+                String title = getFinalMessage(result[1]);
+                setTitle(title);
+            }
+
+            private String getFinalMessage(String resultString) {
+                StringBuffer sb = new StringBuffer();
+                List<String> lines = StringUtil_.readContentToList(resultString, false, false, false);
+                int startPos = 0;
+                for (int pos = 0; pos < lines.size(); pos++) {
+                    String line = lines.get(pos);
+                    if (line.matches("commit\\s\\w+")) {
+                        startPos = pos + 3;
+                        continue;
+                    }
+                    if (pos >= startPos) {
+                        if (line.startsWith(" ")) {
+                            sb.append(StringUtils.trimToEmpty(line));
+                        } else if (sb.length() > 0) {
+                            break;
+                        }
+                    }
+                }
+                return sb.toString();
             }
         });
         swingUtil.addActionHex("gitHistorySearchBtn.Click", new Action() {
