@@ -1056,11 +1056,13 @@ public class FastDBQueryUI extends JFrame {
                 boolean allMatch = finder.isAllMatch();
 
                 List<String> cols = queryList.getLeft();
+
                 for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
                     Object[] rows = queryList.getRight().get(rowIdx);
                     if (allMatch) {
                         qList.add(rows);
-                        addColorRowMatch(rowIdx, cols, changeColorRowCellIdxMap);
+                        // addColorRowMatch(rowIdx, cols,
+                        // changeColorRowCellIdxMap);
                         continue;
                     }
 
@@ -1068,7 +1070,11 @@ public class FastDBQueryUI extends JFrame {
                         String value = finder.valueToString(rows[ii]);
                         for (String text : finder.getArry()) {
                             if (value.contains(text)) {
-                                addColorCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
+                                if (rowFilterTextKeepMatchChk.isSelected()) {
+                                    addColorCellMatch(qList.size(), ii, changeColorRowCellIdxMap);
+                                } else {
+                                    addColorCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
+                                }
                                 qList.add(rows);
                                 break B;
                             }
