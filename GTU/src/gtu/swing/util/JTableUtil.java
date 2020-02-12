@@ -1694,7 +1694,8 @@ public class JTableUtil {
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);row = JTableUtil.getRealRowPos(row, table);
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                row = JTableUtil.getRealRowPos(row, table);
                 row = JTableUtil.getRealRowPos(row, table);
                 column = JTableUtil.getRealColumnPos(column, table);
                 if (colorRowIndexLst.contains(row)) {
@@ -1738,7 +1739,7 @@ public class JTableUtil {
                         findOk = true;
                     }
                 }
-                if (!findOk) {
+                if (!isSelected && !findOk) {
                     c.setBackground(backgroundColor);
                 }
                 return c;
