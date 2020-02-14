@@ -53,6 +53,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -90,6 +91,8 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.db.ExternalJDBCDriverJarLoader;
@@ -2842,12 +2845,40 @@ public class FastDBQueryUI extends JFrame {
                                 }
                             }
                         })//
+                        .addJMenuItem(addBase64Menus())
                         .applyEvent(e)//
                         .show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private JMenu addBase64Menus() {
+        JMenuAppender chdMenu = JMenuAppender.newInstance("Base64");
+        chdMenu.addMenuItem("Encode", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object val = JTableUtil.newInstance(queryResultTable).getSelectedValue();
+                if (val != null) {
+                    String strVal = String.valueOf(val);
+                    String decodeVal = Base64JdkUtil.encode(strVal);
+                    JCommonUtil._jOptionPane_showInputDialog("Base64Encode:" + strVal, decodeVal);
+                }
+            }
+        });
+        chdMenu.addMenuItem("Decode", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object val = JTableUtil.newInstance(queryResultTable).getSelectedValue();
+                if (val != null) {
+                    String strVal = String.valueOf(val);
+                    String decodeVal = Base64JdkUtil.decodeToString(strVal);
+                    JCommonUtil._jOptionPane_showInputDialog("Base64Decode:" + strVal, decodeVal);
+                }
+            }
+        });
+        return chdMenu.getMenu();
     }
 
     private String getRandom_TableNSchema() {

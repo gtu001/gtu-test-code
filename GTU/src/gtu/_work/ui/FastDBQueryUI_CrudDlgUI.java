@@ -52,7 +52,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -62,6 +61,7 @@ import org.apache.commons.lang3.tuple.Triple;
 
 import gtu._work.ui.FastDBQueryUI.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.binary.Base64JdkUtil;
 import gtu.binary.StringUtil4FullChar;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
@@ -78,7 +78,6 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTableUtil.TableColorDef;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 
@@ -1357,6 +1356,31 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             }
                             inst.addJMenuItem(chdMenu.getMenu());
                         }
+
+                        {// base64 --- start
+                            JMenuAppender chdMenu = JMenuAppender.newInstance("Base64");
+                            chdMenu.addMenuItem("Encode", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
+                                    if (val != null) {
+                                        String strVal = String.valueOf(val);
+                                        rowTable.setValueAt(Base64JdkUtil.encode(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
+                                    }
+                                }
+                            });
+                            chdMenu.addMenuItem("Decode", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
+                                    if (val != null) {
+                                        String strVal = String.valueOf(val);
+                                        rowTable.setValueAt(Base64JdkUtil.decodeToString(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
+                                    }
+                                }
+                            });
+                            inst.addJMenuItem(chdMenu.getMenu());
+                        } // base64 --- end
                         inst.applyEvent(e).show();
                     }
                 }
