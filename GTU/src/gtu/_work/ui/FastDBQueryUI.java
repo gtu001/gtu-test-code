@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -141,6 +142,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
 
 public class FastDBQueryUI extends JFrame {
+
+    private static final String QUERY_RESULT_COLUMN_NO = "No.";
 
     private static final long serialVersionUID = 1L;
 
@@ -1005,7 +1008,7 @@ public class FastDBQueryUI extends JFrame {
                         distinctHasClicked = false;
                     }
                     if (columnFilter == null || isResetQuery) {
-                        columnFilter = new ColumnSearchFilter(queryResultTable, "^");
+                        columnFilter = new ColumnSearchFilter(queryResultTable, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
                         isResetQuery = false;
                     }
                     columnFilter.filterText(columnFilterText.getText());
@@ -2190,7 +2193,11 @@ public class FastDBQueryUI extends JFrame {
         }
 
         // 查詢結果table
-        DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, queryList.getLeft(), queryList.getMiddle());
+        LinkedList<String> left = new LinkedList<String>(queryList.getLeft());
+        LinkedList<Class<?>> middle = new LinkedList<Class<?>>(queryList.getMiddle());
+        left.addFirst(QUERY_RESULT_COLUMN_NO);
+        middle.addFirst(JButton.class);
+        DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, left, middle);
 
         queryResultTable.setModel(createModel);
 
@@ -2199,23 +2206,45 @@ public class FastDBQueryUI extends JFrame {
         // 設定 Value 顯示方式
         JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
 
-        for (Object[] rows : queryList.getRight()) {
-            createModel.addRow(rows);
+        for (int ii = 0; ii < queryList.getRight().size(); ii++) {
+            Object[] rows = queryList.getRight().get(ii);
+            Object[] rows2 = new Object[rows.length + 1];
+            System.arraycopy(rows, 0, rows2, 1, rows.length);
+            rows2[0] = createSelectionBtn(ii + 1);
+            createModel.addRow(rows2);
         }
 
         if (changeColorRowCellIdxMap != null) {
             JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), changeColorRowCellIdxMap);
         }
 
+        JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
+
         if (true) {
             Map<String, Object> preference = new HashMap<String, Object>();
             preference.put("offset", 0.75f);
             preference.put("isCaculateTitle", true);
             preference.put("maxWidth", 500);
+            Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
+            presetColumns.put(0, String.valueOf(queryList.getRight().size()).length() * 10 + 15);
+            preference.put("presetColumns", presetColumns);
             JTableUtil.setColumnWidths_ByDataContent(queryResultTable, preference, getInsets());
         } else {
             JTableUtil.setColumnWidths(queryResultTable, getInsets());
         }
+    }
+
+    private JButton createSelectionBtn(int serialNo) {
+        JButton selectionBtn = new JButton(String.valueOf((serialNo)));
+        selectionBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = JTableUtil.newInstance(queryResultTable).getRealSelectedRow();
+                queryResultTable.setRowSelectionInterval(row, row);
+                queryResultTable.setColumnSelectionInterval(1, queryResultTable.getColumnCount() - 1);
+            }
+        });
+        return selectionBtn;
     }
 
     private DefaultTableModel getFakeDataModel(Pair<SqlParam, List<Object>> pair) {
@@ -2822,19 +2851,31 @@ public class FastDBQueryUI extends JFrame {
         return "";
     }
 
+    private boolean isColumnNoExists() {
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+        if (QUERY_RESULT_COLUMN_NO.equals(String.valueOf(util.getColumnTitleArray().get(0)))) {
+            return true;
+        }
+        return false;
+    }
+
     private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex(Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst) {
         TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
         List<String> leftLst = new ArrayList<String>(columnMapping.values());
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
-
+        boolean removeNoColumn = isColumnNoExists();
         // 如果是使用 excel 匯入 需要重組 資料
         List<Object[]> rightRowsLit = new ArrayList<Object[]>();
         for (int row = 0; row < queryResultTable.getRowCount(); row++) {
             TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
-            for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+            A: for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
                 int realCol = util.getRealColumnPos(col, queryResultTable);
                 int realRow = util.getRealRowPos(row, queryResultTable);
                 Object value = util.getModel().getValueAt(realRow, realCol);
+
+                if (removeNoColumn && realCol == 0) {
+                    continue A;
+                }
                 map.put(realCol, value);
             }
             rightRowsLit.add(map.values().toArray());
@@ -2876,6 +2917,8 @@ public class FastDBQueryUI extends JFrame {
             Object value = util.getModel().getValueAt(realRow, realCol);
             map.put(realCol, value);
         }
+        // 移除按第一個鈕欄
+        map.remove(0);
 
         // 用來比較取得row index用
         List<Object[]> newLst = new ArrayList<Object[]>();
@@ -4925,6 +4968,8 @@ public class FastDBQueryUI extends JFrame {
 
             List<String> cols = queryList.getLeft();
 
+            boolean hasNoColumn = isColumnNoExists();
+
             for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
                 Object[] rows = queryList.getRight().get(rowIdx);
                 if (allMatch) {
@@ -4938,10 +4983,14 @@ public class FastDBQueryUI extends JFrame {
                     String value = finder.valueToString(rows[ii]);
                     for (String text : finder.getArry()) {
                         if (value.contains(text)) {
+                            int realCol = ii;
+                            if (hasNoColumn) {
+                                realCol = realCol + 1;
+                            }
                             if (rowFilterTextKeepMatchChk.isSelected()) {
-                                addColorCellMatch(qList.size(), ii, changeColorRowCellIdxMap);
+                                addColorCellMatch(qList.size(), realCol, changeColorRowCellIdxMap);
                             } else {
-                                addColorCellMatch(rowIdx, ii, changeColorRowCellIdxMap);
+                                addColorCellMatch(rowIdx, realCol, changeColorRowCellIdxMap);
                             }
                             qList.add(rows);
                             break B;

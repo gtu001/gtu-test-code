@@ -1446,9 +1446,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
 
-            for (
-
-            final UrlConfig d : lst) {
+            for (final UrlConfig d : lst) {
                 model.addRow(UrlTableConfigEnum.getRow(d, this));
             }
 
@@ -1744,7 +1742,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
         }
-        String finalUrl = url;
+        final String finalUrl = url;
 
         JProgressBarHelper jProgDlg = JProgressBarHelper.newInstance(this, "取得標題")//
                 .indeterminate(true)//

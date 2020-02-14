@@ -748,6 +748,10 @@ public class JTableUtil {
         return table.getSelectedRow();
     }
 
+    public int getRealSelectedRow() {
+        return getRealRowPos(table.getSelectedRow(), table);
+    }
+
     /**
      * (記得傳入未修正 pos , 否則反而錯誤)
      */
@@ -778,8 +782,11 @@ public class JTableUtil {
     /**
      * 取得已修正row arry
      */
-    public int[] getSelectedRows() {
+    public int[] getSelectedRows(boolean isReal) {
         int[] rowPos = table.getSelectedRows();
+        if (!isReal) {
+            return rowPos;
+        }
         if (table.getRowSorter() == null) {
             return rowPos;
         }
@@ -1338,6 +1345,7 @@ public class JTableUtil {
         float offset = (Float) (preferences.containsKey("offset") ? preferences.get("offset") : 1f);
         boolean isCaculateTitle = (Boolean) (preferences.containsKey("isCaculateTitle") ? preferences.get("isCaculateTitle") : true);
         Integer maxWidth = (Integer) (preferences.containsKey("maxWidth") ? preferences.get("maxWidth") : 0);
+        Map<Integer, Integer> presetColumns = (Map<Integer, Integer>) (preferences.containsKey("presetColumns") ? preferences.get("presetColumns") : Collections.EMPTY_MAP);
         // ----------------------------------------------------------------------------------------
         int columnCount = table.getColumnCount();
         TableColumnModel tcm = table.getColumnModel();
@@ -1393,6 +1401,9 @@ public class JTableUtil {
 
         for (int i = 0; i < columnCount; i++) {
             int width = widthPosMap.get(i);
+            if (presetColumns.containsKey(i)) {
+                width = presetColumns.get(i);
+            }
             width += spare;
             TableColumn column = tcm.getColumn(i);
             column.setPreferredWidth(width + 1);
@@ -1521,10 +1532,12 @@ public class JTableUtil {
     public static class ColumnSearchFilter {
         JTable table;
         String delimit;
+        Object[] alwaysMatchColumns;
 
-        public ColumnSearchFilter(JTable table, String delimit) {
+        public ColumnSearchFilter(JTable table, String delimit, Object[] alwaysMatchColumns) {
             this.table = table;
             this.delimit = (delimit == null || StringUtils.isBlank(delimit)) ? "," : delimit;
+            this.alwaysMatchColumns = alwaysMatchColumns;
             this.initTableColumns();
         }
 
@@ -1546,8 +1559,9 @@ public class JTableUtil {
 
         private void removeAll() {
             TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
-            for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
-                System.out.println("clear : " + columnModel.getColumn(ii).getHeaderValue());
+            A: for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
+                Object colName = columnModel.getColumn(ii).getHeaderValue();
+                System.out.println("clear : " + colName);
                 columnModel.removeColumn(columnModel.getColumn(ii));
                 ii--;
             }
@@ -1612,22 +1626,33 @@ public class JTableUtil {
 
                     boolean findOk = false;
 
-                    if (StringUtils.isNotBlank(param) && headerColumnUpper.contains(param)) {
-                        System.out.println("Match------------" + headerColumn + " --> " + param);
-                        findOk = true;
-                    } else if (param.contains("*")) {
-                        if (m.find(headerColumnUpper)) {
-                            findOk = true;
-                        }
-                    } else if (!afterFilterProc.getRight().isEmpty()) {
-                        for (Pattern p : afterFilterProc.getRight()) {
-                            if (p.matcher(headerColumn).find()) {
+                    if (this.alwaysMatchColumns != null) {
+                        for (Object v : this.alwaysMatchColumns) {
+                            if (StringUtils.equals(String.valueOf(headerColumn), String.valueOf(v))) {
                                 findOk = true;
                                 break;
                             }
                         }
-                    } else if (StringUtils.isBlank(filterText)) {
-                        findOk = true;
+                    }
+
+                    if (!findOk) {
+                        if (StringUtils.isNotBlank(param) && headerColumnUpper.contains(param)) {
+                            System.out.println("Match------------" + headerColumn + " --> " + param);
+                            findOk = true;
+                        } else if (param.contains("*")) {
+                            if (m.find(headerColumnUpper)) {
+                                findOk = true;
+                            }
+                        } else if (!afterFilterProc.getRight().isEmpty()) {
+                            for (Pattern p : afterFilterProc.getRight()) {
+                                if (p.matcher(headerColumn).find()) {
+                                    findOk = true;
+                                    break;
+                                }
+                            }
+                        } else if (StringUtils.isBlank(filterText)) {
+                            findOk = true;
+                        }
                     }
 
                     if (findOk && !addColumns.containsKey(headerColumnUpper)) {
