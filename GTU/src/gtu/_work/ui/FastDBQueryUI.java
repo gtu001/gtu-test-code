@@ -1119,6 +1119,12 @@ public class FastDBQueryUI extends JFrame {
                 rowFilterTextDoFilter.run();
             }
         });
+        rowFilterTextKeepMatchChk.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rowFilterTextDoFilter.run();
+            }
+        });
 
         for (final JTextField f : new JTextField[] { rowFilterText, columnFilterText }) {
             f.addMouseListener(new MouseAdapter() {
