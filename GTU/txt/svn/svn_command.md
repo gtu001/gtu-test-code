@@ -1,6 +1,4 @@
-看modification檔案
----
-  $ svn st 
+
   
 
 看prop設定了什麼
@@ -30,3 +28,29 @@
 	或
 	$ svn rm <目錄> --keep-local
 		Ex :  svn rm classes --keep-local
+
+
+
+======
+看modification檔案
+---
+	$ svn status
+	$ svn st 
+
+
+新增檔案
+---
+	需要新增的檔案開頭為 ?
+	$ svn add <從 svn status 看到的路徑>  
+		ps : 可接 "*" 省略部份輸入
+
+
+上傳檔案
+---
+	$ svn commit -m "<msg>"
+
+
+看log 含檔案清單
+---
+	svn log --verbose -r <版號>
+
