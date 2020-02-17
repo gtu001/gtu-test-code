@@ -2967,6 +2967,15 @@ public class FastDBQueryUI extends JFrame {
         return rtnMap;
     }
 
+    private int getColumnIndicateIndex(int columnLstIdx, List<String> columns, String column) {
+        for (int ii = 0; ii < columns.size(); ii++) {
+            if (StringUtils.equalsIgnoreCase(columns.get(ii), column)) {
+                return ii;
+            }
+        }
+        return -1;
+    }
+
     private void excelExportBtnAction() {
         try {
             ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
@@ -3020,9 +3029,28 @@ public class FastDBQueryUI extends JFrame {
                     model.addRow(rows.toArray());
                 }
             } else if (radio_export_excel == selBtn) {
-                if (queryList == null || queryList.getRight().isEmpty()) {
+                Triple<List<String>, List<Class<?>>, List<Object[]>> tmpQueryList = null;
+                if (StringUtils.isBlank(rowFilterText.getText())) {
+                    tmpQueryList = queryList;
+                } else {
+                    tmpQueryList = filterRowsQueryList;
+                }
+
+                if (tmpQueryList == null || tmpQueryList.getRight().isEmpty()) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
                     return;
+                }
+
+                List<String> columnLst = new ArrayList<String>();
+                if (StringUtils.isNotBlank(columnFilterText.getText())) {
+                    List<Object> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    for (Object v : lst) {
+                        String name = String.valueOf(v);
+                        if (QUERY_RESULT_COLUMN_NO.equals(name)) {
+                            continue;
+                        }
+                        columnLst.add(name);
+                    }
                 }
 
                 HSSFWorkbook wk = new HSSFWorkbook();
@@ -3046,27 +3074,54 @@ public class FastDBQueryUI extends JFrame {
                 }
 
                 // 寫資料
-                List<String> columns = new ArrayList<String>(queryList.getLeft());
+                List<String> columns = new ArrayList<String>(tmpQueryList.getLeft());
                 HSSFRow titleRow0 = sheet0.createRow(0);
-                for (int ii = 0; ii < columns.size(); ii++) {
-                    exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
-                }
                 HSSFRow titleRow1 = sheet1.createRow(0);
-                for (int ii = 0; ii < columns.size(); ii++) {
-                    exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                if (columnLst.isEmpty()) {
+                    for (int ii = 0; ii < columns.size(); ii++) {
+                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
+                    }
+                    for (int ii = 0; ii < columns.size(); ii++) {
+                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                    }
+                } else {
+                    for (int ii = 0; ii < columnLst.size(); ii++) {
+                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columnLst.get(ii));
+                    }
+                    for (int ii = 0; ii < columnLst.size(); ii++) {
+                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columnLst.get(ii));
+                    }
                 }
 
-                for (int ii = 0; ii < queryList.getRight().size(); ii++) {
-                    Row row_string = sheet0.createRow(ii + 1);
-                    Row row_orign$ = sheet1.createRow(ii + 1);
+                if (columnLst.isEmpty()) {
+                    for (int ii = 0; ii < tmpQueryList.getRight().size(); ii++) {
+                        Row row_string = sheet0.createRow(ii + 1);
+                        Row row_orign$ = sheet1.createRow(ii + 1);
 
-                    Object[] rows = queryList.getRight().get(ii);
-                    for (int jj = 0; jj < columns.size(); jj++) {
-                        String col = columns.get(jj);
-                        Object value = rows[jj];
+                        Object[] rows = tmpQueryList.getRight().get(ii);
+                        for (int jj = 0; jj < columns.size(); jj++) {
+                            String col = columns.get(jj);
+                            Object value = rows[jj];
 
-                        exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
-                        exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                            exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
+                            exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                        }
+                    }
+                } else {
+                    for (int ii = 0; ii < tmpQueryList.getRight().size(); ii++) {
+                        Row row_string = sheet0.createRow(ii + 1);
+                        Row row_orign$ = sheet1.createRow(ii + 1);
+
+                        Object[] rows = tmpQueryList.getRight().get(ii);
+                        for (int jj = 0; jj < columnLst.size(); jj++) {
+                            String col = columnLst.get(jj);
+
+                            int newIdx = getColumnIndicateIndex(jj, columns, col);
+                            Object value = rows[newIdx];
+
+                            exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
+                            exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                        }
                     }
                 }
 
