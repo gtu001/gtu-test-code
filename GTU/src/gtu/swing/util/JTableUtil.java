@@ -1655,7 +1655,7 @@ public class JTableUtil {
                         }
                     }
 
-                    if (findOk && !addColumns.containsKey(headerColumnUpper)) {
+                    if (findOk && !addColumns.containsKey(headerColumn)) {
                         System.out.println("Add------------" + key);
                         addColumns.put(headerColumn, headerDef.getRight().get(ii));
                     }

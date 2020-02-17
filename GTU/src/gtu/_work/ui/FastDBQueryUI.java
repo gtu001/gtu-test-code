@@ -2918,7 +2918,9 @@ public class FastDBQueryUI extends JFrame {
             map.put(realCol, value);
         }
         // 移除按第一個鈕欄
-        map.remove(0);
+        if (isColumnNoExists()) {
+            map.remove(0);
+        }
 
         // 用來比較取得row index用
         List<Object[]> newLst = new ArrayList<Object[]>();
@@ -4991,6 +4993,8 @@ public class FastDBQueryUI extends JFrame {
 
     private final Runnable rowFilterTextDoFilter = new Runnable() {
 
+        private FastDBQueryUI_ColumnSearchFilter columnFilter;
+
         private void addColorRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
             List<Integer> lst = new ArrayList<Integer>();
             for (int ii = 0; ii < cols.size(); ii++) {
@@ -5013,6 +5017,15 @@ public class FastDBQueryUI extends JFrame {
             if (queryList == null || queryList.getRight().isEmpty()) {
                 return;
             }
+
+            if (columnFilter == null || isResetQuery) {
+                columnFilter = new FastDBQueryUI_ColumnSearchFilter(queryList, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
+                isResetQuery = false;
+            }
+            columnFilter.filterText(columnFilterText.getText());
+            Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = columnFilter.getResult();
+
+            // -----------------------------------------------------------------
 
             List<Object[]> qList = new ArrayList<Object[]>();
 
