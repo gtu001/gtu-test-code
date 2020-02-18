@@ -324,6 +324,7 @@ public class FastDBQueryUI extends JFrame {
     private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
     private JToggleButton recordWatcherToggleBtn;
     private JCheckBox rowFilterTextKeepMatchChk;
+    private JButton resetQueryBtn;
 
     /**
      * Launch the application.
@@ -1033,6 +1034,17 @@ public class FastDBQueryUI extends JFrame {
 
         rowFilterTextKeepMatchChk = new JCheckBox("只保留符合");
         panel_13.add(rowFilterTextKeepMatchChk);
+
+        resetQueryBtn = new JButton("重設");
+        resetQueryBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                columnFilterText.setText("");
+                rowFilterText.setText("");
+                rowFilterTextKeepMatchChk.setSelected(false);
+                checkIsNeedResetQueryResultTable(true);
+            }
+        });
+        panel_13.add(resetQueryBtn);
 
         rowFilterText.addFocusListener(new FocusAdapter() {
             @Override
@@ -2838,7 +2850,7 @@ public class FastDBQueryUI extends JFrame {
             pan.add(JCommonUtil.createScrollComponent(text), BorderLayout.CENTER);
             final JButton btn = new JButton("確定");
             pan.add(btn, BorderLayout.SOUTH);
-            dlg.add(pan);
+            dlg.getContentPane().add(pan);
             dlg.pack();
 
             JCommonUtil.setJFrameCenter(dlg);
@@ -3113,10 +3125,10 @@ public class FastDBQueryUI extends JFrame {
                 }
             } else if (radio_export_excel == selBtn) {
                 Triple<List<String>, List<Class<?>>, List<Object[]>> tmpQueryList = null;
-                if (isResetQuery && StringUtils.isBlank(rowFilterText.getText())) {
-                    tmpQueryList = queryList;
-                } else if (filterRowsQueryList != null) {
+                if (filterRowsQueryList != null && !isResetQuery) {
                     tmpQueryList = filterRowsQueryList;
+                } else if (queryList != null) {
+                    tmpQueryList = queryList;
                 }
 
                 if (tmpQueryList == null || tmpQueryList.getRight().isEmpty()) {
@@ -5110,6 +5122,9 @@ public class FastDBQueryUI extends JFrame {
             Map<Integer, List<Integer>> changeColorRowCellIdxMap = resultFinal.getRight();
 
             queryModeProcess(queryList, true, null, changeColorRowCellIdxMap);//
+
+            filterRowsQueryList = queryList;
+            isResetQuery = false;
         }
 
         @Override
