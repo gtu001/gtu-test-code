@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +52,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -2751,37 +2753,142 @@ public class FastDBQueryUI extends JFrame {
             final StartEditProcess d = new StartEditProcess();
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                d.start();
+                // d.start();
+                new JMenuItem_BasicMenu().run();
             }
 
             if (JMouseEventUtil.buttonRightClick(1, e)) {
-                JPopupMenuUtil.newInstance(queryResultTable)//
-                        .addJMenuItem("進行CRUD操作", new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try {
-                                    d.openCRUD();
-                                } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
-                                }
-                            }
-                        })//
-                        .addJMenuItem("進行比對操作", new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try {
-                                    d.openXLS_COMPARE();
-                                } catch (Exception ex) {
-                                    JCommonUtil.handleException(ex);
-                                }
-                            }
-                        })//
-                        .addJMenuItem(addBase64Menus())//
+                JPopupMenuUtil ppap = JPopupMenuUtil.newInstance(queryResultTable);
+                ppap.addJMenuItem(new JMenuItem_BasicMenu().getItem());//
+                addKeepSelectionOnly(ppap);
+                ppap.addJMenuItem("進行CRUD操作", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            d.openCRUD();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+                ppap.addJMenuItem("進行比對操作", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            d.openXLS_COMPARE();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+                ppap.addJMenuItem(addBase64Menus())//
                         .applyEvent(e)//
                         .show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void addKeepSelectionOnly(JPopupMenuUtil ppap) {
+        try {
+            final int[] select = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
+            JMenuItem item = new JMenuItem("只保留已選列 :" + select.length);
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object[]> newLst = new ArrayList<Object[]>();
+                    for (int ii = 0; ii < select.length; ii++) {
+                        int queryListIdx = transRealRowToQuyerLstIndex(select[ii]);
+                        newLst.add(queryList.getRight().get(queryListIdx));
+                    }
+                    Triple<List<String>, List<Class<?>>, List<Object[]>> newLstForChoice = Triple.of(queryList.getLeft(), queryList.getMiddle(), newLst);
+                    queryModeProcess(newLstForChoice, true, null, null);//
+                    filterRowsQueryList = newLstForChoice;
+                    isResetQuery = false;
+                }
+            });
+            ppap.addJMenuItem(item);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private class JMenuItem_BasicMenu {
+        JMenuItem item;
+        final JDialog dlg;
+        final JTextArea text;
+        final AtomicReference<String> strVal = new AtomicReference<String>("");
+
+        JMenuItem_BasicMenu() {
+            Object val = JTableUtil.newInstance(queryResultTable).getSelectedValue();
+
+            dlg = new JDialog();
+            dlg.setModal(true);
+            dlg.setSize(new Dimension(400, 250));
+            final JPanel pan = new JPanel();
+            pan.setLayout(new BorderLayout(0, 0));
+            final JLabel lbl = new JLabel("");
+            pan.add(lbl, BorderLayout.NORTH);
+            text = new JTextArea();
+            text.setPreferredSize(new Dimension(400, 200));
+            pan.add(JCommonUtil.createScrollComponent(text), BorderLayout.CENTER);
+            final JButton btn = new JButton("確定");
+            pan.add(btn, BorderLayout.SOUTH);
+            dlg.add(pan);
+            dlg.pack();
+
+            JCommonUtil.setJFrameCenter(dlg);
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dlg.dispose();
+                }
+            });
+            final Runnable runner = new Runnable() {
+                @Override
+                public void run() {
+                    String strVal = StringUtils.defaultString(text.getSelectedText());
+                    lbl.setText("選擇長度:" + strVal.length() + "/位元長度:" + strVal.getBytes().length);
+                }
+            };
+            text.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    runner.run();
+                }
+            });
+            text.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    runner.run();
+                }
+            });
+
+            if (val != null) {
+                strVal.set(String.valueOf(val));
+            } else {
+                strVal.set("");
+            }
+
+            item = new JMenuItem("長度 : " + strVal.get().getBytes().length);
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    run();
+                }
+            });
+
+            lbl.setText("選擇長度:" + strVal.get().length() + "/位元長度:" + strVal.get().getBytes().length);
+        }
+
+        JMenuItem getItem() {
+            return item;
+        }
+
+        void run() {
+            text.setText(strVal.get());
+            dlg.setVisible(true);
         }
     }
 
@@ -3003,9 +3110,9 @@ public class FastDBQueryUI extends JFrame {
                 }
             } else if (radio_export_excel == selBtn) {
                 Triple<List<String>, List<Class<?>>, List<Object[]>> tmpQueryList = null;
-                if (StringUtils.isBlank(rowFilterText.getText())) {
+                if (isResetQuery && StringUtils.isBlank(rowFilterText.getText())) {
                     tmpQueryList = queryList;
-                } else {
+                } else if (filterRowsQueryList != null) {
                     tmpQueryList = filterRowsQueryList;
                 }
 
@@ -4989,10 +5096,15 @@ public class FastDBQueryUI extends JFrame {
 
         @Override
         public void run() {
-            try {
-                runProcess();
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
+            if (StringUtils.isBlank(rowFilterText.getText())) {
+                filterRowsQueryList = null;
+                isResetQuery = true;
+            } else {
+                try {
+                    runProcess();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
             }
         }
     };

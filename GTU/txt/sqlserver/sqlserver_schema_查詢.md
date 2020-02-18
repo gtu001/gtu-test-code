@@ -58,3 +58,42 @@
 	Where main.name = '輸入您的TABLENAME'
 	Order By a.colid
 
+
+
+===================================
+以下可用於FastDBQuery
+	        
+        Select a.colid, a.name, 
+                convert(varchar(100), 
+                    IsNull(d.value, '')
+                ) col_desp, 
+                 convert(varchar(100), 
+                    c.name + '(' + Convert(varchar(4), (Case When a.xtype In (99, 231, 239) Then a.length / 2 Else a.length End)) + ')'
+                )  col_type, 
+                convert(varchar(100), 
+                	(Case When b.pk_name Is Not Null Then 'PK' Else 
+                		(Case When a.isnullable = 0 Then 'NN' Else 'N' End) End) 
+                ) col_status,
+                convert(varchar(100), 
+            	    IsNull(e.text, '') 
+	        ) col_default
+        From sysobjects main
+        Inner Join syscolumns a
+        	On main.id = a.id
+        Left Join (
+        		Select a.id, c.name pk_name
+        		From sysindexes a
+        		Inner Join sysindexkeys b
+        			On a.id = b.id And a.indid = b.indid
+        		Inner Join syscolumns c
+        			On a.id = c.id And b.colid = c.colid
+        		Where a.status & 2048 = 2048) b
+        	On a.id = b.id And a.name = b.pk_name
+        Inner Join systypes c
+        	On a.xtype = c.xtype And c.status = 0
+        Left Join sys.extended_properties d
+        	On a.id = d.major_id And a.colid = d.minor_id And d.name = 'chnName'
+        Left Join dbo.syscomments e
+        	On a.cdefault = e.id
+        Where  main.name = :TableName  
+        Order By a.colid
