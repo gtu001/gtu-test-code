@@ -54,3 +54,9 @@
 ---
 	svn log --verbose -r <版號>
 
+
+檔案lock解開
+---
+	$ svn cleanup
+	$ svn status <--複製開頭為Ｌ路徑
+	$ svn unlock <path>

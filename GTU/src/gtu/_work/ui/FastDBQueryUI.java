@@ -1005,6 +1005,9 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void process(DocumentEvent event) {
                 try {
+                    if (checkIsNeedResetQueryResultTable(true)) {
+                        return;
+                    }
                     if (distinctHasClicked) {
                         queryModeProcess(queryList, true, null, null);
                         distinctHasClicked = false;
@@ -5069,6 +5072,21 @@ public class FastDBQueryUI extends JFrame {
         }));
     }
 
+    private boolean checkIsNeedResetQueryResultTable(boolean isCheckColumnFilterText) {
+        boolean isNeedReset = false;
+        if (isCheckColumnFilterText && StringUtils.isBlank(columnFilterText.getText())) {
+            isNeedReset = true;
+        } else if (!isCheckColumnFilterText && StringUtils.isBlank(rowFilterText.getText())) {
+            isNeedReset = true;
+        }
+        if (isNeedReset) {
+            filterRowsQueryList = null;
+            isResetQuery = true;
+            queryModeProcess(queryList, true, null, null);//
+        }
+        return isNeedReset;
+    }
+
     private final Runnable rowFilterTextDoFilter = new Runnable() {
 
         private FastDBQueryUI_ColumnSearchFilter columnFilter;
@@ -5096,10 +5114,7 @@ public class FastDBQueryUI extends JFrame {
 
         @Override
         public void run() {
-            if (StringUtils.isBlank(rowFilterText.getText())) {
-                filterRowsQueryList = null;
-                isResetQuery = true;
-            } else {
+            if (!checkIsNeedResetQueryResultTable(false)) {
                 try {
                     runProcess();
                 } catch (Exception ex) {
