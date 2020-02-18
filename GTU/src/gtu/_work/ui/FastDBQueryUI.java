@@ -1711,35 +1711,6 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    static class FindTextHandler {
-        JTextField searchText;
-        String delimit;
-
-        FindTextHandler(JTextField searchText, String delimit) {
-            this.searchText = searchText;
-            this.delimit = delimit;
-        }
-
-        boolean isAllMatch() {
-            return StringUtils.isBlank(searchText.getText());
-        }
-
-        String[] getArry() {
-            String[] arry = StringUtils.trimToEmpty(searchText.getText()).toLowerCase().split(Pattern.quote(delimit), -1);
-            List<String> rtnLst = new ArrayList<String>();
-            for (int ii = 0; ii < arry.length; ii++) {
-                if (StringUtils.isNotBlank(arry[ii])) {
-                    rtnLst.add(StringUtils.trimToEmpty(arry[ii]));
-                }
-            }
-            return rtnLst.toArray(new String[0]);
-        }
-
-        String valueToString(Object value) {
-            return value == null ? "" : String.valueOf(value).toLowerCase();
-        }
-    }
-
     /**
      * 初始化sqlList
      */
@@ -4995,24 +4966,6 @@ public class FastDBQueryUI extends JFrame {
 
         private FastDBQueryUI_ColumnSearchFilter columnFilter;
 
-        private void addColorRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
-            List<Integer> lst = new ArrayList<Integer>();
-            for (int ii = 0; ii < cols.size(); ii++) {
-                lst.add(ii);
-                ;
-            }
-            changeColorRowCellIdxMap.put(rowIdx, lst);
-        }
-
-        private void addColorCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
-            List<Integer> cellLst = new ArrayList<Integer>();
-            if (changeColorRowCellIdxMap.containsKey(rowIdx)) {
-                cellLst = changeColorRowCellIdxMap.get(changeColorRowCellIdxMap);
-            }
-            cellLst.add(cellIdx);
-            changeColorRowCellIdxMap.put(rowIdx, cellLst);
-        }
-
         private void runProcess() {
             if (queryList == null || queryList.getRight().isEmpty()) {
                 return;
@@ -5022,61 +4975,16 @@ public class FastDBQueryUI extends JFrame {
                 columnFilter = new FastDBQueryUI_ColumnSearchFilter(queryList, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
                 isResetQuery = false;
             }
-            columnFilter.filterText(columnFilterText.getText());
+            columnFilter.filterColumnText(columnFilterText.getText());
             Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = columnFilter.getResult();
 
-            // -----------------------------------------------------------------
+            columnFilter.filterRowText(rowFilterText.getText(), isColumnNoExists(), rowFilterTextKeepMatchChk.isSelected(), queryList);
+            Pair<Triple<List<String>, List<Class<?>>, List<Object[]>>, Map<Integer, List<Integer>>> resultFinal = columnFilter.getResultFinal();
 
-            List<Object[]> qList = new ArrayList<Object[]>();
+            queryList = resultFinal.getLeft();
+            Map<Integer, List<Integer>> changeColorRowCellIdxMap = resultFinal.getRight();
 
-            Map<Integer, List<Integer>> changeColorRowCellIdxMap = new HashMap<Integer, List<Integer>>();
-
-            FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
-            boolean allMatch = finder.isAllMatch();
-
-            List<String> cols = queryList.getLeft();
-
-            boolean hasNoColumn = isColumnNoExists();
-
-            for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
-                Object[] rows = queryList.getRight().get(rowIdx);
-                if (allMatch) {
-                    qList.add(rows);
-                    // addColorRowMatch(rowIdx, cols,
-                    // changeColorRowCellIdxMap);
-                    continue;
-                }
-
-                B: for (int ii = 0; ii < cols.size(); ii++) {
-                    String value = finder.valueToString(rows[ii]);
-                    for (String text : finder.getArry()) {
-                        if (value.contains(text)) {
-                            int realCol = ii;
-                            if (hasNoColumn) {
-                                realCol = realCol + 1;
-                            }
-                            if (rowFilterTextKeepMatchChk.isSelected()) {
-                                addColorCellMatch(qList.size(), realCol, changeColorRowCellIdxMap);
-                            } else {
-                                addColorCellMatch(rowIdx, realCol, changeColorRowCellIdxMap);
-                            }
-                            qList.add(rows);
-                            break B;
-                        }
-                    }
-                }
-            }
-
-            System.out.println("qList - " + qList.size());
-            System.out.println("changeColorRowCellIdxMap - " + changeColorRowCellIdxMap);
-
-            if (rowFilterTextKeepMatchChk.isSelected()) {
-                // 過濾欄位紀錄
-                filterRowsQueryList = fixPairToTripleQueryResult(Pair.of(cols, qList));
-                queryModeProcess(filterRowsQueryList, true, null, changeColorRowCellIdxMap);
-            } else {
-                queryModeProcess(queryList, true, null, changeColorRowCellIdxMap);//
-            }
+            queryModeProcess(queryList, true, null, changeColorRowCellIdxMap);//
         }
 
         @Override

@@ -1,9 +1,11 @@
 package gtu._work.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +18,9 @@ public class FastDBQueryUI_ColumnSearchFilter {
     Object[] alwaysMatchColumns;
     Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = null;
     Triple<List<String>, List<Class<?>>, List<Object[]>> resultList = null;
+    // -----------------以下變數為rowFilter
+    Triple<List<String>, List<Class<?>>, List<Object[]>> rowFilterResult = null;
+    Map<Integer, List<Integer>> changeColorRowCellIdxMap = null;
 
     public FastDBQueryUI_ColumnSearchFilter(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, String delimit, Object[] alwaysMatchColumns) {
         this.delimit = (delimit == null || StringUtils.isBlank(delimit)) ? "," : delimit;
@@ -137,11 +142,150 @@ public class FastDBQueryUI_ColumnSearchFilter {
         resultList = Triple.of(titleLst, dataClzLst, dataLst);
     }
 
-    public void filterText(String filterText) {
+    public void filterColumnText(String filterText) {
         __filterText(filterText);
     }
-    
+
     public Triple<List<String>, List<Class<?>>, List<Object[]>> getResult() {
         return resultList;
+    }
+
+    // -------------------------------------------------------------------------------
+    // 以下是row filter
+    // -------------------------------------------------------------------------------
+
+    public static class FindTextHandler {
+        String searchText;
+        String delimit;
+
+        FindTextHandler(String searchText, String delimit) {
+            this.searchText = searchText;
+            this.delimit = delimit;
+        }
+
+        boolean isAllMatch() {
+            return StringUtils.isBlank(searchText);
+        }
+
+        String[] getArry() {
+            String[] arry = StringUtils.trimToEmpty(searchText).toLowerCase().split(Pattern.quote(delimit), -1);
+            List<String> rtnLst = new ArrayList<String>();
+            for (int ii = 0; ii < arry.length; ii++) {
+                if (StringUtils.isNotBlank(arry[ii])) {
+                    rtnLst.add(StringUtils.trimToEmpty(arry[ii]));
+                }
+            }
+            return rtnLst.toArray(new String[0]);
+        }
+
+        String valueToString(Object value) {
+            return value == null ? "" : String.valueOf(value).toLowerCase();
+        }
+    }
+
+    private void addColorRowMatch(int rowIdx, List<String> cols, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+        List<Integer> lst = new ArrayList<Integer>();
+        for (int ii = 0; ii < cols.size(); ii++) {
+            lst.add(ii);
+            ;
+        }
+        changeColorRowCellIdxMap.put(rowIdx, lst);
+    }
+
+    private void addColorCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+        List<Integer> cellLst = new ArrayList<Integer>();
+        if (changeColorRowCellIdxMap.containsKey(rowIdx)) {
+            cellLst = changeColorRowCellIdxMap.get(changeColorRowCellIdxMap);
+        }
+        cellLst.add(cellIdx);
+        changeColorRowCellIdxMap.put(rowIdx, cellLst);
+    }
+
+    /**
+     * 計算欄位型態
+     * 
+     * @param queryLst
+     * @return
+     */
+    private Triple<List<String>, List<Class<?>>, List<Object[]>> fixPairToTripleQueryResult(Pair<List<String>, List<Object[]>> queryLst) {
+        List<Object[]> lst = queryLst.getRight();
+        TreeMap<Integer, Class<?>> typeMap = new TreeMap<Integer, Class<?>>();
+        A: for (int ii = 0; ii < lst.size(); ii++) {
+            if (queryLst.getLeft().size() == typeMap.size()) {
+                break A;
+            }
+            Object[] arry = lst.get(ii);
+            B: for (int jj = 0; jj < arry.length; jj++) {
+                if (typeMap.containsKey(jj)) {
+                    continue;
+                }
+                if (arry[jj] != null) {
+                    typeMap.put(jj, arry[jj].getClass());
+                }
+            }
+        }
+        for (int ii = 0; ii < queryLst.getLeft().size(); ii++) {
+            if (!typeMap.containsKey(ii)) {
+                typeMap.put(ii, Object.class);
+            }
+        }
+        List<Class<?>> typeLst = new ArrayList<Class<?>>(typeMap.values());
+        return Triple.of(queryLst.getLeft(), typeLst, queryLst.getRight());
+    }
+
+    public void filterRowText(String rowFilterText, boolean isIgnoreFirstColumn, boolean isKeepMatchOnly, Triple<List<String>, List<Class<?>>, List<Object[]>> queryList) {
+        List<Object[]> qList = new ArrayList<Object[]>();
+
+        changeColorRowCellIdxMap = new HashMap<Integer, List<Integer>>();
+
+        FindTextHandler finder = new FindTextHandler(rowFilterText, "^");
+        boolean allMatch = finder.isAllMatch();
+
+        List<String> cols = queryList.getLeft();
+
+        boolean hasNoColumn = isIgnoreFirstColumn;
+
+        for (int rowIdx = 0; rowIdx < queryList.getRight().size(); rowIdx++) {
+            Object[] rows = queryList.getRight().get(rowIdx);
+            if (allMatch) {
+                qList.add(rows);
+                // addColorRowMatch(rowIdx, cols,
+                // changeColorRowCellIdxMap);
+                continue;
+            }
+
+            B: for (int ii = 0; ii < cols.size(); ii++) {
+                String value = finder.valueToString(rows[ii]);
+                for (String text : finder.getArry()) {
+                    if (value.contains(text)) {
+                        int realCol = ii;
+                        if (hasNoColumn) {
+                            realCol = realCol + 1;
+                        }
+                        if (isKeepMatchOnly) {
+                            addColorCellMatch(qList.size(), realCol, changeColorRowCellIdxMap);
+                        } else {
+                            addColorCellMatch(rowIdx, realCol, changeColorRowCellIdxMap);
+                        }
+                        qList.add(rows);
+                        break B;
+                    }
+                }
+            }
+        }
+
+        System.out.println("qList - " + qList.size());
+        System.out.println("changeColorRowCellIdxMap - " + changeColorRowCellIdxMap);
+
+        if (isKeepMatchOnly) {
+            // 過濾欄位紀錄
+            rowFilterResult = fixPairToTripleQueryResult(Pair.of(cols, qList));
+        } else {
+            rowFilterResult = queryList;
+        }
+    }
+
+    public Pair<Triple<List<String>, List<Class<?>>, List<Object[]>>, Map<Integer, List<Integer>>> getResultFinal() {
+        return Pair.of(rowFilterResult, changeColorRowCellIdxMap);
     }
 }

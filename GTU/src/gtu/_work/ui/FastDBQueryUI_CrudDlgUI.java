@@ -59,7 +59,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
-import gtu._work.ui.FastDBQueryUI.FindTextHandler;
+import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
 import gtu.binary.StringUtil4FullChar;
@@ -822,7 +822,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         rowTable.setModel(model);
         JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
 
-        FindTextHandler finder = new FindTextHandler(searchText, "^");
+        FindTextHandler finder = new FindTextHandler(searchText.getText(), "^");
         boolean allMatch = finder.isAllMatch();
 
         B: for (String columnName : columnsLst) {
