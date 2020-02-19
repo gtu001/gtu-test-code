@@ -2731,7 +2731,7 @@ public class FastDBQueryUI extends JFrame {
                         int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                         System.out.println("rowPos " + rowPos);
 
-                        int queryLstIndex = transRealRowToQuyerLstIndex(rowPos);
+                        int queryLstIndex = transRealRowToQuyerLstIndex(rowPos, queryList.getRight());
                         Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
                         rowMapLst.add(rowMap);
                     }
@@ -2815,15 +2815,20 @@ public class FastDBQueryUI extends JFrame {
 
     private void addKeepSelectionOnly(JPopupMenuUtil ppap) {
         try {
-            final int[] select = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
-            JMenuItem item = new JMenuItem("只保留已選列 :" + select.length);
+            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
+            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
+            JMenuItem item = new JMenuItem("只保留已選列 :" + selectRowIdxArry.length);
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    List<Object[]> sourceLst = queryList.getRight();
+                    if (filterRowsQueryList != null) {
+                        sourceLst = filterRowsQueryList.getRight();
+                    }
                     List<Object[]> newLst = new ArrayList<Object[]>();
-                    for (int ii = 0; ii < select.length; ii++) {
-                        int queryListIdx = transRealRowToQuyerLstIndex(select[ii]);
-                        newLst.add(queryList.getRight().get(queryListIdx));
+                    for (int ii = 0; ii < selectRowIdxArry.length; ii++) {
+                        int queryListIdx = transRealRowToQuyerLstIndex(selectRowIdxArry[ii], sourceLst);
+                        newLst.add(sourceLst.get(queryListIdx));
                     }
                     Triple<List<String>, List<Class<?>>, List<Object[]>> newLstForChoice = Triple.of(queryList.getLeft(), queryList.getMiddle(), newLst);
                     queryModeProcess(newLstForChoice, true, null, null);//
@@ -2831,7 +2836,20 @@ public class FastDBQueryUI extends JFrame {
                     isResetQuery = false;
                 }
             });
+            JMenuItem item2 = new JMenuItem("只保留已選欄 :" + selectColIdxArry.length);
+            item2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        strLst.add(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                    }
+                    columnFilterText.setText(StringUtils.join(strLst, "^"));
+                }
+            });
             ppap.addJMenuItem(item);
+            ppap.addJMenuItem(item2);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -3007,7 +3025,7 @@ public class FastDBQueryUI extends JFrame {
         return columnMapping;
     }
 
-    private int transRealRowToQuyerLstIndex(int realRow) {
+    private int transRealRowToQuyerLstIndex(int realRow, List<Object[]> sourceLst) {
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
         TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
 
@@ -3025,7 +3043,7 @@ public class FastDBQueryUI extends JFrame {
 
         // 用來比較取得row index用
         List<Object[]> newLst = new ArrayList<Object[]>();
-        for (Object[] oldArry : this.queryList.getRight()) {
+        for (Object[] oldArry : sourceLst) {
             List<Object> newArry = new ArrayList<Object>();
             for (int columnPos : columnMapping.keySet()) {
                 newArry.add(oldArry[columnPos]);

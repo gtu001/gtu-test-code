@@ -797,6 +797,18 @@ public class JTableUtil {
         return row2;
     }
 
+    public int[] getSelectedColumns(boolean isReal) {
+        int[] colPos = table.getSelectedColumns();
+        if (!isReal) {
+            return colPos;
+        }
+        int[] rtnArry = new int[colPos.length];
+        for (int ii = 0; ii < colPos.length; ii++) {
+            rtnArry[ii] = JTableUtil.getRealColumnPos(colPos[ii], table);
+        }
+        return rtnArry;
+    }
+
     public void addRow(Object[] data) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(data);
