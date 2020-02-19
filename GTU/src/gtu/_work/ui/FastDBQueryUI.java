@@ -1895,6 +1895,14 @@ public class FastDBQueryUI extends JFrame {
      */
     private void saveSqlButtonClick(boolean saveSqlIdConfig) {
         try {
+            if (isSqlIdChange()) {
+                boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("您輸入SqlID以存在:" + sqlIdText.getText() + ", 是否要繼續?", "已存在SqlID");
+                if (!isContinue) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("儲存取消!!!");
+                    return;
+                }
+            }
+
             String sqlId = sqlIdText.getText();
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
             String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
@@ -4551,6 +4559,23 @@ public class FastDBQueryUI extends JFrame {
         bean.color = color.colorCode;
         bean.sqlComment = sqlComment;
         return bean;
+    }
+
+    private boolean isSqlIdChange() {
+        SqlIdConfigBean currentBean = getCurrentEditSqlIdConfigBean();
+        if (sqlBean != null) {
+            if (StringUtils.equalsIgnoreCase(sqlBean.sqlId, currentBean.sqlId)) {
+                return false;
+            }
+        }
+        sqlIdConfigBeanHandler.init("");
+        List<SqlIdConfigBean> lst = sqlIdConfigBeanHandler.lst;
+        for (SqlIdConfigBean b : lst) {
+            if (StringUtils.equalsIgnoreCase(b.sqlId, currentBean.sqlId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void sqlTextAreaChange() {
