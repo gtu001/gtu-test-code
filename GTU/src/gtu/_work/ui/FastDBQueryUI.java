@@ -2883,15 +2883,18 @@ public class FastDBQueryUI extends JFrame {
         JMenuItem_BasicMenu() {
             Object val = JTableUtil.newInstance(queryResultTable).getSelectedValue();
 
-            dlg = new JDialog();
+            dlg = new JDialog() {
+                public Dimension getPreferredSize() {
+                    return new Dimension(450, 250);
+                }
+            };
             dlg.setModal(true);
-            dlg.setSize(new Dimension(400, 250));
             final JPanel pan = new JPanel();
             pan.setLayout(new BorderLayout(0, 0));
             final JLabel lbl = new JLabel("");
             pan.add(lbl, BorderLayout.NORTH);
             text = new JTextArea();
-            text.setPreferredSize(new Dimension(400, 200));
+            JTextAreaUtil.applyCommonSetting(text, false);
             pan.add(JCommonUtil.createScrollComponent(text), BorderLayout.CENTER);
             final JButton btn = new JButton("確定");
             pan.add(btn, BorderLayout.SOUTH);
