@@ -79,6 +79,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -2230,8 +2231,8 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private JButton createSelectionBtn(int serialNo) {
-        JButton selectionBtn = new JButton(String.valueOf((serialNo)));
+    private JToggleButton createSelectionBtn(int serialNo) {
+        JToggleButton selectionBtn = new JToggleButton(String.valueOf((serialNo)));
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -2815,12 +2816,8 @@ public class FastDBQueryUI extends JFrame {
 
     private void addKeepSelectionOnly(JPopupMenuUtil ppap) {
         try {
-            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
-            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
-            JMenuItem item = new JMenuItem("只保留已選列 :" + selectRowIdxArry.length);
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+            class SelectRowIdxProc {
+                void execute(final int[] selectRowIdxArry) {
                     List<Object[]> sourceLst = queryList.getRight();
                     if (filterRowsQueryList != null) {
                         sourceLst = filterRowsQueryList.getRight();
@@ -2835,9 +2832,18 @@ public class FastDBQueryUI extends JFrame {
                     filterRowsQueryList = newLstForChoice;
                     isResetQuery = false;
                 }
+            }
+
+            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
+            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
+            JMenuAppender chdMenu = JMenuAppender.newInstance("保留已選欄/列");
+            chdMenu.addMenuItem("只保留已選列 :" + selectRowIdxArry.length, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new SelectRowIdxProc().execute(selectRowIdxArry);
+                }
             });
-            JMenuItem item2 = new JMenuItem("只保留已選欄 :" + selectColIdxArry.length);
-            item2.addActionListener(new ActionListener() {
+            chdMenu.addMenuItem("只保留已選欄 :" + selectColIdxArry.length, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
@@ -2848,8 +2854,21 @@ public class FastDBQueryUI extends JFrame {
                     columnFilterText.setText(StringUtils.join(strLst, "^"));
                 }
             });
-            ppap.addJMenuItem(item);
-            ppap.addJMenuItem(item2);
+            chdMenu.addMenuItem("只保留第一欄勾選列", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Integer> rowLst = new ArrayList<Integer>();
+                    for (int ii = 0; ii < queryResultTable.getRowCount(); ii++) {
+                        int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
+                        Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
+                        if (v instanceof JToggleButton && ((JToggleButton) v).isSelected()) {
+                            rowLst.add(rowIdx);
+                        }
+                    }
+                    new SelectRowIdxProc().execute(ArrayUtils.toPrimitive(rowLst.toArray(new Integer[0])));
+                }
+            });
+            ppap.addJMenuItem(chdMenu.getMenu());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -5128,6 +5147,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private boolean checkIsNeedResetQueryResultTable(boolean isCheckColumnFilterText) {
+        if (true) {
+            return false;
+        }
         boolean isNeedReset = false;
         if (isCheckColumnFilterText && StringUtils.isBlank(columnFilterText.getText())) {
             isNeedReset = true;
@@ -5146,8 +5168,18 @@ public class FastDBQueryUI extends JFrame {
 
         private FastDBQueryUI_ColumnSearchFilter columnFilter;
 
+        private Triple<List<String>, List<Class<?>>, List<Object[]>> getQuery() {
+            if (!isResetQuery && filterRowsQueryList != null) {
+                return filterRowsQueryList;
+            } else if (queryList != null) {
+                return queryList;
+            }
+            return null;
+        }
+
         private void runProcess() {
-            if (queryList == null || queryList.getRight().isEmpty()) {
+            Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = getQuery();
+            if (queryList == null) {
                 return;
             }
 
@@ -5156,7 +5188,7 @@ public class FastDBQueryUI extends JFrame {
                 isResetQuery = false;
             }
             columnFilter.filterColumnText(columnFilterText.getText());
-            Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = columnFilter.getResult();
+            queryList = columnFilter.getResult();
 
             columnFilter.filterRowText(rowFilterText.getText(), isColumnNoExists(), rowFilterTextKeepMatchChk.isSelected(), queryList);
             Pair<Triple<List<String>, List<Class<?>>, List<Object[]>>, Map<Integer, List<Integer>>> resultFinal = columnFilter.getResultFinal();

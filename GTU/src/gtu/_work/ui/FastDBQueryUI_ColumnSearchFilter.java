@@ -18,6 +18,7 @@ public class FastDBQueryUI_ColumnSearchFilter {
     Object[] alwaysMatchColumns;
     Triple<List<String>, List<Class<?>>, List<Object[]>> queryList = null;
     Triple<List<String>, List<Class<?>>, List<Object[]>> resultList = null;
+    Map<String, Integer> showColumns;
     // -----------------以下變數為rowFilter
     Triple<List<String>, List<Class<?>>, List<Object[]>> rowFilterResult = null;
     Map<Integer, List<Integer>> changeColorRowCellIdxMap = null;
@@ -72,7 +73,7 @@ public class FastDBQueryUI_ColumnSearchFilter {
         Pair<String, List<Pattern>> afterFilterProc = filterPattern(filterText);
 
         String[] params = StringUtils.trimToEmpty(afterFilterProc.getLeft()).toUpperCase().split(Pattern.quote(delimit), -1);
-        Map<String, Integer> addColumns = new LinkedHashMap<String, Integer>();
+        showColumns = new LinkedHashMap<String, Integer>();
 
         for (String param : params) {
             param = StringUtils.trimToEmpty(param);
@@ -114,9 +115,9 @@ public class FastDBQueryUI_ColumnSearchFilter {
                     }
                 }
 
-                if (findOk && !addColumns.containsKey(headerColumn)) {
+                if (findOk && !showColumns.containsKey(headerColumn)) {
                     System.out.println("Add------------" + key);
-                    addColumns.put(headerColumn, ii);
+                    showColumns.put(headerColumn, ii);
                 }
             }
         }
@@ -125,21 +126,19 @@ public class FastDBQueryUI_ColumnSearchFilter {
         List<Class<?>> dataClzLst = new ArrayList<Class<?>>();
         List<Object[]> dataLst = new ArrayList<Object[]>();
 
-        for (String column : addColumns.keySet()) {
-            Integer idx = addColumns.get(column);
-            titleLst.add(queryList.getLeft().get(idx));
-            dataClzLst.add(queryList.getMiddle().get(idx));
-        }
+        /*
+         * for (String column : addColumns.keySet()) { Integer idx =
+         * addColumns.get(column); titleLst.add(queryList.getLeft().get(idx));
+         * dataClzLst.add(queryList.getMiddle().get(idx)); }
+         * 
+         * for (Object[] row : queryList.getRight()) { List<Object> dLst = new
+         * ArrayList<Object>(); for (Integer idx : addColumns.values()) {
+         * dLst.add(row[idx]); } dataLst.add(dLst.toArray()); }
+         * 
+         * resultList = Triple.of(titleLst, dataClzLst, dataLst);
+         */
 
-        for (Object[] row : queryList.getRight()) {
-            List<Object> dLst = new ArrayList<Object>();
-            for (Integer idx : addColumns.values()) {
-                dLst.add(row[idx]);
-            }
-            dataLst.add(dLst.toArray());
-        }
-
-        resultList = Triple.of(titleLst, dataClzLst, dataLst);
+        resultList = queryList;
     }
 
     public void filterColumnText(String filterText) {
@@ -255,6 +254,12 @@ public class FastDBQueryUI_ColumnSearchFilter {
             }
 
             B: for (int ii = 0; ii < cols.size(); ii++) {
+
+                // 只用藥顯示的欄位判斷
+                if (showColumns != null && !showColumns.values().contains(ii)) {
+                    continue;
+                }
+
                 String value = finder.valueToString(rows[ii]);
                 for (String text : finder.getArry()) {
                     if (value.contains(text)) {

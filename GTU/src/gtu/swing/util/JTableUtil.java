@@ -51,8 +51,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -317,15 +317,38 @@ public class JTableUtil {
      * 設定某欄為button
      */
     public void columnIsButton(String columnName) {
+        /**
+         * 定義欄位為按鈕用
+         */
+        class _ColumnButtonMouseAdapter extends MouseAdapter {
+            JTable table;
+
+            private _ColumnButtonMouseAdapter(JTable table) {
+                this.table = table;
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                int column = table.getColumnModel().getColumnIndexAtX(e.getX());
+                int row = e.getY() / table.getRowHeight();
+                System.out.println(String.format("tableClick row[%d],col[%d]", row, column));
+                if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
+                    Object value = table.getValueAt(row, column);
+                    if (value instanceof AbstractButton) {
+                        ((AbstractButton) value).doClick();
+                    }
+                }
+            }
+        }
+        
         TableColumn columConfig = table.getColumn(columnName);
         System.out.println("columnIsButton " + columConfig.getHeaderValue());
         columConfig.setCellRenderer(new TableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                if (value == null || !(value instanceof JButton)) {
+                if (value == null || !(value instanceof AbstractButton)) {
                     throw new RuntimeException("無法被設定為Button : " + value);
                 }
-                JButton button = (JButton) value;
+                AbstractButton button = (AbstractButton) value;
                 return button;
             }
         });
@@ -340,7 +363,7 @@ public class JTableUtil {
             table.addMouseListener(new _ColumnButtonMouseAdapter(table));
         }
     }
-
+    
     public void setRowHeight(int rowPos, int height) {
         table.setRowHeight(rowPos, height);
     }
@@ -1473,29 +1496,6 @@ public class JTableUtil {
      */
     public interface TableColorDef {
         Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column);
-    }
-
-    /**
-     * 定義欄位為按鈕用
-     */
-    private static class _ColumnButtonMouseAdapter extends MouseAdapter {
-        JTable table;
-
-        private _ColumnButtonMouseAdapter(JTable table) {
-            this.table = table;
-        }
-
-        public void mouseClicked(MouseEvent e) {
-            int column = table.getColumnModel().getColumnIndexAtX(e.getX());
-            int row = e.getY() / table.getRowHeight();
-            System.out.println(String.format("tableClick row[%d],col[%d]", row, column));
-            if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
-                Object value = table.getValueAt(row, column);
-                if (value instanceof JButton) {
-                    ((JButton) value).doClick();
-                }
-            }
-        }
     }
 
     public List<Object> getColumnTitleArray() {
