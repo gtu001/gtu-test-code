@@ -41,8 +41,13 @@
 新增檔案
 ---
 	需要新增的檔案開頭為 ?
-	$ svn add <從 svn status 看到的路徑>  
+	$ svn add  --force --force-interactive  <從 svn status 看到的路徑>  
 		ps : 可接 "*" 省略部份輸入
+
+
+取消add檔案
+---
+	$ svn revert --recursive <folder_name>
 
 
 上傳檔案
