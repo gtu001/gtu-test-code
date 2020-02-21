@@ -1046,6 +1046,11 @@ public class FastDBQueryUI extends JFrame {
                 rowFilterText.setText("");
                 rowFilterTextKeepMatchChk.setSelected(false);
                 checkIsNeedResetQueryResultTable(true);
+                {
+                    filterRowsQueryList = null;
+                    isResetQuery = true;
+                    queryModeProcess(queryList, true, null, null);//
+                }
             }
         });
         panel_13.add(resetQueryBtn);
@@ -2215,7 +2220,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         if (changeColorRowCellIdxMap != null) {
-            JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), changeColorRowCellIdxMap);
+            JTableUtil.newInstance(queryResultTable).setCellBackgroundColor(Color.green.brighter(), changeColorRowCellIdxMap);
         }
 
         JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
@@ -2239,9 +2244,7 @@ public class FastDBQueryUI extends JFrame {
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = JTableUtil.newInstance(queryResultTable).getRealSelectedRow();
-                queryResultTable.setRowSelectionInterval(row, row);
-                queryResultTable.setColumnSelectionInterval(1, queryResultTable.getColumnCount() - 1);
+                JTableUtil.newInstance(queryResultTable).setRowSelection();
             }
         });
         return selectionBtn;
@@ -2786,8 +2789,24 @@ public class FastDBQueryUI extends JFrame {
 
             if (JMouseEventUtil.buttonRightClick(1, e)) {
                 JPopupMenuUtil ppap = JPopupMenuUtil.newInstance(queryResultTable);
+
                 ppap.addJMenuItem(new JMenuItem_BasicMenu().getItem());//
+
+                ppap.addJMenuItem("選擇此列", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int[] rows = JTableUtil.newInstance(queryResultTable).getSelectedRows(false);
+                        for (int row : rows) {
+                            JToggleButton b = (JToggleButton) JTableUtil.newInstance(queryResultTable).getValueAt(true, row, 0);
+                            b.setSelected(!b.isSelected());
+                        }
+
+                        JTableUtil.newInstance(queryResultTable).setRowSelection();
+                    }
+                });//
+
                 addKeepSelectionOnly(ppap);
+
                 ppap.addJMenuItem("進行CRUD操作", new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -2798,6 +2817,7 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 });//
+
                 ppap.addJMenuItem("進行比對操作", new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -2808,6 +2828,7 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 });//
+
                 ppap.addJMenuItem(addBase64Menus())//
                         .applyEvent(e)//
                         .show();
@@ -2857,7 +2878,7 @@ public class FastDBQueryUI extends JFrame {
                     columnFilterText.setText(StringUtils.join(strLst, "^"));
                 }
             });
-            chdMenu.addMenuItem("只保留第一欄勾選列", new ActionListener() {
+            chdMenu.addMenuItem("*只保留已「勾」選列*", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     List<Integer> rowLst = new ArrayList<Integer>();
@@ -2937,7 +2958,7 @@ public class FastDBQueryUI extends JFrame {
                 strVal.set("");
             }
 
-            item = new JMenuItem("長度 : " + strVal.get().getBytes().length);
+            item = new JMenuItem("此資料長度 : " + strVal.get().getBytes().length);
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -3276,12 +3297,16 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 }
-                
+
                 exlUtl.autoCellSize(sheet0);
                 exlUtl.autoCellSize(sheet1);
                 exlUtl.autoCellSize(sheet2);
 
-                String filename = FastDBQueryUI.class.getSimpleName() + "_Export_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".xls";
+                String filename = FastDBQueryUI.class.getSimpleName() + //
+                        "_Export_" + //
+                        "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
+                        DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + //
+                        ".xls";
                 filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
                 if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
                     File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
@@ -3297,7 +3322,7 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
-    
+
     private void removeConnectionBtnAction() {
         try {
             String dbNameId = dbNameIdText_getText();
