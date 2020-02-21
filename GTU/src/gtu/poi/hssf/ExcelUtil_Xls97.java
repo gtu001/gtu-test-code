@@ -672,6 +672,12 @@ public class ExcelUtil_Xls97 {
     public void mergeCell(Sheet sheet, String rangeStr) {
         sheet.addMergedRegion(CellRangeAddress.valueOf(rangeStr));
     }
+    
+    public void autoCellSize(Sheet sheet) {
+        for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
+            sheet.autoSizeColumn(jj);
+        }
+    }
 
     private static final ExcelUtil_Xls97 INSTANCE = new ExcelUtil_Xls97();
 }

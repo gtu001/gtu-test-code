@@ -88,6 +88,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -108,6 +109,8 @@ import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.log.LoggerAppender;
 import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.poi.hssf.ExcelWriter;
+import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesMultiUtil;
@@ -3217,22 +3220,28 @@ public class FastDBQueryUI extends JFrame {
                 }
 
                 // 寫資料
+                CellStyleHandler titleCs = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.LIGHT_GREEN());
                 List<String> columns = new ArrayList<String>(tmpQueryList.getLeft());
                 HSSFRow titleRow0 = sheet0.createRow(0);
                 HSSFRow titleRow1 = sheet1.createRow(0);
                 if (columnLst.isEmpty()) {
                     for (int ii = 0; ii < columns.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
                     }
                     for (int ii = 0; ii < columns.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
                     }
                 } else {
                     for (int ii = 0; ii < columnLst.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columnLst.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
                     }
                     for (int ii = 0; ii < columnLst.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columnLst.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
                     }
                 }
 
@@ -3267,6 +3276,10 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 }
+                
+                exlUtl.autoCellSize(sheet0);
+                exlUtl.autoCellSize(sheet1);
+                exlUtl.autoCellSize(sheet2);
 
                 String filename = FastDBQueryUI.class.getSimpleName() + "_Export_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".xls";
                 filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
@@ -3284,7 +3297,7 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
-
+    
     private void removeConnectionBtnAction() {
         try {
             String dbNameId = dbNameIdText_getText();
@@ -4920,7 +4933,7 @@ public class FastDBQueryUI extends JFrame {
                 try {
                     tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
                     tabMap.put(tableName, tab);
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return tab;

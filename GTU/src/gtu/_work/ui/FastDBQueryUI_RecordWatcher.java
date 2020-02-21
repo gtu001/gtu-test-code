@@ -205,6 +205,10 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             addRowDiff(uIdx, su, d.getLeft(), d.getRight(), changeCs);
             uIdx += 2;
         }
+        
+        ExcelUtil_Xls97.getInstance().autoCellSize(sn);
+        ExcelUtil_Xls97.getInstance().autoCellSize(sd);
+        ExcelUtil_Xls97.getInstance().autoCellSize(su);
 
         try {
             ExcelUtil_Xls97.getInstance().writeExcel(xlsFile, wb);
