@@ -13,6 +13,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
 
 /**
  * Excel元件
@@ -159,6 +160,11 @@ public class ExcelWriter {
          */
         public CellStyleHandler applyStyle(int rowNum, int cellNum) {
             this.setCellStyle(sheet, rowNum, cellNum, cellStyle);
+            return this;
+        }
+        
+        public CellStyleHandler applyStyle(Cell cell) {
+            cell.setCellStyle(cellStyle);
             return this;
         }
 

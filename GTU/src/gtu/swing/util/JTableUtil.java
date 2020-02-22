@@ -339,7 +339,7 @@ public class JTableUtil {
                 }
             }
         }
-        
+
         TableColumn columConfig = table.getColumn(columnName);
         System.out.println("columnIsButton " + columConfig.getHeaderValue());
         columConfig.setCellRenderer(new TableCellRenderer() {
@@ -363,7 +363,7 @@ public class JTableUtil {
             table.addMouseListener(new _ColumnButtonMouseAdapter(table));
         }
     }
-    
+
     public void setRowHeight(int rowPos, int height) {
         table.setRowHeight(rowPos, height);
     }
@@ -1695,17 +1695,28 @@ public class JTableUtil {
                 if (listener == null) {
                     return;
                 }
-                int rowPos = table.rowAtPoint(e.getPoint());
-                if (rowPos > -1) {
-                    for (int col = 0; col < table.getColumnCount(); col++) {
-                        Rectangle bounds = table.getCellRect(rowPos, col, true);
-                        if (bounds.contains(e.getPoint())) {
-                            listener.actionPerformed(new ActionEvent(Pair.of(rowPos, col), rowPos, "left:row, right:col"));
-                        }
-                    }
+                Pair<Integer, Integer> pair = getPositionFromMouseEvent(e);
+                if (pair != null) {
+                    listener.actionPerformed(new ActionEvent(pair, pair.getLeft(), "left:row, right:col"));
                 }
             }
         });
+    }
+
+    /**
+     * 取得滑鼠點擊位置
+     */
+    public Pair<Integer, Integer> getPositionFromMouseEvent(MouseEvent e) {
+        int rowPos = table.rowAtPoint(e.getPoint());
+        if (rowPos > -1) {
+            for (int col = 0; col < table.getColumnCount(); col++) {
+                Rectangle bounds = table.getCellRect(rowPos, col, true);
+                if (bounds.contains(e.getPoint())) {
+                    return Pair.of(rowPos, col);
+                }
+            }
+        }
+        return null;
     }
 
     public static void setColumnAlign(JTable table, int columnIndex, int JLabel_RIGNH_LEFT_CENTER_ETC) {
@@ -1719,7 +1730,7 @@ public class JTableUtil {
         table.getColumnModel().getColumn(columnIndex).setCellRenderer(rightRenderer);
     }
 
-    public void setModel_withRowsColorChange(java.awt.Color color, Integer cellIdx, final List<Integer> colorRowIndexLst) {
+    public void setRowsBackgroundColor(java.awt.Color color, Integer cellIdx, final List<Integer> colorRowIndexLst) {
         class MyRenderer extends DefaultTableCellRenderer {
             java.awt.Color color;
 
@@ -1753,7 +1764,7 @@ public class JTableUtil {
         }
     }
 
-    public void setModel_withRowsColorChange(Color color, final Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+    public void setCellBackgroundColor(Color color, final Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
         class MyRenderer extends DefaultTableCellRenderer {
             java.awt.Color color;
 
@@ -1786,5 +1797,17 @@ public class JTableUtil {
         for (int ii = 0; ii < table.getColumnModel().getColumnCount(); ii++) {
             table.getColumnModel().getColumn(ii).setCellRenderer(mMyRenderer);
         }
+    }
+
+    public void setRowSelection() {
+        int[] rows = JTableUtil.newInstance(table).getSelectedRows(false);
+        int minPos = Integer.MAX_VALUE;
+        int maxPos = Integer.MIN_VALUE;
+        for (int i : rows) {
+            maxPos = Math.max(maxPos, i);
+            minPos = Math.min(minPos, i);
+        }
+        table.setRowSelectionInterval(minPos, maxPos);
+        table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
     }
 }

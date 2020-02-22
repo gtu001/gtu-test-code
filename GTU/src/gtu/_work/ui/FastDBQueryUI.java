@@ -88,6 +88,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -108,6 +109,8 @@ import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.log.LoggerAppender;
 import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.poi.hssf.ExcelWriter;
+import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesMultiUtil;
@@ -1043,6 +1046,11 @@ public class FastDBQueryUI extends JFrame {
                 rowFilterText.setText("");
                 rowFilterTextKeepMatchChk.setSelected(false);
                 checkIsNeedResetQueryResultTable(true);
+                {
+                    filterRowsQueryList = null;
+                    isResetQuery = true;
+                    queryModeProcess(queryList, true, null, null);//
+                }
             }
         });
         panel_13.add(resetQueryBtn);
@@ -2212,7 +2220,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         if (changeColorRowCellIdxMap != null) {
-            JTableUtil.newInstance(queryResultTable).setModel_withRowsColorChange(Color.green.brighter(), changeColorRowCellIdxMap);
+            JTableUtil.newInstance(queryResultTable).setCellBackgroundColor(Color.green.brighter(), changeColorRowCellIdxMap);
         }
 
         JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
@@ -2236,9 +2244,7 @@ public class FastDBQueryUI extends JFrame {
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = JTableUtil.newInstance(queryResultTable).getRealSelectedRow();
-                queryResultTable.setRowSelectionInterval(row, row);
-                queryResultTable.setColumnSelectionInterval(1, queryResultTable.getColumnCount() - 1);
+                JTableUtil.newInstance(queryResultTable).setRowSelection();
             }
         });
         return selectionBtn;
@@ -2783,8 +2789,24 @@ public class FastDBQueryUI extends JFrame {
 
             if (JMouseEventUtil.buttonRightClick(1, e)) {
                 JPopupMenuUtil ppap = JPopupMenuUtil.newInstance(queryResultTable);
+
                 ppap.addJMenuItem(new JMenuItem_BasicMenu().getItem());//
+
+                ppap.addJMenuItem("選擇此列", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int[] rows = JTableUtil.newInstance(queryResultTable).getSelectedRows(false);
+                        for (int row : rows) {
+                            JToggleButton b = (JToggleButton) JTableUtil.newInstance(queryResultTable).getValueAt(true, row, 0);
+                            b.setSelected(!b.isSelected());
+                        }
+
+                        JTableUtil.newInstance(queryResultTable).setRowSelection();
+                    }
+                });//
+
                 addKeepSelectionOnly(ppap);
+
                 ppap.addJMenuItem("進行CRUD操作", new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -2795,6 +2817,7 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 });//
+
                 ppap.addJMenuItem("進行比對操作", new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -2805,6 +2828,7 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                 });//
+
                 ppap.addJMenuItem(addBase64Menus())//
                         .applyEvent(e)//
                         .show();
@@ -2854,7 +2878,7 @@ public class FastDBQueryUI extends JFrame {
                     columnFilterText.setText(StringUtils.join(strLst, "^"));
                 }
             });
-            chdMenu.addMenuItem("只保留第一欄勾選列", new ActionListener() {
+            chdMenu.addMenuItem("*只保留已「勾」選列*", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     List<Integer> rowLst = new ArrayList<Integer>();
@@ -2934,7 +2958,7 @@ public class FastDBQueryUI extends JFrame {
                 strVal.set("");
             }
 
-            item = new JMenuItem("長度 : " + strVal.get().getBytes().length);
+            item = new JMenuItem("此資料長度 : " + strVal.get().getBytes().length);
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -3217,22 +3241,28 @@ public class FastDBQueryUI extends JFrame {
                 }
 
                 // 寫資料
+                CellStyleHandler titleCs = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.LIGHT_GREEN());
                 List<String> columns = new ArrayList<String>(tmpQueryList.getLeft());
                 HSSFRow titleRow0 = sheet0.createRow(0);
                 HSSFRow titleRow1 = sheet1.createRow(0);
                 if (columnLst.isEmpty()) {
                     for (int ii = 0; ii < columns.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
                     }
                     for (int ii = 0; ii < columns.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
                     }
                 } else {
                     for (int ii = 0; ii < columnLst.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columnLst.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
                     }
                     for (int ii = 0; ii < columnLst.size(); ii++) {
                         exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columnLst.get(ii));
+                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
                     }
                 }
 
@@ -3268,7 +3298,15 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }
 
-                String filename = FastDBQueryUI.class.getSimpleName() + "_Export_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".xls";
+                exlUtl.autoCellSize(sheet0);
+                exlUtl.autoCellSize(sheet1);
+                exlUtl.autoCellSize(sheet2);
+
+                String filename = FastDBQueryUI.class.getSimpleName() + //
+                        "_Export_" + //
+                        "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
+                        DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + //
+                        ".xls";
                 filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
                 if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
                     File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
@@ -4920,7 +4958,7 @@ public class FastDBQueryUI extends JFrame {
                 try {
                     tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
                     tabMap.put(tableName, tab);
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return tab;

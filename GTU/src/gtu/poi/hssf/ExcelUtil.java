@@ -815,6 +815,12 @@ public class ExcelUtil {
     public void mergeCell(Sheet sheet, String rangeStr) {
         sheet.addMergedRegion(CellRangeAddress.valueOf(rangeStr));
     }
+    
+    public void autoCellSize(Sheet sheet) {
+        for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
+            sheet.autoSizeColumn(jj);
+        }
+    }
 
     private static final ExcelUtil INSTANCE = new ExcelUtil();
 }
