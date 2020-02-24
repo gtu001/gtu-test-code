@@ -67,6 +67,8 @@ public class DebugMointerMappingField {
                     continue A;
 
                 } else if (currentObj == null) {
+                    // 檢查供給與需求 classpath是否相同
+                    this.checkSameClassSimpleNameButClasspathDifferent(fld, indicatePathObject);
 
                     // 使用路徑綁定物件[自定]
                     if (indicatePathObject != null && //
@@ -98,6 +100,9 @@ public class DebugMointerMappingField {
                         if (condidate == newObject) {
                             continue;
                         }
+
+                        // 檢查供給與需求 classpath是否相同
+                        this.checkSameClassSimpleNameButClasspathDifferent(fld, condidate);
 
                         if (condidate != null && ClassUtil.isAssignFrom(fld.getType(), condidate.getClass())) {
                             // 以監控物件直接綁定
@@ -161,6 +166,15 @@ public class DebugMointerMappingField {
                 errSb.append("[ERROR]自動注入field失敗 : " + fld.getName() + "\n");
                 ex.printStackTrace();
             }
+        }
+    }
+
+    // 檢查供給與需求 classpath是否相同
+    private void checkSameClassSimpleNameButClasspathDifferent(Field fld, Object provideObj) {
+        if (provideObj != null && //
+                StringUtils.equals(fld.getType().getSimpleName(), provideObj.getClass().getSimpleName()) && //
+                !ClassUtil.isAssignFrom(fld.getType(), provideObj.getClass())) {
+            errSb.append("[警告:classpath不同] " + fld.getName() + " -> " + "要求為 :" + fld.getType().getName() + ", 來源供給為:" + provideObj.getClass().getName() + "\n");
         }
     }
 

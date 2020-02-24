@@ -2,16 +2,16 @@ package gtu.log.finder;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.reflect.MethodUtils;
-import org.mockito.Mockito;
-
 public class MainTest {
+    
+    public static class HashMap {
+    }
 
     public static void main(String[] args) {
         MainTest test = new MainTest();
         MyTest t = test.new MyTest();
         
-        DebugMointerUI.startWithReflectAndDispose(test, t);
+        DebugMointerUI.startWithReflectAndDispose(test, t, new HashMap());
     }
     
     private class MyTest {

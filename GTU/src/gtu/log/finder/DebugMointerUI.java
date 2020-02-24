@@ -4123,4 +4123,8 @@ public class DebugMointerUI {
         }
         uiCarrier.getDynamicClassArea().setText(sb.toString());
     }
+    
+    public static Object[] getMointerObjects() {
+        return inst.mointerObjects;
+    }
 }

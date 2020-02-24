@@ -140,20 +140,16 @@ public class Logger2File {
     }
 
     public synchronized void error(Object message, Throwable ex) {// root
-        this.debug("[ERROR]:" + message);
+        checkPrintStreamAvailable();
+        String msg = "[ERROR]:" + getPrefix() + message;
+        System.out.println(msg);
         try {
-            try {
-                printError(ex, true);
-                out.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                out.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ex.printStackTrace();
+            out.write(msg + "\n");
+            out.flush();
+            printError(ex, true);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             close();
         }
