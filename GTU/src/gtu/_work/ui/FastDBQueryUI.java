@@ -2139,7 +2139,7 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
             }
         } finally {
-            long duringTime = (System.currentTimeMillis() - startTime) / 1000;
+            BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
             queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
             JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
         }

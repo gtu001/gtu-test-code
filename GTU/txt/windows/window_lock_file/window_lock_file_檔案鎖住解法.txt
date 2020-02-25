@@ -1,0 +1,10 @@
+下載 handle
+	https://docs.microsoft.com/zh-tw/sysinternals/downloads/handle
+
+執行 $ handle64.exe > output.txt
+
+看路徑找來源鎖住的 pid 
+
+執行
+	Taskkill /IM firefox.exe /F
+	Taskkill /PID 26356 /F

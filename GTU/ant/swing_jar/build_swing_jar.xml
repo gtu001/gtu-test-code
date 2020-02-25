@@ -3,7 +3,7 @@
 	<loadproperties srcFile="build_swing_jar.properties" />
 
 	<!--<property name="src_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\src" />
-		<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
+	<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
 	<property name="build_dir" location="build" />
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
@@ -21,7 +21,7 @@
 
 
 	<!-- ant-contrib -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+	<!--<taskdef resource="net/sf/antcontrib/antcontrib.properties" />-->
 
 	<path id="my_test_classpath">
 		<pathelement path="${bin_dir}" />
@@ -33,6 +33,7 @@
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
+	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -81,6 +82,7 @@
 
 			<packagename mode="exact" name="webTest2.jar">gtu.log.finder.etc.WebTestUtil</packagename>
 			<packagename mode="small">org.apache.commons.fileupload.disk.DiskFileItemFactory</packagename><!-- for webTest2 -->
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -152,16 +154,28 @@
 			<param name="enable" value="false" />
 		</antcall>
 
+		<antcall target="notify">
+			<param name="enable" value="true" />
+		</antcall>
+	</target>
+
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
 		<exec executable="cmd">
 			<arg value="/c start echo create ${main_class}.jar complete!!" />
 		</exec>
+		-->
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
 	<target name="compiler">
 		<echo># compiler ...</echo>
 		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
-			<classpath path="${build_dir}" />
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
 		</javac>
 	</target>
 
@@ -176,15 +190,17 @@
 
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
-		<!--<jar destfile="${main_class}.jar" basedir="${build_dir}">
-			<manifest>
-				<attribute name="Main-Class" value="${main_class_full}" />
-			</manifest>
-		</jar>-->
+		<!--
+				<jar destfile="${main_class}.jar" basedir="${build_dir}">
+					<manifest>
+						<attribute name="Main-Class" value="${main_class_full}" />
+					</manifest>
+				</jar>
+				-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<!--<include name="**/*" />-->
 				<include name="**/*.class" />
 				<include name="**/janna.ico" />
@@ -208,7 +224,11 @@
 
 	<target name="runJar" if="${enable}">
 		<echo># run ${main_class}.jar</echo>
-		<java jar="${main_class}.jar" fork="true" />
+		<java jar="${main_class}.jar" fork="true">
+			<classpath>
+				<path location="${build_dir}" />
+			</classpath>
+		</java>
 	</target>
 
 	<target name="moveJarToDesktop" if="${enable}">
