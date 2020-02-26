@@ -883,7 +883,7 @@ public class FastDBQueryUI extends JFrame {
                 Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
                 int row = pair.getLeft();
                 int col = pair.getRight();
-                String column = (String) parametersTable.getValueAt(row, 0);
+                String column = (String) parametersTable.getValueAt(row, ParameterTableColumnDef.COLUMN.idx);
                 SqlParam bean = parseSqlToParam(sqlBean.sql);
                 if (bean instanceof SqlParam_IfExists) {
                     SqlParam_IfExists bean2 = (SqlParam_IfExists) bean;
@@ -1643,12 +1643,14 @@ public class FastDBQueryUI extends JFrame {
 
     private void initParametersTable() {
         JTableUtil.defaultSetting_AutoResize(parametersTable);
-        DefaultTableModel createModel = JTableUtil.createModel(false, new Object[] { "參數", "值", "類型" });
+        DefaultTableModel createModel = JTableUtil.createModel(//
+                new int[] { ParameterTableColumnDef.USE.idx, ParameterTableColumnDef.VALUE.idx, ParameterTableColumnDef.TYPE.idx }, //
+                new Object[] { "使用", "參數", "值", "類型" });
         parametersTable.setModel(createModel);
         JTableUtil.newInstance(parametersTable).setRowHeightByFontSize();
 
         // column = "Data Type"
-        TableColumn sportColumn = parametersTable.getColumnModel().getColumn(2);
+        TableColumn sportColumn = parametersTable.getColumnModel().getColumn(3);
         JComboBox comboBox = new JComboBox();
         for (DataType e : DataType.values()) {
             comboBox.addItem(e);
@@ -1968,7 +1970,7 @@ public class FastDBQueryUI extends JFrame {
         initParametersTable();
         DefaultTableModel createModel = (DefaultTableModel) parametersTable.getModel();
         for (String column : param.getOrderParametersLst()) {
-            createModel.addRow(new Object[] { column, "", DataType.varchar });
+            createModel.addRow(new Object[] { true, column, "", DataType.varchar });
         }
     }
 
@@ -1984,6 +1986,16 @@ public class FastDBQueryUI extends JFrame {
 
     private Object getRealValue(String value, DataType dataType) {
         return dataType.applyDataChange(value);
+    }
+
+    private enum ParameterTableColumnDef {
+        USE(0), COLUMN(1), VALUE(2), TYPE(3);
+
+        final int idx;
+
+        ParameterTableColumnDef(int idx) {
+            this.idx = idx;
+        }
     }
 
     /**
@@ -2008,16 +2020,29 @@ public class FastDBQueryUI extends JFrame {
             Set<String> forceAddColumns = new HashSet<String>();
 
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
-                String columnName = (String) util.getRealValueAt(ii, 0);
-                String value = (String) util.getRealValueAt(ii, 1);
+                Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
+                if (isInUse == null) {
+                    isInUse = false;
+                }
+
+                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
 
                 if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
                     // sql Injection
-                    sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                    if (isInUse) {
+                        sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                    } else {
+                        sqlInjectMap.put(columnName, null);
+                    }
                 } else {
                     // 一般處理
-                    DataType dataType = (DataType) util.getRealValueAt(ii, 2);
-                    paramMap.put(columnName, getRealValue(value, dataType));
+                    DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
+                    if (isInUse) {
+                        paramMap.put(columnName, getRealValue(value, dataType));
+                    } else {
+                        paramMap.put(columnName, null);
+                    }
 
                     if (dataType.isForceAddColumn()) {
                         forceAddColumns.add(columnName);
@@ -2101,8 +2126,8 @@ public class FastDBQueryUI extends JFrame {
                 JTableUtil util2 = JTableUtil.newInstance(parametersTable);
                 DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
                 for (int ii = 0; ii < model.getRowCount(); ii++) {
-                    String col = (String) util2.getRealValueAt(ii, 0);
-                    String val = (String) util2.getRealValueAt(ii, 1);
+                    String col = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                    String val = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
                     paramMap2.put(col, StringUtils.trimToEmpty(val));
                 }
                 try {
@@ -2631,7 +2656,7 @@ public class FastDBQueryUI extends JFrame {
         DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
         for (String col : paramSet) { // paramMap.keySet()
             String val = paramMap.get(col);
-            model.addRow(new Object[] { col, val, DataType.varchar });
+            model.addRow(new Object[] { true, col, val, DataType.varchar });
         }
     }
 
@@ -3230,8 +3255,8 @@ public class FastDBQueryUI extends JFrame {
                 JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
                 int sqlRowPos = 2;
                 for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
-                    int col1 = JTableUtil.getRealColumnPos(0, parametersTable);
-                    int val1 = JTableUtil.getRealColumnPos(1, parametersTable);
+                    int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
+                    int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
                     Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
                     Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
 
@@ -4261,7 +4286,7 @@ public class FastDBQueryUI extends JFrame {
             Map<String, String> paramMap = new LinkedHashMap<String, String>();
             JTableUtil util = JTableUtil.newInstance(parametersTable);
             for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
-                String columnName = (String) util.getRealValueAt(ii, 0);
+                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
                 String value = (String) util.getRealValueAt(ii, 1);
                 paramMap.put(columnName, value);
             }
