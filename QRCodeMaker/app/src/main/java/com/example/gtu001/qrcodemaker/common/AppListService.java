@@ -147,7 +147,7 @@ public class AppListService {
         private AppInfo _findByLst1(String installedPackage, List<AppInfo> lst) {
             for (int jj = 0; jj < lst.size(); jj++) {
                 AppInfo vo_ = lst.get(jj);
-                if (StringUtils.equals(vo_.getInstalledPackage(), vo_.getInstalledPackage())) {
+                if (StringUtils.equals(installedPackage, vo_.getInstalledPackage())) {
                     return vo_;
                 }
             }
@@ -157,7 +157,7 @@ public class AppListService {
         private AppInfoDAO.AppInfo _findByLst2(String installedPackage, List<AppInfoDAO.AppInfo> lst) {
             for (int jj = 0; jj < lst.size(); jj++) {
                 AppInfoDAO.AppInfo vo_ = lst.get(jj);
-                if (StringUtils.equals(vo_.getInstalledPackage(), vo_.getInstalledPackage())) {
+                if (StringUtils.equals(installedPackage, vo_.getInstalledPackage())) {
                     return vo_;
                 }
             }
@@ -170,8 +170,6 @@ public class AppListService {
             List<AppInfoDAO.AppInfo> lst2 = service.queryAll();//資料庫load
             logLst.add("sysReload " + lst.size());
             logLst.add("dbReload " + lst2.size());
-            int lst2Find = 0;
-            int lst1Find = 0;
             for (int ii = 0; ii < lst.size(); ii++) {
                 AppInfo vo = lst.get(ii);
                 AppInfoDAO.AppInfo vo2 = _findByLst2(vo.getInstalledPackage(), lst2);
@@ -185,7 +183,6 @@ public class AppListService {
                     service.insertData(vo2);
                     logLst.add("A " + vo.getInstalledPackage());
                 } else {
-                    lst2Find++;
                 }
             }
             for (int ii = 0; ii < lst2.size(); ii++) {
@@ -195,12 +192,9 @@ public class AppListService {
                     service.deleteId(vo2.getInstalledPackage());
                     logLst.add("D " + vo2.getInstalledPackage());
                 } else {
-                    lst1Find++;
                 }
             }
-            logLst.add("lst1Find " + lst1Find);
-            logLst.add("lst2Find " + lst2Find);
-            Log.line(TAG, StringUtils.join(logLst, "\r\n"));
+            Log.lineFix(TAG, StringUtils.join(logLst, "\r\n"));
         }
 
         private void appendTagToLst(String tag, List<String> tagLst) {
