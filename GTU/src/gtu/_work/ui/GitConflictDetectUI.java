@@ -60,6 +60,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.SwingActionUtil;
+import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
 
@@ -141,16 +142,28 @@ public class GitConflictDetectUI extends JFrame {
         if (!JFrameUtil.lockInstance(GitConflictDetectUI.class)) {
             return;
         }
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    GitConflictDetectUI frame = new GitConflictDetectUI();
-                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        // EventQueue.invokeLater(new Runnable() {
+        // public void run() {
+        // try {
+        // GitConflictDetectUI frame = new GitConflictDetectUI();
+        // gtu.swing.util.JFrameUtil.setVisible(true, frame);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // });
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "git.ico", GitConflictDetectUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setSize(701, 559 + 25);
+        tabUI.startUI();
+        System.out.println("done...");
     }
 
     /**

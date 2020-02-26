@@ -68,11 +68,13 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
+import gtu.swing.util.SwingTabTemplateUI;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -114,13 +116,27 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                DirectoryCompareUI inst = new DirectoryCompareUI();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        if (!JFrameUtil.lockInstance(DirectoryCompareUI.class)) {
+            return;
+        }
+        // SwingUtilities.invokeLater(new Runnable() {
+        // public void run() {
+        // DirectoryCompareUI inst = new DirectoryCompareUI();
+        // inst.setLocationRelativeTo(null);
+        // gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        // }
+        // });
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "file_merge.ico", DirectoryCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setSize(864, 563 + 25);
+        tabUI.startUI();
         System.out.println("done...");
     }
 
@@ -645,7 +661,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                         .addJMenuItem("左 -> 右 (蓋掉)", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                int[] rows = util.getSelectedRows();
+                                int[] rows = util.getSelectedRows(true);
                                 if (rows != null && rows.length >= 1) {
                                     if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("你選了" + rows.length + "檔案, 確定覆蓋?!", "覆蓋檔案")) {
                                         List<File> fileList = new ArrayList<File>();
@@ -669,7 +685,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                         .addJMenuItem("右 -> 左 (蓋掉)", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                int[] rows = util.getSelectedRows();
+                                int[] rows = util.getSelectedRows(true);
                                 if (rows != null && rows.length >= 1) {
                                     if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("你選了" + rows.length + "檔案, 確定覆蓋?!", "覆蓋檔案")) {
                                         List<File> fileList = new ArrayList<File>();
@@ -714,7 +730,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     private void pourOutFilesByOrignPath(boolean isLeftPourOut) {
         try {
             JTableUtil util = JTableUtil.newInstance(dirCompareTable);
-            int[] rows = util.getSelectedRows();
+            int[] rows = util.getSelectedRows(true);
             System.out.println(Arrays.toString(rows));
             if (rows == null || rows.length == 0) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("未選擇檔案!");
@@ -1557,6 +1573,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         DIFFERENT("不同"), //
         SAME("相同"),//
         ;
+
         String label;
 
         DiffMergeStatus(String label) {
@@ -1614,6 +1631,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             }
         },//
         ;
+
         String label;
 
         DiffMergeCommand(String label) {

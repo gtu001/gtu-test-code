@@ -165,8 +165,13 @@ public class AppListService {
         }
 
         private void reloadAllAppListToDB() {
-            List<AppInfo> lst = AppListService.getInstance().loadAllAppList(context);
-            List<AppInfoDAO.AppInfo> lst2 = service.queryAll();
+            List<String> logLst = new ArrayList<>();
+            List<AppInfo> lst = AppListService.getInstance().loadAllAppList(context);//系統重load
+            List<AppInfoDAO.AppInfo> lst2 = service.queryAll();//資料庫load
+            logLst.add("sysReload " + lst.size());
+            logLst.add("dbReload " + lst2.size());
+            int lst2Find = 0;
+            int lst1Find = 0;
             for (int ii = 0; ii < lst.size(); ii++) {
                 AppInfo vo = lst.get(ii);
                 AppInfoDAO.AppInfo vo2 = _findByLst2(vo.getInstalledPackage(), lst2);
@@ -178,15 +183,24 @@ public class AppListService {
                     vo2.setIcon(ImageBase64Util.encodeToBase64(vo.getIcon(), "png", 100));
                     vo2.setTag(vo.getTag());
                     service.insertData(vo2);
+                    logLst.add("A " + vo.getInstalledPackage());
+                } else {
+                    lst2Find++;
                 }
             }
-            for(int ii = 0 ; ii < lst2.size(); ii ++) {
+            for (int ii = 0; ii < lst2.size(); ii++) {
                 AppInfoDAO.AppInfo vo = lst2.get(ii);
                 AppInfo vo2 = _findByLst1(vo.getInstalledPackage(), lst);
                 if (vo2 == null) {
                     service.deleteId(vo2.getInstalledPackage());
+                    logLst.add("D " + vo2.getInstalledPackage());
+                } else {
+                    lst1Find++;
                 }
             }
+            logLst.add("lst1Find " + lst1Find);
+            logLst.add("lst2Find " + lst2Find);
+            Log.line(TAG, StringUtils.join(logLst, "\r\n"));
         }
 
         private void appendTagToLst(String tag, List<String> tagLst) {

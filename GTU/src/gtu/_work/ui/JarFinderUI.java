@@ -56,8 +56,10 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
 
 /**
@@ -85,13 +87,28 @@ public class JarFinderUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JarFinderUI inst = new JarFinderUI();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        if (!JFrameUtil.lockInstance(JarFinderUI.class)) {
+            return;
+        }
+        // SwingUtilities.invokeLater(new Runnable() {
+        // public void run() {
+        // JarFinderUI inst = new JarFinderUI();
+        // inst.setLocationRelativeTo(null);
+        // gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        // }
+        // });
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "jar.ico", JarFinderUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setSize(562, 407 + 25);
+        tabUI.startUI();
+        System.out.println("done...");
     }
 
     public JarFinderUI() {
@@ -186,8 +203,20 @@ public class JarFinderUI extends javax.swing.JFrame {
                             jPanel3.add(search, BorderLayout.CENTER);
                             search.setText("search");
                             search.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    jButton2ActionPerformed(evt);
+                                Thread thead = null;
+
+                                public void actionPerformed(final ActionEvent evt) {
+                                    if (thead == null || thead.getState() == Thread.State.TERMINATED) {
+                                        thead = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                jButton2ActionPerformed(evt);
+                                            }
+                                        });
+                                        thead.start();
+                                    } else {
+                                        JCommonUtil._jOptionPane_showMessageDialog_error("已經在搜尋,請耐心等待!");
+                                    }
                                 }
                             });
                         }
@@ -466,6 +495,8 @@ public class JarFinderUI extends javax.swing.JFrame {
                 File file = (File) enu.nextElement();
                 jarfinder.setDir(file).execute();
             }
+
+            JCommonUtil._jOptionPane_showMessageDialog_info("搜尋完畢!");
         } catch (Exception ex) {
             // JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(ex.getMessage(),
             // "error");

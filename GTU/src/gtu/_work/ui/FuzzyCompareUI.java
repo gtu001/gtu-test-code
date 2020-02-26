@@ -42,10 +42,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import gtu.spring.SimilarityUtil;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.TableColorDef;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.SwingTabTemplateUI;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -78,13 +80,28 @@ public class FuzzyCompareUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                FuzzyCompareUI inst = new FuzzyCompareUI();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        if (!JFrameUtil.lockInstance(FuzzyCompareUI.class)) {
+            return;
+        }
+        // SwingUtilities.invokeLater(new Runnable() {
+        // public void run() {
+        // FuzzyCompareUI inst = new FuzzyCompareUI();
+        // inst.setLocationRelativeTo(null);
+        // gtu.swing.util.JFrameUtil.setVisible(true, inst);
+        // }
+        // });
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "tk_aiengine.ico", FuzzyCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setSize(548, 376 + 25);
+        tabUI.startUI();
+        System.out.println("done...");
     }
 
     public FuzzyCompareUI() {

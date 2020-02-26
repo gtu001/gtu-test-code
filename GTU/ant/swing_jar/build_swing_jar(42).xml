@@ -72,6 +72,7 @@
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			
 			<packagename mode="pom">org.json.JSONObject</packagename>
+			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
 		</jarfinder>
 
