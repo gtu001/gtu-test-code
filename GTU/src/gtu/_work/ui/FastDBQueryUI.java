@@ -309,7 +309,7 @@ public class FastDBQueryUI extends JFrame {
 
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
     private JPanel panel_25;
-    private static final String ICO_FILENAME = "Pig_SC.ico";// "big_boobs.ico";
+    private static final String ICO_FILENAME = "big_boobs.ico";// "big_boobs.ico";//"Pig_SC.ico"
     private JButton setFontSizeBtn;
     private JComboBox sqlPageDbConnCombox;
     private final Predicate IGNORE_PREDICT = new Predicate() {

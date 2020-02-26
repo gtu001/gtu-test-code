@@ -11,7 +11,7 @@
 	<property name="main_class_full" value="gtu._work.ui.FastDBQueryUI" />
 	<property name="main_class" value="FastDBQueryUI" />
 	<property name="rename_jarname" value="${main_class}" />
-	<property name="icon_name" value="Pig_SC.ico" /><!-- big_boobs.ico -->
+	<property name="icon_name" value="big_boobs.ico" /><!-- "big_boobs.ico""Pig_SC.ico" -->
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
 	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
 	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
