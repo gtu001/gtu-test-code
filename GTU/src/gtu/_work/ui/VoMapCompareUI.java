@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +50,7 @@ import gtu.swing.util.JTableUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.swing.util.SwingTabTemplateUI;
 
 public class VoMapCompareUI extends JFrame {
 
@@ -81,16 +81,27 @@ public class VoMapCompareUI extends JFrame {
         if (!JFrameUtil.lockInstance(VoMapCompareUI.class)) {
             return;
         }
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    VoMapCompareUI frame = new VoMapCompareUI();
-                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        // EventQueue.invokeLater(new Runnable() {
+        // public void run() {
+        // try {
+        // VoMapCompareUI frame = new VoMapCompareUI();
+        // gtu.swing.util.JFrameUtil.setVisible(true, frame);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // });
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "google-maps.ico", VoMapCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+            @Override
+            public void beforeInit(SwingTabTemplateUI self) {
+            }
+
+            @Override
+            public void afterInit(SwingTabTemplateUI self) {
             }
         });
+        tabUI.setSize(610, 458 + 25);
+        tabUI.startUI();
     }
 
     /**
@@ -197,7 +208,7 @@ public class VoMapCompareUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/google-maps.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);

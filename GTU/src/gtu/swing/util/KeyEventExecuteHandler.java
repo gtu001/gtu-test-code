@@ -26,6 +26,10 @@ public class KeyEventExecuteHandler {
     private Transformer isDoExecuteEvent;
     private Component[] ignoreComps;
     private Predicate isIgnoreComps;
+    
+    public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
+        return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, null, null);
+    }
 
     public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable, Component[] ignoreComps) {
         return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, ignoreComps, null);

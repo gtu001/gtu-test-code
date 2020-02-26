@@ -2,7 +2,9 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -43,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -753,7 +756,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                 public void run() {
                     exeucteActionPerformed(null);
                 }
-            }, null);
+            }, new Component[] {});
 
             setTitleByTemplateName("");
 
@@ -1437,6 +1440,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         split("split", "split (分頁)", "strKey"), //
         sourceFiles("sourceFiles", "sourceFiles (固定來源檔)", "arryKey"),//
         ;
+
         final String key;
         final String label;
         final String type;
