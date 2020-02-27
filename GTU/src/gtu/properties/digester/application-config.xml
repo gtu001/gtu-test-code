@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application-config-here>
+	<properties>
+		<!-- 參數是否reload -->
+		<set-property property="APP_STATUS" value="INFO" />
+	
+		<!-- 遞歸查詢深度 -->
+		<set-property property="DEPTH_PATH" value="10" />
+		
+		<!-- 應用程序Locale -->
+		<set-property property="APP_LOCALE" value="zh_TW" />
+		
+		<!-- 轉向CSCP開關 -->
+		<set-property property="CSCP_SWITCH" value="false" />
+		<!-- SIT,UAT 參數
+		<set-property property="CSCP_URL" value="https://192.168.29.207:8443/cvs/login.do" /> -->
+		<!-- 上線前應CTCB IT要求修改 -->
+		<set-property property="CSCP_URL" value="https://192.168.29.207:8443/cvs/login.do" />
+		
+		<!-- 上傳FTP開關 -->
+		<set-property property="FTP_SWITCH" value="true" />
+		
+		<!-- MODIFY_SYSTEM -->
+		<set-property property="MODIFY_SYSTEM" value="前台" />
+		<set-property property="BIZUSER_DAO" value="b01BizuserDao" />
+	</properties>
+</application-config-here> 
+
+
+
