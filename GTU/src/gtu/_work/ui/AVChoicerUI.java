@@ -439,6 +439,15 @@ public class AVChoicerUI extends JFrame {
 
         moveToList = new JList();
         panel_11.add(JCommonUtil.createScrollComponent(moveToList), BorderLayout.CENTER);
+        JCommonUtil.applyDropFiles(moveToList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> droppedFiles = (List<File>) e.getSource();
+                if (!droppedFiles.isEmpty()) {
+                    moveToHandler.add(droppedFiles);
+                }
+            }
+        });
 
         JPanel panel_16 = new JPanel();
         tabbedPane.addTab("Config", null, panel_16, null);
@@ -590,6 +599,22 @@ public class AVChoicerUI extends JFrame {
         private PropertiesUtilBean moveConfig = new PropertiesUtilBean(MoveToHandler.class, AVChoicerUI.class.getSimpleName() + "_" + MoveToHandler.class.getSimpleName());
         // private PropertiesUtilBean moveConfig = new PropertiesUtilBean(new
         // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_MoveToHandler_config.properties"));
+
+        private void add(List<File> dropLst) {
+            try {
+                for (File dir : dropLst) {
+                    if (!dir.isDirectory() || !dir.exists()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在:" + dir);
+                        break;
+                    }
+                    moveConfig.getConfigProp().setProperty(dir.getAbsolutePath(), dir.getAbsolutePath());
+                }
+                reload();
+                moveToText.setText("");
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
 
         private void add() {
             try {
@@ -1012,12 +1037,12 @@ public class AVChoicerUI extends JFrame {
 
         private void openContainDir() {
             try {
-//                File dir = tempDir.get();
-//                if (!dir.exists()) {
-//                    JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
-//                    return;
-//                }
-//                Desktop.getDesktop().open(dir);
+                // File dir = tempDir.get();
+                // if (!dir.exists()) {
+                // JCommonUtil._jOptionPane_showMessageDialog_error("目錄不存在!");
+                // return;
+                // }
+                // Desktop.getDesktop().open(dir);
                 DesktopUtil.browseFileDirectory(getAvFile());
             } catch (Exception e) {
                 JCommonUtil.handleException(e);

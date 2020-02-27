@@ -348,6 +348,15 @@ public class RegexReplacer extends javax.swing.JFrame {
                         {
                             templateList = new JList();
                             jScrollPane3.setViewportView(templateList);
+                            JCommonUtil.applyDropFiles(templateList, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    List<File> files = (List<File>) e.getSource();
+                                    if (!files.isEmpty()) {
+                                        RegexReplacer.this.reloadingConfigFromFile(files.get(0));
+                                    }
+                                }
+                            });
                         }
                         JPanel northPanel_1 = new JPanel();
                         jPanel5.add(northPanel_1, BorderLayout.NORTH);
@@ -740,9 +749,7 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
             // config init
             {
-                File configFile = new File(yamlConfigFileText.getText());
-                configHandler = new PropConfigHandler(configFile, templateList, replaceArea, resultArea);
-                configHandler.reloadTemplateList();
+                this.reloadingConfigFromFile(new File(yamlConfigFileText.getText()));
             }
 
             this.setSize(672, 506);
@@ -776,6 +783,12 @@ public class RegexReplacer extends javax.swing.JFrame {
         Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void reloadingConfigFromFile(File yamlFile) {
+        yamlConfigFileText.setText(yamlFile.getAbsolutePath());
+        configHandler = new PropConfigHandler(yamlFile, templateList, replaceArea, resultArea);
+        configHandler.reloadTemplateList();
     }
 
     private void setTitleByTemplateName(String title) {
@@ -955,6 +968,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                         sb.append(config.prefix + "\r\n");
                     }
 
+                    int matchIndex = 0;
                     int startPos = 0;
                     for (; matcher.find();) {
                         tempStr = toFormat.toString();
@@ -978,6 +992,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                                 lstMap.put(ii, matcher.group(ii));
                             }
                             root.put(StringUtils.trimToEmpty(config.fremarkerKey), lstMap.values());
+                            root.put("index", matchIndex);
                             System.out.println("template Map : " + root);
                             tempStr = FreeMarkerSimpleUtil.replace(new File(freemarkBaseDirText.getText()), tempStr, root);
                         }
@@ -985,6 +1000,8 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                         sb.append(tempStr);
                         startPos = matcher.end();
+
+                        matchIndex++;
 
                         if (config.isOnlyMatch) {
                             sb.append("\r\n");
