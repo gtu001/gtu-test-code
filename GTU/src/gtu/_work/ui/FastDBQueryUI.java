@@ -822,13 +822,15 @@ public class FastDBQueryUI extends JFrame {
             private void updateColumnParameter(List<String> params) {
                 DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
                 A: for (int ii = 0; ii < model.getRowCount(); ii++) {
-                    String column = (String) model.getValueAt(ii, 0);
+                    String column = (String) model.getValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
                     int pos = ListUtil.indexOfIgnorecase(column, params);
                     if (pos != -1) {
                         for (int jj = 0; jj < params.size(); jj++) {
                             if (jj > pos) {
-                                model.setValueAt(params.get(jj), ii, jj);
-                                break A;
+                                if (params.get(jj) != null && !"null".equals(params.get(jj))) {
+                                    model.setValueAt(params.get(jj), ii, ParameterTableColumnDef.VALUE.idx);
+                                    break A;
+                                }
                             }
                         }
                     }
@@ -1499,7 +1501,7 @@ public class FastDBQueryUI extends JFrame {
                 DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
                 JTableUtil u = JTableUtil.newInstance(parametersTable);
                 for (int ii = 0; ii < model.getRowCount(); ii++) {
-                    u.setValueAt(false, "", ii, 1);
+                    u.setValueAt(false, "", ii, ParameterTableColumnDef.VALUE.idx);
                 }
             }
         });
@@ -1648,6 +1650,7 @@ public class FastDBQueryUI extends JFrame {
                 new Object[] { "使用", "參數", "值", "類型" });
         parametersTable.setModel(createModel);
         JTableUtil.newInstance(parametersTable).setRowHeightByFontSize();
+        JTableUtil.setColumnWidths_Percent(parametersTable, new float[] { 5, 32, 32, 31 });
 
         // column = "Data Type"
         TableColumn sportColumn = parametersTable.getColumnModel().getColumn(3);
