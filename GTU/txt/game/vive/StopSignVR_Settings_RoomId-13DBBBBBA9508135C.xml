@@ -80,7 +80,7 @@
 	</Boxes>
 </Settings>
 
-<!--
+<!-- 這塊要拿掉不然會有問題
 BoxSkin_BarbedWire.png
 BoxSkin_CautionBox.png
 BoxSkin_WireframeBlue.png
