@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Stop Sign VR Copyright (c) 2019-2020 Reality Inside Ltd. (s.r.o.). All rights reserved. -->
 <!-- Contact: Raivr on Reddit -->
-<Settings savedatetime="2020-03-07T01:54:49" app="Stop Sign VR">
+<Settings savedatetime="2020-03-07T19:04:25" app="Stop Sign VR">
 	<Parameters>
 		<Param name="SettingsFileVersion" value="700030002"/>
 		<Param name="NumBackupConfigFilesToKeep" value="12"/>
@@ -23,15 +23,15 @@
 		<Param name="HideCollisionBoundsGroundPerimeter_UseWithCare" value="false"/>
 		<Param name="HideCollisionBoundsCenterMarker" value="false"/>
 		<Param name="CeilingHeight_Meters" value="2.500000f"/>
-		<Param name="SilentWarningSignSize_Meters" value="0.20000f"/>
-		<Param name="AlertWarningSignSize_Meters" value="0.20000f"/>
+		<Param name="SilentWarningSignSize_Meters" value="0.200000f"/>
+		<Param name="AlertWarningSignSize_Meters" value="0.200000f"/>
 		<Param name="UseSound" value="true"/>
 		<Param name="UseSpatialAudio" value="true"/>
 		<Param name="SilentWarningSoundFileName" value="Geiger_tick_float32pcm24000mono.wav" info="Use 32bit float WAV, pcm, mono. Sample freq. *must* be 24 kHz."/>
-		<Param name="SilentWarningSoundVolume" value="0.00f"/>
+		<Param name="SilentWarningSoundVolume" value="0.000000f"/>
 		<Param name="AlertSoundFileName" value="Horn1_float32pcm24000mono.wav" info="Use 32bit float WAV, pcm, mono. Sample freq. *must* be 24 kHz."/>
-		<Param name="AlertSoundVolume" value="0.015f"/>
-		<Param name="SilentWarningActivationDistance_Meters" value="0.20000f"/>
+		<Param name="AlertSoundVolume" value="0.015000f"/>
+		<Param name="SilentWarningActivationDistance_Meters" value="0.200000f"/>
 		<Param name="SilentWarningTransparency" value="0.800000f"/>
 		<Param name="UseHapticFeedbackForAlerts" value="true"/>
 		<Param name="UseHapticFeedbackForSilentWarnings" value="false"/>
@@ -56,7 +56,7 @@
 				0.001757f, 0.999832f, -0.018234f, 1.324722f, 
 				0.997498f, -0.003041f, -0.070628f, 0.287685f"/>
 		</Box>
-		<Box Name="4" Width="0.549595f" Height="0.256349f" Depth="0.283905f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="10">
+		<Box Name="4" Width="0.549595f" Height="0.256349f" Depth="0.283905f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="false" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="10">
 			<Center HmdMatrix34="
 				0.999839f, -0.012654f, 0.012679f, 0.328947f, 
 				0.013458f, 0.997769f, -0.065390f, 0.753540f, 
@@ -77,13 +77,20 @@
 				0.0f, 0.0f, 1.0f, 0.00f"/>
 		</Box>
 		-->
-	</Boxes>
-</Settings>
-
 <!-- 這塊要拿掉不然會有問題
+1=NA
+2=床
+3=櫃
+4=電腦桌
+5=跑步機
 BoxSkin_BarbedWire.png
 BoxSkin_CautionBox.png
 BoxSkin_WireframeBlue.png
 BoxSkin_CoasterCork.png
 BoxSkin_GridOrange.png
 -->
+	</Boxes>
+</Settings>
+
+
+
