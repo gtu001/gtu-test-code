@@ -7,6 +7,7 @@ GTA5 VR
 	Settings> Camera>  First Person Head Bobbing       : Off
 	Settings> Camera>  First Person Third Person Cover : On
 	Settings> Camera>  First Person Vehicle Hood       : Off
+	Settings> Display> Subtitle                        : On
 
 
 
