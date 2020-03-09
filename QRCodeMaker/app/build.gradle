@@ -78,4 +78,11 @@ dependencies {
 //    implementation files('libs/selenium-remote-driver-3.141.59.jar')
 
     implementation 'com.android.support:multidex:1.0.3'
+
+    implementation group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15', {
+        exclude group: 'commons-beanutils'
+        exclude group: 'commons-collections'
+    }
+    implementation 'commons-beanutils:commons-beanutils:1.9.3'
+    implementation 'commons-collections:commons-collections:3.2.1'
 }

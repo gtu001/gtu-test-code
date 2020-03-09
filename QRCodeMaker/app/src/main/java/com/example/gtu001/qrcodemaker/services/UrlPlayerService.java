@@ -129,7 +129,7 @@ public class UrlPlayerService extends Service {
         return mp3Helper;
     }
 
-    private String startPlay(String name, String url) {
+    private String startPlay(String name, String url, int currentPosition) {
         Log.v(TAG, "#---startPlay : " + url);
         List<Mp3Bean> lst = new ArrayList<>();
         this.totalLst = lst;
@@ -138,7 +138,7 @@ public class UrlPlayerService extends Service {
         bean.setName(name);
         bean.setUrl(url);
         lst.add(bean);
-        getMp3Helper().setReplayMode(this.getApplicationContext(), name, lst);
+        getMp3Helper().setReplayMode(this.getApplicationContext(), name, currentPosition, lst);
         return "";
     }
 
@@ -230,7 +230,7 @@ public class UrlPlayerService extends Service {
 
             if (!this.totalLst.isEmpty()) {
                 String firstName = this.totalLst.get(0).getName();
-                getMp3Helper().setReplayMode(this.getApplicationContext(), firstName, this.totalLst);
+                getMp3Helper().setReplayMode(this.getApplicationContext(), firstName, -1, this.totalLst);
             }
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
@@ -297,8 +297,8 @@ public class UrlPlayerService extends Service {
         }
 
         @Override
-        public String startPlay(String name, String url) throws RemoteException {
-            return UrlPlayerService.this.startPlay(name, url);
+        public String startPlay(String name, String url, int currentPosition) throws RemoteException {
+            return UrlPlayerService.this.startPlay(name, url, currentPosition);
         }
 
         @Override

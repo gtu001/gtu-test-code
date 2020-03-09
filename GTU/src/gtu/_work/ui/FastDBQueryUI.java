@@ -1425,6 +1425,18 @@ public class FastDBQueryUI extends JFrame {
                 nextParameterBtnClick();
             }
         });
+
+        saveParameterTableBtn = new JButton("儲存參數");
+        saveParameterTableBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    saveParameterTableConfig(true);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_4.add(saveParameterTableBtn);
         panel_4.add(nextParameterBtn);
 
         connTestBtn = new JButton("測試連線");
@@ -2124,34 +2136,7 @@ public class FastDBQueryUI extends JFrame {
             }
 
             // 儲存參數設定
-            if (sqlParameterConfigLoadHandler.isInitOk()) {
-                Map<String, String> paramMap2 = new HashMap<String, String>();
-                JTableUtil util2 = JTableUtil.newInstance(parametersTable);
-                DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
-                for (int ii = 0; ii < model.getRowCount(); ii++) {
-                    String col = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
-                    String val = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
-                    paramMap2.put(col, StringUtils.trimToEmpty(val));
-                }
-                try {
-                    // 一般儲存參數處理
-                    sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
-                } catch (Exception ex) {
-                    // 出現異常詢問是否重設
-                    boolean resetOk = false;
-                    if (ex.getMessage().contains("參數不同")) {
-                        boolean resetConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(ex.getMessage(), "是否要重設?");
-                        if (resetConfirm) {
-                            sqlParameterConfigLoadHandler.clear();
-                            sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
-                            resetOk = true;
-                        }
-                    }
-                    if (!resetOk) {
-                        throw ex;
-                    }
-                }
-            }
+            saveParameterTableConfig(false);
 
             // 儲存sqlId mapping dataSource 設定
             sqlIdListDSMappingHandler.store();
@@ -2170,6 +2155,46 @@ public class FastDBQueryUI extends JFrame {
             BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
             queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
             JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+        }
+    }
+
+    // 儲存參數設定
+    private void saveParameterTableConfig(boolean showMsg) {
+        if (!sqlParameterConfigLoadHandler.isInitOk()) {
+            if (showMsg) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("參數設定檔未初始化!");
+            }
+            return;
+        } else {
+            Map<String, String> paramMap2 = new HashMap<String, String>();
+            JTableUtil util2 = JTableUtil.newInstance(parametersTable);
+            DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                String col = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                String val = (String) util2.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
+                paramMap2.put(col, StringUtils.trimToEmpty(val));
+            }
+            try {
+                // 一般儲存參數處理
+                sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
+            } catch (Exception ex) {
+                // 出現異常詢問是否重設
+                boolean resetOk = false;
+                if (ex.getMessage().contains("參數不同")) {
+                    boolean resetConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(ex.getMessage(), "是否要重設?");
+                    if (resetConfirm) {
+                        sqlParameterConfigLoadHandler.clear();
+                        sqlParameterConfigLoadHandler.saveConfig(paramMap2, sqlParamCommentArea.getText());
+                        resetOk = true;
+                    }
+                }
+                if (!resetOk) {
+                    throw new RuntimeException(ex);
+                }
+                if (showMsg) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("參數儲存成功!");
+                }
+            }
         }
     }
 
@@ -5282,4 +5307,5 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
+    private JButton saveParameterTableBtn;
 }

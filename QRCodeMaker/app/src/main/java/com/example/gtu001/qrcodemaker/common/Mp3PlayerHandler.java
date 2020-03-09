@@ -6,6 +6,9 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 
 import com.example.gtu001.qrcodemaker.Mp3Bean;
+import com.example.gtu001.qrcodemaker.Mp3PlayerActivity;
+
+import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -14,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -28,6 +33,7 @@ public class Mp3PlayerHandler {
     private MediaPlayer mediaplayer = new MediaPlayer();
     private static MyReplayListObj mMyReplayListObj;
     private AtomicBoolean isMediaInitDone = new AtomicBoolean(true);
+    private StoreStatusThread mStoreStatusThread;
 
     public Mp3PlayerHandler() {
     }
@@ -78,6 +84,13 @@ public class Mp3PlayerHandler {
             } else {
                 mediaplayer.setOnCompletionListener(mMyReplayListObj);
             }
+
+            //固定儲存進度
+            if (mStoreStatusThread != null) {
+                mStoreStatusThread.close();
+            }
+            mStoreStatusThread = new StoreStatusThread(mMyReplayListObj, context);
+            new Timer().schedule(mStoreStatusThread, 0, 10000);
 
             mediaplayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
@@ -140,7 +153,7 @@ public class Mp3PlayerHandler {
         }
     }
 
-    public void setReplayMode(Context context, final String currentName, final List<Mp3Bean> lst) {
+    public void setReplayMode(Context context, final String currentName, final int currentPosition, final List<Mp3Bean> lst) {
         Log.v(TAG, "setReplayMode size = " + lst.size());
         Log.v(TAG, "# ReplayList ----------- start");
         for (Mp3Bean b : lst) {
@@ -148,24 +161,26 @@ public class Mp3PlayerHandler {
         }
         Log.v(TAG, "# ReplayList ----------- end");
 
-        mMyReplayListObj = new MyReplayListObj(context, this, currentName, lst, true);
+        mMyReplayListObj = new MyReplayListObj(context, this, currentName, currentPosition, lst, true);
         mMyReplayListObj.onCompletion(this.mediaplayer);
     }
 
     public static class MyReplayListObj implements MediaPlayer.OnCompletionListener {
         String currentName = "";
         String currentPath = "";
+        int currentPosition;
         List<Mp3Bean> lst;
         Context context;
         Mp3PlayerHandler mp3PlayerHandler;
         boolean isFirst = false;
 
-        MyReplayListObj(Context context, Mp3PlayerHandler mMp3PlayerHandler, final String currentName, final List<Mp3Bean> lst, boolean isFirst) {
+        MyReplayListObj(Context context, Mp3PlayerHandler mMp3PlayerHandler, final String currentName, final int currentPosition, final List<Mp3Bean> lst, boolean isFirst) {
             this.context = context;
             this.currentName = currentName;
             this.lst = lst;
             this.mp3PlayerHandler = mMp3PlayerHandler;
             this.isFirst = isFirst;
+            this.currentPosition = currentPosition;
         }
 
         @Override
@@ -207,6 +222,10 @@ public class Mp3PlayerHandler {
 
                 mp3PlayerHandler.applyOf(lst.get(findIndex).getUrl(), context);
                 mp3PlayerHandler.mediaplayer.start();
+
+                if (currentPosition > 0) {
+                    mp3PlayerHandler.mediaplayer.seekTo(currentPosition);
+                }
 
                 Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());
 
@@ -270,5 +289,29 @@ public class Mp3PlayerHandler {
 
     public MyReplayListObj getCurrentBean() {
         return mMyReplayListObj;
+    }
+
+    private class StoreStatusThread extends TimerTask {
+        MyReplayListObj mMyReplayListObj;
+        Context context;
+        private Timer timer;
+
+        private void close() {
+            if (timer != null) {
+                timer.cancel();
+            }
+        }
+
+        public StoreStatusThread(MyReplayListObj mMyReplayListObj, Context context) {
+            this.mMyReplayListObj = mMyReplayListObj;
+            this.context = context;
+            this.timer = new Timer();
+        }
+
+        public void run() {
+            if (mMyReplayListObj != null) {
+                Mp3PlayerActivity.InitListViewHandler.saveCurrentMp3(mMyReplayListObj.currentName, mMyReplayListObj.currentPath, mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), context);
+            }
+        }
     }
 }

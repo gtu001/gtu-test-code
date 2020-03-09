@@ -5,7 +5,7 @@ package com.example.gtu001.qrcodemaker;
 
 interface IUrlPlayerService {
 
-    String startPlay(String name, String url);
+    String startPlay(String name, String url, int currentPosition);
 
     boolean isPlaying();
 

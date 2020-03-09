@@ -61,26 +61,15 @@ public class UrlPlayerDialog_bg {
     public UrlPlayerDialog_bg setUrl(String message, Mp3Bean bean, List<Mp3Bean> totalUrlList) {
         this.bean = bean;
 
-        if (this.bean == null) {
-            try {
-                Map currentBeanMap = this.urlPlayerServiceHander.get().getMService().getCurrentBean();
-                this.bean = Mp3Bean.valueOf(currentBeanMap);
-            } catch (Exception e) {
-                Log.e(TAG, "currentBeanMap ERR : " + e.getMessage(), e);
-                Toast.makeText(context, "開啟失敗" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                this.bean = new Mp3Bean();
-            }
-        }
-
         this.message = message;
         this.totalUrlList = totalUrlList;
         Log.v(TAG, "<<<<<<<< totalUrlList size : " + totalUrlList.size());
 
-        if (StringUtils.isBlank(this.message)) {
+        if (StringUtils.isBlank(this.message) && this.bean != null) {
             this.message = this.bean.getName();
         }
 
-        if (totalUrlList != null) {
+        if (totalUrlList != null && this.bean != null) {
             currentIndex = totalUrlList.indexOf(this.bean);
         }
 
@@ -205,12 +194,12 @@ public class UrlPlayerDialog_bg {
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
                     if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl());
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
                     } else {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl());
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -235,12 +224,12 @@ public class UrlPlayerDialog_bg {
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
                     if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl());
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
                     } else {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl());
+                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
@@ -327,6 +316,12 @@ public class UrlPlayerDialog_bg {
     }
 
     private void initService(SeekBar progressBar, TextView text_timer, TextView text_title, TextView text_content) {
+        if (mPercentProgressBarTimer != null) {
+            try {
+                mPercentProgressBarTimer.timer.cancel();
+            } catch (Exception ex) {
+            }
+        }
         mPercentProgressBarTimer = new PercentProgressBarTimer(this.context, progressBar, text_timer, text_title, text_content);
     }
 

@@ -1966,7 +1966,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 // 多項處理
                 if (true) {
                     final JTableUtil jtab = JTableUtil.newInstance(urlTable);
-                    final int[] rowArry = jtab.getSelectedRows();
+                    final int[] rowArry = jtab.getSelectedRows(true);
 
                     popupUtil//
                             .addJMenuItem("URL以參數開啟", new ActionListener() {
