@@ -206,9 +206,10 @@ public class UrlPlayerService extends Service {
         }
     }
 
-    public void setReplayMode(List<String> nameLst, List<String> pathLst, boolean isRandom) {
+    public void setReplayMode(String currentName, int currentPosition, List<String> nameLst, List<String> pathLst, boolean isRandom) {
         try {
             List<Mp3Bean> lst = new ArrayList<Mp3Bean>();
+            int firstIndex = 0;
             if (totalLst != null) {
                 Log.v(TAG, "TotalLst size : " + totalLst.size());
                 for (int ii = 0; ii < nameLst.size(); ii++) {
@@ -219,6 +220,10 @@ public class UrlPlayerService extends Service {
                     b.setUrl(url);
                     Log.v(TAG, "Add TotalLst : " + ReflectionToStringBuilder.toString(b));
                     lst.add(b);
+
+                    if (StringUtils.isNotBlank(currentName) && StringUtils.equals(currentName, name)) {
+                        firstIndex = ii;
+                    }
                 }
             }
 
@@ -229,8 +234,8 @@ public class UrlPlayerService extends Service {
             this.totalLst = lst;
 
             if (!this.totalLst.isEmpty()) {
-                String firstName = this.totalLst.get(0).getName();
-                getMp3Helper().setReplayMode(this.getApplicationContext(), firstName, -1, this.totalLst);
+                String firstName = this.totalLst.get(firstIndex).getName();
+                getMp3Helper().setReplayMode(this.getApplicationContext(), firstName, currentPosition, this.totalLst);
             }
         } catch (Exception ex) {
             Log.e(TAG, "ERR : " + ex.getMessage(), ex);
@@ -317,8 +322,8 @@ public class UrlPlayerService extends Service {
         }
 
         @Override
-        public void setReplayMode(List<String> nameLst, List<String> pathLst, boolean isRandom) throws RemoteException {
-            UrlPlayerService.this.setReplayMode(nameLst, pathLst, isRandom);
+        public void setReplayMode(String currentName, int currentPosition, List<String> nameLst, List<String> pathLst, boolean isRandom) throws RemoteException {
+            UrlPlayerService.this.setReplayMode(currentName, currentPosition, nameLst, pathLst, isRandom);
         }
 
         @Override

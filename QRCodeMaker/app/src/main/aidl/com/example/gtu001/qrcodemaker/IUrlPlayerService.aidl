@@ -19,7 +19,7 @@ interface IUrlPlayerService {
 
     Map getCurrentBean();
 
-    void setReplayMode(inout List<String> nameLst, inout List<String> pathLst, boolean isRandom);
+    void setReplayMode(String currentName, int currentPosition, inout List<String> nameLst, inout List<String> pathLst, boolean isRandom);
 
     void onProgressChange(int percent);
 

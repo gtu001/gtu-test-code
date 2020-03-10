@@ -509,7 +509,7 @@ public class UrlPlayerDialog_bg {
 
                 Map<String, String> toMap = new HashMap<String, String>();
                 toMap.put(bean.getName(), bean.getUrl());
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
                 Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -526,7 +526,7 @@ public class UrlPlayerDialog_bg {
                     pathLst.add(b.getUrl());
                 }
 
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(nameLst, pathLst, false);
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, false);
                 Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -543,7 +543,7 @@ public class UrlPlayerDialog_bg {
                     pathLst.add(b.getUrl());
                 }
 
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(nameLst, pathLst, true);
+                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, true);
                 Toast.makeText(self.context, "重複播放全部(隨機)", Toast.LENGTH_SHORT).show();
             }
         },//

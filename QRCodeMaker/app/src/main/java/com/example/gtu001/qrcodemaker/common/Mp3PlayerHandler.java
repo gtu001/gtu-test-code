@@ -168,7 +168,7 @@ public class Mp3PlayerHandler {
     public static class MyReplayListObj implements MediaPlayer.OnCompletionListener {
         String currentName = "";
         String currentPath = "";
-        int currentPosition;
+        int currentPosition = -1;
         List<Mp3Bean> lst;
         Context context;
         Mp3PlayerHandler mp3PlayerHandler;

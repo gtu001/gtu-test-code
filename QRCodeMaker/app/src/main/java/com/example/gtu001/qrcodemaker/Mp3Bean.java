@@ -34,6 +34,14 @@ public class Mp3Bean {
         return lastPosition;
     }
 
+    public int getLastPositionInt() {
+        try {
+            return Integer.parseInt(lastPosition);
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
+
     public static Mp3Bean valueOf(Map map) {
         if (map == null || map.isEmpty()) {
             return null;
